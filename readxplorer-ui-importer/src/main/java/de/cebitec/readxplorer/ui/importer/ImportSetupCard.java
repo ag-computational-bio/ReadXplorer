@@ -261,11 +261,11 @@ public class ImportSetupCard extends javax.swing.JPanel {
                             if( i < mappingFiles2.size() ) {
                                 file2 = mappingFiles2.get( i );
                             }
-                            this.addReadPairJobToList( readPairPane, file1, file2 );
+                            addReadPairJobToList( readPairPane, file1, file2 );
                         }
                     }
                     else {
-                        this.addReadPairJobToList( readPairPane, readPairPane.getMappingFile1(), readPairPane.getMappingFile2() );
+                        addReadPairJobToList( readPairPane, readPairPane.getMappingFile1(), readPairPane.getMappingFile2() );
                     }
 
                 }
@@ -274,7 +274,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
                     for( File mappingFile : newTrackPanel.getMappingFiles() ) {
 
-                        TrackJob trackJob = this.createTrackJob( newTrackPanel, mappingFile );
+                        TrackJob trackJob = createTrackJob( newTrackPanel, mappingFile );
                         trackJobView.add( trackJob );
                     }
                 }
@@ -363,7 +363,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
             trackJob2 = this.createTrackJob( readPairPane, mappingFile2 );
         }
 
-        this.readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,
+        readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,
                                                                   readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation() ) );
     }
 
@@ -380,12 +380,13 @@ public class ImportSetupCard extends javax.swing.JPanel {
      */
     private TrackJob createTrackJob( ImportTrackBasePanel importPanel, File mappingFile ) {
         ReferenceJob refJob = importPanel.getReferenceJob();
-        TrackJob trackJob = new TrackJob( trackID++, mappingFile,
+        TrackJob trackJob = new TrackJob( trackID, mappingFile,
                                           importPanel.useMultipleImport() && mappingFile != null ? mappingFile.getName() : importPanel.getTrackName(),
-                                          importPanel.getReferenceJob(),
+                                          refJob,
                                           importPanel.getCurrentParser(),
                                           importPanel.isAlreadyImported(),
                                           new Timestamp( System.currentTimeMillis() ) );
+        trackID++;
         refJob.registerTrackWithoutRunJob( trackJob );
         return trackJob;
     }

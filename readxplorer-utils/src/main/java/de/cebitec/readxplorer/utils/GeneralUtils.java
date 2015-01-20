@@ -267,21 +267,23 @@ public final class GeneralUtils {
      * @throws IOException
      */
     public static boolean deleteOldWorkFile( File lastWorkFile ) throws IOException {
-        boolean deleted = false;
+
         if( lastWorkFile.canWrite() ) {
             try {
                 Files.delete( lastWorkFile.toPath() );
-                deleted = true;
                 File indexFile = new File( lastWorkFile.getAbsolutePath().concat( Properties.BAM_INDEX_EXT ) );
                 if( indexFile.canWrite() ) {
                     Files.delete( indexFile.toPath() );
                 }
+                return true;
             }
             catch( IOException ex ) {
                 throw new IOException( NbBundle.getMessage( GeneralUtils.class, "MSG_GeneralUtils.FileDeletionError", lastWorkFile.getAbsolutePath() ) );
             }
         }
-        return deleted;
+
+        return false;
+
     }
 
 

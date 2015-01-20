@@ -137,27 +137,25 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * Processes all reference genome jobs of this import process.
      */
     private void processRefGenomeJobs() {
+
         if( !referenceJobs.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.ref" ) + ":" );
-            long start;
-            long finish;
-            String msg;
 
             for( Iterator<ReferenceJob> it = referenceJobs.iterator(); it.hasNext(); ) {
-                start = System.currentTimeMillis();
+                long start = System.currentTimeMillis();
                 ReferenceJob r = it.next();
                 ph.progress( workunits++ );
 
                 try {
                     // parsing
-                    ParsedReference refGen = this.parseRefJob( r );
+                    ParsedReference refGen = parseRefJob( r );
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.parsed" ) );
 
                     // storing
                     try {
                         storeRefGenome( refGen, r );
-                        finish = System.currentTimeMillis();
-                        msg = "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
+                        long finish = System.currentTimeMillis();
+                        String msg = "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
                         io.getOut().println( Benchmark.calculateDuration( start, finish, msg ) );
                     }
                     catch( StorageException ex ) {
@@ -207,18 +205,20 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * Processes track jobs (parsing and storing) of the current import.
      */
     private void processTrackJobs() {
+
         if( !tracksJobs.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.track" ) + ":" );
 
             for( Iterator<TrackJob> it = tracksJobs.iterator(); it.hasNext(); ) {
                 TrackJob trackJob = it.next();
 
-                this.parseBamTrack( trackJob );
+                parseBamTrack( trackJob );
 
                 ph.progress( workunits++ );
                 it.remove();
             }
         }
+
     }
 
 
@@ -227,19 +227,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.readPairs" ) + ":" );
 
-            long start;
-            long finish;
-            String msg;
-
             for( Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext(); ) {
-                start = System.currentTimeMillis();
                 ReadPairJobContainer readPairJobContainer = it.next();
 
                 int distance = readPairJobContainer.getDistance();
                 if( distance > 0 ) {
 
-                    int trackId1;
-                    int trackId2 = -1;
+//                    int trackId1;
+//                    int trackId2 = -1;
 
                     /*
                      * Algorithm:
@@ -258,12 +253,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                      * create position table (advantage: is already sorted by coordinate & classification in file)
                      */
 
-                    TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
-                    TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
-                    this.setChromLengthMap( trackJob1 );
+                    final TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
+                    final TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
+                    setChromLengthMap( trackJob1 );
                     File inputFile1 = trackJob1.getFile();
                     inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                    Boolean success;
                     StatsContainer statsContainer = new StatsContainer();
                     statsContainer.prepareForTrack();
                     statsContainer.prepareForReadPairTrack();
@@ -273,17 +267,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         try {
                             //executes any conversion before other calculations, if the parser supports any
                             trackJob1.getParser().registerObserver( this );
-                            success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
+                            boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
                             trackJob1.getParser().removeObserver( this );
                             if( !success ) {
-                                this.noErrors = false;
-                                this.showMsg( "Conversion of " + trackJob1.getName() + " failed!" );
+                                noErrors = false;
+                                showMsg( "Conversion of " + trackJob1.getName() + " failed!" );
                                 continue;
                             }
                             File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
 
-                            boolean isTwoTracks = trackJob2 != null;
-                            if( isTwoTracks ) { //only combine, if data is not already combined
+                            if( trackJob2 != null ) { //only combine, if data is not already combined
                                 File inputFile2 = trackJob2.getFile();
                                 inputFile2.setReadOnly();
                                 trackJob2.getParser().registerObserver( this );
@@ -291,8 +284,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 trackJob2.getParser().removeObserver( this );
                                 File lastWorkFile2 = trackJob2.getFile();
                                 if( !success ) {
-                                    this.noErrors = false;
-                                    this.showMsg( "Conversion of " + trackJob2.getName() + " failed!" );
+                                    noErrors = false;
+                                    showMsg( "Conversion of " + trackJob2.getName() + " failed!" );
                                     continue;
                                 }
 
@@ -301,8 +294,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 combiner.registerObserver( this );
                                 success = combiner.combineData();
                                 if( !success ) {
-                                    this.noErrors = false;
-                                    this.showMsg( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
+                                    noErrors = false;
+                                    showMsg( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
                                     continue;
                                 }
                                 GeneralUtils.deleteOldWorkFile( lastWorkFile ); //either were converted or are write protected
@@ -323,14 +316,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
                         }
                         catch( OutOfMemoryError ex ) {
-                            this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
-                            this.noErrors = false;
+                            showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
+                            noErrors = false;
                             continue;
                         }
-                        catch( Exception ex ) {
-                            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
+                        catch( ParsingException | IOException ex ) {
+                            showMsg( "Error during parsing of bam track: " + ex.getMessage() );
                             Exceptions.printStackTrace( ex );
-                            this.noErrors = false;
+                            noErrors = false;
                             continue;
                         }
                         ph.progress( workunits++ );
@@ -344,14 +337,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             statsParser.classifyReadPairs();
                         }
                         catch( OutOfMemoryError ex ) {
-                            this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
-                            this.noErrors = false;
+                            showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
+                            noErrors = false;
                             continue;
                         }
-                        catch( Exception ex ) {
-                            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
+                        catch( ParsingException ex ) {
+                            showMsg( "Error during parsing of bam track: " + ex.getMessage() );
                             Exceptions.printStackTrace( ex );
-                            this.noErrors = false;
+                            noErrors = false;
                             continue;
                         }
                         ph.progress( workunits++ );
@@ -364,19 +357,19 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
                     statsParser.removeObserver( this );
 
-                    this.storeBamTrack( track ); // store track entry in db
-                    trackId1 = trackJob1.getID();
+                    storeBamTrack( track ); // store track entry in db
+                    int trackId1 = trackJob1.getID();
                     inputFile1.setWritable( true );
                     ph.progress( workunits++ );
 //                    }
 
                     //read pair ids have to be set in track entry
-                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
+                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, -1 );
 
                 }
                 else { //if (distance <= 0)
-                    this.showMsg( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.error" ) );
-                    this.noErrors = false;
+                    showMsg( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.error" ) );
+                    noErrors = false;
                 }
 
                 ph.progress( workunits++ );
@@ -404,8 +397,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
          * create statistics (advantage: is already sorted by coordinate & classification in file)
          */
 
-        this.setChromLengthMap( trackJob );
-        boolean success;
+        setChromLengthMap( trackJob );
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
 
@@ -416,7 +408,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
             inputFile.setReadOnly(); //prevents changes or deletion of original file!
             try {
                 //executes any conversion before other calculations, if the parser supports any
-                success = trackJob.getParser().convert( trackJob, chromLengthMap );
+                boolean success = trackJob.getParser().convert( trackJob, chromLengthMap );
                 File lastWorkFile = trackJob.getFile();
 
                 //generate classification data in file sorted by read sequence
@@ -431,14 +423,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
             }
             catch( OutOfMemoryError ex ) {
-                this.showMsg( "Out of memory error during parsing of bam track: " + ex.getMessage() );
-                this.noErrors = false;
+                showMsg( "Out of memory error during parsing of bam track: " + ex.getMessage() );
+                noErrors = false;
                 return;
             }
-            catch( Exception ex ) {
-                this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
+            catch( ParsingException | IOException ex ) {
+                showMsg( "Error during parsing of bam track: " + ex.getMessage() );
                 Exceptions.printStackTrace( ex ); //TODO: remove this error handling
-                this.noErrors = false;
+                noErrors = false;
                 return;
             }
             ph.progress( workunits++ );
@@ -453,7 +445,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
         statsParser.removeObserver( this );
 
-        this.storeBamTrack( track );
+        storeBamTrack( track );
+
     }
 
 
@@ -472,7 +465,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         workunits = 0;
 
         ph.progress( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.progress.ref" ) + "...", workunits );
-        this.processRefGenomeJobs();
+        processRefGenomeJobs();
 
         // track jobs have to be imported last, because they may depend upon previously imported genomes, runs
         ph.progress( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.progress.track" ) + "...", workunits );
@@ -480,14 +473,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         //get system JVM info:
         Runtime rt = Runtime.getRuntime();
 
-        this.showMsg( "Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
-        this.showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
-        this.showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully." );
-        this.showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
-        this.showMsg( "" );
+        showMsg( "Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
+        showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
+        showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully." );
+        showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
+        showMsg( "" );
 
-        this.processTrackJobs();
-        this.processReadPairJobs();
+        processTrackJobs();
+        processReadPairJobs();
 
         return null;
     }
@@ -497,7 +490,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
     protected void done() {
         super.done();
         ph.progress( workunits );
-        if( this.noErrors ) {
+        if( noErrors ) {
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.finished" ) );
         }
         else {
@@ -513,11 +506,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements
     @Override
     public void update( Object data ) {
         if( data.toString().contains( "processed" ) || data.toString().contains( "converted" ) || data.toString().contains( "indexed" ) ) {
-            this.ph.progress( data.toString() );
+            ph.progress( data.toString() );
         }
         else {
-            this.showMsg( data.toString() );
-            this.ph.progress( "" );
+            showMsg( data.toString() );
+            ph.progress( "" );
         }
     }
 
@@ -531,7 +524,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * @param msg the msg to print
      */
     private void showMsg( String msg ) {
-        this.io.getOut().println( "\"" + msg );
+        io.getOut().println( "\"" + msg );
     }
 
 
@@ -542,14 +535,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     private void storeBamTrack( ParsedTrack track ) {
         try {
-            io.getOut().println( track.getTrackName() + ": " + this.getBundleString( "MSG_ImportThread.import.start.trackdirect" ) );
+            io.getOut().println( track.getTrackName() + ": " + getBundleString( "MSG_ImportThread.import.start.trackdirect" ) );
             ProjectConnector.getInstance().storeBamTrack( track );
             ProjectConnector.getInstance().storeTrackStatistics( track.getStatsContainer(), track.getID() );
-            io.getOut().println( this.getBundleString( "MSG_ImportThread.import.success.trackdirect" ) );
+            io.getOut().println( getBundleString( "MSG_ImportThread.import.success.trackdirect" ) );
 
         }
         catch( OutOfMemoryError e ) {
-            io.getOut().println( this.getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
+            io.getOut().println( getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
         }
     }
 

@@ -1289,7 +1289,7 @@ public class ProjectConnector extends Observable {
     /**
      * Resets the file path of a direct access reference.
      * <p>
-     * @param track track whose file path has to be resetted.
+     * @param track track whose file path has to be reseted.
      * <p>
      * @throws StorageException
      */

@@ -52,7 +52,7 @@ public class SamBamSorter implements Observable {
      * given TrackJob.
      */
     public SamBamSorter() {
-        this.observers = new ArrayList<>();
+        observers = new ArrayList<>();
     }
 
 
@@ -107,7 +107,7 @@ public class SamBamSorter implements Observable {
                         } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                     }
                 }
-                this.notifyObservers( "Writing sorted bam file... " );
+                notifyObservers( "Writing sorted bam file... " );
                 samItor.close();
                 writer.close();
 
@@ -129,7 +129,7 @@ public class SamBamSorter implements Observable {
             msg = Bundle.MSG_SamBamSorter_sort_Failed( trackJob.getFile() );
         }
         long finish = System.currentTimeMillis();
-        this.notifyObservers( Benchmark.calculateDuration( start, finish, msg ) );
+        notifyObservers( Benchmark.calculateDuration( start, finish, msg ) );
         return success;
     }
 

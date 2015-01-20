@@ -295,7 +295,7 @@ public final class CommonsMappingParser {
                     // store the char from input file, if this is a modification in the read
                     ParsedDiff diff = new ParsedDiff( start, base );
                     diffs.add( diff );
-                    ++start;
+                    start++;
                 }
             }
             else {
@@ -449,8 +449,8 @@ public final class CommonsMappingParser {
      * @param refSeqLength the length of the reference sequence
      * @param start        the start of the mapping
      * @param stop         the stop of the mapping
-     * @param filename     the file name of which the mapping originates
-     * @param lineno       the line number in the filelineNo<p>
+     * @param fileName     the file name of which the mapping originates
+     * @param lineNo       the line number in the filelineNo<p>
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkRead( final MessageSenderI parent,
@@ -458,24 +458,24 @@ public final class CommonsMappingParser {
                                      final int refSeqLength,
                                      final int start,
                                      final int stop,
-                                     final String filename,
+                                     final String fileName,
                                      final int lineNo ) {
 
         boolean isConsistent = true;
         if( readSeq == null || readSeq.isEmpty() ) {
             parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                                                          "Parser.checkMapping.ErrorReadEmpty", filename, lineNo, readSeq ) );
+                                                          "Parser.checkMapping.ErrorReadEmpty", fileName, lineNo, readSeq ) );
             isConsistent = false;
         }
         if( refSeqLength < start || refSeqLength < stop ) {
             parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
                                                           "Parser.checkMapping.ErrorReadPosition",
-                                                          filename, lineNo, start, stop, refSeqLength ) );
+                                                          fileName, lineNo, start, stop, refSeqLength ) );
             isConsistent = false;
         }
         if( start >= stop ) {
             parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                                                          "Parser.checkMapping.ErrorStartStop", filename, lineNo, start, stop ) );
+                                                          "Parser.checkMapping.ErrorStartStop", fileName, lineNo, start, stop ) );
             isConsistent = false;
         }
 
@@ -550,18 +550,16 @@ public final class CommonsMappingParser {
      * <p>
      * @return true, if the read is consistent, false otherwise
      */
-    public static boolean checkReadJok(
-
-            final MessageSenderI parent,
-            final String readSeq,
-            final String readname,
-            final String refSeq,
-            final int refSeqLength,
-            final int start,
-            final int stop,
-            final int direction,
-            final String filename,
-            final int lineno ) {
+    public static boolean checkReadJok( final MessageSenderI parent,
+                                        final String readSeq,
+                                        final String readname,
+                                        final String refSeq,
+                                        final int refSeqLength,
+                                        final int start,
+                                        final int stop,
+                                        final int direction,
+                                        final String filename,
+                                        final int lineno ) {
 
         boolean isConsistent = CommonsMappingParser.checkRead( parent, readSeq, refSeqLength, start, stop, filename, lineno );
 

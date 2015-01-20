@@ -49,7 +49,7 @@ public class Pair<T1, T2> {
      * @return The first element of the Pair.
      */
     public T1 getFirst() {
-        return this.o1;
+        return o1;
     }
 
 
@@ -59,7 +59,7 @@ public class Pair<T1, T2> {
      * @return The second element of the Pair.
      */
     public T2 getSecond() {
-        return this.o2;
+        return o2;
     }
 
 
@@ -122,15 +122,16 @@ public class Pair<T1, T2> {
      */
     @Override
     public String toString() {
-        return "Pair{" + this.o1 + ", " + this.o2 + "}";
+        return "Pair{" + o1 + ", " + o2 + "}";
     }
 
 
     @Override
     public int hashCode() {
+
         int hash = 3;
-        hash = 29 * hash + (this.o1 != null ? this.o1.hashCode() : 0);
-        hash = 29 * hash + (this.o2 != null ? this.o2.hashCode() : 0);
+        hash = 29 * hash + (o1 != null ? o1.hashCode() : 0);
+        hash = 29 * hash + (o2 != null ? o2.hashCode() : 0);
         return hash;
     }
 

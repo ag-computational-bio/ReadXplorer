@@ -177,7 +177,7 @@ public class StatsContainer {
     public void prepareForReadPairTrack() {
         prepareForStats(getListOfReadPairStatistics());
     }
-    
+
     /**
      * Prepares the container for a predefined list of statistics identifiers.
      * @param statsIdList The list of statistics identifiers to store in this
@@ -185,7 +185,7 @@ public class StatsContainer {
      */
     private void prepareForStats(List<String> statsIdList) {
         for( String statsId : statsIdList ) {
-            this.statsMap.put( statsId, 0 );
+            statsMap.put( statsId, 0 );
         }
     }
 
@@ -197,7 +197,7 @@ public class StatsContainer {
      * @param increaseValue the value to add to the old value of the key
      */
     public void increaseValue( String key, int increaseValue ) {
-        this.statsMap.put( key, this.statsMap.get( key ) + increaseValue );
+        statsMap.put( key, statsMap.get( key ) + increaseValue );
     }
 
 
@@ -211,65 +211,65 @@ public class StatsContainer {
     public void incReadPairStats( final ReadPairType type, final int value ) {
 
         if( type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR ) {
-            this.increaseValue( NO_READ_PAIRS, value );
-            this.increaseValue( NO_PERF_PAIRS, value );
+            increaseValue( NO_READ_PAIRS, value );
+            increaseValue( NO_PERF_PAIRS, value );
             if( type == ReadPairType.PERFECT_UNQ_PAIR ) {
-                this.increaseValue( NO_UNIQUE_PAIRS, value );
-                this.increaseValue( NO_UNIQ_PERF_PAIRS, value );
+                increaseValue( NO_UNIQUE_PAIRS, value );
+                increaseValue( NO_UNIQ_PERF_PAIRS, value );
             }
         }
         else if( type == ReadPairType.DIST_SMALL_PAIR || type == ReadPairType.DIST_SMALL_UNQ_PAIR ) {
-            this.increaseValue( NO_READ_PAIRS, value );
-            this.increaseValue( NO_SMALL_DIST_PAIRS, value );
+            increaseValue( NO_READ_PAIRS, value );
+            increaseValue( NO_SMALL_DIST_PAIRS, value );
             if( type == ReadPairType.DIST_SMALL_UNQ_PAIR ) {
-                this.increaseValue( NO_UNIQUE_PAIRS, value );
-                this.increaseValue( NO_UNIQ_SMALL_PAIRS, value );
+                increaseValue( NO_UNIQUE_PAIRS, value );
+                increaseValue( NO_UNIQ_SMALL_PAIRS, value );
             }
         }
         else if( type == ReadPairType.DIST_LARGE_PAIR || type == ReadPairType.DIST_LARGE_UNQ_PAIR ) {
-            this.increaseValue( NO_READ_PAIRS, value );
-            this.increaseValue( NO_LARGE_DIST_PAIRS, value );
+            increaseValue( NO_READ_PAIRS, value );
+            increaseValue( NO_LARGE_DIST_PAIRS, value );
             if( type == ReadPairType.DIST_LARGE_UNQ_PAIR ) {
-                this.increaseValue( NO_UNIQUE_PAIRS, value );
-                this.increaseValue( NO_UNIQ_LARGE_PAIRS, value );
+                increaseValue( NO_UNIQUE_PAIRS, value );
+                increaseValue( NO_UNIQ_LARGE_PAIRS, value );
             }
         }
         else if( type == ReadPairType.ORIENT_WRONG_PAIR || type == ReadPairType.ORIENT_WRONG_UNQ_PAIR ) {
-            this.increaseValue( NO_READ_PAIRS, value );
-            this.increaseValue( NO_ORIENT_WRONG_PAIRS, value );
+            increaseValue( NO_READ_PAIRS, value );
+            increaseValue( NO_ORIENT_WRONG_PAIRS, value );
             if( type == ReadPairType.ORIENT_WRONG_UNQ_PAIR ) {
-                this.increaseValue( NO_UNIQUE_PAIRS, value );
-                this.increaseValue( NO_UNIQ_ORIENT_WRONG_PAIRS, value );
+                increaseValue( NO_UNIQUE_PAIRS, value );
+                increaseValue( NO_UNIQ_ORIENT_WRONG_PAIRS, value );
             }
         }
         else if( type == ReadPairType.OR_DIST_SMALL_PAIR || type == ReadPairType.OR_DIST_SMALL_UNQ_PAIR ) {
-            this.increaseValue( NO_READ_PAIRS, value );
-            this.increaseValue( NO_SMALL_ORIENT_WRONG_PAIRS, value );
+            increaseValue( NO_READ_PAIRS, value );
+            increaseValue( NO_SMALL_ORIENT_WRONG_PAIRS, value );
             if( type == ReadPairType.OR_DIST_SMALL_PAIR ) {
-                this.increaseValue( NO_UNIQUE_PAIRS, value );
-                this.increaseValue( NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, value );
+                increaseValue( NO_UNIQUE_PAIRS, value );
+                increaseValue( NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, value );
             }
         }
         else if( type == ReadPairType.OR_DIST_LARGE_PAIR || type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR ) {
-            this.increaseValue( NO_READ_PAIRS, value );
-            this.increaseValue( NO_LARGE_ORIENT_WRONG_PAIRS, value );
+            increaseValue( NO_READ_PAIRS, value );
+            increaseValue( NO_LARGE_ORIENT_WRONG_PAIRS, value );
             if( type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR ) {
-                this.increaseValue( NO_UNIQUE_PAIRS, value );
-                this.increaseValue( NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, value );
+                increaseValue( NO_UNIQUE_PAIRS, value );
+                increaseValue( NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, value );
             }
         }
         else { //if (type == Properties.TYPE_UNPAIRED_PAIR) {
-            this.increaseValue( NO_SINGLE_MAPPIGNS, value );
+            increaseValue( NO_SINGLE_MAPPIGNS, value );
         }
     }
 
     /**
-     * @return The list of track statistics identifiers stored in this 
+     * @return The list of track statistics identifiers stored in this
      * container.
      */
     public static List<String> getListOfTrackStatistics() {
-        List<String> statsList = new ArrayList<>();
-        
+        List<String> statsList = new ArrayList<>( MappingClass.values().length + 7 );
+
         for( MappingClass mappingClass : MappingClass.values() ) {
             statsList.add( mappingClass.getTypeString() );
             statsList.add( mappingClass.getTypeString() + StatsContainer.COVERAGE_STRING );
@@ -281,17 +281,17 @@ public class StatsContainer {
         statsList.add( NO_UNIQ_MAPPINGS );
         statsList.add( NO_READS );
         statsList.add( AVERAGE_READ_LENGTH );
-        
+
         return statsList;
     }
-    
+
     /**
      * @return The list of additional read pair track statistics identifiers
      * stored in this container.
      */
     public static List<String> getListOfReadPairStatistics() {
-        List<String> statsList = new ArrayList<>();
-        
+        List<String> statsList = new ArrayList<>( 20 );
+
         statsList.add( NO_READ_PAIRS );
         statsList.add( NO_PERF_PAIRS );
         statsList.add( NO_ORIENT_WRONG_PAIRS );
@@ -308,7 +308,7 @@ public class StatsContainer {
         statsList.add( NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS );
         statsList.add( NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS );
         statsList.add( AVERAGE_READ_PAIR_SIZE );
-        
+
         return statsList;
     }
 

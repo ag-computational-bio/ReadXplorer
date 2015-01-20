@@ -33,7 +33,7 @@ import org.openide.util.Exceptions;
 
 
 /**
- * A fetcher for any part of a referenc sequence stored in an indexed fasta
+ * A fetcher for any part of a reference sequence stored in an indexed fasta
  * file.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
@@ -59,8 +59,8 @@ public class RefSeqFetcher implements Observable {
             refFile = new IndexedFastaSequenceFile( indexedFastaFile );
         }
         catch( FileNotFoundException ex ) {
-            this.notifyObservers( "Fasta reference index file not found. Please make sure it exist." );
-            this.notifyObservers( ex.getMessage() );
+            notifyObservers( "Fasta reference index file not found. Please make sure it exist." );
+            notifyObservers( ex.getMessage() );
         }
         catch( PicardException e ) {
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + indexedFastaFile.getAbsolutePath();
@@ -98,19 +98,19 @@ public class RefSeqFetcher implements Observable {
 
     @Override
     public void registerObserver( Observer observer ) {
-        this.observers.add( observer );
+        observers.add( observer );
     }
 
 
     @Override
     public void removeObserver( Observer observer ) {
-        this.observers.remove( observer );
+        observers.remove( observer );
     }
 
 
     @Override
     public void notifyObservers( Object data ) {
-        for( Observer observer : this.observers ) {
+        for( Observer observer : observers ) {
             observer.update( data );
         }
     }

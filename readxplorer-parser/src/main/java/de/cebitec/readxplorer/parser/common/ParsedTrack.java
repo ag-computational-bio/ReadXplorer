@@ -35,8 +35,7 @@ import java.util.Map;
 public class ParsedTrack {
 
     private final TrackJob trackJob;
-    private Map<String, Integer> readNameToSeqIDMap1;
-//    private Map<String, Integer> readNameToSeqIDMap2;
+    private Map<String, Integer> readNameToSeqIDMap;
     private boolean isFirstTrack;
     private int batchPos;
     /**
@@ -53,7 +52,7 @@ public class ParsedTrack {
      */
     public ParsedTrack( TrackJob trackJob ) {
         this.trackJob = trackJob;
-        this.readNameToSeqIDMap1 = new HashMap<>();
+        this.readNameToSeqIDMap = new HashMap<>();
 //        this.readNameToSeqIDMap2 = new HashMap<>();
     }
 
@@ -124,7 +123,7 @@ public class ParsedTrack {
      *                   pair
      */
     public void setReadnameToSeqIdMap1( HashMap<String, Integer> seqToIdMap ) {
-        this.readNameToSeqIDMap1 = seqToIdMap;
+        this.readNameToSeqIDMap = seqToIdMap;
     }
 
 
@@ -144,7 +143,7 @@ public class ParsedTrack {
      * All other information persists!
      */
     public void clear() {
-        this.readNameToSeqIDMap1.clear();
+        this.readNameToSeqIDMap.clear();
     }
 
 

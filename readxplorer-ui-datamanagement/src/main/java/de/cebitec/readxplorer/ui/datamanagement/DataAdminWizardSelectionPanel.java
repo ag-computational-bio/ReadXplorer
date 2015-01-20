@@ -85,31 +85,32 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
 
 
     private Map<String, List<? extends Job>> getDeletableReferencesAndTracks() {
+
         List<ReferenceJob> refJobs = new ArrayList<>();
         List<TrackJob> trackJobs = new ArrayList<>();
-        HashMap<Integer, ReferenceJob> indexedRefs = new HashMap<>();
+        Map<Integer, ReferenceJob> indexedRefs = new HashMap<>();
 
         try {
 
             List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
             for( PersistentReference ref : refs ) {
                 // File and parser parameter meaningless in this context
-                ReferenceJob r = new ReferenceJob( ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );
-                indexedRefs.put( r.getID(), r );
-                refJobs.add( r );
+                ReferenceJob rj = new ReferenceJob( ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );
+                indexedRefs.put( rj.getID(), rj );
+                refJobs.add( rj );
             }
 
             List<PersistentTrack> dbTracks = ProjectConnector.getInstance().getTracks();
             for( PersistentTrack dbTrack : dbTracks ) {
                 // File and parser, refgenjob, runjob parameters meaningless in this context
-                TrackJob t = new TrackJob( dbTrack.getId(), new File( dbTrack.getFilePath() ),
+                TrackJob tj = new TrackJob( dbTrack.getId(), new File( dbTrack.getFilePath() ),
                                            dbTrack.getDescription(), indexedRefs.get( dbTrack.getRefGenID() ),
                                            null, false, dbTrack.getTimestamp() );
 
                 // register dependent tracks at genome and run
                 ReferenceJob gen = indexedRefs.get( dbTrack.getRefGenID() );
-                gen.registerTrackWithoutRunJob( t ); //TODO: check if track without run job is still needed
-                trackJobs.add( t );
+                gen.registerTrackWithoutRunJob( tj ); //TODO: check if track without run job is still needed
+                trackJobs.add( tj );
             }
 
         }
@@ -122,6 +123,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
         deletableStuff.put( "references", refJobs );
         deletableStuff.put( "tracks", trackJobs );
         return deletableStuff;
+
     }
 
 
