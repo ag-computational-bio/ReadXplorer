@@ -18,7 +18,7 @@
 package bio.comp.jlu.readxplorer.cli.imports;
 
 
-import bio.comp.jlu.readxplorer.cli.imports.ImportMatePairReadsCallable.ImportMatePairResults;
+import bio.comp.jlu.readxplorer.cli.imports.ImportMatePairCallable.ImportMatePairResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
@@ -66,9 +66,9 @@ import org.netbeans.api.sendopts.CommandException;
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
-public final class ImportMatePairReadsCallable implements Callable<ImportMatePairResults> {
+public final class ImportMatePairCallable implements Callable<ImportMatePairResults> {
 
-    private static final Logger LOG = Logger.getLogger( ImportMatePairReadsCallable.class.getName() );
+    private static final Logger LOG = Logger.getLogger(ImportMatePairCallable.class.getName() );
 
     private final ImportReferenceResult  referenceResult;
     private final File trackAFile;
@@ -77,7 +77,7 @@ public final class ImportMatePairReadsCallable implements Callable<ImportMatePai
 
 
 
-    public ImportMatePairReadsCallable( ImportReferenceResult referenceResult, File trackAFile, File trackBFile ) {
+    public ImportMatePairCallable( ImportReferenceResult referenceResult, File trackAFile, File trackBFile ) {
 
         this.referenceResult = referenceResult;
         this.trackAFile = trackAFile;

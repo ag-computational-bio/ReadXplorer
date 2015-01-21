@@ -18,15 +18,19 @@
 package bio.comp.jlu.readxplorer.cli;
 
 
+import bio.comp.jlu.readxplorer.cli.imports.ImportMatePairCallable;
+import bio.comp.jlu.readxplorer.cli.imports.ImportMatePairCallable.ImportMatePairResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable;
+import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable.ImportTrackResults;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.io.PrintStream;
+import java.nio.file.FileSystems;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +103,8 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     @Arg( longName = "rpkm" )
     @Description( displayName = "RPKM", shortDescription = "XXX analysis." )
     public boolean rpkmAnalysis;
+
+
 
 
     @Override
@@ -185,7 +191,7 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
         final ProjectConnector pc = ProjectConnector.getInstance();
         try {
             if( dbFileArg == null  ||  dbFileArg.isEmpty() )
-                dbFileArg = System.getProperty( "user.dir") + "/tmp-db";
+                dbFileArg = System.getProperty( "user.dir") + FileSystems.getDefault().getSeparator() + "tmp-db";
             pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
             LOG.log( Level.CONFIG, "connected to {0}", dbFileArg );
         }
@@ -217,7 +223,7 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
             for( String msg : referenceResult.getOutput() ) {
                 printInfo( ps, msg );
             }
-            
+
             // stores reference sequence in the db
             LOG.log( Level.FINE, "start storing reference to db..." );
             pc.addRefGenome( referenceResult.getParsedReference() );
@@ -239,15 +245,15 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
             try {
                 printInfo( ps, "import tracks..." );
                 // submit track parse jobs for (concurrent) execution
-                List<Future<ImportTrackCallable.ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
+                List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
                 for( File trackFile : trackFiles ) {
-                    Future<ImportTrackCallable.ImportTrackResults> future = es.submit( new ImportTrackCallable( referenceResult, trackFile ) );
+                    Future<ImportTrackResults> future = es.submit( new ImportTrackCallable( referenceResult, trackFile ) );
                     futures.add( future );
                 }
 
                 // store parsed tracks sequently to db
-                for( Future<ImportTrackCallable.ImportTrackResults> future : futures ) {
-                    ImportTrackCallable.ImportTrackResults result = future.get();
+                for( Future<ImportTrackResults> future : futures ) {
+                    ImportTrackResults result = future.get();
                     for( String msg : referenceResult.getOutput() ) {
                         printInfo( ps, msg );
                     }
@@ -267,7 +273,36 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
         }
         else {
-            // TODO implement mate pair import
+            try {
+                printInfo( ps, "import mate pairs..." );
+                // submit track parse jobs for (concurrent) execution
+                List<Future<ImportMatePairResults>> futures = new ArrayList<>( trackFiles.length );
+                for( File trackFile : trackFiles ) {
+                    // TODO get file pair and propagate it to ImportMatePairCallable
+                    Future<ImportMatePairResults> future = es.submit( new ImportMatePairCallable( referenceResult, trackFile, trackFile ) );
+                    futures.add( future );
+                }
+
+                // store parsed tracks sequently to db
+                for( Future<ImportMatePairResults> future : futures ) {
+                    ImportMatePairResults result = future.get();
+                    for( String msg : referenceResult.getOutput() ) {
+                        printInfo( ps, msg );
+                    }
+                    ParsedTrack pt = result.getParsedTrack();
+                    pc.storeBamTrack( pt );
+                    pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+                    printInfo( ps, "\tstored parsed mate pair ("+result.getParsedTrack().getTrackName()+") to db" );
+                }
+                printInfo( ps, "...finished!" );
+            }
+            catch( InterruptedException | ExecutionException ex ) {
+                LOG.log( Level.SEVERE, null, ex );
+                CommandException ce = new CommandException( 1, "mate pair import failed!" );
+                    ce.initCause( ex );
+                throw ce;
+            }
+
         }
 
 
@@ -290,6 +325,8 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
         }
 
     }
+
+
 
 
     private void printInfo( PrintStream ps, String msg ) {
