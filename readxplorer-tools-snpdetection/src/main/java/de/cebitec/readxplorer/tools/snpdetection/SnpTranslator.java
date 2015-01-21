@@ -158,10 +158,10 @@ public class SnpTranslator {
     public void checkForFeature( Snp snp ) {
 
         //find feature/s which cover current snp position
-        List<PersistentFeature> featuresFound = this.checkCoveredByFeature( snp.getPosition() );
+        List<PersistentFeature> featuresFound = checkCoveredByFeature( snp.getPosition() );
 
         //amino acid substitution calculations
-        List<CodonSnp> codonSnpList = this.calcSnpList( featuresFound, snp );
+        List<CodonSnp> codonSnpList = calcSnpList( featuresFound, snp );
         for( CodonSnp codon : codonSnpList ) {
             snp.addCodon( codon );
         }
@@ -188,8 +188,8 @@ public class SnpTranslator {
         int pos = snp.getPosition();
         posDirectAtLeftChromBorder = pos < 2; //pos is never smaller than 1, 1 is min
         posAtLeftChromBorder = pos < 3;
-        posAtRightChromBorder = pos + 2 > this.refLength;
-        posDirectAtRightChromBorder = pos + 1 > this.refLength;
+        posAtRightChromBorder = pos + 2 > refLength;
+        posDirectAtRightChromBorder = pos + 1 > refLength;
 
         //handle feature knowledge:
         //get each strand and triplet for correct reading frame for translation
@@ -210,18 +210,18 @@ public class SnpTranslator {
 
             if( feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA
                 || feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
-                this.calcFeatureData( feature, pos, FeatureType.CDS );
+                calcFeatureData( feature, pos, FeatureType.CDS );
                 if( !subFeatureFound ) {
-                    this.calcFeatureData( feature, pos, FeatureType.EXON );
+                    calcFeatureData( feature, pos, FeatureType.EXON );
                 }
             }
             if( !subFeatureFound && feature.getType() == FeatureType.GENE ) {
-                this.calcFeatureData( feature, pos, FeatureType.MRNA );
+                calcFeatureData( feature, pos, FeatureType.MRNA );
                 if( !subFeatureFound ) { //if the gene has a rRNA or tRNA instead of an mRNA, we have to check this, too
-                    this.calcFeatureData( feature, pos, FeatureType.RRNA );
+                    calcFeatureData( feature, pos, FeatureType.RRNA );
                 }
                 if( !subFeatureFound ) {
-                    this.calcFeatureData( feature, pos, FeatureType.TRNA );
+                    calcFeatureData( feature, pos, FeatureType.TRNA );
                 }
             }
 
@@ -322,8 +322,8 @@ public class SnpTranslator {
 
             //translate string to amino acid and store reference and snp codon
             try {
-                char aminoRef = this.code.getTranslation( tripletRef );
-                char aminoSnp = this.code.getTranslation( tripletSnp );
+                char aminoRef = code.getTranslation( tripletRef );
+                char aminoSnp = code.getTranslation( tripletSnp );
 
                 //determine effect type of snp on the amino acid sequence
                 SequenceComparison type = aminoRef == aminoSnp ? SequenceComparison.MATCH : SequenceComparison.SUBSTITUTION;
