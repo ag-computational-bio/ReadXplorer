@@ -94,12 +94,20 @@ public class GnuR extends RConnection {
      *
      * @param packageName
      */
-    public void loadPackage(String packageName) throws PackageNotLoadableException, RserveException {
-        REXP result = this.eval("library(" + packageName + ")");
-        if (result == null) {
-            this.eval("install.packages(\"" + packageName + "\")");
-            result = this.eval("library(" + packageName + ')');
-            if (result == null) {
+    public void loadPackage(String packageName) throws PackageNotLoadableException {
+        try {
+            this.eval("library(" + packageName + ")");
+        } catch (RserveException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
+            try {
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Trying to install package {1}.", new Object[]{currentTimestamp, packageName});
+                this.eval("install.packages(\"" + packageName + "\")");
+                this.eval("library(" + packageName + ')');
+            } catch (RserveException ex1) {
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{currentTimestamp, packageName});
                 throw new PackageNotLoadableException(packageName);
             }
         }

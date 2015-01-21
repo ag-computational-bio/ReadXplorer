@@ -80,7 +80,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
     private List<ResultDeAnalysis> results;
     private DeAnalysisHandler.Tool usedTool;
     private ChartPanel chartPanel;
-    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private ProgressHandle progressHandle;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -280,6 +280,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
     }// </editor-fold>//GEN-END:initComponents
 
     private void createPlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPlotButtonActionPerformed
+        progressHandle = ProgressHandleFactory.createHandle("Creating plot");
         progressHandle.start();
         progressHandle.switchToIndeterminate();
         plotPanel.removeAll();

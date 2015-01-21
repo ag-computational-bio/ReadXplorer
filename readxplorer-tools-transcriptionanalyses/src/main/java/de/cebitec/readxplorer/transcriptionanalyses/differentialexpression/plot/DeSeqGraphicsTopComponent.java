@@ -55,13 +55,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.NotificationDisplayer;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
-import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -97,7 +95,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
     private boolean SVGCanvasActive;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private ProgressHandle progressHandle;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -155,12 +153,13 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
         jScrollPane1.setBorder(null);
 
         messages.setEditable(false);
-        messages.setBackground(new java.awt.Color(240, 240, 240));
+        messages.setBackground(new java.awt.Color(238, 238, 238));
         messages.setColumns(20);
         messages.setLineWrap(true);
         messages.setRows(5);
         messages.setWrapStyleWord(true);
         messages.setBorder(null);
+        messages.setDisabledTextColor(new java.awt.Color(238, 238, 238));
         jScrollPane1.setViewportView(messages);
 
         org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "DeSeqGraphicsTopComponent.saveButton.text_1")); // NOI18N
@@ -258,16 +257,16 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
             messages.setText( "" );
             plotButton.setEnabled( false );
             saveButton.setEnabled( false );
+            progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+            progressHandle.start();
+            progressHandle.switchToIndeterminate();
             DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
             if( selectedPlot == DeSeqAnalysisHandler.Plot.MAplot ) {
-                progressHandle.start();
-                progressHandle.switchToIndeterminate();
                 chartPanel = CreatePlots.createInfPlot( ConvertData.createMAvalues( result, DeAnalysisHandler.Tool.DeSeq, null, null ), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip() );
                 if( SVGCanvasActive ) {
                     plotPanel.remove( svgCanvas );
                     SVGCanvasActive = false;
                 }
-//                plotDescriptionArea.setText("A (normalized mean expression (0.5 * log2 (baseMeanA * baseMeanB))) against M (log2 fold change)");
                 plotDescriptionArea.setVisible( false );
                 plotPanel.add( chartPanel, BorderLayout.CENTER );
                 plotPanel.repaint();
@@ -380,16 +379,11 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
 
 
     void writeProperties( java.util.Properties p ) {
-        // better to version settings since initial version as advocated at
-        // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty( "version", "1.0" );
-        // TODO store your settings
     }
 
 
     void readProperties( java.util.Properties p ) {
-//        String version = p.getProperty("version");
-        // TODO read your settings according to their version
     }
 
 
@@ -402,8 +396,6 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
         svgCanvas.addSVGDocumentLoaderListener( new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted( SVGDocumentLoaderEvent e ) {
-                progressHandle.start();
-                progressHandle.switchToIndeterminate();
             }
 
 
@@ -413,9 +405,6 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
                 progressHandle.finish();
                 saveButton.setEnabled( true );
                 plotButton.setEnabled( true );
-//                DispEsts("Per gene estimates against normalized mean expression"),
-//        DE("Log2 fold change against base means"),
-//        HIST("Histogram of p values"),
                 String description = "";
                 switch( (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem() ) {
                     case DispEsts:

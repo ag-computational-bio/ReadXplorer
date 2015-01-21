@@ -63,19 +63,8 @@ public class DeSeq {
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
-            //Load an R image containing the plotting functions
-            try( InputStream jarPath = DeSeq.class.getResourceAsStream( "/de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/DeSeqPlot.rdata" ) ) {
-                File to = File.createTempFile( "ReadXplorer_", ".rdata" );
-                to.deleteOnExit();
-                Files.copy( jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING );
-                String tmpPath = to.getAbsolutePath();
-                tmpPath = tmpPath.replace( "\\", "\\\\" );
-                gnuR.eval( "load(file=\"" + tmpPath + "\")" );
-            }
-            catch( IOException ex ) {
-                currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Unable to load plotting functions. You won't be able to plot your results!", currentTimestamp );
-            }
+            //Create the plotting functions as they are not part of the DESeq package
+            createPlotFunctions();
 
             //Handing over the count data to Gnu R.
             int i = 1;
@@ -303,6 +292,24 @@ public class DeSeq {
                                                 RserveException, REngineException, REXPMismatchException, 
                                                 IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
+    }
+    
+    private void createPlotFunctions() throws RserveException {
+        gnuR.eval("plotDispEsts <- function( cds )\n"
+                + "{\n"
+                + "plot(\n"
+                + "rowMeans( counts( cds, normalized=TRUE ) ),\n"
+                + "fitInfo(cds)$perGeneDispEsts,\n"
+                + "pch = '.', log=\"xy\" )\n"
+                + "xg <- 10^seq( -.5, 5, length.out=300 )\n"
+                + "lines( xg, fitInfo(cds)$dispFun( xg ), col=\"red\" )\n"
+                + "}");
+        gnuR.eval("plotDE <- function( res )\n"
+                + "plot(\n"
+                + "res$baseMean,\n"
+                + "res$log2FoldChange,\n"
+                + "log=\"x\", pch=20, cex=.3,\n"
+                + "col = ifelse( res$padj < .1, \"red\", \"black\" ) )");
     }
 
 

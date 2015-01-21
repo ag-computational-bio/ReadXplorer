@@ -54,13 +54,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.NotificationDisplayer;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
-import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -96,7 +94,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
     private boolean svgCanvasActive;
-    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private ProgressHandle progressHandle;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -253,7 +251,10 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         try {
             messages.setText( "" );
             plotButton.setEnabled( false );
-            saveButton.setEnabled( false );
+            saveButton.setEnabled(false);
+            progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+            progressHandle.start();
+            progressHandle.switchToIndeterminate();
             DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
             plotDescriptionArea.setVisible( true );
             if( !svgCanvasActive ) {
@@ -375,8 +376,6 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         svgCanvas.addSVGDocumentLoaderListener( new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted( SVGDocumentLoaderEvent e ) {
-                progressHandle.start();
-                progressHandle.switchToIndeterminate();
             }
 
 

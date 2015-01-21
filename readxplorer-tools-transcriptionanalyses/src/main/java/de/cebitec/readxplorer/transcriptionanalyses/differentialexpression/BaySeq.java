@@ -83,31 +83,30 @@ public class BaySeq {
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
-        gnuR.loadPackage( "baySeq" );
-
+        gnuR.loadPackage("baySeq");
+        //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
+        //computation will speed up a little bit but still leave you at least one core
+        //for your other work.
+        if (gnuR.runningLocal) {
+            gnuR.loadPackage("snow");
+            gnuR.loadPackage("parallel");
+            int processors = Runtime.getRuntime().availableProcessors();
+            if (processors > MAX_PROCESSORS) {
+                processors = MAX_PROCESSORS;
+            }
+            if (processors > 1) {
+                processors--;
+            }
+            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
+            gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
+        } else {
+            gnuR.eval("cl <- NULL");
+        }
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
-            //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
-            //computation will speed up a little bit but still leave you at least one core
-            //for your other work.
-            if (gnuR.runningLocal) {
-                gnuR.loadPackage("snow");
-                gnuR.loadPackage("parallel");
-                int processors = Runtime.getRuntime().availableProcessors();
-                if (processors > MAX_PROCESSORS) {
-                    processors = MAX_PROCESSORS;
-                }
-                if (processors > 1) {
-                    processors--;
-                }
-                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
-                gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
-            } else {
-                gnuR.eval("cl <- NULL");
-            }
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
             while( bseqData.hasCountData() ) {
