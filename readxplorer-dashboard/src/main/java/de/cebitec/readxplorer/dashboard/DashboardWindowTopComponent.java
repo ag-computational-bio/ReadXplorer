@@ -310,13 +310,16 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
         org.openide.awt.Mnemonics.setLocalizedText(quickstartLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.quickstartLabel.text")); // NOI18N
 
-        explorerSplitPane.setDividerLocation(200);
         explorerSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        explorerSplitPane.setResizeWeight(1.0);
+        explorerSplitPane.setToolTipText(org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.explorerSplitPane.toolTipText")); // NOI18N
 
+        explorerPanel.setPreferredSize(new java.awt.Dimension(500, 400));
         explorerPanel.setLayout(new java.awt.BorderLayout());
         explorerSplitPane.setLeftComponent(explorerPanel);
 
         buttonPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        buttonPanel.setPreferredSize(new java.awt.Dimension(1053, 51));
 
         org.openide.awt.Mnemonics.setLocalizedText(openButton, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.openButton.text")); // NOI18N
         openButton.setMargin(new java.awt.Insets(15, 50, 15, 50));
@@ -470,7 +473,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addGap(1, 1, 1)
                 .addComponent(quickstartLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
