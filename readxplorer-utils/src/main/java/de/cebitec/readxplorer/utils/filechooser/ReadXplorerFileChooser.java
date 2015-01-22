@@ -54,9 +54,10 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
     /**
      * Creates a new readxplorer file chooser.
      *
-     * @param fileExtensions  the file extensions to use. If the first entry is
-     *                        the empty string, no file filter is set
-     * @param fileDescription description for the files in the file filter
+     * @param fileExtensions  The file extensions to use. If set to null or the
+     *                        first entry is the empty string, no file filter is 
+     *                        set
+     * @param fileDescription Description for the files in the file filter
      */
     public ReadXplorerFileChooser( final String[] fileExtensions, String fileDescription ) {
         this( fileExtensions, fileDescription, null );
@@ -66,10 +67,11 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
     /**
      * Creates a new readxplorer file chooser.
      *
-     * @param fileExtensions  the file extensions to use. If the first entry is
-     *                        the empty string, no file filter is set
-     * @param fileDescription description for the files in the file filter
-     * @param data            the data which might be used for file choosers
+     * @param fileExtensions  The file extensions to use. If set to null or the
+     *                        first entry is the empty string, no file filter is 
+     *                        set
+     * @param fileDescription Description for the files in the file filter
+     * @param data            The data which might be used for file choosers
      *                        storing data
      */
     public ReadXplorerFileChooser( final String[] fileExtensions, String fileDescription, final Object data ) {

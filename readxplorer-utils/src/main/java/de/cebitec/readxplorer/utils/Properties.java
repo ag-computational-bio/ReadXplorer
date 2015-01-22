@@ -185,7 +185,12 @@ public class Properties {
     public static final String EXT_A2_STRING = String.valueOf( EXT_A2 );
 
     /**
-     * The CRAN Mirror used by Gnu R to load missing packages
+     * Temporary directory used for import of data (SAM/BAM/JOK).
+     */
+    public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
+    
+    /**
+     * The CRAN Mirror used by Gnu R to load missing packages.
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
 

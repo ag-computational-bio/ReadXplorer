@@ -33,6 +33,7 @@ import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
+import org.openide.util.NbPreferences;
 
 /*
  * The MIT License
@@ -184,8 +185,9 @@ public class SamUtils implements Observable {
 //        } catch (ArrayIndexOutOfBoundsException e) {
 //            extension = "bam";
 //        }
-        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
+//        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Properties.TMP_IMPORT_DIR, System.getProperty("java.io.tmpdir") ) ) );
 //        if (extension.toLowerCase().contains("sam")) {
 //            outputFile = new File(newFileName + newEnding + ".sam");
 //            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
