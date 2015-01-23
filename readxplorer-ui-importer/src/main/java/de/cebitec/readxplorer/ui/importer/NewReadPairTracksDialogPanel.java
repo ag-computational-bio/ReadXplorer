@@ -113,7 +113,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
         multiTrackListLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(494, 290));
-        setPreferredSize(new java.awt.Dimension(494, 290));
+        setPreferredSize(new java.awt.Dimension(560, 290));
 
         refGenLabel.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.refGenLabel.text")); // NOI18N
 
@@ -221,6 +221,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
             }
         });
 
+        multiTrackList.setName(""); // NOI18N
         multiTrackScrollPane.setViewportView(multiTrackList);
 
         multiTrackListLabel.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.multiTrackListLabel.text")); // NOI18N
@@ -270,7 +271,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                                         .addComponent(orientation2Button)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(orientation3Button)))
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                                .addGap(0, 152, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(37, 37, 37)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
