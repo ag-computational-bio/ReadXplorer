@@ -131,6 +131,15 @@ public class GnuR extends RConnection {
     }
 
     @Override
+    public void shutdown() throws RserveException {
+        //If we started the RServe instace by our self we should also terminate it.
+        //If we are connected to a remote server however we should not do so.
+        if(runningLocal){
+            super.shutdown();
+        }
+    }
+
+    @Override
     public REXP eval(String cmd) throws RserveException {
         ProcessingLog.getInstance().logGNURinput( cmd );
         return super.eval(cmd);
