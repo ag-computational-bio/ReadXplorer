@@ -368,7 +368,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     trackId1 = trackJob1.getID();
                     inputFile1.setWritable( true );
                     ph.progress( workunits++ );
-//                    }
 
                     //read pair ids have to be set in track entry
                     ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );

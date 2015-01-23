@@ -112,7 +112,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             mapClassMap.get( TotalCoverage.TOTAL_COVERAGE ).add( new Pair<>( 0, 0 ) );
             classToCoveredIntervalsMap.put( chromName, mapClassMap );
         }
-//        HashMap<String, Object> readNameSet = new HashMap<>();
+//        Map<String, Object> readNameSet = new HashMap<>();
 //        String[] nameArray;
 //        String shortReadName;
 
@@ -172,7 +172,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                         ++seqCount;
                         lastReadSeq = readSeq;
 
-                        statsContainer.increaseValue( mappingClass.getTypeString(), mapCount );
+                        statsContainer.increaseValue( mappingClass.getTypeString(), 1 );
                         PositionUtils.updateIntervals( classToCoveredIntervalsMap.get( refName ).get( mappingClass ), start, stop );
                         PositionUtils.updateIntervals( classToCoveredIntervalsMap.get( refName ).get( TotalCoverage.TOTAL_COVERAGE ), start, stop );
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
