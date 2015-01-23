@@ -449,7 +449,7 @@ public final class CommonsMappingParser {
      * @param start        the start of the mapping
      * @param stop         the stop of the mapping
      * @param filename     the file name of which the mapping originates
-     * @param lineno       the line number in the filelineNo<p>
+     * @param lineNo       the line number in the filelineNo<p>
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkRead( final MessageSenderI parent,

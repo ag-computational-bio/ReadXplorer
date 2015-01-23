@@ -178,8 +178,10 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         this.refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
         Boolean success = this.preprocessData( trackJob );
         if( !success ) {
-            throw new ParsingException( "Sorting of the input file by read name was not successful, please try again and make sure to have enough "
-                                        + "free space in your systems temp directory to store intermediate files for sorting (e.g. on Windows 7 the hard disk containing: "
+            throw new ParsingException( "Sorting of the input file by read name was not successful. Please either switch your RX temp directory "
+                                        + "(Tools->Options->Miscellaneous->Directories) to a disk with sufficient space or make sure to have "
+                                        + "enough free space in your systems temp directory to store intermediate files for sorting (e.g. on "
+                                        + "Windows 7 the standard disk and folder: "
                                         + "C:\\Users\\UserName\\AppData\\Local\\Temp needs to have enough free space)." );
         }
 
