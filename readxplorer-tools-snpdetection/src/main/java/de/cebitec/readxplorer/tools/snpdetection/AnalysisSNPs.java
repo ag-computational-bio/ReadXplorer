@@ -47,6 +47,8 @@ import net.sf.samtools.util.RuntimeIOException;
  */
 class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
+    private static final Logger LOG = Logger.getLogger( AnalysisSNPs.class.getName() );
+    
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
     private static final int BASE_G = 2;
@@ -163,7 +165,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             type = SequenceComparison.DELETION;
         }
         else {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown diff type" );
+            LOG.log( Level.SEVERE, "found unknown diff type" );
         }
 
         return type;
@@ -200,7 +202,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 base = '-';
                 break;
             default:
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown snp type" );
+                LOG.log( Level.SEVERE, "found unknown snp type" );
         }
 
         return base;
@@ -349,7 +351,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                         cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                         if( cov == 0 ) {
                             ++cov;
-                            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found uncovered position in diffs: {0}", absPos );
+                            LOG.log( Level.SEVERE, "found uncovered position in diffs: {0}", absPos );
                         }
                         frequency = (diffCount * 100) / cov;
 
@@ -426,7 +428,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                 cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                                 if( cov == 0 ) {
                                     ++cov;
-                                    Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found uncovered position in gaps: {0}", absPos );
+                                    LOG.log( Level.SEVERE, "found uncovered position in gaps: {0}", absPos );
                                 }
                                 frequency = (diffCount * 100) / cov;
 
@@ -462,23 +464,8 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 //        System.out.println(count++ + "size gaps: " + gaps.size());
         }
         catch( RuntimeIOException e ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackPath() );
+            LOG.log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackPath() );
         }
     }
-
-//    private int getNeighboringCov(int absPos, CoverageManager coverage) {
-//        int cov1 = 0;
-//        int cov2 = 0;
-//
-//        cov1 = coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(absPos) + coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(absPos);
-//        if (cov1 == 0) {
-//            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
-//        }
-//
-//        cov2 = coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(absPos + 1) + coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(absPos + 1);
-//
-//        int cov = (cov1 + cov2) / 2;
-//        return cov == 0 ? 1 : cov;
-//    }
 
 }
