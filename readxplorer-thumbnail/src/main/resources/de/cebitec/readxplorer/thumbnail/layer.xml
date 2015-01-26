@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <filesystem>
     <folder name="Actions">
         <folder name="Edit">
-            <file name="de-cebitec-readxplorer-thumbnail-actions-ASyncSliders.instance">
+            <file name="de-cebitec-readxplorer-thumbnail-actions-AsyncSliders.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.actions.Bundle#CTL_AsyncSliders"/>
                 <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.actions.AsyncSliders"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.actions.ASyncSliderCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.actions.AsyncSliderCookie"/>
             </file>
             <file name="de-cebitec-readxplorer-thumbnail-actions-SyncSliders.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.actions.inject"/>
@@ -102,8 +102,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-actions-SyncSliders.instance"/>
                     <attr name="position" intvalue="300"/>
                 </file>
-                <file name="de-cebitec-readxplorer-thumbnail-actions-ASyncSliders.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-actions-ASyncSliders.instance"/>
+                <file name="de-cebitec-readxplorer-thumbnail-actions-AsyncSliders.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-actions-AsyncSliders.instance"/>
                     <attr name="position" intvalue="350"/>
                 </file>
                 <file name="de-cebitec-readxplorer-thumbnail-actions-SyncSliders-separatorAfter.instance">
