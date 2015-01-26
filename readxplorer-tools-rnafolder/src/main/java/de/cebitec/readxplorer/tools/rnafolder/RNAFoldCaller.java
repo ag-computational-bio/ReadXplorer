@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.tools.rnafolder;
 
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -133,9 +132,6 @@ public class RNAFoldCaller {
         }
         catch( ServiceException e ) {
             throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ServiceError" ) + " " + server );
-        }
-        catch( IOException e ) {
-            throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.InputError" ) );
         }
 
         //should never be reached!
