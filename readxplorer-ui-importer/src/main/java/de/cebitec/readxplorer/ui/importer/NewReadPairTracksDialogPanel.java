@@ -61,17 +61,17 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      * Panel allowing for input of two read pair mapping files.
      */
     public NewReadPairTracksDialogPanel() {
-        this.refGenJobs = getReferenceJobs();
+        refGenJobs = getReferenceJobs();
         // choose the default parser. first entry is shown in combobox by default
-        this.jokToBamDirectParser = new JokToBamDirectParser();
-        this.samBamDirectParser = new SamBamParser();
-        this.parsers = new MappingParserI[]{ this.samBamDirectParser, jokToBamDirectParser };
-        this.setCurrentParser( parsers[0] );
+        jokToBamDirectParser = new JokToBamDirectParser();
+        samBamDirectParser = new SamBamParser();
+        parsers = new MappingParserI[]{ this.samBamDirectParser, jokToBamDirectParser };
+        setCurrentParser( parsers[0] );
         mappingFiles2 = new ArrayList<>( 10 );
         initComponents();
-        this.alreadyImportedBox.setVisible( true );
-        this.multiTrackScrollPane.setVisible( false );
-        this.multiTrackListLabel.setVisible( false );
+        alreadyImportedBox.setVisible( true );
+        multiTrackScrollPane.setVisible( false );
+        multiTrackListLabel.setVisible( false );
     }
 
 
@@ -221,6 +221,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
             }
         });
 
+        multiTrackList.setName(""); // NOI18N
         multiTrackScrollPane.setViewportView(multiTrackList);
 
         multiTrackListLabel.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.multiTrackListLabel.text")); // NOI18N
@@ -278,7 +279,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                             .addComponent(multiTrackListLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(alreadyImportedBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(alreadyImportedBox, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
                             .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(multiTrackScrollPane))))
                 .addContainerGap())
@@ -325,7 +326,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                 .addComponent(alreadyImportedBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(multiTrackListLabel)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -334,77 +335,77 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButton1ActionPerformed
-        this.getMappingFiles().clear();
-        this.openFileChooser( true );
+        getMappingFiles().clear();
+        openFileChooser( true );
 }//GEN-LAST:event_chooseButton1ActionPerformed
 
     private void parserComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserComboBoxActionPerformed
         MappingParserI newparser = (MappingParserI) parserComboBox.getSelectedItem();
         if( getCurrentParser() != newparser ) {
             setCurrentParser( newparser );
-            this.getMappingFiles().clear();
+            getMappingFiles().clear();
             mappingFiles2.clear();
             mappingFile1Field.setText( "" );
             mappingFile2Field.setText( "" );
             nameField.setText( "" );
-            this.multiTrackList.setModel( new DefaultListModel<String>() );
+            multiTrackList.setModel( new DefaultListModel<String>() );
 
             if( newparser instanceof SamBamParser ) {
-                this.alreadyImportedBox.setEnabled( true );
+                alreadyImportedBox.setEnabled( true );
             }
             else {
-                this.alreadyImportedBox.setEnabled( false );
-                this.alreadyImportedBox.setSelected( false );
-                this.setIsAlreadyImported( false );
+                alreadyImportedBox.setEnabled( false );
+                alreadyImportedBox.setSelected( false );
+                setIsAlreadyImported( false );
             }
         }
 }//GEN-LAST:event_parserComboBoxActionPerformed
 
     private void chooseButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButton2ActionPerformed
-        this.openFileChooser( false );
+        openFileChooser( false );
     }//GEN-LAST:event_chooseButton2ActionPerformed
 
     private void deviationFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deviationFieldActionPerformed
-        this.setDeviation();
+        setDeviation();
     }//GEN-LAST:event_deviationFieldActionPerformed
 
     private void distanceFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_distanceFieldActionPerformed
-        this.setDistance();
+        setDistance();
     }//GEN-LAST:event_distanceFieldActionPerformed
 
     private void orientation1ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orientation1ButtonActionPerformed
-        this.setOrientation( "fr" );
+        setOrientation( "fr" );
     }//GEN-LAST:event_orientation1ButtonActionPerformed
 
     private void orientation3ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orientation3ButtonActionPerformed
-        this.setOrientation( "ff/rr" );
+        setOrientation( "ff/rr" );
     }//GEN-LAST:event_orientation3ButtonActionPerformed
 
     private void orientation2ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orientation2ButtonActionPerformed
-        this.setOrientation( "rf" );
+        setOrientation( "rf" );
     }//GEN-LAST:event_orientation2ButtonActionPerformed
 
 
     @NbBundle.Messages( { "TrackNumberInfo.Title=Track 2 Removal",
                           "TrackNumberInfo=Only one track allowed, when already imported is chosen!" } )
     private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
-        this.setIsAlreadyImported( this.alreadyImportedBox.isSelected() );
-        if( this.isAlreadyImported() ) {
-            this.chooseButton2.setEnabled( false );
-            if( !this.mappingFiles2.isEmpty() ) {
+        setIsAlreadyImported( alreadyImportedBox.isSelected() );
+        if( isAlreadyImported() ) {
+            chooseButton2.setEnabled( false );
+            if( !mappingFiles2.isEmpty() ) {
                 JOptionPane.showMessageDialog( this, Bundle.TrackNumberInfo(), Bundle.TrackNumberInfo_Title(), JOptionPane.INFORMATION_MESSAGE );
-                this.mappingFiles2.clear();
-                this.mappingFile2Field.setText( "" );
+                mappingFiles2.clear();
+                mappingFile2Field.setText( "" );
                 DefaultListModel<String> model = new DefaultListModel<>();
-                this.fillMultipleImportTable( model, getMappingFiles(), "Mapping file 1 list:" );
-                if( !this.isAlreadyImported() ) {
-                    this.fillMultipleImportTable( model, mappingFiles2, "Mapping file 2 list:" );
+                fillMultipleImportTable( model, getMappingFiles(), "Mapping file 1 list:" );
+                if( !isAlreadyImported() ) {
+                    fillMultipleImportTable( model, mappingFiles2, "Mapping file 2 list:" );
                 }
                 multiTrackList.setModel( model );
             }
         }
         else {
-            this.chooseButton2.setEnabled( true );
+            chooseButton2.setEnabled( true );
         }
     }//GEN-LAST:event_alreadyImportedBoxActionPerformed
 
@@ -441,7 +442,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                     File[] files = this.getSelectedFiles();
 
                     for( int i = 0; i < files.length; ++i ) {
-                        this.addFile( files[i] );
+                        addFile( files[i] );
                     }
 
                     mappingFile1Field.setText( getMappingFiles().size() + " tracks to import" );
@@ -454,7 +455,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                 }
                 else {
                     File file = this.getSelectedFile();
-                    this.addFile( file );
+                    addFile( file );
 
 //                    String path = mappingFiles1 == null ? mappingFiles2.get(mappingFiles2.size() - 1).getAbsolutePath()
 //                            : mappingFiles1.get(mappingFiles1.size() - 1).getAbsolutePath();
@@ -532,17 +533,14 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      */
     @Override
     public boolean isRequiredInfoSet() {
-        if( getMappingFiles().isEmpty() && mappingFiles2.isEmpty()
-            || refGenBox.getSelectedItem() == null
-            || nameField.getText().isEmpty()
-            || !distanceHasValidInput()
-            || !deviationHasValidInput()
-            || !mappingFiles2.isEmpty() && this.isAlreadyImported() ) {
-            return false;
-        }
-        else {
-            return true;
-        }
+
+        return !(getMappingFiles().isEmpty() && mappingFiles2.isEmpty()
+                 || refGenBox.getSelectedItem() == null
+                 || nameField.getText().isEmpty()
+                 || !distanceHasValidInput()
+                 || !deviationHasValidInput()
+                 || !mappingFiles2.isEmpty() && this.isAlreadyImported() );
+
     }
 
 
@@ -550,8 +548,8 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      * @return true, if the distance is larger than 0, false otherwise
      */
     private boolean distanceHasValidInput() {
-        this.setDistance();
-        return this.distance > 0;
+        setDistance();
+        return distance > 0;
     }
 
 
@@ -559,8 +557,8 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      * @return true, if the deviation is >= 0, false otherwise
      */
     private boolean deviationHasValidInput() {
-        this.setDeviation();
-        return this.deviation >= 0;
+        setDeviation();
+        return deviation >= 0;
     }
 
 
@@ -587,7 +585,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
             return null;
         }
         else {
-            return this.mappingFiles2.get( 0 );
+            return mappingFiles2.get( 0 );
         }
     }
 
@@ -597,7 +595,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      *         set import with the same parameters at once
      */
     public List<File> getMappingFiles2() {
-        return this.mappingFiles2;
+        return mappingFiles2;
     }
 
 
@@ -624,7 +622,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      *         stop2)
      */
     public int getDistance() {
-        return this.distance;
+        return distance;
     }
 
 
@@ -632,7 +630,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      * @return deviation allowed from that distance in %
      */
     public short getDeviation() {
-        return this.deviation;
+        return deviation;
     }
 
 
@@ -641,7 +639,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      *         1 = rev, fwd, 2 = fwd, fwd or rev, rev
      */
     public byte getOrientation() {
-        return this.orientation;
+        return orientation;
     }
 
 
@@ -650,7 +648,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      *             have to be available for the import of new tracks too.
      */
     public void setReferenceJobs( List<ReferenceJob> jobs ) {
-        refGenBox.setModel( new DefaultComboBoxModel<>( this.getReferenceJobs( jobs ) ) );
+        refGenBox.setModel( new DefaultComboBoxModel<>( getReferenceJobs( jobs ) ) );
     }
 
 
@@ -659,10 +657,10 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      */
     private void setDistance() {
         try {
-            this.distance = Integer.valueOf( this.distanceField.getText() );
+            distance = Integer.valueOf( distanceField.getText() );
         }
         catch( NumberFormatException e ) {
-            this.distanceField.setText( NbBundle.getMessage( NewReadPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.Number.Error" ) );
+            distanceField.setText( NbBundle.getMessage( NewReadPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.Number.Error" ) );
         }
     }
 
@@ -674,11 +672,11 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      */
     private void setDeviation() {
         try {
-            this.deviation = Short.valueOf( this.deviationField.getText() );
+            deviation = Short.valueOf( deviationField.getText() );
         }
         catch( NumberFormatException e ) {
-            this.deviationField.setText( NbBundle.getMessage( NewReadPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.Number.Error" ) );
-            this.deviation = -1;
+            deviationField.setText( NbBundle.getMessage( NewReadPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.Number.Error" ) );
+            deviation = -1;
         }
     }
 
@@ -690,13 +688,13 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
     private void setOrientation( String orientString ) {
         switch( orientString ) {
             case "fr":
-                this.orientation = 0;
+                orientation = 0;
                 break;
             case "rf":
-                this.orientation = 1;
+                orientation = 1;
                 break;
             case "ff/rr":
-                this.orientation = 2;
+                orientation = 2;
                 break;
         }
     }

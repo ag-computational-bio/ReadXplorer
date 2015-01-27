@@ -33,6 +33,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -46,7 +47,7 @@ import org.openide.util.NbBundle;
  *
  * @author ddoppmeier, rhilker
  */
-public class ImportSetupCard extends javax.swing.JPanel {
+public class ImportSetupCard extends JPanel {
 
     private static final long serialVersionUID = 127732323;
     private boolean canImport;
@@ -252,7 +253,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
                         int largestSize = mappingFiles1.size() > mappingFiles2.size() ? mappingFiles1.size() : mappingFiles2.size();
 
-                        for( int i = 0; i < largestSize; ++i ) {
+                        for( int i = 0; i < largestSize; i++ ) {
                             File file1 = null;
                             File file2 = null;
                             if( i < mappingFiles1.size() ) {
@@ -357,10 +358,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
             mappingFile2 = null;
         }
 
-        TrackJob trackJob1 = this.createTrackJob( readPairPane, mappingFile1 );
+        TrackJob trackJob1 = createTrackJob( readPairPane, mappingFile1 );
         TrackJob trackJob2 = null;
         if( mappingFile2 != null ) {
-            trackJob2 = this.createTrackJob( readPairPane, mappingFile2 );
+            trackJob2 = createTrackJob( readPairPane, mappingFile2 );
         }
 
         readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,

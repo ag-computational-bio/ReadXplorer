@@ -24,7 +24,7 @@ package de.cebitec.readxplorer.databackend;
  *
  * @author ddoppmeier, rhilker
  */
-public class SQLStatements {
+public final class SQLStatements {
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -38,14 +38,9 @@ public class SQLStatements {
      */
     public static final String GET_NUM = "NUM";
 
+
     //////////////////  statements for table creation  /////////////////////////
 
-//    public static final String SETUP_PROJECT_FOLDER =
-//            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_PROJECT_FOLDER
-//            + " ("
-//            + FieldNames.PROJECT_FOLDER_PATH + " VARCHAR(400) NOT NULL "
-//            + ") ";
-    
     public static final String SETUP_STATISTICS
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
               + "( "
@@ -72,16 +67,11 @@ public class SQLStatements {
      * Only needed as long as older databases are floating around and did not
      * already drop this index which is not necessary anymore.
      */
-    public static String DROP_INDEX = "DROP INDEX IF EXISTS ";
+    public static final String DROP_INDEX = "DROP INDEX IF EXISTS ";
+
 
     //////////////////  statements for data insertion  ////////////////////////
 
-//    public static final String INSERT_PROJECT_FOLDER =
-//            "INSERT INTO " + FieldNames.TABLE_PROJECT_FOLDER
-//            + "("
-//            + FieldNames.PROJECT_FOLDER_PATH
-//            + ") "
-//            + " VALUES (?); ";
     public static final String INSERT_REFGENOME
             = "INSERT INTO " + FieldNames.TABLE_REFERENCE + " "
               + "("
@@ -258,7 +248,7 @@ public class SQLStatements {
     /**
      * Delete a chromosome from the chromosome table.
      */
-    public static String DELETE_CHROMOSOME
+    public static final String DELETE_CHROMOSOME
             = "DELETE FROM "
               + FieldNames.TABLE_CHROMOSOME
               + " WHERE "
@@ -332,7 +322,7 @@ public class SQLStatements {
     /**
      * Fetch the number of chromosomes for a reference.
      */
-    public static String FETCH_NUMBER_CHROMS_FOR_REF
+    public static final String FETCH_NUMBER_CHROMS_FOR_REF
             = "SELECT "
               + "COUNT(" + FieldNames.TABLE_CHROMOSOME + "." + FieldNames.CHROM_ID + ") as NUM "
               + " FROM "
@@ -510,23 +500,16 @@ public class SQLStatements {
               + FieldNames.TABLE_STATISTICS
               + " WHERE "
               + FieldNames.STATISTICS_TRACK_ID + " = ?";
-    
+
     public static final String FETCH_ALL_STATS
             = "SELECT * FROM "
               + FieldNames.TABLE_STATISTICS;
 
 
-//    public static final String FETCH_GENOMEID_FOR_TRACK =
-//            "SELECT "
-//            + FieldNames.TRACK_REFERENCE_ID + " "
-//            + "FROM "
-//            + FieldNames.TABLE_TRACK + " "
-//            + "WHERE "
-//            + FieldNames.TRACK_ID + " = ?";
     /**
      * @param trackId track id of one track of a read pair
      */
-    public static String FETCH_READ_PAIR_TO_TRACK_ID
+    public static final String FETCH_READ_PAIR_TO_TRACK_ID
             = "SELECT "
               + FieldNames.TRACK_READ_PAIR_ID + " AS NUM "
               + "FROM "
@@ -534,13 +517,14 @@ public class SQLStatements {
               + "WHERE "
               + FieldNames.TRACK_ID + " = ? ";
 
+
     /**
      * Fetches second track id for read pair tracks.
      * <p>
      * @param readPairId read pair id
      * @param trackId    track id of one of the two tracks of the pair
      */
-    public static String FETCH_TRACK_ID_TO_READ_PAIR_ID
+    public static final String FETCH_TRACK_ID_TO_READ_PAIR_ID
             = "SELECT "
               + FieldNames.TRACK_ID + " "
               + "FROM "
@@ -599,7 +583,7 @@ public class SQLStatements {
               + " SET NOT NULL";
 
 
-    public static String INIT_FASTAFILE
+    public static final String INIT_FASTAFILE
             = "UPDATE "
               + FieldNames.TABLE_REFERENCE
               + " SET "
@@ -623,45 +607,5 @@ public class SQLStatements {
               + " ALTER COLUMN "
               + FieldNames.FEATURE_CHROMOSOME_ID
               + " SET NOT NULL";
-
-//             public static final String COPY_TO_FEATURE_DETAILS_TABLE =
-//                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("
-//                    + FieldNames.FEATURE_ID + ", "
-//                    + FieldNames.FEATURE_EC_NUM + ", "
-//                    + FieldNames.FEATURE_LOCUS_TAG + ", "
-//                    + FieldNames.FEATURE_PRODUCT + ", "
-//                    + FieldNames.FEATURE_STRAND + ", "
-//                    + FieldNames.FEATURE_GENE + ") "
-//                + " SELECT "
-//                    + FieldNames.FEATURE_ID + ", "
-//                    + FieldNames.FEATURE_EC_NUM + ", "
-//                    + FieldNames.FEATURE_LOCUS_TAG + ", "
-//                    + FieldNames.FEATURE_PRODUCT + ", "
-//                    + FieldNames.FEATURE_STRAND + ", "
-//                    + FieldNames.FEATURE_GENE
-//                + " FROM "
-//                    + FieldNames.TABLE_FEATURES +
-//                " WHERE EXISTS ("
-//                    + "SELECT * "
-//                    + "FROM INFORMATION_SCHEMA.COLUMNS "
-//                    + "WHERE TABLE_NAME = '" + FieldNames.TABLE_FEATURES + "' "
-//                    + " AND COLUMN_NAME = '" + FieldNames.FEATURE_PRODUCT + "' ) ";
-//
-//
-//
-//
-//             public static final String CHECK_FEATURE_TABLE =
-//                "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"
-//                    + FieldNames.TABLE_FEATURES + "' AND COLUMN_NAME = '"
-//                    + FieldNames.FEATURE_PRODUCT + "' ";
-//
-//
-//
-//
-//             public static final String ALTER_FEATURE_TABLE =
-//                "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_EC_NUM + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_GENE + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_LOCUS_TAG + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_PRODUCT + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_STRAND + "; ";
+    
 }

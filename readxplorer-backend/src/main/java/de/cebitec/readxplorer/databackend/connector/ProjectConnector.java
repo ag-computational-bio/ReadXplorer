@@ -67,7 +67,7 @@ import org.openide.util.NbBundle;
  *
  * @author ddoppmeier, rhilker
  */
-public class ProjectConnector extends Observable {
+public final class ProjectConnector extends Observable {
 
     private static final Logger LOG = Logger.getLogger( ProjectConnector.class.getName() );
 
@@ -413,8 +413,7 @@ public class ProjectConnector extends Observable {
 
     /**
      * If the current transaction tried to make changes in the DB, these changes
-     * are
-     * rolled back.
+     * are rolled back.
      * <p>
      * @param className name of the class in which the error occured
      * @param ex        the exception, which was thrown
@@ -423,6 +422,7 @@ public class ProjectConnector extends Observable {
 
         LOG.log( Level.SEVERE, "Error occured. Trying to recover", ex );
         try {
+
             if( !con.isClosed() ) {
                 //connection is still open. try rollback
                 con.rollback();
@@ -811,6 +811,7 @@ public class ProjectConnector extends Observable {
 
             try( PreparedStatement setReadPairIds = con.prepareStatement( SQLStatements.INSERT_TRACK_READ_PAIR_ID ) ) {
                 setReadPairIds.setInt( 1, readPairId );
+
                 setReadPairIds.setLong( 2, track1Id );
                 setReadPairIds.execute();
 
