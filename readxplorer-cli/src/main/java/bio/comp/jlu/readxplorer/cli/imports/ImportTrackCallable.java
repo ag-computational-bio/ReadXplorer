@@ -25,15 +25,12 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
-import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readxplorer.parser.mappings.SamBamStatsParser;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,23 +43,7 @@ import org.netbeans.api.sendopts.CommandException;
 
 
 /**
- * The <code>ImportReferenceArgsProcessor</code> class is responsible for the
- * import of a reference genome in the cli version.
- *
- * The following options are available:
- * <p>
- * Mandatory:
- * <li>
- * <lu>-r / --ref-import</lu>
- * <lu>-d / --db: file to H2 database</lu>
- * <lu>-t / --file-type: sequence file type</lu>
- * <lu>-f / --files: reference genome files</lu>
- * <lu>-n / --names: reference genome names</lu>
- * <lu>-d / --descriptions: reference genome descriptions</lu>
- * </li>
- *
- * Optional:
- * -v / --verbose: print information during import process
+ * 
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
@@ -71,15 +52,15 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
     private static final Logger LOG = Logger.getLogger( ImportTrackCallable.class.getName() );
 
     private final ImportReferenceResult  referenceResult;
-    private final File trackFile;
+    private final TrackJob trackJob;
 
 
 
 
-    public ImportTrackCallable( ImportReferenceResult referenceResult, File trackFile ) {
+    public ImportTrackCallable( ImportReferenceResult referenceResult, TrackJob trackJob ) {
 
         this.referenceResult = referenceResult;
-        this.trackFile = trackFile;
+        this.trackJob = trackJob;
 
     }
 
@@ -91,23 +72,16 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
         try {
 
-            // create necessary (mockup) objects
-            final ImportTrackCallable.ImportTrackResults result = new ImportTrackCallable.ImportTrackResults();
-            final ProjectConnector pc = ProjectConnector.getInstance();
-            final MappingParserI mappingParser = selectParser( trackFile.getName().substring( trackFile.getName().lastIndexOf( '.' ) ) );
+            // create necessary objects
+            final File trackFile = trackJob.getFile();
+            final MappingParserI mappingParser = trackJob.getParser();
             final Map<String, Integer> chromLengthMap = new HashMap<>();
-            Map<Integer, PersistentChromosome> chromIdMap = pc.getRefGenomeConnector( referenceResult.getParsedReference().getID() ).getRefGenome().getChromosomes();
+            Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( referenceResult.getParsedReference().getID() ).getRefGenome().getChromosomes();
             for( PersistentChromosome chrom : chromIdMap.values() ) {
                 chromLengthMap.put( chrom.getName(), chrom.getLength() );
             }
             final StatsContainer statsContainer = new StatsContainer();
                 statsContainer.prepareForTrack();
-            final TrackJob trackJob = new TrackJob( pc.getLatestTrackId(), trackFile,
-                                              trackFile.getName(),
-                                              referenceResult.getReferenceJob(), // check if this is ok
-                                              mappingParser,
-                                              false,
-                                              new Timestamp( System.currentTimeMillis() ) );
 
 
             // parse track file
@@ -116,6 +90,7 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             //executes any conversion before other calculations, if the parser supports any
             boolean success = mappingParser.convert( trackJob, chromLengthMap );
             File lastWorkFile = trackJob.getFile();
+
 
             //generate classification data in file sorted by read sequence
             mappingParser.setStatsContainer( statsContainer );
@@ -129,10 +104,12 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             SamBamStatsParser statsParser = new SamBamStatsParser();
                 statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
-            result.setParsedTrack( track );
 
             LOG.log( Level.FINE, "parsed track file: {0}", trackFile.getName() );
+            ImportTrackCallable.ImportTrackResults result = new ImportTrackCallable.ImportTrackResults();
             result.addOutput( "parsed track file " + trackFile.getName() );
+            result.setParsedTrack( track );
+
 
             return result;
 
@@ -142,21 +119,6 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             CommandException ce = new CommandException( 1, "import failed!" );
                 ce.initCause( ex );
             throw ce;
-        }
-
-    }
-
-
-    private static MappingParserI selectParser( String fileTypeArg ) {
-
-        switch( fileTypeArg.toLowerCase() ) {
-            case "out":
-            case "jok":
-                return new JokToBamDirectParser();
-            case "sam":
-            case "bam":
-            default:
-                return new SamBamParser();
         }
 
     }
