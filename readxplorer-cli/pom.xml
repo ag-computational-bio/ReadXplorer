@@ -50,6 +50,10 @@
             <groupId>bio.comp.jlu.readxplorer</groupId>
             <artifactId>readxplorer-parser</artifactId>
         </dependency>
+        <dependency>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <artifactId>readxplorer-tools-readpairclassifier</artifactId>
+        </dependency>
     </dependencies>
 
 

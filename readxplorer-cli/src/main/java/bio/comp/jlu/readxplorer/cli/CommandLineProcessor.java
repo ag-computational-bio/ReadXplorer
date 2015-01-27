@@ -18,20 +18,31 @@
 package bio.comp.jlu.readxplorer.cli;
 
 
-import bio.comp.jlu.readxplorer.cli.imports.ImportMatePairCallable;
-import bio.comp.jlu.readxplorer.cli.imports.ImportMatePairCallable.ImportMatePairResults;
+import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable;
+import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable.ImportPairedEndResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable.ImportTrackResults;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
+import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
+import de.cebitec.readxplorer.parser.mappings.MappingParserI;
+import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readxplorer.utils.Properties;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.FileSystems;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -60,33 +71,41 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     /**
      * Mandatory options
      */
-    @Arg( shortName = 'r', longName = "reference" )
+    @Arg( shortName = 'f', longName = "reference" )
     @Description( displayName = "Reference", shortDescription = "Reference genome to import / analysis." )
     public String referenceArg;
 
-    @Arg( shortName = 't', longName = "tracks" )
-    @Description( displayName = "Tracks", shortDescription = "Tracks to import / analysis." )
-    public String[] tracksArgs;
+    @Arg( shortName = 'r', longName = "reads" )
+    @Description( displayName = "Reads Folder", shortDescription = "Reads to import / analysis." )
+    public String[] readsArgs;
 
-    @Arg( shortName = 'p', longName = "matepairtracks" )
-    @Description( displayName = "Mate Pair Tracks", shortDescription = "Mate Pair Tracks to import / analysis." )
-    public String[] matePairTracksArgs;
+    @Arg( shortName = 'e', longName = "per" )
+    @Description( displayName = "Pair-End Reads Folder", shortDescription = "Paired-end reads to import / analysis." )
+    public String[] pairedEndReads;
 
 
     /**
      * Optional options
      */
     @Arg( shortName = 'v', longName = "verbose" )
-    @Description( displayName = "Verbose", shortDescription = "Increase verbosity." )
+    @Description( displayName = "Verbose", shortDescription = "Print detailed messages to the console." )
     public boolean verboseArg;
 
-    @Arg( shortName = 'm', longName = "multithreading" )
-    @Description( displayName = "Verbose", shortDescription = "Execute imports and analysis concurrently." )
+    @Arg( shortName = 'p', longName = "pairedend" )
+    @Description( displayName = "Paired-End", shortDescription = "Set this flag if reads are paired-end reads." )
+    public boolean pairedEndArg;
+
+    @Arg( shortName = 'm', longName = "multithreaded" )
+    @Description( displayName = "Multithreaded", shortDescription = "Execute imports and analysis concurrently." )
     public boolean multiThreadingArg;
 
     @Arg( longName = "db" )
-    @Description( displayName = "Database", shortDescription = "H2 database to store imported data." )
+    @Description( displayName = "Database", shortDescription = "Set a database name to persistently store imported data." )
     public String dbFileArg;
+
+    @Arg( longName = "props" )
+    @Description( displayName = "Properties", shortDescription = "Specify a path to a property file." )
+    public String propsFileArg;
 
 
     /**
@@ -103,6 +122,27 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     @Arg( longName = "rpkm" )
     @Description( displayName = "RPKM", shortDescription = "XXX analysis." )
     public boolean rpkmAnalysis;
+
+
+    private final java.util.Properties props;
+    private final java.util.Properties defaultProps;
+
+
+
+
+    public CommandLineProcessor() throws CommandException {
+
+        try {
+            props = loadProperties();
+            defaultProps = loadDefaultProperties();
+        }
+        catch( IOException ex ) {
+            CommandException ce = new CommandException( 1 );
+                ce.initCause( ex );
+            throw ce;
+        }
+
+    }
 
 
 
@@ -141,12 +181,12 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
         // test track file
         final File[] trackFiles;
-        if( tracksArgs != null ) {
+        if( readsArgs != null ) {
 
             printInfo( ps, "track files to import:" );
-            trackFiles = new File[ tracksArgs.length ];
+            trackFiles = new File[ readsArgs.length ];
             for( int i=0; i<trackFiles.length; i++ ) {
-                String trackPath = tracksArgs[i];
+                String trackPath = readsArgs[i];
                 File trackFile = new File( trackPath );
                 if( !trackFile.canRead() ) {
                     throw new CommandException( 1, "Cannot read track file " + (i+1) + "("+trackPath+")!" );
@@ -162,28 +202,23 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
         }
 
 
-        // test mate pair track files
-        File[] matePairTrackFiles;
-        final boolean importMatePairReads;
-        if( matePairTracksArgs != null ) {
+        // test paired-end read files
+        File[] pairedEndFiles = null;
+        if( pairedEndReads != null ) {
 
-            if( matePairTracksArgs.length != tracksArgs.length )
-                throw new CommandException( 1, "Mate pair track count ("+matePairTracksArgs.length+") does not match track count (" +matePairTracksArgs.length+")!" );
+            if( pairedEndReads.length != readsArgs.length )
+                throw new CommandException( 1, "Mate pair track count ("+pairedEndReads.length+") does not match track count (" +pairedEndReads.length+")!" );
 
             printInfo( ps, "mate pair files to import:" );
-            matePairTrackFiles = new File[ matePairTracksArgs.length ];
-            for( int i=0; i<matePairTrackFiles.length; i++ ) {
-                String peTrackPath = matePairTracksArgs[i];
-                matePairTrackFiles[i] = new File( peTrackPath );
+            pairedEndFiles = new File[ pairedEndReads.length ];
+            for( int i=0; i<pairedEndFiles.length; i++ ) {
+                String peTrackPath = pairedEndReads[i];
+                pairedEndFiles[i] = new File( peTrackPath );
                 if( !referenceFile.canRead() )
                     throw new CommandException( 1, "Cannot read mate pair track file " + (i+1) + "("+peTrackPath+")!" );
                 printInfo( ps, "\tadd " + trackFiles[i].getName() );
             }
-            importMatePairReads = true;
 
-        }
-        else {
-            importMatePairReads = false;
         }
 
 
@@ -240,15 +275,78 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
 
         // import tracks
-        if( !importMatePairReads ) {
+        try {
 
-            try {
+            if( pairedEndArg  ||  pairedEndFiles != null ) { // import paired-end reads
+
+                printInfo( ps, "import paired-end reads..." );
+
+                // submit parse reads jobs for (concurrent) execution
+                final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
+                final int   distance    = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
+                final byte  orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
+                final short deviation   = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
+                for( int i = 0; i < trackFiles.length; i++ ) {
+
+                    File trackFile = trackFiles[i];
+                    TrackJob trackJob1 = new TrackJob( pc.getLatestTrackId(), trackFile,
+                                                       trackFile.getName(),
+                                                       referenceResult.getReferenceJob(),
+                                                       selectParser( trackFile ),
+                                                       false,
+                                                       new Timestamp( System.currentTimeMillis() ) );
+                    TrackJob trackJob2 = null;
+                    if( pairedEndFiles != null ) {
+                        File pairedEndFile = pairedEndFiles[i];
+                        trackJob2 = new TrackJob( pc.getLatestTrackId(), pairedEndFile,
+                                                  pairedEndFile.getName(),
+                                                  referenceResult.getReferenceJob(),
+                                                  selectParser( pairedEndFile ),
+                                                  false,
+                                                  new Timestamp( System.currentTimeMillis() ) );
+                    }
+
+                    ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
+                    futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
+
+                }
+
+                // store parsed reads sequently to db
+                for( Future<ImportPairedEndResults> future : futures ) {
+                    ImportPairedEndResults result = future.get();
+                    for( String msg : referenceResult.getOutput() ) {
+                        printInfo( ps, msg );
+                    }
+
+                    // store track entry in db
+                    ParsedTrack pt = result.getParsedTrack();
+                    pc.storeBamTrack( pt );
+                    pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+
+                    // read pair ids have to be set in track entry
+                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( pt.getID(), -1 );
+                    printInfo( ps, "\tstored parsed paired-end reads("+result.getParsedTrack().getTrackName()+") to db" );
+                }
+                printInfo( ps, "...finished!" );
+
+            }
+            else { // import normal reads
+
                 printInfo( ps, "import tracks..." );
+
                 // submit track parse jobs for (concurrent) execution
                 List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
                 for( File trackFile : trackFiles ) {
-                    Future<ImportTrackResults> future = es.submit( new ImportTrackCallable( referenceResult, trackFile ) );
-                    futures.add( future );
+
+                    TrackJob trackJob = new TrackJob( pc.getLatestTrackId(), trackFile,
+                            trackFile.getName(),
+                            referenceResult.getReferenceJob(),
+                            selectParser( trackFile ),
+                            false,
+                            new Timestamp( System.currentTimeMillis() ) );
+
+                    futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
+
                 }
 
                 // store parsed tracks sequently to db
@@ -263,46 +361,15 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
                     printInfo( ps, "\tstored parsed track ("+result.getParsedTrack().getTrackName()+") to db" );
                 }
                 printInfo( ps, "...finished!" );
-            }
-            catch( InterruptedException | ExecutionException ex ) {
-                LOG.log( Level.SEVERE, null, ex );
-                CommandException ce = new CommandException( 1, "track import failed!" );
-                    ce.initCause( ex );
-                throw ce;
+
             }
 
         }
-        else {
-            try {
-                printInfo( ps, "import mate pairs..." );
-                // submit track parse jobs for (concurrent) execution
-                List<Future<ImportMatePairResults>> futures = new ArrayList<>( trackFiles.length );
-                for( File trackFile : trackFiles ) {
-                    // TODO get file pair and propagate it to ImportMatePairCallable
-                    Future<ImportMatePairResults> future = es.submit( new ImportMatePairCallable( referenceResult, trackFile, trackFile ) );
-                    futures.add( future );
-                }
-
-                // store parsed tracks sequently to db
-                for( Future<ImportMatePairResults> future : futures ) {
-                    ImportMatePairResults result = future.get();
-                    for( String msg : referenceResult.getOutput() ) {
-                        printInfo( ps, msg );
-                    }
-                    ParsedTrack pt = result.getParsedTrack();
-                    pc.storeBamTrack( pt );
-                    pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-                    printInfo( ps, "\tstored parsed mate pair ("+result.getParsedTrack().getTrackName()+") to db" );
-                }
-                printInfo( ps, "...finished!" );
-            }
-            catch( InterruptedException | ExecutionException ex ) {
-                LOG.log( Level.SEVERE, null, ex );
-                CommandException ce = new CommandException( 1, "mate pair import failed!" );
-                    ce.initCause( ex );
-                throw ce;
-            }
-
+        catch( InterruptedException | ExecutionException ex ) {
+            LOG.log( Level.SEVERE, null, ex );
+            CommandException ce = new CommandException( 1, "track import failed!" );
+                ce.initCause( ex );
+            throw ce;
         }
 
 
@@ -327,6 +394,17 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     }
 
 
+    @Override
+    public Thread newThread( Runnable r ) {
+
+        Thread t = new Thread( r, "readxplorer-cli-worker" );
+            t.setDaemon( true );
+            t.setPriority( Thread.MIN_PRIORITY );
+        return t;
+
+    }
+
+
 
 
     private void printInfo( PrintStream ps, String msg ) {
@@ -347,13 +425,93 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     }
 
 
-    @Override
-    public Thread newThread( Runnable r ) {
 
-        Thread t = new Thread( r, "readxplorer-cli-worker" );
-            t.setDaemon( true );
-            t.setPriority( Thread.MIN_PRIORITY );
-        return t;
+
+    private String getProperty( String key ) {
+
+        String val = props.getProperty( key );
+
+        if( val == null )
+            val = defaultProps.getProperty( key );
+
+        return val;
+
+    }
+
+
+    /**
+     * Loads a <link>java.util.Properties</link> object.
+     * Tries to load a property file as specified in the --props argument.
+     * If the argument isn't present it will look for it in the current working directory.
+     *
+     * @return a java.util.Properties object
+     * @throws IOException
+     */
+    private java.util.Properties loadProperties() throws IOException {
+
+        java.util.Properties properties = new java.util.Properties();
+
+        InputStream is = null;
+        // check specified file
+        if( propsFileArg != null ) { // file is specified
+            File propsFile = new File( propsFileArg );
+            if( !propsFile.canRead() )
+                throw new FileNotFoundException( "specified file ("+propsFileArg+") not found!" );
+            else
+                is = new FileInputStream( propsFile );
+        }
+        else { // no file specified
+
+            File propsFile = new File( System.getProperty( "user.dir" ), "readxplorer-cli.properties" );
+            // check if props file is present in current working directory
+            if( propsFile.canRead() )
+                is = new FileInputStream( propsFile );
+
+        }
+
+        if( is != null ) {
+            try( BufferedInputStream bis = new BufferedInputStream( is ) ) {
+                properties.load( bis );
+            }
+        }
+
+        return properties;
+
+    }
+
+
+    /**
+     * Loads a default <link>java.util.Properties</link> object.
+     *
+     * @return a java.util.Properties object
+     * @throws IOException
+     */
+    private java.util.Properties loadDefaultProperties() throws IOException {
+
+        java.util.Properties properties = new java.util.Properties();
+
+        try( BufferedInputStream bis = new BufferedInputStream( CommandLineProcessor.class.getResourceAsStream( "/bio/comp/jlu/readxplorer/cli/readxplorer-cli.properties") ) ) {
+            properties.load( bis );
+        }
+
+        return properties;
+
+    }
+
+
+
+
+    private static MappingParserI selectParser( File trackFile ) {
+
+        switch( trackFile.getName().substring( trackFile.getName().lastIndexOf( '.' ) ).toLowerCase() ) {
+            case "out":
+            case "jok":
+                return new JokToBamDirectParser();
+            case "sam":
+            case "bam":
+            default:
+                return new SamBamParser();
+        }
 
     }
 
