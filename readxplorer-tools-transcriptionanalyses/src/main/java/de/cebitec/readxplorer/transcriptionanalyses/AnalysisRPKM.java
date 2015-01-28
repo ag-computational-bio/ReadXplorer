@@ -34,6 +34,7 @@ import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -47,7 +48,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     private final TrackConnector trackConnector;
     private final List<RPKMvalue> rpkmValues;
     private final List<PersistentFeature> genomeFeatures;
-    private final HashMap<Integer, RPKMvalue> featureReadCount;
+    private final Map<Integer, RPKMvalue> featureReadCount;
     private double totalMappedReads = 0;
 
     private int lastMappingIdx;
@@ -148,6 +149,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 fstFittingMapping = true;
 
                 for( int j = this.lastMappingIdx; j < mappings.size(); ++j ) {
+//TODO: generally, when results arrive unordered, the first mapping pos can be used to determine feature position to start at                    
                     Mapping mapping = mappings.get( j );
 
                     //mappings identified within a feature

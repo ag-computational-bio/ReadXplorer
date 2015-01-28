@@ -21,10 +21,15 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.RPKMvalue;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.MathUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -40,7 +45,7 @@ import javax.swing.JPanel;
 /**
  * Class for displaying a histogram of RPKM values.
  * <p>
- * @author Martin Tötsches, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @author Martin Toetsches, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ResultHistogramRPKM extends javax.swing.JPanel implements
         ComponentListener {
@@ -49,11 +54,8 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
 
     private JFXPanel fxPanel;
     private final TopComponentExtended topComp;
-    private JPanel mainPanel;
     private final List<RPKMvalue> rpkmValues;
     private BarChart<String, Number> barChart;
-    private BorderPane border;
-    private Scene scene;
 
 
     /**
@@ -69,12 +71,13 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
         initFxComponents();
         this.topComp.addComponentListener( this );
         this.topComp.open();
+        this.topComp.toFront();
         this.topComp.setName( "RPKM Value Histogram for " + GeneralUtils.generateConcatenatedString( rpkmResult.getTrackNameList(), 20 ) );
     }
 
 
     private void initSwingComponents() {
-        mainPanel = new JPanel( new BorderLayout() );
+        JPanel mainPanel = new JPanel( new BorderLayout() );
         fxPanel = new JFXPanel();
         mainPanel.setSize( 300, 300 );
         mainPanel.add( fxPanel, BorderLayout.CENTER );
@@ -90,38 +93,59 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
         Platform.runLater( new Runnable() {
             @Override
             public void run() {
-                border = new BorderPane();
-                scene = new Scene( border, 1200, 600 );
+                BorderPane border = new BorderPane();
+                Application.setUserAgentStylesheet(Application.STYLESHEET_CASPIAN);
+                Scene scene = new Scene( border, 1200, 600 );
 
                 double max = 0;
                 double min = Integer.MAX_VALUE;
+                List<Double> rpkmList = new ArrayList<>();
                 for( RPKMvalue rpkmValue : rpkmValues ) {
+                    double rpkm = rpkmValue.getRPKM();
                     if( rpkmValue.getRPKM() < min ) {
-                        min = rpkmValue.getRPKM();
+                        min = rpkm;
                     }
                     if( rpkmValue.getRPKM() >= max ) {
-                        max = rpkmValue.getRPKM();
+                        max = rpkm;
                     }
+                    rpkmList.add(rpkm);
                 }
-                double shift = max / 20;
+                Collections.sort(rpkmList);
+                
                 int[] intervals = new int[21]; //intervals of bars that are shown later
                 for( int l = 0; l < intervals.length; l++ ) {
                     intervals[l] = 0;
                 }
-                for( RPKMvalue rpkmValue : rpkmValues ) {
+                
+                //calculate quantile borders for useful resolution of the histogram
+                double quantileBorder20 = MathUtils.getQuantileBorder(0.2, rpkmList);
+                double quantileBorder90 = MathUtils.getQuantileBorder(0.9, rpkmList);
+                double shift20 = quantileBorder20 / 5;
+                double shift90 = quantileBorder90 / 13;
+                double shiftLargest = (max + 0.1) / 3;
+                
+                //add rpkm values into their corresponding interval = histogram bar
+                for (RPKMvalue rpkmValue : rpkmValues) {
                     double value = rpkmValue.getRPKM();
-                    int index = (int) Math.floor( value / shift );
+                    int index;
+                    if (value <= quantileBorder20) {
+                        index = (int) Math.floor(value / shift20);
+                    } else if (value <= quantileBorder90) {
+                        index = 5 + (int) Math.floor(value / shift90);
+                    } else {
+                        index = 18 + (int) Math.floor(value / shiftLargest);
+                    }
                     intervals[index]++;
                 }
-                max = Math.log( rpkmValues.size() );
-                NumberAxis lineYAxis = new NumberAxis( 0, max, 2 );
+                
+                double maxY = Math.log( rpkmValues.size() );
+                NumberAxis lineYAxis = new NumberAxis( 0, maxY, 2 );
                 lineYAxis.setLabel( "Number of Features (Log scale)" );
                 CategoryAxis lineXAxis = new CategoryAxis();
-                lineXAxis.setLabel( "RPKM Values" );
+                lineXAxis.setLabel( "RPKM Value Ranges" );
                 barChart = new BarChart<>( lineXAxis, lineYAxis );
                 XYChart.Series<String, Number> bar = new XYChart.Series<>();
-                bar.setName( "RPKM Values" );
-                double start = 0.0;
+                bar.setName( "Frequency of RPKM Values" );
                 /*for (int i = 0; i < rpkmValues.size(); i++) {
                  double rpkm = rpkmValues.get(i).getRPKM();
                  String name = rpkmValues.get(i).getFeature().getFeatureName();
@@ -137,17 +161,11 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
                  });
                  bar.getData().add(o);
                  }*/
+                double start = 0.0;
+                start = addDataAndDescriptionsToBar(0, 5, shift20, start, intervals, bar);
+                start = addDataAndDescriptionsToBar(5, 18, shift90, start, intervals, bar);
+                addDataAndDescriptionsToBar(18, intervals.length, shiftLargest, start, intervals, bar);
 
-                for( int i = 0; i < intervals.length; i++ ) {
-                    int end = (int) (start + shift);
-                    String name = (int) start + " - " + end;
-                    double logValue = Math.log( intervals[i] );
-                    logValue = logValue == 0 ? 0.1 : logValue;
-                    XYChart.Data<String, Number> entry = new XYChart.Data<String, Number>( name, logValue );
-                    entry.setExtraValue( intervals[i] );
-                    bar.getData().add( entry );
-                    start += shift;
-                }
                 barChart.getData().addAll( bar );
 
                 for( XYChart.Series<String, Number> series : barChart.getData() ) {
@@ -159,8 +177,53 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
 
                 border.setCenter( barChart );
                 fxPanel.setScene( scene );
-                exportPanel( fxPanel );
                 Platform.setImplicitExit( false );
+            }
+
+            /**
+             * Adds the given interval data and corresponding descriptions to
+             * the given bar chart.
+             *
+             * @param startIdx The index from the interval list to start adding
+             * the data to the bar chart
+             * @param endIdx The end index of the interval list for adding data
+             * to the bar chart
+             * @param shift The length of each interval in the list
+             * @param start The actual start value of the first interval
+             * @param intervals The list of intervals to add to the bar chart
+             * @param bar The bar chart to add the data to
+             * @return The updated start value. This is the largest value of the
+             * last interval added to the chart.
+             */
+            private double addDataAndDescriptionsToBar(int startIdx, int endIdx, double shift, double start, int[] intervals, XYChart.Series<String, Number> bar) {
+                addDataAndDescriptionToBar(start, shift, intervals, startIdx, bar);
+                start = shift;
+                for( int i = startIdx + 1; i < endIdx; i++ ) {
+                    addDataAndDescriptionToBar(start, start + shift, intervals, i, bar);
+                    start += shift;
+                }
+                return start;
+            }
+
+            /**
+             * Adds the data of a given single interval and its corresponding
+             * description to the given bar chart.
+             *
+             * @param start The start value of the interval to add
+             * @param end The end value of the interval to add
+             * @param intervals The list of intervals to add to the bar chart
+             * @param i The interval index. This interval is treated in this
+             * method call.
+             * @param bar bar The bar chart to add the data to
+             */
+            private void addDataAndDescriptionToBar(double start, double end, int[] intervals, int i, XYChart.Series<String, Number> bar) {
+                DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                String name = decimalFormat.format(start) + " - " + decimalFormat.format(end);
+                double logValue = Math.log( intervals[i] );
+                logValue = logValue == 0 ? 0.1 : logValue;
+                XYChart.Data<String, Number> entry = new XYChart.Data<String, Number>( name, logValue );
+                entry.setExtraValue( intervals[i] );
+                bar.getData().add( entry );
             }
 
 //            /**
@@ -189,11 +252,8 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
 //                    }
 //                });
 //            }
-
         } );
-
     }
-
 
     /**
      * @return The complete bar chart of this histogram.
@@ -201,12 +261,6 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
     public BarChart<String, Number> getBarChart() {
         return this.barChart;
     }
-
-
-    private void exportPanel( JFXPanel fxPanel ) {
-        this.fxPanel = fxPanel;
-    }
-
 
     public void close() {
         this.topComp.close();
