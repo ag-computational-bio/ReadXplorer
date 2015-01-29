@@ -49,7 +49,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
@@ -59,9 +58,11 @@ import org.netbeans.spi.sendopts.Description;
 import org.netbeans.spi.sendopts.Env;
 
 
-public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory {
+
+public final class CommandLineProcessor implements ArgsProcessor {
 
     private static final Logger LOG = Logger.getLogger( CommandLineProcessor.class.getName() );
+    private static final String DATABASE_NAME = "readxplorer-db";
 
     static {
         LOG.setLevel( Level.ALL );
@@ -163,207 +164,55 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
 
         // test reference file
-        final File referenceFile;
-        if( referenceArg != null ) {
-
-            referenceFile = new File( referenceArg );
-            if( !referenceFile.canRead() ) {
-                throw new CommandException( 1, "Cannot read reference file!" );
-            }
-            LOG.fine( "reference file to import: " + referenceFile.getName() );
-
-        }
-        else {
+        final File referenceFile = testReferenceFile();
+        if( referenceFile == null ) {
             env.usage();
             return;
         }
 
 
         // test track file
-        final File[] trackFiles;
-        if( readsArgs != null ) {
-
-            printInfo( ps, "track files to import:" );
-            trackFiles = new File[ readsArgs.length ];
-            for( int i=0; i<trackFiles.length; i++ ) {
-                String trackPath = readsArgs[i];
-                File trackFile = new File( trackPath );
-                if( !trackFile.canRead() ) {
-                    throw new CommandException( 1, "Cannot read track file " + (i+1) + "("+trackPath+")!" );
-                }
-                trackFiles[i] = trackFile;
-                printInfo( ps, "\tadd " + trackFiles[i].getName() );
-            }
-
-        }
-        else {
+        final File[] readsFiles = testReadsFiles( ps );
+        if( readsFiles == null ) {
             env.usage();
             return;
         }
 
 
         // test paired-end read files
-        File[] pairedEndFiles = null;
-        if( pairedEndReads != null ) {
+        final File[] pairedEndFiles = testPairedEndReadsFiles( ps );
 
-            if( pairedEndReads.length != readsArgs.length )
-                throw new CommandException( 1, "Mate pair track count ("+pairedEndReads.length+") does not match track count (" +pairedEndReads.length+")!" );
-
-            printInfo( ps, "mate pair files to import:" );
-            pairedEndFiles = new File[ pairedEndReads.length ];
-            for( int i=0; i<pairedEndFiles.length; i++ ) {
-                String peTrackPath = pairedEndReads[i];
-                pairedEndFiles[i] = new File( peTrackPath );
-                if( !referenceFile.canRead() )
-                    throw new CommandException( 1, "Cannot read mate pair track file " + (i+1) + "("+peTrackPath+")!" );
-                printInfo( ps, "\tadd " + trackFiles[i].getName() );
-            }
-
-        }
 
 
         // setup ProjectConnector
-        final ProjectConnector pc = ProjectConnector.getInstance();
-        try {
-            if( dbFileArg == null  ||  dbFileArg.isEmpty() )
-                dbFileArg = System.getProperty( "user.dir") + FileSystems.getDefault().getSeparator() + "tmp-db";
-            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-            LOG.log( Level.CONFIG, "connected to {0}", dbFileArg );
-        }
-        catch( SQLException ex ) {
+        final ProjectConnector pc = setupProjectConnector();
 
-            CommandException ce = new CommandException( 1 );
-                ce.initCause( ex );
-            throw ce;
-
-        }
 
 
         /**
          * Get a thread pool.
          * If multi-threading flag is not set, number of threads is fixed to 1
-         * thus multithreading is not active.
+         * thus multi-threading is not active.
          */
-        final ExecutorService es = Executors.newFixedThreadPool( multiThreadingArg ? Runtime.getRuntime().availableProcessors() : 1, this );
+        int noThreads = multiThreadingArg ? Runtime.getRuntime().availableProcessors() : 1;
+        final ExecutorService es = Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
 
 
         // import reference
-        final ImportReferenceResult referenceResult;
-        try {
-            printInfo( ps, "import reference genome..." );
-            Future<ImportReferenceResult> refFuture = es.submit( new ImportReferenceCallable( referenceFile ) );
-            referenceResult = refFuture.get();
+        final ImportReferenceResult referenceResult = importReference( referenceFile, es, ps );
 
-            // print (concurrent) output sequently
-            for( String msg : referenceResult.getOutput() ) {
-                printInfo( ps, msg );
-            }
-
-            // stores reference sequence in the db
-            LOG.log( Level.FINE, "start storing reference to db..." );
-            pc.addRefGenome( referenceResult.getParsedReference() );
-            printInfo( ps, "\tstored reference to db..." );
-            LOG.log( Level.FINE, "...stored reference genome source \"{0}\"", referenceResult.getParsedReference().getName() );
-            printInfo( ps, "...finished!" );
-        }
-        catch( InterruptedException | ExecutionException | StorageException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
-            CommandException ce = new CommandException( 1, "reference import failed!" );
-                ce.initCause( ex );
-            throw ce;
-        }
 
 
         // import tracks
         try {
-
-            if( pairedEndArg  ||  pairedEndFiles != null ) { // import paired-end reads
-
-                printInfo( ps, "import paired-end reads..." );
-
-                // submit parse reads jobs for (concurrent) execution
-                final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
-                final int   distance    = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
-                final byte  orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
-                final short deviation   = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
-                for( int i = 0; i < trackFiles.length; i++ ) {
-
-                    File trackFile = trackFiles[i];
-                    TrackJob trackJob1 = new TrackJob( pc.getLatestTrackId(), trackFile,
-                                                       trackFile.getName(),
-                                                       referenceResult.getReferenceJob(),
-                                                       selectParser( trackFile ),
-                                                       false,
-                                                       new Timestamp( System.currentTimeMillis() ) );
-                    TrackJob trackJob2 = null;
-                    if( pairedEndFiles != null ) {
-                        File pairedEndFile = pairedEndFiles[i];
-                        trackJob2 = new TrackJob( pc.getLatestTrackId(), pairedEndFile,
-                                                  pairedEndFile.getName(),
-                                                  referenceResult.getReferenceJob(),
-                                                  selectParser( pairedEndFile ),
-                                                  false,
-                                                  new Timestamp( System.currentTimeMillis() ) );
-                    }
-
-                    ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
-                    futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
-
-                }
-
-                // store parsed reads sequently to db
-                for( Future<ImportPairedEndResults> future : futures ) {
-                    ImportPairedEndResults result = future.get();
-                    for( String msg : referenceResult.getOutput() ) {
-                        printInfo( ps, msg );
-                    }
-
-                    // store track entry in db
-                    ParsedTrack pt = result.getParsedTrack();
-                    pc.storeBamTrack( pt );
-                    pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-
-                    // read pair ids have to be set in track entry
-                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( pt.getID(), -1 );
-                    printInfo( ps, "\tstored parsed paired-end reads("+result.getParsedTrack().getTrackName()+") to db" );
-                }
-                printInfo( ps, "...finished!" );
-
+            if( pairedEndArg  ||  pairedEndFiles != null ) {
+                // import paired-end reads
+                importPairedEndReads( readsFiles, pairedEndFiles, referenceResult, es, ps );
             }
-            else { // import normal reads
-
-                printInfo( ps, "import tracks..." );
-
-                // submit track parse jobs for (concurrent) execution
-                List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
-                for( File trackFile : trackFiles ) {
-
-                    TrackJob trackJob = new TrackJob( pc.getLatestTrackId(), trackFile,
-                            trackFile.getName(),
-                            referenceResult.getReferenceJob(),
-                            selectParser( trackFile ),
-                            false,
-                            new Timestamp( System.currentTimeMillis() ) );
-
-                    futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
-
-                }
-
-                // store parsed tracks sequently to db
-                for( Future<ImportTrackResults> future : futures ) {
-                    ImportTrackResults result = future.get();
-                    for( String msg : referenceResult.getOutput() ) {
-                        printInfo( ps, msg );
-                    }
-                    ParsedTrack pt = result.getParsedTrack();
-                    pc.storeBamTrack( pt );
-                    pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-                    printInfo( ps, "\tstored parsed track ("+result.getParsedTrack().getTrackName()+") to db" );
-                }
-                printInfo( ps, "...finished!" );
-
+            else {
+                // import normal reads
+                importReads( readsFiles, referenceResult, es, ps );
             }
-
         }
         catch( InterruptedException | ExecutionException ex ) {
             LOG.log( Level.SEVERE, null, ex );
@@ -379,14 +228,55 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
         try {
             pc.disconnect();
-            if( verboseArg )
-                ps.println( "disconnected from " + dbFileArg );
-            LOG.log( Level.FINE, "disconnected from {0}", dbFileArg );
+            printInfo( ps, "disconnected from " + dbFileArg );
         }
         catch( Exception ex ) {
-
             CommandException ce = new CommandException( 1 );
                 ce.initCause( ex );
+            throw ce;
+        }
+
+    }
+
+
+
+
+    private ProjectConnector setupProjectConnector() throws CommandException {
+
+        try {
+
+            if( dbFileArg != null ) {
+
+                if( !dbFileArg.isEmpty() ) {
+                    File dbFile = new File( dbFileArg );
+                    if( !dbFile.canRead() || !dbFile.canWrite() ) {
+                        throw new IOException( "can not access database file!" );
+                    }
+                }
+                else {
+                    throw new FileNotFoundException( "path to database file is empty!" );
+                }
+
+            }
+            else {
+                dbFileArg = System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + DATABASE_NAME;
+                File dbFile = new File( dbFileArg );
+                int i = 0;
+                while( dbFile.exists() ) {
+                    dbFile = new File( dbFileArg + '-' + i );
+                }
+            }
+
+            ProjectConnector pc = ProjectConnector.getInstance();
+            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
+            LOG.log( Level.CONFIG, "connected to {0}", dbFileArg );
+            return pc;
+
+        }
+        catch( SQLException | IOException ex ) {
+
+            CommandException ce = new CommandException( 1 );
+            ce.initCause( ex );
             throw ce;
 
         }
@@ -394,26 +284,204 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     }
 
 
-    @Override
-    public Thread newThread( Runnable r ) {
 
-        Thread t = new Thread( r, "readxplorer-cli-worker" );
-            t.setDaemon( true );
-            t.setPriority( Thread.MIN_PRIORITY );
-        return t;
+
+    private File testReferenceFile() throws CommandException {
+
+        if( referenceArg != null ) {
+
+            File referenceFile = new File( referenceArg );
+            if( !referenceFile.canRead() ) {
+                throw new CommandException( 1, "Cannot read reference file!" );
+            }
+            LOG.fine( "reference file to import: " + referenceFile.getName() );
+
+            return referenceFile;
+
+        }
+        else
+            return null;
+
+    }
+
+
+    private File[] testReadsFiles( PrintStream ps ) throws CommandException {
+
+        if( readsArgs != null ) {
+
+            printInfo( ps, "track files to import:" );
+            File[] trackFiles = new File[readsArgs.length];
+            for( int i = 0; i < trackFiles.length; i++ ) {
+                String trackPath = readsArgs[i];
+                File trackFile = new File( trackPath );
+                if( !trackFile.canRead() ) {
+                    throw new CommandException( 1, "Cannot read track file " + (i + 1) + "(" + trackPath + ")!" );
+                }
+                trackFiles[i] = trackFile;
+                printInfo( ps, "\tadd " + trackFiles[i].getName() );
+            }
+            return trackFiles;
+
+        }
+        else
+            return null;
+
+    }
+
+
+    private File[] testPairedEndReadsFiles( PrintStream ps ) throws CommandException {
+
+        if( pairedEndReads != null ) {
+
+            if( pairedEndReads.length != readsArgs.length )
+                throw new CommandException( 1, "Mate pair track count (" + pairedEndReads.length + ") does not match track count (" + pairedEndReads.length + ")!" );
+
+            printInfo( ps, "mate pair files to import:" );
+            File[] pairedEndFiles = new File[pairedEndReads.length];
+            for( int i = 0; i < pairedEndFiles.length; i++ ) {
+                String peTrackPath = pairedEndReads[i];
+                File pairedEndFile = new File( peTrackPath );
+                if( !pairedEndFile.canRead() )
+                    throw new CommandException( 1, "Cannot read paired-end file " + (i + 1) + "(" + peTrackPath + ")!" );
+                printInfo( ps, "\tadd " + pairedEndFile.getName() );
+                pairedEndFiles[i] = pairedEndFile;
+            }
+
+            return pairedEndFiles;
+
+        }
+        else
+            return null;
 
     }
 
 
 
 
-    private void printInfo( PrintStream ps, String msg ) {
+    private ImportReferenceResult importReference( File referenceFile, ExecutorService es, PrintStream ps ) throws CommandException {
 
-        LOG.info( msg );
-        if( verboseArg )
-            ps.println( msg );
+        try {
+
+            printInfo( ps, "import reference genome..." );
+            Future<ImportReferenceResult> refFuture = es.submit( new ImportReferenceCallable( referenceFile ) );
+            ImportReferenceResult referenceResult = refFuture.get();
+
+            // print (concurrent) output sequently
+            for( String msg : referenceResult.getOutput() ) {
+                printInfo( ps, msg );
+            }
+
+            // stores reference sequence in the db
+            LOG.log( Level.FINE, "start storing reference to db..." );
+            ProjectConnector.getInstance().addRefGenome( referenceResult.getParsedReference() );
+            printInfo( ps, "\tstored reference to db..." );
+            LOG.log( Level.FINE, "...stored reference genome source \"{0}\"", referenceResult.getParsedReference().getName() );
+            printInfo( ps, "...finished!" );
+            return referenceResult;
+
+        }
+        catch( InterruptedException | ExecutionException | StorageException ex ) {
+            LOG.log( Level.SEVERE, null, ex );
+            CommandException ce = new CommandException( 1, "reference import failed!" );
+            ce.initCause( ex );
+            throw ce;
+        }
 
     }
+
+
+    private void importPairedEndReads( File[] trackFiles, File[] pairedEndFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
+
+        printInfo( ps, "import paired-end reads..." );
+
+        // submit parse reads jobs for (concurrent) execution
+        final ProjectConnector pc = ProjectConnector.getInstance();
+        final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
+        final int distance = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
+        final byte orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
+        final short deviation = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
+        for( int i = 0; i < trackFiles.length; i++ ) {
+
+            File trackFile = trackFiles[i];
+            TrackJob trackJob1 = new TrackJob( pc.getLatestTrackId(), trackFile,
+                                               trackFile.getName(),
+                                               referenceResult.getReferenceJob(),
+                                               selectParser( trackFile ),
+                                               false,
+                                               new Timestamp( System.currentTimeMillis() ) );
+            TrackJob trackJob2 = null;
+            if( pairedEndFiles != null ) {
+                File pairedEndFile = pairedEndFiles[i];
+                trackJob2 = new TrackJob( pc.getLatestTrackId(), pairedEndFile,
+                                          pairedEndFile.getName(),
+                                          referenceResult.getReferenceJob(),
+                                          selectParser( pairedEndFile ),
+                                          false,
+                                          new Timestamp( System.currentTimeMillis() ) );
+            }
+
+            ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
+            futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
+
+        }
+
+        // store parsed reads sequently to db
+        for( Future<ImportPairedEndResults> future : futures ) {
+            ImportPairedEndResults result = future.get();
+            for( String msg : referenceResult.getOutput() ) {
+                printInfo( ps, msg );
+            }
+
+            // store track entry in db
+            ParsedTrack pt = result.getParsedTrack();
+            pc.storeBamTrack( pt );
+            pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+
+            // read pair ids have to be set in track entry
+            ProjectConnector.getInstance().setReadPairIdsForTrackIds( pt.getID(), -1 );
+            printInfo( ps, "\tstored parsed paired-end reads(" + result.getParsedTrack().getTrackName() + ") to db" );
+        }
+        printInfo( ps, "...finished!" );
+
+    }
+
+
+    private void importReads( File[] trackFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
+
+        printInfo( ps, "import tracks..." );
+
+        final ProjectConnector pc = ProjectConnector.getInstance();
+        // submit track parse jobs for (concurrent) execution
+        List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
+        for( File trackFile : trackFiles ) {
+
+            TrackJob trackJob = new TrackJob( pc.getLatestTrackId(), trackFile,
+                                              trackFile.getName(),
+                                              referenceResult.getReferenceJob(),
+                                              selectParser( trackFile ),
+                                              false,
+                                              new Timestamp( System.currentTimeMillis() ) );
+
+            futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
+
+        }
+
+        // store parsed tracks sequently to db
+        for( Future<ImportTrackResults> future : futures ) {
+            ImportTrackResults result = future.get();
+            for( String msg : referenceResult.getOutput() ) {
+                printInfo( ps, msg );
+            }
+            ParsedTrack pt = result.getParsedTrack();
+            pc.storeBamTrack( pt );
+            pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+            printInfo( ps, "\tstored parsed track (" + result.getParsedTrack().getTrackName() + ") to db" );
+        }
+        printInfo( ps, "...finished!" );
+
+    }
+
+
 
 
     private void printConfig( PrintStream ps, String msg ) {
@@ -425,8 +493,32 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
     }
 
 
+    private void printInfo( PrintStream ps, String msg ) {
+
+        LOG.info( msg );
+        if( verboseArg )
+            ps.println( msg );
+
+    }
 
 
+    private void printSevere( PrintStream ps, String msg ) {
+
+        LOG.severe( msg );
+        ps.println( msg );
+
+    }
+
+
+
+
+    /**
+     * Loads a property value.
+     * Uses either a provided file or the default property file.
+     *
+     * @param key the property key
+     * @return the property value
+     */
     private String getProperty( String key ) {
 
         String val = props.getProperty( key );
@@ -452,7 +544,7 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
         java.util.Properties properties = new java.util.Properties();
 
         InputStream is = null;
-        // check specified file
+        // check if a prop file is specified
         if( propsFileArg != null ) { // file is specified
             File propsFile = new File( propsFileArg );
             if( !propsFile.canRead() )
