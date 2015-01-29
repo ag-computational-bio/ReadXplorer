@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
@@ -158,13 +159,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         // print optional arguments...
-        printConfig( ps, "verbosity=" + (verboseArg ? "on" : "off") );
-        printConfig( ps, "multi-threading=" + (multiThreadingArg ? "on" : "off") );
-        printConfig( ps, "db file=" + dbFileArg );
+        printFine( ps, "verbosity=" + (verboseArg ? "on" : "off") );
+        printFine( ps, "multi-threading=" + (multiThreadingArg ? "on" : "off") );
+        printFine( ps, "db file=" + dbFileArg );
 
 
         // test reference file
-        final File referenceFile = testReferenceFile();
+        final File referenceFile = testReferenceFile( ps );
         if( referenceFile == null ) {
             env.usage();
             return;
@@ -185,7 +186,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         // setup ProjectConnector
-        final ProjectConnector pc = setupProjectConnector();
+        final ProjectConnector pc = setupProjectConnector( ps );
 
 
 
@@ -200,6 +201,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // import reference
         final ImportReferenceResult referenceResult = importReference( referenceFile, es, ps );
+        ParsedReference pr = referenceResult.getParsedReference();
 
 
 
@@ -224,8 +226,24 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // run analyses
         printInfo( ps, "start analyses..." );
+        int runAnalyses = 0;
 
 
+
+        // print reference info
+        ps.println();
+        ps.println( "imported reference: " + pr.getName() );
+        ps.println( "\tdesc: " + pr.getDescription() );
+        ps.println( "\t file: " + pr.getFastaFile().getName() );
+        ps.println( "\t# chromosomes: " + pr.getChromosomes().size() );
+        // print read info
+        ps.println();
+        ps.println( "# imported tracks: " + pc.getTracks().size() );
+        // print analyses info
+        ps.println();
+        ps.println( "# run analyses: " + runAnalyses );
+
+        
         try {
             pc.disconnect();
             printInfo( ps, "disconnected from " + dbFileArg );
@@ -241,7 +259,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
 
-    private ProjectConnector setupProjectConnector() throws CommandException {
+    private ProjectConnector setupProjectConnector( PrintStream ps ) throws CommandException {
 
         try {
 
@@ -269,7 +287,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             ProjectConnector pc = ProjectConnector.getInstance();
             pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-            LOG.log( Level.CONFIG, "connected to {0}", dbFileArg );
+            printFine( ps, "connected to " + dbFileArg );
             return pc;
 
         }
@@ -286,15 +304,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
 
-    private File testReferenceFile() throws CommandException {
+    private File testReferenceFile( PrintStream ps ) throws CommandException {
 
         if( referenceArg != null ) {
 
             File referenceFile = new File( referenceArg );
             if( !referenceFile.canRead() ) {
-                throw new CommandException( 1, "Cannot read reference file!" );
+                throw new CommandException( 1, "Cannot access reference file!" );
             }
-            LOG.fine( "reference file to import: " + referenceFile.getName() );
+            printFine( ps, "reference file to import: " + referenceFile.getName() );
 
             return referenceFile;
 
@@ -309,16 +327,16 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         if( readsArgs != null ) {
 
-            printInfo( ps, "track files to import:" );
+            printFine( ps, "read files to import:" );
             File[] trackFiles = new File[readsArgs.length];
             for( int i = 0; i < trackFiles.length; i++ ) {
                 String trackPath = readsArgs[i];
                 File trackFile = new File( trackPath );
                 if( !trackFile.canRead() ) {
-                    throw new CommandException( 1, "Cannot read track file " + (i + 1) + "(" + trackPath + ")!" );
+                    throw new CommandException( 1, "Cannot access read file " + (i + 1) + "(" + trackPath + ")!" );
                 }
                 trackFiles[i] = trackFile;
-                printInfo( ps, "\tadd " + trackFiles[i].getName() );
+                printFine( ps, "\tadd " + trackFiles[i].getName() );
             }
             return trackFiles;
 
@@ -334,16 +352,16 @@ public final class CommandLineProcessor implements ArgsProcessor {
         if( pairedEndReads != null ) {
 
             if( pairedEndReads.length != readsArgs.length )
-                throw new CommandException( 1, "Mate pair track count (" + pairedEndReads.length + ") does not match track count (" + pairedEndReads.length + ")!" );
+                throw new CommandException( 1, "Number of paired-end files (" + pairedEndReads.length + ") does not match number of read files (" + pairedEndReads.length + ")!" );
 
-            printInfo( ps, "mate pair files to import:" );
+            printFine( ps, "paired-end files to import:" );
             File[] pairedEndFiles = new File[pairedEndReads.length];
             for( int i = 0; i < pairedEndFiles.length; i++ ) {
                 String peTrackPath = pairedEndReads[i];
                 File pairedEndFile = new File( peTrackPath );
                 if( !pairedEndFile.canRead() )
-                    throw new CommandException( 1, "Cannot read paired-end file " + (i + 1) + "(" + peTrackPath + ")!" );
-                printInfo( ps, "\tadd " + pairedEndFile.getName() );
+                    throw new CommandException( 1, "Cannot access paired-end file " + (i + 1) + "(" + peTrackPath + ")!" );
+                printFine( ps, "\tadd " + pairedEndFile.getName() );
                 pairedEndFiles[i] = pairedEndFile;
             }
 
@@ -362,7 +380,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         try {
 
-            printInfo( ps, "import reference genome..." );
+            printFine( ps, "parse reference genome..." );
             Future<ImportReferenceResult> refFuture = es.submit( new ImportReferenceCallable( referenceFile ) );
             ImportReferenceResult referenceResult = refFuture.get();
 
@@ -370,13 +388,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
             for( String msg : referenceResult.getOutput() ) {
                 printInfo( ps, msg );
             }
+            printInfo( ps, "...done!" );
 
             // stores reference sequence in the db
-            LOG.log( Level.FINE, "start storing reference to db..." );
+            printFine( ps, "store reference to db..." );
             ProjectConnector.getInstance().addRefGenome( referenceResult.getParsedReference() );
-            printInfo( ps, "\tstored reference to db..." );
-            LOG.log( Level.FINE, "...stored reference genome source \"{0}\"", referenceResult.getParsedReference().getName() );
-            printInfo( ps, "...finished!" );
+            printFine( ps, "...done!" );
+            printInfo( ps, "imported reference genome source " + referenceResult.getParsedReference().getName() );
             return referenceResult;
 
         }
@@ -392,7 +410,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private void importPairedEndReads( File[] trackFiles, File[] pairedEndFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
 
-        printInfo( ps, "import paired-end reads..." );
+        printFine( ps, "submit jobs to import paired-end read files..." );
 
         // submit parse reads jobs for (concurrent) execution
         final ProjectConnector pc = ProjectConnector.getInstance();
@@ -422,10 +440,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
             futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
+            printFine( ps, "\t"+i+": " + trackFile );
 
         }
 
         // store parsed reads sequently to db
+        printFine( ps, "import paired-end read files..." );
         for( Future<ImportPairedEndResults> future : futures ) {
             ImportPairedEndResults result = future.get();
             for( String msg : referenceResult.getOutput() ) {
@@ -439,22 +459,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             // read pair ids have to be set in track entry
             ProjectConnector.getInstance().setReadPairIdsForTrackIds( pt.getID(), -1 );
-            printInfo( ps, "\tstored parsed paired-end reads(" + result.getParsedTrack().getTrackName() + ") to db" );
+            printFine( ps, "\t..." + result.getParsedTrack().getTrackName() );
         }
-        printInfo( ps, "...finished!" );
+        printFine( ps, "...done!" );
 
     }
 
 
     private void importReads( File[] trackFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
 
-        printInfo( ps, "import tracks..." );
+        printFine( ps, "submit jobs to import read files..." );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
         // submit track parse jobs for (concurrent) execution
         List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
-        for( File trackFile : trackFiles ) {
+        for( int i=0; i<trackFiles.length; i++ ) {
 
+            File trackFile = trackFiles[i];
             TrackJob trackJob = new TrackJob( pc.getLatestTrackId(), trackFile,
                                               trackFile.getName(),
                                               referenceResult.getReferenceJob(),
@@ -463,10 +484,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
                                               new Timestamp( System.currentTimeMillis() ) );
 
             futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
+            printFine( ps, "\t"+i+": " + trackFile );
 
         }
 
         // store parsed tracks sequently to db
+        printFine( ps, "import read files..." );
         for( Future<ImportTrackResults> future : futures ) {
             ImportTrackResults result = future.get();
             for( String msg : referenceResult.getOutput() ) {
@@ -475,16 +498,16 @@ public final class CommandLineProcessor implements ArgsProcessor {
             ParsedTrack pt = result.getParsedTrack();
             pc.storeBamTrack( pt );
             pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-            printInfo( ps, "\tstored parsed track (" + result.getParsedTrack().getTrackName() + ") to db" );
+            printInfo( ps, "\t..." + result.getParsedTrack().getTrackName() );
         }
-        printInfo( ps, "...finished!" );
+        printInfo( ps, "...done!" );
 
     }
 
 
 
 
-    private void printConfig( PrintStream ps, String msg ) {
+    private void printFine( PrintStream ps, String msg ) {
 
         LOG.config( msg );
         if( verboseArg )
@@ -496,15 +519,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private void printInfo( PrintStream ps, String msg ) {
 
         LOG.info( msg );
-        if( verboseArg )
-            ps.println( msg );
-
-    }
-
-
-    private void printSevere( PrintStream ps, String msg ) {
-
-        LOG.severe( msg );
         ps.println( msg );
 
     }
