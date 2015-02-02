@@ -92,26 +92,23 @@ public class CollectCoverageData implements Observer {
         List<Mapping> mappings = result.getMappings();
         Collections.sort( mappings );
         int lastMappingIdx = 0;
-        PersistentFeature feature;
-        boolean fstFittingMapping;
         boolean isStrandBothOption = readClassParams.isStrandBothOption();
         boolean isFeatureStrand = readClassParams.isStrandFeatureOption();
-        boolean analysisStrand;
 
-        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
-            feature = this.genomeFeatures.get( i );
+        for( PersistentFeature feature : genomeFeatures ) {
+
             if( feature.getChromId() == result.getRequest().getChromId() ) {
 
                 int featStart = feature.getStart() - startOffset;
                 int featStop = feature.getStop() + stopOffset;
-                analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
-                fstFittingMapping = true;
+                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
                 if( !countData.containsKey( feature ) ) {
                     countData.put( feature, 0 );
                 }
-                for( int j = lastMappingIdx; j < mappings.size(); ++j ) {
+                for( int j = lastMappingIdx; j < mappings.size(); j++ ) {
                     Mapping mapping = mappings.get( j );
                     //If the orientation of the read does not matter this one is always true.
                     //mappings identified within a feature

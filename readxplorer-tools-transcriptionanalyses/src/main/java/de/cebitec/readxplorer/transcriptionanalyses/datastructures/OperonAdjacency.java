@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.transcriptionanalyses.dataStructures;
+package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;

@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.RPKMvalue;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.RPKMvalue;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;

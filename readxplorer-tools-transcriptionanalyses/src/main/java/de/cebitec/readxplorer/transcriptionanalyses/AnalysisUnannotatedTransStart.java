@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.DetectedFeatures;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.TransStartUnannotated;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.TranscriptionStart;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.List;
 

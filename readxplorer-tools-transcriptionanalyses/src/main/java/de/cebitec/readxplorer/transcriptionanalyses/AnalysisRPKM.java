@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.RPKMvalue;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.RPKMvalue;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.RPKMvalue;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.RPKMvalue;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.MathUtils;
