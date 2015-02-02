@@ -23,7 +23,7 @@ import de.cebitec.readxplorer.parser.common.ParsedChromosome;
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;

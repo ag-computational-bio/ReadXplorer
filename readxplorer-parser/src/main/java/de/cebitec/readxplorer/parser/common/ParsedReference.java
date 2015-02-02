@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;

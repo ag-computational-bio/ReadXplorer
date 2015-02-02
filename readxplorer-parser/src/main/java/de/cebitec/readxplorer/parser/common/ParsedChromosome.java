@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
