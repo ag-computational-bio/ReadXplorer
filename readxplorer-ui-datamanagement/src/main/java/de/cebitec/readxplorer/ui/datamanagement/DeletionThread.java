@@ -37,6 +37,9 @@ import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * Thread for the deletion of tracks and references from the ReadXplorer DB.
@@ -44,6 +47,8 @@ import org.openide.windows.InputOutput;
  * @author ddoppmeier
  */
 public class DeletionThread extends SwingWorker<Object, Object> {
+
+    private static final Logger LOG = Logger.getLogger( DeletionThread.class.getName() );
 
     private final List<ReferenceJob> references;
     private final List<TrackJob> tracks;
@@ -86,7 +91,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         ph.start( workunits == 1 ? 2 : workunits );
         workunits = 0;
 
-        Logger.getLogger( DeletionThread.class.getName() ).log( Level.INFO, "Starting deletion of data" );
+        LOG.log( INFO, "Starting deletion of data" );
 
         if( !tracks.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.track" ) + ":" );
@@ -103,7 +108,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                     //  invalidRuns.add(t.getRunJob());
                     invalidGens.add( t.getRefGen() );
-                    Logger.getLogger( DeletionThread.class.getName() ).log( Level.SEVERE, null, ex );
+                    LOG.log( SEVERE, null, ex );
                 }
             }
             io.getOut().println( "" );
@@ -124,7 +129,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     }
                     catch( StorageException ex ) {
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
-                        Logger.getLogger( DeletionThread.class.getName() ).log( Level.SEVERE, null, ex );
+                        LOG.log( SEVERE, null, ex );
                     }
                 }
             }

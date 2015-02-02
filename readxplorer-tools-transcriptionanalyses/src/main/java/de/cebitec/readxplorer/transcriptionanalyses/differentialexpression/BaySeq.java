@@ -28,10 +28,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -39,6 +40,8 @@ import org.rosuda.JRI.RVector;
  * @author kstaderm
  */
 public class BaySeq {
+
+    private static final Logger LOG = Logger.getLogger( BaySeq.class.getName() );
 
     private GnuR gnuR;
     /*
@@ -81,7 +84,7 @@ public class BaySeq {
                    IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.log( INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );
         gnuR.loadPackage( "snow" );
         //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
@@ -99,7 +102,7 @@ public class BaySeq {
         //So we need to prepare for this.
         try {
             currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
+            LOG.log( INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
             gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
@@ -160,7 +163,7 @@ public class BaySeq {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 

@@ -37,12 +37,17 @@ import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  *
  * @author kstaderm
  */
 public class DeSeq {
+
+    private static final Logger LOG = Logger.getLogger( DeSeq.class.getName() );
 
     private GnuR gnuR;
 
@@ -75,7 +80,7 @@ public class DeSeq {
             }
             catch( IOException ex ) {
                 currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Unable to load plotting functions. You won't be able to plot your results!", currentTimestamp );
+                LOG.log( SEVERE, "{0}: Unable to load plotting functions. You won't be able to plot your results!", currentTimestamp );
             }
 
             //Handing over the count data to Gnu R.
@@ -257,7 +262,7 @@ public class DeSeq {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 

@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -64,6 +63,8 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -86,19 +87,22 @@ import org.openide.windows.TopComponent;
 public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
+    private static final Logger LOG = Logger.getLogger( BaySeqGraphicsTopComponent.class.getName() );
+
     private static final long serialVersionUID = 1L;
 
+    private final DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
+    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+
+    private boolean SVGCanvasActive;
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel<BaySeqAnalysisHandler.Plot> cbm;
-    private final DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
-    private final DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
-    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ResultDeAnalysis result;
     private List<Group> groups;
     private ChartPanel chartPanel;
-    private boolean SVGCanvasActive;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -370,7 +374,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                     }
                     catch( IOException ex ) {
                         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                        Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                        LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                         JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                     }
                 }
@@ -459,7 +463,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
             catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             }
             catch( BaySeq.SamplesNotValidException ex ) {
@@ -468,7 +472,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
             catch( GnuR.PackageNotLoadableException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             }
         }

@@ -28,10 +28,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -39,6 +40,8 @@ import org.rosuda.JRI.RVector;
  * @author kstaderm
  */
 public class DeSeq2 {
+
+    private static final Logger LOG = Logger.getLogger( DeSeq2.class.getName() );
 
     private GnuR gnuR;
 
@@ -54,7 +57,7 @@ public class DeSeq2 {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
         gnuR.clearGnuR();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.log( INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq2" );
         gnuR.loadPackage( "Biobase" );
         List<ResultDeAnalysis> results = new ArrayList<>();
@@ -134,7 +137,7 @@ public class DeSeq2 {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 

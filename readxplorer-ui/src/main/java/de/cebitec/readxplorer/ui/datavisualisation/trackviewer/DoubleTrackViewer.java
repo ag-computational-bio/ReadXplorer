@@ -35,9 +35,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -46,6 +47,9 @@ import java.util.prefs.Preferences;
  * @author ddoppmeier
  */
 public class DoubleTrackViewer extends TrackViewer {
+
+    private static final Logger LOG = Logger.getLogger( DoubleTrackViewer.class.getName() );
+
 
     private static final long serialVersionUID = 572406471;
 
@@ -196,7 +200,7 @@ public class DoubleTrackViewer extends TrackViewer {
                 value = this.getNormalizedValue( id1, cov1.getCoverage( absPos, isFwdStrand ) );
             }
             else {
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown coverage type!" );
+                LOG.log( SEVERE, "found unknown coverage type!" );
             }
         }
         else {

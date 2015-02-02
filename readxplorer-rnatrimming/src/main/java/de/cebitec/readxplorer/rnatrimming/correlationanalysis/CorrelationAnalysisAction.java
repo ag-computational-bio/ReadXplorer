@@ -52,6 +52,8 @@ import org.openide.util.NbBundle.Messages;
 @Messages( "CTL_CorrelationAnalysisAction=Correlation analysis" )
 public final class CorrelationAnalysisAction implements ActionListener {
 
+    private static final Logger LOG = Logger.getLogger( CorrelationAnalysisAction.class.getName() );
+
     public static final String PROP_SELECTED_TRACKS = "PROP_SELECTED_TRACKS";
     public static final String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";
     public static final String PROP_MINCORRELATION = "PROP_MINCORRELATION";
@@ -68,7 +70,6 @@ public final class CorrelationAnalysisAction implements ActionListener {
 
 
     private SelectReadClassWizardPanel readClassWizPanel;
-    private final static Logger LOG = Logger.getLogger( CorrelationAnalysisAction.class.getName() );
     private final ReferenceViewer context;
 
 

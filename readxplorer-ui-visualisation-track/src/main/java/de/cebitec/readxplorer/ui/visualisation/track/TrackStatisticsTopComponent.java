@@ -41,6 +41,8 @@ import org.openide.windows.WindowManager;
 public final class TrackStatisticsTopComponent extends TopComponentExtended
         implements LookupListener {
 
+    private final static Logger LOG = Logger.getLogger( TrackStatisticsTopComponent.class.getName() );
+
     private static final long serialVersionUID = 1L;
 
     private static TrackStatisticsTopComponent instance;
@@ -110,15 +112,13 @@ public final class TrackStatisticsTopComponent extends TopComponentExtended
     public static synchronized TrackStatisticsTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            Logger.getLogger( TrackStatisticsTopComponent.class.getName() ).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof TrackStatisticsTopComponent ) {
             return (TrackStatisticsTopComponent) win;
         }
-        Logger.getLogger( TrackStatisticsTopComponent.class.getName() ).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
+        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }

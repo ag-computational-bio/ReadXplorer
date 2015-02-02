@@ -48,13 +48,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 
 import static de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer.PROP_MOUSEPOSITION_CHANGED;
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -64,6 +64,9 @@ import static de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Abstrac
  * @author ddoppmeier, rhilker
  */
 public class BlockComponent extends JComponent {
+
+    private static final Logger LOG = Logger.getLogger( BlockComponent.class.getName() );
+
 
     private static final long serialVersionUID = 1324672345;
     private final BlockI block;
@@ -553,11 +556,11 @@ public class BlockComponent extends JComponent {
                 break;
             case UNDEF:
                 c = ColorProperties.MISMATCH_BACKGROUND;
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown brick type {0}", brick );
+                LOG.log( SEVERE, "found unknown brick type {0}", brick );
                 break;
             default:
                 c = ColorProperties.MISMATCH_BACKGROUND;
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown brick type {0}", brick );
+                LOG.log( SEVERE, "found unknown brick type {0}", brick );
         }
 
         return c;

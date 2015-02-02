@@ -38,7 +38,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class ActionXMLHandler implements ContentHandler {
 
-    private static final Logger log = Logger.getLogger( "ActionXMLHandler" );
+    private static final Logger LOG = Logger.getLogger( ActionXMLHandler.class.getName() );
 
     private JMenuBar jmb;
     private JToolBar jtb;
@@ -127,7 +127,7 @@ public class ActionXMLHandler implements ContentHandler {
                             item.setAccelerator( accelerator );
                         }
                         catch( NumberFormatException e ) {
-                            log.warning( e.getMessage().concat( " is not a valid int." ) );
+                            LOG.warning( e.getMessage().concat( " is not a valid int." ) );
                         }
                     }
                     menuPath.peek().add( item );
@@ -141,16 +141,16 @@ public class ActionXMLHandler implements ContentHandler {
 
             }
             catch( NoSuchMethodException e ) {
-                log.warning( "Could not find Constructor: ".concat( e.getMessage() ) );
+                LOG.warning( "Could not find Constructor: ".concat( e.getMessage() ) );
             }
             catch( InstantiationException e ) {
-                log.warning( "Could not instantiate: ".concat( e.getMessage() ) );
+                LOG.warning( "Could not instantiate: ".concat( e.getMessage() ) );
             }
             catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
-                log.warning( e.getMessage() );
+                LOG.warning( e.getMessage() );
             }
             catch( ClassNotFoundException e ) {
-                log.warning( "Could not find class: ".concat( e.getMessage() ) );
+                LOG.warning( "Could not find class: ".concat( e.getMessage() ) );
             }
         }
     }
@@ -164,14 +164,14 @@ public class ActionXMLHandler implements ContentHandler {
     @Override
     public void startDocument()
             throws SAXException {
-        log.info( "Loading actions..." );
+        LOG.info( "Loading actions..." );
     }
 
 
     @Override
     public void endDocument()
             throws SAXException {
-        log.info( "Actions successfully loaded." );
+        LOG.info( "Actions successfully loaded." );
     }
 
 

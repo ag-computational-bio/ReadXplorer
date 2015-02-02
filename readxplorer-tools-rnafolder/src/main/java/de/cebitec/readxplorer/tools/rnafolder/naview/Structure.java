@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.FINE;
+
 
 /**
  * NAVIEW -- A program to make a modified radial drawing of an RNA
@@ -67,11 +69,11 @@ import java.util.logging.Logger;
  */
 public class Structure {
 
+    private static final Logger LOG = Logger.getLogger( Structure.class.getName() );
+
     private static final double ANUM = 9999.0;
     private static final double pi = Math.PI;
     private static final int maxiter = 500;
-
-    private static final Logger log = Logger.getLogger( "Structure" );
 
     private Base[] bases;
     private List<Region> regions;
@@ -114,7 +116,7 @@ public class Structure {
         findCentralLoop();
 
         // show debug output
-        if( log.isLoggable( java.util.logging.Level.FINE ) ) {
+        if( LOG.isLoggable( FINE ) ) {
             dumpLoops();
         }
 
@@ -234,7 +236,7 @@ public class Structure {
         }
         if( bases[connection.start].x > ANUM - 100.0
             || bases[connection.end].x > ANUM - 100.0 ) {
-            log.severe( "Bad region passed to generateRegion. "
+            LOG.severe( "Bad region passed to generateRegion. "
                         + "Coordinates not defined." );
             return;
         }
@@ -263,7 +265,7 @@ public class Structure {
             r = Math.sqrt( h * h + b * b / 4.0 );
             disc = 1.0 - 0.5 / (r * r);
             if( Math.abs( disc ) > 1.0 ) {
-                log.severe( "Unexpected large magnitude discriminant: " + disc );
+                LOG.severe( "Unexpected large magnitude discriminant: " + disc );
                 return new Point2D.Double( 0.0, 0.0 );
             }
             theta = Math.acos( disc );
@@ -278,7 +280,7 @@ public class Structure {
         }
         while( Math.abs( e ) > 0.0001 && ++iter < maxiter );
         if( iter >= maxiter ) {
-            log.severe( "Iteration failed in findCenterForArc" );
+            LOG.severe( "Iteration failed in findCenterForArc" );
             return new Point2D.Double( 0.0, 0.0 );
         }
         return new Point2D.Double( h, theta );
@@ -437,7 +439,7 @@ public class Structure {
         done = false;
         while( !done ) {
             if( ++count > nconn * 2 ) {
-                log.severe( "infinite loop detected" );
+                LOG.severe( "infinite loop detected" );
                 return -1;
             }
             if( anchor != null && connections[ic] == croot )
@@ -517,7 +519,7 @@ public class Structure {
             connection = connections[icstart];
             count = 0;
 
-            log.fine( "Now processing Loop #" + loop.number
+            LOG.fine( "Now processing Loop #" + loop.number
                       + " (radius=" + radius + ")" );
 
             done = false;
@@ -561,7 +563,7 @@ public class Structure {
             while( !done );
             done_all = false;
             icstart1 = icstart;
-            log.fine( "icstart1 = " + icstart1 );
+            LOG.fine( "icstart1 = " + icstart1 );
             while( !done_all ) {
                 count = 0;
                 done = false;
@@ -586,7 +588,7 @@ public class Structure {
                 }
                 icmiddle = getMiddleConnection( icstart, icend, anchor, croot, loop );
                 ic = icup = icdown = icmiddle;
-                log.fine( "icstart = " + icstart + ", icmiddle = " + icmiddle
+                LOG.fine( "icstart = " + icstart + ", icmiddle = " + icmiddle
                           + ", icend = " + icend );
                 done = false;
                 direction = 0;
@@ -770,7 +772,7 @@ public class Structure {
                     dc += 2 * pi;
                 if( Math.abs( dan - dc ) > pi ) {
                     if( connection.extruded ) {
-                        log.warning( "Loop #" + loop.number + " has crossed regions" );
+                        LOG.warning( "Loop #" + loop.number + " has crossed regions" );
                     }
                     else if( (cnext.start - connection.end) != 1 ) {
                         connection.extruded = true;
@@ -836,13 +838,13 @@ public class Structure {
         int i;
         Loop loop;
 
-        log.fine( "Root loop is: #" + root.number );
+        LOG.fine( "Root loop is: #" + root.number );
         for( i = 0; i < loops.size(); i++ ) {
             loop = loops.get( i );
-            log.fine( loop.toString() );
+            LOG.fine( loop.toString() );
 
             for( Connection connection : loop.connections ) {
-                log.fine( "  " + connection.toString() );
+                LOG.fine( "  " + connection.toString() );
             }
         }
     }
@@ -901,7 +903,7 @@ public class Structure {
                         loop = constructLoop( region.end2 < nbase ? region.end2 + 1 : 0 );
                     }
                     else {
-                        log.severe( "Error in constructLoop: "
+                        LOG.severe( "Error in constructLoop: "
                                     + i + " not found in region table." );
                         return null;
                     }
@@ -954,7 +956,7 @@ public class Structure {
                 region.end1 = --i;
                 region.start2 = mate + 1;
 
-                log.fine( region.toString() );
+                LOG.fine( region.toString() );
             }
         }
     }

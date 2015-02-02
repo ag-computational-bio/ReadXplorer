@@ -71,6 +71,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class RNAMovies extends JPanel implements ActionContainer {
 
+    private static final Logger LOG = Logger.getLogger( RNAMovies.class.getName() );
+
     public static final String TITLE = "RNAMovies";
     public static final String VERSION = "2.04";
     public static final String USAGE = TITLE + VERSION + "\n"
@@ -88,8 +90,6 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
 
     private static final int SCALE = 15;
-
-    private static final Logger log = Logger.getLogger( "RNAMovies" );
 
     private Configuration config;
 
@@ -117,11 +117,11 @@ public class RNAMovies extends JPanel implements ActionContainer {
             config = new Configuration( configStream );
         }
         catch( IOException e ) {
-            log.severe( e.getMessage() );
+            LOG.severe( e.getMessage() );
             System.exit( 1 );
         }
         catch( SAXException e ) {
-            log.severe( "Error while parsing config: ".concat( e.getMessage() ) );
+            LOG.severe( "Error while parsing config: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
@@ -134,11 +134,11 @@ public class RNAMovies extends JPanel implements ActionContainer {
             parser.parse( new InputSource( actionStream ) );
         }
         catch( IOException e ) {
-            log.severe( e.getMessage() );
+            LOG.severe( e.getMessage() );
             System.exit( 1 );
         }
         catch( SAXException e ) {
-            log.severe( "Error while parsing action file: ".concat( e.getMessage() ) );
+            LOG.severe( "Error while parsing action file: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
@@ -329,7 +329,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
         title_end = name.indexOf( ' ' );
         mp.setMovie( frames, pairs, name.substring( 1, title_end == -1 ? name.length() : title_end ), sequence, w, h, gui );
-        log.log( Level.INFO, "{0} Structures loaded.", frames.size() );
+        LOG.log( Level.INFO, "{0} Structures loaded.", frames.size() );
     }
 
 //    /**

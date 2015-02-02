@@ -37,7 +37,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
@@ -47,8 +46,13 @@ import javax.swing.SwingUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 
 final class GnuRPanel extends OptionsPanel implements Observer {
+
+    private static final Logger LOG = Logger.getLogger( GnuRPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -565,7 +569,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             }
             catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create temporary file.", currentTimestamp );
+                LOG.log( SEVERE, "{0}: Could not create temporary file.", currentTimestamp );
             }
         }
     }//GEN-LAST:event_installButtonActionPerformed
@@ -578,7 +582,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             }
             catch( URISyntaxException | IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.WARNING, "{0}: Could not open URI to GNU R source file.", currentTimestamp );
+                LOG.log( WARNING, "{0}: Could not open URI to GNU R source file.", currentTimestamp );
             }
         }
     }//GEN-LAST:event_sourceFileTextFieldMouseReleased

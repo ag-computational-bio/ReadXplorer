@@ -40,6 +40,8 @@ import org.openide.windows.WindowManager;
                       autostore = false )
 public final class RNAFolderTopComponent extends TopComponentExtended {
 
+    private static final Logger LOG = Logger.getLogger( RNAFolderTopComponent.class.getName() );
+
     private static RNAFolderTopComponent instance;
     /**
      * path to the icon used by the component and its open action
@@ -136,15 +138,13 @@ public final class RNAFolderTopComponent extends TopComponentExtended {
     public static synchronized RNAFolderTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            Logger.getLogger( RNAFolderTopComponent.class.getName() ).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof RNAFolderTopComponent ) {
             return (RNAFolderTopComponent) win;
         }
-        Logger.getLogger( RNAFolderTopComponent.class.getName() ).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
+        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }

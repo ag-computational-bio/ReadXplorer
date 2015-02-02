@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.TribbleException;
@@ -41,6 +40,8 @@ import org.broad.tribble.bed.BEDCodec;
 import org.broad.tribble.bed.BEDFeature;
 import org.broad.tribble.bed.FullBEDFeature.Exon;
 import org.broad.tribble.readers.LineIterator;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -51,12 +52,14 @@ import org.broad.tribble.readers.LineIterator;
  */
 public class TribbleBEDParser implements ReferenceParserI {
 
+    private static final Logger LOG = Logger.getLogger( TribbleBEDParser.class.getName() );
+
     // File extension used by Filechooser to choose files to be parsed by this parser
     private static final String[] fileExtension = new String[]{ "bed", "BED" };
     // name of this parser for use in ComboBoxes
     private static final String parserName = "BED file";
     private static final String fileDescription = "BED file";
-    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
 
 
     /**
@@ -81,7 +84,7 @@ public class TribbleBEDParser implements ReferenceParserI {
         //at first store all eonxs in one data structure and add them to the ref genome at the end
 //        Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
+        LOG.log( INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
 
             final BEDCodec bedCodec = new BEDCodec( BEDCodec.StartOffset.ZERO );

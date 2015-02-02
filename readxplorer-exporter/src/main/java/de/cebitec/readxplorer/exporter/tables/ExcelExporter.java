@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import jxl.Workbook;
@@ -41,6 +40,9 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * General excel exporter. It supports even multiple sheets in one document.
@@ -48,6 +50,8 @@ import org.openide.util.NbBundle;
  * @author -Rolf Hilker-
  */
 public class ExcelExporter implements TableExporterI {
+
+    private static final Logger LOG = getLogger( ExcelExporter.class.getName() );
 
 
     private final ProgressHandle progressHandle;
@@ -121,7 +125,7 @@ public class ExcelExporter implements TableExporterI {
     @Override
     public File writeFile( File file ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting to write Excel file...{0}", file.getAbsolutePath() );
+        LOG.log( INFO, "Starting to write Excel file...{0}", file.getAbsolutePath() );
 
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale( new Locale( "en", "EN" ) );
@@ -159,7 +163,7 @@ public class ExcelExporter implements TableExporterI {
 
         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get( 0 ), null );
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished writing Excel file!" );
+        LOG.log( INFO, "Finished writing Excel file!" );
 
         return file;
     }

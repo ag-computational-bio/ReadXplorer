@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
@@ -46,6 +45,10 @@ import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * A class for GUI Components to safely fetching files within ReadXplorer.
@@ -56,6 +59,10 @@ import org.openide.util.NbPreferences;
              "MSG_FileReset=If you do not reset the track file location, it cannot be opened",
              "MSG_FileReset_StorageError=An error occured during storage of the new file path. Please try again" } )
 public class SaveFileFetcherForGUI {
+
+    private static final Logger LOG = getLogger( SaveFileFetcherForGUI.class.getName() );
+
+
 
     /**
      * A class for GUI Components to safely fetching files within ReadXplorer.
@@ -90,9 +97,7 @@ public class SaveFileFetcherForGUI {
                 }
                 catch( FileNotFoundException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                    Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE,
-                                                                       "{0}: Unable to open data associated with track: " + track.getId(),
-                                                                       currentTimestamp );
+                    LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
                 }
             }
             else {
@@ -154,9 +159,7 @@ public class SaveFileFetcherForGUI {
             }
             catch( FileNotFoundException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE,
-                                                                   "{0}: Unable to open data associated with track: " + tracks.toString(),
-                                                                   currentTimestamp );
+                LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
             }
         }
         return tc;
@@ -298,9 +301,7 @@ public class SaveFileFetcherForGUI {
                 }
                 catch( FileNotFoundException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                    Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE,
-                                                                       "{0}: Unable to open data associated with track: " + track.getId(),
-                                                                       currentTimestamp );
+                    LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
                 }
             }
             else {
@@ -357,9 +358,7 @@ public class SaveFileFetcherForGUI {
             }
             catch( FileNotFoundException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE,
-                                                                   "{0}: Unable to open data associated with track: " + tracks.toString(),
-                                                                   currentTimestamp );
+                LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
             }
         }
         return mtc;
@@ -532,7 +531,7 @@ public class SaveFileFetcherForGUI {
         public UserCanceledTrackPathUpdateException() {
             super( errorMessage );
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.WARNING, "{0}: " + errorMessage, currentTimestamp );
+            LOG.log( WARNING, "{0}: " + errorMessage, currentTimestamp );
         }
 
 

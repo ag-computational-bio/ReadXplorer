@@ -39,8 +39,9 @@ import org.openide.windows.InputOutput;
  */
 public class MappingProcessor {
 
+    private static final Logger LOG = Logger.getLogger( MappingProcessor.class.getName() );
+
     private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
-    private final static Logger LOG = Logger.getLogger( MappingProcessor.class.getName() );
     private RequestProcessor.Task theTask = null;
     private InputOutput io;
 
@@ -77,7 +78,7 @@ public class MappingProcessor {
 
             @Override
             public void run() {
-                
+
                 try {
                     String sam = MappingApi.mapFastaFile( new SimpleIO( io ), referencePath, sourcePath, mappingParam );
                     showMsg( "Extraction ready!" );

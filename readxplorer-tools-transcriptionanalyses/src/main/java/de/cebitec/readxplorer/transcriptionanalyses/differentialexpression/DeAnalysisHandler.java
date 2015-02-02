@@ -45,9 +45,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -61,20 +64,23 @@ import javax.swing.JOptionPane;
 public abstract class DeAnalysisHandler extends Thread implements Observable,
                                                                   DataVisualisationI {
 
-    private ReferenceConnector referenceConnector;
-    private List<PersistentFeature> genomeAnnos;
-    private final List<PersistentTrack> selectedTracks;
-    private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
+    private static final Logger LOG = Logger.getLogger( DeAnalysisHandler.class.getName() );
+
     private final int refGenomeID;
-    private List<ResultDeAnalysis> results;
-    private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
-    private File saveFile = null;
-    private final Set<FeatureType> selectedFeatureTypes;
-    private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
-    private int resultsReceivedBack = 0;
     private final int startOffset;
     private final int stopOffset;
     private final ParametersReadClasses readClassParams;
+    private final List<PersistentTrack> selectedTracks;
+    private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
+    private final Set<FeatureType> selectedFeatureTypes;
+    private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
+
+    private int resultsReceivedBack = 0;
+    private ReferenceConnector referenceConnector;
+    private File saveFile = null;
+    private List<PersistentFeature> genomeAnnos;
+    private List<ResultDeAnalysis> results;
+    private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
 
 
     public static enum Tool {
@@ -158,7 +164,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private void startAnalysis() {
         collectCoverageDataInstances = new HashMap<>();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
+        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos = new ArrayList<>();
@@ -313,28 +319,31 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
     @Override
     public synchronized void showData( Object data ) {
+
+        @SuppressWarnings( "unchecked" )
         Pair<Integer, String> res = (Pair<Integer, String>) data;
         allCountData.put( res.getFirst(), getCollectCoverageDataInstances().get( res.getFirst() ).getCountData() );
 
-        if( ++resultsReceivedBack == getCollectCoverageDataInstances().size() ) {
+        resultsReceivedBack++;
+        if( resultsReceivedBack == getCollectCoverageDataInstances().size() ) {
             try {
                 results = processWithTool();
             }
             catch( PackageNotLoadableException | UnknownGnuRException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 notifyObservers( AnalysisStatus.ERROR );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
                 this.interrupt();
             }
             catch( IllegalStateException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             }
             catch( JRILibraryNotInPathException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             }
             notifyObservers( AnalysisStatus.FINISHED );

@@ -24,12 +24,13 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbPreferences;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.JRI.Rengine;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -38,6 +39,9 @@ import org.rosuda.JRI.Rengine;
  * @author kstaderm
  */
 public class GnuR extends Rengine {
+
+    private static final Logger LOG = Logger.getLogger( GnuR.class.getName() );
+
 
     /**
      * The current instance of Gnu R. There can only be one instance.
@@ -99,7 +103,7 @@ public class GnuR extends Rengine {
             this.clearGnuR();
             KEY = null;
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Current Gnu R instace was released.", currentTimestamp );
+            LOG.log( INFO, "{0}: Current Gnu R instace was released.", currentTimestamp );
         }
         else {
             throw new IllegalStateException( "The instance of Gnu R is currently reserved by another instance." );

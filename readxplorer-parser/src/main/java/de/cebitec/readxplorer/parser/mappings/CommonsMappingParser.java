@@ -31,12 +31,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
+
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -45,6 +46,8 @@ import org.openide.util.NbBundle;
  * @author jstraube, Rolf Hilker
  */
 public final class CommonsMappingParser {
+
+    private static final Logger LOG = Logger.getLogger( CommonsMappingParser.class.getName() );
 
     /*
      * The cigar values are as follows: 0 (M) = alignment match (both, match or
@@ -426,7 +429,7 @@ public final class CommonsMappingParser {
                     }
                     break;
                 default:
-                    Logger.getLogger( CommonsMappingParser.class.getName() ).log( Level.WARNING, NbBundle.getMessage( CommonsMappingParser.class, "CommonMethod.CIGAR ", op ) );
+                    LOG.log( WARNING, NbBundle.getMessage( CommonsMappingParser.class, "CommonMethod.CIGAR ", op ) );
                     break;
             }
         }

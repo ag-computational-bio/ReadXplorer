@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.Exceptions;
@@ -38,6 +37,8 @@ import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
 
+import static java.util.logging.Level.INFO;
+
 
 /**
  * A parser for parsing CSV files.
@@ -45,6 +46,8 @@ import org.supercsv.prefs.CsvPreference;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvTableParser implements CsvParserI {
+
+    private static final Logger LOG = Logger.getLogger( CsvTableParser.class.getName() );
 
     private static final String name = "CSV Table Parser";
     private static final String[] fileExtension = new String[]{ "csv", "CSV" };
@@ -92,7 +95,7 @@ public class CsvTableParser implements CsvParserI {
 
                 tableData = this.parseTable( fileToRead, pref );
                 if( tableData != null ) {
-                    Logger.getLogger( CsvTableParser.class.getName() ).log( Level.INFO, "Entry delimiter used for this table is: {0}", (char) pref.getDelimiterChar() );
+                    LOG.log( INFO, "Entry delimiter used for this table is: {0}", (char) pref.getDelimiterChar() );
                     break;
                 }
             }

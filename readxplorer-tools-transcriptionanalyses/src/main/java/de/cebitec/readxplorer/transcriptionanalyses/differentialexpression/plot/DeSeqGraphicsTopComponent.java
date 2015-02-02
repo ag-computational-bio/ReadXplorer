@@ -39,7 +39,6 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -58,6 +57,8 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -84,16 +85,18 @@ import org.openide.windows.TopComponent;
 public final class DeSeqGraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
+    private static final Logger LOG = Logger.getLogger( DeSeqGraphicsTopComponent.class.getName() );
+
     private static final long serialVersionUID = 1L;
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
     private ChartPanel chartPanel;
-    private ComboBoxModel cbm;
+    private ComboBoxModel<DeSeqAnalysisHandler.Plot> cbm;
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
     private boolean SVGCanvasActive;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -115,7 +118,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
     public DeSeqGraphicsTopComponent( DeAnalysisHandler handler, boolean moreThanTwoConditions ) {
         analysisHandler = handler;
         this.result = handler.getResults().get( 0 );
-        cbm = new DefaultComboBoxModel( DeSeqAnalysisHandler.Plot.getValues( moreThanTwoConditions ) );
+        cbm = new DefaultComboBoxModel<>( DeSeqAnalysisHandler.Plot.getValues( moreThanTwoConditions ) );
         initComponents();
         setupGraphics();
         iSymbol.setVisible( false );
@@ -138,7 +141,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
         messages = new javax.swing.JTextArea();
         saveButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
-        plotType = new javax.swing.JComboBox();
+        plotType = new javax.swing.JComboBox<DeSeqAnalysisHandler.Plot>();
         jLabel1 = new javax.swing.JLabel();
         plotPanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -290,12 +293,12 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
         }
         catch( IOException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
         }
         catch( GnuR.PackageNotLoadableException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
         }
     }//GEN-LAST:event_plotButtonActionPerformed
@@ -324,7 +327,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
                     }
                     catch( IOException ex ) {
                         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                        Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                        LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                         JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                     }
                     finally {
@@ -354,7 +357,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
     private javax.swing.JButton plotButton;
     private javax.swing.JTextArea plotDescriptionArea;
     private javax.swing.JPanel plotPanel;
-    private javax.swing.JComboBox plotType;
+    private javax.swing.JComboBox<DeSeqAnalysisHandler.Plot> plotType;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 

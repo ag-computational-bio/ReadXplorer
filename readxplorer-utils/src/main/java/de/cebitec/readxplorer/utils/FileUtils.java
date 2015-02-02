@@ -22,7 +22,6 @@ import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -30,16 +29,18 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * Utils for work with files and directories
  * <p>
  * @author Evgeny Anisiforov
  */
-public class FileUtils {
+public final class FileUtils {
 
-    private FileUtils() {
-    }
+    private final static Logger LOG = Logger.getLogger( FileUtils.class.getName() );
 
 
     /**
@@ -133,12 +134,12 @@ public class FileUtils {
                     prefs.flush();
                 }
                 catch( BackingStoreException ex ) {
-                    Logger.getLogger( forClass.getName() ).log( Level.SEVERE, null, ex );
+                    LOG.log( SEVERE, null, ex );
                 }
                 return file;
             }
             else {
-                Logger.getLogger( forClass.getName() ).log( Level.WARNING, "Could not read file" );
+                LOG.log( WARNING, "Could not read file" );
             }
         }
         return null;

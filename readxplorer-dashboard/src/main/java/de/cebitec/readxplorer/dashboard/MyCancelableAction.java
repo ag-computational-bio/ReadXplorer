@@ -29,6 +29,8 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
 
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * An action, which can be canceled.
@@ -37,8 +39,9 @@ import org.openide.util.TaskListener;
  */
 public final class MyCancelableAction implements ActionListener {
 
+    private static final Logger LOG = getLogger( MyCancelableAction.class.getName() );
+
     private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
-    private final static Logger LOG = Logger.getLogger( MyCancelableAction.class.getName() );
     private RequestProcessor.Task theTask = null;
 
 

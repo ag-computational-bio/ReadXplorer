@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -34,11 +33,15 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * @author ddopmeier?, jstraube?, rhilker
  */
 public final class LoginVisualPanel extends JPanel {
+
+    private static final Logger LOG = Logger.getLogger( LoginVisualPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -155,7 +158,7 @@ public final class LoginVisualPanel extends JPanel {
             prefs.flush();
         }
         catch( BackingStoreException ex ) {
-            Logger.getLogger( LoginVisualPanel.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( SEVERE, null, ex );
         }
     }
 

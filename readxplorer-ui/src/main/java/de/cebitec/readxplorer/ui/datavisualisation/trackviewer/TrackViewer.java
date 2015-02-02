@@ -47,13 +47,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JSlider;
 import org.openide.util.NbPreferences;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -62,6 +63,9 @@ import org.openide.util.NbPreferences;
  * @author ddoppmeier
  */
 public class TrackViewer extends AbstractViewer implements ThreadListener {
+
+    private static final Logger LOG = Logger.getLogger( TrackViewer.class.getName() );
+
 
     private static final long serialVersionUID = 572406471;
     private static final int MININTERVALLENGTH = 25000;
@@ -492,16 +496,18 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      *         position.
      */
     protected double calcCoverageValue( boolean isFwdStrand, Classification classType, int absPos ) {
+
         double value = 0;
         try {
-            value = this.covManager.getCoverage( classType ).getCoverage( absPos, isFwdStrand );
+            value = covManager.getCoverage( classType ).getCoverage( absPos, isFwdStrand );
         }
         catch( IllegalArgumentException e ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown mapping classification type!" );
+            LOG.log( SEVERE, "found unknown mapping classification type!" );
         }
-        value = this.getNormalizedValue( this.id1, value );
+        value = getNormalizedValue( id1, value );
 
         return value;
+        
     }
 
 

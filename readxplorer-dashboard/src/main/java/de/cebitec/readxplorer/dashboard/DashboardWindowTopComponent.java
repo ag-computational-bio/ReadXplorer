@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
@@ -60,6 +59,8 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -89,6 +90,9 @@ import org.openide.windows.TopComponent;
     "DashboardWindowTopComponent_openDBButton_loggedIn=Close this and open another database", } )
 public final class DashboardWindowTopComponent extends TopComponentExtended
         implements ExplorerManager.Provider {
+
+    private static final Logger LOG = Logger.getLogger( DashboardWindowTopComponent.class.getName() );
+
 
     private static final long serialVersionUID = 1L;
 
@@ -141,8 +145,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             } );
                         }
                         catch( Exception e ) {
-                            Logger.getLogger( this.getClass().getName() ).log( Level.WARNING,
-                                                                               e.getMessage() );
+                            LOG.log( WARNING, e.getMessage() );
                         }
                     }
 
@@ -668,11 +671,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     }
 
     /**
-     * Opens a TableFileChooser and fetches the track statistics for all tracks 
+     * Opens a TableFileChooser and fetches the track statistics for all tracks
      * stored in the DB to store their statistics in a table file.
      */
     private void storeTrackStatistics() {
-        TableExportFileChooser fileChooser = new TableExportFileChooser( 
+        TableExportFileChooser fileChooser = new TableExportFileChooser(
                 TableExportFileChooser.getTableFileExtensions(), new TrackStatisticsGenerator() );
     }
 

@@ -31,8 +31,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -47,10 +48,14 @@ import java.util.logging.Logger;
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
+    private static final Logger LOG = Logger.getLogger( FastaReferenceParser.class.getName() );
+
+
     private static final String parsername = "Fasta file";
     private static final String[] fileExtension = new String[]{ "fas", "fasta", "fna", "fa" };
     private static final String fileDescription = "Fasta File";
-    private final ArrayList<Observer> observers = new ArrayList<>();
+
+    private final List<Observer> observers = new ArrayList<>();
 //    private String errorMsg;
 
 
@@ -89,7 +94,7 @@ public class FastaReferenceParser implements ReferenceParserI {
 
         final ParsedReference refGenome = new ParsedReference();
         int chromCounter = 0;
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
+        LOG.log( INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
 
             refGenome.setDescription( referenceJob.getDescription() );
@@ -115,7 +120,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             this.notifyObservers( ex.getMessage() );
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{ referenceJob.getFile(), chromCounter } );
+        LOG.log( INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{ referenceJob.getFile(), chromCounter } );
         return refGenome;
 
     }

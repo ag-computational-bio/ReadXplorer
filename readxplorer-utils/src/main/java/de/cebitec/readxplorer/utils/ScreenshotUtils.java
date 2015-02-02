@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.MissingResourceException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -51,6 +50,9 @@ import org.w3c.dom.Document;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ScreenshotUtils {
+
+    private final static Logger LOG = Logger.getLogger( ScreenshotUtils.class.getName() );
+
 
     /**
      * Utility class. Not instantiable.
@@ -115,7 +117,7 @@ public class ScreenshotUtils {
                                 NotificationDisplayer.getDefault().notify( Bundle.ScreenshotUtils_SuccessHeader(),
                                                                            new ImageIcon(), Bundle.ScreenshotUtils_SuccessMsg() + fileLocation, null );
 
-                                Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished writing Excel file!" );
+                                LOG.info( "Finished writing Excel file!" );
                             }
 
 

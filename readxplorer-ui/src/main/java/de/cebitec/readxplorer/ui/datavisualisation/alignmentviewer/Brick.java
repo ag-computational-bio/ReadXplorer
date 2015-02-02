@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -45,6 +46,8 @@ public enum Brick {
     UNDEF( Brick.UNDEF_STRING ),
     SKIPPED( Brick.SKIPPED_STRING ),
     TRIMMED( Brick.TRIMMED_STRING );
+
+    private static final Logger LOG = Logger.getLogger( Brick.class.getName() );
 
     private final static String READGAP_STRING = "-";
     private final static String FOREIGN_GENOMEGAP_STRING = "";
@@ -100,7 +103,8 @@ public enum Brick {
      * <p>
      * @return The brick type of the diff
      */
-    public static Brick determineDiffType( char c ) {
+    public static Brick determineDiffType( final char c ) {
+
         Brick type;
         switch( c ) {
             case 'A':
@@ -132,9 +136,10 @@ public enum Brick {
                 break;
             default:
                 type = Brick.UNDEF;
-                Logger.getLogger( Brick.class.getName() ).log( Level.SEVERE, "found unknown brick type {0}", c );
+                LOG.log( SEVERE, "found unknown brick type {0}", c );
         }
         return type;
+
     }
 
 
@@ -145,7 +150,8 @@ public enum Brick {
      * <p>
      * @return The brick type of the gap
      */
-    public static Brick determineGapType( char c ) {
+    public static Brick determineGapType( final char c ) {
+
         Brick type;
         switch( c ) {
             case 'A':
@@ -165,9 +171,10 @@ public enum Brick {
                 break;
             default:
                 type = Brick.UNDEF;
-                Logger.getLogger( Brick.class.getName() ).log( Level.SEVERE, "found unknown brick type {0}", c );
+                LOG.log( SEVERE, "found unknown brick type {0}", c );
         }
         return type;
+
     }
 
 

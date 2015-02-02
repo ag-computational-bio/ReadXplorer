@@ -49,7 +49,7 @@ import javax.swing.text.JTextComponent;
 public class ExportAccessory extends JPanel implements PropertyChangeListener {
 
     /* create a private instance of a Logger */
-    private static final Logger log = Logger.getLogger( ExportAccessory.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ExportAccessory.class.getName() );
 
     private final JSpinner zoom;
 
@@ -232,7 +232,7 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
                 }
             }
             catch( NullPointerException e ) {
-                log.severe( "A NullPointerException occurred during evaluate the PropertyChangeEvent!" );
+                LOG.severe( "A NullPointerException occurred during evaluate the PropertyChangeEvent!" );
             }
 
 

@@ -62,6 +62,8 @@ import org.openide.windows.WindowManager;
 } )
 public final class DetailedViewerTopComponent extends TopComponentExtended {
 
+    private static final Logger LOG = Logger.getLogger( DetailedViewerTopComponent.class.getName() );
+
     private static final long serialVersionUID = 1L;
     private static final String PREFERRED_ID = "DetailedViewerTopComponent";
 
@@ -256,15 +258,13 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     public static synchronized DetailedViewerTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            Logger.getLogger( DetailedViewerTopComponent.class.getName() ).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof DetailedViewerTopComponent ) {
             return (DetailedViewerTopComponent) win;
         }
-        Logger.getLogger( DetailedViewerTopComponent.class.getName() ).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
+        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }

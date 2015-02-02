@@ -55,6 +55,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
@@ -83,6 +84,8 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.WindowManager;
 
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * ServiceProvider for IThumbnailView.
@@ -95,18 +98,20 @@ import org.openide.windows.WindowManager;
 public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                                                  Lookup.Provider {
 
-    private final HashMap<ReferenceViewer, ThumbNailViewTopComponent> refThumbTopComponents;
+    private static final Logger LOG = Logger.getLogger( ThumbnailController.class.getName() );
+
+    private final Map<ReferenceViewer, ThumbNailViewTopComponent> refThumbTopComponents;
     //Currently active ThumbnailTopComponent and ReferenceViewer
     private ThumbNailViewTopComponent activeTopComp;
     private ReferenceViewer activeViewer;
     //Gives access to all Features which are displayed for a referenceViewer
-    private final HashMap<ReferenceViewer, List<PersistentFeature>> selectedFeatures;
+    private final Map<ReferenceViewer, List<PersistentFeature>> selectedFeatures;
     //Gives access to all BasePanels for Feature
-    private final HashMap<PersistentFeature, List<BasePanel>> featureToTrackpanelList;
+    private final Map<PersistentFeature, List<BasePanel>> featureToTrackpanelList;
     //Gives access to PersistentTrack from BasePanel
-    private final HashMap<BasePanel, PersistentTrack> trackPanelToTrack;
+    private final Map<BasePanel, PersistentTrack> trackPanelToTrack;
     //Gives access to LayoutWidget for currentFeature
-    private final HashMap<PersistentFeature, Widget> featureToLayoutWidget;
+    private final Map<PersistentFeature, Widget> featureToLayoutWidget;
     private PersistentFeature currentFeature;
     private ViewController controller;
     private final InstanceContent content;
@@ -269,8 +274,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                             }
                         }
                         catch( ClassCastException e ) {
-                            Logger.getLogger( ThumbnailController.class.getName() ).log(
-                                    Level.WARNING, e.getMessage() );
+                            LOG.log( WARNING, e.getMessage() );
                         }
                     }
                 }
@@ -688,8 +692,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 this.compareTwoTracks( trackList, currentFeature );
             }
             catch( ClassCastException ex ) {
-                Logger.getLogger( ThumbnailController.class.getName() ).log(
-                        Level.WARNING, ex.getMessage() );
+                LOG.log( WARNING, ex.getMessage() );
             }
         }
 

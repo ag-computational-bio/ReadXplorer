@@ -39,6 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * Thread for carrying out the requests for receiving coverage from a bam file.
@@ -47,13 +49,13 @@ import javax.swing.JOptionPane;
  */
 public class CoverageThread extends RequestThread {
 
+    private static final Logger LOG = getLogger( CoverageThread.class.getName() );
+
     private long trackID;
     private long trackID2;
     private final List<PersistentTrack> tracks;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResult currentCov;
-//    private double requestCounter = 0;
-//    private double skippedCounter = 0;
     private PersistentReference referenceGenome;
 
 
@@ -72,13 +74,13 @@ public class CoverageThread extends RequestThread {
         // do id specific stuff
         this.tracks = tracks;
         if( tracks.size() == 1 ) {
-            this.singleCoverageThread( tracks.get( 0 ).getId() );
+            singleCoverageThread( tracks.get( 0 ).getId() );
         }
         else if( tracks.size() == 2 && !combineTracks ) {
-            this.doubleCoverageThread( tracks.get( 0 ).getId(), tracks.get( 1 ).getId() );
+            doubleCoverageThread( tracks.get( 0 ).getId(), tracks.get( 1 ).getId() );
         }
         else if( tracks.size() >= 2 ) {
-            this.multipleCoverageThread();
+            multipleCoverageThread();
         }
         else {
             throw new UnsupportedOperationException( "At least one track needs to be handed over to the CoverageThread." );
@@ -88,8 +90,8 @@ public class CoverageThread extends RequestThread {
 
     private void singleCoverageThread( long trackID ) {
         this.trackID = trackID;
-        this.trackID2 = 0;
-        this.currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, null );
+        trackID2 = 0;
+        currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, null );
     }
 
 
@@ -101,15 +103,15 @@ public class CoverageThread extends RequestThread {
 
 
     private void multipleCoverageThread() {
-        this.trackID = 0;
-        this.trackID2 = 0;
+        trackID = 0;
+        trackID2 = 0;
         currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, null );
     }
 
 
     @Override
     public void addRequest( IntervalRequest request ) {
-        this.setLatestRequest( request );
+        setLatestRequest( request );
         requestQueue.add( request );
     }
 
@@ -125,9 +127,9 @@ public class CoverageThread extends RequestThread {
      */
     CoverageAndDiffResult getCoverageAndDiffsFromFile( IntervalRequest request, PersistentTrack track ) {
         File file = new File( track.getFilePath() );
-        if( this.referenceGenome == null ) {
+        if( referenceGenome == null ) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( track.getRefGenID() );
-            this.referenceGenome = refConnector.getRefGenome();
+            referenceGenome = refConnector.getRefGenome();
         }
         SamBamFileReader externalDataReader = new SamBamFileReader( file, track.getId(), referenceGenome );
         CoverageAndDiffResult result = externalDataReader.getCoverageFromBam( request );
@@ -149,9 +151,9 @@ public class CoverageThread extends RequestThread {
     CoverageAndDiffResult getCoverageAndReadStartsFromFile( IntervalRequest request, PersistentTrack track ) {
         CoverageAndDiffResult result;
         File file = new File( track.getFilePath() );
-        if( this.referenceGenome == null ) {
+        if( referenceGenome == null ) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( track.getRefGenID() );
-            this.referenceGenome = refConnector.getRefGenome();
+            referenceGenome = refConnector.getRefGenome();
         }
 
         SamBamFileReader externalDataReader = new SamBamFileReader( file, track.getId(), referenceGenome );
@@ -187,14 +189,14 @@ public class CoverageThread extends RequestThread {
         if( tracks.size() > 1 ) {
             for( int i = 0; i < this.tracks.size(); ++i ) {
                 CoverageAndDiffResult intermedRes = this.getCoverageAndReadStartsFromFile( request, tracks.get( i ) );
-                cov = this.mergeMultCoverages( cov, intermedRes.getCovManager() );
-                readStarts = this.mergeMultCoverages( readStarts, intermedRes.getReadStarts() );
+                cov = mergeMultCoverages( cov, intermedRes.getCovManager() );
+                readStarts = mergeMultCoverages( readStarts, intermedRes.getReadStarts() );
             }
             result = new CoverageAndDiffResult( cov, null, null, request );
             result.setReadStarts( readStarts );
         }
         else {
-            result = this.getCoverageAndReadStartsFromFile( request, tracks.get( 0 ) );
+            result = getCoverageAndReadStartsFromFile( request, tracks.get( 0 ) );
         }
 
         return result;
@@ -235,7 +237,7 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL,
                 CoverageManager.TRACK2,
                 request.getReadClassParams() );
-        CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile( newRequest, tracks.get( 0 ) );
+        CoverageAndDiffResult result = getCoverageAndDiffsFromFile( newRequest, tracks.get( 0 ) );
 
         newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -248,7 +250,7 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL,
                 CoverageManager.TRACK1,
                 request.getReadClassParams() );
-        result.addCoverageManager( this.getCoverageAndDiffsFromFile( newRequest, tracks.get( 1 ) ).getCovManager() );
+        result.addCoverageManager( getCoverageAndDiffsFromFile( newRequest, tracks.get( 1 ) ).getCovManager() );
 
         return result;
     }
@@ -389,7 +391,7 @@ public class CoverageThread extends RequestThread {
             Thread.sleep( msToSleep );
         }
         catch( InterruptedException ex ) {
-            Logger.getLogger( CoverageThread.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
     }
 

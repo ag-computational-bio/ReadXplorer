@@ -25,7 +25,7 @@ import javax.swing.BoundedRangeModel;
 
 public class FieldAdapter implements ConfigListener {
 
-    private static final Logger log = Logger.getLogger( "FieldAdapter" );
+    private static final Logger LOG = Logger.getLogger( FieldAdapter.class.getName() );
 
     private final Object configurable;
 
@@ -63,10 +63,10 @@ public class FieldAdapter implements ConfigListener {
             }
         }
         catch( NoSuchFieldException ex ) {
-            log.severe( "No such field: ".concat( ex.getMessage() ) );
+            LOG.severe( "No such field: ".concat( ex.getMessage() ) );
         }
         catch( IllegalAccessException ex ) {
-            log.severe( ex.getMessage() );
+            LOG.severe( ex.getMessage() );
         }
     }
 

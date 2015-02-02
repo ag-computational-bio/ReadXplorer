@@ -31,12 +31,13 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -47,19 +48,21 @@ import org.openide.util.Utilities;
  */
 public class JFeature extends JComponent {
 
+    private static final Logger LOG = Logger.getLogger( JFeature.class.getName() );
+
     private static final long serialVersionUID = 347348234;
-    private final PersistentFeature feature;
-    private final Dimension size;
     public static final int NORMAL_HEIGHT = 12;
     public static final int PARENT_FEATURE_HEIGHT = 8;
     public static final byte BORDER_NONE = 0;
     public static final byte BORDER_LEFT = -1;
     public static final byte BORDER_RIGHT = 1;
     public static final byte BORDER_BOTH = 2;
+    private final short border;
     private final int height;
     private final Font font;
+    private final PersistentFeature feature;
+    private final Dimension size;
     private Color color;
-    private final short border;
 
 
     /**
@@ -267,7 +270,7 @@ public class JFeature extends JComponent {
             c = ColorProperties.MINUS_TEN;
         }
         else {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "Found unknown type for feature {0}", feature.getType() );
+            LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
             c = ColorProperties.UNDEF_FEATURE;
         }
 

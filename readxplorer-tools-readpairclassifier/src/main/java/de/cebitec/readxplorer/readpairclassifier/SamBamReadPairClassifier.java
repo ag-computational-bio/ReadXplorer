@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
@@ -60,6 +59,8 @@ import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -76,6 +77,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider( service = ReadPairClassifierI.class )
 public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                                  Observable, MessageSenderI {
+
+    private static final Logger LOG = Logger.getLogger( SamBamReadPairClassifier.class.getName() );
 
     private final ErrorLimit errorLimit;
     private final List<Observer> observers;
@@ -148,7 +151,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver( this );
         boolean success = sorter.sortSamBam( trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING );
-        this.deleteSortedFile = success;
+        deleteSortedFile = success;
         return success;
     }
 
@@ -183,7 +186,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             long finish;
             this.notifyObservers( Bundle.Classifier_Classification_Start() );
 
-            int lineno = 0;
+            int lineNo = 0;
             int noSkippedReads = 0;
             SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() );
             samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
@@ -200,24 +203,21 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 
             File outputFile = writerAndFile.getSecond();
 
-            SAMRecord record;
-            String readName; //read name without pair tag
             String lastReadName = ""; //read name without pair tag
             Map<SAMRecord, Integer> diffMap1 = new HashMap<>( 1024 ); //mapping of record to number of differences
             Map<SAMRecord, Integer> diffMap2 = new HashMap<>( 1024 ); //mapping of record to number of differences
             class1 = new ParsedClassification( sortOrder ); //classification data for all reads with same read name
             class2 = new ParsedClassification( sortOrder );
-            char pairTag;
             int readPairId = 1;
 
             while( samItor.hasNext() ) {
-                ++lineno;
+                lineNo++;
                 try {
                     //separate all mappings of same pair by read pair tag and hand it over to classification then
-                    record = samItor.next();
+                    SAMRecord record = samItor.next();
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
-                        pairTag = CommonsMappingParser.getReadPairTag( record );
-                        readName = CommonsMappingParser.getReadNameWithoutPairTag( record.getReadName() );
+                        char pairTag = CommonsMappingParser.getReadPairTag( record );
+                        String readName = CommonsMappingParser.getReadNameWithoutPairTag( record.getReadName() );//read name without pair tag
 
                         // classify read pair, because all mappings for this pair are currently stored in the lists
                         if( !readName.equals( lastReadName ) && !lastReadName.isEmpty() ) { //meaning: next pair, because sorted by read name
@@ -226,7 +226,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                             CommonsMappingParser.writeSamRecord( diffMap2, class2, samBamWriter );
                             class1 = new ParsedClassification( sortOrder );
                             class2 = new ParsedClassification( sortOrder );
-                            ++readPairId;
+                            readPairId++;
 
                         }
 
@@ -234,19 +234,19 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                         if( pairTag == Properties.EXT_A1 ) {
                             record.setReadPairedFlag( true );
                             record.setFirstOfPairFlag( true );
-                            classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineno, refSeqFetcher, diffMap1, class1 );
+                            classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap1, class1 );
                         }
                         else if( pairTag == Properties.EXT_A2 ) {
                             record.setReadPairedFlag( true );
                             record.setSecondOfPairFlag( true );
-                            classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineno, refSeqFetcher, diffMap2, class2 );
+                            classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap2, class2 );
                         }
                         else { //since only reads without pair tag can have the same read name as the current one without pair tag its okay to add them to 1's data
-                            classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineno, refSeqFetcher, diffMap1, class1 );
+                            classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap1, class1 );
                         }
 
                         if( !classified ) {
-                            ++noSkippedReads;
+                            noSkippedReads++;
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
@@ -254,19 +254,19 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     }
                     else { // else read is unmapped or belongs to another reference
                         this.sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
-                                                                    "Parser.Parsing.CorruptData", lineno, record.getReadName() ) );
+                                                                    "Parser.Parsing.CorruptData", lineNo, record.getReadName() ) );
                     }
                 }
                 catch( SAMFormatException e ) {
                     if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
-                        this.sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
-                                                                    "Parser.Parsing.CorruptData", lineno, e.toString() ) );
+                        sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
+                                                                    "Parser.Parsing.CorruptData", lineNo, e.toString() ) );
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
 
-                if( lineno % 500000 == 0 ) {
+                if( lineNo % 500000 == 0 ) {
                     finish = System.currentTimeMillis();
-                    this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
+                    notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " mappings processed in " ) );
                 }
                 System.err.flush();
             }
@@ -278,12 +278,12 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             }
 
             if( errorLimit.getSkippedCount() > 0 ) {
-                this.notifyObservers( "... " + errorLimit.getSkippedCount() + " more errors occured" );
+                notifyObservers( "... " + errorLimit.getSkippedCount() + " more errors occured" );
             }
 
-            this.notifyObservers( "Writing extended read pair bam file..." );
+            notifyObservers( "Writing extended read pair bam file..." );
             samItor.close();
-            this.samBamWriter.close();
+            samBamWriter.close();
             samBamReader.close();
 
             samBamReader = new SAMFileReader( outputFile );
@@ -293,10 +293,10 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             utils.createIndex( samBamReader, indexFile );
             samBamReader.close();
 
-            this.notifyObservers( "Reads skipped during parsing due to inconsistent data: " + noSkippedReads );
+            notifyObservers( "Reads skipped during parsing due to inconsistent data: " + noSkippedReads );
             finish = System.currentTimeMillis();
             String msg = Bundle.Classifier_Classification_Finish();
-            this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
+            notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
             if( deleteSortedFile ) { //delete the sorted/preprocessed file
                 GeneralUtils.deleteOldWorkFile( oldWorkFile );
@@ -312,7 +312,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         }
         catch( MissingResourceException | IOException e ) {
             this.notifyObservers( Bundle.Classifier_Error( e.getMessage() ) );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, e.getMessage() );
+            LOG.log( INFO, e.getMessage() );
         }
 
         return new ParsedReadPairContainer();

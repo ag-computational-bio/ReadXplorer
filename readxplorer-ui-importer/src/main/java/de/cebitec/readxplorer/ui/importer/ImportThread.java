@@ -31,9 +31,9 @@ import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamStatsParser;
 import de.cebitec.readxplorer.parser.output.SamBamCombiner;
+import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.parser.reference.filter.FilterRuleSource;
-import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import de.cebitec.readxplorer.readpairclassifier.SamBamReadPairClassifier;
 import de.cebitec.readxplorer.readpairclassifier.SamBamReadPairStatsParser;
 import de.cebitec.readxplorer.utils.Benchmark;
@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
@@ -56,6 +55,9 @@ import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * THE thread in ReadXplorer for handling the import of data.
@@ -64,6 +66,8 @@ import org.openide.windows.InputOutput;
  */
 public class ImportThread extends SwingWorker<Object, Object> implements
         Observer {
+
+    private static final Logger LOG = Logger.getLogger( ImportThread.class.getName() );
 
     private final InputOutput io;
     private final List<ReferenceJob> referenceJobs;
@@ -101,7 +105,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
 
     private ParsedReference parseRefJob( ReferenceJob refGenJob ) throws ParsingException, OutOfMemoryError {
-        Logger.getLogger( ImportThread.class.getName() ).log( Level.INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.log( INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
 
         ReferenceParserI parser = refGenJob.getParser();
         parser.registerObserver( this );
@@ -109,7 +113,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         filter.addBlacklistRule( new FilterRuleSource() );
         ParsedReference refGenome = parser.parseReference( refGenJob, filter );
 
-        Logger.getLogger( ImportThread.class.getName() ).log( Level.INFO, "Finished parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.log( INFO, "Finished parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
         return refGenome;
     }
 
@@ -124,12 +128,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * @throws StorageException
      */
     private void storeRefGenome( ParsedReference refGenome, ReferenceJob refGenJob ) throws StorageException {
-        Logger.getLogger( ImportThread.class.getName() ).log( Level.INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.log( INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
 
         int refGenID = ProjectConnector.getInstance().addRefGenome( refGenome );
         refGenJob.setPersistent( refGenID );
 
-        Logger.getLogger( ImportThread.class.getName() ).log( Level.INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.log( INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
     }
 
 
@@ -164,7 +168,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         // if something went wrong, mark all dependent track jobs
                         io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
                         this.noErrors = false;
-                        Logger.getLogger( ImportThread.class.getName() ).log( Level.SEVERE, null, ex );
+                        LOG.log( SEVERE, null, ex );
                     }
 
                 }
@@ -172,7 +176,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     // if something went wrong, mark all dependent track jobs
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
                     this.noErrors = false;
-                    Logger.getLogger( ImportThread.class.getName() ).log( Level.INFO, null, ex );
+                    LOG.log( INFO, null, ex );
                 }
                 catch( OutOfMemoryError ex ) {
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );

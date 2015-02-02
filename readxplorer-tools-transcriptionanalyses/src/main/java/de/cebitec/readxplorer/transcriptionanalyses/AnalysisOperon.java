@@ -37,8 +37,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -48,9 +49,11 @@ import java.util.logging.Logger;
  */
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
+    private static final Logger LOG = Logger.getLogger( AnalysisOperon.class.getName() );
+
     private final TrackConnector trackConnector;
     private final List<Operon> operonList; //final result list of OperonAdjacencies
-    private final HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
+    private final Map<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
     private final List<OperonAdjacency> operonAdjacencies;
     private int averageReadLength = 0;
 //    private int averageReadPairLength = 0;
@@ -164,7 +167,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      */
     public void finish() {
         Date currentTimestamp = new java.sql.Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Detecting operons", currentTimestamp );
+        LOG.log( INFO, "{0}: Detecting operons", currentTimestamp );
         this.findOperons();
     }
 

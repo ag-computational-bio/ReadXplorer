@@ -22,7 +22,6 @@ import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq2AnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ResultDeAnalysis;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
@@ -38,7 +37,6 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -57,6 +55,8 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -83,14 +83,15 @@ import org.openide.windows.TopComponent;
 public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
+    private static final Logger LOG = Logger.getLogger( DeSeq2GraphicsTopComponent.class.getName() );
+
     private static final long serialVersionUID = 1L;
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
     private ChartPanel chartPanel;
-    private ComboBoxModel cbm;
+    private ComboBoxModel<DeSeq2AnalysisHandler.Plot> cbm;
     private File currentlyDisplayed;
-    private ResultDeAnalysis result;
     private boolean svgCanvasActive;
     private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ProgressHandle svgExportProgressHandle;
@@ -110,8 +111,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
      */
     public DeSeq2GraphicsTopComponent( DeAnalysisHandler handler ) {
         analysisHandler = handler;
-        this.result = handler.getResults().get( 0 );
-        cbm = new DefaultComboBoxModel( DeSeq2AnalysisHandler.Plot.getValues() );
+        cbm = new DefaultComboBoxModel<>( DeSeq2AnalysisHandler.Plot.getValues() );
         initComponents();
         setupGraphics();
         iSymbol.setVisible( false );
@@ -134,7 +134,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         messages = new javax.swing.JTextArea();
         saveButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
-        plotType = new javax.swing.JComboBox();
+        plotType = new javax.swing.JComboBox<DeSeq2AnalysisHandler.Plot>();
         jLabel1 = new javax.swing.JLabel();
         plotPanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -267,12 +267,12 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         }
         catch( IOException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
         }
         catch( GnuR.PackageNotLoadableException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
         }
     }//GEN-LAST:event_plotButtonActionPerformed
@@ -297,7 +297,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
                 }
                 catch( IOException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                    Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                    LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                     JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                 }
                 finally {
@@ -327,7 +327,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
     private javax.swing.JButton plotButton;
     private javax.swing.JTextArea plotDescriptionArea;
     private javax.swing.JPanel plotPanel;
-    private javax.swing.JComboBox plotType;
+    private javax.swing.JComboBox<DeSeq2AnalysisHandler.Plot> plotType;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
@@ -378,7 +378,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
                 progressHandle.finish();
                 saveButton.setEnabled( true );
                 plotButton.setEnabled( true );
-                String description = "";
+                String description;
                 switch( (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem() ) {
                     case DispEsts:
                         description = "DESeq's dispersion estimates plot: Empirical (black dots) per gene and fitted (red line) dispersion values (Y) plotted against mean expression strength (X) (doubly logarithmic)";
@@ -409,16 +409,6 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
     }
 
 
-    private void saveToSVG( String fileLocation ) {
-        svgExportProgressHandle = ProgressHandleFactory.createHandle( "Save plot to svg file: " + fileLocation );
-        Path to = FileSystems.getDefault().getPath( fileLocation, "" );
-        ChartExporter exporter = new ChartExporter( to, chartPanel.getChart() );
-        exporter.registerObserver( this );
-        new Thread( exporter ).start();
-
-    }
-
-
     @Override
     public void update( Object args ) {
         if( args instanceof ChartExporter.ChartExportStatus ) {
@@ -429,13 +419,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
 
     @Override
     public void itemStateChanged( ItemEvent e ) {
-//          If an interactive Plot should be integrated in the future this function is needed
-//        DeSeq2AnalysisHandler.Plot plotType = (DeSeq2AnalysisHandler.Plot) e.getItem();
-//        if (plotType == DeSeq2AnalysisHandler.Plot.MAplot) {
-//            iSymbol.setVisible(true);
-//        } else {
-//            iSymbol.setVisible(false);
-//        }
+
     }
 
 

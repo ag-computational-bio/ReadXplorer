@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * Provides some methods for basic database queries.
@@ -32,6 +34,9 @@ import java.util.logging.Logger;
  * @author Rolf Hilker
  */
 public class GenericSQLQueries {
+
+    private static final Logger LOG = getLogger( GenericSQLQueries.class.getName() );
+
 
     private GenericSQLQueries() {
         //not for instantiation
@@ -63,7 +68,7 @@ public class GenericSQLQueries {
             rs.close();
         }
         catch( SQLException ex ) {
-            Logger.getLogger( GenericSQLQueries.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return num;
@@ -80,16 +85,15 @@ public class GenericSQLQueries {
      */
     public static long getLatestIDFromDB( String sqlStatement, Connection con ) {
         long id = 0;
-        try( PreparedStatement latestID = con.prepareStatement( sqlStatement ) ) {
+        try( PreparedStatement latestID = con.prepareStatement( sqlStatement );
+             ResultSet rs = latestID.executeQuery() ) {
 
-            ResultSet rs = latestID.executeQuery();
             if( rs.next() ) {
                 id = rs.getLong( "LATEST_ID" );
             }
-            rs.close();
         }
         catch( SQLException ex ) {
-            Logger.getLogger( GenericSQLQueries.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
         return ++id;
     }

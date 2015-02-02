@@ -23,13 +23,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.NotificationDisplayer;
+
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -39,6 +40,10 @@ import org.openide.awt.NotificationDisplayer;
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public class DgeExportUtilities {
+
+    private static final Logger LOG = Logger.getLogger( DgeExportUtilities.class.getName() );
+
+
 
     private DgeExportUtilities() {
     }
@@ -79,7 +84,7 @@ public class DgeExportUtilities {
         }
         catch( InterruptedException | InvocationTargetException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( status.getClass().getName() ).log( Level.WARNING, ex.getMessage(), currentTimestamp );
+            LOG.log( WARNING, ex.getMessage(), currentTimestamp );
         }
     }
 

@@ -49,6 +49,8 @@ import org.openide.windows.WindowManager;
 public final class ReferenceFeatureTopComp extends TopComponentExtended
         implements LookupListener {
 
+    private final static Logger LOG = Logger.getLogger( ReferenceFeatureTopComp.class.getName() );
+
     private static ReferenceFeatureTopComp instance;
     private static final long serialVersionUID = 1L;
     private Result<ReferenceViewer> result;
@@ -319,15 +321,13 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
     public static synchronized ReferenceFeatureTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            Logger.getLogger( ReferenceFeatureTopComp.class.getName() ).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof ReferenceFeatureTopComp ) {
             return (ReferenceFeatureTopComp) win;
         }
-        Logger.getLogger( ReferenceFeatureTopComp.class.getName() ).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
+        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }

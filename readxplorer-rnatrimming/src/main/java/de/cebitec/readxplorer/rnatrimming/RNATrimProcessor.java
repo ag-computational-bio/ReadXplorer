@@ -54,8 +54,9 @@ import org.openide.util.RequestProcessor;
  */
 public class RNATrimProcessor {
 
-    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
-    private final static Logger LOG = Logger.getLogger( RNATrimProcessor.class.getName() );
+    private static final Logger LOG = Logger.getLogger( RNATrimProcessor.class.getName() );
+    private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
+
     private RequestProcessor.Task theTask = null;
     private String sourcePath;
     private boolean canceled = false;

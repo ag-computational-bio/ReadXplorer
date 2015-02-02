@@ -35,14 +35,17 @@ import org.openide.util.TaskListener;
  */
 public final class MyCancelableAction implements ActionListener {
 
-    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private final static Logger LOG = Logger.getLogger( MyCancelableAction.class.getName() );
+
+    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private RequestProcessor.Task theTask = null;
 
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle( "task thats shows progress", new Cancellable() {
 
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }

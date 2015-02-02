@@ -78,6 +78,8 @@ import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 public class MoviePane extends JComponent implements Runnable, Movie,
                                                      ConfigListener {
 
+    private static final Logger LOG = Logger.getLogger( MoviePane.class.getName() );
+
     private Color background = Color.WHITE;
     private Color textColor = Color.BLACK;
 
@@ -115,8 +117,6 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     private int title_width = 0;
     private List<Point2D[]> frames = null;
     private List<PairTable> pairs = null;
-
-    private static final Logger log = Logger.getLogger( "MoviePane" );
 
 
     /**
@@ -156,7 +156,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             f = f.deriveFont( Font.BOLD, 12f );
         }
         catch( IOException | FontFormatException e ) {
-            log.severe( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
     }
 
@@ -290,7 +290,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                     t.sleep( frame - tot );
                 }
                 catch( InterruptedException e ) {
-                    log.severe( e.getMessage() );
+                    LOG.severe( e.getMessage() );
                 }
             }
         }
@@ -577,7 +577,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             t.start();
         }
         catch( InterruptedException e ) {
-            log.severe( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
     }
 
@@ -600,7 +600,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                 t.join();
         }
         catch( InterruptedException e ) {
-            log.severe( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
     }
 

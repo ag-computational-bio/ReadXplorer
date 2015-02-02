@@ -52,6 +52,8 @@ import javax.swing.filechooser.FileFilter;
  */
 public class Export extends MovieAction {
 
+    private static final Logger LOG = Logger.getLogger( Export.class.getName() );
+
     private File lastDir = null;
     private final String header;
 
@@ -59,8 +61,6 @@ public class Export extends MovieAction {
 //    private double xTrans = 0.0;
 //    private double yTrans = 0.0;
 //    private double zoomf = 0.0;
-
-    private static final Logger log = Logger.getLogger( Export.class.toString() );
 
 
     public Export( MoviePane moviePane, String header ) {//    public Export(RNAMovies movies) {
@@ -127,7 +127,7 @@ public class Export extends MovieAction {
             f = chooser.getSelectedFile();
             lastDir = chooser.getCurrentDirectory();
 //            if(to == from) {
-            log.info( "write a single image" );
+            LOG.info( "write a single image" );
 
             trans = ((ExportAccessory) chooser.getAccessory()).getTransparent();
             if( chooser.getFileFilter() instanceof JPGFilter ) {

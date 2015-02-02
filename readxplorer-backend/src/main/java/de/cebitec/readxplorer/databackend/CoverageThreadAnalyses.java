@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * This coverage thread should be used for analyses, but not for visualizing
@@ -35,6 +37,8 @@ import java.util.logging.Logger;
  * @author -Rolf Hilker-
  */
 public class CoverageThreadAnalyses extends CoverageThread {
+
+    private static final Logger LOG = getLogger( CoverageThreadAnalyses.class.getName() );
 
     /**
      * Thread for retrieving the coverage for a list of tracks from their
@@ -75,7 +79,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
                     Thread.sleep( 10 );
                 }
                 catch( InterruptedException ex ) {
-                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
+                    LOG.log( Level.SEVERE, null, ex );
                 }
             }
 

@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -71,6 +72,9 @@ import org.openide.util.Exceptions;
  */
 public abstract class AbstractViewer extends JPanel implements
         LogicalBoundsListener, MousePositionListener {
+
+    private static final Logger LOG = Logger.getLogger( AbstractViewer.class.getName() );
+
 
     private static final long serialVersionUID = 1L;
     /**

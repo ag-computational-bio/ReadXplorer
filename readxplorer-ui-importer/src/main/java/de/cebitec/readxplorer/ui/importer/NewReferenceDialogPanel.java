@@ -30,7 +30,6 @@ import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -40,6 +39,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * Panel displaying the options for importing new references into ReadXplorer.
@@ -47,6 +49,8 @@ import org.openide.util.NbBundle;
  * @author jwinneba, rhilker
  */
 public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
+
+    private static final Logger LOG = Logger.getLogger( NewReferenceDialogPanel.class.getName() );
 
     private static final long serialVersionUID = 8362375;
     private File refSeqFile = null;
@@ -291,7 +295,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
                         prefs.flush();
                     }
                     catch( BackingStoreException ex ) {
-                        Logger.getLogger( NewReferenceDialogPanel.class.getName() ).log( Level.SEVERE, null, ex );
+                        LOG.log( SEVERE, null, ex );
                     }
                 }
                 else {
@@ -329,11 +333,11 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
                         prefs.flush();
                     }
                     catch( BackingStoreException ex ) {
-                        Logger.getLogger( NewReferenceDialogPanel.class.getName() ).log( Level.SEVERE, null, ex );
+                        LOG.log( SEVERE, null, ex );
                     }
                 }
                 else {
-                    Logger.getLogger( NewReferenceDialogPanel.class.getName() ).log( Level.WARNING, "Could not read file" );
+                    LOG.log( WARNING, "Could not read file" );
                 }
             }
 

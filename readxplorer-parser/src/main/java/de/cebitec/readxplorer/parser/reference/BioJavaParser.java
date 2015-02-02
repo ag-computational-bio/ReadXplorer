@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -65,6 +64,8 @@ import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
 
+import static java.util.logging.Level.INFO;
+
 
 /**
  * A biojava parser can be initialized to parse embl or genbank files and parses
@@ -73,6 +74,9 @@ import org.biojavax.bio.seq.io.RichStreamReader;
  * @author ddopmeier, rhilker
  */
 public class BioJavaParser implements ReferenceParserI, MessageSenderI {
+
+    private static final Logger LOG = Logger.getLogger( BioJavaParser.class.getName() );
+
 
     /**
      * Use this for initializing an embl parser.
@@ -134,7 +138,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
         //at first store all exons in one data structure and add them to the ref genome at the end
         final Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile() );
+        LOG.log( INFO, "Start reading file  \"{0}\"", refGenJob.getFile() );
         try( final BufferedReader br = new BufferedReader( new FileReader( refGenJob.getFile() ) ) ) {
 
             final Namespace ns = RichObjectFactory.getDefaultNamespace();
@@ -300,7 +304,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                             featMap.get( type ).add( currentFeature );
                         }
                     }
-                    Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Sequence successfully read" );
+                    LOG.log( INFO, "Sequence successfully read" );
 
                     chrom.addAllFeatures( this.createFeatureHierarchy( featMap ) );
                     refGenome.addChromosome( chrom );

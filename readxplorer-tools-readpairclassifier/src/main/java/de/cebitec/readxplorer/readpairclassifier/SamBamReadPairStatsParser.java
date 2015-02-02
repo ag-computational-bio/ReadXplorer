@@ -30,12 +30,13 @@ import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -46,6 +47,8 @@ import org.openide.util.NbBundle;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
+
+    private static final Logger LOG = Logger.getLogger( SamBamReadPairStatsParser.class.getName() );
 
     //TODO: identify when pair goes across end of genome but only if circular reference genome
     private final TrackJob trackJob;
@@ -160,7 +163,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
         }
         catch( Exception e ) {
             this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Error", e.getMessage() ) );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, e.getMessage() );
+            LOG.log( INFO, e.getMessage() );
         }
 
         return new ParsedReadPairContainer();

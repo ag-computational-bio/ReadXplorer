@@ -22,8 +22,9 @@ import de.cebitec.readxplorer.databackend.dataObjects.Difference;
 import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import java.util.Collection;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -35,6 +36,8 @@ import java.util.logging.Logger;
  * @author ddoppmeier, rhilker
  */
 public class LogoDataManager {
+
+    private static final Logger LOG = Logger.getLogger( LogoDataManager.class.getName() );
 
     private static final int NO_BASE_TYPES = 7;
     private static final int NO_BASE_FIELDS = NO_BASE_TYPES * 2;
@@ -184,7 +187,7 @@ public class LogoDataManager {
                 row = READGAP;
                 break;
             default:
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown base {0}", base );
+                LOG.log( SEVERE, "found unknown base {0}", base );
         }
 
         int column = MATCH;
@@ -265,7 +268,7 @@ public class LogoDataManager {
                         row = N;
                         break;
                     default:
-                        Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown base {0}", base );
+                        LOG.log( SEVERE, "found unknown base {0}", base );
                 }
 
                 if( !gap.isForwardStrand() ) {
