@@ -31,7 +31,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBo
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.BlockI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayerI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayoutI;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;

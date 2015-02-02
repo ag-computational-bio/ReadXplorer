@@ -33,7 +33,7 @@ import de.cebitec.readxplorer.thumbnail.actions.SyncSliderCookie;
 import de.cebitec.readxplorer.ui.TopComponentHelper;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.IThumbnailView;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.CoverageZoomSlider;

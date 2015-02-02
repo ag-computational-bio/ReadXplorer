@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.api.cookies.OpenTrackCookie;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.MultipleTrackViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;

@@ -7,7 +7,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;

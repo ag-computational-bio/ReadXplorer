@@ -72,7 +72,7 @@
                         <publicPackage>de.cebitec.readxplorer.parser.mappings</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.parser.output</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.parser.reference</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.parser.reference.Filter</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.reference.filter</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.parser.tables</publicPackage>
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>

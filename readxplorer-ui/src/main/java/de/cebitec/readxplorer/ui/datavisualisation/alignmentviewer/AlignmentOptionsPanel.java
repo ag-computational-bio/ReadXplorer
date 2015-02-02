@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.LegendAndOptionsProvider;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
