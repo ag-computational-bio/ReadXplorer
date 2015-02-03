@@ -25,6 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
@@ -68,7 +70,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     private JMenuItem resetItem;
     private JMenuItem occurrenceFilter;
     private final Class<E> classType;
-    private Map<Integer, PersistentTrack> trackMap;
+    private final Map<Integer, PersistentTrack> trackMap;
     private final int posColumn;
     private final int trackColumn;
 
@@ -88,6 +90,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         this.classType = classType;
         this.posColumn = posColumn;
         this.trackColumn = trackColumn;
+        trackMap = new HashMap<>();
         init();
     }
 
@@ -342,12 +345,13 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
 
 
     public void setTrackMap( Map<Integer, PersistentTrack> trackMap ) {
-        this.trackMap = trackMap;
+        this.trackMap.clear();
+        this.trackMap.putAll( trackMap );
     }
 
 
     public Map<Integer, PersistentTrack> getTrackMap() {
-        return trackMap;
+        return Collections.unmodifiableMap( trackMap );
     }
 
 

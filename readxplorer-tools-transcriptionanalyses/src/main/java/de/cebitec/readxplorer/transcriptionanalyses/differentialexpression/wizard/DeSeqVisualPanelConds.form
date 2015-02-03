@@ -98,6 +98,9 @@
               <Connection code="trackListModel" type="code"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistentTrack&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -141,6 +144,9 @@
               <Connection code="conditionOneModel" type="code"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistentTrack&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -164,6 +170,9 @@
               <Connection code="conditionTwoModel" type="code"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistentTrack&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

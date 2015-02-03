@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 
 import de.cebitec.readxplorer.utils.ReadPairType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -149,7 +150,7 @@ public class ReadPairGroup implements ObjectWithId {
      * @return List of all read pairs belonging to this pair id.
      */
     public List<ReadPair> getReadPairs() {
-        return this.readPairs;
+        return Collections.unmodifiableList( readPairs );
     }
 
 
@@ -157,7 +158,7 @@ public class ReadPairGroup implements ObjectWithId {
      * @return List of all single mappings belonging to this pair id.
      */
     public List<Mapping> getSingleMappings() {
-        return this.singleMappings;
+        return Collections.unmodifiableList( singleMappings );
     }
 
 //    @Override

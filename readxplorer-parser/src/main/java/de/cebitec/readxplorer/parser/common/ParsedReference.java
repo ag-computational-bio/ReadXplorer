@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -160,7 +161,7 @@ public class ParsedReference {
      * @return The list of chromosomes for this reference.
      */
     public List<ParsedChromosome> getChromosomes() {
-        return chromosomes;
+        return Collections.unmodifiableList( chromosomes );
     }
 
 

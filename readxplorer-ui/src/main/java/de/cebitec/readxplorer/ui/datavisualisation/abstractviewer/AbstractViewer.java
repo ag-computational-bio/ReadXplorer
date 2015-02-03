@@ -46,6 +46,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -1062,7 +1063,7 @@ public abstract class AbstractViewer extends JPanel implements
      *         excluded from the view/calculations by the user.
      */
     public List<Classification> getExcludedClassifications() {
-        return this.excludedClassifications;
+        return Collections.unmodifiableList( excludedClassifications );
     }
 
 

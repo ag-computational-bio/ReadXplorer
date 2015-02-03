@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.common;
 
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -124,7 +125,7 @@ public class ParsedMapping {
 
 
     public List<ParsedDiff> getDiffs() {
-        return diffs;
+        return Collections.unmodifiableList( diffs );
     }
 
 
@@ -134,7 +135,7 @@ public class ParsedMapping {
 
 
     public List<ParsedReferenceGap> getGenomeGaps() {
-        return gaps;
+        return Collections.unmodifiableList( gaps );
     }
 
 

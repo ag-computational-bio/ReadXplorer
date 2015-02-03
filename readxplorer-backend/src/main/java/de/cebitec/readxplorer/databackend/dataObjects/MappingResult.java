@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 
 
 import de.cebitec.readxplorer.databackend.IntervalRequest;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -52,7 +53,7 @@ public class MappingResult extends AnalysisResult {
      * @return the mappings stored in this result
      */
     public List<Mapping> getMappings() {
-        return this.mappings;
+        return Collections.unmodifiableList( mappings );
     }
 
 

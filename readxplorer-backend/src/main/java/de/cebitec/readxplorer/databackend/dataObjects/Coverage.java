@@ -199,7 +199,7 @@ public class Coverage {
      * @return Get whole fwd coverage array for the given interval.
      */
     public int[] getFwdCov() {
-        return this.fwdCoverage;
+        return fwdCoverage;
     }
 
 
@@ -207,7 +207,7 @@ public class Coverage {
      * @return Get whole rev coverage array for the given interval.
      */
     public int[] getRevCov() {
-        return this.revCoverage;
+        return revCoverage;
     }
 
 

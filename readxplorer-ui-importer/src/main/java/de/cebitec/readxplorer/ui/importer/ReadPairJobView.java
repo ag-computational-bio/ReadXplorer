@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.ui.importer;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -123,7 +124,7 @@ public class ReadPairJobView extends javax.swing.JPanel implements
      * @return the list of readuence pair jobs
      */
     public List<ReadPairJobContainer> getJobs() {
-        return readPairJobContainerList;
+        return Collections.unmodifiableList( readPairJobContainerList );
     }
 
 

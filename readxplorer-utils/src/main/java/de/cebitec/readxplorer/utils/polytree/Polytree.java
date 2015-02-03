@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.utils.polytree;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -57,7 +58,7 @@ import java.util.List;
  */
 public class Polytree implements Traversable { //, Cloneable {
 
-    private List<Node> roots;
+    private final List<Node> roots;
 
 
     /**
@@ -71,12 +72,12 @@ public class Polytree implements Traversable { //, Cloneable {
      * @param roots the roots
      */
     public Polytree( final List<Node> roots ) {
-        if( roots == null ) {
-            this.roots = new ArrayList<>();
+
+        this.roots = new ArrayList<>();
+        if( roots != null ) {
+            this.roots.addAll( roots );
         }
-        else {
-            this.roots = roots;
-        }
+
     }
 
 
@@ -84,7 +85,7 @@ public class Polytree implements Traversable { //, Cloneable {
      * Constructor to create a <tt>polytree</tt>.
      */
     public Polytree() {
-        this.roots = new ArrayList<>();
+        roots = new ArrayList<>();
     }
 
 
@@ -105,7 +106,7 @@ public class Polytree implements Traversable { //, Cloneable {
      * @return the roots
      */
     public List<Node> getRoots() {
-        return this.roots;
+        return Collections.unmodifiableList( roots );
     }
 
 
@@ -115,7 +116,8 @@ public class Polytree implements Traversable { //, Cloneable {
      * @param roots the roots
      */
     public void setRoots( final List<Node> roots ) {
-        this.roots = roots;
+        this.roots.clear();
+        this.roots.addAll( roots );
     }
 
 

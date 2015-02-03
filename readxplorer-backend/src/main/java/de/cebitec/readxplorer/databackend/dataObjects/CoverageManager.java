@@ -50,9 +50,9 @@ public class CoverageManager implements Serializable {
 
     private int highestCoverage;
 
-    public static byte DIFF = 1;
-    public static byte TRACK2 = 2;
-    public static byte TRACK1 = 3;
+    public static final byte DIFF = 1;
+    public static final byte TRACK2 = 2;
+    public static final byte TRACK1 = 3;
     private Coverage totalCoverage;
 
 
@@ -86,7 +86,7 @@ public class CoverageManager implements Serializable {
         this.twoTracks = twoTracks;
         this.leftBound = leftBound;
         this.rightBound = rightBound;
-        this.coverageMap = new HashMap<>();
+        coverageMap = new HashMap<>();
 
         for( Classification classification : MappingClass.values() ) {
             coverageMap.put( classification, new Coverage( leftBound, rightBound, classification ) );
@@ -144,7 +144,7 @@ public class CoverageManager implements Serializable {
      *         interval, <code>false</code> otherwise
      */
     public boolean coversBounds( int left, int right ) {
-        if( this.leftBound == 0 && this.rightBound == 0 ) {
+        if( leftBound == 0 && rightBound == 0 ) {
             return false;
         }
         else {
@@ -164,11 +164,11 @@ public class CoverageManager implements Serializable {
      *                      updated for the given interval
      */
     public void increaseCoverage( int refStart, int refStop, int[] coverageArray ) {
-        int indexStart = this.getInternalPos( refStart );
-        int indexStop = this.getInternalPos( refStop );
+        int indexStart = getInternalPos( refStart );
+        int indexStop = getInternalPos( refStop );
         for( int i = indexStart; i <= indexStop; i++ ) {
             int currentRefPos = refStart + i - indexStart;
-            if( this.coversBounds( currentRefPos, currentRefPos ) ) {
+            if( coversBounds( currentRefPos, currentRefPos ) ) {
                 ++coverageArray[i];
             }
         }
@@ -182,7 +182,7 @@ public class CoverageManager implements Serializable {
      *         reference position can be found
      */
     public int getInternalPos( int logPos ) {
-        return logPos - this.leftBound;
+        return logPos - leftBound;
     }
 
 
@@ -275,7 +275,7 @@ public class CoverageManager implements Serializable {
 
         for( MappingClass mappingClass : MappingClass.values() ) {
             if( !excludedClasses.contains( mappingClass ) ) {
-                value += this.getCoverage( mappingClass ).getCoverage( pos, isFwdStrand );
+                value += getCoverage( mappingClass ).getCoverage( pos, isFwdStrand );
             }
         }
         return value;
@@ -299,17 +299,17 @@ public class CoverageManager implements Serializable {
      * @return The total coverage of the WHOLE INTERVAL.
      */
     public Coverage getTotalCoverage( List<Classification> excludedClasses ) {
-        if( this.totalCoverage == null ) {
-            this.totalCoverage = new Coverage( leftBound, rightBound, FeatureType.ANY );
-            this.totalCoverage.incArraysToIntervalSize();
+        if( totalCoverage == null ) {
+            totalCoverage = new Coverage( leftBound, rightBound, FeatureType.ANY );
+            totalCoverage.incArraysToIntervalSize();
 
             for( MappingClass mappingClass : MappingClass.values() ) {
                 if( !excludedClasses.contains( mappingClass ) ) {
-                    this.updateTotalCoverage( mappingClass );
+                    updateTotalCoverage( mappingClass );
                 }
             }
         }
-        return this.totalCoverage;
+        return totalCoverage;
     }
 
 
@@ -320,11 +320,11 @@ public class CoverageManager implements Serializable {
      * @param mappingClass The mappings class whose data shall be added
      */
     private void updateTotalCoverage( MappingClass mappingClass ) {
-        Coverage coverage = this.getCoverage( mappingClass );
+        Coverage coverage = getCoverage( mappingClass );
         int[] fwdCov = coverage.getFwdCov();
         int[] revCov = coverage.getRevCov();
-        int[] fwdTotal = this.totalCoverage.getFwdCov();
-        int[] revTotal = this.totalCoverage.getRevCov();
+        int[] fwdTotal = totalCoverage.getFwdCov();
+        int[] revTotal = totalCoverage.getRevCov();
         for( int i = 0; i < fwdCov.length; ++i ) {
             fwdTotal[i] += fwdCov[i];
             revTotal[i] += revCov[i];
@@ -337,7 +337,7 @@ public class CoverageManager implements Serializable {
      *         by this coverage manager.
      */
     public List<Classification> getIncludedClassifications() {
-        return new ArrayList<>( this.coverageMap.keySet() );
+        return new ArrayList<>( coverageMap.keySet() );
     }
 
 

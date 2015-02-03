@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis;
 
 import de.cebitec.readxplorer.databackend.dataObjects.AnalysisResult;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -35,8 +36,8 @@ public class CoverageIntervalContainer extends AnalysisResult {
 
     private static final long serialVersionUID = 1L;
 
-    private List<CoverageInterval> coverageInfo;
-    private List<CoverageInterval> coverageInfoRev;
+    private final List<CoverageInterval> coverageInfo;
+    private final List<CoverageInterval> coverageInfoRev;
 
 
     /**
@@ -76,7 +77,7 @@ public class CoverageIntervalContainer extends AnalysisResult {
      */
     public CoverageIntervalContainer( List<CoverageInterval> coverageInfoFwd, List<CoverageInterval> coverageInfoRev ) {
         this( coverageInfoFwd );
-        this.coverageInfoRev = coverageInfoRev;
+        this.coverageInfoRev.addAll( coverageInfo );
     }
 
 
@@ -93,7 +94,7 @@ public class CoverageIntervalContainer extends AnalysisResult {
      *         coverage interval list
      */
     public List<CoverageInterval> getCoverageIntervals() {
-        return coverageInfo;
+        return Collections.unmodifiableList( coverageInfo );
     }
 
 
@@ -102,7 +103,8 @@ public class CoverageIntervalContainer extends AnalysisResult {
      *                          was summed) coverage interval list to set
      */
     public void setIntervalsSumOrFwd( List<CoverageInterval> coverageIntervals ) {
-        this.coverageInfo = coverageIntervals;
+        this.coverageInfo.clear();
+        this.coverageInfo.addAll( coverageIntervals );
     }
 
 
@@ -110,7 +112,7 @@ public class CoverageIntervalContainer extends AnalysisResult {
      * @return the rev coverage interval list
      */
     public List<CoverageInterval> getCoverageIntervalsRev() {
-        return coverageInfoRev;
+        return Collections.unmodifiableList( coverageInfoRev );
     }
 
 
@@ -118,7 +120,8 @@ public class CoverageIntervalContainer extends AnalysisResult {
      * @param coverageIntervalsRev the rev coverage interval list to set
      */
     public void setIntervalsRev( List<CoverageInterval> coverageIntervalsRev ) {
-        this.coverageInfoRev = coverageIntervalsRev;
+        this.coverageInfoRev.clear();
+        this.coverageInfoRev.addAll( coverageIntervalsRev );
     }
 
 

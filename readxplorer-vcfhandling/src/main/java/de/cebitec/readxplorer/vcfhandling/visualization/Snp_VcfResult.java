@@ -11,6 +11,7 @@ import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.broadinstitute.variant.variantcontext.VariantContext;
@@ -23,7 +24,6 @@ import org.broadinstitute.variant.variantcontext.VariantContext;
 public class Snp_VcfResult extends ResultTrackAnalysis<Object> {
 
     private final List<VariantContext> snpVcfList;
-//    private VcfParser vcf = new VcfParser();
 
 
     /**
@@ -35,7 +35,7 @@ public class Snp_VcfResult extends ResultTrackAnalysis<Object> {
      */
     public Snp_VcfResult( List<VariantContext> snpVcfList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks ) {
         super( reference, trackMap, combineTracks, -1, 0 );
-        this.snpVcfList = snpVcfList;
+        this.snpVcfList = new ArrayList<>( snpVcfList );
     }
 
 
@@ -44,7 +44,7 @@ public class Snp_VcfResult extends ResultTrackAnalysis<Object> {
      * @return
      */
     public List<VariantContext> getSnpVcfList() {
-        return this.snpVcfList;
+        return Collections.unmodifiableList( snpVcfList );
     }
 
 

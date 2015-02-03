@@ -824,7 +824,7 @@ public class AnalysisTranscriptionStart implements Observer,
 
     @Override
     public List<TranscriptionStart> getResults() {
-        return this.detectedStarts;
+        return Collections.unmodifiableList( detectedStarts );
     }
 
 

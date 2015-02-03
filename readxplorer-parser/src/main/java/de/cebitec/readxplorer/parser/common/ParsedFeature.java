@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -197,7 +198,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      *         no exons
      */
     public List<ParsedFeature> getSubFeatures() {
-        return subFeatures;
+        return Collections.unmodifiableList( subFeatures );
     }
 
 
@@ -207,7 +208,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @param parsedSubFeature the sub feature to add.
      */
     public void addSubFeature( ParsedFeature parsedSubFeature ) {
-        this.subFeatures.add( parsedSubFeature );
+        subFeatures.add( parsedSubFeature );
     }
 
 
@@ -227,7 +228,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      *         parent features. Otherwise the list is empty.
      */
     public List<String> getParentIds() {
-        return parentIds;
+        return Collections.unmodifiableList( parentIds );
     }
 
 

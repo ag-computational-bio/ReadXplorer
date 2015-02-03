@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -77,12 +78,12 @@ public class DeSeqAnalysisData extends DeAnalysisData {
 
 
     public List<String> getFittingGroupOne() {
-        return fittingGroupOne;
+        return Collections.unmodifiableList( fittingGroupOne );
     }
 
 
     public List<String> getFittingGroupTwo() {
-        return fittingGroupTwo;
+        return Collections.unmodifiableList( fittingGroupTwo );
     }
 
 

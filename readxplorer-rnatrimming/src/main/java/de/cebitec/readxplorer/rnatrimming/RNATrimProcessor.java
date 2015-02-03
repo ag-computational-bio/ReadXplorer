@@ -247,7 +247,7 @@ public class RNATrimProcessor {
                     }
 
                     if( !record.getReadUnmappedFlag() ) {
-                        this.trimProcessResult.incrementTrimmedMappedReads();
+                        trimProcessResult.incrementTrimmedMappedReads();
                     }
 
                 }

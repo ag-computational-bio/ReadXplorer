@@ -115,6 +115,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList(trackListModel)"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistentTrack&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>
@@ -214,6 +215,7 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList(groupListModel)"/>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="createdGroupsList.addListSelectionListener(this);&#xa;createdGroupsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);"/>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
           </SubComponents>

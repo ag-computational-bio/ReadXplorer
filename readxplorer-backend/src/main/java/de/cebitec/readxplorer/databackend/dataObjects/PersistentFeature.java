@@ -25,6 +25,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -146,7 +147,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
      *         has to be used to signal that this feature is a top level feature.
      */
     public List<Integer> getParentIds() {
-        return parentIds;
+        return Collections.unmodifiableList( parentIds );
     }
 
 

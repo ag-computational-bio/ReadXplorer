@@ -26,6 +26,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
 
 
     public List<Operon> getResults() {
-        return detectedOperons;
+        return Collections.unmodifiableList( detectedOperons );
     }
 
 

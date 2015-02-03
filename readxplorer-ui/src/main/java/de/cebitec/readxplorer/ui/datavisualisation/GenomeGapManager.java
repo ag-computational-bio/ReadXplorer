@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 
 /**
@@ -36,7 +35,7 @@ public class GenomeGapManager {
 
     private final int lowerBound;
     private final int upperBound;
-    private TreeMap<Integer, Integer> maxNumGapsPerOriginalPosition;
+    private Map<Integer, Integer> maxNumGapsPerOriginalPosition;
     private TreeMap<Integer, Integer> addedGapsOriginalPosition;
     private TreeMap<Integer, Integer> addedGapsAccumulatedPositions;
     private boolean accCalced;
@@ -59,7 +58,7 @@ public class GenomeGapManager {
     }
 
 
-    private void fillMap( TreeMap<Integer, Integer> map ) {
+    private void fillMap( Map<Integer, Integer> map ) {
         for( int i = lowerBound; i <= upperBound; i++ ) {
             map.put( i, 0 );
         }
@@ -74,7 +73,7 @@ public class GenomeGapManager {
      * <p>
      * @param values
      */
-    public void addGapsFromMapping( TreeMap<Integer, TreeSet<ReferenceGap>> values ) {
+    public void addGapsFromMapping( Map<Integer, Set<ReferenceGap>> values ) {
         Iterator<Integer> positionIt = values.keySet().iterator();
         while( positionIt.hasNext() ) {
             Integer pos = positionIt.next();
@@ -84,7 +83,7 @@ public class GenomeGapManager {
                 // of gap introduced shifts
                 continue;
             }
-            TreeSet<ReferenceGap> gapsPerPosition = values.get( pos );
+            Set<ReferenceGap> gapsPerPosition = values.get( pos );
             int numOfGapsPerPosition = gapsPerPosition.size();
             int oldValue = getNumOfGapsAt( pos );
             // if the current mapping has more gaps at current position,
@@ -219,12 +218,7 @@ public class GenomeGapManager {
 
 
     private boolean fitsIntoBounds( int absPos ) {
-        if( absPos >= lowerBound && absPos <= upperBound ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return absPos >= lowerBound && absPos <= upperBound;
     }
 
 

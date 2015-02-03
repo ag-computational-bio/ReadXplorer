@@ -30,6 +30,7 @@ import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.OutlineView;
@@ -52,7 +53,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
     private final ExplorerManager explorerManager;
     private final OutlineView outlineView;
     private final ReferenceConnector refGenConnector;
-    private List<PersistentTrack> selectedTracks;
+    private final List<PersistentTrack> selectedTracks;
 
 
     /**
@@ -227,7 +228,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
      * @return The list of selected tracks from this panel.
      */
     public List<PersistentTrack> getSelectedTracks() {
-        return this.selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 
@@ -235,13 +236,13 @@ public class OpenTracksVisualPanel extends JobPanel implements
      * Stores all seleceted tracks in the internal selectedTracks list.
      */
     public void storeSelectedTracks() {
-        List<PersistentTrack> trackList = new ArrayList<>();
-        List<Node> markedNodes = this.getAllMarkedNodes();
+
+        List<Node> markedNodes = getAllMarkedNodes();
         for( Node node : markedNodes ) {
             StandardNode markedNode = (StandardNode) node;
-            trackList.add( ((TrackItem) markedNode.getData()).getTrack() );
+            selectedTracks.add( ((TrackItem) markedNode.getData()).getTrack() );
         }
-        this.selectedTracks = trackList;
+        
     }
 
 

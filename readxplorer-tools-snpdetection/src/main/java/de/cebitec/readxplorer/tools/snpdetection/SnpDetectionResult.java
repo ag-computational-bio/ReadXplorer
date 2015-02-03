@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.SnpI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * @return the list of snps found during the analysis step
      */
     public List<SnpI> getSnpList() {
-        return this.snpList;
+        return Collections.unmodifiableList( snpList );
     }
 
 

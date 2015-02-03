@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.parser.common;
 
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +165,7 @@ public class ParsedChromosome {
      * @return The list of root level features.
      */
     public List<ParsedFeature> getFeatures() {
-        return features;
+        return Collections.unmodifiableList( features );
     }
 
 
@@ -172,7 +173,7 @@ public class ParsedChromosome {
      * @return The list of subfeatures (features, which have a parent id).
      */
     public List<ParsedFeature> getSubFeatures() {
-        return finalFeatures;
+        return Collections.unmodifiableList( finalFeatures );
     }
 
 

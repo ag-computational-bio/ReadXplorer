@@ -143,7 +143,7 @@ public class CollectCoverageData implements Observer {
 
 
     public Map<PersistentFeature, Integer> getCountData() {
-        return countData;
+        return Collections.unmodifiableMap( countData );
     }
 
 

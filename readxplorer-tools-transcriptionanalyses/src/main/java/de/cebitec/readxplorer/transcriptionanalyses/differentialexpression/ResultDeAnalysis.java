@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RFactor;
@@ -72,16 +73,15 @@ public class ResultDeAnalysis {
         if( tableContents == null ) {
             tableContents = convertRresults( rawTableContents );
         }
-        return tableContents;
+        return Collections.unmodifiableList( tableContents );
     }
 
 
     public List<Object> getColnames() {
         if( colNames == null ) {
             colNames = convertNames( rawColNames );
-//            colNames.insertElementAt("Chromosome", 1);
         }
-        return colNames;
+        return Collections.unmodifiableList( colNames );
     }
 
 
@@ -89,7 +89,7 @@ public class ResultDeAnalysis {
         if( rowNames == null ) {
             rowNames = convertNames( rawRowNames );
         }
-        return rowNames;
+        return Collections.unmodifiableList( rowNames );
     }
 
 

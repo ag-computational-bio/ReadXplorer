@@ -19,6 +19,8 @@ package de.cebitec.readxplorer.databackend;
 
 
 import de.cebitec.readxplorer.utils.classification.FeatureType;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -30,7 +32,7 @@ import java.util.Set;
  */
 public class ParametersFeatureTypes {
 
-    private Set<FeatureType> selFeatureTypes;
+    private final Set<FeatureType> selFeatureTypes;
 
 
     /**
@@ -40,7 +42,7 @@ public class ParametersFeatureTypes {
      * @param selFeatureTypes the set of selected feature types
      */
     public ParametersFeatureTypes( Set<FeatureType> selFeatureTypes ) {
-        this.selFeatureTypes = selFeatureTypes;
+        this.selFeatureTypes = new HashSet<>( selFeatureTypes );
     }
 
 
@@ -48,7 +50,7 @@ public class ParametersFeatureTypes {
      * @return the set of selected feature types
      */
     public Set<FeatureType> getSelFeatureTypes() {
-        return selFeatureTypes;
+        return Collections.unmodifiableSet( selFeatureTypes );
     }
 
 
@@ -56,7 +58,8 @@ public class ParametersFeatureTypes {
      * @param selFeatureTypes the set of selected feature types
      */
     public void setSelFeatureTypes( Set<FeatureType> selFeatureTypes ) {
-        this.selFeatureTypes = selFeatureTypes;
+        this.selFeatureTypes.clear();
+        this.selFeatureTypes.addAll( selFeatureTypes );
     }
 
 

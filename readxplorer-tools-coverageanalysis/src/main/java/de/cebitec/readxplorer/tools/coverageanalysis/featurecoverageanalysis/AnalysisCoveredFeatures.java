@@ -30,6 +30,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -209,10 +210,10 @@ public class AnalysisCoveredFeatures implements Observer,
             }
         }
         else {
-            for( Integer id : this.coveredFeatureCount.keySet() ) {
-                percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
+            for( Integer id : coveredFeatureCount.keySet() ) {
+                percentCovered = coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered <= analysisParams.getMinCoveredPercent() ) {
-                    this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
+                    detectedFeatures.add( coveredFeatureCount.get( id ) );
                 }
             }
         }
@@ -221,12 +222,12 @@ public class AnalysisCoveredFeatures implements Observer,
 
     @Override
     public List<CoveredFeature> getResults() {
-        return this.detectedFeatures;
+        return Collections.unmodifiableList( detectedFeatures );
     }
 
 
     public int getNoGenomeFeatures() {
-        return this.genomeFeatures.size();
+        return genomeFeatures.size();
     }
 
 

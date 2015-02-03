@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -105,7 +106,7 @@ public class ReferenceJob implements Job {
 
 
     public List<TrackJob> getDependentTrackswithoutRunjob() {
-        return trackswithoutRunjob;
+        return Collections.unmodifiableList( trackswithoutRunjob );
     }
 
 

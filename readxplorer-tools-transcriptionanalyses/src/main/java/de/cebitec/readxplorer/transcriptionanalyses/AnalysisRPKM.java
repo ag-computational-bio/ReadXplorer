@@ -32,6 +32,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      */
     @Override
     public List<RPKMvalue> getResults() {
-        return this.rpkmValues;
+        return Collections.unmodifiableList( rpkmValues );
     }
 
 
@@ -149,7 +150,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 fstFittingMapping = true;
 
                 for( int j = this.lastMappingIdx; j < mappings.size(); ++j ) {
-//TODO: generally, when results arrive unordered, the first mapping pos can be used to determine feature position to start at                    
+//TODO: generally, when results arrive unordered, the first mapping pos can be used to determine feature position to start at
                     Mapping mapping = mappings.get( j );
 
                     //mappings identified within a feature

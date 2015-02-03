@@ -20,6 +20,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -40,7 +42,7 @@ public class DeAnalysisData {
      * Contains ID of the reference features as keys and corresponding feature
      * as values.
      */
-    private Map<String, PersistentFeature> featureData;
+    private final Map<String, PersistentFeature> featureData;
     /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
@@ -51,7 +53,7 @@ public class DeAnalysisData {
     /**
      * The tracks selected by the user to perform the analysis on.
      */
-    private List<PersistentTrack> selectedTracks;
+    private final List<PersistentTrack> selectedTracks;
     /**
      * Track Descriptions. Each description just appears one time.
      */
@@ -64,7 +66,9 @@ public class DeAnalysisData {
      * @param capacity Number of selected tracks.
      */
     public DeAnalysisData( int capacity ) {
+        featureData = new LinkedHashMap<>();
         countData = new ArrayBlockingQueue<>( capacity );
+        selectedTracks = new ArrayList<>();
     }
 
 
@@ -84,7 +88,7 @@ public class DeAnalysisData {
      * Return the first count data value on the Queue and removes it. So this
      * method will give you back the cound data added bei the @see addCountDataForTrack() method.
      * The count data added first will also be the first this method returns.
-     * 
+     *
      * @return count data as int[]
      */
     public int[] pollFirstCountData() {
@@ -171,7 +175,7 @@ public class DeAnalysisData {
      * @return List of PersistentTrack containing the selected tracks.
      */
     public List<PersistentTrack> getSelectedTracks() {
-        return selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 
@@ -191,7 +195,7 @@ public class DeAnalysisData {
 
 
     public void setFeatures( List<PersistentFeature> features ) {
-        featureData = new LinkedHashMap<>();
+        featureData.clear();
         int counter = 1;
         for( PersistentFeature persistentFeature : features ) {
             if( featureData.containsKey( persistentFeature.getLocus() ) ) {
@@ -205,7 +209,8 @@ public class DeAnalysisData {
 
 
     public void setSelectedTracks( List<PersistentTrack> selectedTracks ) {
-        this.selectedTracks = selectedTracks;
+        this.selectedTracks.clear();
+        this.selectedTracks.addAll( selectedTracks );
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;
         for( PersistentTrack selectedTrack : selectedTracks ) {

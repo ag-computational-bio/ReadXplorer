@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.importer;
 
 import de.cebitec.readxplorer.parser.TrackJob;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -101,7 +102,7 @@ public class TrackJobView extends javax.swing.JPanel implements
      * @return the list of all track jobs added to this track job view
      */
     public List<TrackJob> getJobs() {
-        return this.tracks;
+        return Collections.unmodifiableList( tracks );
     }
 
 

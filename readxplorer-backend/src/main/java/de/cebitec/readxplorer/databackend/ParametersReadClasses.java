@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -117,7 +118,7 @@ public class ParametersReadClasses {
      *         otherwise
      */
     public boolean isClassificationAllowed( Classification classification ) {
-        return !this.excludedClasses.contains( classification );
+        return !excludedClasses.contains( classification );
     }
 
 
@@ -126,7 +127,7 @@ public class ParametersReadClasses {
      *         this parameter set.
      */
     public List<Classification> getExcludedClasses() {
-        return this.excludedClasses;
+        return Collections.unmodifiableList( excludedClasses );
     }
 
 
@@ -137,16 +138,16 @@ public class ParametersReadClasses {
      * @param statisticsExportData The table data for an export table
      */
     public void addReadClassParamsToStats( List<List<Object>> statisticsExportData ) {
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Minimum mapping quality:", this.getMinMappingQual() ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Minimum mapping quality:", getMinMappingQual() ) );
         List<Classification> classList = new ArrayList<>();
         classList.addAll( Arrays.asList( MappingClass.values() ) );
         for( Classification classType : classList ) {
             String isAllowed = isClassificationAllowed( classType ) ? "yes" : "no";
             statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getTypeString() + " included:", isAllowed ) );
         }
-        String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "yes" : "no"; 
+        String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "yes" : "no";
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getTypeString() + ":", isAllowed ) );
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Mapping strand selection:", this.getStrandOptionString() ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Mapping strand selection:", getStrandOptionString() ) );
     }
 
 
@@ -158,12 +159,12 @@ public class ParametersReadClasses {
      */
     public String getStrandOptionString() {
         String strandOptionString = "Feature/analysis strand"; //default
-        if( this.getStrandOption() == Properties.STRAND_OPPOSITE ) {
+        if( getStrandOption() == Properties.STRAND_OPPOSITE ) {
             strandOptionString += "Opposite Strand";
         }
-        else if( this.getStrandOption() == Properties.STRAND_BOTH
-                 || this.getStrandOption() == Properties.STRAND_BOTH_FWD
-                 || this.getStrandOption() == Properties.STRAND_BOTH_REV ) {
+        else if( getStrandOption() == Properties.STRAND_BOTH
+                 || getStrandOption() == Properties.STRAND_BOTH_FWD
+                 || getStrandOption() == Properties.STRAND_BOTH_REV ) {
             strandOptionString += "Combine both strands";
         }
         return strandOptionString;
@@ -179,7 +180,7 @@ public class ParametersReadClasses {
      *         <code>false</code>, if one of the other options is chosen.
      */
     public boolean isStrandFeatureOption() {
-        return this.getStrandOption() == Properties.STRAND_FEATURE;
+        return getStrandOption() == Properties.STRAND_FEATURE;
     }
 
 
@@ -192,7 +193,7 @@ public class ParametersReadClasses {
      *         <code>false</code>, if one of the other options is chosen.
      */
     public boolean isStrandOppositeOption() {
-        return this.getStrandOption() == Properties.STRAND_OPPOSITE;
+        return getStrandOption() == Properties.STRAND_OPPOSITE;
     }
 
 
@@ -205,9 +206,9 @@ public class ParametersReadClasses {
      *         if one of the other options is chosen.
      */
     public boolean isStrandBothOption() {
-        return this.getStrandOption() == Properties.STRAND_BOTH
-               || this.getStrandOption() == Properties.STRAND_BOTH_FWD
-               || this.getStrandOption() == Properties.STRAND_BOTH_REV;
+        return getStrandOption() == Properties.STRAND_BOTH
+               || getStrandOption() == Properties.STRAND_BOTH_FWD
+               || getStrandOption() == Properties.STRAND_BOTH_REV;
     }
 
 
@@ -223,7 +224,7 @@ public class ParametersReadClasses {
      *         reverse strand OR if another strand option is chosen.
      */
     public boolean isStrandBothFwdOption() {
-        return this.getStrandOption() == Properties.STRAND_BOTH_FWD;
+        return getStrandOption() == Properties.STRAND_BOTH_FWD;
     }
 
 

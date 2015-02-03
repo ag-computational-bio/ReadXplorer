@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -370,25 +371,25 @@ public class ExpressTest implements ExpressTestI {
 
     @Override
     public List<List<Object>> getResults() {
-        return results;
+        return Collections.unmodifiableList( results );
     }
 
 
     @Override
     public List<List<Object>> getResultsNormalized() {
-        return resultsNormalized;
+        return Collections.unmodifiableList( resultsNormalized );
     }
 
 
     @Override
     public List<Object> getColumnNames() {
-        return colNames;
+        return Collections.unmodifiableList( colNames );
     }
 
 
     @Override
     public List<Object> getRowNames() {
-        return rowNames;
+        return Collections.unmodifiableList( rowNames );
     }
 
 

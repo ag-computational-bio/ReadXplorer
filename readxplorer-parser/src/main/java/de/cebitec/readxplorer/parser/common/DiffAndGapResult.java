@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.common;
 
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -52,7 +53,7 @@ public class DiffAndGapResult {
      * @return differences to the reference
      */
     public List<ParsedDiff> getDiffs() {
-        return diffs;
+        return Collections.unmodifiableList( diffs );
     }
 
 
@@ -60,7 +61,7 @@ public class DiffAndGapResult {
      * @return gaps in the reference (insertions of the read)
      */
     public List<ParsedReferenceGap> getGaps() {
-        return gaps;
+        return Collections.unmodifiableList( gaps );
     }
 
 

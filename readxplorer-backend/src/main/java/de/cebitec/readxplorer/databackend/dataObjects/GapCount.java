@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -112,7 +113,7 @@ public class GapCount {
      *         counts at each gap order index.
      */
     public List<int[][]> getGapOrderCount() {
-        return gapOrderCount;
+        return Collections.unmodifiableList( gapOrderCount );
     }
 
 

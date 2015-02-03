@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -53,7 +54,7 @@ public class ReadPairResultPersistent extends AnalysisResult {
      * @return the collection of read pairs
      */
     public Collection<ReadPairGroup> getReadPairs() {
-        return readPairs;
+        return Collections.unmodifiableCollection( readPairs );
     }
 
 
