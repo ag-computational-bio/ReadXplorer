@@ -22,7 +22,7 @@ package de.cebitec.readxplorer.thumbnail.actions;
  *
  * @author denis
  */
-public interface ASyncSliderCookie {
+public interface AsyncSliderCookie {
 
     public void async();
 

@@ -27,6 +27,8 @@ import javax.swing.JComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.api.visual.widget.BirdViewController;
 import org.netbeans.api.visual.widget.Scene;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -36,12 +38,26 @@ import org.openide.windows.WindowManager;
 /**
  * TopComponent to display a Scene for the Track-Widgets.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.thumbnail//ThumbNailView//EN",
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.thumbnail//ThumbnailView//EN",
                       autostore = false )
-public final class ThumbNailViewTopComponent extends TopComponentExtended
+@TopComponent.Description(
+    preferredID = "ThumbnailViewTopComponent",
+persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+@TopComponent.Registration( mode = "ThumbMode", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.thumbnail.ThumbnailViewTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@TopComponent.OpenActionRegistration(
+    displayName = "#CTL_ThumbnailView",
+    preferredID = "#CTL_ThumbnailView" )
+@NbBundle.Messages( {
+    "CTL_ThumbnailView=ThumbnailViewTopComponent",
+    "CTL_ThumbnailViewTopComponent=Thumbnail View Window",
+    "HINT_ThumbnailViewTopComponent=This is a Thumbnail View window"
+} )
+public final class ThumbnailViewTopComponent extends TopComponentExtended
         implements MouseListener {
-
-    private static final Logger LOG = Logger.getLogger( ThumbNailViewTopComponent.class.getName() );
+    
+    private static final Logger LOG = Logger.getLogger(ThumbnailViewTopComponent.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -56,18 +72,16 @@ public final class ThumbNailViewTopComponent extends TopComponentExtended
     }
 
 
-    private static ThumbNailViewTopComponent instance;
+    private static ThumbnailViewTopComponent instance;
     /**
      * path to the icon used by the component and its open action
      */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "ThumbNailViewTopComponent";
 
-
-    public ThumbNailViewTopComponent() {
+    public ThumbnailViewTopComponent() {
         initComponents();
-        setName( NbBundle.getMessage( ThumbNailViewTopComponent.class, "CTL_ThumbNailViewTopComponent" ) );
-        setToolTipText( NbBundle.getMessage( ThumbNailViewTopComponent.class, "HINT_ThumbNailViewTopComponent" ) );
+        setName(NbBundle.getMessage(ThumbnailViewTopComponent.class, "CTL_ThumbnailViewTopComponent" ) );
+        setToolTipText(NbBundle.getMessage(ThumbnailViewTopComponent.class, "HINT_ThumbnailViewTopComponent" ) );
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         scene = new Scene();
         myView = scene.createView();
@@ -114,28 +128,28 @@ public final class ThumbNailViewTopComponent extends TopComponentExtended
      * instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ThumbNailViewTopComponent getDefault() {
+    public static synchronized ThumbnailViewTopComponent getDefault() {
         if( instance == null ) {
-            instance = new ThumbNailViewTopComponent();
+            instance = new ThumbnailViewTopComponent();
         }
         return instance;
     }
 
 
     /**
-     * Obtain the ThumbNailViewTopComponent instance. Never call
+     * Obtain the ThumbnailViewTopComponent instance. Never call
      * {@link #getDefault} directly!
      */
-    public static synchronized ThumbNailViewTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
+    public static synchronized ThumbnailViewTopComponent findInstance() {
+        TopComponent win = WindowManager.getDefault().findTopComponent( Bundle.CTL_ThumbnailView() );
         if( win == null ) {
-            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + Bundle.CTL_ThumbnailView() + " component. It will not be located properly in the window system." );
             return getDefault();
         }
-        if( win instanceof ThumbNailViewTopComponent ) {
-            return (ThumbNailViewTopComponent) win;
+        if( win instanceof ThumbnailViewTopComponent ) {
+            return (ThumbnailViewTopComponent) win;
         }
-        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
+        LOG.warning( "There seem to be multiple components with the '" + Bundle.CTL_ThumbnailView()
                 + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
@@ -208,7 +222,7 @@ public final class ThumbNailViewTopComponent extends TopComponentExtended
 
     @Override
     protected String preferredID() {
-        return PREFERRED_ID;
+        return Bundle.CTL_ThumbnailView();
     }
 
 

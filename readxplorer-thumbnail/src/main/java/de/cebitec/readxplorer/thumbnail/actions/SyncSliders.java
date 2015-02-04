@@ -20,13 +20,33 @@ package de.cebitec.readxplorer.thumbnail.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.NbBundle;
 
-
+/**
+ * Action to enable synchronization of sliders in the thumbnail viewer.
+ * 
+ * @author denis, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
+@ActionID(
+         category = "Tools",
+         id = "de.cebitec.readxplorer.thumbnail.actions.SyncSliders"
+)
+@ActionRegistration(displayName = "#CTL_SyncSliders", iconInMenu = false)
+@ActionReference( path = "Menu/Tools/Thumbnail", position = 300, separatorAfter = 400 )
+@NbBundle.Messages( "CTL_SyncSliders=Sync sliders" )
 public final class SyncSliders implements ActionListener {
 
     private final SyncSliderCookie context;
 
 
+    /**
+     * Action to enable synchronization of sliders in the thumbnail viewer.
+     * 
+     * @param context 
+     */
     public SyncSliders( SyncSliderCookie context ) {
         this.context = context;
     }

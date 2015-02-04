@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.thumbnail.actions.ASyncSliderCookie;
+import de.cebitec.readxplorer.thumbnail.actions.AsyncSliderCookie;
 import de.cebitec.readxplorer.thumbnail.actions.OpenThumbCookie;
 import de.cebitec.readxplorer.thumbnail.actions.RemoveCookie;
 import de.cebitec.readxplorer.thumbnail.actions.SyncSliderCookie;
@@ -100,9 +100,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     private static final Logger LOG = Logger.getLogger( ThumbnailController.class.getName() );
 
-    private final Map<ReferenceViewer, ThumbNailViewTopComponent> refThumbTopComponents;
+    private final Map<ReferenceViewer, ThumbnailViewTopComponent> refThumbTopComponents;
     //Currently active ThumbnailTopComponent and ReferenceViewer
-    private ThumbNailViewTopComponent activeTopComp;
+    private ThumbnailViewTopComponent activeTopComp;
     private ReferenceViewer activeViewer;
     //Gives access to all Features which are displayed for a referenceViewer
     private final Map<ReferenceViewer, List<PersistentFeature>> selectedFeatures;
@@ -140,7 +140,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             activeTopComp = refThumbTopComponents.get( activeViewer );
         }
         else {
-            activeTopComp = new ThumbNailViewTopComponent();
+            activeTopComp = new ThumbnailViewTopComponent();
             refThumbTopComponents.put( activeViewer, activeTopComp );
         }
         activeTopComp.setName( "ThumbnailReference: " + refViewer.getReference().getName() );
@@ -183,7 +183,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             activeTopComp = refThumbTopComponents.get( refViewer );
         }
         else {
-            activeTopComp = new ThumbNailViewTopComponent();
+            activeTopComp = new ThumbnailViewTopComponent();
             refThumbTopComponents.put( activeViewer, activeTopComp );
         }
         activeTopComp.open();
@@ -231,12 +231,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * Activates don't-synchronize-Sliders Action in Menu.
      */
     private void addASynchCookieToLookup() {
-        getLookup().add( new ASyncSliderCookie() {
+        getLookup().add(new AsyncSliderCookie() {
 
             @Override
             public void async() {
                 sliderSynchronisation( false );
-                getLookup().removeAll( ASyncSliderCookie.class );
+                getLookup().removeAll(AsyncSliderCookie.class );
                 addSyncCookieToLookup();
             }
 
@@ -405,7 +405,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         if( WindowManager.getDefault().getRegistry().getOpened().contains( activeTopComp ) ) {
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( controller.getCurrentRefGen().getId() );
             addFeatureToView( feature, refCon );
-            if( getLookup().lookup( ASyncSliderCookie.class ) != null ) {
+            if( getLookup().lookup(AsyncSliderCookie.class ) != null ) {
                 sliderSynchronisation( true );
             }
             if( !(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp) ) {
@@ -476,7 +476,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     void removeThumbSpecificCookies() {
         getLookup().removeAll( SyncSliderCookie.class );
-        getLookup().removeAll( ASyncSliderCookie.class );
+        getLookup().removeAll(AsyncSliderCookie.class );
     }
 
 
@@ -585,7 +585,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * <p>
      * @param aThis
      */
-    void setMeAsActive( ThumbNailViewTopComponent aThis ) {
+    void setMeAsActive( ThumbnailViewTopComponent aThis ) {
         this.activeTopComp = aThis;
         for( ReferenceViewer refV : refThumbTopComponents.keySet() ) {
             if( refThumbTopComponents.get( refV ) == activeTopComp ) {
@@ -709,7 +709,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             bp.addMouseListener( ThumbnailController.this );
             featureToTrackpanelList.get( feature ).add( bp );
             //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
-            if( getLookup().lookup( ASyncSliderCookie.class ) != null ) {
+            if( getLookup().lookup(AsyncSliderCookie.class ) != null ) {
                 sliderSynchronisation( true );
             }
             ComponentWidget compWidg = new ComponentWidget( activeTopComp.getScene(), bp );
