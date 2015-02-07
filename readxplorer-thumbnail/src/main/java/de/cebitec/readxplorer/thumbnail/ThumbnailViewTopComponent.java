@@ -77,7 +77,7 @@ public final class ThumbnailViewTopComponent extends TopComponentExtended
      * path to the icon used by the component and its open action
      */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-
+     
     public ThumbnailViewTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(ThumbnailViewTopComponent.class, "CTL_ThumbnailViewTopComponent" ) );
