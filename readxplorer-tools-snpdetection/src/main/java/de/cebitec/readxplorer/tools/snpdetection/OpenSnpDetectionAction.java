@@ -172,7 +172,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
     @SuppressWarnings( "unchecked" )
     private void startSNPDetection( final WizardDescriptor wiz ) {
         int minVaryingBases = (int) wiz.getProperty( SNPWizardPanel.PROP_MIN_VARYING_BASES );
-        int minPercentage = (int) wiz.getProperty( SNPWizardPanel.PROP_MIN_PERCENT );
+        double minPercentage = (double) wiz.getProperty( SNPWizardPanel.PROP_MIN_PERCENT );
         boolean useMainBase = (boolean) wiz.getProperty( SNPWizardPanel.PROP_USE_MAIN_BASE );
         byte minBaseQuality = (byte) wiz.getProperty( SNPWizardPanel.PROP_MIN_BASE_QUAL );
         byte minAverageBaseQual = (byte) wiz.getProperty( SNPWizardPanel.PROP_MIN_AVERAGE_BASE_QUAL );

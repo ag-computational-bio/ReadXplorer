@@ -27,6 +27,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -97,18 +99,34 @@ public class GeneralUtils {
 
 
     /**
-     * Checks if the input string is a valid number larger than 0.
+     * Checks if the input string is a valid integer number larger than 0.
      * <p>
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
      *         <code>false</code> otherwise
      */
-    public static boolean isValidPositiveNumberInput( String input ) {
+    public static boolean isValidPositiveIntegerInput( String input ) {
         try {
             return Integer.parseInt( input ) > 0;
         }
         catch( NumberFormatException e ) {
+            return false;
+        }
+    }
+    
+    /**
+     * Checks if the input string is a valid double number larger than 0.
+     * <p>
+     * @param input input string to check
+     * <p>
+     * @return <code>true</code> if it is a valid input string,
+     * <code>false</code> otherwise
+     */
+    public static boolean isValidPositiveDoubleInput( String input ) {
+        try {
+            return Double.parseDouble( input ) > 0;
+        } catch ( NumberFormatException e ) {
             return false;
         }
     }
@@ -122,7 +140,7 @@ public class GeneralUtils {
      * @return <code>true</code> if it is a valid input
      *         string, <code>false</code> otherwise
      */
-    public static boolean isValidNumberInput( String input ) {
+    public static boolean isValidIntegerInput( String input ) {
         try {
             return Integer.parseInt( input ) >= 0;
         }
@@ -188,18 +206,36 @@ public class GeneralUtils {
 
 
     /**
-     * Checks if the input string is a valid number between 1 and 100, so a
-     * valid
-     * percentage value.
+     * Checks if the input string is a valid integer between 1 and 100, so a
+     * valid percentage value.
      * <p>
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid percentage value,
      *         <code>false</code> otherwise
      */
-    public static boolean isValidPercentage( String input ) {
-        if( GeneralUtils.isValidPositiveNumberInput( input ) ) {
+    public static boolean isValidIntegerPercentage( String input ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( input ) ) {
             int value = Integer.valueOf( input );
+            if( value <= 100 ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if the input string is a valid double between 1 and 100, so a
+     * valid percentage value.
+     * <p>
+     * @param input input string to check
+     * <p>
+     * @return <code>true</code> if it is a valid percentage value,
+     *         <code>false</code> otherwise
+     */
+    public static boolean isValidDoublePercentage( String input ) {
+        if( GeneralUtils.isValidPositiveDoubleInput(input ) ) {
+            double value = Double.valueOf( input );
             if( value <= 100 ) {
                 return true;
             }
@@ -409,6 +445,18 @@ public class GeneralUtils {
         NumberFormat percentFormatter = NumberFormat.getPercentInstance( locale );
         percentFormatter.setMaximumFractionDigits( 2 );
         return percentFormatter.format( number );
+    }
+    
+    
+    /**
+     * Format a double to two decimal numbers according to the pattern '###.##'.
+     * @param value The value to format
+     * @return The formatted value
+     */
+    public static double formatDouble(double value) {
+        DecimalFormat formatter = new DecimalFormat( "###.##" );
+        formatter.setDecimalFormatSymbols( new DecimalFormatSymbols( Locale.ENGLISH ) );
+        return Double.valueOf( formatter.format(value) );
     }
 
 

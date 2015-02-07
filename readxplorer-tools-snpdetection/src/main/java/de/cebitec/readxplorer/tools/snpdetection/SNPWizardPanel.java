@@ -88,7 +88,7 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
      */
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( PROP_MIN_PERCENT, this.component.getMinPercentage().toString() );
+        pref.put( PROP_MIN_PERCENT, String.valueOf( this.component.getMinPercentage() ) );
         pref.put( PROP_MIN_VARYING_BASES, String.valueOf( this.component.getMinMismatchingBases() ) );
         pref.put( PROP_USE_MAIN_BASE, this.component.isUseMainBase() ? "1" : "0" );
         pref.put( PROP_SEL_QUAL_FILTER, this.component.isUseQualFilter() ? "1" : "0" );

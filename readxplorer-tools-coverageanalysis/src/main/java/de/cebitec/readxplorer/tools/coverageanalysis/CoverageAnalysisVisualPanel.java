@@ -158,7 +158,7 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidPositiveNumberInput( minCoverageCountField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( minCoverageCountField.getText() ) ) {
             this.minCoverageCount = Integer.parseInt( minCoverageCountField.getText() );
         }
         else {

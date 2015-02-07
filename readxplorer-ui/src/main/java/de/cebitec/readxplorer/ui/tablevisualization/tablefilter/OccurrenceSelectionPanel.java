@@ -215,7 +215,7 @@ public class OccurrenceSelectionPanel extends javax.swing.JPanel {
 
     @NbBundle.Messages( "MSG_PosNumber=Please insert only positive number values." )
     private void trackNumberFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_trackNumberFieldKeyReleased
-        if( !GeneralUtils.isValidPositiveNumberInput( trackNumberField.getText() ) ) {
+        if( !GeneralUtils.isValidPositiveIntegerInput( trackNumberField.getText() ) ) {
             JOptionPane.showMessageDialog( null, Bundle.MSG_PosNumber() );
             trackNumberField.setText( "" );
         }

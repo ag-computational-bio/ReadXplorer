@@ -88,16 +88,12 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="percentSpinner">
-      <Properties>
-        <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="minPercentage" type="code"/>
-        </Property>
-      </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="percentSpinnerStateChanged"/>
       </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JSpinner(new SpinnerNumberModel())"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JSpinner(new SpinnerNumberModel(minPercentage, 0.000001, 100.0, 1.0))"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="spinnerField = ((DefaultEditor) percentSpinner.getEditor()).getTextField();&#xa;InternationalFormatter formatter = (InternationalFormatter) spinnerField.getFormatter();&#xa;DecimalFormat decimalFormat = (DecimalFormat) formatter.getFormat();&#xa;DecimalFormatSymbols geSymbols = new DecimalFormatSymbols(Locale.ENGLISH);&#xa;decimalFormat.setDecimalFormatSymbols(geSymbols);"/>
       </AuxValues>
     </Component>
     <Container class="javax.swing.JPanel" name="mismatchOptionsPanel">

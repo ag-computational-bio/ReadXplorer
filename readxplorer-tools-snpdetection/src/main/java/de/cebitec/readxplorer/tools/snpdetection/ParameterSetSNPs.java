@@ -34,7 +34,7 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
         ParameterSetI<ParameterSetSNPs> {
 
     private int minMismatchBases;
-    private int minPercentage;
+    private double minPercentage;
     private final boolean useMainBase;
     private final byte minBaseQuality;
     private final byte minAverageBaseQual;
@@ -67,7 +67,7 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
      * @param minAverageMappingQual Minimum average phred scaled mapping quality
      *                              or -1 if unknown.
      */
-    ParameterSetSNPs( int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
+    ParameterSetSNPs( int minMismatchBases, double minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
                       byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual ) {
         super( selFeatureTypes, readClassParams );
         this.minMismatchBases = minMismatchBases;
@@ -87,6 +87,10 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
     }
 
 
+    /**
+     * @param minVaryingBases The minimum number of varying bases at a SNP
+     * position.
+     */
     public void setMinVaryingBases( int minVaryingBases ) {
         this.minMismatchBases = minVaryingBases;
     }
@@ -95,13 +99,8 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
     /**
      * @return the minimum percentage of mismatches at a SNP position
      */
-    public int getMinPercentage() {
+    public double getMinPercentage() {
         return minPercentage;
-    }
-
-
-    public void setMinPercentage( int minPercentage ) {
-        this.minPercentage = minPercentage;
     }
 
 

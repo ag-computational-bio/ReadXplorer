@@ -407,43 +407,43 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidPositiveNumberInput( minTotalIncreaseField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( minTotalIncreaseField.getText() ) ) {
             this.minTotalIncrease = Integer.parseInt( minTotalIncreaseField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( minPercentIncreaseField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( minPercentIncreaseField.getText() ) ) {
             this.minTotalPercentIncrease = Integer.parseInt( minPercentIncreaseField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidNumberInput( maxInitialCountField.getText() ) ) {
+        if( GeneralUtils.isValidIntegerInput( maxInitialCountField.getText() ) ) {
             this.maxLowCovInitialCount = Integer.parseInt( maxInitialCountField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( minLowCovCountField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( minLowCovCountField.getText() ) ) {
             this.minLowCovIncrease = Integer.parseInt( minLowCovCountField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( transcriptExtensionField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( transcriptExtensionField.getText() ) ) {
             this.minTranscriptExtensionCov = Integer.parseInt( transcriptExtensionField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( maxLeaderlessDistanceField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( maxLeaderlessDistanceField.getText() ) ) {
             this.maxLeaderlessDistance = Integer.parseInt( maxLeaderlessDistanceField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( maxFeatureDistField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( maxFeatureDistField.getText() ) ) {
             this.maxFeatureDistance = Integer.parseInt( maxFeatureDistField.getText() );
         }
         else {

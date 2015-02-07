@@ -314,7 +314,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         int diffCount;
         int largestBaseCount;
         int cov;
-        int frequency;
+        double frequency;
         SequenceComparison snpType;
         int averageBaseQual;
         int averageMappingQual;
@@ -353,7 +353,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                             ++cov;
                             LOG.log( Level.SEVERE, "found uncovered position in diffs: {0}", absPos );
                         }
-                        frequency = (diffCount * 100) / cov;
+                        frequency = (diffCount * 100.0) / cov;
 
                         if( frequency >= analysisParams.getMinPercentage() ) {
                             refBase = refSubSeq.charAt( i );
@@ -430,7 +430,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                     ++cov;
                                     LOG.log( Level.SEVERE, "found uncovered position in gaps: {0}", absPos );
                                 }
-                                frequency = (diffCount * 100) / cov;
+                                frequency = (diffCount * 100.0) / cov;
 
                                 if( frequency >= analysisParams.getMinPercentage() ) {
                                     base = this.getBase( maxBaseIdx );
@@ -459,9 +459,6 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                     }
                 }
             }
-
-//        System.out.println(count++ + "size diffs: " + diffs.size());
-//        System.out.println(count++ + "size gaps: " + gaps.size());
         }
         catch( RuntimeIOException e ) {
             LOG.log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackPath() );

@@ -332,14 +332,14 @@ public class ConverterSetupCard extends FileSelectionPanel {
         String value = this.referenceLengthField.getText();
         String wholeInput = value.concat( input );
         if( input.equals( "\b" ) ) {
-            if( GeneralUtils.isValidPositiveNumberInput( value ) ) {
+            if( GeneralUtils.isValidPositiveIntegerInput( value ) ) {
                 this.chromLength = Integer.valueOf( value );
             }
             else {
                 this.chromLength = -1;
             }
         }
-        else if( GeneralUtils.isValidPositiveNumberInput( wholeInput ) ) {
+        else if( GeneralUtils.isValidPositiveIntegerInput( wholeInput ) ) {
             this.chromLength = Integer.valueOf( wholeInput );
         }
         else {

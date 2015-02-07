@@ -131,7 +131,7 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidPositiveNumberInput( spanningReadsField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( spanningReadsField.getText() ) ) {
             this.minSpanningReads = Integer.parseInt( spanningReadsField.getText() );
         }
         else {

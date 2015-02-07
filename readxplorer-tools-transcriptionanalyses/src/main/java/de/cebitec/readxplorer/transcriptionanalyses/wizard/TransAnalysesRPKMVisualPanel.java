@@ -138,13 +138,13 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidNumberInput( minRPKMValueField.getText() ) ) {
+        if( GeneralUtils.isValidIntegerInput( minRPKMValueField.getText() ) ) {
             this.minRPKMValue = Integer.parseInt( minRPKMValueField.getText() );
         }
         else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( maxRPKMValueField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( maxRPKMValueField.getText() ) ) {
             this.maxRPKMValue = Integer.parseInt( maxRPKMValueField.getText() );
         }
         else {

@@ -59,7 +59,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
 
 
     public boolean verifyInput() {
-        return GeneralUtils.isValidNumberInput( startOffset.getText() ) && GeneralUtils.isValidNumberInput( stopOffset.getText() );
+        return GeneralUtils.isValidIntegerInput( startOffset.getText() ) && GeneralUtils.isValidIntegerInput( stopOffset.getText() );
     }
 
 

@@ -21,10 +21,15 @@ package de.cebitec.readxplorer.tools.snpdetection;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.prefs.Preferences;
+import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.InternationalFormatter;
 import org.openide.util.NbPreferences;
 
 
@@ -36,11 +41,12 @@ import org.openide.util.NbPreferences;
 public final class SNPVisualPanel extends JobPanel {
 
     private static final long serialVersionUID = 1L;
-    private Object minPercentage = 90;
+    private double minPercentage = 90;
     private int minMismatchBases = 15;
     private byte minBaseQuality = 0;
     private byte minAverageBaseQual = 0;
     private byte minAverageMappingQual = 0;
+    private JFormattedTextField spinnerField;
 
 
     /**
@@ -76,7 +82,7 @@ public final class SNPVisualPanel extends JobPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
-        percentSpinner = new javax.swing.JSpinner(new SpinnerNumberModel());
+        percentSpinner = new javax.swing.JSpinner(new SpinnerNumberModel(minPercentage, 0.000001, 100.0, 1.0));
         mismatchOptionsPanel = new javax.swing.JPanel();
         absNumText = new javax.swing.JTextField();
         useMainBaseBox = new javax.swing.JCheckBox();
@@ -100,7 +106,11 @@ public final class SNPVisualPanel extends JobPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.jLabel2.text")); // NOI18N
 
-        percentSpinner.setValue(minPercentage);
+        spinnerField = ((DefaultEditor) percentSpinner.getEditor()).getTextField();
+        InternationalFormatter formatter = (InternationalFormatter) spinnerField.getFormatter();
+        DecimalFormat decimalFormat = (DecimalFormat) formatter.getFormat();
+        DecimalFormatSymbols geSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
+        decimalFormat.setDecimalFormatSymbols(geSymbols);
         percentSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 percentSpinnerStateChanged(evt);
@@ -267,7 +277,7 @@ public final class SNPVisualPanel extends JobPanel {
     /**
      * @return the minimum percentage of mismatches at a SNP position
      */
-    public Object getMinPercentage() {
+    public double getMinPercentage() {
         return this.minPercentage;
     }
 
@@ -317,12 +327,12 @@ public final class SNPVisualPanel extends JobPanel {
 
 
     /**
-     * Checks if all required information to start the SNP analysis is set.
+     * @return Checks if all required information to start the SNP analysis is set.
      */
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidPositiveNumberInput( absNumText.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( absNumText.getText() ) ) {
             this.minMismatchBases = Integer.parseInt( absNumText.getText() );
         }
         else {
@@ -339,8 +349,8 @@ public final class SNPVisualPanel extends JobPanel {
             isValidated = false;
         }
         JTextField spinnerField = ((DefaultEditor) percentSpinner.getEditor()).getTextField();
-        if( GeneralUtils.isValidPercentage( spinnerField.getText() ) ) {
-            this.minPercentage = this.percentSpinner.getValue();
+        if( GeneralUtils.isValidDoublePercentage( spinnerField.getText() ) ) {
+            this.minPercentage = Double.valueOf( spinnerField.getText() );
         }
         else {
             isValidated = false;

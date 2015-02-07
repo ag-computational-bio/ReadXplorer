@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
     private int nRate;
     private int gapRate;
     private int coverage;
-    private int frequency;
+    private double frequency;
     private SequenceComparison type;
     List<CodonSnp> codons;
     private SequenceComparison effect;
@@ -64,7 +65,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      * @param nRate
      * @param gapRate
      * @param coverage
-     * @param frequency
+     * @param frequency          frequency of the SNP in percent
      * @param type               type can be among S = substitution, I =
      *                           insertion, D = deletion, M = match according to
      *                           Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
@@ -73,7 +74,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      */
     public Snp( int position, int trackId, int chromId, char base, char refBase, int aRate, int cRate,
                 int gRate, int tRate, int nRate, int gapRate, int coverage,
-                int frequency, SequenceComparison type, int averageBaseQual, int averageMappingQual ) {
+                double frequency, SequenceComparison type, int averageBaseQual, int averageMappingQual ) {
         this( position, trackId, chromId, base, refBase, aRate, cRate, gRate, tRate, nRate,
               gapRate, coverage, frequency, type, 0, averageBaseQual, averageMappingQual );
     }
@@ -94,7 +95,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      * @param nRate
      * @param gapRate
      * @param coverage
-     * @param frequency
+     * @param frequency          frequency of the SNP in percent
      * @param type               type can be among S = substitution, I =
      *                           insertion, D = deletion, M = match according to
      *                           Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
@@ -103,7 +104,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      * @param averageMappingQual
      */
     public Snp( int position, int trackId, int chromId, char base, char refBase, int aRate, int cRate,
-                int gRate, int tRate, int nRate, int gapRate, int coverage, int frequency,
+                int gRate, int tRate, int nRate, int gapRate, int coverage, double frequency,
                 SequenceComparison type, int gapOrderIndex, int averageBaseQual, int averageMappingQual ) {
         super( trackId, chromId );
 
@@ -117,7 +118,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
         this.nRate = nRate;
         this.gapRate = gapRate;
         this.coverage = coverage;
-        this.frequency = frequency;
+        this.frequency = GeneralUtils.formatDouble(frequency);
         this.type = type;
         this.codons = new ArrayList<>();
         this.gapOrderIndex = gapOrderIndex;
@@ -179,7 +180,10 @@ public class Snp extends TrackChromResultEntry implements SnpI {
     }
 
 
-    public int getFrequency() {
+    /**
+     * @return frequency of the SNP in percent.
+     */
+    public double getFrequency() {
         return frequency;
     }
 
