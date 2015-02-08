@@ -19,22 +19,22 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
-import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.utils.GeneralUtils;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
-
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LOW_COV_INIT_COUNT;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MERGE_TSS_WINDOW;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_PERCENT_INCREASE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TOTAL_INCREASE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 
 /**
@@ -54,6 +54,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private int minTranscriptExtensionCov;
     private int maxLeaderlessDistance;
     private int maxFeatureDistance;
+    private int mergeTssWindow;
     private boolean detectUnannotatedTranscripts = true;
     private boolean tssAutomatic = false;
 
@@ -105,6 +106,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         analysisDirectionSeparator = new javax.swing.JSeparator();
         maxFeatureDistField = new javax.swing.JTextField();
         maxFeatureDistLabel = new javax.swing.JLabel();
+        mergeTssWindowField = new javax.swing.JTextField();
+        mergeTssLabel = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(transcriptionStartAutomaticBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.transcriptionStartAutomaticBox.text")); // NOI18N
         transcriptionStartAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
@@ -202,6 +205,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(maxFeatureDistLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxFeatureDistLabel.text")); // NOI18N
 
+        mergeTssWindowField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.mergeTssWindowField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(mergeTssLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.mergeTssLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -239,7 +246,11 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptExtensionLabel1)))
+                                .addComponent(transcriptExtensionLabel1))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(mergeTssWindowField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(mergeTssLabel)))
                         .addGap(0, 20, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -269,6 +280,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                     .addComponent(minPercentIncreaseLabel)
                     .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(mergeTssLabel)
+                    .addComponent(mergeTssWindowField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(additionalOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(unannotatedTranscriptsBox)
@@ -280,7 +295,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(transcriptExtensionLabel1))
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -328,6 +343,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private javax.swing.JTextField maxInitialCountField;
     private javax.swing.JLabel maxInitialCountLabel;
     private javax.swing.JTextField maxLeaderlessDistanceField;
+    private javax.swing.JLabel mergeTssLabel;
+    private javax.swing.JTextField mergeTssWindowField;
     private javax.swing.JTextField minLowCovCountField;
     private javax.swing.JLabel minLowCovCountLabel;
     private javax.swing.JTextField minPercentIncreaseField;
@@ -355,6 +372,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.minTranscriptExtensionCov = Integer.parseInt( this.transcriptExtensionField.getText() );
         this.maxLeaderlessDistance = Integer.parseInt( this.maxLeaderlessDistanceField.getText() );
         this.maxFeatureDistance = Integer.parseInt( this.maxFeatureDistField.getText() );
+        this.mergeTssWindow = Integer.parseInt(this.mergeTssWindowField.getText() );
 
         this.minTotalIncreaseField.getDocument().addDocumentListener( this.createDocumentListener() );
         this.minPercentIncreaseField.getDocument().addDocumentListener( this.createDocumentListener() );
@@ -363,6 +381,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.transcriptExtensionField.getDocument().addDocumentListener( this.createDocumentListener() );
         this.maxLeaderlessDistanceField.getDocument().addDocumentListener( this.createDocumentListener() );
         this.maxFeatureDistField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.mergeTssWindowField.getDocument().addDocumentListener( this.createDocumentListener() );
 
         this.loadLastParameterSelection();
     }
@@ -382,6 +401,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         String minExtensionCov = pref.get( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText() );
         String maxLeaderlessDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText() );
         String maxFeatureDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, maxFeatureDistField.getText() );
+        String mergeTssWindowTxt = pref.get(PROP_WIZARD_NAME + PROP_MERGE_TSS_WINDOW, mergeTssWindowField.getText() );
         boolean fwdAnalysisDirection = pref.get( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, "1" ).equals( "1" );
 
         transcriptionStartAutomaticBox.setSelected( tssAutomatic );
@@ -395,6 +415,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         transcriptExtensionField.setText( minExtensionCov );
         maxLeaderlessDistanceField.setText( maxLeaderlessDist );
         maxFeatureDistField.setText( maxFeatureDist );
+        mergeTssWindowField.setText( mergeTssWindowTxt );
 
         this.performTssAutoBoxAction();
     }
@@ -487,6 +508,11 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
     public int getMaxFeatureDistance() {
         return maxFeatureDistance;
+    }
+
+    
+    public int getMergeTssWindow() {
+        return mergeTssWindow;
     }
 
 

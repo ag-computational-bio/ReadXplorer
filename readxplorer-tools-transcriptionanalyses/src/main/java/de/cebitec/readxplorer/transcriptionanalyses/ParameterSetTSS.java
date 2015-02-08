@@ -39,6 +39,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private int minTranscriptExtensionCov;
     private int maxLeaderlessDistance;
     private int maxFeatureDistance;
+    private int mergeTssWindow;
     private ParametersReadClasses readClassParams;
 
 
@@ -54,10 +55,13 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param minLowCovIncrease
      * @param maxLeaderlessDistance
      * @param minTranscriptExtensionCov
+     * @param mergeTssWindow 
+     * @param readClassParams 
      */
     ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
                      int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease,
-                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, ParametersReadClasses readClassParams ) {
+                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, int mergeTssWindow, 
+                     ParametersReadClasses readClassParams ) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -180,6 +184,21 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
     public void setReadClassParams( ParametersReadClasses readClassParams ) {
         this.readClassParams = readClassParams;
+    }
+
+
+    /**
+     * @return Bp window to use for merging TSS.
+     */
+    public int getMergeTssWindow() {
+        return mergeTssWindow;
+    }
+
+    /**
+     * @param mergeTssWindow Bp window to use for merging TSS.
+     */
+    public void setMergeTssWindow(int mergeTssWindow) {
+        this.mergeTssWindow = mergeTssWindow;
     }
 
 

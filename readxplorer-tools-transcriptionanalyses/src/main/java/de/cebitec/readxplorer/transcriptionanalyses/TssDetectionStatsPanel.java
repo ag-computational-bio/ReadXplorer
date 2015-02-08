@@ -66,6 +66,8 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                 {null, null},
                 {null, null},
                 {null, null},
+                {null, null},
+                {null, null},
                 {null, null}
             },
             new String [] {
@@ -101,7 +103,9 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -121,6 +125,8 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                     { TssDetectionResult.TSS_UPSTREAM, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_UPSTREAM ) ) },
                     { TssDetectionResult.TSS_DOWNSTREAM, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_DOWNSTREAM ) ) },
                     { TssDetectionResult.TSS_LEADERLESS, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_LEADERLESS ) ) },
+                    { TssDetectionResult.TSS_PRIMARY, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_PRIMARY ) ) },
+                    { TssDetectionResult.TSS_SECONDARY, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_SECONDARY ) ) },
                     { TssDetectionResult.TSS_FWD, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_FWD ) ) },
                     { TssDetectionResult.TSS_REV, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_REV ) ) },
                     { TssDetectionResult.TSS_NOVEL, unannotatedTransValue }

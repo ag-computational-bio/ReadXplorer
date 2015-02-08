@@ -46,6 +46,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     public static final String TSS_FWD = "TSS on fwd strand";
     public static final String TSS_REV = "TSS on rev strand";
     public static final String TSS_LEADERLESS = "Leaderless TSS";
+    public static final String TSS_PRIMARY = "Primary TSS";
+    public static final String TSS_SECONDARY = "Secondary TSS";
     public static final String TSS_NOVEL = "Novel Transcripts";
     public static final String TSS_UPSTREAM = "TSS with upstream feature";
     public static final String TSS_UPSTREAM1 = "Distance to upstream feature = 1 bp";
@@ -134,6 +136,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add( "Coverage Increase" );
         dataColumnDescriptions.add( "Coverage Increase %" );
         dataColumnDescriptions.add( "Leaderless" );
+        dataColumnDescriptions.add( "TSS Type" );
+        dataColumnDescriptions.add( "Primary TSS" );
         dataColumnDescriptions.add( "Correct Start Feature" );
         dataColumnDescriptions.add( "Correct Start Locus" );
         dataColumnDescriptions.add( "Correct Start EC-Number" );
@@ -196,6 +200,12 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
             DetectedFeatures detFeatures = tss.getDetFeatures();
             tssRow.add( detFeatures.isLeaderless() ? "yes" : "" );
+            tssRow.add( tss.isPrimaryTss() ? "primary" : "secondary" );
+            if (tss.isPrimaryTss()) {
+                tssRow.add( "-" );
+            } else {
+                tssRow.add( tss.getPrimaryTss().getPos() );
+            }
             this.addFeatureRows( detFeatures.getCorrectStartFeature(), tssRow, tss, false );
             this.addFeatureRows( detFeatures.getUpstreamFeature(), tssRow, tss, true );
             this.addFeatureRows( detFeatures.getDownstreamFeature(), tssRow, tss, true );
@@ -259,6 +269,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_FWD, statsMap.get( TSS_FWD ), percentMap.get( TSS_FWD ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_REV, statsMap.get( TSS_REV ), percentMap.get( TSS_REV ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_LEADERLESS, statsMap.get( TSS_LEADERLESS ), percentMap.get( TSS_LEADERLESS ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_PRIMARY, statsMap.get( TSS_PRIMARY ), percentMap.get( TSS_PRIMARY ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_SECONDARY, statsMap.get( TSS_SECONDARY ), percentMap.get( TSS_SECONDARY ) ) );
 
         int noUnannotatedTrans = statsMap.get( TSS_NOVEL );
         String unannotatedTransValue = noUnannotatedTrans == UNUSED_STATISTICS_VALUE ? "-" : String.valueOf( noUnannotatedTrans );
@@ -349,6 +361,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         int noRevFeatures = 0;
         int noUnannotatedTranscripts = 0;
         int noLeaderlessTranscripts = 0;
+        int noPrimaryTss = 0;
+        int noSecondaryTss = 0;
         int noUpstreamFeature = 0;
         int noUpstreamFeature1 = 0;
         int noUpstreamFeature5 = 0;
@@ -379,6 +393,11 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 ++noRevFeatures;
             }
 
+            if (tss.isPrimaryTss()) {
+                ++noPrimaryTss;
+            } else {
+                ++noSecondaryTss;
+            }
 
             detFeatures = tss.getDetFeatures();
             feature = detFeatures.getCorrectStartFeature();
@@ -453,6 +472,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.getStatsMap().put( TSS_TOTAL, this.getStatsMap().get( TSS_TOTAL ) + tssResult.size() );
         this.getStatsMap().put( TSS_CORRECT, this.getStatsMap().get( TSS_CORRECT ) + noCorrectStarts );
         this.getStatsMap().put( TSS_LEADERLESS, this.getStatsMap().get( TSS_LEADERLESS ) + noLeaderlessTranscripts + noCorrectStarts );
+        this.getStatsMap().put( TSS_PRIMARY, this.getStatsMap().get( TSS_PRIMARY ) + noPrimaryTss );
+        this.getStatsMap().put( TSS_SECONDARY, this.getStatsMap().get( TSS_SECONDARY ) + noSecondaryTss );
         this.getStatsMap().put( TSS_FWD, this.getStatsMap().get( TSS_FWD ) + noFwdFeatures );
         this.getStatsMap().put( TSS_REV, this.getStatsMap().get( TSS_REV ) + noRevFeatures );
         if( params.isPerformUnannotatedTranscriptDet() ) {
@@ -487,6 +508,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.getStatsMap().put( TSS_TOTAL, 0 );
         this.getStatsMap().put( TSS_CORRECT, 0 );
         this.getStatsMap().put( TSS_LEADERLESS, 0 );
+        this.getStatsMap().put( TSS_PRIMARY, 0 );
+        this.getStatsMap().put( TSS_SECONDARY, 0 );
         this.getStatsMap().put( TSS_FWD, 0 );
         this.getStatsMap().put( TSS_REV, 0 );
         this.getStatsMap().put( TSS_NOVEL, 0 );

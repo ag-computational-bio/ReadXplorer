@@ -107,14 +107,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             },
             new String [] {
-                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Transcript Stop"
+                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Transcript Stop", "TSS Type", "Primary TSS"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -141,6 +141,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
             tSSTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title13")); // NOI18N
             tSSTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9_1")); // NOI18N
             tSSTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10_1")); // NOI18N
+            tSSTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title14")); // NOI18N
+            tSSTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title15")); // NOI18N
         }
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text_1")); // NOI18N
@@ -232,7 +234,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 @Override
                 public void run() {
 
-                    final int nbColumns = 14;
+                    final int nbColumns = 16;
 
                     DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
                     String strand;
@@ -292,7 +294,15 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             tSSU = (TransStartUnannotated) tss;
                             rowData[i++] = true;
                             rowData[i++] = tSSU.getDetectedStop();
+                        } else {
+                            i += 2;
                         }
+                        
+                        rowData[i++] = tss.isPrimaryTss() ? "primary" : "secondary"; //TODO: Add orphan and internal
+                        if (!tss.isPrimaryTss()) {
+                            rowData[i++] = tss.getPrimaryTss().getPos();
+                        }
+                        
                         model.addRow( rowData );
                     }
 

@@ -60,6 +60,7 @@ public final class TranscriptionAnalysesWizardIterator implements
     public static final String PROP_MAX_NUMBER_READS = "maxNumberReads";
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";
     public static final String PROP_ANALYSIS_DIRECTION = "analysisDirection";
+    public static final String PROP_MERGE_TSS_WINDOW = "mergeTssWindow";
 
     static final String PROP_WIZARD_NAME = "TransAnalyses";
     private static final String FINISH_MSG = "Press 'Finish' to start";

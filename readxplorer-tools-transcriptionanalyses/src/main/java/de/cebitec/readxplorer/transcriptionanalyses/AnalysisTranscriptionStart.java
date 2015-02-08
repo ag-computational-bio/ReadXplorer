@@ -73,6 +73,8 @@ public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
 
     private final TrackConnector trackConnector;
+    private ReferenceConnector refConnector;
+    private Map<Integer, PersistentChromosome> chromosomes;
     private final ParameterSetTSS parametersTSS;
     private boolean isStrandBothOption;
     private boolean isBothFwdDirection;
@@ -83,18 +85,16 @@ public class AnalysisTranscriptionStart implements Observer,
     private boolean calcCoverageDistributions;
 
     //varibles for transcription start site detection
+    protected CoverageManager currentCoverage;
     private int totalCovLastFwdPos;
     private int totalCovLastRevPos;
     private int totalReadStartsLastRevPos;
     private int lastFeatureIdxGenStartsFwd;
     private int lastFeatureIdxGenStartsRev;
-    private ReferenceConnector refConnector;
 
     private final Map<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
     private final Map<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
 
-    protected CoverageManager currentCoverage;
-    private Map<Integer, PersistentChromosome> chromosomes;
 
 
     /**
@@ -193,6 +193,8 @@ public class AnalysisTranscriptionStart implements Observer,
      */
     public void finish() {
         this.storeDistributions();
+        //before removing any TSS, neighboring TSS are merged and classified as primary or secondary
+        this.linkTssInSameRegion();
         if( parametersTSS.isAutoTssParamEstimation() ) {
             this.correctResult();
         }
@@ -351,25 +353,33 @@ public class AnalysisTranscriptionStart implements Observer,
             && percentIncreaseFwd > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos + 1, chromLength, chromFeatures, true );
-            this.checkAndAddDetectedStart( new TranscriptionStart( pos + 1, true,
-                                                                   readStartsFwd, percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId ) );
+            addDetectStart( new TranscriptionStart( pos + 1, true, readStartsFwd, 
+                    percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
         if( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts())
              || readStartsRev > parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts())
             && percentIncreaseRev > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos, chromLength, chromFeatures, false );
-            this.checkAndAddDetectedStart( new TranscriptionStart( pos, false,
-                                                                   readStartsRev, percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID(), chromId ) );
+            addDetectStart( new TranscriptionStart( pos, false, readStartsRev, 
+                    percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
 
         if( this.parametersTSS.isAutoTssParamEstimation() ) {
             //add values to exact counting data structures to refine threshold
-            this.increaseDistribution( this.exactReadStartDist, readStartsFwd, parametersTSS.getMinNoReadStarts() );
-            this.increaseDistribution( this.exactReadStartDist, readStartsRev, parametersTSS.getMinNoReadStarts() );
-            this.increaseDistribution( this.exactCovIncPercDist, percentIncreaseFwd, parametersTSS.getMinPercentIncrease() );
-            this.increaseDistribution( this.exactCovIncPercDist, percentIncreaseRev, parametersTSS.getMinPercentIncrease() );
+            increaseDistribution( exactReadStartDist, readStartsFwd, parametersTSS.getMinNoReadStarts() );
+            increaseDistribution( exactReadStartDist, readStartsRev, parametersTSS.getMinNoReadStarts() );
+            increaseDistribution( exactCovIncPercDist, percentIncreaseFwd, parametersTSS.getMinPercentIncrease() );
+            increaseDistribution( exactCovIncPercDist, percentIncreaseRev, parametersTSS.getMinPercentIncrease() );
         }
+    }
+    
+    /**
+     * Add the detected TSS to the result list.
+     * @param tss The TSS to add
+     */
+    protected void addDetectStart( TranscriptionStart tss ) {
+        this.detectedStarts.add( tss );
     }
 
 
@@ -556,65 +566,112 @@ public class AnalysisTranscriptionStart implements Observer,
         return Math.abs( feature.getStartOnStrand() - tssPos ) <= parametersTSS.getMaxLeaderlessDistance();
     }
 
+    /**
+     * TODO: A comment on merging TSS:
+     * This seems to happen, when the end of the -10 region is further away from
+     * the actual transcription start site than 7 bases in prokaryotes. There
+     * might exist more reasons, of course.
+     */
 
     /**
-     * Before adding a new detected transcription start site to the detected
-     * transcription start sites list the method checks, if the last detected
-     * transcription start site is located within 19bp (sRNAs can be short) of
-     * the current transcription start site on the same strand. If that's the
-     * case, only the transcription start site with the higher number of TOTAL
-     * coverage increase is kept. This method prevents detecting two
-     * transcription start sites for the same gene, in case the transcription
-     * already starts at a low rate a few bases before the actual transcription
-     * start site. This seems to happen, when the end of the -10 region is
-     * further away from the actual transcription start site than 7 bases in
-     * procaryotes. There might exist more reasons, of course.
+     * The method checks for all transcription start sites, if they are located
+     * within the given maximum feature distance bp of the checked transcription
+     * start site on the same strand. If that's the case, the transcription
+     * start site with the higher number of TOTAL read starts is marked as
+     * "primary TSS". All other TSS receive the "secondary TSS" flag.
      * <p>
-     * @param tss the currently detected transcription start site
      */
-    private void checkAndAddDetectedStart( TranscriptionStart tss ) {
-
-        if( this.detectedStarts.size() > 0 ) {
-            int index = this.detectedStarts.size() - 1;
-            TranscriptionStart lastDetectedStart = this.detectedStarts.get( index );
-
-            while( lastDetectedStart.isFwdStrand() != tss.isFwdStrand() && index > 0 ) {
-                lastDetectedStart = this.detectedStarts.get( --index );
-            }
-
-            if( lastDetectedStart.getPos() + 1 >= tss.getPos() && lastDetectedStart.isFwdStrand() == tss.isFwdStrand() ) {
-                int noReadStartsLastStart = lastDetectedStart.getReadStartsAtPos();
-                int noReadStartsTSS = tss.getReadStartsAtPos();
-//                int coverageIncreaseLast = lastDetectedStart.getPercentIncrease();
-//                int coverageIncrease = tss.getPercentIncrease();
-                /* TODO: this causes some TSS to be removed when the distributions are calculated for the first time!
-                 * Alternatively all TSS can be stored first and then a second run checking neighboring TSS and merging/removing them
-                 * can be performed. -> This leads to "merging of neighboring TSS" Feature, which shall be implemented at some point...
-                 */
-
-                if( noReadStartsLastStart < noReadStartsTSS ) {
-                    this.detectedStarts.remove( index );
-                    this.addDetectStart( tss );
-                }
-                //else, we keep the lastDetectedStart, but discard the current transcription start site
-            }
-            else {
-                this.addDetectStart( tss );
-            }
+    private void linkTssInSameRegion() {
+        
+        if (detectedStarts.size() > 0) {
+            detectedStarts.get(0).setIsPrimary(true);
         }
-        else {
-            this.addDetectStart( tss );
+        
+        if (detectedStarts.size() > 1) {
+            for (int tssIdx = 1; tssIdx < detectedStarts.size(); tssIdx++) {
+
+                TranscriptionStart tss = detectedStarts.get(tssIdx);
+                int prevTssIdx = tssIdx - 1;
+                TranscriptionStart previousTss = this.detectedStarts.get(prevTssIdx);
+                while (previousTss.isFwdStrand() != tss.isFwdStrand() && prevTssIdx > 0) {
+                    previousTss = this.detectedStarts.get(--prevTssIdx);
+                }
+
+                flagPrimaryTss(previousTss, prevTssIdx, tss);
+            }
         }
     }
 
+    /**
+     * Check all previous TSS in the current merge TSS window against the 
+     * current TSS. Update the <code>isPrimaryTss()</code> flag of each TSS in
+     * the current merge TSS window. The most prominent TSS receives the 
+     * primary TSS flag, while all others receive the secondary TSS flag. 
+     * Recursively checks all TSS within the current merge TSS window.
+     * @param previousTss The previous TSS from the result to check against the 
+     * current
+     * @param prevTssIdx The index of the previous TSS in the result list
+     * @param tss The current TSS to compare to all previous ones
+     */
+    private void flagPrimaryTss(TranscriptionStart previousTss, int prevTssIdx, TranscriptionStart tss) {
+        
+        if (previousTss.getPos() + parametersTSS.getMaxFeatureDistance() >= tss.getPos()
+                && previousTss.isFwdStrand() == tss.isFwdStrand()) {
+            
+//            int coverageIncreaseLast = lastDetectedStart.getPercentIncrease();
+//            int coverageIncrease = tss.getPercentIncrease();
+            int noReadStartsLastStart = previousTss.getReadStartsAtPos();
+            int noReadStartsTSS = tss.getReadStartsAtPos();
+            if (previousTss.isPrimaryTss()) {
+                if (noReadStartsLastStart < noReadStartsTSS) {
+                    previousTss.setIsPrimary(false);
+                    previousTss.setPrimaryTss(tss);
+                    tss.setIsPrimary(true);
+                    if (prevTssIdx > 0) {
+                        furtherCheckForSecondaryTss(prevTssIdx, tss);
+                    }
+                } else {
+                    tss.setIsPrimary(false);
+                    tss.setPrimaryTss(previousTss);
+                }
+            } else { //previous TSS is secondary -> there is another primary TSS
+                flagPrimaryTss(previousTss.getPrimaryTss(), prevTssIdx, tss);
+            }
+        } else {
+            tss.setIsPrimary(true);
+        }
+    }
+    
 
     /**
-     * Acutally adds the detected TSS to the list of detected TSSs.
-     * <p>
-     * @param tss the transcription start site to add to the list
+     * Check if there are more secondary TSS in the merge window reach of the 
+     * current TSS. For all those, the primary TSS flag has to be updated to the
+     * current one.
+     * @param prevTssIdx The index of the previous primary TSS in the current
+     * merge window
+     * @param tss The current TSS for which the data is updated
      */
-    protected void addDetectStart( TranscriptionStart tss ) {
-        this.detectedStarts.add( tss );
+    private void furtherCheckForSecondaryTss(int prevTssIdx, TranscriptionStart tss) {
+        TranscriptionStart previousTss = detectedStarts.get(--prevTssIdx);
+        while (previousTss.getPos() + parametersTSS.getMaxFeatureDistance() >= tss.getPos() && prevTssIdx > 0) {
+            if (previousTss.isFwdStrand() == tss.isFwdStrand()) {
+                previousTss.setPrimaryTss(tss);
+                if (previousTss.isPrimaryTss()) {
+                    //TODO: test and remove
+                    System.out.println("Oh no! it's primary: " + previousTss.getPos());
+                }
+                /*
+                 * Keep in mind: by doing this, all secondary TSS belonging to 
+                 * another real primaryTSS directly before the current merge TSS 
+                 * window will be reassigned to the current TSS, even if the other 
+                 * one is stronger. But such cases should only occur when futile 
+                 * parameters are chosen (large merge TSS window). Further, its
+                 * highly unlikely to observe 2 real primary TSS within a window of 
+                 * e.g. 5bp.
+                 */
+            }
+            previousTss = detectedStarts.get(--prevTssIdx);
+        }
     }
 
 
@@ -701,8 +758,7 @@ public class AnalysisTranscriptionStart implements Observer,
     /**
      * If a new distribution was calculated, this method stores it in the DB and
      * corrects the result list with the new estimated parameters, if the
-     * tssAutomatic
-     * was chosen.
+     * tssAutomatic was chosen.
      */
     private void storeDistributions() {
         if( this.calcCoverageDistributions ) { //if it was calculated, also store it
@@ -745,14 +801,11 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * After detecting the transcription start sites the exact distribution of
-     * coverage increases
-     * is known and the threshold can be adapted for the automatic parameter
-     * estimation
-     * mode. This method calculates the more stringent thresholds first and then
-     * removes
-     * all transcription start sites from the detected starts list, which cannot
-     * satisfy the new
-     * thresholds. Prevents false positives.
+     * coverage increases is known and the threshold can be adapted for the
+     * automatic parameter estimation mode. This method calculates the more
+     * stringent thresholds first and then removes all transcription start sites
+     * from the detected starts list, which cannot satisfy the new thresholds.
+     * Prevents false positives.
      */
     private void correctResult() {
 

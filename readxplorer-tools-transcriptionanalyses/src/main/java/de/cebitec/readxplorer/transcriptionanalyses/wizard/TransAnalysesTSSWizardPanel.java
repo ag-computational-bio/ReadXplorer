@@ -18,24 +18,24 @@
 package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
-import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.utils.Properties;
-import java.util.prefs.Preferences;
-import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
-
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LOW_COV_INIT_COUNT;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MERGE_TSS_WINDOW;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_PERCENT_INCREASE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TOTAL_INCREASE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import static de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel.PROP_STRAND_OPTION;
+import de.cebitec.readxplorer.utils.Properties;
+import java.util.prefs.Preferences;
+import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
 
 
 /**
@@ -97,6 +97,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
             wiz.putProperty( PROP_MIN_TRANSCRIPT_EXTENSION_COV, this.component.getMinTranscriptExtensionCov() );
             wiz.putProperty( PROP_MAX_LEADERLESS_DISTANCE, this.component.getMaxLeaderlessDistance() );
             wiz.putProperty( PROP_MAX_FEATURE_DISTANCE, this.component.getMaxFeatureDistance() );
+            wiz.putProperty( PROP_MERGE_TSS_WINDOW, this.component.getMergeTssWindow() );
             wiz.putProperty( PROP_ANALYSIS_DIRECTION, this.component.isFwdDirectionSelected() );
             this.storePrefs();
         }
@@ -118,6 +119,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
         pref.put( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, String.valueOf( component.getMinTranscriptExtensionCov() ) );
         pref.put( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, String.valueOf( component.getMaxLeaderlessDistance() ) );
         pref.put( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, String.valueOf( component.getMaxFeatureDistance() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MERGE_TSS_WINDOW, String.valueOf( component.getMergeTssWindow() ) );
         pref.put( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() ? "1" : "0" );
     }
 

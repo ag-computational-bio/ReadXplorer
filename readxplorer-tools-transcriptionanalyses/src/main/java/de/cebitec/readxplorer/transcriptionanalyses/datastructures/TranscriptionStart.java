@@ -37,6 +37,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private final DetectedFeatures detFeatures;
     private final int percentIncrease;
     private final int coverageIncrease;
+    private boolean isPrimaryTss;
+    private TranscriptionStart primaryTss;
 
 
     /**
@@ -118,6 +120,46 @@ public class TranscriptionStart extends TrackChromResultEntry {
      */
     public int getCoverageIncrease() {
         return this.coverageIncrease;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @param isPrimaryTss <code>true</code>, if this is a primary TSS, 
+     * <code>false</code>, if it is a secondary TSS.
+     */
+    public void setIsPrimary(boolean isPrimaryTss) {
+        this.isPrimaryTss = isPrimaryTss;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @return <code>true</code>, if this is a primary TSS, <code>false</code>,
+     * if it is a secondary TSS.
+     */
+    public boolean isPrimaryTss() {
+        return isPrimaryTss;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @param primaryTss If this is a secondary TSS, assign it a primary TSS
+     * using this method.
+     */
+    public void setPrimaryTss(TranscriptionStart primaryTss) {
+        this.primaryTss = primaryTss;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @return If this is a secondary TSS, this method returns the associated 
+     * primary TSS.
+     */
+    public TranscriptionStart getPrimaryTss() {
+        return this.primaryTss;
     }
 
 
