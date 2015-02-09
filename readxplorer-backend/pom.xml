@@ -67,7 +67,7 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.databackend</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.databackend.connector</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.databackend.dataObjects</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.databackend.dataobjects</publicPackage>
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>

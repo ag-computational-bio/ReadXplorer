@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.VisualisationUtils;

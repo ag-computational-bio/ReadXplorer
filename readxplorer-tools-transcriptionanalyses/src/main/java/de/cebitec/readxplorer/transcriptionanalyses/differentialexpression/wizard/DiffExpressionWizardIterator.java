@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeqAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq2AnalysisHandler;

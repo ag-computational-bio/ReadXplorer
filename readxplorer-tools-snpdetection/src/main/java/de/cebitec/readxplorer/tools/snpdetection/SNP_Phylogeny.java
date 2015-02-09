@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.tools.snpdetection;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.databackend.dataObjects.Snp;
-import de.cebitec.readxplorer.databackend.dataObjects.SnpI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.Snp;
+import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

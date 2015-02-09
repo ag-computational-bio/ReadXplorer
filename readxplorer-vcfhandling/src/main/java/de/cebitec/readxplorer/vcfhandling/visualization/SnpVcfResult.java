@@ -8,8 +8,8 @@ package de.cebitec.readxplorer.vcfhandling.visualization;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

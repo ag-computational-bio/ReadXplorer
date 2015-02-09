@@ -20,9 +20,9 @@ package de.cebitec.readxplorer.ui.datavisualisation.basepanel;
 
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;

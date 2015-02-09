@@ -20,10 +20,10 @@ package de.cebitec.readxplorer.databackend.connector;
 
 import de.cebitec.readxplorer.databackend.FieldNames;
 import de.cebitec.readxplorer.databackend.SQLStatements;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;

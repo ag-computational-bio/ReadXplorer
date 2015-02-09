@@ -15,34 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.databackend.dataObjects;
+package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 /**
- * Interface to use for different SNP implementations. Provides three essential
- * methods.
+ * Interface for methods commonly used for data visualization.
  * <p>
- * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @author -Rolf Hilker-
  */
-public interface SnpI extends Comparable<SnpI> {
+public interface DataVisualisationI {
 
     /**
-     * @return The base of this snp which deviates from the reference sequence.
+     * Visualizes the data handed over to this method as defined by the
+     * implementation.
+     * <p>
+     * @param data the data object to visualize.
      */
-    public String getBase();
-
-
-    /**
-     * @return The coverage of this snp which deviates from the reference
-     *         sequence.
-     */
-    public int getCoverage();
-
-
-    /**
-     * @return The position of this snp.
-     */
-    public int getPosition();
+    public void showData( Object data );
 
 
 }

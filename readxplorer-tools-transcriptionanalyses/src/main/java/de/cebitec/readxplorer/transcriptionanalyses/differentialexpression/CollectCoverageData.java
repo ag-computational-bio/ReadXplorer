@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
 import java.util.Collections;
 import java.util.HashMap;

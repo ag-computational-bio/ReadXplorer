@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.Properties;
 import java.util.List;
 import java.util.logging.Level;

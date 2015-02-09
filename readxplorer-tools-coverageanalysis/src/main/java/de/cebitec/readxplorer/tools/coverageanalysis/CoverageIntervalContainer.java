@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.AnalysisResult;
+import de.cebitec.readxplorer.databackend.dataobjects.AnalysisResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

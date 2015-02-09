@@ -20,9 +20,9 @@ package de.cebitec.readxplorer.ui.datavisualisation.referenceviewer;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeatureI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeatureI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;

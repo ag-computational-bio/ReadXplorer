@@ -15,19 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.databackend.dataObjects;
+package de.cebitec.readxplorer.databackend.dataobjects;
+
+
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 
 
 /**
- *
- * @author Rolf Hilker
+ * Interface for all persistent features.
+ * <p>
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public interface ObjectWithId {
+public interface PersistentFeatureI {
 
     /**
-     * @return The id of this object
+     * @return start of the feature. Always the smaller value among start and
+     *         stop.
      */
-    public long getId();
+    public int getStart();
+
+
+    /**
+     * @return stop of the feature. Always the larger value among start and
+     *         stop.
+     */
+    public int getStop();
+
+
+    /**
+     * @return type of the feature among FeatureTypes.
+     */
+    public FeatureType getType();
 
 
 }

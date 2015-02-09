@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;

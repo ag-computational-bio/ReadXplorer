@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.ui.importer;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.TrackResultEntry;
+import de.cebitec.readxplorer.databackend.dataobjects.TrackResultEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

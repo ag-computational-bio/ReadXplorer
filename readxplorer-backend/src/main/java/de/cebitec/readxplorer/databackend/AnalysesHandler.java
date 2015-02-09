@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.databackend;
 
 import de.cebitec.readxplorer.api.objects.JobI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;

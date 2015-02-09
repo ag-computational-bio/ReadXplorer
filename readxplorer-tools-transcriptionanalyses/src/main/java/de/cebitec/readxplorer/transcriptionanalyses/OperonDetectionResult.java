@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.utils.GeneralUtils;

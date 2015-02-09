@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.JRegion;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PatternFilter;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Region;

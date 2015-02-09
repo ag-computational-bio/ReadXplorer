@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.tablevisualization;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.TableType;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;

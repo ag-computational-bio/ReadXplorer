@@ -2,7 +2,7 @@
 package de.cebitec.readxplorer.ui.importer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.TableType;
 import java.util.List;
 import java.util.Map;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;

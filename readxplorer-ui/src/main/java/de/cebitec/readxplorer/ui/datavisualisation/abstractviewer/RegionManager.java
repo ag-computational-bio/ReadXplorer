@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.HighlightAreaListener;
 import de.cebitec.readxplorer.utils.Properties;

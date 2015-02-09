@@ -290,7 +290,7 @@
         <Component class="javax.swing.JComboBox" name="chromComboBox">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;()"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>

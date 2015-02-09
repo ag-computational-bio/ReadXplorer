@@ -4,8 +4,8 @@ package de.cebitec.readxplorer.vcfhandling.importer;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanelFactory;

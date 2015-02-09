@@ -20,10 +20,10 @@ package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 import de.cebitec.readxplorer.databackend.SamBamFileReader;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Difference;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.ObjectWithId;
-import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataobjects.Difference;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
+import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.ui.datavisualisation.PaintUtilities;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;

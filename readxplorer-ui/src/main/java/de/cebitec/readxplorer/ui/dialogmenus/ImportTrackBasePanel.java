@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.utils.VisualisationUtils;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;

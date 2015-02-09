@@ -289,7 +289,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;()"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>
@@ -320,7 +320,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;()"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>

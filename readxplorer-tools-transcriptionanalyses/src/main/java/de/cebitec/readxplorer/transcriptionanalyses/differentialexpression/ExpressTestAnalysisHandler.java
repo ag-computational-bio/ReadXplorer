@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTest;

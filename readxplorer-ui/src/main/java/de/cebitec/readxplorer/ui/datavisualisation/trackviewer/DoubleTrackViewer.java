@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

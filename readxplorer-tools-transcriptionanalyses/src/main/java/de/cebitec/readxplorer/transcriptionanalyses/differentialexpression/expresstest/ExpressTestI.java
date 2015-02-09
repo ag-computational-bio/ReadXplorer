@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import java.util.List;
 
 

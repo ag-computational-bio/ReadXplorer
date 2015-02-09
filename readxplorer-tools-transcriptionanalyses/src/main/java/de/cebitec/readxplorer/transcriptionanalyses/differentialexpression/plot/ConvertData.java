@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ResultDeAnalysis;
 import de.cebitec.readxplorer.utils.GeneralUtils;

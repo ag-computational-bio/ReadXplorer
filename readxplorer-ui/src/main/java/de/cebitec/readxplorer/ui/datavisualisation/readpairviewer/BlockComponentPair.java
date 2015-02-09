@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPair;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPair;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.PaintUtilities;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;

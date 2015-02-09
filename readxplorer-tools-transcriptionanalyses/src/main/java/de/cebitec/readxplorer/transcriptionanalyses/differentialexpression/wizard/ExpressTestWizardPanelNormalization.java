@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;

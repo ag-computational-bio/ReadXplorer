@@ -15,49 +15,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.databackend.dataObjects;
+package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 import de.cebitec.readxplorer.databackend.IntervalRequest;
-import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
- * Contains the basic functionality of an analysis result.
+ * Able to store the result for mapping calls. Called persistent,
+ * because it needs the persistent data types from its own package.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class AnalysisResult implements Serializable {
+public class MappingResult extends AnalysisResult {
 
     private static final long serialVersionUID = 1L;
 
-    private final IntervalRequest request;
+    private final List<Mapping> mappings;
 
 
     /**
-     * Common functionality of of an analysis result.
+     * Able to store the result for mapping calls. Called persistent, because it
+     * needs the persistent data types from its own package.
      * <p>
-     * @param request the interval request for which the result was created
+     * @param mappings the list of mappings to store
+     * @param request  the request for which the result was generated
      */
-    public AnalysisResult( IntervalRequest request ) {
-        this.request = request;
+    public MappingResult( List<Mapping> mappings, IntervalRequest request ) {
+        super( request );
+        this.mappings = mappings;
     }
 
 
     /**
-     * a parameterless constructor is needed to enable deserialization
-     * of child classed
+     * @return the mappings stored in this result
      */
-    public AnalysisResult() {
-        request = new IntervalRequest( -1, -1, -1, null, false );
-    }
-
-
-    /**
-     * @return the interval request for which the result was created
-     */
-    public IntervalRequest getRequest() {
-        return request;
+    public List<Mapping> getMappings() {
+        return Collections.unmodifiableList( mappings );
     }
 
 

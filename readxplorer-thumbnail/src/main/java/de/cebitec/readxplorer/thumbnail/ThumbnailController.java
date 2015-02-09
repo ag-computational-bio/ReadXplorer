@@ -24,8 +24,8 @@ import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrac
 import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.thumbnail.actions.AsyncSliderCookie;
 import de.cebitec.readxplorer.thumbnail.actions.OpenThumbCookie;
 import de.cebitec.readxplorer.thumbnail.actions.RemoveCookie;

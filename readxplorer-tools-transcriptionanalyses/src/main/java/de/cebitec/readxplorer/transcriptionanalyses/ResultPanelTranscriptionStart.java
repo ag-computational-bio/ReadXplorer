@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;

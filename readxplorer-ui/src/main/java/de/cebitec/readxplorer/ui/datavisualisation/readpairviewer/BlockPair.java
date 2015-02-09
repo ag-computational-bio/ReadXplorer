@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.ObjectWithId;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.BlockI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.Brick;
 import java.util.Iterator;

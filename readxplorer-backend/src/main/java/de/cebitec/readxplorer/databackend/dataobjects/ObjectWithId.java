@@ -15,23 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.databackend.dataObjects;
+package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 /**
- * Interface for methods commonly used for data visualization.
- * <p>
- * @author -Rolf Hilker-
+ *
+ * @author Rolf Hilker
  */
-public interface DataVisualisationI {
+public interface ObjectWithId {
 
     /**
-     * Visualizes the data handed over to this method as defined by the
-     * implementation.
-     * <p>
-     * @param data the data object to visualize.
+     * @return The id of this object
      */
-    public void showData( Object data );
+    public long getId();
 
 
 }

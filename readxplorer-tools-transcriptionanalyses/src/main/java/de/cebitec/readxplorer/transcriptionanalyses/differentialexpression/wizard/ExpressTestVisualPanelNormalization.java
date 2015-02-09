@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.visualisation.reference.FeatureTableModel;
 import java.util.List;
 import javax.swing.ButtonGroup;

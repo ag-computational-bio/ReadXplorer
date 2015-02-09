@@ -2,8 +2,8 @@
 package de.cebitec.readxplorer.vcfhandling.importer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.Snp;
-import de.cebitec.readxplorer.databackend.dataObjects.SnpI;
+import de.cebitec.readxplorer.databackend.dataobjects.Snp;
+import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

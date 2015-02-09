@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.Properties;
 import java.util.List;
 import java.util.logging.Logger;

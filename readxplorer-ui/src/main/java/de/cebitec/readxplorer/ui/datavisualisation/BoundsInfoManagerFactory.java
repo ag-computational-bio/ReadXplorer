@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import java.util.HashMap;
 
 

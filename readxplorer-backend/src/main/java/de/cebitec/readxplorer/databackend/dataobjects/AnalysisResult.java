@@ -15,45 +15,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.databackend.dataObjects;
+package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 import de.cebitec.readxplorer.databackend.IntervalRequest;
-import java.util.Collections;
-import java.util.List;
+import java.io.Serializable;
 
 
 /**
- * Able to store the result for mapping calls. Called persistent,
- * because it needs the persistent data types from its own package.
+ * Contains the basic functionality of an analysis result.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class MappingResult extends AnalysisResult {
+public class AnalysisResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<Mapping> mappings;
+    private final IntervalRequest request;
 
 
     /**
-     * Able to store the result for mapping calls. Called persistent, because it
-     * needs the persistent data types from its own package.
+     * Common functionality of of an analysis result.
      * <p>
-     * @param mappings the list of mappings to store
-     * @param request  the request for which the result was generated
+     * @param request the interval request for which the result was created
      */
-    public MappingResult( List<Mapping> mappings, IntervalRequest request ) {
-        super( request );
-        this.mappings = mappings;
+    public AnalysisResult( IntervalRequest request ) {
+        this.request = request;
     }
 
 
     /**
-     * @return the mappings stored in this result
+     * a parameterless constructor is needed to enable deserialization
+     * of child classed
      */
-    public List<Mapping> getMappings() {
-        return Collections.unmodifiableList( mappings );
+    public AnalysisResult() {
+        request = new IntervalRequest( -1, -1, -1, null, false );
+    }
+
+
+    /**
+     * @return the interval request for which the result was created
+     */
+    public IntervalRequest getRequest() {
+        return request;
     }
 
 

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 
 
 /**
@@ -63,7 +63,7 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> refGenList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataobjects.PersistentReference> refGenList;
     // End of variables declaration//GEN-END:variables
 
 

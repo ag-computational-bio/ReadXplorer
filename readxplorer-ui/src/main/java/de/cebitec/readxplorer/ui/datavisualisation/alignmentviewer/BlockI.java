@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.ObjectWithId;
+import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
 import java.util.Iterator;
 
 

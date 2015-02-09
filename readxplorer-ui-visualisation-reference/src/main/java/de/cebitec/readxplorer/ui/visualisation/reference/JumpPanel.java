@@ -20,9 +20,9 @@ package de.cebitec.readxplorer.ui.visualisation.reference;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.IThumbnailView;
@@ -455,7 +455,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chromCheckBox;
-    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome> chromComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome> chromComboBox;
     private javax.swing.JPanel featureGroundPanel;
     private javax.swing.JTable featureTable;
     private javax.swing.JLabel filterForLabel;

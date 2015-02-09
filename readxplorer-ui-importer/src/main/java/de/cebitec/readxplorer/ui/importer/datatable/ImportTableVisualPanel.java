@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.ui.importer.datatable;
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.CsvPreferenceForUsers;
 import de.cebitec.readxplorer.parser.tables.CsvTableParser;
 import de.cebitec.readxplorer.parser.tables.TableParserI;
@@ -82,7 +82,7 @@ public final class ImportTableVisualPanel extends JobPanel {
         tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readxplorer.parser.tables.TableType.values()));
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
-        de.cebitec.readxplorer.databackend.dataObjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataObjects.PersistentReference[0];
+        de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[0];
         refArray = ProjectConnector.getInstance().getGenomes().toArray(refArray);
         refComboBox = new javax.swing.JComboBox<>(new DefaultComboBoxModel<>(refArray));
         tableLabel = new javax.swing.JLabel();
@@ -316,7 +316,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JTextField fileTextField;
     private javax.swing.JComboBox<TableParserI> parserComboBox;
     private javax.swing.JLabel parserLabel;
-    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> refComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataobjects.PersistentReference> refComboBox;
     private javax.swing.JLabel refLabel;
     private javax.swing.JButton statsAndParamsButton;
     private javax.swing.JTextField statsAndParamsFileTextField;

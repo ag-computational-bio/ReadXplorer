@@ -20,11 +20,11 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.readxplorer.databackend.dataObjects.CodonSnp;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.Snp;
+import de.cebitec.readxplorer.databackend.dataobjects.CodonSnp;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;

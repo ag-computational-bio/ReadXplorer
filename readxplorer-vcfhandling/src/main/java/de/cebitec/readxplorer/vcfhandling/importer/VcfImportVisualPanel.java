@@ -9,7 +9,7 @@ package de.cebitec.readxplorer.vcfhandling.importer;
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 
@@ -129,7 +129,7 @@ public final class VcfImportVisualPanel extends JobPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseButton;
     private javax.swing.JTextField fileTextField;
-    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> jComboBox1;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataobjects.PersistentReference> jComboBox1;
     // End of variables declaration//GEN-END:variables
 
 

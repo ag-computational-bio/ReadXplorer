@@ -20,12 +20,12 @@ package de.cebitec.readxplorer.databackend;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairResultPersistent;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairResultPersistent;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.sql.Timestamp;

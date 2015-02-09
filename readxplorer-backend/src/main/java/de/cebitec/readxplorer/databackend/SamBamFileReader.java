@@ -18,14 +18,14 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.DiffAndGapResult;
-import de.cebitec.readxplorer.databackend.dataObjects.Difference;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
-import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.DiffAndGapResult;
+import de.cebitec.readxplorer.databackend.dataobjects.Difference;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.IndexFileNotificationPanel;
 import de.cebitec.readxplorer.utils.Observable;

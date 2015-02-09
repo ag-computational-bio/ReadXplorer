@@ -15,37 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.databackend.dataObjects;
-
-
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 /**
- * Interface for all persistent features.
+ * Interface to use for different SNP implementations. Provides three essential
+ * methods.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public interface PersistentFeatureI {
+public interface SnpI extends Comparable<SnpI> {
 
     /**
-     * @return start of the feature. Always the smaller value among start and
-     *         stop.
+     * @return The base of this snp which deviates from the reference sequence.
      */
-    public int getStart();
-
-
-    /**
-     * @return stop of the feature. Always the larger value among start and
-     *         stop.
-     */
-    public int getStop();
+    public String getBase();
 
 
     /**
-     * @return type of the feature among FeatureTypes.
+     * @return The coverage of this snp which deviates from the reference
+     *         sequence.
      */
-    public FeatureType getType();
+    public int getCoverage();
+
+
+    /**
+     * @return The position of this snp.
+     */
+    public int getPosition();
 
 
 }
