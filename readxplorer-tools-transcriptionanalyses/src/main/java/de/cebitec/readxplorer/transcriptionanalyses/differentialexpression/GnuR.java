@@ -14,130 +14,79 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
-
 import de.cebitec.readxplorer.utils.Properties;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.UUID;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RMainLoopCallbacks;
-import org.rosuda.JRI.Rengine;
-
-import static java.util.logging.Level.INFO;
-
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 
 /**
  * Calls Gnu R.
  *
  * @author kstaderm
  */
-public class GnuR extends Rengine {
+public class GnuR extends RConnection {
 
-    private static final Logger LOG = Logger.getLogger( GnuR.class.getName() );
-
-
-    /**
-     * The current instance of Gnu R. There can only be one instance.
-     */
-    private static GnuR instance = null;
     /**
      * The Cran Mirror used to receive additional packages.
      */
     private String cranMirror;
-    /**
-     * Keeps track over the one and only allowed instance of this class. There
-     * can only be one instance that should only be used by one other class at a
-     * time. If not you might get strange results because two classes are
-     * working with one Gnu R instance an the same time sharing memory and all
-     * variables. Side effects are likely to accure in this case. If more than
-     * one Gnu R instance is created, the Java VM will crash. This key is null
-     * if the class is free.
-     */
-    private static UUID KEY = null;
-
+    
+    public final boolean runningLocal;
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
      */
-    private GnuR( String[] args ) {
-        super( args, false, null );
-        super.addMainLoopCallbacks( new Callback() );
+    private GnuR(String host, int port, boolean runningLocal) throws RserveException {
+        super(host, port);
+        this.runningLocal = runningLocal;
         setDefaultCranMirror();
     }
-
-
-    private static synchronized GnuR getInstance( UUID key ) throws IllegalStateException {
-        if( key == KEY ) {
-            if( instance == null ) {
-                String[] args = new String[]{ "--vanilla", "--slave" };
-                instance = new GnuR( args );
-            }
-            return instance;
-        }
-        else {
-            throw new IllegalStateException( "The instance of Gnu R is currently reserved by another instance." );
-        }
-    }
-
-
-    private static synchronized UUID reserveInstance() {
-        if( KEY == null ) {
-            KEY = UUID.randomUUID();
-            return KEY;
-        }
-        else {
-            throw new IllegalStateException( "The instance of Gnu R is currently used." );
-        }
-    }
-
-
-    public void releaseGnuRInstance( UUID key ) {
-        if( key == KEY ) {
-            this.clearGnuR();
-            KEY = null;
-            Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( INFO, "{0}: Current Gnu R instace was released.", currentTimestamp );
-        }
-        else {
-            throw new IllegalStateException( "The instance of Gnu R is currently reserved by another instance." );
-        }
-    }
-
 
     /**
      * Clears up the memory of an runnig R instance. This should the called
      * every time before a new computation is startet. Doing so you can be sure
      * that no previous result is interfering with the new computation.
      */
-    public void clearGnuR() {
-        this.eval( "rm(list = ls(all = TRUE))" );
+    public void clearGnuR() throws RserveException {
+        this.eval("rm(list = ls(all = TRUE))");
     }
-
 
     /**
      * Saves the memory of the current R instance to the given file.
      *
      * @param saveFile File the memory image should be saved to
      */
-    public void saveDataToFile( File saveFile ) {
+    public void saveDataToFile(File saveFile) throws RserveException {
         String path = saveFile.getAbsolutePath();
-        path = path.replace( "\\", "/" );
-        this.eval( "save.image(\"" + path + "\")" );
+        path = path.replace("\\", "/");
+        this.eval("save.image(\"" + path + "\")");
     }
 
-
-    private void setDefaultCranMirror() {
-        cranMirror = NbPreferences.forModule( Object.class ).get( Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
-        this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
+    private void setDefaultCranMirror() throws RserveException {
+        cranMirror = NbPreferences.forModule(Object.class).get(Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/");
+        this.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
     }
-
 
     /**
      * Loads the specified Gnu R package. If not installed the method will try
@@ -145,258 +94,231 @@ public class GnuR extends Rengine {
      *
      * @param packageName
      */
-    public void loadPackage( String packageName ) throws PackageNotLoadableException {
-        REXP result = this.eval( "library(" + packageName + ')' );
-        if( result == null ) {
-            this.eval( "install.packages(\"" + packageName + "\")" );
-            result = this.eval( "library(" + packageName + ')' );
-            if( result == null ) {
-                throw new PackageNotLoadableException( packageName );
+    public void loadPackage(String packageName) throws PackageNotLoadableException {
+        try {
+            this.eval("library(" + packageName + ")");
+        } catch (RserveException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
+            try {
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Trying to install package {1}.", new Object[]{currentTimestamp, packageName});
+                this.eval("install.packages(\"" + packageName + "\")");
+                this.eval("library(" + packageName + ')');
+            } catch (RserveException ex1) {
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{currentTimestamp, packageName});
+                throw new PackageNotLoadableException(packageName);
             }
         }
     }
 
-
     public static class PackageNotLoadableException extends Exception {
 
-        public PackageNotLoadableException( String packageName ) {
-            super( "The Gnu R package " + packageName + " can't be loaded automatically. Please install it manually!" );
+        public PackageNotLoadableException(String packageName) {
+            super("The Gnu R package " + packageName + " can't be loaded automatically. Please install it manually!");
         }
 
-
     }
-
-
-    public static class JRILibraryNotInPathException extends Exception {
-
-        public JRILibraryNotInPathException() {
-            super( "JRI native library can't be found in the PATH. Please add it to the PATH and try again." );
-        }
-
-
-    }
-
 
     public static class UnknownGnuRException extends Exception {
 
-        public UnknownGnuRException( Exception e ) {
-            super( "An unknown exception occurred in GNU R while processing your data. "
-                   + "This caused an " + e.getClass().getName() + " on the Java side of the programm.", e );
+        public UnknownGnuRException(Exception e) {
+            super("An unknown exception occurred in GNU R while processing your data. "
+                    + "This caused an " + e.getClass().getName() + " on the Java side of the programm.", e);
         }
 
-
     }
 
-
     @Override
-    public synchronized REXP eval( String string ) {
-        return eval( string, true );
-    }
-
-
-    @Override
-    public synchronized REXP eval( String string, boolean bln ) {
-        ProcessingLog.getInstance().logGNURoutput( "> " + string + "\n" );
-        return super.eval( string, bln );
-    }
-
-
-    @Override
-    public boolean assign( String string, String string1 ) {
-        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + string1 + "\" to variable \"" + string + "\"\n" );
-        return super.assign( string, string1 );
-    }
-
-
-    @Override
-    public boolean assign( String string, REXP rexp ) {
-        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + rexp.asString() + "\" to variable \"" + string + "\"\n" );
-        return super.assign( string, rexp );
-    }
-
-
-    @Override
-    public boolean assign( String string, double[] doubles ) {
-        StringBuilder sb = new StringBuilder( doubles.length * 20 ).append( '[' );
-        for( int i = 0; i < doubles.length; i++ ) {
-            sb.append( doubles[i] ).append( ';' );
+    public void shutdown() throws RserveException {
+        //If we started the RServe instace by our self we should also terminate it.
+        //If we are connected to a remote server however we should not do so.
+        if(runningLocal){
+            super.shutdown();
         }
-        sb.deleteCharAt( sb.length() - 1 );
-        sb.append( ']' );
-        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-        return super.assign( string, doubles );
     }
-
 
     @Override
-    public boolean assign( String string, int[] ints ) {
-        StringBuilder sb = new StringBuilder( ints.length * 12 ).append( '[' );
-        for( int i = 0; i < ints.length; i++ ) {
-            sb.append( ints[i] ).append( ';' );
-        }
-        sb.deleteCharAt( sb.length() - 1 );
-        sb.append( ']' );
-        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-        return super.assign( string, ints );
+    public REXP eval(String cmd) throws RserveException {
+        ProcessingLog.getInstance().logGNURinput( cmd );
+        return super.eval(cmd);
     }
-
 
     @Override
-    public boolean assign( String string, boolean[] blns ) {
-        StringBuilder sb = new StringBuilder( blns.length * 6 ).append( '[' );
-        for( int i = 0; i < blns.length; i++ ) {
-            sb.append( blns[i] ).append( ';' );
-        }
-        sb.deleteCharAt( sb.length() - 1 );
-        sb.append( ']' );
-        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-        return super.assign( string, blns );
-    }
+    public REXP eval(REXP what, REXP where, boolean resolve) throws REngineException {
 
+        return super.eval(what, where, resolve);
+    }
 
     @Override
-    public boolean assign( String string, String[] strings ) {
-        StringBuilder sb = new StringBuilder( strings.length * 20 ).append( '[' );
-        for( String string1 : strings ) {
-            sb.append( string1 ).append( ';' );
-        }
-        sb.deleteCharAt( sb.length() - 1 );
-        sb.append( ']' );
-        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-        return super.assign( string, strings );
+    public void assign(String sym, REXP rexp) throws RserveException {
+        super.assign(sym, rexp);
     }
 
+    @Override
+    public void assign(String sym, String ct) throws RserveException {
+        super.assign(sym, ct);
+    }
+
+    @Override
+    public void assign(String symbol, REXP value, REXP env) throws REngineException {
+        super.assign(symbol, value, env);
+    }
 
     /**
      * Store an SVG file of a given plot using this GnuR instance.
      * <p>
-     * @param file           File to store the plot in
+     * @param file File to store the plot in
      * @param plotIdentifier String identifying the data to plot
      * <p>
      * @throws
      * de.cebitec.readxplorer.differentialExpression.GnuR.PackageNotLoadableException
      * @throws IllegalStateException
      */
-    public void storePlot( File file, String plotIdentifier ) throws PackageNotLoadableException, IllegalStateException {
-        if( this == null ) {
-            throw new IllegalStateException( "Shutdown was already called!" );
+    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException, 
+                                                                    RserveException, REngineException, REXPMismatchException, 
+                                                                    FileNotFoundException, IOException {
+        this.loadPackage("grDevices");
+
+        if (runningLocal) {
+            String path = file.getAbsolutePath();
+            path = path.replace("\\", "\\\\");
+            this.eval("svg(filename=\"" + path + "\")");
+            this.eval(plotIdentifier);
+            this.eval("dev.off()");
+        } else {
+            this.eval("tmpFile <- tempfile(pattern =\"ReadXplorer_Plot_\", tmpdir = tempdir(), fileext =\".svg\")");
+            this.eval("svg(filename=tmpFile)");
+            this.eval(plotIdentifier);
+            this.eval("dev.off()");
+            this.eval("r=readBin(tmpFile,\"raw\",30720*1024)");
+            this.eval("unlink(tmpFile)");
+            REXP pictureData = this.parseAndEval("r");
+            byte[] asBytes = pictureData.asBytes();
+            try (OutputStream os = new FileOutputStream(file)) {
+                os.write(asBytes);
+            }
         }
-        this.loadPackage( "grDevices" );
-        String path = file.getAbsolutePath();
-        path = path.replace( "\\", "\\\\" );
-        this.eval( "svg(filename=\"" + path + "\")" );
-        this.eval( plotIdentifier );
-        this.eval( "dev.off()" );
     }
 
+    /**
+     * The next free port that will be used to start a new RServe instance. Per
+     * default RServe starts on port 6311 in order to not interfear with already
+     * running instances we start one port above
+     */
+    private static int nextFreePort = 6312;
 
-    private static class Callback implements RMainLoopCallbacks {
+    public static GnuR startRServe() throws RserveException {
+        String host;
+        int port;
+        boolean manualLocalSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
+        boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
 
-        @Override
-        public void rWriteConsole( Rengine rngn, String string, int i ) {
-            ProcessingLog.getInstance().logGNURoutput( string );
+        if (manualRemoteSetup) {
+            port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
+            host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
+        } else {
+            ProcessBuilder pb;
+            host = "localhost";
+
+            if (manualLocalSetup) {
+                port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
+                String startUpScript = NbPreferences.forModule(Object.class).get(Properties.RSERVE_STARTUP_SCRIPT, "");
+                List<String> commands = new ArrayList<>();
+                commands.add("/bin/bash");
+                commands.add(startUpScript);
+                commands.add(String.valueOf(port));
+                pb = new ProcessBuilder(commands);
+                try {
+                    final Process start = pb.start();
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                BufferedReader reader
+                                        = new BufferedReader(new InputStreamReader(start.getInputStream()));
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    ProcessingLog.getInstance().logGNURoutput(line);
+                                }
+                            } catch (IOException ex) {
+                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
+                            }
+                        }
+                    }).start();
+
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                BufferedReader reader
+                                        = new BufferedReader(new InputStreamReader(start.getErrorStream()));
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    ProcessingLog.getInstance().logGNURoutput(line);
+                                }
+                            } catch (IOException ex) {
+                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
+                            }
+                        }
+                    }).start();
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            } else {
+                port = nextFreePort++;
+                String bit = System.getProperty("sun.arch.data.model");
+                String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+                String user_dir = System.getProperty("netbeans.user");
+                File r_dir = new File(user_dir + File.separator + "R");
+                if (os.contains("windows")) {
+                    String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+                    String arch = "";
+                    if (bit.equals("32")) {
+                        arch = "i386";
+                    }
+                    if (bit.equals("64")) {
+                        arch = "x64";
+                    }
+                    List<String> commands = new ArrayList<>();
+                    commands.add(startupBat);
+                    commands.add(r_dir.getAbsolutePath());
+                    commands.add(arch);
+                    commands.add(String.valueOf(port));
+                    pb = new ProcessBuilder(commands);
+                    try {
+                        pb.start();
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
-
-
-        @Override
-        public void rBusy( Rengine rngn, int i ) {
-        }
-
-
-        @Override
-        public String rReadConsole( Rengine rngn, String string, int i ) {
-            return "";
-        }
-
-
-        @Override
-        public void rShowMessage( Rengine rngn, String string ) {
-            ProcessingLog.getInstance().logGNURoutput( string );
-        }
-
-
-        @Override
-        public String rChooseFile( Rengine rngn, int i ) {
-            return "";
-        }
-
-
-        @Override
-        public void rFlushConsole( Rengine rngn ) {
-        }
-
-
-        @Override
-        public void rSaveHistory( Rengine rngn, String string ) {
-        }
-
-
-        @Override
-        public void rLoadHistory( Rengine rngn, String string ) {
-        }
-
-
+        return new GnuR(host, port, !manualRemoteSetup);
     }
 
+    public static boolean gnuRSetupCorrect() {
+        boolean manualLocalSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
+        boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
 
-    public static class SecureGnuRInitiliser {
-
-        /**
-         * Reserves the GNU R for later usage.
-         *
-         * @return The key needed to get the actual instance.
-         * <p>
-         * @throws IllegalStateException if GNU R is already used.
-         */
-        public static synchronized UUID reserveGnuRinstance() throws IllegalStateException {
-            UUID ret = reserveInstance();
-            return ret;
+        if (!(manualLocalSetup || manualRemoteSetup)) {
+            String user_dir = System.getProperty("netbeans.user");
+            File r_dir = new File(user_dir + File.separator + "R");
+            String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+            File batFile = new File(startupBat);
+            return (batFile.exists() && batFile.canExecute());
+        } else {
+            return true;
         }
-
-
-        /**
-         * Returns the one and only instance of GNU R. reserveGnuRinstance() has
-         * to be called first in order to acquire the key.
-         *
-         * @param key The UUID acquired by calling reserveGnuRinstance()
-         * <p>
-         * @return The one and only instance of GNU R.
-         * <p>
-         * @throws IllegalStateException if the key is not correct.
-         */
-        public static synchronized GnuR getGnuRinstance( UUID key ) throws IllegalStateException {
-            GnuR ret = getInstance( key );
-            return ret;
-        }
-
-
-        /**
-         * Checks if R is installed.
-         *
-         * @return true if the needed libraries are included, else false.
-         */
-        public static boolean isGnuRSetUpCorrect() {
-            System.setProperty( "jri.ignore.ule", "yes" );
-            isGnuRInstanceFree();
-            return Rengine.jriLoaded;
-        }
-
-
-        /**
-         * Checks if the GNU R instance is available. This is just an informal
-         * check that will not reserve the instance if it is available. You have
-         * to call reserveGnuRinstance() later if you want to do so. Note that
-         * it might be possible that even if you call reserveGnuRinstance()
-         * directly after calling this method the GNU R instance is reserved in
-         * between by another thread.
-         *
-         * @return true if the GNU R instance is available, else false.
-         */
-        public static boolean isGnuRInstanceFree() {
-            return KEY == null;
-        }
-
-
     }
-
 }

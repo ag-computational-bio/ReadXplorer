@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -29,7 +28,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -40,7 +41,6 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     private DeSeq deSeq;
     private final DeSeqAnalysisData deSeqAnalysisData;
-    private final UUID key;
 
 
     public static enum Plot {
@@ -78,10 +78,9 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public DeSeqAnalysisHandler( List<PersistentTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
                                  List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-                                 File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, UUID key ) {
+                                 File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
         deSeq = new DeSeq();
-        this.key = key;
         deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(),
                                                    design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo,
                                                    workingWithoutReplicates );
@@ -89,11 +88,11 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );
-        results = deSeq.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key );
+        results = deSeq.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
         return results;
 
     }
@@ -105,13 +104,14 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    public void endAnalysis() {
-        deSeq.shutdown( key );
+    public void endAnalysis() throws RserveException {
+        deSeq.shutdown();
         deSeq = null;
     }
 
 
-    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException {
+    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException, 
+                                            RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.DE ) {

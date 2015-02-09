@@ -28,7 +28,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpResultViewerTopComponent;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExportOnlyAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExpressTestAnalysisHandler;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
@@ -43,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.UUID;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import org.openide.DialogDisplayer;
@@ -117,12 +115,10 @@ public final class DiffExpressionWizardIterator implements
             DeAnalysisHandler handler = null;
 
             if( tool == DeAnalysisHandler.Tool.BaySeq ) {
-                UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 handler = new BaySeqAnalysisHandler( selectedTracks, createdGroups, genomeID,
-                                                     replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, key );
+                                                     replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams);
             }
             else if( tool == DeAnalysisHandler.Tool.DeSeq ) {
-                UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 boolean moreThanTwoConditions = (boolean) wiz.getProperty( "moreThanTwoConditions" );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
@@ -134,15 +130,14 @@ public final class DiffExpressionWizardIterator implements
                 }
                 handler = new DeSeqAnalysisHandler( selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
                                                     fittingGroupTwo, genomeID, workingWithoutReplicates,
-                                                    saveFile, featureTypes, startOffset, stopOffset, readClassParams, key );
+                                                    saveFile, featureTypes, startOffset, stopOffset, readClassParams);
             }
             else if( tool == DeAnalysisHandler.Tool.DeSeq2 ) {
-                UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
                 handler = new DeSeq2AnalysisHandler( selectedTracks, design, null,
                                                      null, genomeID, workingWithoutReplicates,
-                                                     saveFile, featureTypes, startOffset, stopOffset, readClassParams, key );
+                                                     saveFile, featureTypes, startOffset, stopOffset, readClassParams);
             }
             else if( tool == DeAnalysisHandler.Tool.ExpressTest ) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty( "groupA" );

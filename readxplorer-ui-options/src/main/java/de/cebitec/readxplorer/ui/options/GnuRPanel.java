@@ -28,20 +28,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
@@ -66,6 +67,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private static final String SOURCE_URI = "R.tar.gz";
     private static final String R_ZIP = "R.zip";
     private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
+    private static final String DEFAULT_RSERVE_HOST = "localhost";
+    private static final int DEFAULT_RSERVE_PORT = 6311;
     private final String license = "		    GNU GENERAL PUBLIC LICENSE\n"
                                    + "		       Version 2, June 1991\n"
                                    + "\n"
@@ -415,6 +418,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
         initComponents();
+        warningMessage.setText("");
         String source_uri = pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
         sourceFileTextField.setText( source_uri );
         jProgressBar1.setMaximum( 100 );
@@ -433,6 +437,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         else {
             messages.setText( "Auto installation is only supported under Windows 7 & 8." );
         }
+        rServePort.setInputVerifier(new PortInputVerifier());
+        rServeStartupScript.setInputVerifier(new ScriptInputVerifier());
     }
 
 
@@ -466,6 +472,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        autoOrmanual = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
         cranMirror = new javax.swing.JTextField();
         installButton = new javax.swing.JButton();
@@ -473,10 +480,23 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         messages = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         sourceFileTextField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        rServeHost = new javax.swing.JTextField();
+        autoButton = new javax.swing.JRadioButton();
+        manualRemoteButton = new javax.swing.JRadioButton();
+        manualLocalButton = new javax.swing.JRadioButton();
+        jLabel4 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel5 = new javax.swing.JLabel();
+        rServePort = new javax.swing.JTextField();
+        warningMessage = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        jLabel6 = new javax.swing.JLabel();
+        rServeStartupScript = new javax.swing.JTextField();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text_1")); // NOI18N
 
-        cranMirror.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.text")); // NOI18N
+        cranMirror.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.text_1")); // NOI18N
         cranMirror.setToolTipText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.toolTipText")); // NOI18N
         cranMirror.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -484,7 +504,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(installButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.installButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(installButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.installButton.text_1")); // NOI18N
         installButton.setEnabled(false);
         installButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -494,18 +514,63 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
         jProgressBar1.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.messages.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.messages.text_1")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel2.text_1")); // NOI18N
 
         sourceFileTextField.setEditable(false);
-        sourceFileTextField.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.sourceFileTextField.text")); // NOI18N
+        sourceFileTextField.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.sourceFileTextField.text_1")); // NOI18N
         sourceFileTextField.setBorder(null);
         sourceFileTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 sourceFileTextFieldMouseReleased(evt);
             }
         });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel3.text")); // NOI18N
+
+        rServeHost.setEditable(false);
+        rServeHost.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeHost.text")); // NOI18N
+
+        autoOrmanual.add(autoButton);
+        autoButton.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(autoButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.autoButton.text")); // NOI18N
+        autoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoButtonActionPerformed(evt);
+            }
+        });
+
+        autoOrmanual.add(manualRemoteButton);
+        org.openide.awt.Mnemonics.setLocalizedText(manualRemoteButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualRemoteButton.text")); // NOI18N
+        manualRemoteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualRemoteButtonActionPerformed(evt);
+            }
+        });
+
+        autoOrmanual.add(manualLocalButton);
+        org.openide.awt.Mnemonics.setLocalizedText(manualLocalButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualLocalButton.text")); // NOI18N
+        manualLocalButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualLocalButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel4.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel5.text")); // NOI18N
+
+        rServePort.setEditable(false);
+        rServePort.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServePort.text")); // NOI18N
+
+        warningMessage.setForeground(new java.awt.Color(255, 0, 0));
+        org.openide.awt.Mnemonics.setLocalizedText(warningMessage, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.warningMessage.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel6.text")); // NOI18N
+
+        rServeStartupScript.setEditable(false);
+        rServeStartupScript.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeStartupScript.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -514,38 +579,79 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(63, 63, 63))
+                    .addComponent(jSeparator1)
                     .addComponent(cranMirror)
                     .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(sourceFileTextField)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(63, 63, 63))
+                    .addComponent(jSeparator3)
+                    .addComponent(rServeStartupScript)
+                    .addComponent(rServeHost)
+                    .addComponent(rServePort)
+                    .addComponent(warningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(installButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel1)
+                            .addComponent(installButton)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(autoButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(manualLocalButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(manualRemoteButton)))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(sourceFileTextField))
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(autoButton)
+                    .addComponent(manualRemoteButton)
+                    .addComponent(manualLocalButton))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cranMirror, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(installButton)
                 .addGap(18, 18, 18)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(11, 11, 11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sourceFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
-                .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(messages)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rServeStartupScript, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rServeHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(warningMessage)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -591,26 +697,103 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.sourceFileTextField.setText( cranMirror.getText() + SOURCE_URI );
     }//GEN-LAST:event_cranMirrorKeyReleased
 
+    private void manualRemoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualRemoteButtonActionPerformed
+        manualRemoteButtonSelected();
+    }//GEN-LAST:event_manualRemoteButtonActionPerformed
+
+    private void manualRemoteButtonSelected() {
+        rServeStartupScript.setEditable(false);
+        rServeHost.setEditable(true);
+        rServePort.setEditable(true);
+        installButton.setEnabled(false);
+    }
+
+    private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
+        autoButtonSelected();
+    }//GEN-LAST:event_autoButtonActionPerformed
+
+    private void autoButtonSelected() {
+        rServeStartupScript.setEditable(false);
+        rServeHost.setEditable(false);
+        rServePort.setEditable(false);
+        installButton.setEnabled(true);
+        warningMessage.setText("");
+    }
+
+    private void manualLocalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualLocalButtonActionPerformed
+        manualLocalButtonSelected();
+    }//GEN-LAST:event_manualLocalButtonActionPerformed
+
+    private void manualLocalButtonSelected() {
+        rServeStartupScript.setEditable(true);
+        rServeHost.setEditable(false);
+        rServePort.setEditable(true);
+        installButton.setEnabled(false);
+    }
+
 
     @Override
     void load() {
-        cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
+        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR));
+        rServeHost.setText(pref.get(Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST));
+        rServePort.setText(String.valueOf(pref.getInt(Properties.RSERVE_PORT, DEFAULT_RSERVE_PORT)));
+        boolean manualRemoteButtonSelected = pref.getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
+        if (manualRemoteButtonSelected) {
+            autoOrmanual.setSelected(manualRemoteButton.getModel(), true);
+            manualRemoteButtonSelected();
+        } else {
+            boolean manualLocalButtonSelected = pref.getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
+            if (manualLocalButtonSelected) {
+                autoOrmanual.setSelected(manualLocalButton.getModel(), true);
+                rServeStartupScript.setText(pref.get(Properties.RSERVE_STARTUP_SCRIPT, ""));
+                manualLocalButtonSelected();
+            }
+        }
     }
 
 
     @Override
     void store() {
-        pref.put( Properties.CRAN_MIRROR, cranMirror.getText() );
+        pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
+        pref.putBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButton.isSelected());
+        pref.putBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButton.isSelected());
+        if (manualRemoteButton.isSelected()) {
+            pref.put(Properties.RSERVE_HOST, rServeHost.getText());
+            pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
+            pref.remove(Properties.RSERVE_STARTUP_SCRIPT);
+        } else if (manualLocalButton.isSelected()){
+            pref.put(Properties.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText());
+            pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
+            pref.remove(Properties.RSERVE_HOST);           
+        } else {
+            pref.remove(Properties.RSERVE_HOST);
+            pref.remove(Properties.RSERVE_PORT);
+            pref.remove(Properties.RSERVE_STARTUP_SCRIPT);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton autoButton;
+    private javax.swing.ButtonGroup autoOrmanual;
     private javax.swing.JTextField cranMirror;
     private javax.swing.JButton installButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JProgressBar jProgressBar1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JRadioButton manualLocalButton;
+    private javax.swing.JRadioButton manualRemoteButton;
     private javax.swing.JLabel messages;
+    private javax.swing.JTextField rServeHost;
+    private javax.swing.JTextField rServePort;
+    private javax.swing.JTextField rServeStartupScript;
     private javax.swing.JTextField sourceFileTextField;
+    private javax.swing.JLabel warningMessage;
     // End of variables declaration//GEN-END:variables
 
 
@@ -626,36 +809,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         Thread th = new Thread( unzip );
         th.start();
     }
-
-
-    private void setPath() {
-        String bit = System.getProperty( "sun.arch.data.model" );
-        String r_dll = "";
-
-        if( bit.equals( "32" ) ) {
-            r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "i386";
-        }
-        if( bit.equals( "64" ) ) {
-            r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "x64";
-        }
-
-        try( InputStream jarPath = GnuRPanel.class.getResourceAsStream( "/de/cebitec/readxplorer/options/setPath.ps1" ) ) {
-            File to = File.createTempFile( "ReadXplorer_", ".ps1" );
-            to.deleteOnExit();
-            Files.copy( jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING );
-            ProcessBuilder pb = new ProcessBuilder( "powershell.exe", "-ExecutionPolicy", "RemoteSigned", "-File", to.getAbsolutePath(), "-Directory", r_dll, "-Rhome", r_dir.getAbsolutePath() );
-            pb.redirectInput( ProcessBuilder.Redirect.from( new File( "NUL" ) ) );
-            Process start = pb.start();
-            start.waitFor();
-            messages.setText( "Setup completed. Please restart ReadXplorer!" );
-            jProgressBar1.setIndeterminate( false );
-            jProgressBar1.setValue( 100 );
-        }
-        catch( IOException | InterruptedException ex ) {
-            Exceptions.printStackTrace( ex );
-        }
-    }
-
 
     @Override
     public void update( Object args ) {
@@ -720,8 +873,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 0 );
                             break;
                         case FINISHED:
-                            setPath();
-                            JOptionPane.showMessageDialog( null, "Changes will only take effect after you restart the application" );
+                            messages.setText( "Setup complete!" );
+                            jProgressBar1.setIndeterminate( false );
+                            jProgressBar1.setValue( 100 );
                             break;
                         case NO_RIGHTS:
                             messages.setText( "Can not write to user dir. Please check permissions." );
@@ -741,5 +895,37 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     }
 
+    class PortInputVerifier extends InputVerifier {
 
+        @Override
+        public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
+            String text = textField.getText();
+            try {
+                Integer.parseInt(text);
+            } catch (NumberFormatException ex) {
+                warningMessage.setText("Please enter a valid port number.");
+                return false;
+            }
+            warningMessage.setText("");
+            return true;
+        }
+    }
+    
+    class ScriptInputVerifier extends InputVerifier {
+
+        @Override
+        public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
+            String text = textField.getText();
+            File script = new File(text);
+            if (script.exists() && script.canExecute()) {
+                warningMessage.setText("");
+                return true;
+            } else {
+                warningMessage.setText("Please enter a valid startup script.");
+                return false;
+            }
+        }
+    }
 }

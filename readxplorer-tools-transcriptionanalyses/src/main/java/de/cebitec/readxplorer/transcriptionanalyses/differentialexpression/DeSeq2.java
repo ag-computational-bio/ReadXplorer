@@ -18,21 +18,22 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
-
-import static java.util.logging.Level.INFO;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -40,8 +41,6 @@ import static java.util.logging.Level.INFO;
  * @author kstaderm
  */
 public class DeSeq2 {
-
-    private static final Logger LOG = Logger.getLogger( DeSeq2.class.getName() );
 
     private GnuR gnuR;
 
@@ -51,19 +50,17 @@ public class DeSeq2 {
 
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile, UUID key )
-            throws PackageNotLoadableException, JRILibraryNotInPathException,
-                   IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
-        gnuR.clearGnuR();
+                                           int numberOfFeatures, int numberOfTracks, File saveFile)
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
+        gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: GNU R is processing data.", currentTimestamp );
-        gnuR.loadPackage( "DESeq2" );
-        gnuR.loadPackage( "Biobase" );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
+            gnuR.loadPackage( "DESeq2" );
+            gnuR.loadPackage( "Biobase" );
             //Handing over the count data to Gnu R.
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
@@ -116,12 +113,12 @@ public class DeSeq2 {
                 gnuR.eval( "dds <- DESeqDataSetFromMatrix(countData = inputData, colData = design, design = ~ conds)" );
             }
 
-            REXP E = gnuR.eval( "dds <- DESeq(dds)" );
-            E = gnuR.eval( "res <- results(dds)" );
-            E = gnuR.eval( "res <- res[order(res$padj),]" );
+            gnuR.eval( "dds <- DESeq(dds)" );
+            gnuR.eval( "res <- results(dds)" );
+            gnuR.eval( "res <- res[order(res$padj),]" );
 
             REXP currentResult1 = gnuR.eval( "as.data.frame(res)" );
-            RVector tableContents1 = currentResult1.asVector();
+            List<REXPVector> tableContents1 = currentResult1.asList();
             REXP colNames1 = gnuR.eval( "colnames(res)" );
             REXP rowNames1 = gnuR.eval( "rownames(res)" );
             results.add( new ResultDeAnalysis( tableContents1, colNames1, rowNames1, "Results", analysisData ) );
@@ -134,10 +131,12 @@ public class DeSeq2 {
         } //We don't know what errors Gnu R might cause, so we have to catch all.
         //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch( Exception e ) {
+            //If something goes wrong try to shutdown Rserve so that no instance keeps running
+            this.shutdown();
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
@@ -145,27 +144,30 @@ public class DeSeq2 {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown( UUID key ) {
-        if( gnuR != null ) {
-            gnuR.releaseGnuRInstance( key );
-            gnuR = null;
+    public void shutdown() throws RserveException {
+        //Might happen that gnuR is null if something went wrong during Rserve
+        //startup or connection process.
+        if (gnuR != null) {
+            gnuR.shutdown();
         }
     }
 
 
-    public void saveResultsAsCSV( int index, File saveFile ) {
+    public void saveResultsAsCSV( int index, File saveFile ) throws RserveException {
         String path = saveFile.getAbsolutePath();
         path = path.replace( "\\", "/" );
         gnuR.eval( "write.csv(res" + index + ",file=\"" + path + "\")" );
     }
 
 
-    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException, 
+                                            RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "plotDispEsts(dds)" );
     }
 
 
-    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException, 
+                                            RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
 

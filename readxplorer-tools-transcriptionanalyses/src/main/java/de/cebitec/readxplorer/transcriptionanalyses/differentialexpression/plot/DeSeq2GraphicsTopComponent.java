@@ -55,6 +55,8 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 
 import static java.util.logging.Level.SEVERE;
 
@@ -93,7 +95,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
     private ComboBoxModel<DeSeq2AnalysisHandler.Plot> cbm;
     private File currentlyDisplayed;
     private boolean svgCanvasActive;
-    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private ProgressHandle progressHandle;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -249,7 +251,10 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         try {
             messages.setText( "" );
             plotButton.setEnabled( false );
-            saveButton.setEnabled( false );
+            saveButton.setEnabled(false);
+            progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+            progressHandle.start();
+            progressHandle.switchToIndeterminate();
             DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
             plotDescriptionArea.setVisible( true );
             if( !svgCanvasActive ) {
@@ -274,6 +279,10 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+        } catch (IllegalStateException | REXPMismatchException | REngineException ex) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
         }
     }//GEN-LAST:event_plotButtonActionPerformed
 
@@ -367,8 +376,6 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         svgCanvas.addSVGDocumentLoaderListener( new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted( SVGDocumentLoaderEvent e ) {
-                progressHandle.start();
-                progressHandle.switchToIndeterminate();
             }
 
 

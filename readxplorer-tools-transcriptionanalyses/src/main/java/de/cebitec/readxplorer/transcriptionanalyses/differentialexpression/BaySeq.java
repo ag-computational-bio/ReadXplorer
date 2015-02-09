@@ -18,21 +18,22 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
-
-import static java.util.logging.Level.INFO;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -40,8 +41,6 @@ import static java.util.logging.Level.INFO;
  * @author kstaderm
  */
 public class BaySeq {
-
-    private static final Logger LOG = Logger.getLogger( BaySeq.class.getName() );
 
     private GnuR gnuR;
     /*
@@ -79,31 +78,35 @@ public class BaySeq {
      *         not normalised results and then all the normalised ones.
      */
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile, UUID key )
-            throws JRILibraryNotInPathException, PackageNotLoadableException,
-                   IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
+                                           int numberOfFeatures, int numberOfTracks, File saveFile)
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
+        gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: GNU R is processing data.", currentTimestamp );
-        gnuR.loadPackage( "baySeq" );
-        gnuR.loadPackage( "snow" );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        gnuR.loadPackage("baySeq");
         //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
         //computation will speed up a little bit but still leave you at least one core
         //for your other work.
-        int processors = Runtime.getRuntime().availableProcessors();
-        if( processors > MAX_PROCESSORS ) {
-            processors = MAX_PROCESSORS;
-        }
-        if( processors > 1 ) {
-            processors--;
+        if (gnuR.runningLocal) {
+            gnuR.loadPackage("snow");
+            gnuR.loadPackage("parallel");
+            int processors = Runtime.getRuntime().availableProcessors();
+            if (processors > MAX_PROCESSORS) {
+                processors = MAX_PROCESSORS;
+            }
+            if (processors > 1) {
+                processors--;
+            }
+            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
+            gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
+        } else {
+            gnuR.eval("cl <- NULL");
         }
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
-            currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
-            gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
             while( bseqData.hasCountData() ) {
@@ -120,7 +123,7 @@ public class BaySeq {
             gnuR.eval( "colnames(features) <- c(\"locus\", \"start\", \"stop\")" );
             gnuR.eval( "seglens <- features$stop - features$start + 1" );
             gnuR.eval( "cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)" );
-            gnuR.eval( "cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")" );
+            gnuR.eval( "libsizes(cD) <- getLibsizes(cD)" );
             gnuR.assign( "replicates", bseqData.getReplicateStructure() );
             gnuR.eval( "replicates(cD) <- as.factor(c(replicates))" );
             concatenate = new StringBuilder( 1000 );
@@ -139,7 +142,7 @@ public class BaySeq {
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ')' );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
-                RVector rvec = result.asVector();
+                List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
                 REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
@@ -148,7 +151,7 @@ public class BaySeq {
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
-                RVector rvec = result.asVector();
+                List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
                 REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
@@ -160,10 +163,12 @@ public class BaySeq {
         } //We don't know what errors Gnu R might cause, so we have to catch all.
         //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch( Exception e ) {
+            //If something goes wrong try to shutdown Rserve so that no instance keeps running
+            this.shutdown();
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
@@ -184,7 +189,9 @@ public class BaySeq {
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotMACD( File file, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                             IllegalStateException, PackageNotLoadableException {
+                                                                             IllegalStateException, PackageNotLoadableException, 
+                                                                             RserveException, REngineException, REXPMismatchException, 
+                                                                             IOException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -214,7 +221,9 @@ public class BaySeq {
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotPosteriors( File file, Group group, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                                                IllegalStateException, PackageNotLoadableException {
+                                                                                                IllegalStateException, PackageNotLoadableException, 
+                                                                                                RserveException, REngineException, REXPMismatchException, 
+                                                                                                IOException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -240,12 +249,14 @@ public class BaySeq {
      * @param file  a File the created SVG image should be saved to.
      * @param group the underlying group for the plot.
      */
-    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException, 
+                                                            RserveException, REngineException, REXPMismatchException, 
+                                                            IOException {
         gnuR.storePlot( file, "plotPriors(cD, group = " + group.getGnuRID() + ')' );
     }
 
 
-    public void saveResultsAsCSV( int index, File saveFile ) {
+    public void saveResultsAsCSV( int index, File saveFile ) throws RserveException {
         String path = saveFile.getAbsolutePath();
         path = path.replace( "\\", "/" );
         gnuR.eval( "write.csv(tCounts" + index + ",file=\"" + path + "\")" );
@@ -281,10 +292,11 @@ public class BaySeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown( UUID key ) {
-        if( gnuR != null ) {
-            gnuR.releaseGnuRInstance( key );
-            gnuR = null;
+    public void shutdown() throws RserveException {
+        //Might happen that gnuR is null if something went wrong during Rserve
+        //startup or connection process.
+        if (gnuR != null) {
+            gnuR.shutdown();
         }
     }
 
