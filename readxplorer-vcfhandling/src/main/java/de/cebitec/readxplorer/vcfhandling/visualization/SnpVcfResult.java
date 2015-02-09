@@ -21,7 +21,7 @@ import org.broadinstitute.variant.variantcontext.VariantContext;
  *
  * @author Marie
  */
-public class Snp_VcfResult extends ResultTrackAnalysis<Object> {
+public class SnpVcfResult extends ResultTrackAnalysis<Object> {
 
     private final List<VariantContext> snpVcfList;
 
@@ -33,7 +33,7 @@ public class Snp_VcfResult extends ResultTrackAnalysis<Object> {
      * @param reference
      * @param combineTracks
      */
-    public Snp_VcfResult( List<VariantContext> snpVcfList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks ) {
+    public SnpVcfResult( List<VariantContext> snpVcfList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks ) {
         super( reference, trackMap, combineTracks, -1, 0 );
         this.snpVcfList = new ArrayList<>( snpVcfList );
     }

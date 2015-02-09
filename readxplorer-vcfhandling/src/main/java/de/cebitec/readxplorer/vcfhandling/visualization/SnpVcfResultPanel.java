@@ -25,7 +25,7 @@ import org.broadinstitute.variant.variantcontext.VariantContext;
  *
  * @author Marie
  */
-public class Snp_VcfResultPanel extends ResultTablePanel {
+public class SnpVcfResultPanel extends ResultTablePanel {
 
     public static final String SOURCE = "Source";
     public static final String CONTIG = "Contig";
@@ -39,7 +39,7 @@ public class Snp_VcfResultPanel extends ResultTablePanel {
 
     private static final long serialVersionUID = 1L;
     private Map<String, Integer> vcfStatsMap;
-    private Snp_VcfResult completeVcfData;
+    private SnpVcfResult completeVcfData;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private Object[] rowData;
 
@@ -47,7 +47,7 @@ public class Snp_VcfResultPanel extends ResultTablePanel {
     /**
      * Creates new form Snp_VcfResultPanel
      */
-    public Snp_VcfResultPanel() {
+    public SnpVcfResultPanel() {
         initComponents();
         final int sourColumn = 3;
         final int trackColumn = 2;
@@ -123,8 +123,8 @@ public class Snp_VcfResultPanel extends ResultTablePanel {
 
     @Override
     public void addResult( ResultTrackAnalysis newResult ) {
-        if( newResult instanceof Snp_VcfResult ) {
-            Snp_VcfResult vcfData = (Snp_VcfResult) newResult;
+        if( newResult instanceof SnpVcfResult ) {
+            SnpVcfResult vcfData = (SnpVcfResult) newResult;
 
             if( this.completeVcfData == null ) {
                 this.completeVcfData = vcfData;

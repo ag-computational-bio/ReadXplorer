@@ -35,9 +35,9 @@ import org.openide.windows.TopComponent;
     "CTL_SNP_VCFViewerTopComponent=SNP_VCFViewer Window",
     "HINT_SNP_VCFViewerTopComponent=This is a SNP_VCFViewer window"
 } )
-public final class Snp_VcfViewerTopComponent extends TopComponent {
+public final class SnpVcfViewerTopComponent extends TopComponent {
 
-    public Snp_VcfViewerTopComponent() {
+    public SnpVcfViewerTopComponent() {
         initComponents();
         setName( Bundle.CTL_SNP_VCFViewerTopComponent() );
         setToolTipText( Bundle.HINT_SNP_VCFViewerTopComponent() );
