@@ -279,10 +279,11 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-        } catch (IllegalStateException | REXPMismatchException | REngineException ex) {
-                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
-                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
+        }
+        catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
+            Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
         }
     }//GEN-LAST:event_plotButtonActionPerformed
 
