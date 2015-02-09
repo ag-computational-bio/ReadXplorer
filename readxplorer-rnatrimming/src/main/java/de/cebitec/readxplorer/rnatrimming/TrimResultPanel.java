@@ -58,6 +58,7 @@ public class TrimResultPanel extends JPanel implements Observer {
     public TrimResultPanel() {
         initComponents();
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 try {
                     createStatisticsWindow();

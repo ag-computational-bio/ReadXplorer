@@ -25,6 +25,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * @return The current content of the result list.
      */
     public List<CoveredFeature> getResults() {
-        return results;
+        return Collections.unmodifiableList( results );
     }
 
 

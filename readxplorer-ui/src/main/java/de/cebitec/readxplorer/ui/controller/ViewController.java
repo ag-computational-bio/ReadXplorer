@@ -37,6 +37,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -282,7 +283,7 @@ public class ViewController implements MousePositionListener {
      * @return The list of currently opened track base panels.
      */
     public List<BasePanel> getOpenTracks() {
-        return currentTracks;
+        return Collections.unmodifiableList( currentTracks );
     }
 
 

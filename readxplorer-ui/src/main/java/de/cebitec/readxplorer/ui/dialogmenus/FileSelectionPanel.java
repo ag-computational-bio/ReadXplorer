@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -42,7 +43,7 @@ public class FileSelectionPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private boolean useMultipleImport = false;
-    private List<File> mappingFiles = new ArrayList<>();
+    private final List<File> mappingFiles = new ArrayList<>();
 
 
     /**
@@ -117,7 +118,7 @@ public class FileSelectionPanel extends JPanel {
      *         set import with the same parameters at once.
      */
     public List<File> getMappingFiles() {
-        return mappingFiles;
+        return Collections.unmodifiableList( mappingFiles );
     }
 
 
@@ -127,7 +128,8 @@ public class FileSelectionPanel extends JPanel {
      * @param mappingFiles The list of mapping files to import at once
      */
     protected void setMappingFiles( List<File> mappingFiles ) {
-        this.mappingFiles = mappingFiles;
+        this.mappingFiles.clear();
+        this.mappingFiles.addAll( mappingFiles );
     }
 
 

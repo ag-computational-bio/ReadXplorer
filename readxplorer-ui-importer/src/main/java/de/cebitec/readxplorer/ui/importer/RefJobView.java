@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.importer;
 
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -91,7 +92,7 @@ public class RefJobView extends javax.swing.JPanel implements
 
 
     public List<ReferenceJob> getJobs() {
-        return jobs;
+        return Collections.unmodifiableList( jobs );
     }
 
 

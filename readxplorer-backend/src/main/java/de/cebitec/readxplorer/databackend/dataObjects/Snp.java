@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -204,7 +205,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      *              gene id the amino acid belongs to.
      */
     public void addCodon( CodonSnp codon ) {
-        this.codons.add( codon );
+        codons.add( codon );
     }
 
 
@@ -216,7 +217,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      *         gene id the amino acid belongs to.
      */
     public List<CodonSnp> getCodons() {
-        return this.codons;
+        return Collections.unmodifiableList( codons );
     }
 
 

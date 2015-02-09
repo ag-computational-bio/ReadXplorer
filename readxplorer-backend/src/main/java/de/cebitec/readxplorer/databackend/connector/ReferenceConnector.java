@@ -33,6 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -374,7 +375,7 @@ public class ReferenceConnector {
             LOG.log( Level.SEVERE, null, ex );
         }
 
-        return associatedTracks;
+        return Collections.unmodifiableList( associatedTracks );
 
     }
 

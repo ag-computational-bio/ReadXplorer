@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.ParameterSetWithReadClasses;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -86,7 +87,7 @@ public class ParameterSetCorrelationAnalysis extends ParameterSetWithReadClasses
 
 
     public List<PersistentTrack> getSelectedTracks() {
-        return selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 

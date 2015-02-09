@@ -39,6 +39,7 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -147,6 +148,10 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
+        genomeAnnos = new ArrayList<>();
+        results = new ArrayList<>();
+        collectCoverageDataInstances = new HashMap<>();
+
     }
 
 
@@ -154,12 +159,12 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * Acutally starts the differential gene expression analysis.
      */
     private void startAnalysis() {
-        collectCoverageDataInstances = new HashMap<>();
+        collectCoverageDataInstances.clear();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
-        genomeAnnos = new ArrayList<>();
+        genomeAnnos.clear();
 
         for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
             genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
@@ -236,12 +241,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     public void setResults( List<ResultDeAnalysis> results ) {
-        this.results = results;
+        this.results.clear();
+        this.results.addAll( results );
     }
 
 
     public Map<Integer, Map<PersistentFeature, Integer>> getAllCountData() {
-        return allCountData;
+        return Collections.unmodifiableMap( allCountData );
     }
 
 
@@ -251,17 +257,17 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     public List<PersistentFeature> getPersAnno() {
-        return genomeAnnos;
+        return Collections.unmodifiableList( genomeAnnos );
     }
 
 
     public List<PersistentTrack> getSelectedTracks() {
-        return selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 
     public List<ResultDeAnalysis> getResults() {
-        return results;
+        return Collections.unmodifiableList( results );
     }
 
 
@@ -274,7 +280,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     public Map<Integer, CollectCoverageData> getCollectCoverageDataInstances() {
-        return collectCoverageDataInstances;
+        return Collections.unmodifiableMap( collectCoverageDataInstances );
     }
 
 

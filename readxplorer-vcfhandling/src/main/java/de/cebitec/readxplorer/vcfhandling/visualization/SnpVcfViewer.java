@@ -31,7 +31,7 @@ import org.openide.util.NbPreferences;
  *
  * @author Margarita Steinhauer
  */
-public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
+public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
 
     private List<VariantContext> snpVcfList;
 
@@ -62,7 +62,7 @@ public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
      * @param combineTracks true, if the coverage of the tracks contained in the
      *                      track connector should be combined.
      */
-    public Snp_VcfViewer( BoundsInfoManager boundsManager, BasePanel basePanel, PersistentReference refGen ) {
+    public SnpVcfViewer( BoundsInfoManager boundsManager, BasePanel basePanel, PersistentReference refGen ) {
         super( boundsManager, basePanel, refGen );
 
         snpVcfList = new ArrayList<>();
@@ -76,11 +76,11 @@ public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
         final Preferences pref = NbPreferences.forModule( Object.class );
         this.setColors( pref );
 
-        pref.addPreferenceChangeListener( new PreferenceChangeListener() {
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
 
             @Override
             public void preferenceChange( PreferenceChangeEvent evt ) {
-                Snp_VcfViewer.this.setColors( pref );
+                SnpVcfViewer.this.setColors( pref );
                 repaint();
             }
 

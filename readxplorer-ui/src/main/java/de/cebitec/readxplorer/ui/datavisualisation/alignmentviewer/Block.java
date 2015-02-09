@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -37,7 +38,7 @@ public class Block implements BlockI {
     private final int absStop;
     private final Mapping mapping;
     private final GenomeGapManager gapManager;
-    private final ArrayList<Brick> bricks;
+    private final List<Brick> bricks;
 
 
     /**
@@ -56,8 +57,8 @@ public class Block implements BlockI {
         this.absStop = absStop;
         this.mapping = mapping;
         this.gapManager = gapManager;
-        this.bricks = new ArrayList<>();
-        this.createBricks();
+        bricks = new ArrayList<>();
+        createBricks();
     }
 
 
@@ -80,7 +81,7 @@ public class Block implements BlockI {
                         }
                     }
                     if( i == 2055 ) {
-                        System.out.println( "" );
+                        System.out.println();
                     }
                     this.addDiffOrMatchBrick( mapping, i );
                 }
@@ -113,7 +114,7 @@ public class Block implements BlockI {
                     stop = nexStart > absStop ? absStop : nexStart;
                     for( int j = start; j < stop; ++j ) {
                         if( j == 2055 ) {
-                            System.out.println( "" );
+                            System.out.println();
                         }
                         bricks.add( Brick.SKIPPED );
                     }

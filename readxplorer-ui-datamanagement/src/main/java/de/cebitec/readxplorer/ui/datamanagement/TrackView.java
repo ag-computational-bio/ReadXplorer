@@ -35,8 +35,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener 
 
     private static final long serialVersionUID = 762498252;
 
-    private List<TrackJob> jobs;
-    private List<TrackJob> jobs2del;
+    private final List<TrackJob> jobs;
     private Boolean hasCheckedJobs;
 
     public static final String PROP_DESELECT = "deselect";
@@ -46,13 +45,17 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener 
      * Creates new form MappingView
      */
     public TrackView() {
+
         initComponents();
         jobs = new ArrayList<>();
+
     }
 
 
     public void setTrackJobs( List<TrackJob> trackJobs ) {
-        this.jobs = trackJobs;
+
+        jobs.clear();
+        jobs.addAll( trackJobs );
         clearTableRows();
 
         DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
@@ -63,14 +66,15 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener 
 
 
     public List<TrackJob> getJobs2Del() {
-        jobs2del = new ArrayList<>();
 
+        List<TrackJob> jobs2del = new ArrayList<>();
         for( int row = 0; row <= jobTable.getRowCount() - 1; row++ ) {
             if( (Boolean) jobTable.getValueAt( row, 0 ) ) {
                 jobs2del.add( jobs.get( row ) );
             }
         }
         return jobs2del;
+
     }
 
 

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
@@ -74,7 +74,7 @@ public class ResultDeAnalysis {
         if( tableContents == null ) {
             tableContents = convertRresults( rawTableContents );
         }
-        return tableContents;
+        return Collections.unmodifiableList( tableContents );
     }
 
 
@@ -82,7 +82,7 @@ public class ResultDeAnalysis {
         if( colNames == null ) {
             colNames = convertNames( rawColNames );
         }
-        return colNames;
+        return Collections.unmodifiableList( colNames );
     }
 
 
@@ -90,7 +90,7 @@ public class ResultDeAnalysis {
         if( rowNames == null ) {
             rowNames = convertNames( rawRowNames );
         }
-        return rowNames;
+        return Collections.unmodifiableList( rowNames );
     }
 
 

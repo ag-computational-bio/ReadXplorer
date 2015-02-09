@@ -77,8 +77,8 @@ public class TrackConnector {
      */
     protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException {
 
-        this.associatedTracks = new ArrayList<>();
-        this.associatedTracks.add( track );
+        associatedTracks = new ArrayList<>();
+        associatedTracks.add( track );
         initTrackConnector( track.getId(), false );
 
     }

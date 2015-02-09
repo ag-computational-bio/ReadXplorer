@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.utils.polytree;
 
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -55,7 +56,7 @@ public class Node implements Traversable {//, Cloneable {
     /**
      * Vector with the children of a node.
      */
-    private List<Node> nodeChildren;
+    private final List<Node> nodeChildren;
     /**
      * Parents of the Node.
      */
@@ -207,7 +208,7 @@ public class Node implements Traversable {//, Cloneable {
                 out.append( nodeChild.toString() ).append( "," );
             }
             out.deleteCharAt( out.length() - 1 );
-            out.append( ")" );
+            out.append( ')' );
         }
         return out.toString();
     }
@@ -219,7 +220,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return The parents <tt>node</tt> of a <tt>node</tt>
      */
     public List<Node> getParents() {
-        return this.parents;
+        return Collections.unmodifiableList( parents );
     }
 
 
@@ -230,7 +231,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return true if the <tt>node</tt> is a leaf
      */
     public boolean isLeaf() {
-        return (this.nodeChildren.isEmpty());
+        return (nodeChildren.isEmpty());
     }
 
 
@@ -241,7 +242,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return true if the <tt>node</tt> is the <tt>root</tt>
      */
     public boolean isRoot() {
-        return this.parents.isEmpty();
+        return parents.isEmpty();
     }
 
 
@@ -271,7 +272,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return nodeChildren The vector of children of a <tt>node</tt>
      */
     public List<Node> getNodeChildren() {
-        return this.nodeChildren;
+        return Collections.unmodifiableList( nodeChildren );
     }
 
 
@@ -281,7 +282,8 @@ public class Node implements Traversable {//, Cloneable {
      * @param children A vector of children-nodes
      */
     public void setNodeChildren( final List<Node> children ) {
-        this.nodeChildren = children;
+        nodeChildren.clear();
+        nodeChildren.addAll( children );
     }
 
 

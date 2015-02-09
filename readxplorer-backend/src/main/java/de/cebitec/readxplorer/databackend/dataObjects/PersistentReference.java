@@ -26,6 +26,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class PersistentReference implements Observable {
     private String name;
     private String description;
     private int genomeLength = 0;
-    private Map<Integer, PersistentChromosome> chromosomes;
+    private final Map<Integer, PersistentChromosome> chromosomes;
     private Timestamp timestamp;
     private int noChromosomes;
     private List<Observer> observers;
@@ -109,10 +110,10 @@ public class PersistentReference implements Observable {
         this.name = name;
         this.description = description;
         this.fastaFile = fastaFile;
-        this.chromosomes = ProjectConnector.getInstance().getRefGenomeConnector( id ).getChromosomesForGenome();
-        this.noChromosomes = this.chromosomes.size();
+        chromosomes = ProjectConnector.getInstance().getRefGenomeConnector( id ).getChromosomesForGenome();
+        noChromosomes = chromosomes.size();
         this.timestamp = timestamp;
-        this.observers = new ArrayList<>( 10 );
+        observers = new ArrayList<>( 10 );
         if( checkFile ) {
             this.checkRef( activeChromId );
         }
@@ -236,7 +237,7 @@ public class PersistentReference implements Observable {
      * @return The map of all chromosomes of this reference genome.
      */
     public Map<Integer, PersistentChromosome> getChromosomes() {
-        return this.chromosomes;
+        return Collections.unmodifiableMap( chromosomes );
     }
 
 

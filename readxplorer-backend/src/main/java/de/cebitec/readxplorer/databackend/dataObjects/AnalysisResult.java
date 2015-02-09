@@ -31,7 +31,7 @@ public class AnalysisResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private IntervalRequest request;
+    private final IntervalRequest request;
 
 
     /**
@@ -49,7 +49,7 @@ public class AnalysisResult implements Serializable {
      * of child classed
      */
     public AnalysisResult() {
-        this.request = new IntervalRequest( -1, -1, -1, null, false );
+        request = new IntervalRequest( -1, -1, -1, null, false );
     }
 
 
@@ -57,7 +57,7 @@ public class AnalysisResult implements Serializable {
      * @return the interval request for which the result was created
      */
     public IntervalRequest getRequest() {
-        return this.request;
+        return request;
     }
 
 

@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.tools.rnafolder.rnamovies.configuration;
 
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -26,42 +28,39 @@ import javax.swing.event.EventListenerList;
 
 public class Category {
 
-    private Map<String, TypeWrapper> values;
+    private final Map<String, TypeWrapper> values;
 
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
-    private String name;
+    private final String name;
 
-    private int id = -1;
+    private final int id;
 
 
     protected Category( String name, Map<String, TypeWrapper> values ) {
-        this.name = name;
-        this.values = values;
+         this( -1, name, values );
     }
 
 
     protected Category( int id, String name, Map<String, TypeWrapper> values ) {
         this.id = id;
         this.name = name;
-        this.values = values;
+        this.values = new HashMap<>( values );
     }
 
 
     public Map<String, TypeWrapper> getValues() {
-        return values;
+        return Collections.unmodifiableMap( values );
     }
 
 
     public void init() {
         int localId = -1;
-        String key;
         Iterator<String> keys;
-        TypeWrapper tw;
 
         for( keys = values.keySet().iterator(); keys.hasNext(); ) {
-            key = keys.next();
-            tw = values.get( key );
+            String key = keys.next();
+            TypeWrapper tw = values.get( key );
 
             if( tw.contains( "id" ) ) {
                 try {
@@ -79,12 +78,11 @@ public class Category {
 
     public void set( String key, Object value ) {
         int localId = -1;
-        TypeWrapper tw;
 
         if( !values.containsKey( key ) )
             throw new NoSuchElementException( "Key " + key + " does not exsist in Configuration." );
 
-        tw = values.get( key );
+        TypeWrapper tw = values.get( key );
 
         if( tw.contains( "id" ) ) {
             try {
@@ -110,7 +108,7 @@ public class Category {
 
 
     public void set( String key, boolean value ) {
-        set( key, value );
+        set( key, Boolean.valueOf( value ) );
     }
 
 

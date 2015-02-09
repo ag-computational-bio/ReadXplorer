@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Transcription
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     public static final int UNUSED_STATISTICS_VALUE = -1;
 
     private final List<TranscriptionStart> results;
-    private List<String> promotorRegions;
+    private final List<String> promotorRegions;
 
 
     /**
@@ -87,6 +88,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.setParameters( tssParams );
         this.results = results;
         this.calcStats( results );
+        promotorRegions = new ArrayList<>();
+
     }
 
 
@@ -94,7 +97,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @return The results of the TSS detection
      */
     public List<TranscriptionStart> getResults() {
-        return results;
+        return Collections.unmodifiableList( results );
     }
 
 
@@ -102,7 +105,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @return Promotor regions of the detected TSS
      */
     public List<String> getPromotorRegions() {
-        return promotorRegions;
+        return Collections.unmodifiableList( promotorRegions );
     }
 
 
@@ -112,7 +115,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @param promotorRegions Promotor regions of the detected TSS
      */
     public void setPromotorRegions( List<String> promotorRegions ) {
-        this.promotorRegions = promotorRegions;
+        this.promotorRegions.clear();
+        this.promotorRegions.addAll( promotorRegions );
     }
 
 

@@ -25,6 +25,7 @@ import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -191,8 +192,8 @@ public class StartCodonFilter implements RegionFilterI {
 
     @Override
     public List<Region> findRegions() {
-        this.findSelectedCodons();
-        return this.regions;
+        findSelectedCodons();
+        return Collections.unmodifiableList( regions );
     }
 
 

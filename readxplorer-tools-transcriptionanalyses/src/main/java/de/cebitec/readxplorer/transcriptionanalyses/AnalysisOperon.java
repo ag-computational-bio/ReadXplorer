@@ -33,6 +33,7 @@ import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -319,7 +320,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
     @Override
     public List<Operon> getResults() {
-        return this.operonList;
+        return Collections.unmodifiableList( operonList );
 
     }
 

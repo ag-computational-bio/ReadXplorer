@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.parser.common;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,8 +70,8 @@ public class ParsedClassification {
      *                   at the current mapping position.
      */
     public void updateMinMismatches( int mismatches ) {
-        if( mismatches < this.minMismatches ) {
-            this.minMismatches = mismatches;
+        if( mismatches < minMismatches ) {
+            minMismatches = mismatches;
         }
     }
 
@@ -79,7 +80,7 @@ public class ParsedClassification {
      * @return The array of read start positions for this read.
      */
     public List<Integer> getReadStarts() {
-        return readStarts;
+        return Collections.unmodifiableList( readStarts );
     }
 
 
@@ -99,11 +100,11 @@ public class ParsedClassification {
         if( readStarts.size() <= 1 ) {
             return 0;
         }
-        else if( this.sortOrder == SAMFileHeader.SortOrder.coordinate ) {
-            return this.getSortedMappingStart( start );
+        else if( sortOrder == SAMFileHeader.SortOrder.coordinate ) {
+            return getSortedMappingStart( start );
         }
         else {
-            return this.calcNextMappingStart( start );
+            return calcNextMappingStart( start );
         }
     }
 
@@ -115,12 +116,12 @@ public class ParsedClassification {
      *         mapping position, if this is the largest mapping position for the read
      */
     private int getSortedMappingStart( int start ) {
-        int index = this.readStarts.indexOf( start ) + 1;
-        if( index < this.readStarts.size() ) {
-            return this.readStarts.get( index );
+        int index = readStarts.indexOf( start ) + 1;
+        if( index < readStarts.size() ) {
+            return readStarts.get( index );
         }
         else {
-            return this.readStarts.get( 0 );
+            return readStarts.get( 0 );
         }
     }
 
@@ -164,7 +165,7 @@ public class ParsedClassification {
      *                     the list
      */
     public void addReadStart( int mappingStart ) {
-        this.readStarts.add( mappingStart );
+        readStarts.add( mappingStart );
     }
 
 
@@ -172,7 +173,7 @@ public class ParsedClassification {
      * @return The number of occurrences of this read in the data set.
      */
     public int getNumberOccurrences() {
-        return this.readStarts.size();
+        return readStarts.size();
     }
 
 
@@ -181,7 +182,7 @@ public class ParsedClassification {
      *         has this number of mismatches been observed in total.
      */
     public Map<Integer, Integer> getMismatchCountMap() {
-        return mismatchCountMap;
+        return Collections.unmodifiableMap( mismatchCountMap );
     }
 
 

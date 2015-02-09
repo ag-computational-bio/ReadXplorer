@@ -29,6 +29,7 @@ import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -47,11 +48,13 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
         implements NewJobDialogI {
 
     private static final long serialVersionUID = 776435254;
+    
     private final List<File> mappingFiles2;
     private final ReferenceJob[] refGenJobs;
     private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamParser samBamDirectParser;
     private final MappingParserI[] parsers;
+
     private int distance; //distance of the sequences in a read pair in bp
     private short deviation; //deviation allowed from that distance in %
     private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
@@ -588,7 +591,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
             return null;
         }
         else {
-            return this.mappingFiles2.get( 0 );
+            return mappingFiles2.get( 0 );
         }
     }
 
@@ -598,7 +601,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      *         set import with the same parameters at once
      */
     public List<File> getMappingFiles2() {
-        return this.mappingFiles2;
+        return Collections.unmodifiableList( mappingFiles2 );
     }
 
 

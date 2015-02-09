@@ -225,13 +225,13 @@ public final class TranscriptionAnalysesWizardIterator implements
     // If nothing unusual changes in the middle of the wizard, simply:
     @Override
     public void addChangeListener( ChangeListener l ) {
-        this.changeSupport.addChangeListener( l );
+        changeSupport.addChangeListener( l );
     }
 
 
     @Override
     public void removeChangeListener( ChangeListener l ) {
-        this.changeSupport.removeChangeListener( l );
+        changeSupport.removeChangeListener( l );
     }
 
     // If something changes dynamically (besides moving between panels), e.g.
@@ -288,7 +288,7 @@ public final class TranscriptionAnalysesWizardIterator implements
      *         read class parameters.
      */
     public String getReadClassPropForWiz() {
-        return this.readClassPanel.getPropReadClassParams();
+        return readClassPanel.getPropReadClassParams();
     }
 
 
@@ -297,7 +297,7 @@ public final class TranscriptionAnalysesWizardIterator implements
      *         corresponding RPKM analysis.
      */
     public String getPropSelectedRPKMFeatTypes() {
-        return this.featTypeRPKMPanel.getPropSelectedFeatTypes();
+        return featTypeRPKMPanel.getPropSelectedFeatTypes();
     }
 
 
@@ -306,7 +306,7 @@ public final class TranscriptionAnalysesWizardIterator implements
      *         corresponding operon detection.
      */
     public String getPropSelectedOperonFeatTypes() {
-        return this.featTypeOperonPanel.getPropSelectedFeatTypes();
+        return featTypeOperonPanel.getPropSelectedFeatTypes();
     }
 
 
@@ -316,7 +316,7 @@ public final class TranscriptionAnalysesWizardIterator implements
      *         boolean if the tracks shall be combined.
      */
     public String getCombineTracksPropForWiz() {
-        return this.openTracksPanel.getPropCombineTracks();
+        return openTracksPanel.getPropCombineTracks();
     }
 
 
@@ -324,7 +324,7 @@ public final class TranscriptionAnalysesWizardIterator implements
      * @return The list of track selected in this wizard.
      */
     public List<PersistentTrack> getSelectedTracks() {
-        return this.openTracksPanel.getComponent().getSelectedTracks();
+        return openTracksPanel.getComponent().getSelectedTracks();
     }
 
 

@@ -26,6 +26,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.rosuda.REngine.REXPMismatchException;
@@ -110,7 +111,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
 
     public List<Group> getGroups() {
-        return groups;
+        return Collections.unmodifiableList( groups );
     }
 
 

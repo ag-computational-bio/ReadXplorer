@@ -44,13 +44,13 @@ import org.openide.windows.WindowManager;
     "CTL_VcfResultTopComponent=VcfResult Window",
     "HINT_VcfResultTopComponent=This is a VcfResult window"
 } )
-public final class Snp_VcfResultTopComponent extends TopComponentExtended {
+public final class SnpVcfResultTopComponent extends TopComponentExtended {
 
     public static final String PREFERRED_ID = "Snp_VcfResultTopComponent";
     private static final long serialVersionUID = 1L;
 
 
-    public Snp_VcfResultTopComponent() {
+    public SnpVcfResultTopComponent() {
         initComponents();
         setName( Bundle.CTL_VcfResultTopComponent() );
         setToolTipText( Bundle.HINT_VcfResultTopComponent() );

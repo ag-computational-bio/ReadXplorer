@@ -21,9 +21,11 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -36,12 +38,12 @@ import java.util.TreeSet;
 public class Mapping implements ObjectWithId, Comparable<Mapping> {
 
     private int id;
-    private int start;
+    private final int start;
     private int trackId;
-    private int stop;
-    private boolean isFwdStrand;
+    private final int stop;
+    private final boolean isFwdStrand;
     private Map<Integer, Difference> diffs;
-    private TreeMap<Integer, TreeSet<ReferenceGap>> gaps;
+    private Map<Integer, Set<ReferenceGap>> gaps;
     private int differences;
     private int sequenceID;
     private MappingClass mappingClass;
@@ -106,15 +108,15 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      * @return The complete Map of differences to the reference for this mapping
      */
     public Map<Integer, Difference> getDiffs() {
-        return diffs;
+        return Collections.unmodifiableMap( diffs );
     }
 
 
     /**
      * @return The complete TreeMap of genome gaps for this mapping
      */
-    public TreeMap<Integer, TreeSet<ReferenceGap>> getGenomeGaps() {
-        return gaps;
+    public Map<Integer, Set<ReferenceGap>> getGenomeGaps() {
+        return Collections.unmodifiableMap( gaps );
     }
 
 
@@ -211,7 +213,7 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      * @return A TreeSet containing the reference gaps for the given position.
      *         If no gaps are stored for the position <code>null</code> is returned
      */
-    public TreeSet<ReferenceGap> getGenomeGapsAtPosition( int position ) {
+    public Set<ReferenceGap> getGenomeGapsAtPosition( int position ) {
         return gaps.get( position );
     }
 
@@ -404,7 +406,7 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      *         to be omitted in the list. Thus, the list only represents mapped regions.
      */
     public List<SamAlignmentBlock> getAlignmentBlocks() {
-        return this.alignmentBlocks;
+        return Collections.unmodifiableList( alignmentBlocks );
     }
 
 

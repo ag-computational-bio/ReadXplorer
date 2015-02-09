@@ -22,7 +22,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Pair;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.jfree.chart.ChartPanel;
@@ -148,11 +148,9 @@ public class CreatePlots {
         renderer2.setBaseToolTipGenerator( toolTip );
         final NumberAxis rangeAxis2 = new NumberAxis() {
             @Override
-            public List refreshTicks( Graphics2D g2, AxisState state,
+            public List<NumberTick> refreshTicks( Graphics2D g2, AxisState state,
                                       Rectangle2D dataArea, RectangleEdge edge ) {
-                List myTicks = new ArrayList();
-                myTicks.add( new NumberTick( 0, "-Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
-                return myTicks;
+                return Collections.singletonList( new NumberTick( 0, "-Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
             }
 
 
@@ -167,11 +165,9 @@ public class CreatePlots {
         renderer3.setBaseToolTipGenerator( toolTip );
         final NumberAxis rangeAxis3 = new NumberAxis() {
             @Override
-            public List refreshTicks( Graphics2D g2, AxisState state,
+            public List<NumberTick> refreshTicks( Graphics2D g2, AxisState state,
                                       Rectangle2D dataArea, RectangleEdge edge ) {
-                List myTicks = new ArrayList();
-                myTicks.add( new NumberTick( 0, "Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
-                return myTicks;
+                return Collections.singletonList( new NumberTick( 0, "Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
             }
 
 

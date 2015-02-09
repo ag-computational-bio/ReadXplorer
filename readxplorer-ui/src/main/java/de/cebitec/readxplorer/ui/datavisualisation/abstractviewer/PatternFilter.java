@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -287,23 +288,20 @@ public class PatternFilter implements RegionFilterI {
      */
     private void matchPattern( String sequence, Pattern p, boolean isForwardStrand, int offset ) {
 
-        Matcher m = p.matcher( sequence );
-        int from;
-        int to;
-        int end;
+        final Matcher m = p.matcher( sequence );
         while( m.find() ) { //If you also want to find the second AAA in AAAA, then use m.find(lastFrom);
-            from = m.start();
-            to = m.end() - 1;
+            int from = m.start();
+            int to = m.end() - 1;
             if( isForwardStrand ) {
                 from = absStart - offset + from;
                 to = absStart - offset + to;
             }
             else {
-                end = from;
+                int end = from;
                 from = absStart - offset + sequence.length() - to - 1;
                 to = absStart - offset + sequence.length() - end - 1;
             }
-            this.matchedPatterns.add( new Region( from, to, isForwardStrand, Properties.PATTERN ) );
+            matchedPatterns.add( new Region( from, to, isForwardStrand, Properties.PATTERN ) );
         }
     }
 
@@ -330,16 +328,16 @@ public class PatternFilter implements RegionFilterI {
 
     @Override
     public List<Region> findRegions() {
-        this.matchedPatterns.clear();
-        this.findPatternInInterval();
-        return this.matchedPatterns;
+        matchedPatterns.clear();
+        findPatternInInterval();
+        return Collections.unmodifiableList( matchedPatterns );
     }
 
 
     @Override
     public void setInterval( int start, int stop ) {
-        this.absStart = start;
-        this.absStop = stop;
+        absStart = start;
+        absStop = stop;
     }
 
 

@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.IntervalRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -79,9 +80,10 @@ public class CoverageAndDiffResult extends AnalysisResult implements
                                   IntervalRequest request ) {
         super( request );
         this.covManagers = covManagers;
-        this.readStarts = null;
-        this.diffs = diffs;
+        readStarts = null;
+        diffs = diffs;
         this.gaps = gaps;
+
     }
 
 
@@ -90,11 +92,11 @@ public class CoverageAndDiffResult extends AnalysisResult implements
      *         the list is empty.
      */
     public List<Difference> getDiffs() {
-        if( this.diffs != null ) {
-            return this.diffs;
+        if( diffs != null ) {
+            return Collections.unmodifiableList( diffs );
         }
         else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -104,11 +106,11 @@ public class CoverageAndDiffResult extends AnalysisResult implements
      *         the list is empty.
      */
     public List<ReferenceGap> getGaps() {
-        if( this.gaps != null ) {
-            return this.gaps;
+        if( gaps != null ) {
+            return Collections.unmodifiableList( gaps );
         }
         else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -118,8 +120,8 @@ public class CoverageAndDiffResult extends AnalysisResult implements
      *         it returns an empty coverage manager covering only 0.
      */
     public CoverageManager getCovManager() {
-        if( this.covManagers != null && !covManagers.isEmpty() ) {
-            return this.covManagers.get( 0 );
+        if( covManagers != null && !covManagers.isEmpty() ) {
+            return covManagers.get( 0 );
         }
         else {
             return new CoverageManager( 0, 0 );
@@ -133,10 +135,10 @@ public class CoverageAndDiffResult extends AnalysisResult implements
      */
     public List<CoverageManager> getCovManagers() {
         if( covManagers != null && !covManagers.isEmpty() ) {
-            return this.covManagers;
+            return Collections.unmodifiableList( covManagers );
         }
         else {
-            return new ArrayList<>( Arrays.asList( new CoverageManager( 0, 0 ) ) );
+            return Collections.singletonList( new CoverageManager( 0, 0 ) );
         }
     }
 
@@ -147,10 +149,10 @@ public class CoverageAndDiffResult extends AnalysisResult implements
      * @param covManager The CoverageManager to add
      */
     public void addCoverageManager( CoverageManager covManager ) {
-        if( this.covManagers == null ) {
-            this.covManagers = new ArrayList<>();
+        if( covManagers == null ) {
+            covManagers = new ArrayList<>();
         }
-        this.covManagers.add( covManager );
+        covManagers.add( covManager );
     }
 
 

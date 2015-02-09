@@ -34,6 +34,7 @@ import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +49,7 @@ import net.sf.samtools.util.RuntimeIOException;
 class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
     private static final Logger LOG = Logger.getLogger( AnalysisSNPs.class.getName() );
-    
+
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
     private static final int BASE_G = 2;
@@ -126,7 +127,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      */
     @Override
     public List<SnpI> getResults() {
-        return this.snps;
+        return Collections.unmodifiableList( snps );
     }
 
 

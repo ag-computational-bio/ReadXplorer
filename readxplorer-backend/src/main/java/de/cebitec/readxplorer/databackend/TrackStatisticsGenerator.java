@@ -34,9 +34,9 @@ import javax.swing.JOptionPane;
  */
 public class TrackStatisticsGenerator implements ExportDataI {
 
-    private ProjectConnector projectConnector;
-    private List<String> trackStatsIds;
-    
+    private final ProjectConnector projectConnector;
+    private final List<String> trackStatsIds;
+
     /**
      * Generates a complete set of track statistics for all tracks in a DB in a
      * fashion that can be used for table exporter output.
@@ -65,7 +65,7 @@ public class TrackStatisticsGenerator implements ExportDataI {
         List<List<String>> dataColumnDescriptionsList = new ArrayList<>();
 
         List<String> dataColumnDescriptions = new ArrayList<>();
-        
+
         dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Reference");
         dataColumnDescriptions.addAll(trackStatsIds);
@@ -86,44 +86,44 @@ public class TrackStatisticsGenerator implements ExportDataI {
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> allData = new ArrayList<>();
         List<List<Object>> statsData = new ArrayList<>();
-        
+
         List<PersistentTrack> tracks = projectConnector.getTracks();
         for (PersistentTrack track : tracks) {
             SaveFileFetcherForGUI fileFetcher = new SaveFileFetcherForGUI();
             try {
-                
+
                 TrackConnector trackConnector = fileFetcher.getTrackConnector(track);
                 StatsContainer trackStats = trackConnector.getTrackStats();
                 statsData.add(statsToList(track, trackStats));
-                
+
             } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
                 JOptionPane.showMessageDialog( null, "You did not complete the track path selection. The track statistics cannot be stored for this track.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE );
                 //skipping track
             }
         }
-        
+
         allData.add(statsData);
-        
+
         return allData;
     }
 
     /**
-     * Creates a statistics list from the given track and track statistics 
-     * data. The order of the elements is always the same as declared in the 
+     * Creates a statistics list from the given track and track statistics
+     * data. The order of the elements is always the same as declared in the
      * StatsContainer for all statistics. Both, track statistics and read pair
-     * track statistics are stored. All missing statistics fields are filled 
+     * track statistics are stored. All missing statistics fields are filled
      * with "-1".
      * @param track The track for which the data should be processed
      * @param trackStats The StatsContainer with all track statistics
      * @return The ready-to-use statistics list
      */
     private List<Object> statsToList(PersistentTrack track, StatsContainer trackStats) {
-        
+
         List<Object> trackStatsList = new ArrayList<>();
-        
+
         trackStatsList.add(track);
         trackStatsList.add(projectConnector.getRefGenomeConnector(track.getRefGenID()).getRefGenome());
-        
+
         Map<String, Integer> statsMap = trackStats.getStatsMap();
         for (String trackStatsId : trackStatsIds) {
             if (statsMap.containsKey(trackStatsId)) {
@@ -132,7 +132,7 @@ public class TrackStatisticsGenerator implements ExportDataI {
                 trackStatsList.add(-1);
             }
         }
-        
+
         return trackStatsList;
     }
 }

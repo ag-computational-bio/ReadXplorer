@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -269,7 +270,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton addModelButton;
-    private javax.swing.JList createdGroupsList;
+    private javax.swing.JList<String> createdGroupsList;
     private javax.swing.JTextField groupCreationField;
     private javax.swing.JTextField infoText;
     private javax.swing.JLabel jLabel1;
@@ -279,7 +280,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JButton removeModelButton;
-    private javax.swing.JList trackList;
+    private javax.swing.JList<PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
 
@@ -293,7 +294,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
 
 
     public List<Group> getCreatedGroups() {
-        return createdGroups;
+        return Collections.unmodifiableList( createdGroups );
     }
 
 

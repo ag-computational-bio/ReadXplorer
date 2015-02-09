@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class ParsedReadPairContainer {
     private int trackId1;
     private int trackId2;
     private String description;
-    private final HashMap<Pair<Long, Long>, ParsedReadPairMapping> parsedReadPairs;
+    private final Map<Pair<Long, Long>, ParsedReadPairMapping> parsedReadPairs;
     private final List<Pair<Long, Long>> mappingToPairIDList;
     private final StatsContainer statsContainer;
 
@@ -98,8 +99,8 @@ public class ParsedReadPairContainer {
     }
 
 
-    public HashMap<Pair<Long, Long>, ParsedReadPairMapping> getParsedReadPairs() {
-        return parsedReadPairs;
+    public Map<Pair<Long, Long>, ParsedReadPairMapping> getParsedReadPairs() {
+        return Collections.unmodifiableMap( parsedReadPairs );
     }
 
 
@@ -111,7 +112,7 @@ public class ParsedReadPairContainer {
      *         <code>getParsedReadPairs()</code>.
      */
     public List<Pair<Long, Long>> getMappingToPairIdList() {
-        return this.mappingToPairIDList;
+        return Collections.unmodifiableList( mappingToPairIDList );
     }
 
 

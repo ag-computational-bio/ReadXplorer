@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 import de.cebitec.readxplorer.databackend.dataObjects.TrackResultEntry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -32,7 +33,7 @@ import java.util.List;
  */
 public class Operon extends TrackResultEntry {
 
-    private List<OperonAdjacency> operonAdjacencies;
+    private final List<OperonAdjacency> operonAdjacencies;
 
 
     /**
@@ -51,7 +52,7 @@ public class Operon extends TrackResultEntry {
      * @return the operon adjacencies of this operon
      */
     public List<OperonAdjacency> getOperonAdjacencies() {
-        return this.operonAdjacencies;
+        return Collections.unmodifiableList( operonAdjacencies );
     }
 
 
@@ -60,7 +61,8 @@ public class Operon extends TrackResultEntry {
      *               object.
      */
     public void setOperonAdjacencies( List<OperonAdjacency> newOperonAdjacencys ) {
-        this.operonAdjacencies = newOperonAdjacencys;
+        operonAdjacencies.clear();
+        operonAdjacencies.addAll( newOperonAdjacencys );
     }
 
 
@@ -68,7 +70,7 @@ public class Operon extends TrackResultEntry {
      * Remove all operon adjacencies associated with this operon object.
      */
     public void clearOperonAdjacencyList() {
-        this.operonAdjacencies.removeAll( this.operonAdjacencies );
+        operonAdjacencies.clear();
     }
 
 
@@ -78,7 +80,7 @@ public class Operon extends TrackResultEntry {
      * @param operonAdjacency
      */
     public void addOperonAdjacency( OperonAdjacency operonAdjacency ) {
-        this.operonAdjacencies.add( operonAdjacency );
+        operonAdjacencies.add( operonAdjacency );
     }
 
 

@@ -25,6 +25,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.RPKMvalue;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +73,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * @return The result list of RPKM values and read counts.
      */
     public List<RPKMvalue> getResults() {
-        return rpkmResults;
+        return Collections.unmodifiableList( rpkmResults );
     }
 
 

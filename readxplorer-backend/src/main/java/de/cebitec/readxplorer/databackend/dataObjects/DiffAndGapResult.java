@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class DiffAndGapResult {
      * @return the diffs of one mapping.
      */
     public List<Difference> getDiffs() {
-        return diffs;
+        return Collections.unmodifiableList( diffs );
     }
 
 
@@ -64,7 +65,7 @@ public class DiffAndGapResult {
      * @return the gaps of one mapping
      */
     public List<ReferenceGap> getGaps() {
-        return gaps;
+        return Collections.unmodifiableList( gaps );
     }
 
 
@@ -73,7 +74,7 @@ public class DiffAndGapResult {
      *         this object belongs
      */
     public Map<Integer, Integer> getGapOrderIndex() {
-        return gapOrderIndex;
+        return Collections.unmodifiableMap( gapOrderIndex );
     }
 
 
