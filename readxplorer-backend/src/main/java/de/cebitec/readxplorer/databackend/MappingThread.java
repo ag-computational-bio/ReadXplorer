@@ -37,9 +37,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static java.util.logging.Level.INFO;
+import java.util.logging.Logger;
 
 
 /**
@@ -217,7 +216,7 @@ public class MappingThread extends RequestThread {
                     Thread.sleep( 10 );
                 }
                 catch( InterruptedException ex ) {
-                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
+                    LOG.log( Level.SEVERE, null, ex );
                 }
             }
 
