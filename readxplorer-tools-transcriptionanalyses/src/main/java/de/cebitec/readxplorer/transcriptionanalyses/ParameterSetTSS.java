@@ -32,7 +32,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private boolean performTSSAnalysis;
     private boolean autoTssParamEstimation;
     private boolean performUnannotatedTranscriptDet;
-    private boolean isMergeTss;
+    private boolean isAssociateTss;
     private int minNoReadStarts;
     private int minPercentIncrease;
     private int maxLowCovInitCount;
@@ -40,7 +40,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private int minTranscriptExtensionCov;
     private int maxLeaderlessDistance;
     private int maxFeatureDistance;
-    private int mergeTssWindow;
+    private int associateTssWindow;
     private ParametersReadClasses readClassParams;
 
 
@@ -56,14 +56,14 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param minLowCovIncrease
      * @param maxLeaderlessDistance
      * @param minTranscriptExtensionCov
-     * @param isMergeTss
-     * @param mergeTssWindow 
+     * @param isAssociateTss
+     * @param associateTssWindow 
      * @param readClassParams 
      */
     ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
                      int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease,
-                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, boolean isMergeTss, 
-                     int mergeTssWindow, ParametersReadClasses readClassParams ) {
+                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, boolean isAssociateTss, 
+                     int associateTssWindow, ParametersReadClasses readClassParams ) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -74,8 +74,8 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
         this.maxLeaderlessDistance = maxLeaderlessDistance;
         this.maxFeatureDistance = maxFeatureDistance;
-        this.isMergeTss = isMergeTss;
-        this.mergeTssWindow = mergeTssWindow;
+        this.isAssociateTss = isAssociateTss;
+        this.associateTssWindow = associateTssWindow;
         this.readClassParams = readClassParams;
 
     }
@@ -193,35 +193,35 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
     /**
      * @return <code>true</code>, if TSS within the given window shall be
-     * merged, <code>false</code> otherwise.
+     * associated, <code>false</code> otherwise.
      */
-    public boolean isMergeTss() {
-        return isMergeTss;
+    public boolean isAssociateTss() {
+        return isAssociateTss;
     }
 
     
     /**
-     * @param isMergeTss <code>true</code>, if TSS within the given window shall
-     * be merged, <code>false</code> otherwise.
+     * @param isAssociateTss <code>true</code>, if TSS within the given window shall
+     * be associated, <code>false</code> otherwise.
      */
-    public void setIsMergeTss(boolean isMergeTss) {
-        this.isMergeTss = isMergeTss;
+    public void setIsAssociateTss(boolean isAssociateTss) {
+        this.isAssociateTss = isAssociateTss;
     }
 
     
     /**
-     * @return Bp window to use for merging TSS.
+     * @return Bp window to use for associating TSS.
      */
-    public int getMergeTssWindow() {
-        return mergeTssWindow;
+    public int getAssociateTssWindow() {
+        return associateTssWindow;
     }
 
     
     /**
-     * @param mergeTssWindow Bp window to use for merging TSS.
+     * @param associateTssWindow Bp window to use for associating TSS.
      */
-    public void setMergeTssWindow(int mergeTssWindow) {
-        this.mergeTssWindow = mergeTssWindow;
+    public void setAssociateTssWindow(int associateTssWindow) {
+        this.associateTssWindow = associateTssWindow;
     }
 
 

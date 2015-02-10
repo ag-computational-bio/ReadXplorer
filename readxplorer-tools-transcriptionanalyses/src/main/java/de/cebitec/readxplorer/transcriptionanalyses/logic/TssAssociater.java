@@ -23,9 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Merges all TSS within a bp window defined by the TSS analysis parameters.
+ * Associates all TSS within a bp window defined by the TSS analysis parameters.
  * Only the TSS with the highest number of read starts is kept. All other TSS
- * are discarded and added to the merged TSS list of the remaining TSS. This
+ * are discarded and added to the associated TSS list of the remaining TSS. This
  * behavior prevents detecting two transcription start sites for the same gene, in
  * case the transcription already starts at a low rate a few bases before the
  * actual transcription start site.
@@ -36,14 +36,14 @@ import java.util.List;
  * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class TssMerger implements TssLinker {
+public class TssAssociater implements TssLinker {
     
     private ParameterSetTSS parametersTSS;
     private List<TranscriptionStart> detectedStarts;
-    private List<TranscriptionStart> mergedTss;
+    private List<TranscriptionStart> associatedTss;
 
     /**
-     * Checks for the given TSS, if it is located within the merge Tss bp window
+     * Checks for the given TSS, if it is located within the associate Tss bp window
      * defined by the TSS analysis parameters of the current TSS on the same
      * strand. If that's the case, only the transcription start site with the
      * higher number of TOTAL read starts is kept. This method prevents
@@ -63,7 +63,7 @@ public class TssMerger implements TssLinker {
     @Override
     public final void linkTss(TranscriptionStart previousTss, int prevTssIdx, TranscriptionStart tss) {
         
-        while (previousTss.getPos() + parametersTSS.getMergeTssWindow() >= tss.getPos() && prevTssIdx > 0 ) {
+        while (previousTss.getPos() + parametersTSS.getAssociateTssWindow() >= tss.getPos() && prevTssIdx > 0 ) {
             if (previousTss.isFwdStrand() == tss.isFwdStrand()) {
 
                 int noReadStartsLastStart = previousTss.getReadStartsAtPos();
@@ -73,11 +73,11 @@ public class TssMerger implements TssLinker {
 //                int coverageIncrease = tss.getPercentIncrease();
 
                 if (noReadStartsLastStart < noReadStartsTSS) {
-                    tss.addMergedTss(previousTss, parametersTSS.getMergeTssWindow());
-                    this.mergedTss.remove(previousTss);
+                    tss.addAssociatedTss(previousTss, parametersTSS.getAssociateTssWindow());
+                    this.associatedTss.remove(previousTss);
                 } else {
-                    previousTss.addMergedTss(tss, parametersTSS.getMergeTssWindow());
-                    this.mergedTss.remove(tss);
+                    previousTss.addAssociatedTss(tss, parametersTSS.getAssociateTssWindow());
+                    this.associatedTss.remove(tss);
                 }
             }
             previousTss = detectedStarts.get(--prevTssIdx);
@@ -90,15 +90,15 @@ public class TssMerger implements TssLinker {
 
     public final void setDetectedStarts(List<TranscriptionStart> detectedStarts) {
         this.detectedStarts = detectedStarts;
-        this.mergedTss = new ArrayList<>(this.detectedStarts);
+        this.associatedTss = new ArrayList<>(this.detectedStarts);
     }
 
     /**
-     * @return The updated copy of the original result list. All TSS merged into
-     * another TSS have been deleted from this list.
+     * @return The updated copy of the original result list. All TSS associated
+     * with a more significant TSS have been deleted from this list.
      */
-    public List<TranscriptionStart> getMergedTss() {
-        return Collections.unmodifiableList( mergedTss );
+    public List<TranscriptionStart> getAssociatedTss() {
+        return Collections.unmodifiableList( associatedTss );
     }
     
 }

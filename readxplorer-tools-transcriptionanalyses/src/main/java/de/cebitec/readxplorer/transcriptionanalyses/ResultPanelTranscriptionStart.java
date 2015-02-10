@@ -106,7 +106,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             },
             new String [] {
-                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Transcript Stop", "TSS Type", "Primary TSS", "Merged TSS"
+                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Transcript Stop", "TSS Type", "Primary TSS", "Associated TSS"
             }
         ) {
             Class[] types = new Class [] {
@@ -238,8 +238,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 @Override
                 public void run() {
 
-                    if (!tssParameters.isMergeTss()) {
-                        tSSTable.removeColumn( tSSTable.getColumn( "Merged TSS" ) );
+                    if (!tssParameters.isAssociateTss()) {
+                        tSSTable.removeColumn( tSSTable.getColumn( "Associated TSS" ) );
                     }
                     
                     final int nbColumns = 17;
@@ -313,7 +313,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             i++;
                         }
                         
-                        rowData[i++] = GeneralUtils.implode(",", tss.getMergedTssList().toArray());
+                        rowData[i++] = GeneralUtils.implode(",", tss.getAssociatedTssList().toArray());
                         
                         model.addRow( rowData );
                     }

@@ -131,8 +131,8 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                     { TssDetectionResult.TSS_REV, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_REV ) ) },
                     { TssDetectionResult.TSS_NOVEL, tssParameters.isPerformUnannotatedTranscriptDet() 
                             ? tssStatisticsMap.get( TssDetectionResult.TSS_NOVEL ) : "-" },
-                    { TssDetectionResult.TSS_MERGED, tssParameters.isMergeTss()
-                            ? tssStatisticsMap.get( TssDetectionResult.TSS_MERGED ) : "-" }
+                    { TssDetectionResult.TSS_ASSOCIATED, tssParameters.isAssociateTss()
+                            ? tssStatisticsMap.get(TssDetectionResult.TSS_ASSOCIATED ) : "-" }
                 },
                 new String[]{
                     NbBundle.getMessage( TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1" ),

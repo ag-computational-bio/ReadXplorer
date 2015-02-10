@@ -173,8 +173,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param mergedTss A TSS merged with this TSS.
      * @param bpWindow The base pair window in which all TSS shall be merged
      */
-    public void addMergedTss( TranscriptionStart mergedTss, int bpWindow ) {
-        for ( TranscriptionStart otherMergedTss : mergedTss.getMergedTssList() ) {
+    public void addAssociatedTss( TranscriptionStart mergedTss, int bpWindow ) {
+        for ( TranscriptionStart otherMergedTss : mergedTss.getAssociatedTssList() ) {
             if ( otherMergedTss.getPos() + bpWindow >= pos && !mergedTssList.contains( otherMergedTss ) ) {
                 mergedTssList.add(otherMergedTss);
             }
@@ -187,7 +187,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     /**
      * @return The list of TSS already merged with this TSS.
      */
-    public List<TranscriptionStart> getMergedTssList() {
+    public List<TranscriptionStart> getAssociatedTssList() {
         return mergedTssList;
     }
     

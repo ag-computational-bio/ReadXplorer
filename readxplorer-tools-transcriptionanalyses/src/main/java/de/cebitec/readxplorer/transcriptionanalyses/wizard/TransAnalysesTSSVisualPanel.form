@@ -24,7 +24,6 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="transcriptionStartAutomaticBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="analysisDirectionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -38,11 +37,11 @@
                                   <Component id="maxFeatureDistLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="minTotalIncreaseLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="minPercentIncreaseLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="mergeTssCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="associateTssCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="mergeTssWindowField" min="-2" pref="56" max="-2" attributes="0"/>
+                                  <Component id="associateTssWindowField" min="-2" pref="56" max="-2" attributes="0"/>
                                   <Component id="maxFeatureDistField" alignment="0" min="-2" pref="56" max="-2" attributes="0"/>
                                   <Component id="minTotalIncreaseField" alignment="0" min="-2" pref="56" max="-2" attributes="0"/>
                                   <Component id="minPercentIncreaseField" alignment="0" min="-2" pref="56" max="-2" attributes="0"/>
@@ -54,46 +53,41 @@
                   </Group>
                   <Component id="analysisDirectionSeparator" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
+                      <Component id="jSeparator2" min="-2" pref="12" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="addRestrictionLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jSeparator1" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jSeparator4" min="-2" pref="12" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="unannotatedTranscriptsBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jSeparator3" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="jSeparator5" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jSeparator2" min="-2" pref="12" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="addRestrictionLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jSeparator1" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jSeparator4" min="-2" pref="12" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="unannotatedTranscriptsBox" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jSeparator3" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="jSeparator5" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="maxInitialCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="minLowCovCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="minLowCovCountField" min="-2" pref="56" max="-2" attributes="0"/>
-                                          <Component id="maxInitialCountField" min="-2" pref="56" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <Component id="transcriptExtensionLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="transcriptExtensionLabel" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="transcriptExtensionField" min="-2" pref="57" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="maxInitialCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="minLowCovCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="minLowCovCountField" min="-2" pref="56" max="-2" attributes="0"/>
+                                  <Component id="maxInitialCountField" min="-2" pref="56" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Component id="transcriptExtensionLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="transcriptExtensionLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="transcriptExtensionField" min="-2" pref="57" max="-2" attributes="0"/>
                           </Group>
                       </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -136,8 +130,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="mergeTssWindowField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="mergeTssCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="associateTssWindowField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="associateTssCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
@@ -297,10 +291,13 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="mergeTssWindowField">
+    <Component class="javax.swing.JTextField" name="associateTssWindowField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.mergeTssWindowField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.associateTssWindowField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.associateTssWindowField.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -349,14 +346,17 @@
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator5">
     </Component>
-    <Component class="javax.swing.JCheckBox" name="mergeTssCheckBox">
+    <Component class="javax.swing.JCheckBox" name="associateTssCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.mergeTssCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.associateTssCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.associateTssCheckBox.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mergeTssCheckBoxActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="associateTssCheckBoxActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

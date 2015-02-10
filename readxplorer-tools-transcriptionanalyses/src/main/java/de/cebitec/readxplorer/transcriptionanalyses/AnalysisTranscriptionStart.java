@@ -31,8 +31,8 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.transcriptionanalyses.logic.PrimaryTssFlagger;
+import de.cebitec.readxplorer.transcriptionanalyses.logic.TssAssociater;
 import de.cebitec.readxplorer.transcriptionanalyses.logic.TssLinker;
-import de.cebitec.readxplorer.transcriptionanalyses.logic.TssMerger;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
@@ -200,7 +200,6 @@ public class AnalysisTranscriptionStart implements Observer,
      */
     public void finish() {
         this.storeDistributions();
-        //before removing any TSS, neighboring TSS are merged and classified as primary or secondary
         this.linkTssInSameRegion();
         if( parametersTSS.isAutoTssParamEstimation() ) {
             this.correctResult();
@@ -575,7 +574,7 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * The method first checks for all neighboring transcription start site
-     * pairs, if they need to be merged according to the given parameters and
+     * pairs, if they need to be associated according to the given parameters and
      * their distance. Then it checks, if they are located within the given
      * maximum feature distance bp of the checked transcription start site on
      * the same strand. If that's the case, the transcription start site with
@@ -590,12 +589,12 @@ public class AnalysisTranscriptionStart implements Observer,
         
         if (detectedStarts.size() > 1) {
             
-            if (parametersTSS.isMergeTss()) {
-                TssMerger tssMerger = new TssMerger();
-                tssMerger.setParametersTSS(parametersTSS);
-                tssMerger.setDetectedStarts(Collections.unmodifiableList(detectedStarts));
-                iterateTssForLinking(tssMerger);
-                detectedStarts = tssMerger.getMergedTss();
+            if (parametersTSS.isAssociateTss()) {
+                TssAssociater tssAssociater = new TssAssociater();
+                tssAssociater.setParametersTSS(parametersTSS);
+                tssAssociater.setDetectedStarts(Collections.unmodifiableList(detectedStarts));
+                iterateTssForLinking(tssAssociater);
+                detectedStarts = tssAssociater.getAssociatedTss();
             }
             PrimaryTssFlagger primaryTssFlagger = new PrimaryTssFlagger();
             primaryTssFlagger.setParametersTSS(parametersTSS);
