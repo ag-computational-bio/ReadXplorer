@@ -57,13 +57,12 @@ public class ReferenceViewer extends AbstractViewer {
     private JFeature selectedFeature;
     private final int labelMargin;
     private ReferenceConnector refGenConnector;
-    private final ArrayList<JFeature> features;
+    private final List<JFeature> features;
 
     public final static String PROP_FEATURE_STATS_CHANGED = "feats changed";
     public final static String PROP_FEATURE_SELECTED = "feat selected";
     public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
     private int trackCount = 0;
-//    private Lookup viewerLookup;
 
 
     /**
@@ -80,8 +79,8 @@ public class ReferenceViewer extends AbstractViewer {
         features = new ArrayList<>();
         refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenome.getId() );
         featureStats = new EnumMap<>( FeatureType.class );
-        getExcludedClassifications().add( FeatureType.UNDEFINED );
-        getExcludedClassifications().add( FeatureType.SOURCE );
+        excludedClassifications.add( FeatureType.UNDEFINED );
+        excludedClassifications.add( FeatureType.SOURCE );
         showSequenceBar( true, true );
         labelMargin = 3;
         setViewerSize();
@@ -128,7 +127,7 @@ public class ReferenceViewer extends AbstractViewer {
         refGenConnector = null;
         featureStats.clear();
         features.clear();
-        getExcludedClassifications().clear();
+        excludedClassifications.clear();
     }
 
 

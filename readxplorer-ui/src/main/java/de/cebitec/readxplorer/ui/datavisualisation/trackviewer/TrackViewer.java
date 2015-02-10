@@ -507,7 +507,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         value = getNormalizedValue( id1, value );
 
         return value;
-        
+
     }
 
 

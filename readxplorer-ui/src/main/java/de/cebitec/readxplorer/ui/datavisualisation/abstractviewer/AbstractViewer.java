@@ -129,7 +129,6 @@ public abstract class AbstractViewer extends JPanel implements
     private boolean hasOptions;
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
-    private final List<Classification> excludedClassifications;
     private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
@@ -142,6 +141,8 @@ public abstract class AbstractViewer extends JPanel implements
     private boolean centerScrollBar = false;
     private BufferedImage loadingIndicator;
     private boolean newDataRequestNeeded = false;
+
+    protected final List<Classification> excludedClassifications;
 
 
     /**
@@ -1059,12 +1060,32 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
+     * Add a classification type to currently excluded views/calculations.
+     * @param excludedClassification
+     */
+    public void addExcludedClassifications( Classification excludedClassification ) {
+        excludedClassifications.add( excludedClassification );
+    }
+
+
+    /**
      * @return The list of classification types, which are currently
      *         excluded from the view/calculations by the user.
      */
     public List<Classification> getExcludedClassifications() {
         return Collections.unmodifiableList( excludedClassifications );
     }
+
+
+    /**
+     * Remove a classification type from currently excluded views/calculations.
+     * @param excludedClassification
+     */
+    public void removeExcludedClassifications( Classification excludedClassification ) {
+        excludedClassifications.remove( excludedClassification );
+    }
+
+
 
 
     /**

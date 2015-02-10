@@ -59,7 +59,7 @@ public class ParametersReadClasses {
      *                        {@link Properties.STRAND_BOTH}
      */
     public ParametersReadClasses( List<Classification> excludedClasses, byte minMappingQual, byte strandOption ) {
-        this.excludedClasses = excludedClasses;
+        this.excludedClasses = new ArrayList<>( excludedClasses );
         this.minMappingQual = minMappingQual;
         this.strandOption = strandOption;
     }

@@ -852,10 +852,10 @@ public class BasePanelFactory {
         @Override
         public void actionPerformed( ActionEvent e ) {
             if( ((AbstractButton) e.getSource()).isSelected() ) {
-                this.viewer.getExcludedClassifications().remove( this.type );
+                viewer.removeExcludedClassifications( type );
             }
             else {
-                this.viewer.getExcludedClassifications().add( this.type );
+                viewer.addExcludedClassifications( type );
             }
             this.viewer.setNewDataRequestNeeded( true );
             this.viewer.boundsChangedHook();
