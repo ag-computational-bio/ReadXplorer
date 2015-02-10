@@ -414,12 +414,12 @@ public class SelectReadClassVisualPanel extends JobPanel {
      */
     private void loadLastParameterSelection() {
         Preferences pref = NbPreferences.forModule( Object.class );
-        boolean isPerfectSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_PERFECT_SELECTED, "0" ).equals( "1" );
-        boolean isBestMatchSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_BEST_MATCH_SELECTED, "0" ).equals( "1" );
-        boolean isCommonMatchSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_COMMON_MATCH_SELECTED, "0" ).equals( "1" );
-        boolean isSinglePerfectSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_PERFECT_SELECTED, "1" ).equals( "1" );
-        boolean isSingleBestMatchSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_BEST_MATCH_SELECTED, "1" ).equals( "1" );
-        boolean isUniqueSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_UNIQUE_SELECTED, "0" ).equals( "1" );
+        boolean isPerfectSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_PERFECT_SELECTED, false );
+        boolean isBestMatchSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_BEST_MATCH_SELECTED, false );
+        boolean isCommonMatchSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_COMMON_MATCH_SELECTED, false );
+        boolean isSinglePerfectSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_PERFECT_SELECTED, true );
+        boolean isSingleBestMatchSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_BEST_MATCH_SELECTED, true );
+        boolean isUniqueSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_UNIQUE_SELECTED, false );
         String strandOption = pref.get( wizardName + SelectReadClassWizardPanel.PROP_STRAND_OPTION, String.valueOf( Properties.STRAND_FEATURE ) );
 
         this.checkBoxPerfect.setSelected( isPerfectSelected );
