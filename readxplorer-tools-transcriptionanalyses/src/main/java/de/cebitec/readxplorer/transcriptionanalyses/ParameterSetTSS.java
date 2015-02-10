@@ -32,6 +32,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private boolean performTSSAnalysis;
     private boolean autoTssParamEstimation;
     private boolean performUnannotatedTranscriptDet;
+    private boolean isAssociateTss;
     private int minNoReadStarts;
     private int minPercentIncrease;
     private int maxLowCovInitCount;
@@ -39,6 +40,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private int minTranscriptExtensionCov;
     private int maxLeaderlessDistance;
     private int maxFeatureDistance;
+    private int associateTssWindow;
     private ParametersReadClasses readClassParams;
 
 
@@ -54,10 +56,14 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param minLowCovIncrease
      * @param maxLeaderlessDistance
      * @param minTranscriptExtensionCov
+     * @param isAssociateTss
+     * @param associateTssWindow 
+     * @param readClassParams 
      */
     ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
                      int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease,
-                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, ParametersReadClasses readClassParams ) {
+                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, boolean isAssociateTss, 
+                     int associateTssWindow, ParametersReadClasses readClassParams ) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -68,6 +74,8 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
         this.maxLeaderlessDistance = maxLeaderlessDistance;
         this.maxFeatureDistance = maxFeatureDistance;
+        this.isAssociateTss = isAssociateTss;
+        this.associateTssWindow = associateTssWindow;
         this.readClassParams = readClassParams;
 
     }
@@ -180,6 +188,40 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
     public void setReadClassParams( ParametersReadClasses readClassParams ) {
         this.readClassParams = readClassParams;
+    }
+
+
+    /**
+     * @return <code>true</code>, if TSS within the given window shall be
+     * associated, <code>false</code> otherwise.
+     */
+    public boolean isAssociateTss() {
+        return isAssociateTss;
+    }
+
+    
+    /**
+     * @param isAssociateTss <code>true</code>, if TSS within the given window shall
+     * be associated, <code>false</code> otherwise.
+     */
+    public void setIsAssociateTss(boolean isAssociateTss) {
+        this.isAssociateTss = isAssociateTss;
+    }
+
+    
+    /**
+     * @return Bp window to use for associating TSS.
+     */
+    public int getAssociateTssWindow() {
+        return associateTssWindow;
+    }
+
+    
+    /**
+     * @param associateTssWindow Bp window to use for associating TSS.
+     */
+    public void setAssociateTssWindow(int associateTssWindow) {
+        this.associateTssWindow = associateTssWindow;
     }
 
 

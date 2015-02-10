@@ -19,6 +19,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
 import de.cebitec.readxplorer.databackend.dataobjects.TrackChromResultEntry;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -37,6 +39,9 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private final DetectedFeatures detFeatures;
     private final int percentIncrease;
     private final int coverageIncrease;
+    private boolean isPrimaryTss;
+    private TranscriptionStart primaryTss;
+    private List<TranscriptionStart> mergedTssList;
 
 
     /**
@@ -66,6 +71,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
         this.percentIncrease = percentIncrease;
         this.coverageIncrease = coverageIncrease;
         this.detFeatures = detFeatures;
+        this.mergedTssList = new ArrayList<>();
     }
 
 
@@ -120,5 +126,77 @@ public class TranscriptionStart extends TrackChromResultEntry {
         return this.coverageIncrease;
     }
 
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @param isPrimaryTss <code>true</code>, if this is a primary TSS, 
+     * <code>false</code>, if it is a secondary TSS.
+     */
+    public void setIsPrimary(boolean isPrimaryTss) {
+        this.isPrimaryTss = isPrimaryTss;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @return <code>true</code>, if this is a primary TSS, <code>false</code>,
+     * if it is a secondary TSS.
+     */
+    public boolean isPrimaryTss() {
+        return isPrimaryTss;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @param primaryTss If this is a secondary TSS, assign it a primary TSS
+     * using this method.
+     */
+    public void setPrimaryTss(TranscriptionStart primaryTss) {
+        this.primaryTss = primaryTss;
+    }
+
+    /**
+     * A primary TSS is the most prominent of a gene, while all other ones are
+     * secondary TSS.
+     * @return If this is a secondary TSS, this method returns the associated 
+     * primary TSS.
+     */
+    public TranscriptionStart getPrimaryTss() {
+        return this.primaryTss;
+    }
+
+    /**
+     * Merges the <code>mergedTss</code> with the current one. All other merged
+     * TSS associated with the <code>mergedTss</code> and within the given
+     * <code>bpWindow</code> are added as well.
+     * @param mergedTss A TSS merged with this TSS.
+     * @param bpWindow The base pair window in which all TSS shall be merged
+     */
+    public void addAssociatedTss( TranscriptionStart mergedTss, int bpWindow ) {
+        for ( TranscriptionStart otherMergedTss : mergedTss.getAssociatedTssList() ) {
+            if ( otherMergedTss.getPos() + bpWindow >= pos && !mergedTssList.contains( otherMergedTss ) ) {
+                mergedTssList.add(otherMergedTss);
+            }
+        }
+        if ( !mergedTssList.contains( mergedTss ) ) {
+            mergedTssList.add(mergedTss);
+        }
+    }
+
+    /**
+     * @return The list of TSS already merged with this TSS.
+     */
+    public List<TranscriptionStart> getAssociatedTssList() {
+        return mergedTssList;
+    }
+    
+    /**
+     * @return The position of the TSS.
+     */
+    @Override
+    public String toString() {
+        return String.valueOf(pos);
+    }
 
 }
