@@ -10,16 +10,33 @@ and open the template in the editor.
     </head>
     <body>
         <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Transcription Start Site (TSS) Detection:</strong></span></p>
-        <p style="text-align: justify;">The TSS detection (enabled by checking the "<span style="text-decoration: underline;">TSS detection</span>" box in the wizard) has two default parameters.
+        <p style="text-align: justify;">
+            The TSS detection (enabled by checking the "<span style="text-decoration: underline;">TSS detection</span>" box in the wizard) has two default parameters.
             <br /> 
             A) The <span style="text-decoration: underline;">minimal number of read starts</span> at the investigated position (default = 50 reads).
             <br /> 
             B) The <span style="text-decoration: underline;">minimal coverage increase in percent</span> from one position to the neighboring one (default = 50%). 
             <br /><br /> 
-            In order to output currently unannotated transcript information along with the detected TSS, you can choose the "<span style="text-decoration: underline;"><span>Novel transcript detection</span></span>". For detected TSS which do not have neighboring features, it adds the information, that this is a novel transcript and further a transcript stop is inferred by the coverage threshold "<span style="text-decoration: underline;"><span>Minimal transcript extension coverage"</span></span>, which has to be set, if the novel transcript detection checkbox is selected.<br /><br /> Additionally, two more parameters can be set for TSS detection in low coverage regions:<br /> C) The <span style="text-decoration: underline;">maximal initial read count</span> (default = 8 reads) can be set
+            In order to output currently unannotated transcript information along with the detected TSS, you can choose the "<span style="text-decoration: underline;">Novel transcript detection</span>". For detected TSS which do not have neighboring features on their respective strand in the given "<span style="text-decoration: underline;">Max distance of features to assign to TSS</span>" distance, it adds the information that this is a novel transcript. Further, a transcript stop is inferred by the coverage threshold "<span style="text-decoration: underline;">Min transcript extension coverage"</span>, which has to be set if the novel transcript detection checkbox is selected.
+            <br />
+            <br />
+            TSS are also classified as "<span style="text-decoration: underline;">primary</span>" or "<span style="text-decoration: underline;">secondary</span>" TSS. This is achieved by flagging the most significant TSS in the chosen maximum distance to genomic features (s. above) as primary and all other valid TSS as secondary.
+            <br /><br /> 
+            Additionally, two more parameters can be set for TSS detection in low coverage regions:<br /> C) The <span style="text-decoration: underline;">Max low coverage read starts</span> (default = 20 reads) can be set
             <br /> 
-            D) The <span style="text-decoration: underline;">minimal coverage increase</span> (default = 23%) for predicted TSS with less than x (in the default case 8) reads at the position directly in front of the TSS has to be set. It can be the same as the mandatory first parameter, but it is recommended to choose a lower value, depending on your analysis and data quality. If one of these two additional paramters is &gt; 0 the other one also has to be set correctly. By checking the <span style="text-decoration: underline;">Automatic parameter estimation</span> box, the parameters are estimated from the data in the track. In this case only the mandatory parameters are set.</p>
-        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/TSS-detection.jpg" alt="tss-detection-result" /></p>
-        <p style="text-align: justify;">This is an exemplary result of a TSS detection. The highlighted position in the table is centered in the Reference and PersistentTrack Viewers. Obviously, the start of the gene is annotated correctly and we have a leaderless transcript at the inspected position. The statistics window displays the overall statistics of this TSS detection. TSS with a downstream feature can either have a wrong annotated CDS start, or we can observe a 5'UTR in this experiment.</p>
+            D) The <span style="text-decoration: underline;">Min number read starts</span> (default = 10 reads) for predicted TSS with less than x (in the default case 20) reads at the TSS position has to be set. It can be the same as the mandatory first parameter, but it is recommended to choose a lower value, depending on your analysis and data quality. If one of these two additional paramters is &gt; 0 the other one also has to be set correctly. 
+            <br /> 
+            <br />
+            By checking the <span style="text-decoration: underline;">Automatic parameter estimation</span> box, the parameters are estimated from the data in the track. In this case only the mandatory parameters are set.
+        <br /> 
+        Transcripts can be classified as leaderless, if their distance to the next genomic feature is within the base pair window configured via the <span style="text-decoration: underline;">Max distance to feature for leaderless transcripts</span>" field.
+        <br /> 
+        <br /> 
+        To prevent receiving multiple TSS for the same TSS area, the check box "<span style="text-decoration: underline;">Associate all TSS with most significant TSS in this window of bps</span>" has been added. Only the most significant TSS in the entered base pair window (default = 3bp) is kept. All others are associated to this TSS and deleted from the result list. They still appear in the "Associated TSS" column of the result table, thus ARE NOT LOST!
+        </p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/TSS-detection.png" alt="tss-detection-result" /></p>
+        <p style="text-align: justify;">This is an exemplary result of a TSS detection. The highlighted position in the table is centered in the Reference and PersistentTrack Viewers. The secondary TSS (480994) at the start of the gene has reads (transcripts) starting at excatly that position, so it is annotated correctly and we have a leaderless transcript at the inspected position (a "Leaderless" column only appears in exported tables). But the selected primary TSS (480989) has many more reads starting there. It seems that an alternative transcript on another reading frame can be generated from this position on. 
+            <br /> 
+            The statistics window displays the overall statistics of this TSS detection. TSS with a downstream feature can either have a wrong annotated CDS start, or we can observe a 5'UTR in this experiment.</p>
     </body>
 </html>
