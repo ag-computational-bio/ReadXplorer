@@ -32,6 +32,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private boolean performTSSAnalysis;
     private boolean autoTssParamEstimation;
     private boolean performUnannotatedTranscriptDet;
+    private boolean isMergeTss;
     private int minNoReadStarts;
     private int minPercentIncrease;
     private int maxLowCovInitCount;
@@ -55,13 +56,14 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param minLowCovIncrease
      * @param maxLeaderlessDistance
      * @param minTranscriptExtensionCov
+     * @param isMergeTss
      * @param mergeTssWindow 
      * @param readClassParams 
      */
     ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
                      int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease,
-                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, int mergeTssWindow, 
-                     ParametersReadClasses readClassParams ) {
+                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, boolean isMergeTss, 
+                     int mergeTssWindow, ParametersReadClasses readClassParams ) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -72,6 +74,8 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
         this.maxLeaderlessDistance = maxLeaderlessDistance;
         this.maxFeatureDistance = maxFeatureDistance;
+        this.isMergeTss = isMergeTss;
+        this.mergeTssWindow = mergeTssWindow;
         this.readClassParams = readClassParams;
 
     }
@@ -188,12 +192,31 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
 
     /**
+     * @return <code>true</code>, if TSS within the given window shall be
+     * merged, <code>false</code> otherwise.
+     */
+    public boolean isMergeTss() {
+        return isMergeTss;
+    }
+
+    
+    /**
+     * @param isMergeTss <code>true</code>, if TSS within the given window shall
+     * be merged, <code>false</code> otherwise.
+     */
+    public void setIsMergeTss(boolean isMergeTss) {
+        this.isMergeTss = isMergeTss;
+    }
+
+    
+    /**
      * @return Bp window to use for merging TSS.
      */
     public int getMergeTssWindow() {
         return mergeTssWindow;
     }
 
+    
     /**
      * @param mergeTssWindow Bp window to use for merging TSS.
      */

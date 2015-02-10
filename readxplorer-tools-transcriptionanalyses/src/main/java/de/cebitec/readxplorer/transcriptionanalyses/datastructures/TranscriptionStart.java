@@ -19,6 +19,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.TrackChromResultEntry;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -39,6 +41,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private final int coverageIncrease;
     private boolean isPrimaryTss;
     private TranscriptionStart primaryTss;
+    private List<TranscriptionStart> mergedTssList;
 
 
     /**
@@ -68,6 +71,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
         this.percentIncrease = percentIncrease;
         this.coverageIncrease = coverageIncrease;
         this.detFeatures = detFeatures;
+        this.mergedTssList = new ArrayList<>();
     }
 
 
@@ -162,5 +166,37 @@ public class TranscriptionStart extends TrackChromResultEntry {
         return this.primaryTss;
     }
 
+    /**
+     * Merges the <code>mergedTss</code> with the current one. All other merged
+     * TSS associated with the <code>mergedTss</code> and within the given
+     * <code>bpWindow</code> are added as well.
+     * @param mergedTss A TSS merged with this TSS.
+     * @param bpWindow The base pair window in which all TSS shall be merged
+     */
+    public void addMergedTss( TranscriptionStart mergedTss, int bpWindow ) {
+        for ( TranscriptionStart otherMergedTss : mergedTss.getMergedTssList() ) {
+            if ( otherMergedTss.getPos() + bpWindow >= pos && !mergedTssList.contains( otherMergedTss ) ) {
+                mergedTssList.add(otherMergedTss);
+            }
+        }
+        if ( !mergedTssList.contains( mergedTss ) ) {
+            mergedTssList.add(mergedTss);
+        }
+    }
+
+    /**
+     * @return The list of TSS already merged with this TSS.
+     */
+    public List<TranscriptionStart> getMergedTssList() {
+        return mergedTssList;
+    }
+    
+    /**
+     * @return The position of the TSS.
+     */
+    @Override
+    public String toString() {
+        return String.valueOf(pos);
+    }
 
 }

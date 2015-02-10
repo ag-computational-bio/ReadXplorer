@@ -48,6 +48,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     public static final String TSS_LEADERLESS = "Leaderless TSS";
     public static final String TSS_PRIMARY = "Primary TSS";
     public static final String TSS_SECONDARY = "Secondary TSS";
+    public static final String TSS_MERGED = "Merged TSS";
     public static final String TSS_NOVEL = "Novel Transcripts";
     public static final String TSS_UPSTREAM = "TSS with upstream feature";
     public static final String TSS_UPSTREAM1 = "Distance to upstream feature = 1 bp";
@@ -69,6 +70,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
     private final List<TranscriptionStart> results;
     private List<String> promotorRegions;
+    private final ParameterSetTSS tssParameters;
 
 
     /**
@@ -87,6 +89,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                                PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn ) {
         super( reference, trackList, combineTracks, trackColumn, filterColumn );
         this.setParameters( tssParams );
+        this.tssParameters = tssParams;
         this.results = results;
         this.calcStats( results );
     }
@@ -160,6 +163,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add( "Distance Downstream Feature" );
         dataColumnDescriptions.add( "Novel Transcript" );
         dataColumnDescriptions.add( "Transcript Stop" );
+        if ( tssParameters.isMergeTss() ) {
+            dataColumnDescriptions.add( "Merged TSS" );
+        }
         dataColumnDescriptions.add( "70bp Upstream of Start" );
 
 
@@ -219,6 +225,10 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 tssRow.add( "-" );
                 tssRow.add( "-" );
             }
+            
+            if (tssParameters.isMergeTss()) {
+                tssRow.add( GeneralUtils.implode(",", tss.getMergedTssList().toArray()) );
+            }
 
             tssRow.add( promotorRegions.get( i ) );
 
@@ -229,7 +239,6 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
 
         //create statistics sheet
-        ParameterSetTSS tssParameters = (ParameterSetTSS) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow(
@@ -250,9 +259,14 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Detect novel transcripts?",
                                                                       tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no" ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Minimum transcript extension coverage:",
-                                                                      tssParameters.getMinTranscriptExtensionCov() ) );
+                                                                      tssParameters.isPerformUnannotatedTranscriptDet() 
+                                                                              ? tssParameters.getMinTranscriptExtensionCov() : "-" ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Maximum distance to feature of leaderless transcripts:",
                                                                       tssParameters.getMaxFeatureDistance() ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Merge nearby neighboring TSS?",
+                                                                      tssParameters.isMergeTss() ? "yes" : "no" ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Merge neighboring TSS in a bp window of:",
+                                                                      tssParameters.isMergeTss() ? tssParameters.getMergeTssWindow() : "-" ) );
         tssParameters.getReadClassParams().addReadClassParamsToStats( statisticsExportData );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
@@ -271,10 +285,10 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_LEADERLESS, statsMap.get( TSS_LEADERLESS ), percentMap.get( TSS_LEADERLESS ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_PRIMARY, statsMap.get( TSS_PRIMARY ), percentMap.get( TSS_PRIMARY ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_SECONDARY, statsMap.get( TSS_SECONDARY ), percentMap.get( TSS_SECONDARY ) ) );
-
-        int noUnannotatedTrans = statsMap.get( TSS_NOVEL );
-        String unannotatedTransValue = noUnannotatedTrans == UNUSED_STATISTICS_VALUE ? "-" : String.valueOf( noUnannotatedTrans );
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_NOVEL, unannotatedTransValue, percentMap.get( TSS_NOVEL ) ) );
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(TSS_MERGED,
+                tssParameters.isMergeTss() ? statsMap.get(TSS_MERGED) : "-", percentMap.get(TSS_MERGED)));
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_NOVEL, 
+                tssParameters.isPerformUnannotatedTranscriptDet() ? statsMap.get( TSS_NOVEL ) : "-", percentMap.get( TSS_NOVEL ) ) );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_UPSTREAM, statsMap.get( TSS_UPSTREAM ), percentMap.get( TSS_UPSTREAM ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_UPSTREAM1, statsMap.get( TSS_UPSTREAM1 ), percentMap.get( TSS_UPSTREAM1 ) ) );
@@ -363,6 +377,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         int noLeaderlessTranscripts = 0;
         int noPrimaryTss = 0;
         int noSecondaryTss = 0;
+        int noMergedTss = 0;
         int noUpstreamFeature = 0;
         int noUpstreamFeature1 = 0;
         int noUpstreamFeature5 = 0;
@@ -397,6 +412,10 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 ++noPrimaryTss;
             } else {
                 ++noSecondaryTss;
+            }
+            
+            if (tss.getMergedTssList().size() > 0) {
+                ++noMergedTss;
             }
 
             detFeatures = tss.getDetFeatures();
@@ -474,14 +493,11 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.getStatsMap().put( TSS_LEADERLESS, this.getStatsMap().get( TSS_LEADERLESS ) + noLeaderlessTranscripts + noCorrectStarts );
         this.getStatsMap().put( TSS_PRIMARY, this.getStatsMap().get( TSS_PRIMARY ) + noPrimaryTss );
         this.getStatsMap().put( TSS_SECONDARY, this.getStatsMap().get( TSS_SECONDARY ) + noSecondaryTss );
+        this.getStatsMap().put( TSS_MERGED, this.getStatsMap().get( TSS_MERGED ) + noMergedTss );
         this.getStatsMap().put( TSS_FWD, this.getStatsMap().get( TSS_FWD ) + noFwdFeatures );
         this.getStatsMap().put( TSS_REV, this.getStatsMap().get( TSS_REV ) + noRevFeatures );
-        if( params.isPerformUnannotatedTranscriptDet() ) {
-            this.getStatsMap().put( TSS_NOVEL, this.getStatsMap().get( TSS_NOVEL ) + noUnannotatedTranscripts );
-        }
-        else {
-            this.getStatsMap().put( TSS_NOVEL, UNUSED_STATISTICS_VALUE );
-        }
+        this.getStatsMap().put( TSS_NOVEL, this.getStatsMap().get( TSS_NOVEL ) + noUnannotatedTranscripts );
+        
         this.getStatsMap().put( TSS_UPSTREAM, this.getStatsMap().get( TSS_UPSTREAM ) + noUpstreamFeature );
         this.getStatsMap().put( TSS_UPSTREAM1, this.getStatsMap().get( TSS_UPSTREAM1 ) + noUpstreamFeature1 );
         this.getStatsMap().put( TSS_UPSTREAM5, this.getStatsMap().get( TSS_UPSTREAM5 ) + noUpstreamFeature5 );
@@ -510,6 +526,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.getStatsMap().put( TSS_LEADERLESS, 0 );
         this.getStatsMap().put( TSS_PRIMARY, 0 );
         this.getStatsMap().put( TSS_SECONDARY, 0 );
+        this.getStatsMap().put( TSS_MERGED, 0 );
         this.getStatsMap().put( TSS_FWD, 0 );
         this.getStatsMap().put( TSS_REV, 0 );
         this.getStatsMap().put( TSS_NOVEL, 0 );

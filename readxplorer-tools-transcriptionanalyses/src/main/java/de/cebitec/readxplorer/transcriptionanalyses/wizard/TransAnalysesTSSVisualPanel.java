@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_IS_MERGE_TSS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LOW_COV_INIT_COUNT;
@@ -55,6 +56,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private int maxLeaderlessDistance;
     private int maxFeatureDistance;
     private int mergeTssWindow;
+    private boolean isMergeTss;
     private boolean detectUnannotatedTranscripts = true;
     private boolean tssAutomatic = false;
 
@@ -89,12 +91,6 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         minTotalIncreaseLabel = new javax.swing.JLabel();
         minPercentIncreaseField = new javax.swing.JTextField();
         minPercentIncreaseLabel = new javax.swing.JLabel();
-        additionalOptionPanel = new javax.swing.JPanel();
-        maxInitialCountField = new javax.swing.JTextField();
-        maxInitialCountLabel = new javax.swing.JLabel();
-        minLowCovCountField = new javax.swing.JTextField();
-        minLowCovCountLabel = new javax.swing.JLabel();
-        addRestrictionLabel = new javax.swing.JLabel();
         unannotatedTranscriptsBox = new javax.swing.JCheckBox();
         transcriptExtensionField = new javax.swing.JTextField();
         transcriptExtensionLabel = new javax.swing.JLabel();
@@ -107,7 +103,17 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         maxFeatureDistField = new javax.swing.JTextField();
         maxFeatureDistLabel = new javax.swing.JLabel();
         mergeTssWindowField = new javax.swing.JTextField();
-        mergeTssLabel = new javax.swing.JLabel();
+        addRestrictionLabel = new javax.swing.JLabel();
+        maxInitialCountLabel = new javax.swing.JLabel();
+        maxInitialCountField = new javax.swing.JTextField();
+        minLowCovCountField = new javax.swing.JTextField();
+        minLowCovCountLabel = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JSeparator();
+        jSeparator4 = new javax.swing.JSeparator();
+        jSeparator5 = new javax.swing.JSeparator();
+        mergeTssCheckBox = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(transcriptionStartAutomaticBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.transcriptionStartAutomaticBox.text")); // NOI18N
         transcriptionStartAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
@@ -123,57 +129,6 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         minPercentIncreaseField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minPercentIncreaseField.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(minPercentIncreaseLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minPercentIncreaseLabel.text")); // NOI18N
-
-        additionalOptionPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        maxInitialCountField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxInitialCountField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(maxInitialCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxInitialCountLabel.text")); // NOI18N
-
-        minLowCovCountField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountField.text")); // NOI18N
-        minLowCovCountField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                minLowCovCountFieldActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(minLowCovCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(addRestrictionLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.addRestrictionLabel.text")); // NOI18N
-
-        javax.swing.GroupLayout additionalOptionPanelLayout = new javax.swing.GroupLayout(additionalOptionPanel);
-        additionalOptionPanel.setLayout(additionalOptionPanelLayout);
-        additionalOptionPanelLayout.setHorizontalGroup(
-            additionalOptionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(additionalOptionPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(additionalOptionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(addRestrictionLabel)
-                    .addGroup(additionalOptionPanelLayout.createSequentialGroup()
-                        .addComponent(maxInitialCountField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(maxInitialCountLabel))
-                    .addGroup(additionalOptionPanelLayout.createSequentialGroup()
-                        .addComponent(minLowCovCountField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(minLowCovCountLabel)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        additionalOptionPanelLayout.setVerticalGroup(
-            additionalOptionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, additionalOptionPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(addRestrictionLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(additionalOptionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(maxInitialCountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(maxInitialCountLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(additionalOptionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(minLowCovCountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(minLowCovCountLabel))
-                .addGap(7, 7, 7))
-        );
 
         unannotatedTranscriptsBox.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(unannotatedTranscriptsBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.unannotatedTranscriptsBox.text")); // NOI18N
@@ -195,7 +150,6 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         org.openide.awt.Mnemonics.setLocalizedText(analysisDirectionLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.analysisDirectionLabel.text")); // NOI18N
 
         buttonGroup1.add(dirFwdRadioButton);
-        dirFwdRadioButton.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(dirFwdRadioButton, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.dirFwdRadioButton.text")); // NOI18N
 
         buttonGroup1.add(dirRevRadioButton);
@@ -207,58 +161,93 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
         mergeTssWindowField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.mergeTssWindowField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(mergeTssLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.mergeTssLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addRestrictionLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.addRestrictionLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(maxInitialCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxInitialCountLabel.text")); // NOI18N
+
+        maxInitialCountField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxInitialCountField.text")); // NOI18N
+
+        minLowCovCountField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(minLowCovCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(mergeTssCheckBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.mergeTssCheckBox.text")); // NOI18N
+        mergeTssCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mergeTssCheckBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(analysisDirectionSeparator)
                     .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(transcriptionStartAutomaticBox)
-                            .addComponent(analysisDirectionLabel)
+                            .addComponent(transcriptionStartAutomaticBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(analysisDirectionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(dirFwdRadioButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(dirRevRadioButton))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(maxFeatureDistField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(maxFeatureDistLabel))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(maxFeatureDistLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(minTotalIncreaseLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(minPercentIncreaseLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(mergeTssCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(mergeTssWindowField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(maxFeatureDistField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(minTotalIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(63, 63, 63))
+                    .addComponent(analysisDirectionSeparator)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptExtensionLabel))
+                                .addComponent(addRestrictionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator1))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(minPercentIncreaseLabel))
+                                .addComponent(unannotatedTranscriptsBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator3))
+                            .addComponent(jSeparator5)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(minTotalIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(minTotalIncreaseLabel))
-                            .addComponent(unannotatedTranscriptsBox)
-                            .addComponent(additionalOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptExtensionLabel1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(mergeTssWindowField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(mergeTssLabel)))
-                        .addGap(0, 20, Short.MAX_VALUE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(maxInitialCountLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(minLowCovCountLabel))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(minLowCovCountField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(maxInitialCountField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(transcriptExtensionLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(transcriptExtensionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(analysisDirectionLabel)
+                .addComponent(analysisDirectionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(dirFwdRadioButton)
@@ -266,36 +255,52 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                 .addGap(3, 3, 3)
                 .addComponent(analysisDirectionSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
-                .addComponent(transcriptionStartAutomaticBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(transcriptionStartAutomaticBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(maxFeatureDistField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(maxFeatureDistLabel))
+                    .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(minPercentIncreaseLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(minTotalIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(minTotalIncreaseLabel))
+                    .addComponent(minTotalIncreaseLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(minPercentIncreaseLabel)
-                    .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(maxFeatureDistField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxFeatureDistLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(mergeTssLabel)
-                    .addComponent(mergeTssWindowField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(transcriptExtensionLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(additionalOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(mergeTssWindowField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(mergeTssCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(unannotatedTranscriptsBox)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addRestrictionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(transcriptExtensionLabel))
-                .addGap(27, 27, 27)
+                    .addComponent(maxInitialCountLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxInitialCountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(transcriptExtensionLabel1))
-                .addContainerGap(101, Short.MAX_VALUE))
+                    .addComponent(minLowCovCountLabel)
+                    .addComponent(minLowCovCountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(unannotatedTranscriptsBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(transcriptExtensionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -318,32 +323,32 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
     private void unannotatedTranscriptsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unannotatedTranscriptsBoxActionPerformed
         this.detectUnannotatedTranscripts = this.unannotatedTranscriptsBox.isSelected();
-        if( this.detectUnannotatedTranscripts ) {
-            this.transcriptExtensionField.setEnabled( true );
-        }
-        else {
-            this.transcriptExtensionField.setEnabled( false );
-        }
+        this.transcriptExtensionField.setEnabled( detectUnannotatedTranscripts );
     }//GEN-LAST:event_unannotatedTranscriptsBoxActionPerformed
 
-    private void minLowCovCountFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minLowCovCountFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_minLowCovCountFieldActionPerformed
+    private void mergeTssCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeTssCheckBoxActionPerformed
+        isMergeTss = mergeTssCheckBox.isSelected();
+        mergeTssWindowField.setEnabled( isMergeTss );
+    }//GEN-LAST:event_mergeTssCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel addRestrictionLabel;
-    private javax.swing.JPanel additionalOptionPanel;
     private javax.swing.JLabel analysisDirectionLabel;
     private javax.swing.JSeparator analysisDirectionSeparator;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton dirFwdRadioButton;
     private javax.swing.JRadioButton dirRevRadioButton;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JTextField maxFeatureDistField;
     private javax.swing.JLabel maxFeatureDistLabel;
     private javax.swing.JTextField maxInitialCountField;
     private javax.swing.JLabel maxInitialCountLabel;
     private javax.swing.JTextField maxLeaderlessDistanceField;
-    private javax.swing.JLabel mergeTssLabel;
+    private javax.swing.JCheckBox mergeTssCheckBox;
     private javax.swing.JTextField mergeTssWindowField;
     private javax.swing.JTextField minLowCovCountField;
     private javax.swing.JLabel minLowCovCountLabel;
@@ -384,6 +389,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.mergeTssWindowField.getDocument().addDocumentListener( this.createDocumentListener() );
 
         this.loadLastParameterSelection();
+        
+        mergeTssWindowField.setEnabled(isMergeTss);
     }
 
 
@@ -392,17 +399,18 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
      */
     private void loadLastParameterSelection() {
         Preferences pref = NbPreferences.forModule( Object.class );
-        tssAutomatic = pref.get( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, "0" ).equals( "1" );
+        tssAutomatic = pref.getBoolean( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, false );
         String minTotalIncreaseString = pref.get( PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, minTotalIncreaseField.getText() );
         String minPercentIncreaseString = pref.get( PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, minPercentIncreaseField.getText() );
         String maxInitialLowCov = pref.get( PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, maxInitialCountField.getText() );
         String minInitialLowCov = pref.get( PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, minLowCovCountField.getText() );
-        detectUnannotatedTranscripts = pref.get( PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, "1" ).equals( "1" );
+        detectUnannotatedTranscripts = pref.getBoolean( PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, true );
         String minExtensionCov = pref.get( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText() );
         String maxLeaderlessDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText() );
         String maxFeatureDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, maxFeatureDistField.getText() );
+        isMergeTss = pref.getBoolean( PROP_WIZARD_NAME + PROP_IS_MERGE_TSS, true );
         String mergeTssWindowTxt = pref.get(PROP_WIZARD_NAME + PROP_MERGE_TSS_WINDOW, mergeTssWindowField.getText() );
-        boolean fwdAnalysisDirection = pref.get( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, "1" ).equals( "1" );
+        boolean fwdAnalysisDirection = pref.getBoolean( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, true );
 
         transcriptionStartAutomaticBox.setSelected( tssAutomatic );
         unannotatedTranscriptsBox.setSelected( detectUnannotatedTranscripts );
@@ -415,6 +423,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         transcriptExtensionField.setText( minExtensionCov );
         maxLeaderlessDistanceField.setText( maxLeaderlessDist );
         maxFeatureDistField.setText( maxFeatureDist );
+        mergeTssCheckBox.setSelected( isMergeTss );
         mergeTssWindowField.setText( mergeTssWindowTxt );
 
         this.performTssAutoBoxAction();
@@ -470,6 +479,12 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         else {
             isValidated = false;
         }
+        if( GeneralUtils.isValidIntegerInput(mergeTssWindowField.getText() ) ) {
+            this.mergeTssWindow = Integer.parseInt( mergeTssWindowField.getText() );
+        }
+        else {
+            isValidated = false;
+        }
 
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
@@ -511,6 +526,19 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     }
 
     
+    /**
+     * @return <code>true</code>, if TSS within the given window shall be 
+     * merged, <code>false</code> otherwise.
+     */
+    public boolean isMergeTss() {
+        return isMergeTss;
+    }
+    
+    
+    /**
+     * @return The bp window in which all TSS shall be merged if 
+     * <code>isMergeTss()</code> is <code>true</code> otherwise.
+     */
     public int getMergeTssWindow() {
         return mergeTssWindow;
     }

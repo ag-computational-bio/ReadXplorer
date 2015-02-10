@@ -175,6 +175,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         int minTranscriptExtensionCov = 0;
         int maxLeaderlessDistance = 0;
         int maxFeatureDistance = 0;
+        boolean isMergeTss = true;
         int mergeTssWindow = 0;
         int minNumberReads = 0;
         int maxNumberReads = 0;
@@ -201,6 +202,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             minTranscriptExtensionCov = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV );
             maxLeaderlessDistance = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE );
             maxFeatureDistance = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE );
+            isMergeTss = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_IS_MERGE_TSS );
             mergeTssWindow = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MERGE_TSS_WINDOW );
             boolean isFwdAnalysisDirection = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION );
             if( readClassParams.isStrandBothOption() ) {
@@ -220,7 +222,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS( performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                                              minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov,
-                                             maxLeaderlessDistance, maxFeatureDistance, mergeTssWindow, readClassParams );
+                                             maxLeaderlessDistance, maxFeatureDistance, isMergeTss, mergeTssWindow, readClassParams );
         parametersOperonDet = new ParameterSetOperonDet( performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams );
         parametersRPKM = new ParameterSetRPKM( performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes, readClassParams );
 
