@@ -87,41 +87,7 @@ public class Node implements Traversable {//, Cloneable {
         this.nodeChildren = new ArrayList<>();
     }
 
-//    /**
-//     * Returns the depth of the Node.
-//     * @return depth the depth of the Node
-//     */
-//    public Integer getDepth() {
-//        Node node = this;
-//        Integer depth = 0;
-//        while (!node.isRoot()) {
-//            node = node.getParents();
-//            depth++;
-//        }
-//        return depth;
-//    }
 
-//    /**
-//     * Clones the node.
-//     * @return newNode the copy of the original node.
-//     */
-//    @Override
-//    public Node clone() {
-//
-//        Node newNode;
-//        if (this.nodeType == null) {
-//            newNode = new Node(null, null);
-//        } else {
-//            newNode = new Node(this.nodeType, null);
-//        }
-//        if (!this.isLeaf()) {
-//            for (Node n : this.getNodeChildren()) {
-//                newNode.getNodeChildren().add(n.clone());
-//                newNode.getNodeChildren().get(newNode.getNodeChildren().size() - 1).parents.add(newNode);
-//            }
-//        }
-//        return newNode;
-//    }
     /**
      * Bottom up through the tree. Does not set the visited flag for any nodes!
      * The node visitor has to take care of this behaviour. But nodes and their
@@ -181,8 +147,8 @@ public class Node implements Traversable {//, Cloneable {
      * @param newChild The <tt>node</tt> to be set as a new child
      */
     public void addChild( final Node newChild ) {
-        this.nodeChildren.add( newChild );
-        newChild.getParents().add( this );
+        nodeChildren.add( newChild );
+        newChild.addParent( this );
     }
 
 
@@ -190,7 +156,7 @@ public class Node implements Traversable {//, Cloneable {
      * Deletes all children (<tt>nodes</tt>) of a <tt>node</tt>.
      */
     public void clearChildren() {
-        this.nodeChildren.clear();
+        nodeChildren.clear();
     }
 
 
@@ -201,16 +167,25 @@ public class Node implements Traversable {//, Cloneable {
      */
     @Override
     public String toString() {
-        final StringBuilder out = new StringBuilder();
-        if( !this.isLeaf() ) {
-            out.append( '(' );
-            for( Node nodeChild : this.nodeChildren ) {
-                out.append( nodeChild.toString() ).append( "," );
+        final StringBuilder sb = new StringBuilder();
+        if( !isLeaf() ) {
+            sb.append( '(' );
+            for( Node nodeChild : nodeChildren ) {
+                sb.append( nodeChild.toString() ).append( ',' );
             }
-            out.deleteCharAt( out.length() - 1 );
-            out.append( ')' );
+            sb.deleteCharAt( sb.length() - 1 );
+            sb.append( ')' );
         }
-        return out.toString();
+        return sb.toString();
+    }
+
+
+    /**
+     * Add a parent <tt>node</tt>.
+     * @param parentNode A new parent node of this instance.
+     */
+    public void addParent( Node parentNode ) {
+        parents.add( parentNode );
     }
 
 
@@ -231,7 +206,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return true if the <tt>node</tt> is a leaf
      */
     public boolean isLeaf() {
-        return (nodeChildren.isEmpty());
+        return nodeChildren.isEmpty();
     }
 
 
@@ -262,7 +237,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return key A key object which is stored in the <tt>node</tt>
      */
     public FeatureType getNodeType() {
-        return this.nodeType;
+        return nodeType;
     }
 
 
