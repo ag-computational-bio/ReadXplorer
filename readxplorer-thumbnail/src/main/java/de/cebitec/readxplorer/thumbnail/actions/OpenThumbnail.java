@@ -38,7 +38,7 @@ import org.openide.util.NbBundle;
 @ActionRegistration( displayName = "#CTL_OpenThumbnail", 
                     iconBase = "de/cebitec/readxplorer/thumbnail/thumbOpen.png" )
 @ActionReferences( {
-    @ActionReference( path = "Menu/Tools/Thumbnail", position = 100, separatorAfter = 150 ),
+    @ActionReference( path = "Menu/Tools/Thumbnail", position = 100, separatorAfter = 160 ),
     @ActionReference( path = "Toolbars/Tools", position = 400 )
 } )
 @NbBundle.Messages("CTL_OpenThumbnail=Create new Thumbnail View")

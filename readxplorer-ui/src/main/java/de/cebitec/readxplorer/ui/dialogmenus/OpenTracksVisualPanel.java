@@ -237,6 +237,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
      */
     public void storeSelectedTracks() {
 
+        selectedTracks.clear();
         List<Node> markedNodes = getAllMarkedNodes();
         for( Node node : markedNodes ) {
             StandardNode markedNode = (StandardNode) node;

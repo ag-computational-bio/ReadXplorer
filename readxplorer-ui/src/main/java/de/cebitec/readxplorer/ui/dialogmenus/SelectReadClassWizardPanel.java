@@ -104,21 +104,21 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * @param readClassParams The parameters to store
      */
     private void storePrefs( ParametersReadClasses readClassParams ) {
-        String isPerfectSelected = readClassParams.isClassificationAllowed( MappingClass.PERFECT_MATCH ) ? "1" : "0";
-        String isBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.BEST_MATCH ) ? "1" : "0";
-        String isCommonMatchSelected = readClassParams.isClassificationAllowed( MappingClass.COMMON_MATCH ) ? "1" : "0";
-        String isSinglePerfectSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_PERFECT_MATCH ) ? "1" : "0";
-        String isSingleBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_BEST_MATCH ) ? "1" : "0";
-        String isUniqueSelected = readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "0" : "1";
+        boolean isPerfectSelected = readClassParams.isClassificationAllowed( MappingClass.PERFECT_MATCH );
+        boolean isBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.BEST_MATCH );
+        boolean isCommonMatchSelected = readClassParams.isClassificationAllowed( MappingClass.COMMON_MATCH );
+        boolean isSinglePerfectSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_PERFECT_MATCH );
+        boolean isSingleBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_BEST_MATCH );
+        boolean isUniqueSelected = !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ );
         String minMappingQuality = String.valueOf( readClassParams.getMinMappingQual() );
         String strandOption = String.valueOf( readClassParams.getStrandOption() );
         Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( wizardName + PROP_PERFECT_SELECTED, isPerfectSelected );
-        pref.put( wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected );
-        pref.put( wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected );
-        pref.put( wizardName + PROP_SINGLE_PERFECT_SELECTED, isSinglePerfectSelected );
-        pref.put( wizardName + PROP_SINGLE_BEST_MATCH_SELECTED, isSingleBestMatchSelected );
-        pref.put( wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected );
+        pref.putBoolean( wizardName + PROP_PERFECT_SELECTED, isPerfectSelected );
+        pref.putBoolean( wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected );
+        pref.putBoolean( wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected );
+        pref.putBoolean( wizardName + PROP_SINGLE_PERFECT_SELECTED, isSinglePerfectSelected );
+        pref.putBoolean( wizardName + PROP_SINGLE_BEST_MATCH_SELECTED, isSingleBestMatchSelected );
+        pref.putBoolean( wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected );
         pref.put( wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality );
         pref.put( wizardName + PROP_STRAND_OPTION, strandOption );
     }
