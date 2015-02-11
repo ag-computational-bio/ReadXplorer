@@ -59,7 +59,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     public SnpDetectionResult( List<SnpI> snpList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks,
                                int trackColumn, int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
-        this.snpList = snpList;
+        this.snpList = new ArrayList<>( snpList );
+        Collections.sort( this.snpList );
     }
 
 

@@ -37,7 +37,6 @@ import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
@@ -318,7 +317,6 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             final String intergenic = "Intergenic";
             final int snpDataSize = 23;
             List<SnpI> snps = snpData.getSnpList();
-            Collections.sort( snps );
             DefaultTableModel model = (DefaultTableModel) snpTable.getModel();
 
             //get all features from the reference to determine amino acid

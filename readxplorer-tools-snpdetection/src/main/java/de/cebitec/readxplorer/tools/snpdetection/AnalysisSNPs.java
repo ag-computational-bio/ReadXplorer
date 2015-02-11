@@ -132,7 +132,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
 
     /**
-     * @return <cc>true</cc> if all mappings have base qualities, <cc>false</cc>
+     * @return <code>true</code> if all mappings have base qualities, <code>false</code>
      * if at least one mapping does not have base qualities.
      */
     public boolean isHasBaseQualities() {
@@ -141,8 +141,8 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
 
     /**
-     * @return <cc>true</cc> if all mappings have mapping qualities including
-     *         255, <cc>false</cc> if at least one mapping does not have a mapping
+     * @return <code>true</code> if all mappings have mapping qualities including
+     *         255, <code>false</code> if at least one mapping does not have a mapping
      *         quality.
      */
     public boolean isHasMappingQualities() {
