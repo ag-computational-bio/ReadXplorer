@@ -241,7 +241,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 this.filterStatisticsMap.put( FEATURES_TOTAL, rpkmCalcResultNew.getNoGenomeFeatures() );
             }
             else {
-                this.rpkmCalcResult.getResults().addAll( rpkmCalcResultNew.getResults() );
+                this.rpkmCalcResult.addAllToResult( rpkmCalcResultNew.getResults() );
             }
             DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();
 

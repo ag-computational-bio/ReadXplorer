@@ -65,7 +65,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
     public RPKMAnalysisResult( Map<Integer, PersistentTrack> trackMap, List<RPKMvalue> rpkmResults, PersistentReference reference,
                                boolean combineTracks, int trackColumn, int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
-        this.rpkmResults = rpkmResults;
+        this.rpkmResults = new ArrayList<>( rpkmResults );
     }
 
 
@@ -74,6 +74,18 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      */
     public List<RPKMvalue> getResults() {
         return Collections.unmodifiableList( rpkmResults );
+    }
+    
+    
+    /**
+     * Use this method when adding new results to the current results. It
+     * synchronizes the list and prevents making changes during the adding
+     * process.
+     * <p>
+     * @param newRpkmValues RPKM values to add to the current result
+     */
+    public void addAllToResult(List<RPKMvalue> newRpkmValues) {
+        rpkmResults.addAll( newRpkmValues );
     }
 
 
