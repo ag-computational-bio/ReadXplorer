@@ -91,7 +91,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         super( reference, trackList, combineTracks, trackColumn, filterColumn );
         this.setParameters( tssParams );
         this.tssParameters = tssParams;
-        this.results = results;
+        this.results = new ArrayList<>( results );
         this.calcStats( results );
         promotorRegions = new ArrayList<>();
 
@@ -103,6 +103,16 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      */
     public List<TranscriptionStart> getResults() {
         return Collections.unmodifiableList( results );
+    }
+    
+    
+    /**
+     * Adds all new TSS to the current list of detected TSS.
+     * <p>
+     * @param newTss Promotor regions of the detected TSS
+     */
+    public void addTss(List<TranscriptionStart> newTss) {
+        this.results.addAll( newTss );
     }
 
 
@@ -497,14 +507,13 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statsMap.put( TSS_TOTAL, statsMap.get( TSS_TOTAL ) + tssResult.size() );
         statsMap.put( TSS_CORRECT, statsMap.get( TSS_CORRECT ) + noCorrectStarts );
         statsMap.put( TSS_LEADERLESS, statsMap.get( TSS_LEADERLESS ) + noLeaderlessTranscripts + noCorrectStarts );
+        statsMap.put( TSS_PRIMARY, this.getStatsMap().get( TSS_PRIMARY ) + noPrimaryTss );
+        statsMap.put( TSS_SECONDARY, this.getStatsMap().get( TSS_SECONDARY ) + noSecondaryTss );
+        statsMap.put( TSS_ASSOCIATED, this.getStatsMap().get( TSS_ASSOCIATED ) + noAssociatedTss );
         statsMap.put( TSS_FWD, statsMap.get( TSS_FWD ) + noFwdFeatures );
         statsMap.put( TSS_REV, statsMap.get( TSS_REV ) + noRevFeatures );
-        if( params.isPerformUnannotatedTranscriptDet() ) {
-            statsMap.put( TSS_NOVEL, statsMap.get( TSS_NOVEL ) + noUnannotatedTranscripts );
-        }
-        else {
-            statsMap.put( TSS_NOVEL, UNUSED_STATISTICS_VALUE );
-        }
+        statsMap.put( TSS_NOVEL, this.getStatsMap().get( TSS_NOVEL ) + noUnannotatedTranscripts );
+        
         statsMap.put( TSS_UPSTREAM, statsMap.get( TSS_UPSTREAM ) + noUpstreamFeature );
         statsMap.put( TSS_UPSTREAM1, statsMap.get( TSS_UPSTREAM1 ) + noUpstreamFeature1 );
         statsMap.put( TSS_UPSTREAM5, statsMap.get( TSS_UPSTREAM5 ) + noUpstreamFeature5 );
@@ -535,6 +544,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statsMap.put( TSS_TOTAL, 0 );
         statsMap.put( TSS_CORRECT, 0 );
         statsMap.put( TSS_LEADERLESS, 0 );
+        statsMap.put( TSS_PRIMARY, 0 );
+        statsMap.put( TSS_SECONDARY, 0 );
+        statsMap.put( TSS_ASSOCIATED, 0 );
         statsMap.put( TSS_FWD, 0 );
         statsMap.put( TSS_REV, 0 );
         statsMap.put( TSS_NOVEL, 0 );

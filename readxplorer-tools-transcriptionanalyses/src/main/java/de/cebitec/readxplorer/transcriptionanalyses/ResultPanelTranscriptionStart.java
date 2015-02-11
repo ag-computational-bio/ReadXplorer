@@ -222,13 +222,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
         if( newResult instanceof TssDetectionResult ) {
             final TssDetectionResult tssResultNew = (TssDetectionResult) newResult;
-            final List<TranscriptionStart> tsss = new ArrayList<>( tssResultNew.getResults() );
+            final List<TranscriptionStart> tsss = tssResultNew.getResults();
 
             if( tssResult == null ) {
                 tssResult = tssResultNew;
             }
             else {
-                tssResult.getResults().addAll( tssResultNew.getResults() );
+                tssResult.addTss( tsss );
                 tssResult.updateStatsMap( tssResultNew.getStatsMap() );
             }
             final ParameterSetTSS tssParameters = (ParameterSetTSS) tssResult.getParameters();
