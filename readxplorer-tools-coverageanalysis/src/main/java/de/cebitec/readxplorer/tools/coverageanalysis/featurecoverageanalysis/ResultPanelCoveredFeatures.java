@@ -217,7 +217,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
         if( this.coveredFeaturesResult == null ) {
             this.coveredFeaturesResult = coveredFeaturesResultNew;
-            this.coveredStatisticsMap = coveredFeaturesResult.getStatsMap();
+            this.coveredStatisticsMap = new HashMap<>( coveredFeaturesResult.getStatsMap() );
             this.coveredStatisticsMap.put( FEATURES_COVERED, 0 );
         }
         else {

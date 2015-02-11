@@ -37,6 +37,7 @@ import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
@@ -283,7 +284,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             // if first result: initialize data structures and stats
             if( this.completeSnpData == null ) {
                 this.completeSnpData = snpData;
-                this.snpStatsMap = snpData.getStatsMap();
+                this.snpStatsMap = new HashMap<>( snpData.getStatsMap() );
                 snpStatsMap.put( SNPS_TOTAL, 0 );
                 snpStatsMap.put( SNPS_INTERGENEIC, 0 );
                 snpStatsMap.put( SNPS_SYNONYMOUS, 0 );
@@ -297,7 +298,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                 snpStatsMap.put( SNPS_DELETIONS, 0 );
             }
             else {
-                this.completeSnpData.getSnpList().addAll( snpData.getSnpList() );
+                this.completeSnpData.addAllSnps( snpData.getSnpList() );
             }
 
             //snp effect statistics

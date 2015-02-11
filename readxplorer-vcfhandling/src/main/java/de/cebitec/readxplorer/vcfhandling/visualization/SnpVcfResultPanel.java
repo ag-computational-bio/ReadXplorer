@@ -12,6 +12,7 @@ import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
@@ -128,7 +129,7 @@ public class SnpVcfResultPanel extends ResultTablePanel {
 
             if( this.completeVcfData == null ) {
                 this.completeVcfData = vcfData;
-                this.vcfStatsMap = vcfData.getStatsMap();
+                this.vcfStatsMap = new HashMap<>( vcfData.getStatsMap() );
                 vcfStatsMap.put( SOURCE, 0 );
                 vcfStatsMap.put( CONTIG, 0 );
                 vcfStatsMap.put( START, 0 );

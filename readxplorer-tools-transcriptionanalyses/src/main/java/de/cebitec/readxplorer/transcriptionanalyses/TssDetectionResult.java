@@ -454,7 +454,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         }
 
         //create statistics
-        Map<String, Integer> statsMap = getStatsMap();
+        Map<String, Integer> statsMap = new HashMap<>( getStatsMap() );
         
         statsMap.put( TSS_TOTAL, statsMap.get( TSS_TOTAL ) + tssResult.size() );
         statsMap.put( TSS_CORRECT, statsMap.get( TSS_CORRECT ) + noCorrectStarts );
@@ -492,7 +492,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * Initializes the statistics map.
      */
     private void initStatsMap() {
-        Map<String, Integer> statsMap = getStatsMap();
+        Map<String, Integer> statsMap = new HashMap<>(getStatsMap());
         
         statsMap.put( TSS_TOTAL, 0 );
         statsMap.put( TSS_CORRECT, 0 );

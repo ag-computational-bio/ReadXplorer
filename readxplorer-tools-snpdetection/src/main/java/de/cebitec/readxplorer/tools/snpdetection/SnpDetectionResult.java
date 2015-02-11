@@ -70,6 +70,14 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     public List<SnpI> getSnpList() {
         return Collections.unmodifiableList( snpList );
     }
+    
+    /**
+     * Adds all new SNPs to the current list of SNPs stored in this result.
+     * @param newSnps The list of new SNPs to add
+     */
+    public void addAllSnps(List<SnpI> newSnps) {
+        snpList.addAll(newSnps);
+    }
 
 
     /**

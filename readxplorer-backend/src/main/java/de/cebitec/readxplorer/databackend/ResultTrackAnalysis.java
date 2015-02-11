@@ -231,10 +231,10 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
 
     /**
-     * @return A copy of the statistics map associated with this analysis.
+     * @return The statistics map associated with this analysis.
      */
     public Map<String, Integer> getStatsMap() {
-        return new HashMap<>( statsMap );
+        return Collections.unmodifiableMap( statsMap );
     }
 
 
