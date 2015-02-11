@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +90,7 @@ public class CollectCoverageData implements Observer {
      * @param mappings the mappings
      */
     private void updateReadCountForFeatures( MappingResult result ) {
-        List<Mapping> mappings = result.getMappings();
+        List<Mapping> mappings = new ArrayList<>( result.getMappings() );
         Collections.sort( mappings );
         int lastMappingIdx = 0;
         boolean isStrandBothOption = readClassParams.isStrandBothOption();

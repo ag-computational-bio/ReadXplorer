@@ -89,7 +89,7 @@ public class Layout implements LayoutI {
         // gaps do extend the width of this layout
         // so absStop has to be decreased, to fit to old width
 
-        // count the number of gaps occuring in visible area
+        // count the number of gaps occurring in visible area
         int width = absStop - absStart + 1;
         int gapNo = 0; // count the number of gaps
         int widthCount = 0; // count the number of bases
@@ -97,7 +97,7 @@ public class Layout implements LayoutI {
         while( widthCount < width ) {
             int num = gapManager.getNumOfGapsAt( absStart + i ); // get the number of gaps at current position
             ++widthCount; // current position needs 1 base space in visual alignment
-            widthCount += num; // if gaps occured at current position, they need some space, too
+            widthCount += num; // if gaps occurred at current position, they need some space, too
             gapNo += num;
             ++i;
         }
