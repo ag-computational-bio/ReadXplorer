@@ -38,20 +38,41 @@ import java.util.Map;
  */
 public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOperonDet> {
 
-    //sdfsdf
-
     private final List<Operon> detectedOperons;
 
 
+    /**
+     * Container for all data belonging to an operon detection result.
+     * @param trackList
+     * @param detectedOperons
+     * @param reference
+     * @param combineTracks
+     * @param trackColumn
+     * @param filterColumn 
+     */
     public OperonDetectionResult( Map<Integer, PersistentTrack> trackList, List<Operon> detectedOperons,
                                   PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn ) {
         super( reference, trackList, combineTracks, trackColumn, filterColumn );
-        this.detectedOperons = detectedOperons;
+        this.detectedOperons = new ArrayList<>( detectedOperons );
     }
 
 
+    /**
+     * @return The list of detected operons.
+     */
     public List<Operon> getResults() {
         return Collections.unmodifiableList( detectedOperons );
+    }
+    
+    /**
+     * Use this method when adding new results to the current results. It
+     * synchronizes the list and prevents making changes during the adding
+     * process.
+     * <p>
+     * @param newOperons Operons to add to the current result
+     */
+    public void addAllToResult(List<Operon> newOperons) {
+        detectedOperons.addAll( newOperons );
     }
 
 

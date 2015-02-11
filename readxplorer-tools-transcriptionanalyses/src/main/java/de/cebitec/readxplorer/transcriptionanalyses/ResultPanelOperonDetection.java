@@ -236,7 +236,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 this.operonResult = operonResultNew;
             }
             else {
-                this.operonResult.getResults().addAll( operonResultNew.getResults() );
+                this.operonResult.addAllToResult( operonResultNew.getResults() );
             }
 
             DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();

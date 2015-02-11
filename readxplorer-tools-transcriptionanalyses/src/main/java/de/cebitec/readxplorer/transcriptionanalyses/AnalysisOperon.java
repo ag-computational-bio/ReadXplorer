@@ -38,9 +38,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import static java.util.logging.Level.INFO;
+import java.util.logging.Logger;
 
 
 /**
@@ -307,7 +306,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             else if( feature2.getStart() - feature1.getStop() > averageReadLength
                      && internalReads > operonDetParameters.getMinSpanningReads() ) {
                 //TODO: think about creating an operon
-                System.out.println( "found case " + ++count );
+                LOG.log(INFO, "found case {0}", ++count); 
             }
         }
         if( !operonAdjacencies.isEmpty() ) {
