@@ -221,7 +221,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             this.coveredStatisticsMap.put( FEATURES_COVERED, 0 );
         }
         else {
-            this.coveredFeaturesResult.getResults().addAll( coveredFeaturesResultNew.getResults() );
+            this.coveredFeaturesResult.addAllToResult( coveredFeaturesResultNew.getResults() );
         }
 
         DefaultTableModel model = (DefaultTableModel) coveredFeaturesTable.getModel();

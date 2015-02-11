@@ -57,7 +57,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
     public CoveredFeatureResult( List<CoveredFeature> results, Map<Integer, PersistentTrack> trackMap, PersistentReference reference,
                                  boolean combineTracks, int trackColumn, int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
-        this.results = results;
+        this.results = new ArrayList<>( results );
 
     }
 
@@ -75,7 +75,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * synchronizes the list and prevents making changes during the adding
      * process.
      * <p>
-     * @param coveredFeatures
+     * @param coveredFeatures The new list of covered features to add
      */
     public void addAllToResult( List<CoveredFeature> coveredFeatures ) {
         this.results.addAll( coveredFeatures );
