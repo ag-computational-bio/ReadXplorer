@@ -26,6 +26,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickF
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,8 +235,13 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
             this.coverageAnalysisResult = coverageAnalysisResultNew;
         }
         else {
-            this.coverageAnalysisResult.getResults().getCoverageIntervals().addAll( coverageAnalysisResultNew.getResults().getCoverageIntervals() );
-            this.coverageAnalysisResult.getResults().getCoverageIntervalsRev().addAll( coverageAnalysisResultNew.getResults().getCoverageIntervalsRev() );
+            CoverageIntervalContainer results = coverageAnalysisResult.getResults();
+            List<CoverageInterval> coverageIntervals = new ArrayList<>( results.getCoverageIntervals() );
+            List<CoverageInterval> coverageIntervalsRev = new ArrayList<>( results.getCoverageIntervalsRev() );
+            coverageIntervals.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervals() );
+            coverageIntervalsRev.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervalsRev() );
+            results.setIntervalsSumOrFwd( coverageIntervals );
+            results.setIntervalsRev( coverageIntervalsRev );
         }
 
         this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervals() );
@@ -314,7 +320,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      */
     private void exportSeqAsMultipleFasta() {
         StringBuilder results = new StringBuilder( 100 );
-        List<CoverageInterval> coverageIntervals = coverageAnalysisResult.getResults().getCoverageIntervals();
+        List<CoverageInterval> coverageIntervals = new ArrayList<>( coverageAnalysisResult.getResults().getCoverageIntervals() );
         coverageIntervals.addAll( coverageAnalysisResult.getResults().getCoverageIntervalsRev() );
         PersistentReference reference = coverageAnalysisResult.getReference();
         int start;
