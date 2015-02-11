@@ -250,7 +250,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         tssParameters.getReadClassParams().addReadClassParamsToStats( statisticsExportData );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
-        Map<String, Integer> statsMap = this.getStatsMap();
+        Map<String, Integer> statsMap = getStatsMap();
         int totalTSS = statsMap.get( TSS_TOTAL );
         Map<String, String> percentMap = new HashMap<>(); //Calculate the percentage of each statistics value in relation to total TSS count
         for( Map.Entry<String, Integer> statsSet : statsMap.entrySet() ) {
@@ -454,33 +454,37 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         }
 
         //create statistics
-        this.getStatsMap().put( TSS_TOTAL, this.getStatsMap().get( TSS_TOTAL ) + tssResult.size() );
-        this.getStatsMap().put( TSS_CORRECT, this.getStatsMap().get( TSS_CORRECT ) + noCorrectStarts );
-        this.getStatsMap().put( TSS_LEADERLESS, this.getStatsMap().get( TSS_LEADERLESS ) + noLeaderlessTranscripts + noCorrectStarts );
-        this.getStatsMap().put( TSS_FWD, this.getStatsMap().get( TSS_FWD ) + noFwdFeatures );
-        this.getStatsMap().put( TSS_REV, this.getStatsMap().get( TSS_REV ) + noRevFeatures );
+        Map<String, Integer> statsMap = getStatsMap();
+        
+        statsMap.put( TSS_TOTAL, statsMap.get( TSS_TOTAL ) + tssResult.size() );
+        statsMap.put( TSS_CORRECT, statsMap.get( TSS_CORRECT ) + noCorrectStarts );
+        statsMap.put( TSS_LEADERLESS, statsMap.get( TSS_LEADERLESS ) + noLeaderlessTranscripts + noCorrectStarts );
+        statsMap.put( TSS_FWD, statsMap.get( TSS_FWD ) + noFwdFeatures );
+        statsMap.put( TSS_REV, statsMap.get( TSS_REV ) + noRevFeatures );
         if( params.isPerformUnannotatedTranscriptDet() ) {
-            this.getStatsMap().put( TSS_NOVEL, this.getStatsMap().get( TSS_NOVEL ) + noUnannotatedTranscripts );
+            statsMap.put( TSS_NOVEL, statsMap.get( TSS_NOVEL ) + noUnannotatedTranscripts );
         }
         else {
-            this.getStatsMap().put( TSS_NOVEL, UNUSED_STATISTICS_VALUE );
+            statsMap.put( TSS_NOVEL, UNUSED_STATISTICS_VALUE );
         }
-        this.getStatsMap().put( TSS_UPSTREAM, this.getStatsMap().get( TSS_UPSTREAM ) + noUpstreamFeature );
-        this.getStatsMap().put( TSS_UPSTREAM1, this.getStatsMap().get( TSS_UPSTREAM1 ) + noUpstreamFeature1 );
-        this.getStatsMap().put( TSS_UPSTREAM5, this.getStatsMap().get( TSS_UPSTREAM5 ) + noUpstreamFeature5 );
-        this.getStatsMap().put( TSS_UPSTREAM10, this.getStatsMap().get( TSS_UPSTREAM10 ) + noUpstreamFeature10 );
-        this.getStatsMap().put( TSS_UPSTREAM20, this.getStatsMap().get( TSS_UPSTREAM20 ) + noUpstreamFeature20 );
-        this.getStatsMap().put( TSS_UPSTREAM50, this.getStatsMap().get( TSS_UPSTREAM50 ) + noUpstreamFeature50 );
-        this.getStatsMap().put( TSS_UPSTREAM100, this.getStatsMap().get( TSS_UPSTREAM100 ) + noUpstreamFeature100 );
-        this.getStatsMap().put( TSS_UPSTREAM250, this.getStatsMap().get( TSS_UPSTREAM250 ) + noUpstreamFeature250 );
-        this.getStatsMap().put( TSS_DOWNSTREAM, this.getStatsMap().get( TSS_DOWNSTREAM ) + noDownstreamFeature );
-        this.getStatsMap().put( TSS_DOWNSTREAM1, this.getStatsMap().get( TSS_DOWNSTREAM1 ) + noDownstreamFeature1 );
-        this.getStatsMap().put( TSS_DOWNSTREAM5, this.getStatsMap().get( TSS_DOWNSTREAM5 ) + noDownstreamFeature5 );
-        this.getStatsMap().put( TSS_DOWNSTREAM10, this.getStatsMap().get( TSS_DOWNSTREAM10 ) + noDownstreamFeature10 );
-        this.getStatsMap().put( TSS_DOWNSTREAM20, this.getStatsMap().get( TSS_DOWNSTREAM20 ) + noDownstreamFeature20 );
-        this.getStatsMap().put( TSS_DOWNSTREAM50, this.getStatsMap().get( TSS_DOWNSTREAM50 ) + noDownstreamFeature50 );
-        this.getStatsMap().put( TSS_DOWNSTREAM100, this.getStatsMap().get( TSS_DOWNSTREAM100 ) + noDownstreamFeature100 );
-        this.getStatsMap().put( TSS_DOWNSTREAM250, this.getStatsMap().get( TSS_DOWNSTREAM250 ) + noDownstreamFeature250 );
+        statsMap.put( TSS_UPSTREAM, statsMap.get( TSS_UPSTREAM ) + noUpstreamFeature );
+        statsMap.put( TSS_UPSTREAM1, statsMap.get( TSS_UPSTREAM1 ) + noUpstreamFeature1 );
+        statsMap.put( TSS_UPSTREAM5, statsMap.get( TSS_UPSTREAM5 ) + noUpstreamFeature5 );
+        statsMap.put( TSS_UPSTREAM10, statsMap.get( TSS_UPSTREAM10 ) + noUpstreamFeature10 );
+        statsMap.put( TSS_UPSTREAM20, statsMap.get( TSS_UPSTREAM20 ) + noUpstreamFeature20 );
+        statsMap.put( TSS_UPSTREAM50, statsMap.get( TSS_UPSTREAM50 ) + noUpstreamFeature50 );
+        statsMap.put( TSS_UPSTREAM100, statsMap.get( TSS_UPSTREAM100 ) + noUpstreamFeature100 );
+        statsMap.put( TSS_UPSTREAM250, statsMap.get( TSS_UPSTREAM250 ) + noUpstreamFeature250 );
+        statsMap.put( TSS_DOWNSTREAM, statsMap.get( TSS_DOWNSTREAM ) + noDownstreamFeature );
+        statsMap.put( TSS_DOWNSTREAM1, statsMap.get( TSS_DOWNSTREAM1 ) + noDownstreamFeature1 );
+        statsMap.put( TSS_DOWNSTREAM5, statsMap.get( TSS_DOWNSTREAM5 ) + noDownstreamFeature5 );
+        statsMap.put( TSS_DOWNSTREAM10, statsMap.get( TSS_DOWNSTREAM10 ) + noDownstreamFeature10 );
+        statsMap.put( TSS_DOWNSTREAM20, statsMap.get( TSS_DOWNSTREAM20 ) + noDownstreamFeature20 );
+        statsMap.put( TSS_DOWNSTREAM50, statsMap.get( TSS_DOWNSTREAM50 ) + noDownstreamFeature50 );
+        statsMap.put( TSS_DOWNSTREAM100, statsMap.get( TSS_DOWNSTREAM100 ) + noDownstreamFeature100 );
+        statsMap.put( TSS_DOWNSTREAM250, statsMap.get( TSS_DOWNSTREAM250 ) + noDownstreamFeature250 );
+        
+        setStatsMap(statsMap); //since we want to store the update in the result itself
     }
 
 
@@ -488,29 +492,31 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * Initializes the statistics map.
      */
     private void initStatsMap() {
-        this.getStatsMap().put( TSS_TOTAL, 0 );
-        this.getStatsMap().put( TSS_CORRECT, 0 );
-        this.getStatsMap().put( TSS_LEADERLESS, 0 );
-        this.getStatsMap().put( TSS_FWD, 0 );
-        this.getStatsMap().put( TSS_REV, 0 );
-        this.getStatsMap().put( TSS_NOVEL, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM1, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM5, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM10, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM20, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM50, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM100, 0 );
-        this.getStatsMap().put( TSS_UPSTREAM250, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM1, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM5, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM10, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM20, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM50, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM100, 0 );
-        this.getStatsMap().put( TSS_DOWNSTREAM250, 0 );
+        Map<String, Integer> statsMap = getStatsMap();
+        
+        statsMap.put( TSS_TOTAL, 0 );
+        statsMap.put( TSS_CORRECT, 0 );
+        statsMap.put( TSS_LEADERLESS, 0 );
+        statsMap.put( TSS_FWD, 0 );
+        statsMap.put( TSS_REV, 0 );
+        statsMap.put( TSS_NOVEL, 0 );
+        statsMap.put( TSS_UPSTREAM, 0 );
+        statsMap.put( TSS_UPSTREAM1, 0 );
+        statsMap.put( TSS_UPSTREAM5, 0 );
+        statsMap.put( TSS_UPSTREAM10, 0 );
+        statsMap.put( TSS_UPSTREAM20, 0 );
+        statsMap.put( TSS_UPSTREAM50, 0 );
+        statsMap.put( TSS_UPSTREAM100, 0 );
+        statsMap.put( TSS_UPSTREAM250, 0 );
+        statsMap.put( TSS_DOWNSTREAM, 0 );
+        statsMap.put( TSS_DOWNSTREAM1, 0 );
+        statsMap.put( TSS_DOWNSTREAM5, 0 );
+        statsMap.put( TSS_DOWNSTREAM10, 0 );
+        statsMap.put( TSS_DOWNSTREAM20, 0 );
+        statsMap.put( TSS_DOWNSTREAM50, 0 );
+        statsMap.put( TSS_DOWNSTREAM100, 0 );
+        statsMap.put( TSS_DOWNSTREAM250, 0 );
+        
+        setStatsMap(statsMap); //since we want to store the update in the result itself
     }
-
-
 }

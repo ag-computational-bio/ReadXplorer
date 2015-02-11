@@ -138,6 +138,7 @@ public class SnpVcfResultPanel extends ResultTablePanel {
                 vcfStatsMap.put( LOG10ERROR, 0 );
                 vcfStatsMap.put( FILTERS, 0 );
                 vcfStatsMap.put( ATTRIBUTES, 0 );
+                vcfData.setStatsMap( vcfStatsMap );
             }
             else {
                 this.completeVcfData.getSnpVcfList().addAll( vcfData.getSnpVcfList() );

@@ -231,10 +231,10 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
 
     /**
-     * @return The statistics map associated with this analysis
+     * @return A copy of the statistics map associated with this analysis.
      */
     public Map<String, Integer> getStatsMap() {
-        return Collections.unmodifiableMap( statsMap );
+        return new HashMap<>( statsMap );
     }
 
 
@@ -264,18 +264,18 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * Update the stats map of this track analysis result with the given data.
      * <p>
      * @param newStatsMap A new stats map, whose content shall be merged /
-     *                    summed with the content of the stats map contained in this result object.
+     *                    summed with the content of the stats map contained in 
+     *                    this result object.
      */
     public void updateStatsMap( Map<String, Integer> newStatsMap ) {
-        Map<String, Integer> internalStatsMap = getStatsMap();
         for( Map.Entry<String, Integer> entrySet : newStatsMap.entrySet() ) {
             String key = entrySet.getKey();
             Integer value = entrySet.getValue();
-            if( internalStatsMap.containsKey( key ) ) {
-                internalStatsMap.put( key, internalStatsMap.get( key ) + value );
+            if( statsMap.containsKey( key ) ) {
+                statsMap.put( key, statsMap.get( key ) + value );
             }
             else {
-                internalStatsMap.put( key, value );
+                statsMap.put( key, value );
             }
         }
     }
@@ -292,7 +292,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         List<Object> row = new ArrayList<>();
         if( statsMap.containsKey( identifier ) ) {
             row.add( identifier );
-            row.add( getStatsMap().get( identifier ) );
+            row.add( statsMap.get( identifier ) );
         }
         return row;
     }

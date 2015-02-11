@@ -246,8 +246,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             model.addRow( rowData );
         }
 
-        coveredStatisticsMap.put( FEATURES_COVERED, coveredStatisticsMap.get( FEATURES_COVERED )
-                                                    + features.size() );
+        coveredStatisticsMap.put( FEATURES_COVERED, coveredStatisticsMap.get( FEATURES_COVERED ) + features.size() );
         coveredFeaturesResult.setStatsMap( coveredStatisticsMap );
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>();
