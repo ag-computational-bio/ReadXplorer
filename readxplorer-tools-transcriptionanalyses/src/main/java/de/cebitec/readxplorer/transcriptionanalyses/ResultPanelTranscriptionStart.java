@@ -263,7 +263,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         Object[] rowData = new Object[nbColumns];
                         int i = 0;
                         rowData[i++] = tss.getPos();
-                        rowData[i++] = tssResult.getTrackMap().get( tss.getTrackId() );
+                        rowData[i++] = tssResult.getTrackEntry( tss.getTrackId(), false );
                         rowData[i++] = tssResult.getChromosomeMap().get( tss.getChromId() );
                         rowData[i++] = strand;
                         rowData[i++] = tss.getReadStartsAtPos();
