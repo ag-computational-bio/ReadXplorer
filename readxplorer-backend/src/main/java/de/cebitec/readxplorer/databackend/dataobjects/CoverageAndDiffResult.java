@@ -81,15 +81,15 @@ public class CoverageAndDiffResult extends AnalysisResult implements
         super( request );
         this.covManagers = covManagers;
         readStarts = null;
-        diffs = diffs;
+        this.diffs = diffs;
         this.gaps = gaps;
 
     }
 
 
     /**
-     * @return the diffs, if they are stored. If they are not,
-     *         the list is empty.
+     * @return The diffs, if they are stored. If they are not, the list is
+     *         empty.
      */
     public List<Difference> getDiffs() {
         if( diffs != null ) {
@@ -102,8 +102,7 @@ public class CoverageAndDiffResult extends AnalysisResult implements
 
 
     /**
-     * @return the gaps, if they are stored. If they are not,
-     *         the list is empty.
+     * @return The gaps, if they are stored. If they are not, the list is empty.
      */
     public List<ReferenceGap> getGaps() {
         if( gaps != null ) {

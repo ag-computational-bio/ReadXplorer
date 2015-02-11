@@ -278,8 +278,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                         coverageLoaded = true;
                     }
                     if( result.getRequest().isDiffsAndGapsNeeded() && !diffsLoaded && result.getRequest().getTotalFrom() <= lowerBound && result.getRequest().getTotalTo() >= upperBound ) {
-                        diffs = result.getDiffs();
-                        gaps = result.getGaps();
+                        diffs = new ArrayList<>( result.getDiffs() );
+                        gaps = new ArrayList<>( result.getGaps() );
                         Collections.sort( diffs );
                         Collections.sort( gaps );
                         diffsLoaded = true;
