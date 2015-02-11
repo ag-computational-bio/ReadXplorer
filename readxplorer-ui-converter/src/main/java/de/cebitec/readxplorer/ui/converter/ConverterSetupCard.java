@@ -285,16 +285,16 @@ public class ConverterSetupCard extends FileSelectionPanel {
                 updateGuiForMultipleFiles( this.getSelectedFiles().length > 1, multiTrackScrollPane, multiTrackList, multiTrackListLabel, fileTextField );
                 if( useMultipleImport() ) {
                     File[] files = this.getSelectedFiles();
-                    getMappingFiles().clear();
+                    mappingFiles.clear();
 
                     for( int i = 0; i < files.length; ++i ) {
                         addFile( files[i], fileTextField );
                         fileTextField.setText( files[i].getName() );
                     }
 
-                    fileTextField.setText( getMappingFiles().size() + " tracks to import" );
+                    fileTextField.setText( mappingFiles.size() + " tracks to import" );
                     DefaultListModel<String> model = new DefaultListModel<>();
-                    fillMultipleImportTable( model, getMappingFiles(), "Mapping file list:" );
+                    fillMultipleImportTable( model, mappingFiles, "Mapping file list:" );
                     multiTrackList.setModel( model );
                 }
                 else {
@@ -407,7 +407,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * conversion can be started or not.
      */
     public void isRequiredInfoSet() {
-        canConvert = !getMappingFiles().isEmpty() && currentConverter != null
+        canConvert = !mappingFiles.isEmpty() && currentConverter != null
                      && (refChromName != null && !refChromName.isEmpty() && chromLength >= 0 || refCheckBox.isSelected());
         firePropertyChange( ConverterAction.PROP_CAN_CONVERT, null, canConvert );
     }

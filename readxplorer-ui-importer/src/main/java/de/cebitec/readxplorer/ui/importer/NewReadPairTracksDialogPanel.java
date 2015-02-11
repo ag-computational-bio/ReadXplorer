@@ -338,7 +338,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButton1ActionPerformed
-        this.getMappingFiles().clear();
+        mappingFiles.clear();
         this.openFileChooser( true );
 }//GEN-LAST:event_chooseButton1ActionPerformed
 
@@ -346,20 +346,20 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
         MappingParserI newparser = (MappingParserI) parserComboBox.getSelectedItem();
         if( getCurrentParser() != newparser ) {
             setCurrentParser( newparser );
-            this.getMappingFiles().clear();
+            mappingFiles.clear();
             mappingFiles2.clear();
             mappingFile1Field.setText( "" );
             mappingFile2Field.setText( "" );
             nameField.setText( "" );
-            this.multiTrackList.setModel( new DefaultListModel<String>() );
+            multiTrackList.setModel( new DefaultListModel<String>() );
 
             if( newparser instanceof SamBamParser ) {
-                this.alreadyImportedBox.setEnabled( true );
+                alreadyImportedBox.setEnabled( true );
             }
             else {
-                this.alreadyImportedBox.setEnabled( false );
-                this.alreadyImportedBox.setSelected( false );
-                this.setIsAlreadyImported( false );
+                alreadyImportedBox.setEnabled( false );
+                alreadyImportedBox.setSelected( false );
+                setIsAlreadyImported( false );
             }
         }
 }//GEN-LAST:event_parserComboBoxActionPerformed
@@ -400,7 +400,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                 this.mappingFiles2.clear();
                 this.mappingFile2Field.setText( "" );
                 DefaultListModel<String> model = new DefaultListModel<>();
-                this.fillMultipleImportTable( model, getMappingFiles(), "Mapping file 1 list:" );
+                this.fillMultipleImportTable( model, mappingFiles, "Mapping file 1 list:" );
                 if( !this.isAlreadyImported() ) {
                     this.fillMultipleImportTable( model, mappingFiles2, "Mapping file 2 list:" );
                 }
@@ -436,7 +436,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
 
                 // file chosen
                 if( isRead1File ) {
-                    getMappingFiles().clear();
+                    mappingFiles.clear();
                 } else {
                     mappingFiles2.clear();
                 }
@@ -448,10 +448,10 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                         this.addFile( files[i] );
                     }
 
-                    mappingFile1Field.setText( getMappingFiles().size() + " tracks to import" );
+                    mappingFile1Field.setText( mappingFiles.size() + " tracks to import" );
                     mappingFile2Field.setText( mappingFiles2.size() + " tracks to import" );
                     DefaultListModel<String> model = new DefaultListModel<>();
-                    fillMultipleImportTable( model, getMappingFiles(), "Mapping file 1 list:" );
+                    fillMultipleImportTable( model, mappingFiles, "Mapping file 1 list:" );
                     fillMultipleImportTable( model, mappingFiles2, "Mapping file 2 list:" );
                     multiTrackList.setModel( model );
                     nameField.setText( "Note: each track gets its file name" );
@@ -474,14 +474,14 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
             private void addFile( File file ) {
                 if( file.canRead() ) {
                     if( isRead1File ) {
-                        getMappingFiles().add( file );
+                        mappingFiles.add( file );
                         mappingFile1Field.setText( file.getAbsolutePath() );
                         nameField.setText( file.getName() );
                     }
                     else {
                         mappingFiles2.add( file );
                         mappingFile2Field.setText( file.getAbsolutePath() );
-                        if( getMappingFiles().isEmpty() ) {
+                        if( mappingFiles.isEmpty() ) {
                             nameField.setText( file.getName() );
                         }
                     }
@@ -536,7 +536,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      */
     @Override
     public boolean isRequiredInfoSet() {
-        if( getMappingFiles().isEmpty() && mappingFiles2.isEmpty()
+        if( mappingFiles.isEmpty() && mappingFiles2.isEmpty()
             || refGenBox.getSelectedItem() == null
             || nameField.getText().isEmpty()
             || !distanceHasValidInput()
@@ -573,11 +573,11 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
      *         files has to be set always
      */
     public File getMappingFile1() {
-        if( getMappingFiles().isEmpty() ) {
+        if( mappingFiles.isEmpty() ) {
             return null;
         }
         else {
-            return getMappingFiles().get( 0 );
+            return mappingFiles.get( 0 );
         }
     }
 

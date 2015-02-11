@@ -43,7 +43,7 @@ public class FileSelectionPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private boolean useMultipleImport = false;
-    private final List<File> mappingFiles = new ArrayList<>();
+    protected final List<File> mappingFiles = new ArrayList<>();
 
 
     /**
@@ -104,11 +104,11 @@ public class FileSelectionPanel extends JPanel {
      * @return The single mapping file to import
      */
     public File getMappingFile() {
-        if( getMappingFiles().isEmpty() ) {
+        if( mappingFiles.isEmpty() ) {
             return null;
         }
         else {
-            return getMappingFiles().get( 0 );
+            return mappingFiles.get( 0 );
         }
     }
 
@@ -119,17 +119,6 @@ public class FileSelectionPanel extends JPanel {
      */
     public List<File> getMappingFiles() {
         return Collections.unmodifiableList( mappingFiles );
-    }
-
-
-    /**
-     * Sets the mapping files for multiple track import at once.
-     * <p>
-     * @param mappingFiles The list of mapping files to import at once
-     */
-    protected void setMappingFiles( List<File> mappingFiles ) {
-        this.mappingFiles.clear();
-        this.mappingFiles.addAll( mappingFiles );
     }
 
 
@@ -184,9 +173,9 @@ public class FileSelectionPanel extends JPanel {
         multiTrackList.setVisible( this.useMultipleImport() );
         multiTrackListLabel.setVisible( this.useMultipleImport() );
         if( this.useMultipleImport() ) {
-            fileTextField.setText( getMappingFiles().size() + " tracks to import" );
+            fileTextField.setText( mappingFiles.size() + " tracks to import" );
             DefaultListModel<String> model = new DefaultListModel<>();
-            fillMultipleImportTable( model, getMappingFiles(), "Mapping file list:" );
+            fillMultipleImportTable( model, mappingFiles, "Mapping file list:" );
             multiTrackList.setModel( model );
             this.setSize( this.getPreferredSize() );
         }
