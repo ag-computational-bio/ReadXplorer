@@ -18,12 +18,18 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,8 +57,12 @@ public class GnuR extends RConnection {
      * The Cran Mirror used to receive additional packages.
      */
     private String cranMirror;
-    
+
     public final boolean runningLocal;
+
+    private static final SecureRandom random = new SecureRandom();
+    
+    private static final Logger LOG = Logger.getLogger( GnuR.class.getName() );
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
@@ -99,15 +109,15 @@ public class GnuR extends RConnection {
             this.eval("library(" + packageName + ")");
         } catch (RserveException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
+            LOG.log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
             try {
                 currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Trying to install package {1}.", new Object[]{currentTimestamp, packageName});
+                LOG.log(Level.INFO, "{0}: Trying to install package {1}.", new Object[]{currentTimestamp, packageName});
                 this.eval("install.packages(\"" + packageName + "\")");
                 this.eval("library(" + packageName + ')');
             } catch (RserveException ex1) {
                 currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{currentTimestamp, packageName});
+                LOG.log(Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{currentTimestamp, packageName});
                 throw new PackageNotLoadableException(packageName);
             }
         }
@@ -134,14 +144,14 @@ public class GnuR extends RConnection {
     public void shutdown() throws RserveException {
         //If we started the RServe instace by our self we should also terminate it.
         //If we are connected to a remote server however we should not do so.
-        if(runningLocal){
+        if (runningLocal) {
             super.shutdown();
         }
     }
 
     @Override
     public REXP eval(String cmd) throws RserveException {
-        ProcessingLog.getInstance().logGNURinput( cmd );
+        ProcessingLog.getInstance().logGNURinput(cmd);
         return super.eval(cmd);
     }
 
@@ -176,9 +186,9 @@ public class GnuR extends RConnection {
      * de.cebitec.readxplorer.differentialExpression.GnuR.PackageNotLoadableException
      * @throws IllegalStateException
      */
-    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException, 
-                                                                    RserveException, REngineException, REXPMismatchException, 
-                                                                    FileNotFoundException, IOException {
+    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException,
+            RserveException, REngineException, REXPMismatchException,
+            FileNotFoundException, IOException {
         this.loadPackage("grDevices");
 
         if (runningLocal) {
@@ -210,14 +220,22 @@ public class GnuR extends RConnection {
     private static int nextFreePort = 6312;
 
     public static GnuR startRServe() throws RserveException {
+        GnuR instance;
         String host;
         int port;
         boolean manualLocalSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
         boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
+        boolean useAuth = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_USE_AUTH, false);
 
         if (manualRemoteSetup) {
             port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
             host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
+            instance = new GnuR(host, port, !manualRemoteSetup);
+            if (useAuth) {
+                String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
+                String password = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PASSWORD, "");
+                instance.login(user, password);
+            }
         } else {
             ProcessBuilder pb;
             host = "localhost";
@@ -244,8 +262,8 @@ public class GnuR extends RConnection {
                                     ProcessingLog.getInstance().logGNURoutput(line);
                                 }
                             } catch (IOException ex) {
-                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
+                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                LOG.log(Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp);
                             }
                         }
                     }).start();
@@ -262,13 +280,19 @@ public class GnuR extends RConnection {
                                     ProcessingLog.getInstance().logGNURoutput(line);
                                 }
                             } catch (IOException ex) {
-                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
+                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                LOG.log(Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp);
                             }
                         }
                     }).start();
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
+                }
+                instance = new GnuR(host, port, !manualRemoteSetup);
+                if (useAuth) {
+                    String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
+                    String password = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PASSWORD, "");
+                    instance.login(user, password);
                 }
             } else {
                 port = nextFreePort++;
@@ -297,6 +321,11 @@ public class GnuR extends RConnection {
                         Exceptions.printStackTrace(ex);
                     }
                 }
+                String password = nextSessionId();
+                String user = "readxplorer";
+                writePasswordFile(user, password, r_dir);
+                instance = new GnuR(host, port, !manualRemoteSetup);
+                instance.login(user, password);
             }
             try {
                 Thread.sleep(1000);
@@ -304,7 +333,7 @@ public class GnuR extends RConnection {
                 Exceptions.printStackTrace(ex);
             }
         }
-        return new GnuR(host, port, !manualRemoteSetup);
+        return instance;
     }
 
     public static boolean gnuRSetupCorrect() {
@@ -320,5 +349,23 @@ public class GnuR extends RConnection {
         } else {
             return true;
         }
+    }
+
+    private static void writePasswordFile(String user, String password, File r_dir) {
+
+        File out = new File(r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "passwd");
+        out.deleteOnExit();
+        try (BufferedWriter writer = Files.newBufferedWriter(out.toPath(), Charset.defaultCharset(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            writer.write(user);
+            writer.write(" ");
+            writer.write(password);
+            writer.write("\n");
+            writer.close();
+        } catch (IOException ex) {
+        }
+    }
+
+    private static String nextSessionId() {
+        return new BigInteger(130, random).toString(32);
     }
 }

@@ -44,6 +44,7 @@ public class DeSeq2 {
 
     private GnuR gnuR;
 
+    private static final Logger LOG = Logger.getLogger( DeSeq2.class.getName() );
 
     public DeSeq2( int referenceId ) {
     }
@@ -54,7 +55,7 @@ public class DeSeq2 {
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
@@ -136,7 +137,7 @@ public class DeSeq2 {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
