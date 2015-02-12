@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -493,6 +492,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jSeparator3 = new javax.swing.JSeparator();
         jLabel6 = new javax.swing.JLabel();
         rServeStartupScript = new javax.swing.JTextField();
+        useAuthButton = new javax.swing.JCheckBox();
+        jLabel7 = new javax.swing.JLabel();
+        usernameTextField = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        passwordTextField = new javax.swing.JPasswordField();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text_1")); // NOI18N
 
@@ -572,6 +576,24 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeStartupScript.setEditable(false);
         rServeStartupScript.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeStartupScript.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(useAuthButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.useAuthButton.text")); // NOI18N
+        useAuthButton.setEnabled(false);
+        useAuthButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useAuthButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel7.text")); // NOI18N
+
+        usernameTextField.setEditable(false);
+        usernameTextField.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.usernameTextField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel8, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel8.text")); // NOI18N
+
+        passwordTextField.setEditable(false);
+        passwordTextField.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.passwordTextField.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -579,35 +601,54 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1)
-                    .addComponent(cranMirror)
-                    .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(sourceFileTextField)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(cranMirror)
+                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(63, 63, 63))
-                    .addComponent(jSeparator3)
-                    .addComponent(rServeStartupScript)
-                    .addComponent(rServeHost)
-                    .addComponent(rServePort)
-                    .addComponent(warningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(73, 73, 73))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
-                            .addComponent(jLabel1)
-                            .addComponent(installButton)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(autoButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(manualLocalButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(manualRemoteButton)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                                .addComponent(manualRemoteButton))
+                            .addComponent(jLabel1)
+                            .addComponent(installButton)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel5)
+                            .addComponent(useAuthButton))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator1)
+                            .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(sourceFileTextField)
+                            .addComponent(jSeparator3)
+                            .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(rServeStartupScript)
+                            .addComponent(rServeHost)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(warningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(usernameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -619,15 +660,15 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                     .addComponent(autoButton)
                     .addComponent(manualRemoteButton)
                     .addComponent(manualLocalButton))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cranMirror, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(installButton)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
@@ -648,9 +689,19 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(warningMessage))
+                .addGap(18, 18, 18)
+                .addComponent(useAuthButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(warningMessage)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(usernameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -706,6 +757,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeHost.setEditable(true);
         rServePort.setEditable(true);
         installButton.setEnabled(false);
+        useAuthButton.setEnabled(true);
     }
 
     private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
@@ -718,17 +770,26 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServePort.setEditable(false);
         installButton.setEnabled(true);
         warningMessage.setText("");
+        useAuthButton.setEnabled(false);
+        usernameTextField.setEditable(false);
+        passwordTextField.setEditable(false);
     }
 
     private void manualLocalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualLocalButtonActionPerformed
         manualLocalButtonSelected();
     }//GEN-LAST:event_manualLocalButtonActionPerformed
 
+    private void useAuthButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useAuthButtonActionPerformed
+        usernameTextField.setEditable(useAuthButton.isSelected());
+        passwordTextField.setEditable(useAuthButton.isSelected());
+    }//GEN-LAST:event_useAuthButtonActionPerformed
+
     private void manualLocalButtonSelected() {
         rServeStartupScript.setEditable(true);
         rServeHost.setEditable(false);
         rServePort.setEditable(true);
         installButton.setEnabled(false);
+        useAuthButton.setEnabled(true);
     }
 
 
@@ -783,16 +844,21 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JRadioButton manualLocalButton;
     private javax.swing.JRadioButton manualRemoteButton;
     private javax.swing.JLabel messages;
+    private javax.swing.JPasswordField passwordTextField;
     private javax.swing.JTextField rServeHost;
     private javax.swing.JTextField rServePort;
     private javax.swing.JTextField rServeStartupScript;
     private javax.swing.JTextField sourceFileTextField;
+    private javax.swing.JCheckBox useAuthButton;
+    private javax.swing.JTextField usernameTextField;
     private javax.swing.JLabel warningMessage;
     // End of variables declaration//GEN-END:variables
 
