@@ -99,7 +99,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
             workunits += trackJob.isAlreadyImported() ? 1 : 2; //one or two steps are needed
         }
         for( ReadPairJobContainer readPairJob : readPairJobs ) {
-            workunits += readPairJob.getTrackJob1().isAlreadyImported() ? 1 : 3; //one or three steps are needed
+            workunits += readPairJob.getTrackJob2() != null ? 3 : 2; //two or three steps are needed
         }
     }
 
@@ -150,7 +150,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements
             for( Iterator<ReferenceJob> it = referenceJobs.iterator(); it.hasNext(); ) {
                 start = System.currentTimeMillis();
                 ReferenceJob r = it.next();
-                ph.progress( workunits++ );
 
                 try {
                     // parsing
@@ -181,6 +180,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 catch( OutOfMemoryError ex ) {
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
                 }
+                
+                ph.progress( ++workunits );
             }
 
             io.getOut().println( "" );
@@ -217,7 +218,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
                 this.parseBamTrack( trackJob );
 
-                ph.progress( workunits++ );
+                ph.progress( ++workunits );
             }
         }
     }
@@ -310,6 +311,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
                                 lastWorkFile = trackJob1.getFile(); //the combined file
                                 inputFile2.setWritable( true );
+
+                                ph.progress( ++workunits );
                             }
 
                             //extension for both classification and read pair info
@@ -333,7 +336,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             this.noErrors = false;
                             continue;
                         }
-                        ph.progress( workunits++ );
+                        ph.progress( ++workunits );
 
                     } else { //else case with 2 already imported tracks is prohibited
                         //we have to calculate the stats
@@ -354,7 +357,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             this.noErrors = false;
                             continue;
                         }
-                        ph.progress( workunits++ );
+                        ph.progress( ++workunits );
                     }
 
                     //create general track stats
@@ -376,7 +379,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     this.noErrors = false;
                 }
 
-                ph.progress( workunits++ );
+                ph.progress( ++workunits );
             }
         }
     }
@@ -437,7 +440,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 this.noErrors = false;
                 return;
             }
-            ph.progress( workunits++ );
+            ph.progress( ++workunits );
             inputFile.setWritable( true );
             mappingParser.removeObserver( this );
         }
