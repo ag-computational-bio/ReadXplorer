@@ -181,8 +181,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 catch( OutOfMemoryError ex ) {
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
                 }
-
-                it.remove();
             }
 
             io.getOut().println( "" );
@@ -220,7 +218,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 this.parseBamTrack( trackJob );
 
                 ph.progress( workunits++ );
-                it.remove();
             }
         }
     }
@@ -325,34 +322,33 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
                             GeneralUtils.deleteOldWorkFile( lastWorkFile );
 
-                        }
-                        catch( OutOfMemoryError ex ) {
+                        } catch( OutOfMemoryError ex ) {
                             this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
                             this.noErrors = false;
                             continue;
-                        }
-                        catch( Exception ex ) {
+
+                        } catch( Exception ex ) {
                             this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
                             Exceptions.printStackTrace( ex );
                             this.noErrors = false;
                             continue;
                         }
                         ph.progress( workunits++ );
-                    }
-                    else { //else case with 2 already imported tracks is prohibited
+
+                    } else { //else case with 2 already imported tracks is prohibited
                         //we have to calculate the stats
                         SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
                         statsParser.setStatsContainer( statsContainer );
                         try {
                             statsParser.registerObserver( this );
                             statsParser.classifyReadPairs();
-                        }
-                        catch( OutOfMemoryError ex ) {
+
+                        } catch( OutOfMemoryError ex ) {
                             this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
                             this.noErrors = false;
                             continue;
-                        }
-                        catch( Exception ex ) {
+
+                        } catch( Exception ex ) {
                             this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
                             Exceptions.printStackTrace( ex );
                             this.noErrors = false;
@@ -371,19 +367,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     this.storeBamTrack( track ); // store track entry in db
                     trackId1 = trackJob1.getID();
                     inputFile1.setWritable( true );
-                    ph.progress( workunits++ );
 
                     //read pair ids have to be set in track entry
                     ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
 
-                }
-                else { //if (distance <= 0)
+                } else { //if (distance <= 0)
                     this.showMsg( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.error" ) );
                     this.noErrors = false;
                 }
 
                 ph.progress( workunits++ );
-                it.remove();
             }
         }
     }
