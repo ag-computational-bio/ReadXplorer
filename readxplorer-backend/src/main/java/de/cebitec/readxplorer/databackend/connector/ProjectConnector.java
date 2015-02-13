@@ -707,17 +707,15 @@ public class ProjectConnector extends Observable {
 
         LOG.info( "Start storing track statistics..." );
 
-        Map<String, Integer> statsMap = statsContainer.getStatsMap();
-
         DiscreteCountingDistribution readLengthDistribution = statsContainer.getReadLengthDistribution();
         if( !readLengthDistribution.isEmpty() ) {
             insertCountDistribution( readLengthDistribution, trackID );
-            statsMap.put( StatsContainer.AVERAGE_READ_LENGTH, readLengthDistribution.getAverageValue() );
+            statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_LENGTH, readLengthDistribution.getAverageValue() );
         }
         DiscreteCountingDistribution readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
         if( !readPairLengthDistribution.isEmpty() ) {
             insertCountDistribution( readPairLengthDistribution, trackID );
-            statsMap.put( StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue() );
+            statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue() );
         }
 
         // get latest id for statistic
@@ -726,14 +724,13 @@ public class ProjectConnector extends Observable {
         // TODO check nonsense PreparedStatement fix
         try( PreparedStatement insertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ); ) {
             insertStats.setInt( 2, trackID );
-            for( Map.Entry<String, Integer> entry : statsMap.entrySet() ) {
+            for( Map.Entry<String, Integer> entry : statsContainer.getStatsMap().entrySet() ) {
                 insertStats.setLong( 1, latestID++ );
                 insertStats.setString( 3, entry.getKey() );
                 insertStats.setInt( 4, entry.getValue() );
                 insertStats.executeUpdate();
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -1638,7 +1635,7 @@ public class ProjectConnector extends Observable {
         }
 
         return refGens;
-        
+
     }
 
 

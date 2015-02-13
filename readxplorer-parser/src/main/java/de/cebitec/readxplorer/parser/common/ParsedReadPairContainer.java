@@ -69,16 +69,16 @@ public class ParsedReadPairContainer {
             this.parsedReadPairs.put( mappingIDs, parsedReadPair ); //TODO: mappingIDs can be vice versa
 
             if( parsedReadPair.getType() == ReadPairType.PERFECT_PAIR || parsedReadPair.getType() == ReadPairType.PERFECT_UNQ_PAIR ) {
-                statsMap.put( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) + 1 );
+                statsContainer.addStatsValue( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) + 1 );
             }
-            statsMap.put( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) + 1 );
+            statsContainer.addStatsValue( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) + 1 );
         }
         else {
             this.parsedReadPairs.get( mappingIDs ).addReplicate();
             if( parsedReadPair.getType() == ReadPairType.PERFECT_PAIR || parsedReadPair.getType() == ReadPairType.PERFECT_UNQ_PAIR ) {
-                statsMap.put( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) - 1 );
+                statsContainer.addStatsValue( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) - 1 );
             }
-            statsMap.put( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) - 1 );
+            statsContainer.addStatsValue( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) - 1 );
         }
         statsContainer.incReadPairStats( parsedReadPair.getType(), 1 );
     }
