@@ -129,6 +129,14 @@ public class ReferenceJob implements Job {
 
 
     /**
+     * @param file Reset the file of this {@link ReferenceJob}. 
+     */
+    public void setFile( File file ) {
+        this.file = file;
+    }
+
+
+    /**
      * @return the file in which the reference features are stored, if this is
      *         an
      *         import of a GFF reference.

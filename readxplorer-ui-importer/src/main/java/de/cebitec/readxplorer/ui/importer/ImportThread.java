@@ -132,6 +132,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
         int refGenID = ProjectConnector.getInstance().addRefGenome( refGenome );
         refGenJob.setPersistent( refGenID );
+        refGenJob.setFile( refGenome.getFastaFile() );
 
         LOG.log( INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
     }
@@ -180,7 +181,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 catch( OutOfMemoryError ex ) {
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
                 }
-                
+
                 ph.progress( ++workunits );
             }
 
