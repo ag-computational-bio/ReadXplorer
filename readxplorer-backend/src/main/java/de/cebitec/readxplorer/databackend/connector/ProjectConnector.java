@@ -48,7 +48,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -616,7 +615,6 @@ public class ProjectConnector extends Observable {
 
                 int latestId = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_FEATURE_ID, con );
 
-                Collections.sort( chrom.getFeatures() ); //sort features by position
                 chrom.setFeatId( latestId );
                 chrom.distributeFeatureIds();
 
