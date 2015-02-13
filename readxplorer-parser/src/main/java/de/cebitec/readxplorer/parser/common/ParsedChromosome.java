@@ -179,7 +179,7 @@ public class ParsedChromosome {
 
     /**
      * @param featId The latest feature id used in the db. Set it before
-     *               distributing feature ids with {@link distributeFeatureIds}.
+     *               distributing feature ids with {@link distributeFeatureIds()}.
      */
     public void setFeatId( int featId ) {
         this.featId = featId;
@@ -193,7 +193,8 @@ public class ParsedChromosome {
      * assigned parent ids.
      */
     public void distributeFeatureIds() {
-        this.distributeFeatureIds( features ); //this way only the feature ids of this reference features can be distributed!
+        Collections.sort( features ); //sort features by position
+        distributeFeatureIds( features ); //this way only the feature ids of this reference features can be distributed!
 
         if( hasSubFeatures ) {
             this.mutateSubFeatureToParentIds( features );

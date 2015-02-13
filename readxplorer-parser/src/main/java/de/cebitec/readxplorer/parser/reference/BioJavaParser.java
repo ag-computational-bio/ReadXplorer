@@ -230,10 +230,6 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                             }
                         }
 
-                        if( locusTag.equals( "cg2826" ) ) {
-                            System.out.println( "here" );
-                        }
-
                         /*
                          * If the type of the feature is unknown to readxplorer (see below),
                          * an undefined type is used.

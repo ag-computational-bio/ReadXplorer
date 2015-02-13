@@ -128,6 +128,17 @@ public class StatsContainer {
         return Collections.unmodifiableMap( statsMap );
     }
 
+    /**
+     * Add a new key-value pair to the statistics map of this StatsContainer.
+     * It does not check if the key already existed, so the value to an existing
+     * key is overwritten.
+     * @param key The key to add
+     * @param value The value to add
+     */
+    public void addStatsValue(String key, int value) {
+        statsMap.put( key, value );
+    }
+
 
     /**
      * Set the number of positions covered by mappings of the given mapping
