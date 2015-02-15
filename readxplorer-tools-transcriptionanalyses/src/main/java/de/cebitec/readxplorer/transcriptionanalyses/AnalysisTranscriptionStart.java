@@ -37,6 +37,7 @@ import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import static java.util.logging.Logger.getLogger;
 
 
@@ -77,9 +79,9 @@ import static java.util.logging.Logger.getLogger;
  */
 public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
-    
+
     private static final Logger LOG = getLogger( AnalysisTranscriptionStart.class.getName() );
-    
+
     private final TrackConnector trackConnector;
     private ReferenceConnector refConnector;
     private Map<Integer, PersistentChromosome> chromosomes;
@@ -161,18 +163,38 @@ public class AnalysisTranscriptionStart implements Observer,
             this.parametersTSS.setMinLowCovIncrease( 0 ); //avoids loosing smaller, low coverage increases, can only be set by the user
             this.parametersTSS.setMinNoReadStarts( 0 );
             this.parametersTSS.setMinPercentIncrease( 0 );
+            int genomeLength = PersistentReference.calcWholeGenomeLength( chromosomes );
             if( !this.calcCoverageDistributions ) {
-                int genomeLength = PersistentReference.calcWholeGenomeLength( chromosomes );
                 parametersTSS.setMinNoReadStarts( this.estimateCutoff( genomeLength, readStartDistribution, 0 ) ); //+ 0,05%
                 parametersTSS.setMinPercentIncrease( this.estimateCutoff( genomeLength, covIncPercentDistribution, 0 ) );// (int) (this.genomeSize / 1000)); //0,1%
-            }
-            else {
-                this.parametersTSS.setMinNoReadStarts( 10 ); //lowest default values for new data sets without an inital distribution in the database
+
+            } else {
+                calcInitialReadStartThreshold( genomeLength );
             }
         }
 
         //the minimal increase is initially set to 10%, if the coverage distributions were not calculated yet
         parametersTSS.setMinPercentIncrease( calcCoverageDistributions ? 10 : parametersTSS.getMinPercentIncrease() );
+    }
+
+
+    /**
+     * Calculates the initial threshold for read starts. The largest value is
+     * 10, but for small data sets the formula calculates the rounded up value
+     * of number of mappings in data set / ( 0.1 * genome length ). This is
+     * meant as a rough estimator for a useful initial threshold.
+     * @param genomeLength Total length of the genome under analysis
+     */
+    private void calcInitialReadStartThreshold( int genomeLength ) {
+        int noMappings = trackConnector.getTrackStats().getStatsMap().get( StatsContainer.NO_MAPPINGS );
+        //for small read numbers calculate a lower initial threshold
+        int defaultMinReadStarts = (int) Math.floor(noMappings / ( 0.1 * genomeLength ) ); //always round down but the minimum is 1
+        if (defaultMinReadStarts > 10) {
+            defaultMinReadStarts = 10; // to ensure values smaller or equal to 10 as initial threshold
+        } else if( defaultMinReadStarts < 1 ) {
+            defaultMinReadStarts = 1;
+        }
+        this.parametersTSS.setMinNoReadStarts( defaultMinReadStarts ); //lowest default values for new data sets without an inital distribution in the database
     }
 
 
@@ -187,8 +209,8 @@ public class AnalysisTranscriptionStart implements Observer,
         if( data instanceof CoverageAndDiffResult ) {
             CoverageAndDiffResult result = ((CoverageAndDiffResult) data);
             this.detectTSSs( result );
-        }
-        else if( data instanceof Byte && ((Byte) data) == 1 ) {
+
+        } else if( data instanceof Byte && ((Byte) data) == 1 ) {
             this.finish();
         }
     }
@@ -200,10 +222,10 @@ public class AnalysisTranscriptionStart implements Observer,
      */
     public void finish() {
         this.storeDistributions();
-        this.linkTssInSameRegion();
         if( parametersTSS.isAutoTssParamEstimation() ) {
             this.correctResult();
         }
+        this.linkTssInSameRegion();
     }
 
 
@@ -293,8 +315,8 @@ public class AnalysisTranscriptionStart implements Observer,
                 percentIncRev = GeneralUtils.calculatePercentageIncrease( revCov2, revCov1 );
                 readStartsFwd = readStartArrayFwd[pos + 1];
                 readStartsRev = readStartArrayRev[pos];
-            }
-            else { //extra increases for invertedly stranded libraries
+
+            } else { //extra increases for invertedly stranded libraries
                 increaseRev = fwdCov1 - fwdCov2;
                 increaseFwd = revCov2 - revCov1;
                 percentIncRev = GeneralUtils.calculatePercentageIncrease( fwdCov2, fwdCov1 );
@@ -311,8 +333,8 @@ public class AnalysisTranscriptionStart implements Observer,
                 percentIncRev = GeneralUtils.calculatePercentageIncrease( 0, 0 );
                 readStartsFwd = readStartArrayFwd[pos + 1] + readStartArrayRev[pos + 1];
                 readStartsRev = 0;
-            }
-            else {
+
+            } else {
                 increaseFwd = 0;
                 increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
                 percentIncFwd = GeneralUtils.calculatePercentageIncrease( 0, 0 );
@@ -359,7 +381,7 @@ public class AnalysisTranscriptionStart implements Observer,
             && percentIncreaseFwd > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos + 1, chromLength, chromFeatures, true );
-            addDetectStart( new TranscriptionStart( pos + 1, true, readStartsFwd, 
+            addDetectStart( new TranscriptionStart( pos + 1, true, readStartsFwd,
                     percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
         if( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts())
@@ -367,7 +389,7 @@ public class AnalysisTranscriptionStart implements Observer,
             && percentIncreaseRev > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos, chromLength, chromFeatures, false );
-            addDetectStart( new TranscriptionStart( pos, false, readStartsRev, 
+            addDetectStart( new TranscriptionStart( pos, false, readStartsRev,
                     percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
 
@@ -379,7 +401,7 @@ public class AnalysisTranscriptionStart implements Observer,
             increaseDistribution( exactCovIncPercDist, percentIncreaseRev, parametersTSS.getMinPercentIncrease() );
         }
     }
-    
+
     /**
      * Add the detected TSS to the result list.
      * @param tss The TSS to add
@@ -452,14 +474,13 @@ public class AnalysisTranscriptionStart implements Observer,
 
                         detectedFeatures.setUpstreamFeature( feature );
 
-                    }
-                    else if( start == tssPos ) {
+                    } else if( start == tssPos ) {
                         //store correctly annotated transcription start site
                         detectedFeatures.setCorrectStartFeature( feature );
                         detectedFeatures.setUpstreamFeature( null );
                         break;
-                    }
-                    else if( start > tssPos ) {
+
+                    } else if( start > tssPos ) {
                         /*
                          * Store next downstream feature, transcription start is earlier than annotated,
                          * except the current feature is a CDS feature and no gene feature is present for
@@ -471,8 +492,8 @@ public class AnalysisTranscriptionStart implements Observer,
                             detectedFeatures.setDownstreamFeature( chromFeatures.get( i + 1 ) );
                             detectedFeatures.setIsLeaderless( isLeaderless( chromFeatures.get( i + 1 ), tssPos ) );
 //                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Fwd");
-                        }
-                        else {
+
+                        } else {
                             detectedFeatures.setDownstreamFeature( feature );
                             detectedFeatures.setIsLeaderless( isLeaderless( feature, tssPos ) );
                         }
@@ -480,8 +501,7 @@ public class AnalysisTranscriptionStart implements Observer,
                         break;
                     }
 
-                }
-                else if( start >= maxStartPos ) {
+                } else if( start >= maxStartPos ) {
                     if( fstFittingFeature ) {
                         this.lastFeatureIdxGenStartsFwd = i; //this is the first feature in the interval
                     }
@@ -524,14 +544,13 @@ public class AnalysisTranscriptionStart implements Observer,
                         detectedFeatures.setDownstreamFeature( feature );
                         detectedFeatures.setIsLeaderless( isLeaderless( feature, tssPos ) );
 
-                    }
-                    else if( start == tssPos ) {
+                    } else if( start == tssPos ) {
                         //store correctly annotated transcription start site
                         detectedFeatures.setCorrectStartFeature( feature );
                         detectedFeatures.setDownstreamFeature( null );
                         break;
-                    }
-                    else if( start > tssPos && feature.getStart() < tssPos ) {
+
+                    } else if( start > tssPos && feature.getStart() < tssPos ) {
                         //store next upstream feature, translation start is further in gene
 
                         if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size()
@@ -546,8 +565,7 @@ public class AnalysisTranscriptionStart implements Observer,
                         break;
                     }
 
-                }
-                else if( start >= tssPos ) {
+                } else if( start >= tssPos ) {
                     if( fstFittingFeature ) {
                         this.lastFeatureIdxGenStartsRev = i; //TODO: features should be sorted by stop pos for rev strand
                         fstFittingFeature = false;
@@ -582,13 +600,13 @@ public class AnalysisTranscriptionStart implements Observer,
      * other TSS receive the "secondary TSS" flag.
      */
     private void linkTssInSameRegion() {
-        
+
         if (detectedStarts.size() > 0) {
             detectedStarts.get(0).setIsPrimary(true);
         }
-        
+
         if (detectedStarts.size() > 1) {
-            
+
             if (parametersTSS.isAssociateTss()) {
                 TssAssociater tssAssociater = new TssAssociater();
                 tssAssociater.setParametersTSS(parametersTSS);
@@ -602,7 +620,7 @@ public class AnalysisTranscriptionStart implements Observer,
             iterateTssForLinking(primaryTssFlagger);
         }
     }
-    
+
 
     /**
      * Iterates all TSS in the result list and runs the TssLinker implementation
@@ -628,21 +646,20 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * Used to computationally estimate the optimal cutoff = minimum increase of
-     * read counts from one position to the next in total or in percent.
-     * 2 Parameters take care of this task:
+     * read counts from one position to the next in total or in percent.<br>
+     * 2 Parameters take care of this task:<br>
      * At first the index of the coverage increase distribution, which exceeds
-     * the threshold
-     * of more than 2 genes per 1KB genome size for the first time for this
-     * track is calculated.
+     * the threshold of more than 2 genes per 1KB genome size for the first time
+     * for this track is calculated.<br>
      * In prokaryotic genomes gene density is approx 1 per 1kb and max 1,16 in
-     * Sulfolobus solfataricus according to
-     * I. B. Rogozin, et al., “Congruent evolution of different classes of
-     * non-coding DNA in prokaryotic genomes,”
+     * Sulfolobus solfataricus according to I. B. Rogozin, et al., “Congruent
+     * evolution of different classes of non-coding DNA in prokaryotic genomes,”
      * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
+     * <p>
      * In this case we allow for 2 genes per kb, because we use two
-     * distributions, each leading to one threshold.
+     * distributions, each leading to one threshold.<br>
      * Since only positions exceeding both thresholds are reported later, the
-     * result set is shrinked again.
+     * result set is shrinked again.<br>
      * In the optimal case we gain very low numbers of false positives, but
      * still find all true positives.
      * <p>
@@ -653,10 +670,10 @@ public class AnalysisTranscriptionStart implements Observer,
      *                          if 0,3% of the whole distribution should be used as threshold use
      *                          "this.genomeSize * 3 / 1000"
      * <p>
-     * @return The calculated threshold returns an index from the coverage
-     *         increase distribution
-     *         and the smallest total coverage increase (in total or percent) value for
-     *         the calculated index is returned by this method.
+     * @return The lower bound value associated with the index from the given
+     *         <code>distribution</code> FIRST EXCEEDING the number of expected
+     *         events for the analyzed genome. This is NOT yet the final cutoff,
+     *         but rather an estimation!
      */
     private int estimateCutoff( int genomeLength, DiscreteCountingDistribution distribution, int thresholdEnlarger ) {
         //genomeSize = total number of positions contributing to the increase distribution
@@ -669,8 +686,7 @@ public class AnalysisTranscriptionStart implements Observer,
             // we use the index which first exceeds maxEstimatedNbOfActiveGenes
             if( nbTSSs < maxEstimatedNbOfActiveGenes ) {
                 nbTSSs += distributionValues[i];
-            }
-            else {
+            } else {
                 selectedIndex = i;
                 break;
             }
@@ -681,15 +697,14 @@ public class AnalysisTranscriptionStart implements Observer,
          * I. B. Rogozin, et al., “Congruent evolution of different classes of non-coding DNA in prokaryotic genomes,”
          * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
          */
-        return distribution.getMinValueForIndex( selectedIndex - 1 );
+        return distribution.getMinValueForIndex( selectedIndex );
     }
 
 
     /**
      * Receives a Hashmap, checks if the current value is already present in the
-     * map
-     * and increases it by one. If it is not present yet, it is created with a
-     * value of 0.
+     * map and increases it by one. If it is not present yet, it is created with
+     * a value of 0.
      * <p>
      * @param map       the map whose data should be increased
      * @param value     the value (key) which should be increased
@@ -697,7 +712,10 @@ public class AnalysisTranscriptionStart implements Observer,
      *                  the map
      */
     private void increaseDistribution( Map<Integer, Integer> map, int value, int threshold ) {
-        if( value > threshold ) {
+        if (threshold > 1) {
+            threshold--; //this value is also needed for small data sets
+        }
+        if( value >= threshold ) {
             if( !map.containsKey( value ) ) {
                 map.put( value, 0 );
             }
@@ -712,40 +730,9 @@ public class AnalysisTranscriptionStart implements Observer,
      * tssAutomatic was chosen.
      */
     private void storeDistributions() {
-        if( this.calcCoverageDistributions ) { //if it was calculated, also store it
-            if( this.trackConnector.getAssociatedTrackNames().size() == 1 ) {
-                ProjectConnector.getInstance().insertCountDistribution( readStartDistribution, this.trackConnector.getTrackID() );
-                ProjectConnector.getInstance().insertCountDistribution( covIncPercentDistribution, this.trackConnector.getTrackID() );
-            }
-            if( this.parametersTSS.isAutoTssParamEstimation() ) {
-                for( PersistentChromosome chrom : chromosomes.values() ) {
-                    parametersTSS.setMinNoReadStarts( parametersTSS.getMinNoReadStarts()
-                                                      + this.estimateCutoff( chrom.getLength(), readStartDistribution, 0 ) ); //+ 0,05%
-                    parametersTSS.setMinPercentIncrease( parametersTSS.getMinPercentIncrease()
-                                                         + this.estimateCutoff( chrom.getLength(), covIncPercentDistribution, 0 ) );// (int) (this.genomeSize / 1000)); //0,1%
-                }
-                parametersTSS.setMinNoReadStarts( parametersTSS.getMinNoReadStarts() / chromosomes.values().size() );
-                parametersTSS.setMinPercentIncrease( parametersTSS.getMinPercentIncrease() / chromosomes.values().size() );
-                this.correctTSSList();
-            }
-        }
-    }
-
-
-    /**
-     * Removes all detected transcription start sites with a too small coverage
-     * increase, in case
-     * the increaseReadCount was changed after calculating the list of
-     * detectedGenes.
-     */
-    private void correctTSSList() {
-        TranscriptionStart tss;
-        for( int i = 0; i < this.detectedStarts.size(); ++i ) {
-            tss = this.detectedStarts.get( i );
-            if( tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
-                || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease() ) {
-                this.detectedStarts.remove( tss );
-            }
+        if( this.calcCoverageDistributions && this.trackConnector.getAssociatedTrackNames().size() == 1 ) {
+            ProjectConnector.getInstance().insertCountDistribution( readStartDistribution, this.trackConnector.getTrackID() );
+            ProjectConnector.getInstance().insertCountDistribution( covIncPercentDistribution, this.trackConnector.getTrackID() );
         }
     }
 
@@ -761,17 +748,17 @@ public class AnalysisTranscriptionStart implements Observer,
     private void correctResult() {
 
         //estimate exact cutoff for readcount increase of 0,25%
-        LOG.log( Level.INFO, null, "old threshold read count: " + parametersTSS.getMinNoReadStarts() );
-        LOG.log( Level.INFO, null, "old threshold percent: " + parametersTSS.getMinPercentIncrease() );
-        parametersTSS.setMinNoReadStarts( this.getNewThreshold( this.exactReadStartDist, 0 ) );//(int) (this.genomeSize * 0.0005));
-        parametersTSS.setMinPercentIncrease( this.getNewThreshold( this.exactCovIncPercDist, 0 ) );//(int) (this.genomeSize * 0.0005));
+        LOG.log( Level.INFO, "old threshold read count: {0}", parametersTSS.getMinNoReadStarts() );
+        LOG.log( Level.INFO, "old threshold percent: {0}", parametersTSS.getMinPercentIncrease() );
+        parametersTSS.setMinNoReadStarts( getNewThreshold( exactReadStartDist, 0 ) );//(int) (this.genomeSize * 0.0005));
+        parametersTSS.setMinPercentIncrease( getNewThreshold( exactCovIncPercDist, 0 ) );//(int) (this.genomeSize * 0.0005));
 
         //remove detected starts with too low coverage increases
-        List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>( this.detectedStarts );
-        for( TranscriptionStart tss : this.detectedStarts ) {
+        List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>( detectedStarts );
+        for( TranscriptionStart tss : detectedStarts ) {
 
             if( (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
-                 || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) //                    && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
+                 || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) // && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
                     ) {
                 copiedDetectedStarts.remove( tss );
             }
@@ -782,15 +769,15 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * Calculates the exact threshold for a map containing a coverage increase
-     * distribution.
+     * or read start distribution.
      * The threshold is set exactly to 0,25% and can be enlarged by setting the
      * threshold enlarger.
      * <p>
-     * @param distribution      the exact distribution of coverage increases or
-     *                          cov increases in percent
-     * @param thresholdEnlarger absolute value to be added to the new threshold
+     * @param distribution      The exact distribution of coverage increases or
+     *                          read starts
+     * @param thresholdEnlarger Absolute value to be added to the new threshold
      * <p>
-     * @return
+     * @return The exact read start or coverage increase cutoff threshold
      */
     private int getNewThreshold( Map<Integer, Integer> distribution, int thresholdEnlarger ) {
         int maxValue = (int) (PersistentReference.calcWholeGenomeLength( chromosomes ) * 0.0025 + thresholdEnlarger);
@@ -799,19 +786,17 @@ public class AnalysisTranscriptionStart implements Observer,
         List<Integer> keyList = new ArrayList<>( distribution.keySet() );
         Collections.sort( keyList );
 
-        for( int i = keyList.size() - 1; i >= 0; --i ) {
+        for( int i = keyList.size() - 1; i > 0; --i ) {
             if( nbValues < maxValue ) {
                 nbValues += distribution.get( keyList.get( i ) );
-            }
-            else {
-                return keyList.get( i );
+            } else {
+                return keyList.get( i - 1 );
             }
         }
 
         if( keyList.isEmpty() ) {
             return 4;
-        }
-        else {
+        } else {
             return keyList.get( 0 );
         }
     }
