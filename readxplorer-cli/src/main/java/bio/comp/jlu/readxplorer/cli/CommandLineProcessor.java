@@ -45,6 +45,7 @@ import java.nio.file.FileSystems;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -78,11 +79,11 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public String referenceArg;
 
     @Arg( shortName = 'r', longName = "reads" )
-    @Description( displayName = "Reads Folder", shortDescription = "Reads to import / analysis." )
+    @Description( displayName = "SAM/BAM Read Files", shortDescription = "SAM/BAM read files to import / analysis." )
     public String[] readsArgs;
 
     @Arg( shortName = 'e', longName = "per" )
-    @Description( displayName = "Pair-End Reads Folder", shortDescription = "Paired-end reads to import / analysis." )
+    @Description( displayName = "Pair-End Read Files", shortDescription = "SAM/BAM paired-end read files to import / analysis." )
     public String[] pairedEndReads;
 
 
@@ -243,7 +244,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         ps.println();
         ps.println( "# run analyses: " + runAnalyses );
 
-        
+
         try {
             pc.disconnect();
             printInfo( ps, "disconnected from " + dbFileArg );
@@ -327,6 +328,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         if( readsArgs != null ) {
 
+            Arrays.sort( readsArgs ); // sort read files lexicographically
+
             printFine( ps, "read files to import:" );
             File[] trackFiles = new File[readsArgs.length];
             for( int i = 0; i < trackFiles.length; i++ ) {
@@ -353,6 +356,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             if( pairedEndReads.length != readsArgs.length )
                 throw new CommandException( 1, "Number of paired-end files (" + pairedEndReads.length + ") does not match number of read files (" + pairedEndReads.length + ")!" );
+
+            Arrays.sort( pairedEndReads ); // sort paired-end read files lexicographically
 
             printFine( ps, "paired-end files to import:" );
             File[] pairedEndFiles = new File[pairedEndReads.length];
