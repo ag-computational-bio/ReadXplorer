@@ -16,6 +16,7 @@
  */
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
+import de.cebitec.readxplorer.utils.PasswordStore;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 import org.rosuda.REngine.REXP;
@@ -70,7 +72,6 @@ public class GnuR extends RConnection {
     private GnuR(String host, int port, boolean runningLocal) throws RserveException {
         super(host, port);
         this.runningLocal = runningLocal;
-        setDefaultCranMirror();
     }
 
     /**
@@ -233,7 +234,7 @@ public class GnuR extends RConnection {
             instance = new GnuR(host, port, !manualRemoteSetup);
             if (useAuth) {
                 String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
-                String password = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PASSWORD, "");
+                String password = new String(PasswordStore.read(Properties.RSERVE_PASSWORD));
                 instance.login(user, password);
             }
         } else {
@@ -291,17 +292,21 @@ public class GnuR extends RConnection {
                 instance = new GnuR(host, port, !manualRemoteSetup);
                 if (useAuth) {
                     String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
-                    String password = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PASSWORD, "");
+                    String password = new String(PasswordStore.read(Properties.RSERVE_PASSWORD));
                     instance.login(user, password);
                 }
             } else {
                 port = nextFreePort++;
                 String bit = System.getProperty("sun.arch.data.model");
                 String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-                String user_dir = System.getProperty("netbeans.user");
-                File r_dir = new File(user_dir + File.separator + "R");
+                File user_dir = Places.getUserDirectory();
+                File r_dir = new File(user_dir.getAbsolutePath() + File.separator + "R");
+                String password = nextSessionId();
+                String user = "readxplorer";
+                writePasswordFile(user, password, r_dir);
                 if (os.contains("windows")) {
                     String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+                    File workdir = new File(r_dir.getAbsolutePath() + File.separator + "bin");
                     String arch = "";
                     if (bit.equals("32")) {
                         arch = "i386";
@@ -315,17 +320,16 @@ public class GnuR extends RConnection {
                     commands.add(arch);
                     commands.add(String.valueOf(port));
                     pb = new ProcessBuilder(commands);
+                    pb.directory(workdir);
                     try {
                         pb.start();
                     } catch (IOException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
-                String password = nextSessionId();
-                String user = "readxplorer";
-                writePasswordFile(user, password, r_dir);
                 instance = new GnuR(host, port, !manualRemoteSetup);
                 instance.login(user, password);
+                instance.setDefaultCranMirror();
             }
             try {
                 Thread.sleep(1000);
@@ -341,8 +345,8 @@ public class GnuR extends RConnection {
         boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
 
         if (!(manualLocalSetup || manualRemoteSetup)) {
-            String user_dir = System.getProperty("netbeans.user");
-            File r_dir = new File(user_dir + File.separator + "R");
+            File user_dir = Places.getUserDirectory();
+            File r_dir = new File(user_dir.getAbsolutePath() + File.separator + "R");
             String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
             File batFile = new File(startupBat);
             return (batFile.exists() && batFile.canExecute());

@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.ui.options;
 import de.cebitec.readxplorer.utils.Downloader;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.PasswordStore;
 import de.cebitec.readxplorer.utils.Unzip;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -43,11 +44,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
+import javax.swing.JPasswordField;
 
 
 final class GnuRPanel extends OptionsPanel implements Observer {
@@ -61,8 +64,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private Downloader downloader;
     private Unzip unzip;
     private File zipFile;
-    private final String user_dir = System.getProperty( "netbeans.user" );
-    private final File r_dir = new File( user_dir + File.separator + "R" );
+    private boolean passwordChanged = false;
+    private final File user_dir = Places.getUserDirectory();
+    private final File r_dir = new File( user_dir.getAbsolutePath() + File.separator + "R" );
     private static final String SOURCE_URI = "R.tar.gz";
     private static final String R_ZIP = "R.zip";
     private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
@@ -438,6 +442,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         }
         rServePort.setInputVerifier(new PortInputVerifier());
         rServeStartupScript.setInputVerifier(new ScriptInputVerifier());
+        usernameTextField.setInputVerifier(new UsernameInputVerifier());
+        passwordTextField.setInputVerifier(new PasswordInputVerifier());
     }
 
 
@@ -492,7 +498,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jSeparator3 = new javax.swing.JSeparator();
         jLabel6 = new javax.swing.JLabel();
         rServeStartupScript = new javax.swing.JTextField();
-        useAuthButton = new javax.swing.JCheckBox();
+        useAuthCheckBox = new javax.swing.JCheckBox();
         jLabel7 = new javax.swing.JLabel();
         usernameTextField = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
@@ -537,7 +543,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeHost.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeHost.text")); // NOI18N
 
         autoOrmanual.add(autoButton);
-        autoButton.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(autoButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.autoButton.text")); // NOI18N
         autoButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -576,11 +581,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeStartupScript.setEditable(false);
         rServeStartupScript.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeStartupScript.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(useAuthButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.useAuthButton.text")); // NOI18N
-        useAuthButton.setEnabled(false);
-        useAuthButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(useAuthCheckBox, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.useAuthCheckBox.text")); // NOI18N
+        useAuthCheckBox.setEnabled(false);
+        useAuthCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                useAuthButtonActionPerformed(evt);
+                useAuthCheckBoxActionPerformed(evt);
             }
         });
 
@@ -593,6 +598,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
         passwordTextField.setEditable(false);
         passwordTextField.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.passwordTextField.text")); // NOI18N
+        passwordTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                passwordTextFieldFocusGained(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -621,7 +631,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             .addComponent(jLabel6)
                             .addComponent(jLabel3)
                             .addComponent(jLabel5)
-                            .addComponent(useAuthButton))
+                            .addComponent(useAuthCheckBox))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -693,7 +703,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                     .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(warningMessage))
                 .addGap(18, 18, 18)
-                .addComponent(useAuthButton)
+                .addComponent(useAuthCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
@@ -757,7 +767,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeHost.setEditable(true);
         rServePort.setEditable(true);
         installButton.setEnabled(false);
-        useAuthButton.setEnabled(true);
+        useAuthCheckBox.setEnabled(true);
     }
 
     private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
@@ -770,7 +780,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServePort.setEditable(false);
         installButton.setEnabled(true);
         warningMessage.setText("");
-        useAuthButton.setEnabled(false);
+        useAuthCheckBox.setEnabled(false);
         usernameTextField.setEditable(false);
         passwordTextField.setEditable(false);
     }
@@ -779,35 +789,60 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         manualLocalButtonSelected();
     }//GEN-LAST:event_manualLocalButtonActionPerformed
 
-    private void useAuthButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useAuthButtonActionPerformed
-        usernameTextField.setEditable(useAuthButton.isSelected());
-        passwordTextField.setEditable(useAuthButton.isSelected());
-    }//GEN-LAST:event_useAuthButtonActionPerformed
+    private void useAuthCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useAuthCheckBoxActionPerformed
+        useAuthCheckboxSelected();
+    }//GEN-LAST:event_useAuthCheckBoxActionPerformed
+
+    private void passwordTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_passwordTextFieldFocusGained
+        passwordTextField.setText("");
+        passwordChanged = true;
+    }//GEN-LAST:event_passwordTextFieldFocusGained
 
     private void manualLocalButtonSelected() {
         rServeStartupScript.setEditable(true);
         rServeHost.setEditable(false);
         rServePort.setEditable(true);
         installButton.setEnabled(false);
-        useAuthButton.setEnabled(true);
+        useAuthCheckBox.setEnabled(true);
+    }
+    
+    private void useAuthCheckboxSelected() {
+        usernameTextField.setEditable(useAuthCheckBox.isSelected());
+        passwordTextField.setEditable(useAuthCheckBox.isSelected());
     }
 
 
     @Override
     void load() {
+        autoOrmanual.clearSelection();
         cranMirror.setText(pref.get(Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR));
         rServeHost.setText(pref.get(Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST));
         rServePort.setText(String.valueOf(pref.getInt(Properties.RSERVE_PORT, DEFAULT_RSERVE_PORT)));
         boolean manualRemoteButtonSelected = pref.getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
+        boolean authSelected = pref.getBoolean(Properties.RSERVE_USE_AUTH, false);
         if (manualRemoteButtonSelected) {
             autoOrmanual.setSelected(manualRemoteButton.getModel(), true);
             manualRemoteButtonSelected();
+            if (authSelected) {
+                useAuthCheckBox.setSelected(true);
+                usernameTextField.setText(pref.get(Properties.RSERVE_USER, ""));
+                passwordTextField.setText("xxxxxxxx");
+                useAuthCheckboxSelected();
+            }
         } else {
             boolean manualLocalButtonSelected = pref.getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
             if (manualLocalButtonSelected) {
                 autoOrmanual.setSelected(manualLocalButton.getModel(), true);
                 rServeStartupScript.setText(pref.get(Properties.RSERVE_STARTUP_SCRIPT, ""));
                 manualLocalButtonSelected();
+                if (authSelected) {
+                    useAuthCheckBox.setSelected(true);
+                    usernameTextField.setText(pref.get(Properties.RSERVE_USER, ""));
+                    passwordTextField.setText("xxxxxxxx");
+                    useAuthCheckboxSelected();
+                }
+            } else {
+                autoOrmanual.setSelected(autoButton.getModel(), true);
             }
         }
     }
@@ -816,20 +851,47 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     @Override
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
-        pref.putBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButton.isSelected());
-        pref.putBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButton.isSelected());
+        boolean manualRemoteButtonSelected = manualRemoteButton.isSelected();
+        boolean manualLocalButtonSelected = manualLocalButton.isSelected();
+        pref.putBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButtonSelected);
+        pref.putBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButtonSelected);       
         if (manualRemoteButton.isSelected()) {
             pref.put(Properties.RSERVE_HOST, rServeHost.getText());
             pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
             pref.remove(Properties.RSERVE_STARTUP_SCRIPT);
-        } else if (manualLocalButton.isSelected()){
+            if (useAuthCheckBox.isSelected()) {
+                pref.putBoolean(Properties.RSERVE_USE_AUTH, true);
+                pref.put(Properties.RSERVE_USER, usernameTextField.getText());
+                if (passwordChanged) {
+                    PasswordStore.save(Properties.RSERVE_PASSWORD, passwordTextField.getPassword(), "");
+                    passwordChanged = false;
+                }
+            } else {
+                pref.remove(Properties.RSERVE_USER);
+                PasswordStore.delete(Properties.RSERVE_PASSWORD);
+            }
+        } else if (manualLocalButton.isSelected()) {
             pref.put(Properties.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText());
             pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
-            pref.remove(Properties.RSERVE_HOST);           
+            pref.remove(Properties.RSERVE_HOST);
+            if (useAuthCheckBox.isSelected()) {
+                pref.putBoolean(Properties.RSERVE_USE_AUTH, true);
+                pref.put(Properties.RSERVE_USER, usernameTextField.getText());
+                if (passwordChanged) {
+                    PasswordStore.save(Properties.RSERVE_PASSWORD, passwordTextField.getPassword(), "");
+                    passwordChanged = false;
+                }
+            } else {
+                pref.remove(Properties.RSERVE_USER);
+                PasswordStore.delete(Properties.RSERVE_PASSWORD);
+            }
         } else {
             pref.remove(Properties.RSERVE_HOST);
             pref.remove(Properties.RSERVE_PORT);
             pref.remove(Properties.RSERVE_STARTUP_SCRIPT);
+            pref.remove(Properties.RSERVE_USE_AUTH);
+            pref.remove(Properties.RSERVE_USER);
+            PasswordStore.delete(Properties.RSERVE_PASSWORD);
         }
     }
 
@@ -857,7 +919,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JTextField rServePort;
     private javax.swing.JTextField rServeStartupScript;
     private javax.swing.JTextField sourceFileTextField;
-    private javax.swing.JCheckBox useAuthButton;
+    private javax.swing.JCheckBox useAuthCheckBox;
     private javax.swing.JTextField usernameTextField;
     private javax.swing.JLabel warningMessage;
     // End of variables declaration//GEN-END:variables
@@ -991,6 +1053,38 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             } else {
                 warningMessage.setText("Please enter a valid startup script.");
                 return false;
+            }
+        }
+    }
+
+    class UsernameInputVerifier extends InputVerifier {
+
+        @Override
+        public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
+            String username = textField.getText();
+            if (username.isEmpty()) {
+                warningMessage.setText("Username cannot be left empty.");
+                return false;
+            } else {
+                warningMessage.setText("");
+                return true;
+            }
+        }
+    }
+
+    class PasswordInputVerifier extends InputVerifier {
+
+        @Override
+        public boolean verify(JComponent input) {
+            JPasswordField textField = (JPasswordField) input;
+            char[] username = textField.getPassword();
+            if (username.length > 0) {
+                warningMessage.setText("Password cannot be left empty.");
+                return false;
+            } else {
+                warningMessage.setText("");
+                return true;
             }
         }
     }
