@@ -60,7 +60,6 @@ import org.netbeans.spi.sendopts.Description;
 import org.netbeans.spi.sendopts.Env;
 
 
-
 public final class CommandLineProcessor implements ArgsProcessor {
 
     private static final Logger LOG = Logger.getLogger( CommandLineProcessor.class.getName() );
@@ -333,13 +332,20 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "read files to import:" );
             File[] trackFiles = new File[readsArgs.length];
             for( int i = 0; i < trackFiles.length; i++ ) {
+
                 String trackPath = readsArgs[i];
+
+                String fileType = trackPath.substring( trackPath.lastIndexOf( '.' ) ).toLowerCase();
+                if( !checkFileType( fileType ) ) // check file type
+                    throw new CommandException( 1, "wrong paired-end file type \""+fileType+"\"!" );
+
                 File trackFile = new File( trackPath );
-                if( !trackFile.canRead() ) {
+                if( !trackFile.canRead() ) // check file permissions
                     throw new CommandException( 1, "Cannot access read file " + (i + 1) + "(" + trackPath + ")!" );
-                }
+
                 trackFiles[i] = trackFile;
                 printFine( ps, "\tadd " + trackFiles[i].getName() );
+
             }
             return trackFiles;
 
@@ -362,12 +368,20 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "paired-end files to import:" );
             File[] pairedEndFiles = new File[pairedEndReads.length];
             for( int i = 0; i < pairedEndFiles.length; i++ ) {
+
                 String peTrackPath = pairedEndReads[i];
+
+                String fileType = peTrackPath.substring( peTrackPath.lastIndexOf( '.' ) ).toLowerCase();
+                if( !checkFileType( fileType ) ) // check file type
+                    throw new CommandException( 1, "wrong paired-end file type \""+fileType+"\"!" );
+
                 File pairedEndFile = new File( peTrackPath );
-                if( !pairedEndFile.canRead() )
+                if( !pairedEndFile.canRead() ) // check file permissions
                     throw new CommandException( 1, "Cannot access paired-end file " + (i + 1) + "(" + peTrackPath + ")!" );
+
                 printFine( ps, "\tadd " + pairedEndFile.getName() );
                 pairedEndFiles[i] = pairedEndFile;
+
             }
 
             return pairedEndFiles;
@@ -375,6 +389,17 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
         else
             return null;
+
+    }
+
+
+    private static boolean checkFileType( String filePath ) {
+
+        String fileType = filePath.substring( filePath.lastIndexOf( '.' ) ).toLowerCase();
+        return "sam".equals( fileType )
+               || "bam".equals( fileType )
+               || "out".equals( fileType )
+               || "jok".equals( fileType );
 
     }
 
@@ -409,64 +434,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
             ce.initCause( ex );
             throw ce;
         }
-
-    }
-
-
-    private void importPairedEndReads( File[] trackFiles, File[] pairedEndFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
-
-        printFine( ps, "submit jobs to import paired-end read files..." );
-
-        // submit parse reads jobs for (concurrent) execution
-        final ProjectConnector pc = ProjectConnector.getInstance();
-        final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
-        final int distance = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
-        final byte orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
-        final short deviation = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
-        for( int i = 0; i < trackFiles.length; i++ ) {
-
-            File trackFile = trackFiles[i];
-            TrackJob trackJob1 = new TrackJob( pc.getLatestTrackId(), trackFile,
-                                               trackFile.getName(),
-                                               referenceResult.getReferenceJob(),
-                                               selectParser( trackFile ),
-                                               false,
-                                               new Timestamp( System.currentTimeMillis() ) );
-            TrackJob trackJob2 = null;
-            if( pairedEndFiles != null ) {
-                File pairedEndFile = pairedEndFiles[i];
-                trackJob2 = new TrackJob( pc.getLatestTrackId(), pairedEndFile,
-                                          pairedEndFile.getName(),
-                                          referenceResult.getReferenceJob(),
-                                          selectParser( pairedEndFile ),
-                                          false,
-                                          new Timestamp( System.currentTimeMillis() ) );
-            }
-
-            ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
-            futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
-            printFine( ps, "\t"+i+": " + trackFile );
-
-        }
-
-        // store parsed reads sequently to db
-        printFine( ps, "import paired-end read files..." );
-        for( Future<ImportPairedEndResults> future : futures ) {
-            ImportPairedEndResults result = future.get();
-            for( String msg : referenceResult.getOutput() ) {
-                printInfo( ps, msg );
-            }
-
-            // store track entry in db
-            ParsedTrack pt = result.getParsedTrack();
-            pc.storeBamTrack( pt );
-            pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-
-            // read pair ids have to be set in track entry
-            ProjectConnector.getInstance().setReadPairIdsForTrackIds( pt.getID(), -1 );
-            printFine( ps, "\t..." + result.getParsedTrack().getTrackName() );
-        }
-        printFine( ps, "...done!" );
 
     }
 
@@ -510,18 +477,77 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
+    private void importPairedEndReads( File[] trackFiles, File[] pairedEndFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
+
+        printFine( ps, "submit jobs to import paired-end read files..." );
+
+        // submit parse reads jobs for (concurrent) execution
+        final int   distance    = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
+        final byte  orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
+        final short deviation   = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
+        final ProjectConnector pc = ProjectConnector.getInstance();
+        final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
+        for( int i = 0; i < trackFiles.length; i++ ) {
+
+            File trackFile = trackFiles[i];
+            Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
+            TrackJob trackJob1 = new TrackJob( pc.getLatestTrackId(), trackFile,
+                                               trackFile.getName(),
+                                               referenceResult.getReferenceJob(),
+                                               selectParser( trackFile ),
+                                               false,
+                                               timestamp );
+            TrackJob trackJob2 = null;
+            if( pairedEndFiles != null ) {
+                File pairedEndFile = pairedEndFiles[i];
+                trackJob2 = new TrackJob( pc.getLatestTrackId(), pairedEndFile,
+                                          pairedEndFile.getName(),
+                                          referenceResult.getReferenceJob(),
+                                          selectParser( pairedEndFile ),
+                                          false,
+                                          timestamp );
+            }
+
+            ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
+            futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
+            printFine( ps, "\t"+i+": " + trackFile );
+
+        }
+
+        // store parsed reads sequently to db
+        printFine( ps, "import paired-end read files..." );
+        for( Future<ImportPairedEndResults> future : futures ) {
+            ImportPairedEndResults result = future.get();
+            for( String msg : referenceResult.getOutput() ) {
+                printInfo( ps, msg );
+            }
+
+            // store track entry in db
+            ParsedTrack pt = result.getParsedTrack();
+            pc.storeBamTrack( pt );
+            pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+
+            // read pair ids have to be set in track entry
+            pc.setReadPairIdsForTrackIds( pt.getID(), -1 );
+            printFine( ps, "\t..." + result.getParsedTrack().getTrackName() );
+        }
+        printFine( ps, "...done!" );
+
+    }
+
+
 
 
     private void printFine( PrintStream ps, String msg ) {
 
-        LOG.config( msg );
+        LOG.fine( msg );
         if( verboseArg )
             ps.println( msg );
 
     }
 
 
-    private void printInfo( PrintStream ps, String msg ) {
+    private static void printInfo( PrintStream ps, String msg ) {
 
         LOG.info( msg );
         ps.println( msg );
@@ -597,7 +623,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * @return a java.util.Properties object
      * @throws IOException
      */
-    private java.util.Properties loadDefaultProperties() throws IOException {
+    private static java.util.Properties loadDefaultProperties() throws IOException {
 
         java.util.Properties properties = new java.util.Properties();
 
