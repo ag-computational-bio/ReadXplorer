@@ -54,6 +54,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.url>www.readxplorer.org</project.url>
         <netbeans.hint.license>gpl30</netbeans.hint.license>
+        <checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
+        <checkstyle.header.file>license-header.txt</checkstyle.header.file>
     </properties>
 
 
@@ -230,6 +232,7 @@
 
     <build>
         <pluginManagement>
+
             <plugins>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -243,6 +246,7 @@
                         <licenseFile>License-GPLv3</licenseFile>
                     </configuration>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -253,11 +257,34 @@
                         <showDeprecation>true</showDeprecation>
                     </configuration>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.5</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.14</version>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <configuration>
+                                <configLocation>checkstyle.xml</configLocation>
+                                <consoleOutput>true</consoleOutput>
+                                <failsOnError>true</failsOnError>
+                                <headerLocation>License-GPLv3.txt</headerLocation>
+                            </configuration>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
     </build>
