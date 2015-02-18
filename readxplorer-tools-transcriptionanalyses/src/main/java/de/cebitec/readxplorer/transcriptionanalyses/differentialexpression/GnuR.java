@@ -61,14 +61,14 @@ public class GnuR extends RConnection {
     private String cranMirror;
 
     public final boolean runningLocal;
-    
+
     /*  Is there already a instance running that we can connect to?
-     *   This is only interesting for manual setup on Unix hosts. 
+     *   This is only interesting for manual setup on Unix hosts.
      */
     private static int connectableInstanceRunning = 0;
 
     private static final SecureRandom random = new SecureRandom();
-    
+
     private static final Logger LOG = Logger.getLogger( GnuR.class.getName() );
 
     /**
@@ -112,7 +112,7 @@ public class GnuR extends RConnection {
      */
     public void loadPackage(String packageName) throws PackageNotLoadableException {
         try {
-            this.eval("library(" + packageName + ")");
+            this.eval("library(\"" + packageName + "\")");
         } catch (RserveException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             LOG.log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
