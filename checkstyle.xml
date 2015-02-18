@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright (C) 2015 Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
+ Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <!DOCTYPE module PUBLIC
@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 what the following rules do, please see the checkstyle configuration
 page at http://checkstyle.sourceforge.net/config.html -->
 <module name="Checker">
+
+
+    <!--<property name="basedir" value="${sourcedir}"/>-->
 
 
     <module name="Header">
@@ -232,10 +235,6 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
         <!-- detects overridden equals without hashCode -->
         <module name="EqualsHashCode"/>
-
-
-        <!-- Checks that a local variable or a parameter does not shadow a field that is defined in the same class -->
-        <module name="HiddenField"/>
 
 
         <!-- Makes sure that utility classes (classes that contain only static methods or fields in their API) do not have a public constructor -->

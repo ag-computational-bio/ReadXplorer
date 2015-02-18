@@ -277,6 +277,7 @@
                                 <consoleOutput>true</consoleOutput>
                                 <failsOnError>true</failsOnError>
                                 <headerLocation>License-GPLv3.txt</headerLocation>
+                                <propertyExpansion>sourcedir=${project.basedir}/src/main/java/</propertyExpansion>
                             </configuration>
                             <goals>
                                 <goal>check</goal>
