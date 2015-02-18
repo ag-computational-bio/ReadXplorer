@@ -334,6 +334,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             try {
                 results.clear();
                 results.addAll( processWithTool() );
+                notifyObservers( AnalysisStatus.FINISHED );
             } catch( PackageNotLoadableException | UnknownGnuRException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
@@ -348,8 +349,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
+                notifyObservers( AnalysisStatus.ERROR );
+                this.interrupt();
             }
-            notifyObservers( AnalysisStatus.FINISHED );
         }
     }
 

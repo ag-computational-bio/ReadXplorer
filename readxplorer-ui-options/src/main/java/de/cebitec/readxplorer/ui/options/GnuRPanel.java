@@ -72,7 +72,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
     private static final String DEFAULT_RSERVE_HOST = "localhost";
     private static final int DEFAULT_RSERVE_PORT = 6311;
-    private final String license = "		    GNU GENERAL PUBLIC LICENSE\n"
+    private static final String OS = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+    private static final String GNU_LICENSE = "		    GNU GENERAL PUBLIC LICENSE\n"
                                    + "		       Version 2, June 1991\n"
                                    + "\n"
                                    + " Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"
@@ -426,8 +427,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         sourceFileTextField.setText( source_uri );
         jProgressBar1.setMaximum( 100 );
         setUpListener();
-        String os = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
-        if( os.contains( "windows" ) ) {
+        if( OS.contains( "windows" ) ) {
             if( !r_dir.exists() ) {
                 installButton.setEnabled( true );
                 jProgressBar1.setEnabled( true );
@@ -439,6 +439,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         }
         else {
             messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+            autoButton.setEnabled(false);
         }
         rServePort.setInputVerifier(new PortInputVerifier());
         rServeStartupScript.setInputVerifier(new ScriptInputVerifier());
@@ -718,7 +719,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     private void installButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installButtonActionPerformed
 
-        JTextArea textArea = new JTextArea( license );
+        JTextArea textArea = new JTextArea( GNU_LICENSE );
         JScrollPane scrollPane = new JScrollPane( textArea );
         textArea.setLineWrap( true );
         textArea.setWrapStyleWord( true );
@@ -1016,8 +1017,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             break;
                     }
                 }
-
-
             } );
         }
 
@@ -1078,13 +1077,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         @Override
         public boolean verify(JComponent input) {
             JPasswordField textField = (JPasswordField) input;
-            char[] username = textField.getPassword();
-            if (username.length > 0) {
-                warningMessage.setText("Password cannot be left empty.");
-                return false;
-            } else {
+            char[] password = textField.getPassword();
+            if (password.length > 0) {
                 warningMessage.setText("");
                 return true;
+            } else {
+                warningMessage.setText("Password cannot be left empty.");
+                return false;
             }
         }
     }

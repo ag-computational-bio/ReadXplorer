@@ -61,6 +61,11 @@ public class GnuR extends RConnection {
     private String cranMirror;
 
     public final boolean runningLocal;
+    
+    /*  Is there already a instance running that we can connect to?
+     *   This is only interesting for manual setup on Unix hosts. 
+     */
+    private static int connectableInstanceRunning = 0;
 
     private static final SecureRandom random = new SecureRandom();
     
@@ -147,6 +152,9 @@ public class GnuR extends RConnection {
         //If we are connected to a remote server however we should not do so.
         if (runningLocal) {
             super.shutdown();
+            if (connectableInstanceRunning > 0) {
+                connectableInstanceRunning--;
+            }
         }
     }
 
@@ -242,52 +250,63 @@ public class GnuR extends RConnection {
             host = "localhost";
 
             if (manualLocalSetup) {
+                String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
                 port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
-                String startUpScript = NbPreferences.forModule(Object.class).get(Properties.RSERVE_STARTUP_SCRIPT, "");
-                List<String> commands = new ArrayList<>();
-                commands.add("/bin/bash");
-                commands.add(startUpScript);
-                commands.add(String.valueOf(port));
-                pb = new ProcessBuilder(commands);
-                try {
-                    final Process start = pb.start();
-                    new Thread(new Runnable() {
+                if (!((os.contains("linux") || os.contains("mac")) && (connectableInstanceRunning > 0))) {
+                    File startUpScript = new File(NbPreferences.forModule(Object.class).get(Properties.RSERVE_STARTUP_SCRIPT, ""));
+                    List<String> commands = new ArrayList<>();
+                    commands.add("/bin/bash");
+                    commands.add(startUpScript.getAbsolutePath());
+                    commands.add(String.valueOf(port));
+                    pb = new ProcessBuilder(commands);
+                    pb.directory(startUpScript.getParentFile());
+                    try {
+                        final Process start = pb.start();
+                        new Thread(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            try {
-                                BufferedReader reader
-                                        = new BufferedReader(new InputStreamReader(start.getInputStream()));
-                                String line = null;
-                                while ((line = reader.readLine()) != null) {
-                                    ProcessingLog.getInstance().logGNURoutput(line);
+                            @Override
+                            public void run() {
+                                try {
+                                    BufferedReader reader
+                                            = new BufferedReader(new InputStreamReader(start.getInputStream()));
+                                    String line = null;
+                                    while ((line = reader.readLine()) != null) {
+                                        ProcessingLog.getInstance().logGNURoutput(line);
+                                    }
+                                } catch (IOException ex) {
+                                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                    LOG.log(Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp);
                                 }
-                            } catch (IOException ex) {
-                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                                LOG.log(Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp);
                             }
-                        }
-                    }).start();
+                        }).start();
 
-                    new Thread(new Runnable() {
+                        new Thread(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            try {
-                                BufferedReader reader
-                                        = new BufferedReader(new InputStreamReader(start.getErrorStream()));
-                                String line = null;
-                                while ((line = reader.readLine()) != null) {
-                                    ProcessingLog.getInstance().logGNURoutput(line);
+                            @Override
+                            public void run() {
+                                try {
+                                    BufferedReader reader
+                                            = new BufferedReader(new InputStreamReader(start.getErrorStream()));
+                                    String line = null;
+                                    while ((line = reader.readLine()) != null) {
+                                        ProcessingLog.getInstance().logGNURoutput(line);
+                                    }
+                                } catch (IOException ex) {
+                                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                    LOG.log(Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp);
                                 }
-                            } catch (IOException ex) {
-                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                                LOG.log(Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp);
                             }
-                        }
-                    }).start();
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                        }).start();
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    //Give the Process a moment to start up everything.
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    connectableInstanceRunning++;
                 }
                 instance = new GnuR(host, port, !manualRemoteSetup);
                 if (useAuth) {
@@ -327,14 +346,15 @@ public class GnuR extends RConnection {
                         Exceptions.printStackTrace(ex);
                     }
                 }
+                //Give the Process a moment to start up everything.
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
                 instance = new GnuR(host, port, !manualRemoteSetup);
                 instance.login(user, password);
                 instance.setDefaultCranMirror();
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Exceptions.printStackTrace(ex);
             }
         }
         return instance;
