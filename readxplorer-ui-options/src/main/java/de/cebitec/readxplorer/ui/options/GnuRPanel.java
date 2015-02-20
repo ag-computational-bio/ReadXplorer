@@ -419,7 +419,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
 
     GnuRPanel( GnuROptionsPanelController controller ) {
-        System.out.println(Properties.RUNNING_IN_CEBITEC);
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
         initComponents();
