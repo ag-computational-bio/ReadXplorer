@@ -350,15 +350,14 @@ public class GnuR extends RConnection {
 
                     //Give the Process a moment to start up everything.
                     try {
-                        rserveProcess.waitFor();
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 } else {
                     rserveProcess = null;
                 }
-                if (rserveProcess != null && (rserveProcess.exitValue() == 0)) {
+                if (rserveProcess != null && rserveProcess.isAlive()) {
                     instance = new GnuR(host, port, !manualRemoteSetup);
                     instance.login(user, password);
                     instance.setDefaultCranMirror();
