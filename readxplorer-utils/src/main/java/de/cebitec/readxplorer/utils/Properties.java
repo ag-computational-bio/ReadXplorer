@@ -203,6 +203,18 @@ public class Properties {
      */
     public static final String RSERVE_PORT = "RSERVE_PORT";
     /**
+     * Use username and password for authentication. 
+     */
+    public static final String RSERVE_USE_AUTH = "RSERVE_USE_AUTH";
+    /**
+     * The RServe user we will use for the connection.
+     */
+    public static final String RSERVE_USER = "RSERVE_USER";
+    /**
+     * The RServe password we will use for the connection.
+     */
+    public static final String RSERVE_PASSWORD = "RSERVE_PASSWORD";
+    /**
      * Holds the full path to the Rserve startup script if manual local setup is used.
      */
     public static final String RSERVE_STARTUP_SCRIPT = "RSERVE_STARTUP_SCRIPT";

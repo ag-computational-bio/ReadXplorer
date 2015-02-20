@@ -16,14 +16,21 @@
  */
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
+import de.cebitec.readxplorer.utils.PasswordStore;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 import org.rosuda.REngine.REXP;
@@ -51,8 +59,17 @@ public class GnuR extends RConnection {
      * The Cran Mirror used to receive additional packages.
      */
     private String cranMirror;
-    
+
     public final boolean runningLocal;
+
+    /*  Is there already a instance running that we can connect to?
+     *   This is only interesting for manual setup on Unix hosts.
+     */
+    private static int connectableInstanceRunning = 0;
+
+    private static final SecureRandom random = new SecureRandom();
+
+    private static final Logger LOG = Logger.getLogger(GnuR.class.getName());
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
@@ -60,7 +77,6 @@ public class GnuR extends RConnection {
     private GnuR(String host, int port, boolean runningLocal) throws RserveException {
         super(host, port);
         this.runningLocal = runningLocal;
-        setDefaultCranMirror();
     }
 
     /**
@@ -96,18 +112,18 @@ public class GnuR extends RConnection {
      */
     public void loadPackage(String packageName) throws PackageNotLoadableException {
         try {
-            this.eval("library(" + packageName + ")");
+            this.eval("library(\"" + packageName + "\")");
         } catch (RserveException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
+            LOG.log(Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{currentTimestamp, packageName});
             try {
                 currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Trying to install package {1}.", new Object[]{currentTimestamp, packageName});
+                LOG.log(Level.INFO, "{0}: Trying to install package {1}.", new Object[]{currentTimestamp, packageName});
                 this.eval("install.packages(\"" + packageName + "\")");
                 this.eval("library(" + packageName + ')');
             } catch (RserveException ex1) {
                 currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{currentTimestamp, packageName});
+                LOG.log(Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{currentTimestamp, packageName});
                 throw new PackageNotLoadableException(packageName);
             }
         }
@@ -134,14 +150,17 @@ public class GnuR extends RConnection {
     public void shutdown() throws RserveException {
         //If we started the RServe instace by our self we should also terminate it.
         //If we are connected to a remote server however we should not do so.
-        if(runningLocal){
+        if (runningLocal) {
             super.shutdown();
+            if (connectableInstanceRunning > 0) {
+                connectableInstanceRunning--;
+            }
         }
     }
 
     @Override
     public REXP eval(String cmd) throws RserveException {
-        ProcessingLog.getInstance().logGNURinput( cmd );
+        ProcessingLog.getInstance().logGNURinput(cmd);
         return super.eval(cmd);
     }
 
@@ -176,9 +195,9 @@ public class GnuR extends RConnection {
      * de.cebitec.readxplorer.differentialExpression.GnuR.PackageNotLoadableException
      * @throws IllegalStateException
      */
-    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException, 
-                                                                    RserveException, REngineException, REXPMismatchException, 
-                                                                    FileNotFoundException, IOException {
+    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException,
+            RserveException, REngineException, REXPMismatchException,
+            FileNotFoundException, IOException {
         this.loadPackage("grDevices");
 
         if (runningLocal) {
@@ -204,48 +223,60 @@ public class GnuR extends RConnection {
 
     /**
      * The next free port that will be used to start a new RServe instance. Per
-     * default RServe starts on port 6311 in order to not interfear with already
+     * default RServe starts on port 6311 in order to not interfere with already
      * running instances we start one port above
      */
     private static int nextFreePort = 6312;
 
-    public static GnuR startRServe() throws RserveException {
+    public static GnuR startRServe() throws RserveException, IOException {
+        GnuR instance;
         String host;
         int port;
         boolean manualLocalSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
         boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
+        boolean useAuth = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_USE_AUTH, false);
 
         if (manualRemoteSetup) {
             port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
             host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
+            instance = new GnuR(host, port, !manualRemoteSetup);
+            if (useAuth) {
+                String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
+                String password = new String(PasswordStore.read(Properties.RSERVE_PASSWORD));
+                instance.login(user, password);
+            }
         } else {
             ProcessBuilder pb;
+            final Process rserveProcess;
             host = "localhost";
 
             if (manualLocalSetup) {
+                String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
                 port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
-                String startUpScript = NbPreferences.forModule(Object.class).get(Properties.RSERVE_STARTUP_SCRIPT, "");
-                List<String> commands = new ArrayList<>();
-                commands.add("/bin/bash");
-                commands.add(startUpScript);
-                commands.add(String.valueOf(port));
-                pb = new ProcessBuilder(commands);
-                try {
-                    final Process start = pb.start();
+                if (!((os.contains("linux") || os.contains("mac")) && (connectableInstanceRunning > 0))) {
+                    File startUpScript = new File(NbPreferences.forModule(Object.class).get(Properties.RSERVE_STARTUP_SCRIPT, ""));
+                    List<String> commands = new ArrayList<>();
+                    commands.add("/bin/bash");
+                    commands.add(startUpScript.getAbsolutePath());
+                    commands.add(String.valueOf(port));
+                    pb = new ProcessBuilder(commands);
+                    pb.directory(startUpScript.getParentFile());
+
+                    rserveProcess = pb.start();
                     new Thread(new Runnable() {
 
                         @Override
                         public void run() {
                             try {
                                 BufferedReader reader
-                                        = new BufferedReader(new InputStreamReader(start.getInputStream()));
+                                        = new BufferedReader(new InputStreamReader(rserveProcess.getInputStream()));
                                 String line = null;
                                 while ((line = reader.readLine()) != null) {
                                     ProcessingLog.getInstance().logGNURoutput(line);
                                 }
                             } catch (IOException ex) {
-                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
+                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                LOG.log(Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp);
                             }
                         }
                     }).start();
@@ -256,28 +287,51 @@ public class GnuR extends RConnection {
                         public void run() {
                             try {
                                 BufferedReader reader
-                                        = new BufferedReader(new InputStreamReader(start.getErrorStream()));
+                                        = new BufferedReader(new InputStreamReader(rserveProcess.getErrorStream()));
                                 String line = null;
                                 while ((line = reader.readLine()) != null) {
                                     ProcessingLog.getInstance().logGNURoutput(line);
                                 }
                             } catch (IOException ex) {
-                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
+                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                LOG.log(Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp);
                             }
                         }
                     }).start();
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+
+                    //Give the Process a moment to start up everything.
+                    try {
+                        rserveProcess.waitFor();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    connectableInstanceRunning++;
+                } else {
+                    rserveProcess = null;
+                }
+                if (rserveProcess != null && (rserveProcess.exitValue() == 0)) {
+                    instance = new GnuR(host, port, !manualRemoteSetup);
+                    if (useAuth) {
+                        String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
+                        String password = new String(PasswordStore.read(Properties.RSERVE_PASSWORD));
+                        instance.login(user, password);
+                    }
+                } else {
+                    throw new IOException("Could not start Rserve instance!");
                 }
             } else {
                 port = nextFreePort++;
                 String bit = System.getProperty("sun.arch.data.model");
                 String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-                String user_dir = System.getProperty("netbeans.user");
-                File r_dir = new File(user_dir + File.separator + "R");
+                File user_dir = Places.getUserDirectory();
+                File r_dir = new File(user_dir.getAbsolutePath() + File.separator + "R");
+                String password = nextSessionId();
+                String user = "readxplorer";
+                writePasswordFile(user, password, r_dir);
                 if (os.contains("windows")) {
                     String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+                    File workdir = new File(r_dir.getAbsolutePath() + File.separator + "bin");
                     String arch = "";
                     if (bit.equals("32")) {
                         arch = "i386";
@@ -291,20 +345,28 @@ public class GnuR extends RConnection {
                     commands.add(arch);
                     commands.add(String.valueOf(port));
                     pb = new ProcessBuilder(commands);
+                    pb.directory(workdir);
+                    rserveProcess = pb.start();
+
+                    //Give the Process a moment to start up everything.
                     try {
-                        pb.start();
-                    } catch (IOException ex) {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     }
+                } else {
+                    rserveProcess = null;
+                }
+                if (rserveProcess != null && rserveProcess.isAlive()) {
+                    instance = new GnuR(host, port, !manualRemoteSetup);
+                    instance.login(user, password);
+                    instance.setDefaultCranMirror();
+                } else {
+                    throw new IOException("Could not start Rserve instance!");
                 }
             }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Exceptions.printStackTrace(ex);
-            }
         }
-        return new GnuR(host, port, !manualRemoteSetup);
+        return instance;
     }
 
     public static boolean gnuRSetupCorrect() {
@@ -312,13 +374,31 @@ public class GnuR extends RConnection {
         boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
 
         if (!(manualLocalSetup || manualRemoteSetup)) {
-            String user_dir = System.getProperty("netbeans.user");
-            File r_dir = new File(user_dir + File.separator + "R");
+            File user_dir = Places.getUserDirectory();
+            File r_dir = new File(user_dir.getAbsolutePath() + File.separator + "R");
             String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
             File batFile = new File(startupBat);
             return (batFile.exists() && batFile.canExecute());
         } else {
             return true;
         }
+    }
+
+    private static void writePasswordFile(String user, String password, File r_dir) {
+
+        File out = new File(r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "passwd");
+        out.deleteOnExit();
+        try (BufferedWriter writer = Files.newBufferedWriter(out.toPath(), Charset.defaultCharset(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            writer.write(user);
+            writer.write(" ");
+            writer.write(password);
+            writer.write("\n");
+            writer.close();
+        } catch (IOException ex) {
+        }
+    }
+
+    private static String nextSessionId() {
+        return new BigInteger(130, random).toString(32);
     }
 }

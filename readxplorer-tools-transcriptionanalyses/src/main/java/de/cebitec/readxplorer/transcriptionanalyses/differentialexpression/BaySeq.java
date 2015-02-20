@@ -50,6 +50,7 @@ public class BaySeq {
      */
     private static final int MAX_PROCESSORS = 6;
 
+    private static final Logger LOG = Logger.getLogger( BaySeq.class.getName() );
 
     public BaySeq() {
     }
@@ -79,10 +80,10 @@ public class BaySeq {
      */
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
-            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage("baySeq");
         //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
         //computation will speed up a little bit but still leave you at least one core
@@ -98,7 +99,7 @@ public class BaySeq {
                 processors--;
             }
             currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
+            LOG.log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
             gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
         } else {
             gnuR.eval("cl <- NULL");
@@ -168,7 +169,7 @@ public class BaySeq {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
