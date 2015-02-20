@@ -16,29 +16,32 @@
  */
 package de.cebitec.readxplorer.utils;
 
+
 import java.util.List;
+
 
 /**
  * Contains all generally useful mathematical methods.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class MathUtils {
+public final class MathUtils {
 
-    private MathUtils() {
-    }
-    
+
+    private MathUtils() {}
+
+
     /**
      * Calculates the quantile border of the given quantile for a given list of
      * Doubles.
      * @param quantile Quantile whose border value is needed
      * @param list List representing some empirical series of measurements
-     * @return The quantile border value calculated from the series of 
+     * @return The quantile border value calculated from the series of
      * measurements.
      */
     public static double getQuantileBorder(double quantile, List<Double> list) {
         double quantileIndex = quantile * list.size();
-        boolean isWholeNumber = (quantileIndex == Math.floor(quantileIndex));
+        boolean isWholeNumber = quantileIndex == Math.floor(quantileIndex);
         double quantileValue;
         if (isWholeNumber) {
             int indexInt = (int) Math.floor(quantileIndex);

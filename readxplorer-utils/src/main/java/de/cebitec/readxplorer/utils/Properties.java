@@ -23,10 +23,10 @@ package de.cebitec.readxplorer.utils;
  * <p>
  * @author Rolf Hilker
  */
-public class Properties {
+public final class Properties {
 
-    private Properties() {
-    }
+
+    private Properties() {}
 
 
     // different adapter types for a project and or database
@@ -46,7 +46,7 @@ public class Properties {
 
     // ReadXplorer file chooser properties
     public static final String READXPLORER_FILECHOOSER_DIRECTORY = "readXplorerFileChooser.Directory";
-    public static final String ReadXplorer_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
+    public static final String READXPLORER_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
 
     //Properties to set different viewers active
     public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
@@ -83,7 +83,7 @@ public class Properties {
     /**
      * Value for obtaining read starts instead of coverage (9).
      */
-    public static byte READ_STARTS = 9;
+    public static final byte READ_STARTS = 9;
     /**
      * Value for viewing all mappings as if they came from the fwd. strand
      * (10). This should only be used in combination with {@link STRAND_BOTH}
@@ -91,7 +91,7 @@ public class Properties {
      * or
      * the rev. strand ()
      */
-    public static byte STRAND_FWD_ANALYSIS = 10;
+    public static final byte STRAND_FWD_ANALYSIS = 10;
 
     /**
      * Value for read start distribution = 5.
@@ -188,12 +188,12 @@ public class Properties {
      * Temporary directory used for import of data (SAM/BAM/JOK).
      */
     public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
-    
+
     /**
      * The CRAN Mirror used by Gnu R to load missing packages.
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
-    
+
     /**
      * The RServe host we will connect to for GNU R computations.
      */
@@ -214,7 +214,7 @@ public class Properties {
      * Is Rserve manually configured to connect to a local server with custom startup script.
      */
     public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
-    
+
     public static final String MAPPER_PATH = "MAPPER_PATH";
 
     /**

@@ -56,8 +56,38 @@ import org.openide.util.NbBundle;
 public class TabWithCloseX extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private final JTabbedPane pane;
+    private static final MouseListener BUTTON_MOUSE_LISTENER;
 
+    static {
+
+        BUTTON_MOUSE_LISTENER = new MouseAdapter() {
+
+        @Override
+        public void mouseEntered( MouseEvent e ) {
+            Component component = e.getComponent();
+            if( component instanceof AbstractButton ) {
+                AbstractButton button = (AbstractButton) component;
+                button.setBorderPainted( true );
+            }
+        }
+
+
+        @Override
+        public void mouseExited( MouseEvent e ) {
+            Component component = e.getComponent();
+            if( component instanceof AbstractButton ) {
+                AbstractButton button = (AbstractButton) component;
+                button.setBorderPainted( false );
+            }
+        }
+
+
+    };
+
+    }
+
+
+    private final JTabbedPane pane;
 
     public TabWithCloseX( final JTabbedPane pane ) {
         //unset default FlowLayout' gaps
@@ -115,7 +145,7 @@ public class TabWithCloseX extends JPanel {
             setBorderPainted( false );
             //Making nice rollover effect
             //we use the same listener for all buttons
-            addMouseListener( buttonMouseListener );
+            addMouseListener( BUTTON_MOUSE_LISTENER );
             setRolloverEnabled( true );
             //Close the proper tab by clicking the button
             addActionListener( this );
@@ -160,28 +190,5 @@ public class TabWithCloseX extends JPanel {
 
     }
 
-    private final static MouseListener buttonMouseListener = new MouseAdapter() {
-
-        @Override
-        public void mouseEntered( MouseEvent e ) {
-            Component component = e.getComponent();
-            if( component instanceof AbstractButton ) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted( true );
-            }
-        }
-
-
-        @Override
-        public void mouseExited( MouseEvent e ) {
-            Component component = e.getComponent();
-            if( component instanceof AbstractButton ) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted( false );
-            }
-        }
-
-
-    };
 
 }

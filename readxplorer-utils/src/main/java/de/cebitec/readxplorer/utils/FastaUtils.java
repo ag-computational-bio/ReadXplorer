@@ -46,7 +46,7 @@ import org.openide.DialogDisplayer;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class FastaUtils implements Observable {
+public final class FastaUtils implements Observable {
 
     private final List<Observer> observers;
 
@@ -164,7 +164,7 @@ public class FastaUtils implements Observable {
 
         final IndexFileNotificationPanel indexPanel = new IndexFileNotificationPanel();
         final JButton okButton = new JButton( "OK" );
-        DialogDescriptor dialogDescriptor = new DialogDescriptor( indexPanel, "Fasta index missing!", true, new JButton[]{ okButton }, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null );
+        okButton.setEnabled( false );
         Thread indexThread = new Thread( new Runnable() {
 
             @Override
@@ -177,8 +177,8 @@ public class FastaUtils implements Observable {
 
         } );
         indexThread.start();
+        DialogDescriptor dialogDescriptor = new DialogDescriptor( indexPanel, "Fasta index missing!", true, new JButton[]{ okButton }, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null );
         Dialog indexDialog = DialogDisplayer.getDefault().createDialog( dialogDescriptor );
-        okButton.setEnabled( false );
         indexDialog.setVisible( true );
     }
 

@@ -130,7 +130,8 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
         catch( BackingStoreException e ) {
             LOG.log( SEVERE, null, e );
         }
-        catch( IOException ex ) {
+        catch( IOException ioe ) {
+            LOG.fine( ioe.getMessage() );
             // do nothing, path is not stored in properties...
         }
         ////////////// handle return events /////////////////////////////////////////

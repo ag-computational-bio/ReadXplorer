@@ -28,8 +28,8 @@ package de.cebitec.readxplorer.utils;
 public class DiscreteCountingDistribution {
 
     private static double[] standardBinSteps = { 0.5, 1, 1, 1, 1.5, 1.5, 1.5, 1.5, 2, 2 }; //= 135% of the adjustmentValue in total
-    private static final int standardAdjustmentValue = 1000;
-    private static final int noDistributionBins = 101;
+    private static final int STANDARD_ADJUSTMENT_VALUE = 1000;
+    private static final int NO_DISTRIBUTION_BINS = 101;
 
     private int[] discreteCountingDistribution;
     private double[] binSteps;
@@ -52,7 +52,7 @@ public class DiscreteCountingDistribution {
      * This constructor also uses the standard adjustmentValue = 1000.
      */
     public DiscreteCountingDistribution() {
-        this( standardBinSteps, standardAdjustmentValue );
+        this( standardBinSteps, STANDARD_ADJUSTMENT_VALUE );
     }
 
 
@@ -85,7 +85,7 @@ public class DiscreteCountingDistribution {
      *                        the increasing bin values. In the end 100 bins are created.
      */
     public DiscreteCountingDistribution( double[] binStepsPercent ) {
-        this( binStepsPercent, standardAdjustmentValue );
+        this( binStepsPercent, STANDARD_ADJUSTMENT_VALUE );
     }
 
 
@@ -103,9 +103,9 @@ public class DiscreteCountingDistribution {
      *                        values in the binStepsPercent array.
      */
     public DiscreteCountingDistribution( double[] binStepsPercent, int adjustmentValue ) {
-        this.discreteCountingDistribution = new int[noDistributionBins];
-        this.lowerBinBorders = new int[noDistributionBins];
-        this.upperBinBorders = new int[noDistributionBins];
+        this.discreteCountingDistribution = new int[NO_DISTRIBUTION_BINS];
+        this.lowerBinBorders = new int[NO_DISTRIBUTION_BINS];
+        this.upperBinBorders = new int[NO_DISTRIBUTION_BINS];
         this.binSteps = binStepsPercent;
         this.adjustmentValue = adjustmentValue;
         this.createBins();
@@ -124,7 +124,7 @@ public class DiscreteCountingDistribution {
         int lastBorder = 0;
         int stepsCounter = 0;
         int stepIdx = -1;
-        for( int i = 0; i < noDistributionBins - 1; ++i ) {
+        for( int i = 0; i < NO_DISTRIBUTION_BINS - 1; ++i ) {
             if( stepsCounter % 10 == 0 ) {
                 ++stepIdx;
             }
@@ -144,7 +144,7 @@ public class DiscreteCountingDistribution {
      * @param valueToAdd The value to add to the distribution
      */
     public void increaseDistribution( int valueToAdd ) {
-        for( int i = 1; i < noDistributionBins; ++i ) {
+        for( int i = 1; i < NO_DISTRIBUTION_BINS; ++i ) {
             if( valueToAdd < lowerBinBorders[i] ) {
                 ++discreteCountingDistribution[i - 1];
                 break;
@@ -237,7 +237,7 @@ public class DiscreteCountingDistribution {
      */
     public int getIndexForCountValue( int count ) {
         int index = -1;
-        for( int i = 0; i < noDistributionBins; ++i ) {
+        for( int i = 0; i < NO_DISTRIBUTION_BINS; ++i ) {
             if( count > lowerBinBorders[i] ) {
                 index = i;
                 break;

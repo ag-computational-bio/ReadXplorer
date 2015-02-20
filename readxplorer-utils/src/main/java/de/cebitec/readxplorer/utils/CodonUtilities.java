@@ -47,20 +47,23 @@ public class CodonUtilities {
      *         array contains the start codons, the second the stop codons.
      */
     public static Pair<String[], String[]> parseCustomCodons( int wantedIndex, String customCodonString ) {
+
         GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
         int index = genCodeFactory.getGeneticCodes().size() + 1;
-        while( index++ <= wantedIndex ) {
+        while( index <= wantedIndex ) {
+            index++;
             customCodonString = customCodonString.substring( customCodonString.indexOf( '\n' ) + 1, customCodonString.length() );
         }
         int startIndex = customCodonString.startsWith( "\n" ) ? 2 : 1;
         String codons = customCodonString.substring( startIndex, customCodonString.indexOf( ')' ) );
         String[] startsAndStops = codons.split( ";" );
-        String[] starts = splitCodons( startsAndStops[0] );
         String[] stops = {};
         if( startsAndStops.length > 1 ) {
             stops = splitCodons( startsAndStops[1] );
         }
+        String[] starts = splitCodons( startsAndStops[0] );
         return new Pair<>( starts, stops );
+
     }
 
 
@@ -105,7 +108,7 @@ public class CodonUtilities {
      *         codons and translations as well.
      */
     public static GeneticCode getGeneticCode() {
-        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+
         Preferences pref = NbPreferences.forModule( Object.class );
         Integer codeIdx;
         try {
@@ -115,7 +118,8 @@ public class CodonUtilities {
             codeIdx = Integer.valueOf( Properties.STANDARD_CODE_INDEX );
         }
 
-        return genCodeFactory.getGeneticCodeById( codeIdx );
+        return GeneticCodeFactory.getDefault().getGeneticCodeById( codeIdx );
+        
     }
 
 

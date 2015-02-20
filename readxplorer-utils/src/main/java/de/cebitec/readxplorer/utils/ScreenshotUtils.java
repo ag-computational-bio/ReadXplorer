@@ -51,7 +51,9 @@ import org.w3c.dom.Document;
  */
 public class ScreenshotUtils {
 
-    private final static Logger LOG = Logger.getLogger( ScreenshotUtils.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ScreenshotUtils.class.getName() );
+
+    private static final String SVG = "svg";
 
 
     /**
@@ -77,7 +79,7 @@ public class ScreenshotUtils {
             if( container.isShowing() ) {
                 DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
                 String svgNS = "http://www.w3.org/2000/svg";
-                Document document = domImpl.createDocument( svgNS, "svg", null );
+                Document document = domImpl.createDocument( svgNS, SVG, null );
                 final SVGGraphics2D svgGenerator = new SVGGraphics2D( document );
                 Dimension screenSize = ScreenshotUtils.getOptimalScreenSize( container, container.getBounds().getSize() );
                 svgGenerator.setSVGCanvasSize( screenSize );
@@ -91,7 +93,7 @@ public class ScreenshotUtils {
                 container.setBounds( new Rectangle( screenSize ) );
                 container.paintAll( svgGenerator );
 
-                ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{ "svg" }, "svg" ) {
+                ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{ SVG }, SVG ) {
                     private static final long serialVersionUID = 1L;
 
 
@@ -135,17 +137,14 @@ public class ScreenshotUtils {
 
                 };
                 screenFileChooser.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorMsg" ),
                                                NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorHeader" ), JOptionPane.ERROR_MESSAGE );
             }
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorMsg" ),
                                            NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorHeader" ), JOptionPane.ERROR_MESSAGE );
-        }
-        catch( HeadlessException | MissingResourceException | DOMException e ) {
+        } catch( HeadlessException | MissingResourceException | DOMException e ) {
             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", e.toString() ),
                                            NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
         }
@@ -191,8 +190,8 @@ public class ScreenshotUtils {
                 if( currentDim.width < width ) {
                     currentDim.width = width + comp.getLocationOnScreen().x;
                 }
-            }
-            catch( IllegalStateException e ) {
+            } catch( IllegalStateException ise ) {
+                LOG.warning( ise.getMessage() );
                 //nothing to do: ignoring non visible components of the current container
             }
         }

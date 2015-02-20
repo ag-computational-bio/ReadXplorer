@@ -24,6 +24,10 @@ package de.cebitec.readxplorer.utils;
  */
 public class Benchmark {
 
+    private static final int MILLISECONDS_PER_HOUR  = 3600000;
+    private static final int MILLISECONDS_PER_MINUTE = 60000;
+
+
     /**
      * Private constructor so this utility class can not be instantiated.
      */
@@ -43,44 +47,43 @@ public class Benchmark {
      */
     public static String calculateDuration( long startTime, long finishTime, String message ) {
 
-        long diff = finishTime - startTime;
+        int diff = (int) (finishTime - startTime);
 
         int hours = 0;
         int minutes = 0;
         int seconds = 0;
-        int millis;
 
-        if( diff > 3600000 ) { //milliseconds per hour
-            hours = (int) (diff / 3600000);
-            diff -= (hours * 3600000);
+        if( diff > MILLISECONDS_PER_HOUR ) { //milliseconds per hour
+            hours = diff / MILLISECONDS_PER_HOUR;
+            diff -= hours * MILLISECONDS_PER_HOUR;
         }
 
-        if( diff > 60000 ) { // milliseconds per minute
-            minutes = (int) (diff / 60000);
-            diff -= (minutes * 60000);
+        if( diff > MILLISECONDS_PER_MINUTE ) { // milliseconds per minute
+            minutes = diff / MILLISECONDS_PER_MINUTE;
+            diff -= minutes * MILLISECONDS_PER_MINUTE;
         }
 
         if( diff > 1000 ) { // milliseconds per second
-            seconds = (int) (diff / 1000);
-            diff -= (seconds * 1000);
+            seconds = diff / 1000;
+            diff -= seconds * 1000;
         }
 
-        millis = (int) diff; //milliseconds
 
-        String benchmark = message;
+        StringBuilder sb = new StringBuilder( message );
         if( hours > 0 ) {
-            benchmark = benchmark.concat( hours + " h " );
+            sb.append( hours ).append( " h " );
         }
         if( minutes > 0 ) {
-            benchmark = benchmark.concat( minutes + " min " );
+            sb.append( minutes ).append( " min " );
         }
         if( seconds > 0 ) {
-            benchmark = benchmark.concat( seconds + " s " );
+            sb.append( seconds ).append( " s " );
         }
-        if( millis > 0 ) {
-            benchmark = benchmark.concat( millis + " millis" );
+        if( diff > 0 ) {
+            sb.append( diff ).append( " millis " );
         }
-        return benchmark;
+        return sb.toString();
+
     }
 
 

@@ -45,7 +45,11 @@ import org.openide.util.NbBundle;
  * <p>
  * @author -Rolf Hilker-
  */
-public class GeneralUtils {
+public final class GeneralUtils {
+
+
+    private GeneralUtils() {}
+
 
     /**
      * Calculates the percentage increase of value 1 to value 2. In case value1
@@ -114,19 +118,21 @@ public class GeneralUtils {
             return false;
         }
     }
-    
+
+
     /**
      * Checks if the input string is a valid double number larger than 0.
      * <p>
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidPositiveDoubleInput( String input ) {
         try {
             return Double.parseDouble( input ) > 0;
-        } catch ( NumberFormatException e ) {
+        }
+        catch( NumberFormatException e ) {
             return false;
         }
     }
@@ -223,7 +229,8 @@ public class GeneralUtils {
         }
         return false;
     }
-    
+
+
     /**
      * Checks if the input string is a valid double between 1 and 100, so a
      * valid percentage value.
@@ -234,7 +241,7 @@ public class GeneralUtils {
      *         <code>false</code> otherwise
      */
     public static boolean isValidDoublePercentage( String input ) {
-        if( GeneralUtils.isValidPositiveDoubleInput(input ) ) {
+        if( GeneralUtils.isValidPositiveDoubleInput( input ) ) {
             double value = Double.valueOf( input );
             if( value <= 100 ) {
                 return true;
@@ -252,8 +259,8 @@ public class GeneralUtils {
      * <p>
      * @return time as hours, minutes and seconds
      */
-    public static ArrayList<Integer> getTime( long timeInMillis ) {
-        ArrayList<Integer> timeList = new ArrayList<>();
+    public static List<Integer> getTime( long timeInMillis ) {
+
         int remdr = (int) (timeInMillis % (24L * 60 * 60 * 1000));
 
         final int hours = remdr / (60 * 60 * 1000);
@@ -265,6 +272,7 @@ public class GeneralUtils {
         remdr %= 60 * 1000;
 
         final int seconds = remdr / 1000;
+        List<Integer> timeList = new ArrayList<>();
         timeList.add( 0, hours );
         timeList.add( 1, minutes );
         timeList.add( 2, seconds );
@@ -446,17 +454,19 @@ public class GeneralUtils {
         percentFormatter.setMaximumFractionDigits( 2 );
         return percentFormatter.format( number );
     }
-    
-    
+
+
     /**
      * Format a double to two decimal numbers according to the pattern '###.##'.
+     * <p>
      * @param value The value to format
+     * <p>
      * @return The formatted value
      */
-    public static double formatDouble(double value) {
+    public static double formatDouble( double value ) {
         DecimalFormat formatter = new DecimalFormat( "###.##" );
         formatter.setDecimalFormatSymbols( new DecimalFormatSymbols( Locale.ENGLISH ) );
-        return Double.valueOf( formatter.format(value) );
+        return Double.valueOf( formatter.format( value ) );
     }
 
 
@@ -598,9 +608,6 @@ public class GeneralUtils {
 //        String[] splittedName = GeneralUtils.splitReadName(readName, style);
 //        GeneralUtils.generateStringMap(map, splittedName, valueToStore);
 //    }
-
-    private GeneralUtils() {
-    }
 
 
 }

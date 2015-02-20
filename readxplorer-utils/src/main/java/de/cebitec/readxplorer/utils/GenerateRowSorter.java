@@ -31,6 +31,10 @@ import javax.swing.table.TableRowSorter;
  */
 public class GenerateRowSorter {
 
+    
+    private GenerateRowSorter() {}
+
+
     /**
      * Creates a row sorter for the underlying table model and table contents.
      * <p>

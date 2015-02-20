@@ -22,6 +22,7 @@ import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -39,6 +40,10 @@ import static java.util.logging.Level.WARNING;
  * @author Evgeny Anisiforov
  */
 public final class FileUtils {
+
+
+    private FileUtils() {}
+
 
     private final static Logger LOG = Logger.getLogger( FileUtils.class.getName() );
 
@@ -88,7 +93,7 @@ public final class FileUtils {
                 lines++;
             }
         }
-        catch( Exception e ) {
+        catch( IOException ioe ) {
             lines = 0;
         }
         return lines;

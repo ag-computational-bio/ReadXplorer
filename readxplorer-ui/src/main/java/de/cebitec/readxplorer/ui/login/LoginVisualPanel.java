@@ -311,7 +311,7 @@ public final class LoginVisualPanel extends JPanel {
             @Override
             public void open( String fileLocation ) {
                 try { //store current directory
-                    NbPreferences.forModule( Object.class ).put( Properties.ReadXplorer_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
+                    NbPreferences.forModule( Object.class ).put( Properties.READXPLORER_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
                 }
                 catch( IOException ex ) {
                     // do nothing, path is not stored in properties...
@@ -321,7 +321,7 @@ public final class LoginVisualPanel extends JPanel {
 
 
         };
-        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Properties.ReadXplorer_DATABASE_DIRECTORY, null ) );
+        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Properties.READXPLORER_DATABASE_DIRECTORY, null ) );
 
         Preferences prefs2 = Preferences.userNodeForPackage( LoginVisualPanel.class );
         String db = dbTypeBox.getSelectedItem().toString();
