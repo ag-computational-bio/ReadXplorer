@@ -16,11 +16,6 @@
     <name>${project.displayname} - CentralLookup</name>
 
 
-    <properties>
-        <checkstyle.config.location>centrallookup-checkstyle.xml</checkstyle.config.location>
-    </properties>
-
-
     <dependencies>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -49,15 +44,17 @@
         <plugins>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>nbm-maven-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <publicPackages>
-                        <publicPackage>de.cebitec.centrallookup</publicPackage>
-                    </publicPackages>
-                    <licenseFile>../License-GPLv3.txt</licenseFile>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <configuration>
+                            <configLocation>centrallookup-checkstyle.xml</configLocation>
+                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -69,20 +66,15 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <configuration>
-                            <configLocation>centrallookup-checkstyle.xml</configLocation>
-                        </configuration>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>de.cebitec.centrallookup</publicPackage>
+                    </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
+                </configuration>
             </plugin>
 
         </plugins>
