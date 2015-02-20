@@ -119,7 +119,6 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                 public void recordLine( final GFFRecord gffr ) {
 
                     if( chromMap.containsKey( gffr.getSeqName() ) ) {
-                        ParsedChromosome currentChrom = chromMap.get( gffr.getSeqName() );
 
                         final String parsedType = gffr.getFeature();
 
@@ -133,7 +132,7 @@ public class BioJavaGff2Parser implements ReferenceParserI {
 //                            }
 //                        } // else ignore phase as it is not used
 
-                        Map<?,?> attributes = gffr.getGroupAttributes();
+                        Map<?, ?> attributes = gffr.getGroupAttributes();
                         Iterator<?> attrIt = attributes.keySet().iterator();
 
                         String geneName = "";
@@ -208,7 +207,9 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                         int strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand,
                                                                           locusTag, product, ecNumber, geneName, null, new ArrayList<String>(), identifier );
+                        ParsedChromosome currentChrom = chromMap.get( gffr.getSeqName() );
                         currentChrom.addFeature( currentFeature );
+                        
                     }
 
                 }

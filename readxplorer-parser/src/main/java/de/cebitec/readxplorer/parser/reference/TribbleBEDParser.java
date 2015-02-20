@@ -55,10 +55,10 @@ public class TribbleBEDParser implements ReferenceParserI {
     private static final Logger LOG = Logger.getLogger( TribbleBEDParser.class.getName() );
 
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtension = new String[]{ "bed", "BED" };
+    private static final String[] FILE_EXTENSION = new String[]{ "bed", "BED" };
     // name of this parser for use in ComboBoxes
-    private static final String parserName = "BED file";
-    private static final String fileDescription = "BED file";
+    private static final String PARSER_NAME = "BED file";
+    private static final String FILE_DESCRIPTION = "BED file";
     private final List<Observer> observers = new ArrayList<>();
 
 
@@ -150,19 +150,19 @@ public class TribbleBEDParser implements ReferenceParserI {
 
     @Override
     public String getName() {
-        return parserName;
+        return PARSER_NAME;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSION;
     }
 
 
