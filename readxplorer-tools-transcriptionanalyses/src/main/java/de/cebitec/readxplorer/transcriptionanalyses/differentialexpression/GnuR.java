@@ -69,7 +69,7 @@ public class GnuR extends RConnection {
 
     private static final SecureRandom random = new SecureRandom();
 
-    private static final Logger LOG = Logger.getLogger( GnuR.class.getName() );
+    private static final Logger LOG = Logger.getLogger(GnuR.class.getName());
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
@@ -223,12 +223,12 @@ public class GnuR extends RConnection {
 
     /**
      * The next free port that will be used to start a new RServe instance. Per
-     * default RServe starts on port 6311 in order to not interfear with already
+     * default RServe starts on port 6311 in order to not interfere with already
      * running instances we start one port above
      */
     private static int nextFreePort = 6312;
 
-    public static GnuR startRServe() throws RserveException {
+    public static GnuR startRServe() throws RserveException, IOException {
         GnuR instance;
         String host;
         int port;
@@ -247,6 +247,7 @@ public class GnuR extends RConnection {
             }
         } else {
             ProcessBuilder pb;
+            final Process rserveProcess;
             host = "localhost";
 
             if (manualLocalSetup) {
@@ -260,59 +261,64 @@ public class GnuR extends RConnection {
                     commands.add(String.valueOf(port));
                     pb = new ProcessBuilder(commands);
                     pb.directory(startUpScript.getParentFile());
-                    try {
-                        final Process start = pb.start();
-                        new Thread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                try {
-                                    BufferedReader reader
-                                            = new BufferedReader(new InputStreamReader(start.getInputStream()));
-                                    String line = null;
-                                    while ((line = reader.readLine()) != null) {
-                                        ProcessingLog.getInstance().logGNURoutput(line);
-                                    }
-                                } catch (IOException ex) {
-                                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                                    LOG.log(Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp);
+                    rserveProcess = pb.start();
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                BufferedReader reader
+                                        = new BufferedReader(new InputStreamReader(rserveProcess.getInputStream()));
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    ProcessingLog.getInstance().logGNURoutput(line);
                                 }
+                            } catch (IOException ex) {
+                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                LOG.log(Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp);
                             }
-                        }).start();
+                        }
+                    }).start();
 
-                        new Thread(new Runnable() {
+                    new Thread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                try {
-                                    BufferedReader reader
-                                            = new BufferedReader(new InputStreamReader(start.getErrorStream()));
-                                    String line = null;
-                                    while ((line = reader.readLine()) != null) {
-                                        ProcessingLog.getInstance().logGNURoutput(line);
-                                    }
-                                } catch (IOException ex) {
-                                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                                    LOG.log(Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp);
+                        @Override
+                        public void run() {
+                            try {
+                                BufferedReader reader
+                                        = new BufferedReader(new InputStreamReader(rserveProcess.getErrorStream()));
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    ProcessingLog.getInstance().logGNURoutput(line);
                                 }
+                            } catch (IOException ex) {
+                                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                LOG.log(Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp);
                             }
-                        }).start();
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
+                        }
+                    }).start();
+
                     //Give the Process a moment to start up everything.
                     try {
-                        Thread.sleep(2000);
+                        rserveProcess.waitFor();
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                     connectableInstanceRunning++;
+                } else {
+                    rserveProcess = null;
                 }
-                instance = new GnuR(host, port, !manualRemoteSetup);
-                if (useAuth) {
-                    String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
-                    String password = new String(PasswordStore.read(Properties.RSERVE_PASSWORD));
-                    instance.login(user, password);
+                if (rserveProcess != null && (rserveProcess.exitValue() == 0)) {
+                    instance = new GnuR(host, port, !manualRemoteSetup);
+                    if (useAuth) {
+                        String user = NbPreferences.forModule(Object.class).get(Properties.RSERVE_USER, "");
+                        String password = new String(PasswordStore.read(Properties.RSERVE_PASSWORD));
+                        instance.login(user, password);
+                    }
+                } else {
+                    throw new IOException("Could not start Rserve instance!");
                 }
             } else {
                 port = nextFreePort++;
@@ -340,21 +346,25 @@ public class GnuR extends RConnection {
                     commands.add(String.valueOf(port));
                     pb = new ProcessBuilder(commands);
                     pb.directory(workdir);
+                    rserveProcess = pb.start();
+
+                    //Give the Process a moment to start up everything.
                     try {
-                        pb.start();
-                    } catch (IOException ex) {
+                        rserveProcess.waitFor();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     }
+                } else {
+                    rserveProcess = null;
                 }
-                //Give the Process a moment to start up everything.
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
+                if (rserveProcess != null && (rserveProcess.exitValue() == 0)) {
+                    instance = new GnuR(host, port, !manualRemoteSetup);
+                    instance.login(user, password);
+                    instance.setDefaultCranMirror();
+                } else {
+                    throw new IOException("Could not start Rserve instance!");
                 }
-                instance = new GnuR(host, port, !manualRemoteSetup);
-                instance.login(user, password);
-                instance.setDefaultCranMirror();
             }
         }
         return instance;

@@ -36,6 +36,7 @@ import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -233,7 +234,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
                                                                        IllegalStateException,
                                                                        UnknownGnuRException, 
-                                                                       RserveException;
+                                                                       RserveException,
+                                                                       IOException;
 
 
     /**
@@ -351,6 +353,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
                 notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
+            } catch (IOException ex) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
+                notifyObservers( AnalysisStatus.ERROR );
             }
         }
     }

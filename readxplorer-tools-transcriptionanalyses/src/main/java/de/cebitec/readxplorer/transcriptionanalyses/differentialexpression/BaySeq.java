@@ -80,7 +80,7 @@ public class BaySeq {
      */
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
-            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );

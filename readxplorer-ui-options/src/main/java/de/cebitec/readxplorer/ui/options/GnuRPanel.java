@@ -419,6 +419,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
 
     GnuRPanel( GnuROptionsPanelController controller ) {
+        System.out.println(Properties.RUNNING_IN_CEBITEC);
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
         initComponents();
@@ -428,14 +429,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jProgressBar1.setMaximum( 100 );
         setUpListener();
         if( OS.contains( "windows" ) ) {
+            messages.setText("'Manual Local' setup is only supported under Linux and Mac OS.");
+            manualLocalButton.setEnabled(false);
             if( !r_dir.exists() ) {
                 installButton.setEnabled( true );
                 jProgressBar1.setEnabled( true );
                 messages.setText( "" );
-            }
-            else {
-                messages.setText( "GNU R is already installed." );
-            }
+            }         
         }
         else {
             messages.setText( "Auto installation is only supported under Windows 7 & 8." );
