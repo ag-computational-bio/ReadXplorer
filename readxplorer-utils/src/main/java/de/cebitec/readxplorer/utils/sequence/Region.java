@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
+package de.cebitec.readxplorer.utils.sequence;
+
 
 
 /**
@@ -25,7 +26,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
  * <p>
  * @author ddoppmeier, rhilker
  */
-public class Region {
+public class Region implements GenomicRange {
 
     private final int start;
     private final int stop;
@@ -37,8 +38,10 @@ public class Region {
      * A region marked by a start and stop position and if it should be read in
      * fwd or reverse direction. Furthermore, it holds the type of the region.
      * <p>
-     * @param start           the start of the region as base position
-     * @param stop            the stop of the region as base position
+     * @param start           the start of the region as base position, always
+     *                        smaller than stop
+     * @param stop            the stop of the region as base position, always
+     *                        larger than start
      * @param isForwardStrand true, if it is on the fwd strand, false otherwise
      * @param type            type of the region. Use Properties.CDS,
      *                        Properties.START, Properties.STOP,
@@ -54,30 +57,35 @@ public class Region {
 
     /**
      * @return the start of this region = the starting position in the genome.
+     *         Always smaller than stop.
      */
+    @Override
     public int getStart() {
         return this.start;
     }
 
 
     /**
-     * @return the stop of this region. = the ending position in the genome.
+     * @return The stop of this region. = the ending position in the genome.
+     *         Always larger than start.
      */
+    @Override
     public int getStop() {
         return this.stop;
     }
 
 
     /**
-     * @return true, if the region is located on the fwd strand, false otherwise
+     * {@inheritDoc}
      */
-    public boolean isForwardStrand() {
+    @Override
+    public boolean isFwdStrand() {
         return this.isForwardStrand;
     }
 
 
     /**
-     * @return the type of the region. Either Properties.CDS, Properties.START,
+     * @return The type of the region. Either Properties.CDS, Properties.START,
      *         Properties.STOP,
      *         Properties.PATTERN or Properties.ALL
      */
@@ -86,11 +94,26 @@ public class Region {
     }
 
 
+    /**
+     * Compares the start positions of both Regions.
+     * @param other Region to compare to this one
+     * @return The value 0 if this position is equal to the argument position;
+     *         a value less than 0 if this position is numerically less than the
+     *         argument position; and a value greater than 0 if this position is
+     *         numerically greater than the argument position (signed
+     *         comparison).
+     */
+    @Override
+    public int compareTo( GenomicRange other ) {
+        return ((Integer) this.start).compareTo( other.getStart() );
+    }
+
+
     @Override
     public boolean equals( Object other ) {
         if( other instanceof Region ) {
             Region otherRegion = (Region) other;
-            if( otherRegion.isForwardStrand() == this.isForwardStrand()
+            if( otherRegion.isFwdStrand() == this.isFwdStrand()
                 && otherRegion.getType() == this.getType()
                 && otherRegion.getStart() == this.getStart()
                 && otherRegion.getStop() == this.getStop() ) {

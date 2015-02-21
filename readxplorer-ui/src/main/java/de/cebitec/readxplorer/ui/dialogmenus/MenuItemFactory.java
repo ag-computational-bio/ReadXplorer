@@ -22,8 +22,8 @@ import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.parser.output.OutputWriter;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
-import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Region;
 import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -402,7 +402,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 if( !cdsRegions.isEmpty() ) {
-                    if( cdsRegions.get( 0 ).isForwardStrand() ) {
+                    if( cdsRegions.get( 0 ).isFwdStrand() ) {
                         boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStop() );
                     }
                     else {

@@ -96,6 +96,12 @@
             <version>1.0.3-rc3</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
@@ -112,6 +118,7 @@
                         <publicPackage>de.cebitec.readxplorer.utils.classification</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.filechooser</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.polytree</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.utils.sequence</publicPackage>
                         <publicPackage>de.cebitec.common.*</publicPackage>
                         <publicPackage>net.sf.picard.*</publicPackage>
                         <publicPackage>net.sf.samtools.*</publicPackage>

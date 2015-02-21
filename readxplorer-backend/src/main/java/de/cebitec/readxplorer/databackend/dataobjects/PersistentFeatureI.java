@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 
 
 /**
@@ -26,24 +27,26 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public interface PersistentFeatureI {
+public interface PersistentFeatureI extends GenomicRange {
 
     /**
-     * @return start of the feature. Always the smaller value among start and
+     * @return Start of the feature. Always the smaller value among start and
      *         stop.
      */
+    @Override
     public int getStart();
 
 
     /**
-     * @return stop of the feature. Always the larger value among start and
+     * @return Stop of the feature. Always the larger value among start and
      *         stop.
      */
+    @Override
     public int getStop();
 
 
     /**
-     * @return type of the feature among FeatureTypes.
+     * @return Type of the feature among {@link FeatureType}s.
      */
     public FeatureType getType();
 

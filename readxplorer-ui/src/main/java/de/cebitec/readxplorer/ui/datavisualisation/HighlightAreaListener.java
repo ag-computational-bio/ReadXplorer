@@ -20,14 +20,13 @@ package de.cebitec.readxplorer.ui.datavisualisation;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.JRegion;
-import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PatternFilter;
-import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Region;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
+import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
-import de.cebitec.readxplorer.utils.CodonUtilities;
-import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -35,6 +34,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 
@@ -48,7 +48,7 @@ import org.openide.util.Lookup;
 public class HighlightAreaListener extends MouseAdapter {
 
     private static final int HEIGHT = 12;
-    private final HashMap<Integer, List<JRegion>> specialRegionList;
+    private final Map<Integer, List<JRegion>> specialRegionList;
     private final SequenceBar parentComponent;
     private final int baseLineY;
     private final int offsetY;
@@ -358,20 +358,20 @@ public class HighlightAreaListener extends MouseAdapter {
      * @return the CDS regions for a pixel in a start codon (given by xPos).
      */
     private List<Region> calcCdsRegions( int xPos ) {
-        List<JRegion> specialRegions = this.specialRegionList.get( xPos );
+        List<JRegion> specialRegions = specialRegionList.get( xPos );
 
         List<Region> cdsRegions = new ArrayList<>();
         for( JRegion specialRegion : specialRegions ) {
 
             if( specialRegion.getType() == Properties.START ) {
-                if( isFwdStrand && specialRegion.getY() < this.baseLineY ) {
+                if( isFwdStrand && specialRegion.getY() < baseLineY ) {
                     //detect stop pos of special region for fwd strand
-                    Region cdsToHighlight = this.findNextStopPos( specialRegion.getStart(), parentComponent.getPersistentReference() );
+                    Region cdsToHighlight = findNextStopPos( specialRegion.getStart(), parentComponent.getPersistentReference() );
                     cdsRegions.add( cdsToHighlight );
-                }
-                else if( !isFwdStrand && specialRegion.getY() > this.baseLineY ) {
+
+                } else if( !isFwdStrand && specialRegion.getY() > baseLineY ) {
                     //detect stop pos (which is the start pos in pixels) of special region for rev strand
-                    Region cdsToHighlight = this.findNextStopPos( specialRegion.getStop(), parentComponent.getPersistentReference() );
+                    Region cdsToHighlight = findNextStopPos( specialRegion.getStop(), parentComponent.getPersistentReference() );
                     cdsRegions.add( cdsToHighlight );
                 }
             }
@@ -381,39 +381,46 @@ public class HighlightAreaListener extends MouseAdapter {
 
 
     /**
-     * @param start     the first position in the correct reading frame, on
-     *                  which
-     *                  stop codons should be detected.
-     * @param reference
+     * @param start     The first position in the correct reading frame, on
+     *                  which stop codons should be detected.
+     * @param reference The reference to analyze for the next stop position
      *                  <p>
      * @return The next stop position in the reference from the given start
      */
     private Region findNextStopPos( int start, PersistentReference reference ) {
-        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
-        String[] stopCodons = geneticCode.getSecond();
-        List<Integer> results = new ArrayList<>();
 
-        PatternFilter patternFilter = new PatternFilter( start, reference.getActiveChromLength(), reference );
-        for( String stop : stopCodons ) {
-            patternFilter.setPattern( stop.toUpperCase() );
-            int stopPos = patternFilter.findNextOccurrenceOnStrand( isFwdStrand );
-            results.add( stopPos );
+        int startOnStrand = start;
+        int stop = reference.getActiveChromLength();
+        if ( !isFwdStrand ) {
+            stop = start;
+            startOnStrand = 1;
         }
 
-        //find closest stop codon in correct frame on correct strand
-        int closestStop = isFwdStrand ? Integer.MAX_VALUE : -1;
-        for( Integer stop : results ) {
-            if( isFwdStrand && stop < closestStop || !isFwdStrand && stop > closestStop ) {
-                closestStop = stop;
+        StartCodonFilter codonFilter = new StartCodonFilter( startOnStrand, stop, reference );
+        codonFilter.setAllStopCodonsSelected( true );
+        codonFilter.setAnalysisStrand( isFwdStrand ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV );
+        int frame = isFwdStrand ? PositionUtils.determineFwdFrame( start ) : PositionUtils.determineRevFrame( stop );
+        codonFilter.setAnalysisFrame( frame );
+        codonFilter.setAnalyzeInRevDirection( !isFwdStrand );
+        codonFilter.setAddOffset( false );
+        codonFilter.setMaxNoResults( 1 );
+
+        List<Region> codons = new ArrayList<>( codonFilter.findRegions() );
+        PositionUtils.sortList( isFwdStrand, codons );
+        int codonStop = -1;
+        for( Region stopCodon : codons ) {
+            if( stopCodon.getType() == Properties.STOP ) {
+                if( !isFwdStrand ) {
+                    codonStop = start;
+                    start = stopCodon.getStart();
+                } else {
+                    codonStop = stopCodon.getStop();
+                }
+                break;
             }
         }
 
-        if( isFwdStrand ) {
-            return new Region( start, closestStop, isFwdStrand, Properties.CDS );
-        }
-        else {
-            return new Region( closestStop, start, isFwdStrand, Properties.CDS );
-        }
+        return new Region( start, codonStop, isFwdStrand, Properties.CDS );
     }
 
 
@@ -433,6 +440,4 @@ public class HighlightAreaListener extends MouseAdapter {
     public void clearSpecialRegions() {
         this.specialRegionList.clear();
     }
-
-
 }

@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
-import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,8 +39,7 @@ import java.util.Set;
  *
  * @author ddoppmeier, rhilker
  */
-public class PersistentFeature extends Node implements PersistentFeatureI,
-                                                       Comparable<PersistentFeature> {
+public class PersistentFeature extends Node implements PersistentFeatureI {
 
     private final int id;
     private final int chromId;
@@ -227,6 +226,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
      * <p>
      * @return true for featues on forward and false on reverse strand
      */
+    @Override
     public boolean isFwdStrand() {
         return isFwdStrand;
     }
@@ -242,11 +242,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
 
 
     /**
-     * @return the type of the feature among: FeatureType.CDS,
-     *         FeatureType.REPEAT_UNIT, FeatureType.R_RNA,
-     *         FeatureType.SOURCE, FeatureType.T_RNA, FeatureType.MISC_RNA,
-     *         FeatureType.MI_RNA, FeatureType.GENE,
-     *         FeatureType.M_RNA
+     * @return the type of the feature among {@link FeatureType}s.
      */
     @Override
     public FeatureType getType() {
@@ -342,7 +338,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
      *         mapping is larger.
      */
     @Override
-    public int compareTo( PersistentFeature feature ) {
+    public int compareTo( GenomicRange feature ) {
         int ret = 0;
         if( this.start < feature.getStart() ) {
             ret = -1;
@@ -364,25 +360,6 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
          * Utility class, no instantiation allowed.
          */
         private Utils() {
-        }
-
-
-        /**
-         * @param feature feature whose frame has to be determined
-         * <p>
-         * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the
-         *         feature
-         */
-        public static int determineFrame( PersistentFeature feature ) {
-            int frame;
-
-            if( feature.isFwdStrand() ) { // forward strand
-                frame = PositionUtils.determineFwdFrame( feature.getStart() );
-            }
-            else { // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
-                frame = PositionUtils.determineRevFrame( feature.getStop() );
-            }
-            return frame;
         }
 
 
