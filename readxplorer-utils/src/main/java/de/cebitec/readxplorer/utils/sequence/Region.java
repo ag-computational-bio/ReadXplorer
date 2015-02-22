@@ -76,6 +76,34 @@ public class Region implements GenomicRange {
 
 
     /**
+     * @return The length of the feature in base pairs.
+     */
+    public int getLength() {
+        return GenomicRange.Utils.getLength( this );
+    }
+
+
+    /**
+     * @return The start position on the feature strand = smaller position for
+     *         features on the fwd and larger position for features on the rev
+     *         strand.
+     */
+    public int getStartOnStrand() {
+        return GenomicRange.Utils.getStartOnStrand( this );
+    }
+
+
+    /**
+     * @return The stop position on the feature strand = smaller position for
+     *         features on the rev and larger position for features on the fwd
+     *         strand.
+     */
+    public int getStopOnStrand() {
+        return GenomicRange.Utils.getStopOnStrand( this );
+    }
+
+
+    /**
      * {@inheritDoc}
      */
     @Override

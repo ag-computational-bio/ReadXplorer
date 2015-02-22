@@ -199,25 +199,27 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * @return The length of the feature in base pairs.
      */
     public int getLength() {
-        return stop - start + 1;
+        return GenomicRange.Utils.getLength( this );
     }
 
 
     /**
      * @return The start position on the feature strand = smaller position for
-     *         features on the fwd and larger position for features on the rev strand.
+     *         features on the fwd and larger position for features on the rev
+     *         strand.
      */
     public int getStartOnStrand() {
-        return this.isFwdStrand ? start : stop;
+        return GenomicRange.Utils.getStartOnStrand( this );
     }
 
 
     /**
      * @return The stop position on the feature strand = smaller position for
-     *         features on the rev and larger position for features on the fwd strand.
+     *         features on the rev and larger position for features on the fwd
+     *         strand.
      */
     public int getStopOnStrand() {
-        return this.isFwdStrand ? stop : start;
+        return GenomicRange.Utils.getStopOnStrand( this );
     }
 
 

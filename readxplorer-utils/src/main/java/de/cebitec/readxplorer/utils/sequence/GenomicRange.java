@@ -45,4 +45,45 @@ public interface GenomicRange extends Comparable<GenomicRange> {
      *         on reverse strand
      */
     public boolean isFwdStrand();
+
+
+    /**
+     * Contains utility methods related to genomic ranges.
+     */
+    public class Utils {
+
+
+        private Utils() {
+        }
+
+        /**
+         * @param genomicRange The genomic range whose start is needed
+         * @return The start position on the region strand = smaller position
+         *         for features on the fwd and larger position for features on
+         *         the rev strand.
+         */
+        public static int getStartOnStrand( GenomicRange genomicRange ) {
+            return genomicRange.isFwdStrand() ? genomicRange.getStart() : genomicRange.getStop();
+        }
+
+
+        /**
+         * @param genomicRange The genomic range whose stop is needed
+         * @return The stop position on the region strand = smaller position for
+         *         features on the rev and larger position for features on the
+         *         fwd strand.
+         */
+        public static int getStopOnStrand( GenomicRange genomicRange ) {
+            return genomicRange.isFwdStrand() ? genomicRange.getStop() : genomicRange.getStart();
+        }
+
+
+        /**
+         * @param genomicRange The genomic range whose length is needed
+         * @return The length of the region in base pairs.
+         */
+        public static int getLength( GenomicRange genomicRange ) {
+            return genomicRange.getStop() - genomicRange.getStart() + 1;
+        }
+    }
 }
