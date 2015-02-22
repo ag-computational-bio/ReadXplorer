@@ -25,6 +25,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
+import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
@@ -247,25 +248,13 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                         tssRow.add( tSSU.getStopCodon().getStopOnStrand() );
                         tssRow.add( tSSU.getCodonTranscriptLength() );
                     } else {
-                        tssRow.add( "" );
-                        tssRow.add( "" );
-                        tssRow.add( "" );
+                        TableUtils.addEmptyColumns( 3, tssRow );
                     }
                 } else {
-                    tssRow.add( "" );
-                    tssRow.add( "" );
-                    tssRow.add( "" );
-                    tssRow.add( "" );
-                    tssRow.add( "" );
+                    TableUtils.addEmptyColumns( 5, tssRow );
                 }
             } else {
-                tssRow.add( "" );
-                tssRow.add( "" );
-                tssRow.add( "" );
-                tssRow.add( "" );
-                tssRow.add( "" );
-                tssRow.add( "" );
-                tssRow.add( "" );
+                TableUtils.addEmptyColumns( 7, tssRow );
             }
 
             if (tssParameters.isAssociateTss()) {
@@ -388,14 +377,12 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             if( addDistance ) {
                 tssRow.add( Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) ) );
             }
-        }
-        else {
+        } else {
             tssRow.add( "-" );
             tssRow.add( "-" );
             tssRow.add( "-" );
             tssRow.add( "-" );
-            tssRow.add( "" );
-            tssRow.add( "" );
+            TableUtils.addEmptyColumns( 2, tssRow );
             if( addDistance ) {
                 tssRow.add( "" );
             }

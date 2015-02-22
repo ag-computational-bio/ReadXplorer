@@ -65,7 +65,7 @@
                 <Column editable="false" title="Next Downstream Feature" type="java.lang.String"/>
                 <Column editable="false" title="Dist. Downstream Feature" type="java.lang.Integer"/>
                 <Column editable="false" title="Novel Transcript" type="java.lang.Boolean"/>
-                <Column editable="false" title="Transcript Stop" type="java.lang.Integer"/>
+                <Column editable="false" title="Cov. Transcript Stop" type="java.lang.Integer"/>
                 <Column editable="false" title="Start Codon Pos" type="java.lang.Integer"/>
                 <Column editable="false" title="Leader Length" type="java.lang.Integer"/>
                 <Column editable="false" title="Stop Codon Pos" type="java.lang.Integer"/>
