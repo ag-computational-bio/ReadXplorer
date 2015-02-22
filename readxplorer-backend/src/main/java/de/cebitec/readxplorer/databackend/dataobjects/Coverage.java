@@ -192,11 +192,7 @@ public class Coverage {
      *         position is not covered 0 is returned.
      */
     public int getCoverage( int logPos, boolean isFwdStrand ) {
-        if( isFwdStrand ) {
-            return this.getFwdCov( logPos );
-        } else {
-            return this.getRevCov( logPos );
-        }
+        return isFwdStrand ? getFwdCov( logPos ) : getRevCov( logPos );
     }
 
 

@@ -92,8 +92,8 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
             && features.getDownstreamFeature() == null
             && features.getUpstreamFeature() == null ) {
 
-            int increment = tss.isFwdStrand() ? 1 : -1;
-            while( currentCoverage.getTotalCoverage( excludedClasses, currentPos, tss.isFwdStrand() )
+            int increment = tss.isFwdStrand() ? 1 : -1; //only this getTotalCoverage method returns the array with the fixed leftmost position!
+            while( currentCoverage.getTotalCoverage( excludedClasses ).getCoverage( currentPos, tss.isFwdStrand() )
                    > this.getParametersTSS().getMinTranscriptExtensionCov() ) {
                 currentPos += increment;
             }
