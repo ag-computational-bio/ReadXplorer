@@ -20,10 +20,10 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.sequence.SequenceMatcher;
 import de.cebitec.readxplorer.utils.sequence.SequenceScanner;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 public class PatternFilter implements RegionFilterI {
 
     public static final int INIT = 10;
+    /** Default size of a single scanning step. */
     public static final int INTERVAL_SIZE = 3000000;
     private List<Region> matchedPatterns;
     private int absStart;
@@ -55,6 +56,8 @@ public class PatternFilter implements RegionFilterI {
     private int maxNoResults;
     private boolean analyzeInRevDirection;
     private boolean addOffset;
+    private int intervalSize;
+    private boolean requireSameFrame;
 
 
     /**
@@ -76,7 +79,9 @@ public class PatternFilter implements RegionFilterI {
         regionType = Properties.PATTERN;
         analyzeInRevDirection = false;
         addOffset = true;
-        analysisFrame = PatternFilter.INIT; //because this is not a frame value
+        requireSameFrame = false;
+        analysisFrame = INIT; //because this is not a frame value
+        intervalSize = INTERVAL_SIZE;
     }
 
 
@@ -130,13 +135,12 @@ public class PatternFilter implements RegionFilterI {
             SequenceMatcher seqMatcher = new SequenceMatcher();
             seqMatcher.setMaxNoResults( maxNoResults );
             seqMatcher.setAnalyzeInRevDirection( analyzeInRevDirection );
-            boolean isOnlyOneFrameRequired = analysisFrame != INIT;
-            if( isOnlyOneFrameRequired ) {
-                seqMatcher.setRequireSameFrame( isOnlyOneFrameRequired );
+            if( requireSameFrame ) {
+                seqMatcher.setRequireSameFrame( requireSameFrame );
                 seqMatcher.setTargetFrame( analysisFrame );
             }
             //configure scanner and run analysis
-            PatternScanner patternScanner = new PatternScanner( start, stop, INTERVAL_SIZE, seqMatcher );
+            PatternScanner patternScanner = new PatternScanner( start, stop, intervalSize, seqMatcher );
             patternScanner.setAnalysisStrand( analysisStrand );
             patternScanner.setAnalyzeInRevDirection( analyzeInRevDirection );
             patternScanner.scanSequence();
@@ -175,13 +179,13 @@ public class PatternFilter implements RegionFilterI {
             seqMatcher.setMaxNoResults( 1 );
             seqMatcher.setAnalyzeInRevDirection( analyzeInRevDirection );
 
-            PatternPosScanner patternScanner = new PatternPosScanner( start, refLength, INTERVAL_SIZE, seqMatcher );
+            PatternPosScanner patternScanner = new PatternPosScanner( start, refLength, intervalSize, seqMatcher );
             patternScanner.scanSequence();
             from = patternScanner.getPatternStart();
 
             //if nothing found search from 1 to current position on both frames
             if( from == -1 ) {
-                PatternPosScanner patternScanner2 = new PatternPosScanner( 1, start, INTERVAL_SIZE, seqMatcher );
+                PatternPosScanner patternScanner2 = new PatternPosScanner( 1, start, intervalSize, seqMatcher );
                 patternScanner2.scanSequence();
                 from = patternScanner2.getPatternStart();
             }
@@ -198,6 +202,17 @@ public class PatternFilter implements RegionFilterI {
     public void setInterval( int start, int stop ) {
         absStart = start;
         absStop = stop;
+    }
+
+
+    /**
+     * @param intervalSize The size of each scanning step. Enables splitting the
+     *                     whole region to analyze in smaller parts. Especially
+     *                     useful when results are expected to be located
+     *                     closeby. The default value is {@link #INTERVAL_SIZE}.
+     */
+    public void setIntervalSize( int intervalSize ) {
+        this.intervalSize = intervalSize;
     }
 
 
@@ -265,16 +280,18 @@ public class PatternFilter implements RegionFilterI {
      * to be set first in case the analysis should only return start codons of
      * the correct frame. <br/>
      * This method also sets the appropriate analysis strand (see
-     * {@link #setAnalysisStrand(byte)}).
+     * {@link #setAnalysisStrand(byte)}) and if the same frame is required (see
+     * {@link #setRequireSameFrame(boolean)}).
      * <p>
      * @param analysisFrame the frame to analyze for the pattern
      */
     public void setAnalysisFrame( int analysisFrame ) {
         this.analysisFrame = analysisFrame;
+        requireSameFrame = analysisFrame != 0 && analysisFrame != INIT;
 
         if( analysisFrame < 0 ) {
             analysisStrand = SequenceUtils.STRAND_REV;
-        } else if( analysisFrame == INIT || analysisFrame == 0 ) {
+        } else if( !requireSameFrame || analysisFrame == 0 ) {
             analysisStrand = 0;
         } else {
             analysisStrand = SequenceUtils.STRAND_FWD;
@@ -322,6 +339,14 @@ public class PatternFilter implements RegionFilterI {
 
 
     /**
+     * @return The type to use for the identified regions
+     */
+    public byte getRegionType() {
+        return regionType;
+    }
+
+
+    /**
      * @param regionType The type to use for the identified regions
      */
     public void setRegionType( byte regionType ) {
@@ -351,6 +376,34 @@ public class PatternFilter implements RegionFilterI {
      */
     public void setAddOffset( boolean addOffset ) {
         this.addOffset = addOffset;
+    }
+
+    /**
+     * @return <code>true</code> if results should only be calculated for the
+     *         currently set reading frame, <code>false</code> if both strands
+     *         should be analyzed. The default value is <code>false</code>.
+     */
+    public boolean isRequireSameFrame() {
+        return requireSameFrame;
+    }
+
+
+    /**
+     * @param requireSameFrame <code>true</code> if results should only be
+     *                         calculated for the currently set reading frame,
+     *                         <code>false</code> if both strands should be
+     *                         analyzed. The default value is
+     *                         <code>false</code>.
+     */
+    public void setRequireSameFrame( boolean requireSameFrame ) {
+        this.requireSameFrame = requireSameFrame;
+    }
+
+    /**
+     * @return The reference used in this filter.
+     */
+    PersistentReference getReference() {
+        return refGen;
     }
 
 

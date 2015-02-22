@@ -221,11 +221,11 @@ public class AnalysisTranscriptionStart implements Observer,
      * distributions and corrects the results for automatic mode.
      */
     public void finish() {
-        this.storeDistributions();
+        storeDistributions();
         if( parametersTSS.isAutoTssParamEstimation() ) {
-            this.correctResult();
+            correctResult();
         }
-        this.linkTssInSameRegion();
+        linkTssInSameRegion();
     }
 
 

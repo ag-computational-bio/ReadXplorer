@@ -24,10 +24,9 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
-import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -366,12 +365,12 @@ public class HighlightAreaListener extends MouseAdapter {
             if( specialRegion.getType() == Properties.START ) {
                 if( isFwdStrand && specialRegion.getY() < baseLineY ) {
                     //detect stop pos of special region for fwd strand
-                    Region cdsToHighlight = findNextStopPos( specialRegion.getStart(), parentComponent.getPersistentReference() );
+                    Region cdsToHighlight = findCdsRegion( specialRegion.getStart(), parentComponent.getPersistentReference() );
                     cdsRegions.add( cdsToHighlight );
 
                 } else if( !isFwdStrand && specialRegion.getY() > baseLineY ) {
                     //detect stop pos (which is the start pos in pixels) of special region for rev strand
-                    Region cdsToHighlight = findNextStopPos( specialRegion.getStop(), parentComponent.getPersistentReference() );
+                    Region cdsToHighlight = findCdsRegion( specialRegion.getStop(), parentComponent.getPersistentReference() );
                     cdsRegions.add( cdsToHighlight );
                 }
             }
@@ -381,46 +380,33 @@ public class HighlightAreaListener extends MouseAdapter {
 
 
     /**
-     * @param start     The first position in the correct reading frame, on
+     * Identifies the CDS belonging to the given
+     * @param cdsStart  The first position in the correct reading frame, on
      *                  which stop codons should be detected.
      * @param reference The reference to analyze for the next stop position
-     *                  <p>
-     * @return The next stop position in the reference from the given start
+     * <p>
+     * @return The CDS identified for the given start in the current reference
      */
-    private Region findNextStopPos( int start, PersistentReference reference ) {
+    private Region findCdsRegion( int cdsStart, PersistentReference reference ) {
 
-        int startOnStrand = start;
-        int stop = reference.getActiveChromLength();
-        if ( !isFwdStrand ) {
-            stop = start;
-            startOnStrand = 1;
-        }
-
-        StartCodonFilter codonFilter = new StartCodonFilter( startOnStrand, stop, reference );
+        StartCodonFilter codonFilter = new StartCodonFilter( cdsStart, cdsStart, reference );
         codonFilter.setAllStopCodonsSelected( true );
-        codonFilter.setAnalysisStrand( isFwdStrand ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV );
-        int frame = isFwdStrand ? PositionUtils.determineFwdFrame( start ) : PositionUtils.determineRevFrame( stop );
-        codonFilter.setAnalysisFrame( frame );
-        codonFilter.setAnalyzeInRevDirection( !isFwdStrand );
-        codonFilter.setAddOffset( false );
         codonFilter.setMaxNoResults( 1 );
+        codonFilter.setRequireSameFrame( true );
 
-        List<Region> codons = new ArrayList<>( codonFilter.findRegions() );
-        PositionUtils.sortList( isFwdStrand, codons );
-        int codonStop = -1;
-        for( Region stopCodon : codons ) {
-            if( stopCodon.getType() == Properties.STOP ) {
-                if( !isFwdStrand ) {
-                    codonStop = start;
-                    start = stopCodon.getStart();
-                } else {
-                    codonStop = stopCodon.getStop();
-                }
-                break;
+        Region stopCodon = codonFilter.findNextCodon( cdsStart, isFwdStrand );
+
+        int cdsStop = -1;
+        if( stopCodon != null ) {
+            if( !isFwdStrand ) {
+                cdsStop = cdsStart;
+                cdsStart = stopCodon.getStart();
+            } else {
+                cdsStop = stopCodon.getStop();
             }
         }
 
-        return new Region( start, codonStop, isFwdStrand, Properties.CDS );
+        return new Region( cdsStart, cdsStop, isFwdStrand, Properties.CDS );
     }
 
 
@@ -437,6 +423,9 @@ public class HighlightAreaListener extends MouseAdapter {
     }
 
 
+    /**
+     * Clears the list of special regions in this listener.
+     */
     public void clearSpecialRegions() {
         this.specialRegionList.clear();
     }

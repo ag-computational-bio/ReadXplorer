@@ -43,8 +43,12 @@ public class Coverage {
      * to call <code>incArraysToIntervalSize()</code>. The arrays are
      * initialized with a default length of 0.
      * <p>
-     * @param leftBound      left bound of the interval
-     * @param rightBound     right bound of the interval
+     * @param leftBound      left bound of the interval in reference
+     *                       coordinates. The borders are inclusive in the data
+     *                       structures.
+     * @param rightBound     right bound of the interval in reference
+     *                       coordinates. The borders are inclusive in the data
+     *                       structures.
      * @param classification The <code>Classification</code>
      *                       classification type of this coverage object.
      */
@@ -77,7 +81,8 @@ public class Coverage {
 
     /**
      * @param leftBound The left bound of the stored coverage interval in
-     *                  reference coordinates. The borders are inclusive in the data structures.
+     *                  reference coordinates. The borders are inclusive in the
+     *                  data structures.
      */
     public void setLeftBound( int leftBound ) {
         this.leftBound = leftBound;
@@ -86,7 +91,8 @@ public class Coverage {
 
     /**
      * @param rightBound The right bound of the stored coverage interval in
-     *                   reference coordinates. The borders are inclusive in the data structures.
+     *                   reference coordinates. The borders are inclusive in the
+     *                   data structures.
      */
     public void setRightBound( int rightBound ) {
         this.rightBound = rightBound;
@@ -188,8 +194,7 @@ public class Coverage {
     public int getCoverage( int logPos, boolean isFwdStrand ) {
         if( isFwdStrand ) {
             return this.getFwdCov( logPos );
-        }
-        else {
+        } else {
             return this.getRevCov( logPos );
         }
     }

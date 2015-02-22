@@ -21,7 +21,9 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,6 +75,48 @@ public class StartCodonFilter extends PatternFilter {
             startSearch( selectedStops, stopCodons );
         }
         return Collections.unmodifiableList( regions );
+    }
+
+    /**
+     * Configures and runs a search for the next codon of the currently set
+     * codon type (see {@link #setRegionType(byte)}) in the same reading frame
+     * (and strand) than the given search start position.
+     * <p>
+     * @param start       The first position in the correct reading frame, on
+     *                    which a codon should be detected.
+     * <p>
+     * @param isFwdStrand <code>true</code> if the codon should be searched on
+     *                    the forward strand, <code>false</code> otherwise.
+     * <p>
+     * @return The next codon position in the reference from the given start
+     */
+    public Region findNextCodon( int start, boolean isFwdStrand ) {
+
+        int startOnStrand = start;
+        int stop = getReference().getActiveChromLength();
+        if( !isFwdStrand ) {
+            stop = start;
+            startOnStrand = 1;
+        }
+
+        setInterval( startOnStrand, stop );
+        setAnalysisStrand( isFwdStrand ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV );
+        if( isRequireSameFrame() ) {
+            int frame = isFwdStrand ? PositionUtils.determineFwdFrame( start ) : PositionUtils.determineRevFrame( stop );
+            setAnalysisFrame( frame );
+        }
+        setAnalyzeInRevDirection( !isFwdStrand );
+        setAddOffset( false );
+
+        List<Region> codons = new ArrayList<>( findRegions() );
+        PositionUtils.sortList( isFwdStrand, codons );
+        Region foundCodon = null;
+        for( Region codon : codons ) {
+            foundCodon = codon;
+            break;
+        }
+
+        return foundCodon;
     }
 
 
