@@ -63,20 +63,15 @@ public class Difference extends BasicDiff implements Comparable<Difference>,
      * <p>
      * @param other the diff to compare with this diff
      * <p>
-     * @return -1 if this diff has a smaller position than the other, 1 if this
-     *         diff has a larger position than the other, and 0 if the position is equal
+     * @return The value 0 if this position is equal to the argument position;
+     *         a value less than 0 if this position is numerically less than the
+     *         argument position; and a value greater than 0 if this position is
+     *         numerically greater than the argument position (signed
+     *         comparison).
      */
     @Override
-    public int compareTo( Difference other ) {
-        if( this.getPosition() < other.getPosition() ) {
-            return -1;
-        }
-        else if( this.getPosition() > other.getPosition() ) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
+    public final int compareTo( Difference other ) {
+        return ( (Integer) this.getPosition()).compareTo(other.getPosition());
     }
 
 
