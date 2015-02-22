@@ -81,7 +81,7 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );

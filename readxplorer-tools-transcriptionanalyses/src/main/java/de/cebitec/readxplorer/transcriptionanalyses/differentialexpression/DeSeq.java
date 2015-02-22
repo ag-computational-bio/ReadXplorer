@@ -43,6 +43,8 @@ import org.rosuda.REngine.Rserve.RserveException;
 public class DeSeq {
 
     private GnuR gnuR;
+    
+    private static final Logger LOG = Logger.getLogger( DeSeq.class.getName() );
 
 
     public DeSeq() {
@@ -51,10 +53,10 @@ public class DeSeq {
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
-            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {      
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {      
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq" );
         final List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
@@ -247,7 +249,7 @@ public class DeSeq {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
