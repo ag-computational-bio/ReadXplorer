@@ -18,6 +18,9 @@
 package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
+import static java.lang.Integer.MIN_VALUE;
+
+
 /**
  * An extension to the classic TranscriptionStart data structure, adding data
  * fields for storage of unannotated transcript information.
@@ -64,5 +67,22 @@ public class TransStartUnannotated extends TranscriptionStart {
         return this.detectedStop;
     }
 
+    
+    /**
+     * @return Calculates and returns the absolute difference of the associated
+     *         stop codon end and the associated coverage cutoff stop position.
+     *         A positive result means that the coverage cutoff stop position is
+     *         larger, while a negative result means that the stop codon end
+     *         position is larger. 0 means both are identical and {@link
+     *         Integer#MIN_VALUE} means that no stop codon is associated to this
+     *         novel transcript.
+     */
+    public int getTranscriptStopDifference() {
+        int difference = MIN_VALUE;
+        if( getStopCodon() != null ) {
+            difference = detectedStop - getStopCodon().getStop();
+        }
+        return difference;
+    }
 
 }

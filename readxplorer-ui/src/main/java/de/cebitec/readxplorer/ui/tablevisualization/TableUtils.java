@@ -235,4 +235,15 @@ public class TableUtils {
     }
 
 
+    /**
+     * Adds empty columns to a table row. They contain the empty string.
+     * @param noColumns The number of empty columns to add
+     * @param tableRow The table row to update with empty rows
+     */
+    public static void addEmptyColumns( int noColumns, List<Object> tableRow ) {
+        for ( int i = 0; i < noColumns; i++ ) {
+            tableRow.add( "" );
+        }
+    }
+
 }

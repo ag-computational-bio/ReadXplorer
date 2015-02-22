@@ -56,7 +56,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
     private static final long serialVersionUID = 1L;
 
-    private List<String> promotorRegions;
+    private List<String> promoterRegions;
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -106,14 +106,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             },
             new String [] {
-                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Transcript Stop", "TSS Type", "Primary TSS", "Associated TSS"
+                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Cov. Transcript Stop", "Start Codon Pos", "Leader Length", "Stop Codon Pos", "Codon Transcript Length", "TSS Type", "Primary TSS", "Associated TSS"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -140,9 +140,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
             tSSTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title13")); // NOI18N
             tSSTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9_1")); // NOI18N
             tSSTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10_1")); // NOI18N
-            tSSTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title14")); // NOI18N
-            tSSTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title15")); // NOI18N
-            tSSTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title16")); // NOI18N
+            tSSTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title17")); // NOI18N
+            tSSTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title18")); // NOI18N
+            tSSTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title19")); // NOI18N
+            tSSTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title20")); // NOI18N
+            tSSTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title14")); // NOI18N
+            tSSTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title15")); // NOI18N
+            tSSTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title16")); // NOI18N
         }
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text_1")); // NOI18N
@@ -193,10 +197,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog( this, new TssDetectionStatsPanel( 
-                tssResult.getStatsMap(), 
-                (ParameterSetTSS) tssResult.getParameters() ), 
-                "TSS Detection Statistics", 
+        JOptionPane.showMessageDialog( this, new TssDetectionStatsPanel(
+                tssResult.getStatsMap(),
+                (ParameterSetTSS) tssResult.getParameters() ),
+                "TSS Detection Statistics",
                 JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
@@ -215,7 +219,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
      * @param newResult transcription start sites detection result to add
      */
     @Override
-    @NbBundle.Messages( "ResultPanelTranscriptionStart.parametersLabel.text_1=Parameters: min no read starts:  {0},  min coverage increase percent: {1}%,  max leaderless dist.: {2},  init. low cov. read start max:  {3},  min low cov. read starts: {4},  detect novel transcripts: {5},  transcript extension cov.: {6}" )
+    @NbBundle.Messages( {"# {0} - min no read starts",
+                        "# {1} - min coverage increase percent",
+                        "# {2} - max leaderless dist",
+                        "# {3} - init. low cov. read start max",
+                        "# {4} - min low cov. read starts",
+                        "# {5} - detect novel transcripts",
+                        "# {6} - transcript extension cov",
+                        "ResultPanelTranscriptionStart.parametersLabel.text_1=Parameters: min no read starts:  {0},  min coverage increase percent: {1}%,  max leaderless dist.: {2},  init. low cov. read start max:  {3},  min low cov. read starts: {4},  detect novel transcripts: {5},  transcript extension cov.: {6}"} )
     public void addResult( final ResultTrackAnalysis newResult ) {
 
         tableFilter.setTrackMap( newResult.getTrackMap() );
@@ -241,8 +252,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     if (!tssParameters.isAssociateTss()) {
                         tSSTable.removeColumn( tSSTable.getColumn( "Associated TSS" ) );
                     }
-                    
-                    final int nbColumns = 17;
+
+                    final int nbColumns = 21;
 
                     DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
                     String strand;
@@ -302,19 +313,31 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             tSSU = (TransStartUnannotated) tss;
                             rowData[i++] = true;
                             rowData[i++] = tSSU.getDetectedStop();
+                            if( tSSU.hasStartCodon() ) {
+                                rowData[i++] = tSSU.getStartCodon().getStartOnStrand();
+                                rowData[i++] = tSSU.getStartPosDifference();
+                                if ( tSSU.hasStopCodon() ) {
+                                    rowData[i++] = tSSU.getStopCodon().getStartOnStrand();
+                                    rowData[i++] = tSSU.getCodonTranscriptLength();
+                                } else {
+                                    rowData[i++] = null;
+                                }
+                            } else {
+                                i += 4;
+                            }
                         } else {
-                            i += 2;
+                            i += 6;
                         }
-                        
+
                         rowData[i++] = tss.isPrimaryTss() ? "primary" : "secondary";
                         if (!tss.isPrimaryTss()) {
                             rowData[i++] = tss.getPrimaryTss().getPos();
                         } else {
                             i++;
                         }
-                        
+
                         rowData[i++] = GeneralUtils.implode(",", tss.getAssociatedTssList().toArray());
-                        
+
                         model.addRow( rowData );
                     }
 
@@ -357,33 +380,33 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
     /**
      * Prepares the result for output. Any special operations are carried out
-     * here. In this case generating the promotor region for each TSS.
+     * here. In this case generating the promoter region for each TSS.
      */
     private void processResultForExport() {
-        //Generating promotor regions for the TSS
-        this.promotorRegions = new ArrayList<>();
+        //Generating promoter regions for the TSS
+        this.promoterRegions = new ArrayList<>();
 
-        //get reference sequence for promotor regions
+        //get reference sequence for promoter regions
         PersistentReference ref = this.referenceViewer.getReference();
-        String promotor;
+        String promoter;
 
-        //get the promotor region for each TSS
-        int promotorStart;
+        //get the promoter region for each TSS
+        int promoterStart;
         int chromLength = ref.getActiveChromosome().getLength();
         for( TranscriptionStart tSS : this.tssResult.getResults() ) {
             if( tSS.isFwdStrand() ) {
-                promotorStart = tSS.getPos() - 70;
-                promotorStart = promotorStart < 0 ? 0 : promotorStart;
-                promotor = ref.getActiveChromSequence( promotorStart, tSS.getPos() );
+                promoterStart = tSS.getPos() - 70;
+                promoterStart = promoterStart < 0 ? 0 : promoterStart;
+                promoter = ref.getActiveChromSequence( promoterStart, tSS.getPos() );
             }
             else {
-                promotorStart = tSS.getPos() + 70;
-                promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
-                promotor = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( tSS.getPos(), promotorStart ) );
+                promoterStart = tSS.getPos() + 70;
+                promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
+                promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( tSS.getPos(), promoterStart ) );
             }
-            this.promotorRegions.add( promotor );
+            this.promoterRegions.add( promoter );
         }
-        tssResult.setPromotorRegions( promotorRegions );
+        tssResult.setPromoterRegions( promoterRegions );
     }
 
 

@@ -221,11 +221,11 @@ public class AnalysisTranscriptionStart implements Observer,
      * distributions and corrects the results for automatic mode.
      */
     public void finish() {
-        this.storeDistributions();
+        storeDistributions();
         if( parametersTSS.isAutoTssParamEstimation() ) {
-            this.correctResult();
+            correctResult();
         }
-        this.linkTssInSameRegion();
+        linkTssInSameRegion();
     }
 
 
@@ -242,19 +242,19 @@ public class AnalysisTranscriptionStart implements Observer,
         int chromId = result.getRequest().getChromId();
         int chromLength = chromosomes.get( chromId ).getLength();
         List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval( 0, chromLength, chromId );
-        this.currentCoverage = coverage;
+        currentCoverage = coverage;
         isStrandBothOption = parametersTSS.getReadClassParams().isStrandBothOption();
         isBothFwdDirection = parametersTSS.getReadClassParams().isStrandBothFwdOption();
         isFeatureStrand = parametersTSS.getReadClassParams().isStrandFeatureOption();
 
-        int leftBound = coverage.getLeftBound();
+        int leftBound = currentCoverage.getLeftBound();
         int fixedLeftBound = leftBound <= 0 ? 0 : leftBound - 1;
-        int rightBound = coverage.getRightBound();
+        int rightBound = currentCoverage.getRightBound();
 
-        coverage.setLeftBound( fixedLeftBound ); //add left coverage value from last request (or 0) to left
+        currentCoverage.setLeftBound( fixedLeftBound ); //add left coverage value from last request (or 0) to left
         readStarts.setLeftBound( fixedLeftBound ); //of all coverage arrays.
 
-        Coverage totalCoverage = coverage.getTotalCoverage( this.parametersTSS.getReadClassParams().getExcludedClasses() );
+        Coverage totalCoverage = currentCoverage.getTotalCoverage( this.parametersTSS.getReadClassParams().getExcludedClasses() );
         Coverage totalStarts = readStarts.getTotalCoverage( this.parametersTSS.getReadClassParams().getExcludedClasses() );
 
         totalCoverage.setFwdCoverage( this.fixLeftCoverageBound( totalCoverage.getFwdCov(), totalCovLastFwdPos ) );

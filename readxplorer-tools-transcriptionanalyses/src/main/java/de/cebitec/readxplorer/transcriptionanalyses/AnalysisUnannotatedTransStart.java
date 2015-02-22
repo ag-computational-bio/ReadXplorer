@@ -19,10 +19,13 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
+import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
 import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.List;
 
 
@@ -89,8 +92,8 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
             && features.getDownstreamFeature() == null
             && features.getUpstreamFeature() == null ) {
 
-            int increment = tss.isFwdStrand() ? 1 : -1;
-            while( currentCoverage.getTotalCoverage( excludedClasses, currentPos, tss.isFwdStrand() )
+            int increment = tss.isFwdStrand() ? 1 : -1; //only this getTotalCoverage method returns the array with the fixed leftmost position!
+            while( currentCoverage.getTotalCoverage( excludedClasses ).getCoverage( currentPos, tss.isFwdStrand() )
                    > this.getParametersTSS().getMinTranscriptExtensionCov() ) {
                 currentPos += increment;
             }
@@ -107,4 +110,47 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void finish() {
+        super.finish();
+        calcNovelTranscriptDetails();
+    }
+
+
+    /**
+     * Calculate all additional novel transcript details.<br/>
+     * They consist of the next downstream start codon and the corresponding
+     * stop codon in the same reading frame than the start codon.
+     */
+    private void calcNovelTranscriptDetails() {
+        PersistentReference refGenome = trackCon.getRefGenome();
+        StartCodonFilter codonFilter = new StartCodonFilter( 1, refGenome.getActiveChromLength(), refGenome );
+
+        for( TranscriptionStart tss : detectedStarts ) {
+            if( tss instanceof TransStartUnannotated ) {
+                codonFilter.setAllStopCodonsSelected( false );
+                codonFilter.setAllStartCodonsSelected( true );
+                codonFilter.setIntervalSize( 500 ); //we expect the result closeby
+                codonFilter.setMaxNoResults( 1 );
+                codonFilter.setRequireSameFrame( false );
+
+                Region startCodon = codonFilter.findNextCodon( tss.getPos(), tss.isFwdStrand() );
+                if( startCodon != null ) {
+                    tss.setStartCodon( startCodon );
+
+                    codonFilter.resetCodons();
+                    codonFilter.setAllStartCodonsSelected( false );
+                    codonFilter.setAllStopCodonsSelected( true );
+                    codonFilter.setRequireSameFrame( true );
+                    Region stopCodon = codonFilter.findNextCodon( startCodon.getStartOnStrand(), tss.isFwdStrand() );
+                    if( stopCodon != null ) {
+                        tss.setStopCodon( stopCodon );
+                    }
+                }
+            }
+        }
+    }
 }

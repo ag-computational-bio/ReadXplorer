@@ -46,12 +46,19 @@ public class SequenceMatcher {
 
     /**
      * Enables matching a pattern on a sequence, especially for DNA sequences.
-     * Provides several configuration options for the matching process.
+     * Provides several configuration options for the matching process. <br/>
+     * Initializes the default start position of the matcher to 1.
      */
     public SequenceMatcher() {
         this( 1 );
     }
 
+    /**
+     * Enables matching a pattern on a sequence, especially for DNA sequences.
+     * Provides several configuration options for the matching process.
+     * @param absoluteStart The absolute search start position in genome
+     *                      coordinates of the matcher
+     */
     public SequenceMatcher( int absoluteStart ) {
         this.absoluteStart = absoluteStart;
         regions = new ArrayList<>();
@@ -182,10 +189,8 @@ public class SequenceMatcher {
 
     /**
      * @return <code>true</code> if results should only be calculated for the
-     *         strand set in
-     *         {@link #matchPattern(String, Pattern, boolean, int)},
-     *         <code>false</code> if both strands should be analyzed. The
-     *         default value is <code>false</code>.
+     *         currently set reading frame, <code>false</code> if both strands
+     *         should be analyzed. The default value is <code>false</code>.
      */
     public boolean isRequireSameFrame() {
         return requireSameFrame;
@@ -194,8 +199,7 @@ public class SequenceMatcher {
 
     /**
      * @param requireSameFrame <code>true</code> if results should only be
-     *                         calculated for the strand set in
-     *                         {@link #matchPattern(String, Pattern, boolean, int)},
+     *                         calculated for the currently set reading frame,
      *                         <code>false</code> if both strands should be
      *                         analyzed. The default value is
      *                         <code>false</code>.
