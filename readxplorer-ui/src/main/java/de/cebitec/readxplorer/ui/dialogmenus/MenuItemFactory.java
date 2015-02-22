@@ -23,8 +23,8 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.parser.output.OutputWriter;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.utils.CodonUtilities;
-import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -240,9 +240,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             public void actionPerformed( ActionEvent e ) {
                 String output;
                 if( feature != null ) {
-                    output = this.generateFastaFromFeature();
-                }
-                else {
+                    output = this.generateFastaFromFeature( "Genome_" + refName );
+                } else {
                     String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
                     output = OutputWriter.generateFasta( sequence, header );
                 }
@@ -253,12 +252,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             /**
              * Generates a string ready for output in a fasta file.
              */
-            private String generateFastaFromFeature() {
+            private String generateFastaFromFeature( String refName ) {
                 String ecNumber = feature.getEcNumber() != null ? feature.getEcNumber() : "no EC number";
                 String locus = feature.getLocus() != null ? feature.getLocus() : "no locus";
                 String product = feature.getProduct() != null ? feature.getProduct() : "no product";
 
-                return OutputWriter.generateFasta( sequence, ecNumber, locus, product );
+                return OutputWriter.generateFasta( sequence, refName, ecNumber, locus, product );
             }
 
 
