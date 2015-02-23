@@ -114,7 +114,7 @@ public class GeneralUtils {
             return false;
         }
     }
-    
+
     /**
      * Checks if the input string is a valid double number larger than 0.
      * <p>
@@ -223,7 +223,7 @@ public class GeneralUtils {
         }
         return false;
     }
-    
+
     /**
      * Checks if the input string is a valid double between 1 and 100, so a
      * valid percentage value.
@@ -446,8 +446,8 @@ public class GeneralUtils {
         percentFormatter.setMaximumFractionDigits( 2 );
         return percentFormatter.format( number );
     }
-    
-    
+
+
     /**
      * Format a double to two decimal numbers according to the pattern '###.##'.
      * @param value The value to format
@@ -543,6 +543,23 @@ public class GeneralUtils {
         }
 
         return nameArray;
+    }
+
+
+    /**
+     * Creates a link to the currently set protein database for a given EC
+     * number. If the EC number string is empty, empty html tags are returned.
+     * <p>
+     * @param ecNumber The EC number or empty string or <code>null</code>
+     * <p>
+     * @return The link or a string of empty html tags
+     */
+    public static String createEcLink( String ecNumber ) {
+        String ecLink = "<html> </html>";
+        if( ecNumber != null && !ecNumber.isEmpty() ) {
+            ecLink = "<a href=\"" + Properties.DEFAULT_PROTEIN_DB_LINK + ecNumber + "\">" + ecNumber + "</a>";
+        }
+        return ecLink;
     }
 
 //    /**

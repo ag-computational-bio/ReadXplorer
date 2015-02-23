@@ -34,6 +34,9 @@ public class Properties {
     public static final String ADAPTER_H2 = "h2";
     public static final String ADAPTER_DIRECT_ACCESS = "direct";
 
+    // protein DB property
+    public static final String DEFAULT_PROTEIN_DB_LINK = "http://enzyme.expasy.org/EC/";
+
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";
@@ -188,12 +191,12 @@ public class Properties {
      * Temporary directory used for import of data (SAM/BAM/JOK).
      */
     public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
-    
+
     /**
      * The CRAN Mirror used by Gnu R to load missing packages.
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
-    
+
     /**
      * The RServe host we will connect to for GNU R computations.
      */
@@ -203,7 +206,7 @@ public class Properties {
      */
     public static final String RSERVE_PORT = "RSERVE_PORT";
     /**
-     * Use username and password for authentication. 
+     * Use username and password for authentication.
      */
     public static final String RSERVE_USE_AUTH = "RSERVE_USE_AUTH";
     /**
@@ -226,7 +229,7 @@ public class Properties {
      * Is Rserve manually configured to connect to a local server with custom startup script.
      */
     public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
-    
+
     public static final String MAPPER_PATH = "MAPPER_PATH";
 
     /**
