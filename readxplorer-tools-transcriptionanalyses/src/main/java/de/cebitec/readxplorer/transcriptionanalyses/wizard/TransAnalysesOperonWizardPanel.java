@@ -19,7 +19,13 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
 
 /**
@@ -62,10 +68,20 @@ public class TransAnalysesOperonWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
-            wiz.putProperty( TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS, this.component.isOperonAutomatic() );
-            wiz.putProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS, this.component.getMinSpanningReads() );
+            wiz.putProperty( PROP_AUTO_OPERON_PARAMS, this.component.isOperonAutomatic() );
+            wiz.putProperty( PROP_MIN_SPANNING_READS, this.component.getMinSpanningReads() );
+            storePrefs();
         }
     }
 
 
+    /**
+     * Stores the chosen operon detection parameters for this wizard for later
+     * use, also after restarting the software.
+     */
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_AUTO_OPERON_PARAMS, component.isOperonAutomatic() );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_SPANNING_READS, String.valueOf( component.getMinSpanningReads() ) );
+    }
 }

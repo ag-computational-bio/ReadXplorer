@@ -19,6 +19,12 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import java.util.prefs.Preferences;
+import javax.swing.ToolTipManager;
+import org.openide.util.NbPreferences;
+
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ASSOCIATE_TSS_WINDOW;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
@@ -32,11 +38,6 @@ import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionA
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
-import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.utils.GeneralUtils;
-import java.util.prefs.Preferences;
-import javax.swing.ToolTipManager;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -383,28 +384,28 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
         //ensure the tooltips are shown for 20 seconds to be able to read the data
         ToolTipManager.sharedInstance().setDismissDelay( 10000 );
-        
-        this.minTotalIncrease = Integer.parseInt( this.minTotalIncreaseField.getText() );
-        this.minTotalPercentIncrease = Integer.parseInt( this.minPercentIncreaseField.getText() );
-        this.maxLowCovInitialCount = Integer.parseInt( this.maxInitialCountField.getText() );
-        this.minLowCovIncrease = Integer.parseInt( this.minLowCovCountField.getText() );
-        this.minTranscriptExtensionCov = Integer.parseInt( this.transcriptExtensionField.getText() );
-        this.maxLeaderlessDistance = Integer.parseInt( this.maxLeaderlessDistanceField.getText() );
-        this.maxFeatureDistance = Integer.parseInt( this.maxFeatureDistField.getText() );
-        this.associateTssWindow = Integer.parseInt(this.associateTssWindowField.getText() );
 
-        this.minTotalIncreaseField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.minPercentIncreaseField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.maxInitialCountField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.minLowCovCountField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.transcriptExtensionField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.maxLeaderlessDistanceField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.maxFeatureDistField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.associateTssWindowField.getDocument().addDocumentListener( this.createDocumentListener() );
+        minTotalIncrease = Integer.parseInt( minTotalIncreaseField.getText() );
+        minTotalPercentIncrease = Integer.parseInt( minPercentIncreaseField.getText() );
+        maxLowCovInitialCount = Integer.parseInt( maxInitialCountField.getText() );
+        minLowCovIncrease = Integer.parseInt( minLowCovCountField.getText() );
+        minTranscriptExtensionCov = Integer.parseInt( transcriptExtensionField.getText() );
+        maxLeaderlessDistance = Integer.parseInt( maxLeaderlessDistanceField.getText() );
+        maxFeatureDistance = Integer.parseInt( maxFeatureDistField.getText() );
+        associateTssWindow = Integer.parseInt(associateTssWindowField.getText() );
 
-        this.loadLastParameterSelection();
-        
-        associateTssWindowField.setEnabled(isAssociateTss);
+        minTotalIncreaseField.getDocument().addDocumentListener( createDocumentListener() );
+        minPercentIncreaseField.getDocument().addDocumentListener( createDocumentListener() );
+        maxInitialCountField.getDocument().addDocumentListener( createDocumentListener() );
+        minLowCovCountField.getDocument().addDocumentListener( createDocumentListener() );
+        transcriptExtensionField.getDocument().addDocumentListener( createDocumentListener() );
+        maxLeaderlessDistanceField.getDocument().addDocumentListener( createDocumentListener() );
+        maxFeatureDistField.getDocument().addDocumentListener( createDocumentListener() );
+        associateTssWindowField.getDocument().addDocumentListener( createDocumentListener() );
+
+        loadLastParameterSelection();
+
+        associateTssWindowField.setEnabled( isAssociateTss );
     }
 
 
@@ -539,18 +540,18 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         return maxFeatureDistance;
     }
 
-    
+
     /**
-     * @return <code>true</code>, if TSS within the given window shall be 
+     * @return <code>true</code>, if TSS within the given window shall be
      * associated, <code>false</code> otherwise.
      */
     public boolean isAssociateTss() {
         return isAssociateTss;
     }
-    
-    
+
+
     /**
-     * @return The bp window in which all TSS shall be associated if 
+     * @return The bp window in which all TSS shall be associated if
      * <code>isAssociateTss()</code> is <code>true</code> otherwise.
      */
     public int getAssociateTssWindow() {

@@ -20,12 +20,18 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.awt.Component;
+import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
 
 /**
- * Panel for showing and handling all available options for the operon
- * detection.
+ * Panel for showing and handling all available options for the RPKM and
+ * read count analysis.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -35,8 +41,8 @@ public class TransAnalysesRPKMWizardPanel extends ChangeListeningWizardPanel {
 
 
     /**
-     * Panel for showing and handling all available options for the operon
-     * detection.
+     * Panel for showing and handling all available options for the RPKM and
+     * read count analysis.
      */
     public TransAnalysesRPKMWizardPanel() {
         super( "Please enter valid parameters (only positive numbers are allowed)" );
@@ -55,10 +61,20 @@ public class TransAnalysesRPKMWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
-            wiz.putProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS, this.component.getMinReadCount() );
-            wiz.putProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS, this.component.getMaxReadCount() );
+            wiz.putProperty( PROP_MIN_NUMBER_READS, this.component.getMinReadCount() );
+            wiz.putProperty( PROP_MAX_NUMBER_READS, this.component.getMaxReadCount() );
+            storePrefs();
         }
     }
 
 
+    /**
+     * Stores the chosen RPKM and read count analysis parameters for this wizard
+     * for later use, also after restarting the software.
+     */
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, String.valueOf( component.getMinReadCount() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, String.valueOf( component.getMaxReadCount() ) );
+    }
 }

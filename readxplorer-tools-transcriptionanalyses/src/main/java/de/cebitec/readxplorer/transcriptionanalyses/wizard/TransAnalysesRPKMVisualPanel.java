@@ -21,6 +21,12 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
 
 /**
@@ -123,16 +129,31 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
 
 
     private void initAdditionalComponents() {
-        this.minRPKMValue = Integer.parseInt( this.minRPKMValueField.getText() );
-        this.maxRPKMValue = Integer.parseInt( this.maxRPKMValueField.getText() );
+        minRPKMValue = Integer.parseInt( minRPKMValueField.getText() );
+        maxRPKMValue = Integer.parseInt( maxRPKMValueField.getText() );
 
-        this.minRPKMValueField.getDocument().addDocumentListener( this.createDocumentListener() );
-        this.maxRPKMValueField.getDocument().addDocumentListener( this.createDocumentListener() );
+        minRPKMValueField.getDocument().addDocumentListener( createDocumentListener() );
+        maxRPKMValueField.getDocument().addDocumentListener( createDocumentListener() );
+
+        loadLastParameterSelection();
+    }
+
+    /**
+     * Loads the last selected parameters into the component.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        String minNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, minRPKMValueField.getText() );
+        String maxNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, maxRPKMValueField.getText() );
+
+        minRPKMValueField.setText( minNoReadsString );
+        maxRPKMValueField.setText( maxNoReadsString );
+
     }
 
 
     /**
-     * Checks if all required information to start the transcription start
+     * Checks if all required information to start the RPKM and read count
      * analysis is set.
      */
     @Override
@@ -156,11 +177,19 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
     }
 
 
+    /**
+     * @return Maximum number of read counts for features to be listed in the
+     * result.
+     */
     public int getMaxReadCount() {
         return maxRPKMValue;
     }
 
 
+    /**
+     * @return Minimum number of read counts for features to be listed in the
+     *         result.
+     */
     public int getMinReadCount() {
         return minRPKMValue;
     }
