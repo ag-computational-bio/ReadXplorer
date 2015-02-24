@@ -34,8 +34,14 @@ public class Properties {
     public static final String ADAPTER_H2 = "h2";
     public static final String ADAPTER_DIRECT_ACCESS = "direct";
 
-    // protein DB property
-    public static final String DEFAULT_PROTEIN_DB_LINK = "http://enzyme.expasy.org/EC/";
+    // protein DB properties
+    public static final String DB_BRENDA = "http://www.brenda-enzymes.org/enzyme.php?ecno=";
+    public static final String DB_EC2PDB = "http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/enzymes/GetPage.pl?ec_number=";
+    public static final String DB_EXPASY = "http://enzyme.expasy.org/EC/";
+    public static final String DB_INTENZ = "http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec=";
+    public static final String DB_KEGG = "http://www.genome.jp/dbget-bin/www_bget?ec:";
+    public static final String DB_METACYC = "http://biocyc.org/META/substring-search?type=REACTION&object=";
+    public static final String DB_PRIAM = "http://priam.prabi.fr/cgi-bin/PRIAM_profiles_CurrentRelease.pl?EC=";
 
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
@@ -191,6 +197,11 @@ public class Properties {
      * Temporary directory used for import of data (SAM/BAM/JOK).
      */
     public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
+
+    /**
+     * Protein database prefix used for creating EC-number links.
+     */
+    public static final String PROTEIN_DB_LINK = "PROTEIN_DB_LINK";
 
     /**
      * The CRAN Mirror used by Gnu R to load missing packages.

@@ -38,9 +38,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
@@ -54,6 +56,8 @@ import static java.util.logging.Logger.getLogger;
 public class GeneralUtils {
 
     private static final Logger LOG = getLogger( GeneralUtils.class.getName() );
+
+    private static final Preferences PREF = NbPreferences.forModule( Object.class );
 
     /**
      * Calculates the percentage increase of value 1 to value 2. In case value1
@@ -565,7 +569,8 @@ public class GeneralUtils {
     public static String createEcHtmlLink( String ecNumber ) {
         String ecLink = "<html> </html>";
         if( ecNumber != null && !ecNumber.isEmpty() ) {
-            ecLink = "<a href=\"" + Properties.DEFAULT_PROTEIN_DB_LINK + ecNumber + "\">" + ecNumber + "</a>";
+            String dbUrl = PREF.get( Properties.PROTEIN_DB_LINK, Properties.DB_EXPASY );
+            ecLink = "<a href=\"" + dbUrl + ecNumber + "\">" + ecNumber + "</a>";
         }
         return ecLink;
     }
@@ -578,13 +583,14 @@ public class GeneralUtils {
      * <p>
      * @param ecNumber The EC number or empty string or <code>null</code>
      * <p>
-     * @return The link or a string of empty html tags
+     * @return The URL with a title or <code>null</code>
      */
     public static UrlWithTitle createEcUrl( String ecNumber ) {
         UrlWithTitle url = null;
         if( ecNumber != null && !ecNumber.isEmpty() ) {
             try {
-                url = new UrlWithTitle( ecNumber, new URL( Properties.DEFAULT_PROTEIN_DB_LINK + ecNumber ) );
+                String dbUrl = PREF.get( Properties.PROTEIN_DB_LINK, Properties.DB_EXPASY );
+                url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
             } catch( MalformedURLException ex ) {
                 LOG.log( SEVERE, ex.getMessage() );
             }
