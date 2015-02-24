@@ -218,6 +218,13 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
         org.openide.awt.Mnemonics.setLocalizedText(subfeatureLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.subfeatureLabel.text")); // NOI18N
         subfeatureLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.subfeatureLabel.toolTipText")); // NOI18N
 
+        jScrollPane4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(171, 173, 179)));
+        jScrollPane4.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        jScrollPane4.setMaximumSize(new java.awt.Dimension(6, 32767));
+        jScrollPane4.setMinimumSize(new java.awt.Dimension(6, 23));
+        jScrollPane4.setPreferredSize(new java.awt.Dimension(6, 24));
+
         ecNumberEditorPane.setEditable(false);
         ecNumberEditorPane.setBackground(new java.awt.Color(240, 240, 240));
         ecNumberEditorPane.setContentType("text/html"); // NOI18N
@@ -253,7 +260,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
                     .addComponent(strandText, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -280,9 +287,9 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
                     .addComponent(stopField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(stopLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ecNumLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(ecNumLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -452,7 +459,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
             Vector<PersistentFeature> parentVect = this.getFeatureVector( feat.getParents(), "Root feature" );
             Vector<PersistentFeature> childrenVect = this.getFeatureVector( feat.getNodeChildren(), "No children" );
 
-            String ecLink = GeneralUtils.createEcLink( feat.getEcNumber() );
+            String ecLink = GeneralUtils.createEcHtmlLink( feat.getEcNumber() );
             this.ecNumberEditorPane.setText( ecLink );
             this.startField.setText( String.valueOf( feat.getStart() ) );
             this.stopField.setText( String.valueOf( feat.getStop() ) );

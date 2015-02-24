@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Transcription
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -370,7 +371,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         if( feature != null ) {
             tssRow.add( feature.toString() );
             tssRow.add( feature.getLocus() );
-            tssRow.add( feature.getEcNumber() );
+            UrlWithTitle url = GeneralUtils.createEcUrl( feature.getEcNumber() );
+            tssRow.add( url != null ? url : "" );
             tssRow.add( feature.getProduct() );
             tssRow.add( feature.getStartOnStrand() );
             tssRow.add( feature.getStopOnStrand() );

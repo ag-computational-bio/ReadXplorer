@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.RPKMvalue;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,8 +76,8 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
     public List<RPKMvalue> getResults() {
         return Collections.unmodifiableList( rpkmResults );
     }
-    
-    
+
+
     /**
      * Use this method when adding new results to the current results. It
      * synchronizes the list and prevents making changes during the adding
@@ -142,7 +143,8 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
             feat = rpkmValue.getFeature();
             rpkmRow.add( feat );
             rpkmRow.add( feat.getLocus() );
-            rpkmRow.add( feat.getEcNumber() );
+            UrlWithTitle url = GeneralUtils.createEcUrl( feat.getEcNumber() );
+            rpkmRow.add( url != null ? url : "" );
             rpkmRow.add( feat.getProduct() );
             rpkmRow.add( feat.getType() );
             rpkmRow.add( this.getTrackEntry( rpkmValue.getTrackId(), true ) );

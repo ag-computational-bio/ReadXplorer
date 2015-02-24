@@ -26,6 +26,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -35,9 +37,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
+
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -46,6 +52,8 @@ import org.openide.util.NbBundle;
  * @author -Rolf Hilker-
  */
 public class GeneralUtils {
+
+    private static final Logger LOG = getLogger( GeneralUtils.class.getName() );
 
     /**
      * Calculates the percentage increase of value 1 to value 2. In case value1
@@ -554,13 +562,36 @@ public class GeneralUtils {
      * <p>
      * @return The link or a string of empty html tags
      */
-    public static String createEcLink( String ecNumber ) {
+    public static String createEcHtmlLink( String ecNumber ) {
         String ecLink = "<html> </html>";
         if( ecNumber != null && !ecNumber.isEmpty() ) {
             ecLink = "<a href=\"" + Properties.DEFAULT_PROTEIN_DB_LINK + ecNumber + "\">" + ecNumber + "</a>";
         }
         return ecLink;
     }
+
+
+    /**
+     * Creates a URL with a title (see {@link UrlWithTitle}) to the currently
+     * set protein database for a given EC number. If the EC number string is
+     * empty, <code>null</code> is returned.
+     * <p>
+     * @param ecNumber The EC number or empty string or <code>null</code>
+     * <p>
+     * @return The link or a string of empty html tags
+     */
+    public static UrlWithTitle createEcUrl( String ecNumber ) {
+        UrlWithTitle url = null;
+        if( ecNumber != null && !ecNumber.isEmpty() ) {
+            try {
+                url = new UrlWithTitle( ecNumber, new URL( Properties.DEFAULT_PROTEIN_DB_LINK + ecNumber ) );
+            } catch( MalformedURLException ex ) {
+                LOG.log( SEVERE, ex.getMessage() );
+            }
+        }
+        return url;
+    }
+
 
 //    /**
 //     * For a given map of strings to other maps or objects, this method
