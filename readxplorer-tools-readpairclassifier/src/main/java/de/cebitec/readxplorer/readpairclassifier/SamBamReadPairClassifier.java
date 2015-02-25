@@ -88,7 +88,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
     private int maxDist;
     private short orienation; //orientation of the reads: 0 = fr, 1 = rf, 2 = ff/rr
     private SAMFileWriter samBamWriter;
-    private final Map<String, Integer> chromLengthMap;
+    protected final Map<String, Integer> chromLengthMap;
     private boolean deleteSortedFile;
     private ParsedClassification class1;
     private ParsedClassification class2;
