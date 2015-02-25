@@ -201,7 +201,7 @@ public class Properties {
     /**
      * Protein database prefix used for creating EC-number links.
      */
-    public static final String PROTEIN_DB_LINK = "PROTEIN_DB_LINK";
+    public static final String ENZYME_DB_LINK = "PROTEIN_DB_LINK";
 
     /**
      * The CRAN Mirror used by Gnu R to load missing packages.

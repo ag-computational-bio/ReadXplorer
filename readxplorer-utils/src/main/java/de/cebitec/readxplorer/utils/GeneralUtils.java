@@ -569,7 +569,7 @@ public class GeneralUtils {
     public static String createEcHtmlLink( String ecNumber ) {
         String ecLink = "<html> </html>";
         if( ecNumber != null && !ecNumber.isEmpty() ) {
-            String dbUrl = PREF.get( Properties.PROTEIN_DB_LINK, Properties.DB_EXPASY );
+            String dbUrl = PREF.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
             ecLink = "<a href=\"" + dbUrl + ecNumber + "\">" + ecNumber + "</a>";
         }
         return ecLink;
@@ -589,7 +589,7 @@ public class GeneralUtils {
         UrlWithTitle url = null;
         if( ecNumber != null && !ecNumber.isEmpty() ) {
             try {
-                String dbUrl = PREF.get( Properties.PROTEIN_DB_LINK, Properties.DB_EXPASY );
+                String dbUrl = PREF.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
                 url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
             } catch( MalformedURLException ex ) {
                 LOG.log( SEVERE, ex.getMessage() );

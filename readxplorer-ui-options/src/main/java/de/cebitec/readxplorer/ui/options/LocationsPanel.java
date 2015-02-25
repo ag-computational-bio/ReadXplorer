@@ -96,7 +96,7 @@ final class LocationsPanel extends OptionsPanel {
         dbKeggRadioButton = new javax.swing.JRadioButton();
         dbOwnRadioButton = new javax.swing.JRadioButton();
         dbOwnTextField = new javax.swing.JTextField();
-        proteinDbLabel = new javax.swing.JLabel();
+        enzymeDbLabel = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         dbBrendaRadioButton = new javax.swing.JRadioButton();
         dbEc2pdbRadioButton = new javax.swing.JRadioButton();
@@ -144,7 +144,7 @@ final class LocationsPanel extends OptionsPanel {
 
         dbOwnTextField.setText(org.openide.util.NbBundle.getMessage(LocationsPanel.class, "LocationsPanel.dbOwnTextField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(proteinDbLabel, org.openide.util.NbBundle.getMessage(LocationsPanel.class, "LocationsPanel.proteinDbLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(enzymeDbLabel, org.openide.util.NbBundle.getMessage(LocationsPanel.class, "LocationsPanel.enzymeDbLabel.text")); // NOI18N
 
         dbButtonGroup.add(dbBrendaRadioButton);
         org.openide.awt.Mnemonics.setLocalizedText(dbBrendaRadioButton, org.openide.util.NbBundle.getMessage(LocationsPanel.class, "LocationsPanel.dbBrendaRadioButton.text")); // NOI18N
@@ -212,23 +212,22 @@ final class LocationsPanel extends OptionsPanel {
                         .addComponent(tempImportDirField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chooseTmpImportDirButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(validateUrlButton)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(validateUrlTextField))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(dbMetaCycRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dbIntEnzRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dbPriamRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dbEc2pdbRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dbBrendaRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dbKeggRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dbExpasyRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(proteinDbLabel)
-                                .addComponent(tempImportDirLabel))
-                            .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(validateUrlButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(validateUrlTextField))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(dbMetaCycRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dbIntEnzRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dbPriamRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dbEc2pdbRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dbBrendaRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dbKeggRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dbExpasyRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(enzymeDbLabel)
+                            .addComponent(tempImportDirLabel))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -243,7 +242,7 @@ final class LocationsPanel extends OptionsPanel {
                 .addGap(23, 23, 23)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(proteinDbLabel)
+                .addComponent(enzymeDbLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(dbExpasyRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -342,13 +341,13 @@ final class LocationsPanel extends OptionsPanel {
     @Override
     void load() {
         tempImportDirField.setText( pref.get( Properties.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) );
-        selectedDbLink = pref.get( Properties.PROTEIN_DB_LINK, Properties.DB_EXPASY );
+        selectedDbLink = pref.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
         setDbButtonSelected();
     }
 
 
     /**
-     * Identify the currently selected protein DB link and select the
+     * Identify the currently selected enzyme DB link and select the
      * corresponding radio button.
      */
     private void setDbButtonSelected() {
@@ -373,7 +372,7 @@ final class LocationsPanel extends OptionsPanel {
         }
 
         pref.put( Properties.TMP_IMPORT_DIR, tempImportDirField.getText() );
-        pref.put( Properties.PROTEIN_DB_LINK, selectedDbLink );
+        pref.put(Properties.ENZYME_DB_LINK, selectedDbLink );
     }
 
 
@@ -401,8 +400,8 @@ final class LocationsPanel extends OptionsPanel {
     private javax.swing.JRadioButton dbOwnRadioButton;
     private javax.swing.JTextField dbOwnTextField;
     private javax.swing.JRadioButton dbPriamRadioButton;
+    private javax.swing.JLabel enzymeDbLabel;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JLabel proteinDbLabel;
     private javax.swing.JTextField tempImportDirField;
     private javax.swing.JLabel tempImportDirLabel;
     private javax.swing.JButton validateUrlButton;

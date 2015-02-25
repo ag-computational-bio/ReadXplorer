@@ -34,26 +34,24 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chooseTmpImportDirButton" min="-2" pref="70" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="validateUrlButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="validateUrlTextField" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="validateUrlButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="validateUrlTextField" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="dbMetaCycRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="dbIntEnzRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="dbPriamRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="dbEc2pdbRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="dbBrendaRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="dbKeggRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="dbExpasyRadioButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="enzymeDbLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="tempImportDirLabel" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="dbMetaCycRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="dbIntEnzRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="dbPriamRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="dbEc2pdbRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="dbBrendaRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="dbKeggRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="dbExpasyRadioButton" min="-2" max="-2" attributes="0"/>
-                              <Component id="proteinDbLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="tempImportDirLabel" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -73,7 +71,7 @@
               <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
               <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="proteinDbLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="enzymeDbLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dbExpasyRadioButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -175,10 +173,10 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="proteinDbLabel">
+    <Component class="javax.swing.JLabel" name="enzymeDbLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="LocationsPanel.proteinDbLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="LocationsPanel.enzymeDbLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
