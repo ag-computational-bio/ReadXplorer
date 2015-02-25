@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.JFeature;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.awt.Desktop;
@@ -460,31 +461,37 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
             Vector<PersistentFeature> childrenVect = this.getFeatureVector( feat.getNodeChildren(), "No children" );
 
             String ecLink = GeneralUtils.createEcHtmlLink( feat.getEcNumber() );
-            this.ecNumberEditorPane.setText( ecLink );
-            this.startField.setText( String.valueOf( feat.getStart() ) );
-            this.stopField.setText( String.valueOf( feat.getStop() ) );
-            this.productText.setText( feat.getProduct() );
-            this.productText.setToolTipText( feat.getProduct() );
-            this.locusField.setText( feat.getLocus() );
-            this.geneField.setText( feat.getName() );
-            this.typeText.setText( feat.getType().getTypeString() );
-            this.parentList.setListData( parentVect );
-            this.subfeatureList.setListData( childrenVect );
+            ecNumberEditorPane.setText( ecLink );
+            UrlWithTitle ecUrl = GeneralUtils.createEcUrl( feat.getEcNumber() );
+            if ( ecUrl != null ) {
+                ecNumberEditorPane.setToolTipText( ecUrl.getUrl().toString() );
+            } else {
+                ecNumberEditorPane.setToolTipText( null );
+            }
+            startField.setText( String.valueOf( feat.getStart() ) );
+            stopField.setText( String.valueOf( feat.getStop() ) );
+            productText.setText( feat.getProduct() );
+            productText.setToolTipText( feat.getProduct() );
+            locusField.setText( feat.getLocus() );
+            geneField.setText( feat.getName() );
+            typeText.setText( feat.getType().getTypeString() );
+            parentList.setListData( parentVect );
+            subfeatureList.setListData( childrenVect );
 
             strand = feat.isFwdStrand() ? "forward" : "reverse";
 
         } else {
-            this.ecNumberEditorPane.setText( "" );
-            this.startField.setText( "" );
-            this.stopField.setText( "" );
-            this.productText.setText( "" );
-            this.productText.setToolTipText( "" );
-            this.locusField.setText( "" );
-            this.geneField.setText( "" );
-            this.typeText.setText( "" );
+            ecNumberEditorPane.setText( "" );
+            startField.setText( "" );
+            stopField.setText( "" );
+            productText.setText( "" );
+            productText.setToolTipText( "" );
+            locusField.setText( "" );
+            geneField.setText( "" );
+            typeText.setText( "" );
         }
-        this.strandText.setText( strand );
-        this.productText.setCaretPosition( 0 );
+        strandText.setText( strand );
+        productText.setCaretPosition( 0 );
     }
 
 
