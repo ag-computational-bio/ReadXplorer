@@ -80,16 +80,16 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
     private int finishedMappingAnalyses = 0;
     private ParameterSetTSS parametersTss;
     private ParameterSetOperonDet parametersOperonDet;
-    private ParameterSetRPKM parametersRPKM;
+    private ParameterSetNormalization parametersNormalization;
     private boolean combineTracks;
     private Map<Integer, PersistentTrack> trackMap;
     private final Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
-    private ResultPanelRPKM rpkmResultPanel;
+    private ResultPanelNormalization normalizationResultPanel;
 
     private String readClassPropString;
-    private String selRPKMFeatureTypesPropString;
+    private String selNormFeatureTypesPropString;
     private String selOperonFeatureTypesPropString;
     private String combineTracksPropString;
 
@@ -131,7 +131,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator( reference.getId() );
         this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
         this.selOperonFeatureTypesPropString = transWizardIterator.getPropSelectedOperonFeatTypes();
-        this.selRPKMFeatureTypesPropString = transWizardIterator.getPropSelectedRPKMFeatTypes();
+        this.selNormFeatureTypesPropString = transWizardIterator.getPropSelectedNormFeatTypes();
         this.combineTracksPropString = transWizardIterator.getCombineTracksPropForWiz();
         WizardDescriptor wiz = new WizardDescriptor( transWizardIterator );
         transWizardIterator.setWiz( wiz );
@@ -181,13 +181,13 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         int maxNumberReads = 0;
         boolean autoOperonParamEstimation = false;
         int minSpanningReads = 0;
-        Set<FeatureType> selRPKMFeatureTypes = new HashSet<>();
+        Set<FeatureType> selNormFeatureTypes = new HashSet<>();
         Set<FeatureType> selOperonFeatureTypes = new HashSet<>();
 
         //obtain all analysis parameters
         boolean performTSSAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS );
         boolean performOperonAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS );
-        boolean performRPKMAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS );
+        boolean performNormAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_NORM_ANALYSIS );
 
         ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty( readClassPropString );
         this.combineTracks = (boolean) wiz.getProperty( combineTracksPropString );
@@ -214,17 +214,17 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             minSpanningReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS );
             selOperonFeatureTypes = (Set<FeatureType>) wiz.getProperty( selOperonFeatureTypesPropString );
         }
-        if( performRPKMAnalysis ) {
+        if( performNormAnalysis ) {
             minNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS );
             maxNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS );
-            selRPKMFeatureTypes = (Set<FeatureType>) wiz.getProperty( selRPKMFeatureTypesPropString );
+            selNormFeatureTypes = (Set<FeatureType>) wiz.getProperty( selNormFeatureTypesPropString );
         }
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS( performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                                              minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov,
                                              maxLeaderlessDistance, maxFeatureDistance, isAssociateTss, associateTssWindow, readClassParams );
         parametersOperonDet = new ParameterSetOperonDet( performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams );
-        parametersRPKM = new ParameterSetRPKM( performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes, readClassParams );
+        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads, selNormFeatureTypes, readClassParams );
 
 
         TrackConnector connector;
@@ -266,19 +266,20 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
     private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassesParams ) {
         AnalysisTranscriptionStart analysisTSS = null;
         AnalysisOperon analysisOperon = null;
-        AnalysisRPKM analysisRPKM = null;
+        AnalysisNormalization analysisNormalization = null;
 
         AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler( this,
-                                                                              NbBundle.getMessage( OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name" ), readClassesParams );
+                                                                              NbBundle.getMessage( OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name" ),
+                                                                              readClassesParams );
         AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler( this,
-                                                                                  NbBundle.getMessage( OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name" ), readClassesParams );
+                                                                                  NbBundle.getMessage( OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name" ),
+                                                                                  readClassesParams );
 
         if( parametersTss.isPerformTSSAnalysis() ) {
 
             if( parametersTss.isPerformUnannotatedTranscriptDet() ) {
                 analysisTSS = new AnalysisUnannotatedTransStart( connector, parametersTss );
-            }
-            else {
+            } else {
                 analysisTSS = new AnalysisTranscriptionStart( connector, parametersTss );
             }
             covAnalysisHandler.registerObserver( analysisTSS );
@@ -292,15 +293,15 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             mappingAnalysisHandler.setMappingsNeeded( true );
             mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
         }
-        if( parametersRPKM.isPerformRPKMAnalysis() ) {
-            analysisRPKM = new AnalysisRPKM( connector, parametersRPKM );
+        if( parametersNormalization.isPerformNormAnalysis() ) {
+            analysisNormalization = new AnalysisNormalization( connector, parametersNormalization );
 
-            mappingAnalysisHandler.registerObserver( analysisRPKM );
+            mappingAnalysisHandler.registerObserver( analysisNormalization );
             mappingAnalysisHandler.setMappingsNeeded( true );
             mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
         }
 
-        trackToAnalysisMap.put( connector.getTrackID(), new AnalysisContainer( analysisTSS, analysisOperon, analysisRPKM ) );
+        trackToAnalysisMap.put( connector.getTrackID(), new AnalysisContainer( analysisTSS, analysisOperon, analysisNormalization ) );
         covAnalysisHandler.startAnalysis();
         mappingAnalysisHandler.startAnalysis();
     }
@@ -370,22 +371,22 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                             }
                         }
 
-                        if( parametersRPKM.isPerformRPKMAnalysis() ) {
-                            AnalysisRPKM rpkmAnalysis = trackToAnalysisMap.get( trackId ).getAnalysisRPKM();
-                            if( rpkmResultPanel == null ) {
-                                rpkmResultPanel = new ResultPanelRPKM();
-                                rpkmResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
+                        if( parametersNormalization.isPerformNormAnalysis() ) {
+                            AnalysisNormalization normalizationAnalysis = trackToAnalysisMap.get( trackId ).getAnalysisNorm();
+                            if( normalizationResultPanel == null ) {
+                                normalizationResultPanel = new ResultPanelNormalization();
+                                normalizationResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
                             }
-                            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult( trackMap,
-                                                                                            trackToAnalysisMap.get( trackId ).getAnalysisRPKM().getResults(), reference, combineTracks, 1, 0 );
-                            rpkmAnalysisResult.setParameters( parametersRPKM );
-                            rpkmAnalysisResult.setNoGenomeFeatures( rpkmAnalysis.getNoGenomeFeatures() );
-                            rpkmResultPanel.addResult( rpkmAnalysisResult );
+                            NormalizationAnalysisResult normAnalysisResult = new NormalizationAnalysisResult( trackMap,
+                                                                                            trackToAnalysisMap.get( trackId ).getAnalysisNorm().getResults(), reference, combineTracks, 1, 0 );
+                            normAnalysisResult.setParameters( parametersNormalization );
+                            normAnalysisResult.setNoGenomeFeatures( normalizationAnalysis.getNoGenomeFeatures() );
+                            normalizationResultPanel.addResult( normAnalysisResult );
 
                             if( finishedMappingAnalyses >= tracks.size() || combineTracks ) {
-                                trackNames = GeneralUtils.generateConcatenatedString( rpkmAnalysisResult.getTrackNameList(), 120 );
-                                String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getDataSize() + " hits)";
-                                transcAnalysesTopComp.openAnalysisTab( panelName, rpkmResultPanel );
+                                trackNames = GeneralUtils.generateConcatenatedString( normAnalysisResult.getTrackNameList(), 120 );
+                                String panelName = "TPM, RPKM & read count values for " + trackNames + " (" + normalizationResultPanel.getDataSize() + " hits)";
+                                transcAnalysesTopComp.openAnalysisTab( panelName, normalizationResultPanel );
                             }
                         }
                     }
@@ -408,22 +409,23 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
         private final AnalysisTranscriptionStart analysisTSS;
         private final AnalysisOperon analysisOperon;
-        private final AnalysisRPKM analysisRPKM;
+        private final AnalysisNormalization analysisNormalization;
 
 
         /**
          * Container class for all available transcription analyses.
          */
-        AnalysisContainer( AnalysisTranscriptionStart analysisTSS, AnalysisOperon analysisOperon, AnalysisRPKM analysisRPKM ) {
+        AnalysisContainer( AnalysisTranscriptionStart analysisTSS, AnalysisOperon analysisOperon,
+                                                                   AnalysisNormalization analysisNormalization ) {
             this.analysisTSS = analysisTSS;
             this.analysisOperon = analysisOperon;
-            this.analysisRPKM = analysisRPKM;
+            this.analysisNormalization = analysisNormalization;
         }
 
 
         /**
          * @return The transcription start site analysis stored in this
-         *         container
+         *         container.
          */
         public AnalysisTranscriptionStart getAnalysisTSS() {
             return analysisTSS;
@@ -431,15 +433,18 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
 
         /**
-         * @return The operon detection stored in this container
+         * @return The operon detection stored in this container.
          */
         public AnalysisOperon getAnalysisOperon() {
             return analysisOperon;
         }
 
 
-        public AnalysisRPKM getAnalysisRPKM() {
-            return analysisRPKM;
+        /**
+         * @return The normalization analysis stored in this container.
+         */
+        public AnalysisNormalization getAnalysisNorm() {
+            return analysisNormalization;
         }
 
 

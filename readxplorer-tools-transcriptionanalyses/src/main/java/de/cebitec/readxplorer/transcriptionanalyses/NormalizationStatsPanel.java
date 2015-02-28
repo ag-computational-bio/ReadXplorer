@@ -18,29 +18,31 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
-import java.util.HashMap;
+import java.util.Map;
 import org.openide.util.NbBundle;
 
 
 /**
- * Panel for showing the the statistics of a result of filtered features.
+ * Panel for showing the the statistics of a result of the normalization
+ * analysis.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class RpkmStatsPanel extends javax.swing.JPanel {
+public class NormalizationStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final HashMap<String, Integer> returnedFeaturesStatsMap;
+    private final Map<String, Integer> featureStatsMap;
 
 
     /**
-     * Creates new form RpkmStatsPanel
+     * Panel for showing the the statistics of a result of the normalization
+     * analysis.
      * <p>
-     * @param returnedFeaturesStatsMap statistics to display
+     * @param featureStatsMap statistics to display
      */
-    public RpkmStatsPanel( HashMap<String, Integer> returnedFeaturesStatsMap ) {
-        this.returnedFeaturesStatsMap = returnedFeaturesStatsMap;
+    public NormalizationStatsPanel( Map<String, Integer> featureStatsMap ) {
+        this.featureStatsMap = featureStatsMap;
         this.initComponents();
         this.initAdditionalComponents();
     }
@@ -56,9 +58,9 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         returnedFeatureStatsScrollpane = new javax.swing.JScrollPane();
-        returnedFeatureStatsTable = new javax.swing.JTable();
+        featureStatsTable = new javax.swing.JTable();
 
-        returnedFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
+        featureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null},
                 {null, null},
@@ -87,10 +89,10 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        returnedFeatureStatsScrollpane.setViewportView(returnedFeatureStatsTable);
-        if (returnedFeatureStatsTable.getColumnModel().getColumnCount() > 0) {
-            returnedFeatureStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title0")); // NOI18N
-            returnedFeatureStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title1")); // NOI18N
+        returnedFeatureStatsScrollpane.setViewportView(featureStatsTable);
+        if (featureStatsTable.getColumnModel().getColumnCount() > 0) {
+            featureStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title0")); // NOI18N
+            featureStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title1")); // NOI18N
         }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -105,20 +107,20 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable featureStatsTable;
     private javax.swing.JScrollPane returnedFeatureStatsScrollpane;
-    private javax.swing.JTable returnedFeatureStatsTable;
     // End of variables declaration//GEN-END:variables
 
 
     private void initAdditionalComponents() {
-        returnedFeatureStatsTable.setModel( new javax.swing.table.DefaultTableModel(
+        featureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    { ResultPanelRPKM.RETURNED_FEATURES, this.returnedFeaturesStatsMap.get( ResultPanelRPKM.RETURNED_FEATURES ) },
-                    { ResultPanelRPKM.FEATURES_TOTAL, this.returnedFeaturesStatsMap.get( ResultPanelRPKM.FEATURES_TOTAL ) }
+                    { ResultPanelNormalization.RETURNED_FEATURES, this.featureStatsMap.get( ResultPanelNormalization.RETURNED_FEATURES ) },
+                    { ResultPanelNormalization.FEATURES_TOTAL, this.featureStatsMap.get( ResultPanelNormalization.FEATURES_TOTAL ) }
                 },
                 new String[]{
-                    NbBundle.getMessage( RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title0" ),
-                    NbBundle.getMessage( RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title1" )
+                    NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title0" ),
+                    NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title1" )
                 } ) {
                     private static final long serialVersionUID = 1L;
                     Class<?>[] types = new Class<?>[]{

@@ -259,6 +259,10 @@ public class ReferenceConnector {
      * Fetches all features which at least partly overlap a given region of the
      * reference including all parent-children relationships between the
      * features.
+     * <br>An Example:
+     * <br>Gene is included, CDS is excluded:
+     * <br>All CDS belonging to a gene are preserved in the feature hierarchy of
+     * that gene, while all CDS from the result list level are discarded
      * <p>
      * @param from        start position of the region of interest
      * @param to          end position of the region of interest
@@ -282,6 +286,10 @@ public class ReferenceConnector {
      * Fetches all features which at least partly overlap a given region of the
      * reference including all parent-children relationships between the
      * features.
+     * <br>An Example:
+     * <br>Gene is included, CDS is excluded:
+     * <br>All CDS belonging to a gene are preserved in the feature hierarchy of
+     * that gene, while all CDS from the result list level are discarded
      * <p>
      * @param from         start position of the region of interest
      * @param to           end position of the region of interest

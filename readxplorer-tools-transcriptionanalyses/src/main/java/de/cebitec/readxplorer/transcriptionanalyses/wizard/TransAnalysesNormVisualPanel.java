@@ -30,21 +30,23 @@ import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionA
 
 
 /**
- * Panel for showing all available options for the RPKM calculation.
- *
+ * Panel for showing all available options for the normalization (TPM and RPKM)
+ * calculation.
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TransAnalysesRPKMVisualPanel extends JobPanel {
+public class TransAnalysesNormVisualPanel extends JobPanel {
 
     private static final long serialVersionUID = 1L;
-    private int minRPKMValue;
-    private int maxRPKMValue;
+    private int minReadCountValue;
+    private int maxReadCountValue;
 
 
     /**
-     * Panel for showing all available options for the RPKM value calculation.
+     * Panel for showing all available options for the normalization (TPM and
+     * RPKM) calculation.
      */
-    public TransAnalysesRPKMVisualPanel() {
+    public TransAnalysesNormVisualPanel() {
         initComponents();
         initAdditionalComponents();
     }
@@ -52,7 +54,7 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
 
     @Override
     public String getName() {
-        return "RPKM Calculation";
+        return "TPM, RPKM & Read Count Calculation";
     }
 
 
@@ -65,23 +67,28 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        minRPKMValueField = new javax.swing.JTextField();
+        minReadCountValueField = new javax.swing.JTextField();
         minRPKMValueLabel = new javax.swing.JLabel();
-        maxRPKMValueField = new javax.swing.JTextField();
+        maxReadCountValueField = new javax.swing.JTextField();
         maxRPKMValueLabel = new javax.swing.JLabel();
 
-        minRPKMValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesRPKMVisualPanel.class, "TransAnalysesRPKMVisualPanel.minRPKMValueField.text")); // NOI18N
-        minRPKMValueField.addActionListener(new java.awt.event.ActionListener() {
+        minReadCountValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.minReadCountValueField.text")); // NOI18N
+        minReadCountValueField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                minRPKMValueFieldActionPerformed(evt);
+                minReadCountValueFieldActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(minRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesRPKMVisualPanel.class, "TransAnalysesRPKMVisualPanel.minRPKMValueLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(minRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.minRPKMValueLabel.text")); // NOI18N
 
-        maxRPKMValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesRPKMVisualPanel.class, "TransAnalysesRPKMVisualPanel.maxRPKMValueField.text")); // NOI18N
+        maxReadCountValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.maxReadCountValueField.text")); // NOI18N
+        maxReadCountValueField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                maxReadCountValueFieldActionPerformed(evt);
+            }
+        });
 
-        org.openide.awt.Mnemonics.setLocalizedText(maxRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesRPKMVisualPanel.class, "TransAnalysesRPKMVisualPanel.maxRPKMValueLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(maxRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.maxRPKMValueLabel.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -90,50 +97,51 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(minRPKMValueField)
-                    .addComponent(maxRPKMValueField, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE))
+                    .addComponent(maxReadCountValueField, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                    .addComponent(minReadCountValueField))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(11, 11, 11)
-                        .addComponent(minRPKMValueLabel))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(maxRPKMValueLabel)))
-                .addContainerGap(13, Short.MAX_VALUE))
+                    .addComponent(maxRPKMValueLabel)
+                    .addComponent(minRPKMValueLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(minRPKMValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(minReadCountValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(minRPKMValueLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(maxRPKMValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxReadCountValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(maxRPKMValueLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void minRPKMValueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minRPKMValueFieldActionPerformed
+    private void minReadCountValueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minReadCountValueFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_minRPKMValueFieldActionPerformed
+    }//GEN-LAST:event_minReadCountValueFieldActionPerformed
+
+    private void maxReadCountValueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxReadCountValueFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_maxReadCountValueFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField maxRPKMValueField;
     private javax.swing.JLabel maxRPKMValueLabel;
-    private javax.swing.JTextField minRPKMValueField;
+    private javax.swing.JTextField maxReadCountValueField;
     private javax.swing.JLabel minRPKMValueLabel;
+    private javax.swing.JTextField minReadCountValueField;
     // End of variables declaration//GEN-END:variables
 
 
     private void initAdditionalComponents() {
-        minRPKMValue = Integer.parseInt( minRPKMValueField.getText() );
-        maxRPKMValue = Integer.parseInt( maxRPKMValueField.getText() );
+        minReadCountValue = Integer.parseInt( minReadCountValueField.getText() );
+        maxReadCountValue = Integer.parseInt( maxReadCountValueField.getText() );
 
-        minRPKMValueField.getDocument().addDocumentListener( createDocumentListener() );
-        maxRPKMValueField.getDocument().addDocumentListener( createDocumentListener() );
+        minReadCountValueField.getDocument().addDocumentListener( createDocumentListener() );
+        maxReadCountValueField.getDocument().addDocumentListener( createDocumentListener() );
 
         loadLastParameterSelection();
     }
@@ -143,32 +151,30 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
      */
     private void loadLastParameterSelection() {
         Preferences pref = NbPreferences.forModule( Object.class );
-        String minNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, minRPKMValueField.getText() );
-        String maxNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, maxRPKMValueField.getText() );
+        String minNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, minReadCountValueField.getText() );
+        String maxNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, maxReadCountValueField.getText() );
 
-        minRPKMValueField.setText( minNoReadsString );
-        maxRPKMValueField.setText( maxNoReadsString );
+        minReadCountValueField.setText( minNoReadsString );
+        maxReadCountValueField.setText( maxNoReadsString );
 
     }
 
 
     /**
-     * Checks if all required information to start the RPKM and read count
-     * analysis is set.
+     * Checks if all required information to start the normalization (TPM and
+     * RPKM) and read count analysis is set.
      */
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidIntegerInput( minRPKMValueField.getText() ) ) {
-            this.minRPKMValue = Integer.parseInt( minRPKMValueField.getText() );
-        }
-        else {
+        if( GeneralUtils.isValidIntegerInput( minReadCountValueField.getText() ) ) {
+            this.minReadCountValue = Integer.parseInt( minReadCountValueField.getText() );
+        } else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveIntegerInput( maxRPKMValueField.getText() ) ) {
-            this.maxRPKMValue = Integer.parseInt( maxRPKMValueField.getText() );
-        }
-        else {
+        if( GeneralUtils.isValidPositiveIntegerInput( maxReadCountValueField.getText() ) ) {
+            this.maxReadCountValue = Integer.parseInt( maxReadCountValueField.getText() );
+        } else {
             isValidated = false;
         }
 
@@ -182,7 +188,7 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
      * result.
      */
     public int getMaxReadCount() {
-        return maxRPKMValue;
+        return maxReadCountValue;
     }
 
 
@@ -191,7 +197,7 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
      *         result.
      */
     public int getMinReadCount() {
-        return minRPKMValue;
+        return minReadCountValue;
     }
 
 

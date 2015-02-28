@@ -226,7 +226,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
     /**
      * Returns if the feature is located on the fwd or rev strand.
      * <p>
-     * @return true for featues on forward and false on reverse strand
+     * @return <code>true</code> for mappings on forward and <code>false</code>
+     *         for mappings on the reverse strand
      */
     @Override
     public boolean isFwdStrand() {
@@ -328,24 +329,25 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
 //    }
 
     /**
-     * Compares two PersistentFeature based on their start position. '0' is
-     * returned for
-     * equal start positions, 1, if the start position of the other is larger
-     * and -1, if the start position of this mapping is larger.
+     * Compares two genomic ranges (e.g. PersistentFeatures) based on their
+     * start position. '0' is returned for equal start positions, 1, if the
+     * start position of the other is larger and -1, if the start position of
+     * this PersistentFeature is larger.
      * <p>
-     * @param feature mapping to compare to this mapping
+     * @param genomicRange Genomic range (e.g. feature) to compare to this
+     *                     PersistentFeature
      * <p>
-     * @return '0' for equal start positions, 1, if the start
-     *         position of the other is larger and -1, if the start position of this
-     *         mapping is larger.
+     * @return '0' for equal start positions, 1, if the start position of the
+     *         other is larger and -1, if the start position of this genomic
+     *         range (PersistentFeature) is larger.
      */
     @Override
-    public int compareTo( GenomicRange feature ) {
+    public int compareTo( GenomicRange genomicRange ) {
         int ret = 0;
-        if( this.start < feature.getStart() ) {
+        if( this.start < genomicRange.getStart() ) {
             ret = -1;
         }
-        else if( this.start > feature.getStart() ) {
+        else if( this.start > genomicRange.getStart() ) {
             ret = 1;
         }
         return ret;

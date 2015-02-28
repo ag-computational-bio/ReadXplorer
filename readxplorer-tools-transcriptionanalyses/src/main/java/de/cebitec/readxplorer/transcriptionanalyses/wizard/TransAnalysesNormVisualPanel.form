@@ -19,20 +19,15 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="minRPKMValueField" max="32767" attributes="0"/>
-                  <Component id="maxRPKMValueField" pref="0" max="32767" attributes="0"/>
+                  <Component id="maxReadCountValueField" pref="94" max="32767" attributes="0"/>
+                  <Component id="minReadCountValueField" max="32767" attributes="0"/>
               </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                      <Component id="minRPKMValueLabel" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="maxRPKMValueLabel" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="maxRPKMValueLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="minRPKMValueLabel" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="13" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -41,12 +36,12 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="minRPKMValueField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="minReadCountValueField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="minRPKMValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="maxRPKMValueField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="maxReadCountValueField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="maxRPKMValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -55,34 +50,37 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JTextField" name="minRPKMValueField">
+    <Component class="javax.swing.JTextField" name="minReadCountValueField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesRPKMVisualPanel.minRPKMValueField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.minReadCountValueField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minRPKMValueFieldActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minReadCountValueFieldActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="minRPKMValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesRPKMVisualPanel.minRPKMValueLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.minRPKMValueLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="maxRPKMValueField">
+    <Component class="javax.swing.JTextField" name="maxReadCountValueField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesRPKMVisualPanel.maxRPKMValueField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.maxReadCountValueField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="maxReadCountValueFieldActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="maxRPKMValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesRPKMVisualPanel.maxRPKMValueLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.maxRPKMValueLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

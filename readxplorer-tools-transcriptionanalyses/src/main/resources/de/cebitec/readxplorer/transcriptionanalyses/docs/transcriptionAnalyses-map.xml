@@ -22,6 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <mapID target="de.cebitec.readxplorer.differentialExpression.about" url="differentialExpression-about.html"/>
     <mapID target="de.cebitec.readxplorer.differentialExpression.installation" url="differentialExpression-installation.html"/>
     <mapID target="de.cebitec.readxplorer.transcriptionAnalyses.tss" url="tss-about.html"/>
-    <mapID target="de.cebitec.readxplorer.transcriptionAnalyses.rpkm" url="rpkm-about.html"/>
+    <mapID target="de.cebitec.readxplorer.transcriptionAnalyses.normalization" url="normalization-about.html"/>
     <mapID target="de.cebitec.readxplorer.transcriptionAnalyses.operon" url="operon-about.html"/>
 </map>

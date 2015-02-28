@@ -15,11 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.transcriptionanalyses;
+package de.cebitec.readxplorer.ui;
 
 
-import de.cebitec.readxplorer.ui.TopComponentExtended;
-import de.cebitec.readxplorer.ui.TopComponentHelper;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -29,44 +27,41 @@ import org.openide.windows.TopComponent;
 
 
 /**
- * TopComponent for displaying all gui elements belonging to the transcription
- * analyses.
+ * TopComponent for displaying something in multiple tabs.
  *
- * @author -Rolf Hilker-
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readxplorer.transcriptionanalyses//TranscriptionAnalyses//EN",
+    dtd = "-//de.cebitec.readxplorer.ui//TabbedTopComponent//EN",
     autostore = false )
 @TopComponent.Description(
-    preferredID = "TranscriptionAnalysesTopComponent",
-    iconBase = "de/cebitec/readxplorer/transcriptionanalyses/transcriptionAnalyses.png",
+    preferredID = "TabbedTopComponent",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.TranscriptionAnalysesTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.ui.TabbedTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_TranscriptionAnalysesAction",
-    preferredID = "TranscriptionAnalysesTopComponent" )
+    displayName = "#CTL_TabbedTopComponent",
+    preferredID = "TabbedTopComponent" )
 @Messages( {
-    "CTL_TranscriptionAnalysesAction=TranscriptionAnalyses",
-    "CTL_TranscriptionAnalysesTopComponent=TranscriptionAnalyses Window",
-    "HINT_TranscriptionAnalysesTopComponent=This is a TranscriptionAnalyses window"
+    "CTL_TabbedTopComponentAction=TabbedTopComponent",
+    "CTL_TabbedTopComponent=Tabbed Window",
+    "HINT_TabbedTopComponent=This is a Tabbed window"
 } )
-public final class TranscriptionAnalysesTopComponent extends TopComponentExtended {
+public class TabbedTopComponent extends TopComponentExtended {
 
     private static final long serialVersionUID = 1L;
 
 
     /**
-     * TopComponent for displaying all gui elements belonging to the
-     * transcription analyses.
+     * TopComponent for displaying something in multiple tabs.
      */
-    public TranscriptionAnalysesTopComponent() {
+    public TabbedTopComponent() {
         initComponents();
         setName( Bundle.CTL_TranscriptionAnalysesTopComponent() );
         setToolTipText( Bundle.HINT_TranscriptionAnalysesTopComponent() );
         putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
-        TopComponentHelper.setupContainerListener( analysesTabbedPane, preferredID() );
+        TopComponentHelper.setupContainerListener( tabbedPane, preferredID() );
     }
 
 
@@ -78,22 +73,22 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        analysesTabbedPane = new javax.swing.JTabbedPane();
+        tabbedPane = new javax.swing.JTabbedPane();
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(analysesTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+            .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(analysesTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+            .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTabbedPane analysesTabbedPane;
+    private javax.swing.JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
@@ -103,7 +98,7 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
 
     @Override
     public void componentClosed() {
-        this.analysesTabbedPane.removeAll();
+        this.tabbedPane.removeAll();
     }
 
 
@@ -122,14 +117,13 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
 
 
     /**
-     * This method needs to be called in order to open a new tab for
-     * transcription analyses.
+     * This method needs to be called in order to open a new tab.
      * <p>
      * @param panelName   title of the new tab to create
-     * @param resultPanel the panel to place in the new tab
+     * @param newTabPanel the panel to place in the new tab
      */
-    public void openAnalysisTab( final String panelName, final JPanel resultPanel ) {
-        TopComponentHelper.openTableTab( analysesTabbedPane, panelName, resultPanel );
+    public void openAnalysisTab( final String panelName, final JPanel newTabPanel ) {
+        TopComponentHelper.openTableTab( tabbedPane, panelName, newTabPanel );
     }
 
 
@@ -138,7 +132,7 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
      *         otherwise.
      */
     public boolean hasComponents() {
-        return this.analysesTabbedPane.getComponentCount() > 0;
+        return this.tabbedPane.getComponentCount() > 0;
     }
 
 
