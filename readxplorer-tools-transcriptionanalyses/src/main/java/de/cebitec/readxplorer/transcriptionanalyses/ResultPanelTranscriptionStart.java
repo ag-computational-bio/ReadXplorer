@@ -106,7 +106,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             },
             new String [] {
-                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Cov. Transcript Stop", "Start Codon Pos", "Leader Length", "Stop Codon Pos", "Codon Transcript Length", "TSS Type", "Primary TSS", "Associated TSS"
+                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Dist. Upstream Feature", "Next Downstream Feature", "Dist. Downstream Feature", "Novel Transcript", "Cov. Transcript Stop", "Start Codon Pos", "Leader Length", "Stop Codon Pos", "Codon CDS Length", "TSS Type", "Primary TSS", "Associated TSS"
             }
         ) {
             Class[] types = new Class [] {
@@ -318,7 +318,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                                 rowData[i++] = tSSU.getStartPosDifference();
                                 if ( tSSU.hasStopCodon() ) {
                                     rowData[i++] = tSSU.getStopCodon().getStartOnStrand();
-                                    rowData[i++] = tSSU.getCodonTranscriptLength();
+                                    rowData[i++] = tSSU.getCodonCDSLength();
                                 } else {
                                     rowData[i++] = null;
                                 }

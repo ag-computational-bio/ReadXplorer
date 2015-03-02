@@ -26,7 +26,9 @@ import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.AssignedMapping;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.UnionFractionMapping;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
@@ -163,12 +165,13 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
      *                      feature count
      */
     public void updateReadCountForFeatures( MappingResult mappingResult ) {
-        List<Mapping> mappings = mappingResult.getMappings();
+        List<Mapping> resultMappings = mappingResult.getMappings();
         int currentChromId = mappingResult.getRequest().getChromId();
         boolean isStrandBothOption = paramsNormalization.getReadClassParams().isStrandBothOption();
         boolean isFeatureStrand = paramsNormalization.getReadClassParams().isStrandFeatureOption();
+        List<AssignedMapping> mappings = createAssignedMappings( resultMappings );
 
-        //every mapping is associated to EACH overlapping feature via lastMappingIdx //TODO: implement other strategies for mapping assignment
+        //every mapping is associated to overlapping feature via lastMappingIdx according to strategy in AssignedMapping
         for( PersistentFeature feature : genomeFeatures ) {
             if( feature.getChromId() == currentChromId ) {
 
@@ -181,7 +184,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
 
                 for( int j = lastMappingIdx; j < mappings.size(); ++j ) {
 //TODO: generally, when results arrive unordered, the first mapping pos can be used to determine feature position to start at
-                    Mapping mapping = mappings.get( j );
+                    AssignedMapping assignedMapping = mappings.get( j );
+                    Mapping mapping = assignedMapping.getMapping();
 
                     //overlapping mappings identified within a feature
                     if( mapping.getStop() >= featStart && mapping.getStart() <= featStop ) {
@@ -191,8 +195,12 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                             fstFittingMapping = false;
                         }
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
-                            ++currentCount;
-                            readLengthSum += mapping.getLength();
+                            boolean countIt = assignedMapping.checkAssignment( featStart, featStop, feature );
+                            if ( countIt ) {
+                                assignedMapping.checkCountDecrease( featureReadCount );
+                                ++currentCount;
+                                readLengthSum += mapping.getLength();
+                            }
                         }
 
                     //still mappings left, but need next feature
@@ -213,8 +221,29 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
             }//TODO: total mapped reads now counts several reads multiple times!
         }
 
+        for( AssignedMapping assignedMapping : mappings ) {
+            assignedMapping.fractionAssignmentCheck( featureReadCount );
+        }
+
         lastMappingIdx = 0;
         //TODO: solution for more than one feature overlapping mapping request boundaries
+    }
+
+
+
+
+
+    /**
+     * Create an {@link AssignedMapping} for each mapping
+     * @param mappings The list of mappings to process
+     * @return The created list of {@link AssignedMapping}s
+     */
+    private List<AssignedMapping> createAssignedMappings( List<Mapping> mappings ) {
+        List<AssignedMapping> assignedMappings = new ArrayList<>();
+        for( Mapping mapping : mappings ) { //when other read count models are supported, they can be initialized here!
+            assignedMappings.add( new UnionFractionMapping( mapping ) );
+        }
+        return assignedMappings;
     }
 
 
@@ -252,7 +281,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         for( Integer id : featureReadCount.keySet() ) {
             NormalizedReadCount countObject = featureReadCount.get( id );
             PersistentFeature feature = countObject.getFeature();
-            int readCount = countObject.getReadCount();
+            double readCount = countObject.getReadCount();
             //undesired feature types are not treated
             if( readCount >= paramsNormalization.getMinReadCount() && readCount <= paramsNormalization.getMaxReadCount() &&
                 paramsNormalization.getSelFeatureTypes().contains( feature.getType() ) ) {
@@ -282,7 +311,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                 if( geneExonLength > 0 ) { //we have multi exon/cds genes only in this case
                     countObject.setReadCount( noFeatureReads ); //not needed for most prokaryotes
                     countObject.setReadLengthSum( readLengthSum );
-//TODO: problem: many reads counted double now for 2 cds, but RNA-seq will not look like that (except operons!) - what do you think?
                     double effectiveLength = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
                     countObject.storeEffectiveFeatureLength( effectiveLength );
                 }
@@ -343,7 +371,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         for( Integer id : featureReadCount.keySet() ) {
             NormalizedReadCount countObject = featureReadCount.get( id );
             PersistentFeature feature = countObject.getFeature();
-            int readCount = countObject.getReadCount();
+            double readCount = countObject.getReadCount();
             //undesired feature types have to be removed now
             if( readCount >= paramsNormalization.getMinReadCount() && readCount <= paramsNormalization.getMaxReadCount() &&
                 paramsNormalization.getSelFeatureTypes().contains( feature.getType() ) ) {

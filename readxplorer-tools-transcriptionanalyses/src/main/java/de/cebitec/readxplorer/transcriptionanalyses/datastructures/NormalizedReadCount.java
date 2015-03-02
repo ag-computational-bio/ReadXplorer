@@ -42,7 +42,7 @@ public class NormalizedReadCount extends TrackResultEntry {
     private int readLengthSum;
     private double rpkm;
     private double tpm;
-    private int readCount;
+    private double readCount;
 
 
     /**
@@ -63,7 +63,7 @@ public class NormalizedReadCount extends TrackResultEntry {
      * @param trackId   the trackId for which these result values where
      *                  calculated
      */
-    public NormalizedReadCount( PersistentFeature feature, double rpkm, double tpm, int readCount, int trackId ) {
+    public NormalizedReadCount( PersistentFeature feature, double rpkm, double tpm, double readCount, int trackId ) {
         super( trackId );
         this.feature = feature;
         this.rpkm = rpkm;
@@ -97,7 +97,7 @@ public class NormalizedReadCount extends TrackResultEntry {
      * @param trackId                The trackId for which these result values
      *                               where calculated
      */
-    public NormalizedReadCount( PersistentFeature feature, double rpkm, double tpm, int readCount, double effectiveFeatureLength, int trackID ) {
+    public NormalizedReadCount( PersistentFeature feature, double rpkm, double tpm, double readCount, double effectiveFeatureLength, int trackID ) {
         this(feature, rpkm, tpm, readCount, trackID );
         this.effectiveFeatureLength = effectiveFeatureLength;
     }
@@ -122,7 +122,7 @@ public class NormalizedReadCount extends TrackResultEntry {
     /**
      * @return The raw read count for this feature.
      */
-    public int getReadCount() {
+    public double getReadCount() {
         return readCount;
     }
 
@@ -130,7 +130,7 @@ public class NormalizedReadCount extends TrackResultEntry {
     /**
      * @param readCount The raw read count for this feature
      */
-    public void setReadCount( int readCount ) {
+    public void setReadCount( double readCount ) {
         this.readCount = readCount;
     }
 

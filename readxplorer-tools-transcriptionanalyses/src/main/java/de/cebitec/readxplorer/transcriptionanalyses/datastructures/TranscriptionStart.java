@@ -147,7 +147,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *         the start and stop codon. If one or both of the codons are not
      *         set, the method returns 0.
      */
-    public int getCodonTranscriptLength() {
+    public int getCodonCDSLength() {
         int length = 0;
         if( startCodon != null && stopCodon != null ) {
             int codonStart = startCodon.getStartOnStrand();

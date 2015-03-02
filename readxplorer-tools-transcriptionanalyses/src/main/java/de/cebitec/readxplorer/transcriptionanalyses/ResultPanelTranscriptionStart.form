@@ -69,7 +69,7 @@
                 <Column editable="false" title="Start Codon Pos" type="java.lang.Integer"/>
                 <Column editable="false" title="Leader Length" type="java.lang.Integer"/>
                 <Column editable="false" title="Stop Codon Pos" type="java.lang.Integer"/>
-                <Column editable="false" title="Codon Transcript Length" type="java.lang.Integer"/>
+                <Column editable="false" title="Codon CDS Length" type="java.lang.Integer"/>
                 <Column editable="false" title="TSS Type" type="java.lang.String"/>
                 <Column editable="false" title="Primary TSS" type="java.lang.Integer"/>
                 <Column editable="false" title="Associated TSS" type="java.lang.String"/>

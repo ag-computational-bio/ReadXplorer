@@ -107,7 +107,7 @@ public class NormalizationFormulas {
         for( int featId : featureReadCount.keySet() ) {
             NormalizedReadCount countObject = featureReadCount.get( featId );
             PersistentFeature feature = countObject.getFeature();
-            int readCount = countObject.getReadCount();
+            double readCount = countObject.getReadCount();
             double effectiveFeatLength = countObject.getEffectiveFeatureLength();
             normalizationSumMap.put( feature.getType(), normalizationSumMap.get( feature.getType() ) + readCount / effectiveFeatLength );
         }

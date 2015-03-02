@@ -182,8 +182,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add( "Start Codon Pos" );
         dataColumnDescriptions.add( "Leader Length" );
         dataColumnDescriptions.add( "Stop Codon Pos" );
-        dataColumnDescriptions.add( "Codon Transcript Stop" );
-        dataColumnDescriptions.add( "Codon Transcript Length" );
+        dataColumnDescriptions.add( "Codon CDS Stop" );
+        dataColumnDescriptions.add( "Codon CDS Length" );
         if ( tssParameters.isAssociateTss() ) {
             dataColumnDescriptions.add( "Associated TSS" );
         }
@@ -247,7 +247,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                     if( tSSU.hasStopCodon() ) {
                         tssRow.add( tSSU.getStopCodon().getStartOnStrand() );
                         tssRow.add( tSSU.getStopCodon().getStopOnStrand() );
-                        tssRow.add( tSSU.getCodonTranscriptLength() );
+                        tssRow.add( tSSU.getCodonCDSLength() );
                     } else {
                         TableUtils.addEmptyColumns( 3, tssRow );
                     }
