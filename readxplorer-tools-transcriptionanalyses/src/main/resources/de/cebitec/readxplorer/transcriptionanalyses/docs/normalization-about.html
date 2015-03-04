@@ -1,7 +1,19 @@
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
+<!--/
+ Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/-->
 <!DOCTYPE html>
 <html>
     <head>
@@ -44,6 +56,12 @@ and open the template in the editor.
         </ul>
         <p>for all annotated features of the user-selected feature types (e.g. CDS or gene), which have a raw read count within the given range by:</p>
         <p style="text-align: justify;">1. The <span style="text-decoration: underline;">minimum number of reads</span> (default = 1 read)<br /> 2. The <span style="text-decoration: underline;">maximum number of reads</span> (default = 100000000 reads)<br /> overlapping with a feature.</p>
+        <p style="text-align: justify;">The implemented <b>assignment model for reads</b> to features counts a read for a genomic feature if it at least overlaps with the feature. If a read overlaps multiple features:</p>
+        <ul>
+            <li style="text-align: justify;">If they are sub-features of a larger feature (i.e. CDS and exons of the same gene), they are counted once per gene</li>
+            <li style="text-align: justify;">If the overlapping features do not belong together (e.g. a read overlaps two neighboring genes), the read is counted for the first of these features on the respective strand (on the reverse strand this is the last, instead of the first feature).</li>
+            <li style="text-align: justify;">If the read is completely contained in multiple features of the same feature type (e.g. for overlapping genes), the fraction of the read is counted for both features (a read completely contained in two genes is thus counted with 0.5 for each of the genes).</li></ul>
+        <p style="text-align: justify;">This model including the fraction has been chosen, because according to the literature (Li et al. 2010), models including read mappings overlapping and contained in multiple features show a better correlation to microarray data than models neglecting such read mappings - thus throwing away real data.</p>
         <p style="text-align: justify;"><span style="text-decoration: underline;">Wizard steps:</span></p>
         <ol>
             <li style="text-align: justify;">Click the corresponding toolbar icon (see <i><a href="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/view-about.html">Main Window a)</a></i>) or choose "<span style="text-decoration: underline;">Tools -&gt; Transcription Analyses</span>".</li>
