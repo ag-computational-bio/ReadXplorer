@@ -49,7 +49,7 @@ import org.w3c.dom.Document;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class ScreenshotUtils {
+public final class ScreenshotUtils {
 
     private static final Logger LOG = Logger.getLogger( ScreenshotUtils.class.getName() );
 
@@ -65,15 +65,13 @@ public class ScreenshotUtils {
 
     /**
      * Creates an SVG screenshot of an arbitrary <code>Container</code> and
-     * opens
-     * a save dialog to store the svg somewhere.
+     * opens a save dialog to store the svg somewhere.
      * <p>
      * @param container the <code>Container</code>, for which a screenshot shall
-     *                  be
-     *                  stored
+     * be stored
      */
-    @NbBundle.Messages( { "ScreenshotUtils.SuccessMsg=Successfully saved the screenshot in ",
-                          "ScreenshotUtils.SuccessHeader=Screenshot saved" } )
+    @NbBundle.Messages({"ScreenshotUtils.SuccessMsg=Successfully saved the screenshot in ",
+        "ScreenshotUtils.SuccessHeader=Screenshot saved"})
     public static void saveScreenshot( final Container container ) {
         try {
             if( container.isShowing() ) {
@@ -93,7 +91,8 @@ public class ScreenshotUtils {
                 container.setBounds( new Rectangle( screenSize ) );
                 container.paintAll( svgGenerator );
 
-                ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{ SVG }, SVG ) {
+                ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{SVG}, SVG ) {
+
                     private static final long serialVersionUID = 1L;
 
 
@@ -104,20 +103,20 @@ public class ScreenshotUtils {
                         progressHandle.start();
 
                         Thread exportThread = new Thread( new Runnable() {
+
                             @Override
                             public void run() {
                                 try( Writer out = new OutputStreamWriter( new FileOutputStream( fileLocation ), "UTF-8" ); ) {
                                     svgGenerator.stream( out, false );
-                                }
-                                catch( IOException ex ) {
+                                } catch( IOException ex ) {
                                     JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", ex.toString() ),
-                                                                   NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
+                                            NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
                                 }
 
                                 progressHandle.finish();
 
                                 NotificationDisplayer.getDefault().notify( Bundle.ScreenshotUtils_SuccessHeader(),
-                                                                           new ImageIcon(), Bundle.ScreenshotUtils_SuccessMsg() + fileLocation, null );
+                                        new ImageIcon(), Bundle.ScreenshotUtils_SuccessMsg() + fileLocation, null );
 
                                 LOG.info( "Finished writing Excel file!" );
                             }
@@ -139,14 +138,14 @@ public class ScreenshotUtils {
                 screenFileChooser.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
             } else {
                 JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorMsg" ),
-                                               NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorHeader" ), JOptionPane.ERROR_MESSAGE );
+                        NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorHeader" ), JOptionPane.ERROR_MESSAGE );
             }
         } catch( OutOfMemoryError e ) {
             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorMsg" ),
-                                           NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorHeader" ), JOptionPane.ERROR_MESSAGE );
+                    NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorHeader" ), JOptionPane.ERROR_MESSAGE );
         } catch( HeadlessException | MissingResourceException | DOMException e ) {
             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", e.toString() ),
-                                           NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
+                    NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
         }
         System.gc();
     }
@@ -157,11 +156,11 @@ public class ScreenshotUtils {
      * means, that all subcomponents can be displayed in their full size. Starts
      * the calculation with the given <code>currentDim</code>.
      * <p>
-     * @param container  the container whose optimal subcomponents size shall be
-     *                   calculated
+     * @param container the container whose optimal subcomponents size shall be
+     * calculated
      * @param currentDim the current dimension to start with, any smaller
-     *                   dimension is ignored. Only if a subcomponent needs more space than given
-     *                   here, the dimension is adapted
+     * dimension is ignored. Only if a subcomponent needs more space than given
+     * here, the dimension is adapted
      * <p>
      * @return The optimal screen size for the given container
      */

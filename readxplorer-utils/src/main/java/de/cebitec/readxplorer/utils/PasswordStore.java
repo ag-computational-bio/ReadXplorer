@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Kai
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readxplorer.utils;
 
+
 import org.netbeans.api.keyring.Keyring;
+
 
 /**
  *
  * @author kstaderm
  */
-public class PasswordStore {
+public final class PasswordStore {
 
-    public static void save(String passwordIdentifier, char[] password, String visibleComment) {
-        Keyring.save(passwordIdentifier, password, visibleComment);
+
+    private PasswordStore() {}
+
+    public static void save( String passwordIdentifier, char[] password, String visibleComment ) {
+        Keyring.save( passwordIdentifier, password, visibleComment );
     }
 
-    public static char[] read(String passwordIdentifier) {
-        return Keyring.read(passwordIdentifier);
+
+    public static char[] read( String passwordIdentifier ) {
+        return Keyring.read( passwordIdentifier );
     }
 
-    public static void delete(String passwordIdentifier) {
-        Keyring.delete(passwordIdentifier);
+
+    public static void delete( String passwordIdentifier ) {
+        Keyring.delete( passwordIdentifier );
     }
+
 
 }

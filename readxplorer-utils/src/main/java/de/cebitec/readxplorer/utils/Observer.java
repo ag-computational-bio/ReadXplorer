@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.utils;
 
 
 /**
- * Observer in the observer pattern.
- * The observer is updated whenever the update method is called.
+ * Observer in the observer pattern. The observer is updated whenever the update
+ * method is called.
  *
  * @author rhilker
  */
@@ -28,10 +28,8 @@ public interface Observer {
 
     /**
      * This method is called whenever the observed object is changed. An
-     * application
-     * calls an Observable object's notifyObservers method to have all the
-     * object's
-     * observers notified of the change.
+     * application calls an Observable object's notifyObservers method to have
+     * all the object's observers notified of the change.
      * <p>
      * @param args the arguments to be send to the observer
      */

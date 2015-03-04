@@ -42,14 +42,12 @@ import org.openide.util.NbBundle;
 
 /**
  * A tab with an 'X' that will close the tab if used in a
- * <code>JTabbedPane</code>.
- * Taken from
+ * <code>JTabbedPane</code>. Taken from
  * http://download.oracle.com/javase/tutorial/uiswing/examples/components/TabComponentsDemoProject/src/components/ButtonTabComponent.java
  *
  * TODO running tasks in this tab are ignored. Maybe add functionality to cancel
- * running tasks
- * before tab is closed or do not allow closing while a task is running. (Use
- * CentralLookup and look for SwingWorkers...)
+ * running tasks before tab is closed or do not allow closing while a task is
+ * running. (Use CentralLookup and look for SwingWorkers...)
  *
  * @author joern
  */
@@ -58,36 +56,38 @@ public class TabWithCloseX extends JPanel {
     private static final long serialVersionUID = 1L;
     private static final MouseListener BUTTON_MOUSE_LISTENER;
 
+
     static {
 
         BUTTON_MOUSE_LISTENER = new MouseAdapter() {
 
-        @Override
-        public void mouseEntered( MouseEvent e ) {
-            Component component = e.getComponent();
-            if( component instanceof AbstractButton ) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted( true );
+            @Override
+            public void mouseEntered( MouseEvent e ) {
+                Component component = e.getComponent();
+                if( component instanceof AbstractButton ) {
+                    AbstractButton button = (AbstractButton) component;
+                    button.setBorderPainted( true );
+                }
             }
-        }
 
 
-        @Override
-        public void mouseExited( MouseEvent e ) {
-            Component component = e.getComponent();
-            if( component instanceof AbstractButton ) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted( false );
+            @Override
+            public void mouseExited( MouseEvent e ) {
+                Component component = e.getComponent();
+                if( component instanceof AbstractButton ) {
+                    AbstractButton button = (AbstractButton) component;
+                    button.setBorderPainted( false );
+                }
             }
-        }
 
 
-    };
+        };
 
     }
 
 
     private final JTabbedPane pane;
+
 
     public TabWithCloseX( final JTabbedPane pane ) {
         //unset default FlowLayout' gaps
@@ -100,6 +100,7 @@ public class TabWithCloseX extends JPanel {
 
         //make JLabel read titles from JTabbedPane
         JLabel label = new JLabel() {
+
             private static final long serialVersionUID = 1L;
 
 

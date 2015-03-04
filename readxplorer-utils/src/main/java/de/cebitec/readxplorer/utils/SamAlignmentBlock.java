@@ -33,7 +33,7 @@ public class SamAlignmentBlock {
      * A block representing a part of a sam alignment.
      * <p>
      * @param refStart block start in reference coordinates
-     * @param refStop  block stop in reference coordinates
+     * @param refStop block stop in reference coordinates
      */
     public SamAlignmentBlock( int refStart, int refStop ) {
         this.refStart = refStart;

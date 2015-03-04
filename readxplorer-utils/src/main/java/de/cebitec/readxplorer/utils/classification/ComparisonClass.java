@@ -57,7 +57,7 @@ public enum ComparisonClass implements Classification {
 
     /**
      * @return the string representation of the current comparison
-     *         classification.
+     * classification.
      */
     @Override
     public String getTypeString() {
@@ -67,7 +67,7 @@ public enum ComparisonClass implements Classification {
 
     /**
      * @return the byte value of the type of the current comparison
-     *         classification.
+     * classification.
      */
     @Override
     public int getTypeByte() {
@@ -77,7 +77,7 @@ public enum ComparisonClass implements Classification {
 
     /**
      * @return the string representation of the current comparison
-     *         classification.
+     * classification.
      */
     @Override
     public String toString() {
@@ -87,10 +87,10 @@ public enum ComparisonClass implements Classification {
 
     /**
      * @return the desired ComparisonClass for a given integer of a valid
-     *         classification type.
+     * classification type.
      * <p>
-     * @param type Type of ComparisonClass to return. If the type does not
-     *             match a classification type, null is returned.
+     * @param type Type of ComparisonClass to return. If the type does not match
+     * a classification type, null is returned.
      */
     public static ComparisonClass getFeatureType( byte type ) {
         switch( type ) {

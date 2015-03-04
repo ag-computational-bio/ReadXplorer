@@ -31,7 +31,7 @@ import org.openide.util.NbPreferences;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class ColorUtils {
+public final class ColorUtils {
 
     private ColorUtils() {
     }
@@ -43,12 +43,11 @@ public class ColorUtils {
      * maximum value.
      * <p>
      * @param currentValue The value to represent by saturation and brigthness
-     * @param maxValue     The maximum accepted value possible for the
-     *                     currentValue
-     * @param origColor    The original color to update
+     * @param maxValue The maximum accepted value possible for the currentValue
+     * @param origColor The original color to update
      * <p>
      * @return The color with the updated saturation and brigthness
-     *         corresponding to the given phred score.
+     * corresponding to the given phred score.
      */
     public static Color getAdaptedColor( int currentValue, int maxValue, Color origColor ) {
         float[] hsbColorValues = Color.RGBtoHSB( origColor.getRed(), origColor.getGreen(), origColor.getBlue(), null );
@@ -60,8 +59,8 @@ public class ColorUtils {
     /**
      * Calculates the saturation and brigthness value of a color per given unit.
      * <p>
-     * @param numberOfUnits number of units to be represented in brightness
-     *                      and saturation
+     * @param numberOfUnits number of units to be represented in brightness and
+     * saturation
      * <p>
      * @return The saturation and brigthness value of a color per given unit.
      */
@@ -141,7 +140,7 @@ public class ColorUtils {
     /**
      * Initializes the color of a class type.
      * <p>
-     * @param classType    The class type whose color needs to be set
+     * @param classType The class type whose color needs to be set
      * @param defaultColor The default color for this class type
      * <p>
      * @return The color of the given class type.
@@ -150,8 +149,7 @@ public class ColorUtils {
         String colorRGB = NbPreferences.forModule( Object.class ).get( classType.getTypeString(), "" );
         if( !colorRGB.isEmpty() ) { //otherwise default color is kept
             return new Color( Integer.parseInt( colorRGB ) );
-        }
-        else {
+        } else {
             return defaultColor;
         }
     }

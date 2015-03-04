@@ -22,9 +22,9 @@ package de.cebitec.readxplorer.utils;
  *
  * @author ddoppmei
  */
-public class Benchmark {
+public final class Benchmark {
 
-    private static final int MILLISECONDS_PER_HOUR  = 3600000;
+    private static final int MILLISECONDS_PER_HOUR = 3600000;
     private static final int MILLISECONDS_PER_MINUTE = 60000;
 
 
@@ -38,12 +38,12 @@ public class Benchmark {
     /**
      * Benchmarks something in time.
      * <p>
-     * @param startTime  the start time of the benchmark in milliseconds
+     * @param startTime the start time of the benchmark in milliseconds
      * @param finishTime the finish time of the benchmark in milliseconds
-     * @param message    the message to concatenate with the result
+     * @param message the message to concatenate with the result
      * <p>
      * @return the message concatenated with the time difference between both
-     *         time points separated by hours, minutes, seconds and milliseconds
+     * time points separated by hours, minutes, seconds and milliseconds
      */
     public static String calculateDuration( long startTime, long finishTime, String message ) {
 

@@ -26,7 +26,8 @@ package de.cebitec.readxplorer.utils;
 public final class Properties {
 
 
-    private Properties() {}
+    private Properties() {
+    }
 
 
     // different adapter types for a project and or database
@@ -94,10 +95,9 @@ public final class Properties {
      */
     public static final byte READ_STARTS = 9;
     /**
-     * Value for viewing all mappings as if they came from the fwd. strand
-     * (10). This should only be used in combination with {@link STRAND_BOTH}
-     * to infer, if all mappings shall be treated as if the came from the fwd.
-     * or
+     * Value for viewing all mappings as if they came from the fwd. strand (10).
+     * This should only be used in combination with {@link STRAND_BOTH} to
+     * infer, if all mappings shall be treated as if the came from the fwd. or
      * the rev. strand ()
      */
     public static final byte STRAND_FWD_ANALYSIS = 10;
@@ -229,7 +229,8 @@ public final class Properties {
      */
     public static final String RSERVE_PASSWORD = "RSERVE_PASSWORD";
     /**
-     * Holds the full path to the Rserve startup script if manual local setup is used.
+     * Holds the full path to the Rserve startup script if manual local setup is
+     * used.
      */
     public static final String RSERVE_STARTUP_SCRIPT = "RSERVE_STARTUP_SCRIPT";
     /**
@@ -237,7 +238,8 @@ public final class Properties {
      */
     public static final String RSERVE_MANUAL_REMOTE_SETUP = "RSERVE_MANUAL_REMOTE_SETUP";
     /**
-     * Is Rserve manually configured to connect to a local server with custom startup script.
+     * Is Rserve manually configured to connect to a local server with custom
+     * startup script.
      */
     public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
 

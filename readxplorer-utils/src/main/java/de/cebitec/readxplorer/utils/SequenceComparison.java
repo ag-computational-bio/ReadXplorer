@@ -105,7 +105,7 @@ public enum SequenceComparison {
      * @param type the type of SequenceComparison to return.
      * <p>
      * @return The SequenceComparison for a given char. If the type is unknown
-     *         SequenceComparison.UNKNOWN is returned.
+     * SequenceComparison.UNKNOWN is returned.
      */
     public static SequenceComparison getSequenceComparison( char type ) {
         switch( type ) {

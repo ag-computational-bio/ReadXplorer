@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,14 @@ package de.cebitec.readxplorer.utils.sequence;
 
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
-import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -93,32 +91,32 @@ public class PositionUtilsTest {
     public void testDetermineFrame() {
         System.out.println( "determineFrame" );
         List<GenomicRange> ranges = new ArrayList<>();
-        List<Integer> expResults  = new ArrayList<>();
-        List<Integer> results  = new ArrayList<>();
+        List<Integer> expResults = new ArrayList<>();
+        List<Integer> results = new ArrayList<>();
 
         ranges.add( new GenomicRangeImpl( 1, 6, true ) ); //frame 1
         expResults.add( 1 );
-        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1) ) );
+        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1 ) ) );
 
         ranges.add( new GenomicRangeImpl( 2, 6, true ) ); //frame 2
         expResults.add( 2 );
-        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1) ) );
+        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1 ) ) );
 
         ranges.add( new GenomicRangeImpl( 3, 6, true ) ); //frame 3
         expResults.add( 3 );
-        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1) ) );
+        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1 ) ) );
 
         ranges.add( new GenomicRangeImpl( 1, 6, false ) ); //frame -1
         expResults.add( -1 );
-        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1) ) );
+        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1 ) ) );
 
         ranges.add( new GenomicRangeImpl( 1, 5, false ) ); //frame -2
         expResults.add( -2 );
-        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1) ) );
+        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1 ) ) );
 
         ranges.add( new GenomicRangeImpl( 1, 4, false ) ); //frame -3
         expResults.add( -3 );
-        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1) ) );
+        results.add( PositionUtils.determineFrame( ranges.get( ranges.size() - 1 ) ) );
 
         for( int i = 0; i < results.size(); i++ ) {
             assertEquals( expResults.get( i ), results.get( i ) );
@@ -138,27 +136,27 @@ public class PositionUtilsTest {
 
         positions.add( 1 );
         expResults.add( 1 );
-        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1) ) );
+        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1 ) ) );
 
         positions.add( 2 );
         expResults.add( 2 );
-        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1) ) );
+        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1 ) ) );
 
         positions.add( 3 );
         expResults.add( 3 );
-        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1) ) );
+        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1 ) ) );
 
         positions.add( 4 );
         expResults.add( 1 );
-        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1) ) );
+        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1 ) ) );
 
         positions.add( 5 );
         expResults.add( 2 );
-        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1) ) );
+        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1 ) ) );
 
         positions.add( 6 );
         expResults.add( 3 );
-        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1) ) );
+        results.add( PositionUtils.determineFwdFrame( positions.get( positions.size() - 1 ) ) );
 
         for( int i = 0; i < results.size(); i++ ) {
             assertEquals( expResults.get( i ), results.get( i ) );
@@ -219,14 +217,15 @@ public class PositionUtilsTest {
         // TODO write test for this method
     }
 
+
     private class GenomicRangeImpl implements GenomicRange {
 
-        int start;
-        int stop;
-        boolean isFwdStrand;
+        private int start;
+        private int stop;
+        private boolean isFwdStrand;
 
 
-        public GenomicRangeImpl( int start, int stop, boolean isFwdStrand ) {
+        GenomicRangeImpl( int start, int stop, boolean isFwdStrand ) {
             this.start = start;
             this.stop = stop;
             this.isFwdStrand = isFwdStrand;
@@ -260,6 +259,7 @@ public class PositionUtilsTest {
             this.stop = stop;
         }
 
+
         @Override
         public boolean isFwdStrand() {
             return isFwdStrand;
@@ -269,6 +269,7 @@ public class PositionUtilsTest {
         public void setIsFwdStrand( boolean isFwdStrand ) {
             this.isFwdStrand = isFwdStrand;
         }
+
 
     }
 

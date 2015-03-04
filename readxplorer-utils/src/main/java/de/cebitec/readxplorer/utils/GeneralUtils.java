@@ -33,10 +33,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import static java.util.logging.Level.SEVERE;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
@@ -44,29 +44,27 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
-import static java.util.logging.Level.SEVERE;
-
 
 /**
  * Contains general use utilities.
  * <p>
  * @author -Rolf Hilker-
  */
-public class GeneralUtils {
+public final class GeneralUtils {
 
     private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
 
     private static final Preferences PREF = NbPreferences.forModule( Object.class );
 
 
-    private GeneralUtils() {}
+    private GeneralUtils() {
+    }
 
 
     /**
      * Calculates the percentage increase of value 1 to value 2. In case value1
-     * is 0,
-     * the percentage is set to 1.5 times the absolute difference as a weight
-     * factor.
+     * is 0, the percentage is set to 1.5 times the absolute difference as a
+     * weight factor.
      * <p>
      * @param value1 smaller value
      * @param value2 larger value
@@ -78,8 +76,7 @@ public class GeneralUtils {
         if( value1 == 0 ) {
             int absoluteDiff = value2 - value1;
             percentDiff = (int) (absoluteDiff * 1.5); //weight factor
-        }
-        else {
+        } else {
             percentDiff = (int) Math.ceil( ((double) value2 / (double) value1) * 100.0 ) - 100;
         }
         return percentDiff;
@@ -90,22 +87,20 @@ public class GeneralUtils {
      * @param parent the parent component
      * <p>
      * @return Any text found in the clipboard. If none is found, an empty
-     *         String is returned.
+     * String is returned.
      */
     public static String getClipboardContents( Component parent ) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         String result = "";
         Transferable contents = clipboard.getContents( null );
         final boolean hasTransferableText = (contents != null)
-                                            && contents.isDataFlavorSupported( DataFlavor.stringFlavor );
+                && contents.isDataFlavorSupported( DataFlavor.stringFlavor );
         if( hasTransferableText ) {
             try {
                 result = (String) contents.getTransferData( DataFlavor.stringFlavor );
-            }
-            catch( UnsupportedFlavorException ex ) {
+            } catch( UnsupportedFlavorException ex ) {
                 JOptionPane.showMessageDialog( parent, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE );
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 JOptionPane.showMessageDialog( parent, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             }
         }
@@ -119,16 +114,16 @@ public class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidPositiveIntegerInput( String input ) {
         try {
             return Integer.parseInt( input ) > 0;
-        }
-        catch( NumberFormatException e ) {
+        } catch( NumberFormatException e ) {
             return false;
         }
     }
+
 
     /**
      * Checks if the input string is a valid double number larger than 0.
@@ -136,13 +131,12 @@ public class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidPositiveDoubleInput( String input ) {
         try {
             return Double.parseDouble( input ) > 0;
-        }
-        catch( NumberFormatException e ) {
+        } catch( NumberFormatException e ) {
             return false;
         }
     }
@@ -153,14 +147,13 @@ public class GeneralUtils {
      * <p>
      * @param input input string to check
      * <p>
-     * @return <code>true</code> if it is a valid input
-     *         string, <code>false</code> otherwise
+     * @return <code>true</code> if it is a valid input string,
+     * <code>false</code> otherwise
      */
     public static boolean isValidIntegerInput( String input ) {
         try {
             return Integer.parseInt( input ) >= 0;
-        }
-        catch( NumberFormatException e ) {
+        } catch( NumberFormatException e ) {
             return false;
         }
     }
@@ -171,10 +164,10 @@ public class GeneralUtils {
      * given maximum position.
      * <p>
      * @param input input string to check
-     * @param max   maximum position value for the input
+     * @param max maximum position value for the input
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidPositionInput( String input, int max ) {
         return GeneralUtils.isValidRangeInput( input, 1, max );
@@ -186,18 +179,17 @@ public class GeneralUtils {
      * interval.
      * <p>
      * @param input input string to check
-     * @param min   minimum position value for the input
-     * @param max   maximum position value for the input
+     * @param min minimum position value for the input
+     * @param max maximum position value for the input
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidRangeInput( String input, int min, int max ) {
         try {
             int tmp = Integer.parseInt( input );
             return tmp >= min && tmp <= max;
-        }
-        catch( NumberFormatException e ) {
+        } catch( NumberFormatException e ) {
             return false;
         }
     }
@@ -209,13 +201,12 @@ public class GeneralUtils {
      * @param text input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidByteInput( String text ) {
         try {
             return Byte.parseByte( text ) >= 0;
-        }
-        catch( NumberFormatException e ) {
+        } catch( NumberFormatException e ) {
             return false;
         }
     }
@@ -228,7 +219,7 @@ public class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid percentage value,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidIntegerPercentage( String input ) {
         if( GeneralUtils.isValidPositiveIntegerInput( input ) ) {
@@ -248,7 +239,7 @@ public class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid percentage value,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isValidDoublePercentage( String input ) {
         if( GeneralUtils.isValidPositiveDoubleInput( input ) ) {
@@ -262,8 +253,8 @@ public class GeneralUtils {
 
 
     /**
-     * Calculates the given time as 3 entries in an array list:
-     * 0 = hours, 1 = minutes, 2 = seconds.
+     * Calculates the given time as 3 entries in an array list: 0 = hours, 1 =
+     * minutes, 2 = seconds.
      * <p>
      * @param timeInMillis given time in milliseconds
      * <p>
@@ -293,16 +284,15 @@ public class GeneralUtils {
 
     /**
      * Generates a string, which concatenates the list of strings for user
-     * friendly
-     * displaying in the gui with an " and ".
+     * friendly displaying in the gui with an " and ".
      * <p>
-     * @param strings   the list of strings, which should be concatenated
+     * @param strings the list of strings, which should be concatenated
      * @param maxLength maximum length of the string to return or 0, if no
-     *                  restriction of the length is desired
+     * restriction of the length is desired
      * <p>
      * @return the string containing all strings concatenated with "and". If the
-     *         string is too long it is cut at the maxLength position and "..." is
-     *         appended.
+     * string is too long it is cut at the maxLength position and "..." is
+     * appended.
      */
     public static String generateConcatenatedString( List<String> strings, int maxLength ) {
         String concatString = implode( " and ", strings.toArray() );
@@ -333,8 +323,7 @@ public class GeneralUtils {
                 if( indexFile.canWrite() ) {
                     Files.delete( indexFile.toPath() );
                 }
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 throw new IOException( NbBundle.getMessage( GeneralUtils.class, "MSG_GeneralUtils.FileDeletionError", lastWorkFile.getAbsolutePath() ) );
             }
         }
@@ -354,8 +343,7 @@ public class GeneralUtils {
         String asImplodedString;
         if( array.length == 0 ) {
             asImplodedString = "";
-        }
-        else {
+        } else {
             StringBuilder sb = new StringBuilder();
             sb.append( array[0] );
             for( int i = 1; i < array.length; i++ ) {
@@ -373,7 +361,7 @@ public class GeneralUtils {
      * <p>
      * @param valueDelim Delimiter between key and value of an element
      * @param entryDelim Delimiter between each Entry element
-     * @param map        a map of elements
+     * @param map a map of elements
      * <p>
      * @return String
      */
@@ -381,15 +369,13 @@ public class GeneralUtils {
         String asImplodedString;
         if( (map == null) || (map.isEmpty()) ) {
             asImplodedString = "";
-        }
-        else {
+        } else {
             StringBuilder sb = new StringBuilder();
             Boolean firstLine = true;
-            for( Iterator<?> it = map.entrySet().iterator(); it.hasNext(); ) {
+            for( Map.Entry<?, ?> line : map.entrySet() ) {
                 if( !firstLine ) {
                     sb.append( entryDelim );
                 }
-                Map.Entry<?, ?> line = (Map.Entry) it.next();
                 sb.append( line.getKey() );
                 sb.append( valueDelim );
                 sb.append( line.getValue() );
@@ -405,30 +391,25 @@ public class GeneralUtils {
      * Converts a given number into a number of the given classType. If this is
      * not possible, it throws a ClassCastException
      * <p>
-     * @param <T>       one of the classes derived from Number
+     * @param <T> one of the classes derived from Number
      * @param classType the type to convert the number into
-     * @param number    the number to convert
+     * @param number the number to convert
      * <p>
      * @return The converted number
      */
-    public static <T extends Number> T convertNumber( Class<T> classType, Number number ) throws ClassCastException {
+    public static <T extends Number> T convertNumber( Class<T> classType, Number number ) {
         T convertedValue = null;
         if( classType.equals( Integer.class ) ) {
             convertedValue = classType.cast( number.intValue() );
-        }
-        else if( classType.equals( Double.class ) ) {
+        } else if( classType.equals( Double.class ) ) {
             convertedValue = classType.cast( number.doubleValue() );
-        }
-        else if( classType.equals( Long.class ) ) {
+        } else if( classType.equals( Long.class ) ) {
             convertedValue = classType.cast( number.longValue() );
-        }
-        else if( classType.equals( Float.class ) ) {
+        } else if( classType.equals( Float.class ) ) {
             convertedValue = classType.cast( number.floatValue() );
-        }
-        else if( classType.equals( Short.class ) ) {
+        } else if( classType.equals( Short.class ) ) {
             convertedValue = classType.cast( number.shortValue() );
-        }
-        else if( classType.equals( Byte.class ) ) {
+        } else if( classType.equals( Byte.class ) ) {
             convertedValue = classType.cast( number.byteValue() );
         }
 
@@ -444,7 +425,7 @@ public class GeneralUtils {
      * format a number to show it to the user
      * <p>
      * @param number
-     *               <p>
+     * <p>
      * @return a good readable string representation of the given number
      */
     public static String formatNumber( Number number ) {
@@ -456,7 +437,7 @@ public class GeneralUtils {
      * @param number A number to convert into a percent value
      * <p>
      * @return The percent representation of the given value in the format of
-     *         the Java virtual machine's Locale.
+     * the Java virtual machine's Locale.
      */
     public static String formatNumberAsPercent( Number number ) {
         Locale locale = Locale.getDefault();
@@ -482,13 +463,13 @@ public class GeneralUtils {
 
     /**
      * Preliminary method for enshorting an Illumina based read name from single
-     * or paired end to a still unique name, which can save memory.
-     * Use with care!
+     * or paired end to a still unique name, which can save memory. Use with
+     * care!
      * <p>
      * @param readName the read name to enshorten
      * <p>
      * @return the short read name, if it was possible to shorten it. Otherwise
-     *         the original read name is returned
+     * the original read name is returned
      */
     public static String enshortenReadName( String readName ) {
         String shortReadName = readName;
@@ -501,8 +482,7 @@ public class GeneralUtils {
                     nameArray = shortReadName.split( "#" );
                     shortReadName = nameArray[0] + nameArray[1].split( "/" )[1];
                 }
-            }
-            else if( nameArray.length == 10 ) {
+            } else if( nameArray.length == 10 ) {
                 shortReadName = nameArray[4] + nameArray[5] + nameArray[6];
             }
         }
@@ -535,7 +515,7 @@ public class GeneralUtils {
     /**
      * Splits the given readname by the given style.
      * <p>
-     * @param readName     The readname to split
+     * @param readName The readname to split
      * @param specialStyle The style to use for splitting
      * <p>
      * @return The splitted read name array
@@ -544,8 +524,7 @@ public class GeneralUtils {
         String[] nameArray;
         if( specialStyle == NameStyle.STYLE_ILLUMINA ) {
             nameArray = readName.split( ":|#" );
-        }
-        else {
+        } else {
             int length = readName.length() / 5 + 1;
             nameArray = new String[length];
             int index;
@@ -555,8 +534,7 @@ public class GeneralUtils {
                 end = index + 5;
                 if( end < readName.length() ) {
                     nameArray[i] = readName.substring( index, end );
-                }
-                else {
+                } else {
                     nameArray[i] = readName.substring( index, readName.length() );
                 }
             }
@@ -577,7 +555,7 @@ public class GeneralUtils {
     public static String createEcHtmlLink( String ecNumber ) {
         String ecLink = "<html> </html>";
         if( ecNumber != null && !ecNumber.isEmpty() ) {
-            String dbUrl = PREF.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+            String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
             ecLink = "<a href=\"" + dbUrl + ecNumber + "\">" + ecNumber + "</a>";
         }
         return ecLink;
@@ -597,7 +575,7 @@ public class GeneralUtils {
         UrlWithTitle url = null;
         if( ecNumber != null && !ecNumber.isEmpty() ) {
             try {
-                String dbUrl = PREF.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+                String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
                 url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
             } catch( MalformedURLException ex ) {
                 LOG.log( SEVERE, ex.getMessage() );
@@ -660,6 +638,4 @@ public class GeneralUtils {
 //        String[] splittedName = GeneralUtils.splitReadName(readName, style);
 //        GeneralUtils.generateStringMap(map, splittedName, valueToStore);
 //    }
-
-
 }

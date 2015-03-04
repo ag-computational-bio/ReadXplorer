@@ -26,7 +26,7 @@ import java.awt.Color;
  *
  * @author ddoppmeier, rhilker
  */
-public class ColorProperties {
+public final class ColorProperties {
 
     /**
      * Private constructor so this utility class can not be instantiated.

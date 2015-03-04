@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
 
 
 /**
@@ -53,11 +51,13 @@ public class SequenceMatcher {
         this( 1 );
     }
 
+
     /**
      * Enables matching a pattern on a sequence, especially for DNA sequences.
      * Provides several configuration options for the matching process.
+     *
      * @param absoluteStart The absolute search start position in genome
-     *                      coordinates of the matcher
+     * coordinates of the matcher
      */
     public SequenceMatcher( int absoluteStart ) {
         this.absoluteStart = absoluteStart;
@@ -76,14 +76,13 @@ public class SequenceMatcher {
      * enables skipping of reverse complementing long search sequences. Beware
      * to set all necessary options before running the analysis.
      * <p>
-     * @param sequence        the sequence to analyze
-     * @param pattern          pattern to search for (complement for rev strand)
+     * @param sequence the sequence to analyze
+     * @param pattern pattern to search for (complement for rev strand)
      * @param isForwardStrand <code>true</code> if <code>pattern</code>
-     *                        originates from the fwd strand, <code>false</code>
-     *                        if it originates from the reverse strand
-     * @param type            The type of the regions to create. Either
-     *                        Region.START or Region.STOP, Properties.PATTERN or
-     *                        Properties.CDS.
+     * originates from the fwd strand, <code>false</code> if it originates from
+     * the reverse strand
+     * @param type The type of the regions to create. Either Region.START or
+     * Region.STOP, Properties.PATTERN or Properties.CDS.
      */
     public void matchPattern( String sequence, Pattern pattern, boolean isForwardStrand, int type ) {
 
@@ -109,8 +108,9 @@ public class SequenceMatcher {
                     stop = absoluteStart + to;
                 }
 
-                if( !requireSameFrame || PositionUtils.determineFwdFrame( start ) == targetFrame ||
-                                         PositionUtils.determineRevFrame( stop ) == targetFrame ) {
+                if( !requireSameFrame
+                        || PositionUtils.determineFwdFrame( start ) == targetFrame
+                        || PositionUtils.determineRevFrame( stop ) == targetFrame ) {
                     regions.add( new Region( start, stop, isForwardStrand, type ) );
                     counter++;
                 }
@@ -151,7 +151,7 @@ public class SequenceMatcher {
 
     /**
      * @return The maximum number of pattern matches to calculate. The default
-     *         value is 0 = no restriction. <br/>
+     * value is 0 = no restriction. <br/>
      * E.g. 1 means that only the next hit is searched for the current pattern.
      */
     public int getMaxNoResults() {
@@ -161,7 +161,7 @@ public class SequenceMatcher {
 
     /**
      * @param maxNoResults The maximum number of pattern matches to calculate.
-     *                     The default value is 0 = no restriction. <br/>
+     * The default value is 0 = no restriction. <br/>
      * E.g. 1 means that only the next hit is searched for the current pattern.
      */
     public void setMaxNoResults( int maxNoResults ) {
@@ -171,7 +171,7 @@ public class SequenceMatcher {
 
     /**
      * @return The reading frame to analyze (-3 to 3 except 0). The default
-     *         value is 0 = analyze all frames.
+     * value is 0 = analyze all frames.
      */
     public int getTargetFrame() {
         return targetFrame;
@@ -180,7 +180,7 @@ public class SequenceMatcher {
 
     /**
      * @param targetFrame The reading frame to analyze (-3 to 3 except 0). The
-     *                    default value is 0 = analyze all frames.
+     * default value is 0 = analyze all frames.
      */
     public void setTargetFrame( int targetFrame ) {
         this.targetFrame = targetFrame;
@@ -189,8 +189,8 @@ public class SequenceMatcher {
 
     /**
      * @return <code>true</code> if results should only be calculated for the
-     *         currently set reading frame, <code>false</code> if both strands
-     *         should be analyzed. The default value is <code>false</code>.
+     * currently set reading frame, <code>false</code> if both strands should be
+     * analyzed. The default value is <code>false</code>.
      */
     public boolean isRequireSameFrame() {
         return requireSameFrame;
@@ -199,10 +199,8 @@ public class SequenceMatcher {
 
     /**
      * @param requireSameFrame <code>true</code> if results should only be
-     *                         calculated for the currently set reading frame,
-     *                         <code>false</code> if both strands should be
-     *                         analyzed. The default value is
-     *                         <code>false</code>.
+     * calculated for the currently set reading frame, <code>false</code> if
+     * both strands should be analyzed. The default value is <code>false</code>.
      */
     public void setRequireSameFrame( boolean requireSameFrame ) {
         this.requireSameFrame = requireSameFrame;
@@ -211,9 +209,9 @@ public class SequenceMatcher {
 
     /**
      * @return <code>true</code> if the sequence shall be analyzed in reverse
-     *         direction (e.g. for the corresponding stop codon of a start codon
-     *         on the reverse strand), <code>false</code> if the analysis
-     *         direction is forward. The default value is <code>false</code>.
+     * direction (e.g. for the corresponding stop codon of a start codon on the
+     * reverse strand), <code>false</code> if the analysis direction is forward.
+     * The default value is <code>false</code>.
      */
     public boolean isAnalyzeInRevDirection() {
         return analyzeInRevDirection;
@@ -222,11 +220,9 @@ public class SequenceMatcher {
 
     /**
      * @param analyzeInRevDirection <code>true</code> if the sequence shall be
-     *                              analyzed in reverse direction (e.g. for the
-     *                              corresponding stop codon of a start codon on
-     *                              the reverse strand), <code>false</code> if
-     *                              the analysis direction is forward. The
-     *                              default value is <code>false</code>.
+     * analyzed in reverse direction (e.g. for the corresponding stop codon of a
+     * start codon on the reverse strand), <code>false</code> if the analysis
+     * direction is forward. The default value is <code>false</code>.
      */
     public void setAnalyzeInRevDirection( boolean analyzeInRevDirection ) {
         this.analyzeInRevDirection = analyzeInRevDirection;
@@ -249,5 +245,6 @@ public class SequenceMatcher {
     public void clearRegions() {
         regions.clear();
     }
+
 
 }

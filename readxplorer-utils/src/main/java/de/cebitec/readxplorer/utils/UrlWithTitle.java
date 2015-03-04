@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package de.cebitec.readxplorer.utils;
 import java.net.URL;
 
 
-
 /**
  * Pairs a standard URL with a friendly name title.
  *
@@ -35,6 +34,7 @@ public class UrlWithTitle {
 
     /**
      * Pairs a standard URL with a friendly name title.
+     *
      * @param title The title to display as friendly name of the URL
      * @param url The URL itself
      */
@@ -59,6 +59,7 @@ public class UrlWithTitle {
         return url;
     }
 
+
     /**
      * @return The string representation of the URL.
      */
@@ -66,5 +67,6 @@ public class UrlWithTitle {
     public String toString() {
         return url.toString();
     }
+
 
 }

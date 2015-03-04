@@ -140,8 +140,7 @@ public enum ReadPairType {
      * @return the desired ReadPairType for a given integer between 0 and 12.
      * <p>
      * @param type the type of ReadPairType to return. If the type is larger
-     *             than 12
-     *             UNPAIRED_PAIR is returned.
+     * than 12 UNPAIRED_PAIR is returned.
      */
     public static ReadPairType getReadPairType( int type ) {
         switch( type ) {
@@ -181,50 +180,37 @@ public enum ReadPairType {
      * @return the desired ReadPairType for a given type string.
      * <p>
      * @param type the type of ReadPairType to return. If the type is unknown
-     *             UNPAIRED_PAIR is returned.
+     * UNPAIRED_PAIR is returned.
      */
     public static ReadPairType getReadPairType( String type ) {
         ReadPairType readPairType;
         if( type.equalsIgnoreCase( PERFECT_PAIR_STRING ) ) {
             readPairType = PERFECT_PAIR;
-        }
-        else if( type.equalsIgnoreCase( DIST_LARGE_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( DIST_LARGE_PAIR_STRING ) ) {
             readPairType = DIST_LARGE_PAIR;
-        }
-        else if( type.equalsIgnoreCase( DIST_SMALL_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( DIST_SMALL_PAIR_STRING ) ) {
             readPairType = DIST_SMALL_PAIR;
-        }
-        else if( type.equalsIgnoreCase( ORIENT_WRONG_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( ORIENT_WRONG_PAIR_STRING ) ) {
             readPairType = ORIENT_WRONG_PAIR;
-        }
-        else if( type.equalsIgnoreCase( OR_DIST_LARGE_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( OR_DIST_LARGE_PAIR_STRING ) ) {
             readPairType = OR_DIST_LARGE_PAIR;
-        }
-        else if( type.equalsIgnoreCase( OR_DIST_SMALL_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( OR_DIST_SMALL_PAIR_STRING ) ) {
             readPairType = OR_DIST_SMALL_PAIR;
-        }
-        else if( type.equalsIgnoreCase( UNPAIRED_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( UNPAIRED_PAIR_STRING ) ) {
             readPairType = UNPAIRED_PAIR;
-        }
-        else if( type.equalsIgnoreCase( PERFECT_UNQ_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( PERFECT_UNQ_PAIR_STRING ) ) {
             readPairType = PERFECT_UNQ_PAIR;
-        }
-        else if( type.equalsIgnoreCase( DIST_LARGE_UNQ_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( DIST_LARGE_UNQ_PAIR_STRING ) ) {
             readPairType = DIST_LARGE_UNQ_PAIR;
-        }
-        else if( type.equalsIgnoreCase( DIST_SMALL_UNQ_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( DIST_SMALL_UNQ_PAIR_STRING ) ) {
             readPairType = DIST_SMALL_UNQ_PAIR;
-        }
-        else if( type.equalsIgnoreCase( ORIENT_WRONG_UNQ_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( ORIENT_WRONG_UNQ_PAIR_STRING ) ) {
             readPairType = ORIENT_WRONG_UNQ_PAIR;
-        }
-        else if( type.equalsIgnoreCase( OR_DIST_LARGE_UNQ_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( OR_DIST_LARGE_UNQ_PAIR_STRING ) ) {
             readPairType = OR_DIST_LARGE_UNQ_PAIR;
-        }
-        else if( type.equalsIgnoreCase( OR_DIST_SMALL_UNQ_PAIR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( OR_DIST_SMALL_UNQ_PAIR_STRING ) ) {
             readPairType = OR_DIST_SMALL_UNQ_PAIR;
-        }
-        else {
+        } else {
             readPairType = UNPAIRED_PAIR;
         }
 

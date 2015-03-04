@@ -26,24 +26,18 @@ import java.util.List;
 
 /**
  * *************************************************************************
- * Copyright (C) 2010 by Rolf Hilker *
- * rhilker a t cebitec.uni-bielefeld.de *
- *                                                                         *
- * This program is free software; you can redistribute it and/or modify *
- * it under the terms of the GNU General Public License as published by *
- * the Free Software Foundation; either version 2 of the License, or *
- * (at your option) any later version. *
- *                                                                         *
- * This program is distributed in the hope that it will be useful, *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the *
- * GNU General Public License for more details. *
- *                                                                         *
- * You should have received a copy of the GNU General Public License *
- * along with this program; if not, write to the *
- * Free Software Foundation, Inc., *
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. *
- **************************************************************************
+ * Copyright (C) 2010 by Rolf Hilker * rhilker a t cebitec.uni-bielefeld.de * *
+ * This program is free software; you can redistribute it and/or modify * it
+ * under the terms of the GNU General Public License as published by * the Free
+ * Software Foundation; either version 2 of the License, or * (at your option)
+ * any later version. * * This program is distributed in the hope that it will
+ * be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU General
+ * Public License for more details. * * You should have received a copy of the
+ * GNU General Public License * along with this program; if not, write to the *
+ * Free Software Foundation, Inc., * 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA. *
+ * *************************************************************************
  */
 /**
  * Defines a <tt>node</tt> constructor to create a new <tt>node</tt> and has
@@ -70,9 +64,8 @@ public class Node implements Traversable {//, Cloneable {
      * length and a key-object to be stored in the <tt>node</tt> .
      * <p>
      * @param nodeType The node type to store within the current <tt>node</tt>
-     * @param parents  A list of <tt>nodes</tt> which are the parents of the
-     * <tt>node</tt> to be
-     * created.
+     * @param parents A list of <tt>nodes</tt> which are the parents of the
+     * <tt>node</tt> to be created.
      */
     public Node( final FeatureType nodeType, final List<Node> parents ) {
         this.nodeType = nodeType;
@@ -80,8 +73,7 @@ public class Node implements Traversable {//, Cloneable {
             for( Node parent : parents ) {
                 parent.addChild( this );
             }
-        }
-        else {
+        } else {
             this.parents = new ArrayList<>();
         }
         this.nodeChildren = new ArrayList<>();
@@ -121,10 +113,9 @@ public class Node implements Traversable {//, Cloneable {
      * Traverses a <tt>node</tt> with different visitors in top down fashion.
      * <p>
      * @param nodeVisitor Visitor-type with which the <tt>node</tt> should be
-     *                    traversed. Does not set the visited flag for any nodes! The node visitor
-     *                    has to take care of this behaviour. But nodes and their corresponding
-     *                    subtree,
-     *                    whose visited flag is set are not visited anymore.
+     * traversed. Does not set the visited flag for any nodes! The node visitor
+     * has to take care of this behaviour. But nodes and their corresponding
+     * subtree, whose visited flag is set are not visited anymore.
      */
     @Override
     public void traverse( final NodeVisitor nodeVisitor ) {
@@ -182,6 +173,7 @@ public class Node implements Traversable {//, Cloneable {
 
     /**
      * Add a parent <tt>node</tt>.
+     *
      * @param parentNode A new parent node of this instance.
      */
     public void addParent( Node parentNode ) {
@@ -264,7 +256,7 @@ public class Node implements Traversable {//, Cloneable {
 
     /**
      * @return <code>true</code>, if this node was already visited in the
-     *         current traversal.
+     * current traversal.
      */
     public boolean isVisited() {
         return visited;
@@ -275,7 +267,7 @@ public class Node implements Traversable {//, Cloneable {
      * Sets whether this node was already visited in the current traversal.
      * <p>
      * @param visited <code>true</code>, if this node was already visited in the
-     *                current traversal
+     * current traversal
      */
     public void setVisited( boolean visited ) {
         this.visited = visited;
