@@ -22,6 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <indexitem text="Differential Gene Expression Analysis" target="de.cebitec.readxplorer.differentialExpression.about"/>
     <indexitem text="Installation Differential Gene Expression Analysis" target="de.cebitec.readxplorer.differentialExpression.installation"/>
     <indexitem text="Transcription Start Site (TSS) Detection" target="de.cebitec.readxplorer.transcriptionAnalyses.tss"/>
-    <indexitem text="RPKM and Read Count Calculations" target="de.cebitec.readxplorer.transcriptionAnalyses.rpkm"/>
+    <indexitem text="Read Count & Normalization Calculations" target="de.cebitec.readxplorer.transcriptionAnalyses.normalization"/>
     <indexitem text="Operon Detection" target="de.cebitec.readxplorer.transcriptionAnalyses.operon"/>
 </index>

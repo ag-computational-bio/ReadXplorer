@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+ * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,205 +24,173 @@ import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 
 /**
- * Filters for start and stop codons in two ways: First for all
- * available start and stop codons in a specified region and second
- * for all start and stop codons of a given frame for a specified region.
+ * Filter for start and stop codons of a DNA sequence.
  *
- * @author ddoppmeier, rhilker
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class StartCodonFilter implements RegionFilterI {
+public class StartCodonFilter extends PatternFilter {
 
-    public static final int INIT = 10;
-    private static final int INTERVAL_SIZE = 3000000;
-
-    private final List<Region> regions;
-    private int absStart;
-    private int absStop;
-    private final PersistentReference refGen;
-    private String sequence;
-    private ArrayList<Boolean> selectedStarts;
-    private ArrayList<Boolean> selectedStops;
-    private Pattern[] startCodons;
-    private Pattern[] stopCodons;
-    private int frameCurrFeature;
-
+    private List<Region> regions;
+    private List<Boolean> selectedStarts;
+    private List<Boolean> selectedStops;
+    private String[] startCodons;
+    private String[] stopCodons;
 
     /**
-     * Filters for start and stop codons in two ways: First for all available
-     * start
-     * codons in a specified region and second for all start codons of a given
-     * frame
-     * for a specified region.
+     * Filter for start and stop codons of a DNA sequence.
      * <p>
-     * @param absStart start of the region to search in
-     * @param absStop  end of the region to search in
+     * @param absStart The absolute start of the whole interval to scan. Always
+     *                 smaller than <code>absStop</code>.
+     * @param absStop  The absolute stop of the whole interval to scan. Always
+     *                 larger than <code>absStart</code>.
      * @param refGen   the reference in which to search
      */
     public StartCodonFilter( int absStart, int absStop, PersistentReference refGen ) {
+        super(absStart, absStop, refGen );
         this.regions = new ArrayList<>();
-        this.absStart = absStart;
-        this.absStop = absStop;
-        this.refGen = refGen;
 
         this.resetCodons();
-
-        this.frameCurrFeature = StartCodonFilter.INIT; //because this is not a frame value
     }
-
 
     /**
-     * Searches and identifies start and stop codons and saves their position
-     * in this class' region list.
+     * @return Identifies the currently selected start and stop codons in the
+     *         given interval of the currently set reference according to the
+     *         current filter configuration.
      */
-    private void findSelectedCodons() {
-        regions.clear();
-
-        if( this.atLeastOneCodonSelected() ) {
-            // extends interval to search to the left and right,
-            // to find start/stop codons that overlap current interval boundaries
-            int offset = 3;
-            int start = absStart - offset;
-            int stop = absStop + 2;
-            int genomeLength = this.refGen.getActiveChromosome().getLength();
-
-            if( stop > 0 ) {
-                if( start <= 0 ) {
-                    offset -= Math.abs( start ) + 1;
-                    start = 1;
-                }
-                if( stop > genomeLength ) {
-                    stop = genomeLength;
-                }
-                for( int i = start; i <= stop; i++ ) {
-                    if( i + INTERVAL_SIZE <= stop ) {
-                        this.sequence = refGen.getActiveChromSequence( i, i + INTERVAL_SIZE );
-                    }
-                    else {
-                        this.sequence = refGen.getActiveChromSequence( i, stop );
-                    }
-                    i += INTERVAL_SIZE;
-                    boolean isFeatureSelected = this.frameCurrFeature != INIT;
-
-                    int index = 0;
-                    for( int j = 0; j < this.selectedStarts.size(); ++j ) {
-                        if( this.selectedStarts.get( j ) ) {
-                            this.matchPattern( sequence, this.startCodons[index++], true, offset, isFeatureSelected, Properties.START );
-                            this.matchPattern( sequence, this.startCodons[index++], false, offset, isFeatureSelected, Properties.START );
-                        }
-                        else {
-                            index += 2;
-                        }
-                    }
-                    index = 0;
-                    for( int j = 0; j < this.selectedStops.size(); ++j ) {
-                        if( this.selectedStops.get( j ) ) {
-                            this.matchPattern( sequence, this.stopCodons[index++], true, offset, isFeatureSelected, Properties.STOP );
-                            this.matchPattern( sequence, this.stopCodons[index++], false, offset, isFeatureSelected, Properties.STOP );
-                        }
-                        else {
-                            index += 2;
-                        }
-                    }
-                }
-            }
-
-        }
-
-    }
-
-
-    /**
-     * Identifies pattern "p" in the given "sequence" and stores positive
-     * results
-     * in this class' region list.
-     * <p>
-     * @param sequence        the sequence to analyse
-     * @param p               pattern to search for
-     * @param isForwardStrand if pattern is fwd or rev
-     * @param offset          offset needed for storing the correct region
-     *                        positions
-     * @param restricted      determining if the visualization should be
-     *                        restricted to a certain frame
-     * @param genomeLength    length of the genome, needed for checking frame on
-     *                        the reverse strand
-     * @param type            The type of the regions to create. Either
-     *                        Region.START or Region.STOP.
-     */
-    private void matchPattern( String sequence, Pattern p, boolean isForwardStrand, int offset, boolean restricted,
-                               int type ) {
-        // match forward
-        final boolean codonFwdStrand = this.frameCurrFeature > 0;
-        if( !restricted || restricted && codonFwdStrand == isForwardStrand ) {
-            Matcher m = p.matcher( sequence );
-            while( m.find() ) {
-                int from = m.start();
-                int to = m.end() - 1;
-                final int start = absStart - offset + from; // +1 because in matcher each pos is
-                final int stop = absStart - offset + to; //shifted by -1 (index starts with 0)
-                if( restricted ) {
-                    /*
-                     * Works because e.g. for positions 1-3 & 6-4:
-                     * +1 = (pos 1 - 1) % 3 = 0 -> 0 + 1 = frame +1
-                     * +2 = (pos 2 - 1) % 3 = 1 -> 1 + 1 = frame +2
-                     * +3 = (pos 3 - 1) % 3 = 2 -> 2 + 1 = frame +3
-                     * -1 = (pos 6 - 1) % 3 = 2 -> 2 - 3 = frame -1
-                     * -2 = (pos 5 - 1) % 3 = 1 -> 1 - 3 = frame -2
-                     * -3 = (pos 4 - 1) % 3 = 0 -> 0 - 3 = frame -3
-                     */
-                    if( PositionUtils.determineFwdFrame( start ) == this.frameCurrFeature
-                        || PositionUtils.determineRevFrame( stop ) == this.frameCurrFeature ) {
-                        regions.add( new Region( start, stop, isForwardStrand, type ) );
-                    }
-                }
-                else {
-                    regions.add( new Region( start, stop, isForwardStrand, type ) );
-                }
-            }
-        }
-    }
-
-
     @Override
     public List<Region> findRegions() {
-        findSelectedCodons();
+        regions.clear();
+        if( atLeastOneCodonSelected() ) {
+            setRegionType( Properties.START );
+            startSearch( selectedStarts, startCodons );
+            setRegionType( Properties.STOP );
+            startSearch( selectedStops, stopCodons );
+        }
         return Collections.unmodifiableList( regions );
     }
 
+    /**
+     * Configures and runs a search for the next codon of the currently set
+     * codon type (see {@link #setRegionType(byte)}) in the same reading frame
+     * (and strand) than the given search start position.
+     * <p>
+     * @param start       The first position in the correct reading frame, on
+     *                    which a codon should be detected.
+     * <p>
+     * @param isFwdStrand <code>true</code> if the codon should be searched on
+     *                    the forward strand, <code>false</code> otherwise.
+     * <p>
+     * @return The next codon position in the reference from the given start
+     */
+    public Region findNextCodon( int start, boolean isFwdStrand ) {
 
-    @Override
-    public void setInterval( int start, int stop ) {
-        this.absStart = start;
-        this.absStop = stop;
+        int startOnStrand = start;
+        int stop = getReference().getActiveChromLength();
+        if( !isFwdStrand ) {
+            stop = start;
+            startOnStrand = 1;
+        }
+
+        setInterval( startOnStrand, stop );
+        setAnalysisStrand( isFwdStrand ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV );
+        if( isRequireSameFrame() ) {
+            int frame = isFwdStrand ? PositionUtils.determineFwdFrame( start ) : PositionUtils.determineRevFrame( stop );
+            setAnalysisFrame( frame );
+        }
+        setAnalyzeInRevDirection( !isFwdStrand );
+        setAddOffset( false );
+
+        List<Region> codons = new ArrayList<>( findRegions() );
+        PositionUtils.sortList( isFwdStrand, codons );
+        Region foundCodon = null;
+        for( Region codon : codons ) {
+            foundCodon = codon;
+            break;
+        }
+
+        return foundCodon;
+    }
+
+
+    /**
+     * Checks if at least one codon is currently selected.
+     * <p>
+     * @return <code>true</code> if at least one codon is currently selected,
+     *         <code>false</code> otherwise.
+     */
+    private boolean atLeastOneCodonSelected() {
+        return selectedStarts.contains( true ) || selectedStops.contains( true );
+    }
+
+    /**
+     * Starts the pattern search for both strands and all selected codons.
+     * <p>
+     * @param selectedCodons The list of booleans determining which codons are
+     *                       currently selected for the analysis
+     * @param codons         The array of codons to search in the current
+     *                       reference interval
+     */
+    private void startSearch( List<Boolean> selectedCodons, String[] codons ) {
+
+        for( int i = 0; i < selectedCodons.size(); i++ ) {
+            if( selectedCodons.get( i ) ) {
+                setPattern( codons[i] );
+                regions.addAll( super.findRegions() );
+            }
+        }
+    }
+
+    /**
+     * Sets if all start codons are currently selected.
+     * <p>
+     * @param isSelected <code>true</code>, if the start codons are all
+     *                   selected, <code>false</code> otherwise
+     */
+    public void setAllStartCodonsSelected( boolean isSelected ) {
+        setListSelected( selectedStarts, isSelected );
+    }
+
+
+    /**
+     * Sets if all stop codons are currently selected.
+     * <p>
+     * @param isSelected <code>true</code>, if the stop codons are all selected,
+     *                   <code>false</code> otherwise
+     */
+    public void setAllStopCodonsSelected( boolean isSelected ) {
+        setListSelected( selectedStops, isSelected );
+    }
+
+
+    /**
+     * Selects or deselects all boolean values in the given list.
+     * <p>
+     * @param selectionList The list whose boolean values shall be updated
+     * @param isSelected    The boolean to assign to each list element
+     */
+    private void setListSelected( List<Boolean> selectionList, boolean isSelected ) {
+        for( int i = 0; i < selectionList.size(); i++ ) {
+            selectionList.set( i, isSelected );
+        }
     }
 
 
     /**
      * Sets if the start codon with the index i is currently selected.
      * <p>
-     * @param i          the index of the current start codon
-     * @param isSelected true, if the start codon is selected, false otherwise
+     * @param i          The index of the current start codon
+     * @param isSelected <code>true</code>, if the start codon is selected, <code>false</code> otherwise
      */
     public void setStartCodonSelected( final int i, final boolean isSelected ) {
         this.selectedStarts.set( i, isSelected );
-    }
-
-
-    /**
-     * Sets if the stop codon with the index i is currently selected.
-     * <p>
-     * @param i          the index of the current stop codon
-     * @param isSelected true, if the stop codon is selected, false otherwise
-     */
-    public void setStopCodonSelected( final int i, final boolean isSelected ) {
-        this.selectedStops.set( i, isSelected );
     }
 
 
@@ -231,10 +199,23 @@ public class StartCodonFilter implements RegionFilterI {
      * <p>
      * @param i index of the start codon
      * <p>
-     * @return true if the start codon with index i is currently selected
+     * @return <code>true</code> if the start codon with index i is currently
+     *         selected, <code>false</code> otherwise
      */
     public boolean isStartCodonSelected( final int i ) {
         return this.selectedStarts.get( i );
+    }
+
+
+    /**
+     * Sets if the stop codon with the index i is currently selected.
+     * <p>
+     * @param i          the index of the current stop codon
+     * @param isSelected <code>true</code>, if the stop codon is selected,
+     *                   <code>false</code> otherwise
+     */
+    public void setStopCodonSelected( final int i, final boolean isSelected ) {
+        this.selectedStops.set( i, isSelected );
     }
 
 
@@ -243,47 +224,11 @@ public class StartCodonFilter implements RegionFilterI {
      * <p>
      * @param i index of the stop codon
      * <p>
-     * @return true if the stop codon with index i is currently selected
+     * @return <code>true</code> if the stop codon with index i is currently
+     *         selected, <code>false</code> otherwise
      */
     public boolean isStopCodonSelected( final int i ) {
         return this.selectedStops.get( i );
-    }
-
-
-    public int getFrameCurrFeature() {
-        return this.frameCurrFeature;
-    }
-
-
-    /**
-     * Sets the data needed for the current feature. Currently only the frame is
-     * necessary. This always has to be set first in case the action should only
-     * show start codons of the correct frame.
-     * <p>
-     * @param frameCurrFeature the frame of the currently selected feature
-     */
-    public void setCurrFeatureData( int frameCurrFeature ) {
-        this.frameCurrFeature = frameCurrFeature;
-    }
-
-
-    /**
-     * Checks if at least one codon is currently selected.
-     * <p>
-     * @return true if at least one codon is currently selected
-     */
-    private boolean atLeastOneCodonSelected() {
-        for( int i = 0; i < this.selectedStarts.size(); ++i ) {
-            if( this.selectedStarts.get( i ) ) {
-                return true;
-            }
-        }
-        for( int i = 0; i < this.selectedStops.size(); ++i ) {
-            if( this.selectedStops.get( i ) ) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -293,29 +238,17 @@ public class StartCodonFilter implements RegionFilterI {
      */
     public final void resetCodons() {
         Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
-        String[] startCodonsNew = geneticCode.getFirst();
-        String[] stopCodonsNew = geneticCode.getSecond();
 
-        this.startCodons = new Pattern[startCodonsNew.length * 2];
-        this.stopCodons = new Pattern[stopCodonsNew.length * 2];
-        this.selectedStarts = new ArrayList<>();
-        this.selectedStops = new ArrayList<>();
-        int index = 0;
-        String codon;
-        for( int i = 0; i < startCodonsNew.length; ++i ) {
-            codon = startCodonsNew[i];
-            this.startCodons[index++] = Pattern.compile( codon );
-            this.startCodons[index++] = Pattern.compile( SequenceUtils.getDnaComplement( SequenceUtils.reverseString( codon ) ) );
+        startCodons = geneticCode.getFirst();
+        stopCodons = geneticCode.getSecond();
+        selectedStarts = new ArrayList<>();
+        selectedStops = new ArrayList<>();
+        for( String startCodon : startCodons ) {
             this.selectedStarts.add( false );
         }
-        index = 0;
-        for( int i = 0; i < stopCodonsNew.length; ++i ) {
-            codon = stopCodonsNew[i];
-            this.stopCodons[index++] = Pattern.compile( codon );
-            this.stopCodons[index++] = Pattern.compile( SequenceUtils.getDnaComplement( SequenceUtils.reverseString( codon ) ) );
+        for( String stopCodon : stopCodons ) {
             this.selectedStops.add( false );
         }
     }
-
 
 }

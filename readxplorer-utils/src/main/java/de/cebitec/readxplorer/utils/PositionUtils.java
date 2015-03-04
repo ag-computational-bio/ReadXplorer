@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -51,6 +53,23 @@ public class PositionUtils {
 
 
     /**
+     * @param genomicRange feature whose frame has to be determined
+     * <p>
+     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the
+     *         feature
+     */
+    public static int determineFrame( GenomicRange genomicRange ) {
+        int frame;
+        if( genomicRange.isFwdStrand() ) {
+            frame = PositionUtils.determineFwdFrame( genomicRange.getStart() );
+        } else {
+            frame = PositionUtils.determineRevFrame( genomicRange.getStop() );
+        }
+        return frame;
+    }
+
+
+    /**
      * Determines the frame of an element at a given genomic position on the fwd
      * strand.
      * <p>
@@ -73,6 +92,24 @@ public class PositionUtils {
      */
     public static int determineRevFrame( int position ) {
         return (position - 1) % 3 - 3;
+    }
+
+    /**
+     * Sorts the given <code>GenomicRange</code> implementation list according
+     * to the given sort order. For items with <code>isFwdOrder</code> =
+     * <code>true</code>, it sorts by the natural order, for items with
+     * <code>isFwdOrder</code> = <code>false</code>, it sorts by the reverse
+     * natural order.
+     * <p>
+     * @param isFwdOrder The sort order to use for the list
+     * @param codons     The list of genomic ranges to sort
+     */
+    public static void sortList( boolean isFwdOrder, List<? extends GenomicRange> codons ) {
+        if( isFwdOrder ) {
+            Collections.sort( codons ); //start with first
+        } else {
+            Collections.sort( codons, Collections.reverseOrder() ); //start with last
+        }
     }
 
 

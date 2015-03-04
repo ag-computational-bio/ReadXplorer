@@ -26,6 +26,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -35,9 +37,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -45,7 +52,11 @@ import org.openide.util.NbBundle;
  * <p>
  * @author -Rolf Hilker-
  */
-public final class GeneralUtils {
+public class GeneralUtils {
+
+    private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
+
+    private static final Preferences PREF = NbPreferences.forModule( Object.class );
 
 
     private GeneralUtils() {}
@@ -118,7 +129,6 @@ public final class GeneralUtils {
             return false;
         }
     }
-
 
     /**
      * Checks if the input string is a valid double number larger than 0.
@@ -554,6 +564,48 @@ public final class GeneralUtils {
 
         return nameArray;
     }
+
+
+    /**
+     * Creates a link to the currently set protein database for a given EC
+     * number. If the EC number string is empty, empty html tags are returned.
+     * <p>
+     * @param ecNumber The EC number or empty string or <code>null</code>
+     * <p>
+     * @return The link or a string of empty html tags
+     */
+    public static String createEcHtmlLink( String ecNumber ) {
+        String ecLink = "<html> </html>";
+        if( ecNumber != null && !ecNumber.isEmpty() ) {
+            String dbUrl = PREF.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+            ecLink = "<a href=\"" + dbUrl + ecNumber + "\">" + ecNumber + "</a>";
+        }
+        return ecLink;
+    }
+
+
+    /**
+     * Creates a URL with a title (see {@link UrlWithTitle}) to the currently
+     * set protein database for a given EC number. If the EC number string is
+     * empty, <code>null</code> is returned.
+     * <p>
+     * @param ecNumber The EC number or empty string or <code>null</code>
+     * <p>
+     * @return The URL with a title or <code>null</code>
+     */
+    public static UrlWithTitle createEcUrl( String ecNumber ) {
+        UrlWithTitle url = null;
+        if( ecNumber != null && !ecNumber.isEmpty() ) {
+            try {
+                String dbUrl = PREF.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+                url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
+            } catch( MalformedURLException ex ) {
+                LOG.log( SEVERE, ex.getMessage() );
+            }
+        }
+        return url;
+    }
+
 
 //    /**
 //     * For a given map of strings to other maps or objects, this method

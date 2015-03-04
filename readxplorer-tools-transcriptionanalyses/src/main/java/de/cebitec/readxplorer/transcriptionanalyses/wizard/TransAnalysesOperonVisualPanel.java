@@ -21,6 +21,12 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
 
 /**
@@ -102,13 +108,8 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void operonDetectionAutomaticBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionAutomaticBoxActionPerformed
-        this.isAutoParamEstimation = this.operonDetectionAutomaticBox.isSelected();
-        if( this.isAutoParamEstimation ) {
-            this.spanningReadsField.setEnabled( false );
-        }
-        else {
-            this.spanningReadsField.setEnabled( true );
-        }
+        isAutoParamEstimation = operonDetectionAutomaticBox.isSelected();
+        spanningReadsField.setEnabled( !isAutoParamEstimation );
     }//GEN-LAST:event_operonDetectionAutomaticBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -119,14 +120,30 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
 
 
     private void initAdditionalComponents() {
-        this.minSpanningReads = Integer.parseInt( this.spanningReadsField.getText() );
-        this.spanningReadsField.getDocument().addDocumentListener( this.createDocumentListener() );
+        minSpanningReads = Integer.parseInt( spanningReadsField.getText() );
+        spanningReadsField.getDocument().addDocumentListener( createDocumentListener() );
+
+        loadLastParameterSelection();
+
+        spanningReadsField.setEnabled( !isAutoParamEstimation );
     }
 
 
     /**
-     * Checks if all required information to start the transcription start
-     * analysis is set.
+     * Loads the last selected parameters into the component.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        isAutoParamEstimation = pref.getBoolean( PROP_WIZARD_NAME + PROP_AUTO_OPERON_PARAMS, false );
+        String minSpanningReadsString = pref.get( PROP_WIZARD_NAME + PROP_MIN_SPANNING_READS, spanningReadsField.getText() );
+
+        operonDetectionAutomaticBox.setSelected( isAutoParamEstimation );
+        spanningReadsField.setText( minSpanningReadsString );
+    }
+
+
+    /**
+     * Checks if all required information to start the operon detection is set.
      */
     @Override
     public boolean isRequiredInfoSet() {

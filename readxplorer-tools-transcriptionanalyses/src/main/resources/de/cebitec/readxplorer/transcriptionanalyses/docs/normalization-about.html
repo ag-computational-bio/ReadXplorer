@@ -1,0 +1,60 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Read Count & Normalization (TPM & RPKM) Calculations</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Read Count & Normalization (TPM & RPKM) Calculations:</strong></span></p>
+        <p style="text-align: justify;">The read count normalization analysis calculates three values:</p>
+        <ul>
+            <li style="text-align: justify;"><b>TPM = Transcripts per million</b> according to:
+                <object CLASSID="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                        <param name="content" value="http://www.ncbi.nlm.nih.gov/pubmed/20022975">
+                        <param name="text" value="<html><u>Li et al. 2010</u></html>">
+                        <param name="textFontSize" value="5">
+                        <param name="textColor" value="blue">
+                    </object>
+                <br>The formula is:
+                <br><b>TPM = 10^6 * (c / l) * (1 / (sum_i (c_i / l_i)))</b> where
+                <br>c = number of mappable reads for gene (or genomic feature)
+                <br>l = effective length (or length) of gene (or genomic feature)
+                <br>i = 1 - #genes (or genomic features of the same type)
+                <br>
+            </li>
+            <li style="text-align: justify;"><b>RPKM = Reads per kilobase per million mapped reads</b> according to:
+                <object CLASSID="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                        <param name="content" value="http://www.ncbi.nlm.nih.gov/pubmed/18516045">
+                        <param name="text" value="<html><u>Mortazavi et al. 2008</u></html>">
+                        <param name="textFontSize" value="5">
+                        <param name="textColor" value="blue">
+                </object>
+                <br>The formula is:
+                <br><b>RPKM = 10^9 * C / (N * L)</b> where
+                <br>C = number of mappable reads for feature (e.g. gene)
+                <br>N = total number of mappable reads for experiment/data set
+                <br>L = sum of feature (e.g. gene) base pairs
+                <br>
+            </li>
+            <li style="text-align: justify;">Raw read count values: All values overlapping the feature and used for the formula calculations.</li>
+        </ul>
+        <p>for all annotated features of the user-selected feature types (e.g. CDS or gene), which have a raw read count within the given range by:</p>
+        <p style="text-align: justify;">1. The <span style="text-decoration: underline;">minimum number of reads</span> (default = 1 read)<br /> 2. The <span style="text-decoration: underline;">maximum number of reads</span> (default = 100000000 reads)<br /> overlapping with a feature.</p>
+        <p style="text-align: justify;"><span style="text-decoration: underline;">Wizard steps:</span></p>
+        <ol>
+            <li style="text-align: justify;">Click the corresponding toolbar icon (see <i><a href="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/view-about.html">Main Window a)</a></i>) or choose "<span style="text-decoration: underline;">Tools -&gt; Transcription Analyses</span>".</li>
+            <li style="text-align: justify;">Select the track(s) to analyze with a left click.</li>
+            <li style="text-align: justify;">Select the "<span style="text-decoration: underline;">Read Count & Normalization calculation</span>".</li>
+            <li style="text-align: justify;">Select the mapping classes (see <i><a href="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/classification-about.html">Read Classification</a></i>) to include in the analysis. </li>
+            <li style="text-align: justify;">Select the Normalization and Read Count Calculation parameters.<br /></li>
+            <li style="text-align: justify;">Select the feature types, for which the Read Count & Normalization Calculation shall be carried out. NOTE for eukaryotes: If e.g. "Gene" is selected, but not "Exon" the TPM, RPKM and Read Count values still correspond to the exons of that gene and NOT to all reads mapped within the gene's boundaries. If "Exon" or "CDS" are selected e.g. together with "Gene", it means that an extra row for each "Exon" or "CDS" satisfying the given parameters will be shown in the result next to the "Gene" result row. If no "Exon" information is available for a "Gene" it is screened for mRNA/rRNA/tRNA, and only if they are also not present, all reads mapped within the gene's boundaries are counted.<br /></li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Finish</span>" to start the <span>Read Count & Normalization (TPM & RPKM) Calculation.</span><br /></li>
+        </ol>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/TPM-Histogram.png" /></p>
+        <p style="text-align: justify;">The screenshot shows an Read Count & Normalization Calculation result with calculated TPM, RPKM and Read Count values in the last three columns of the table. The <b>effective length</b> (fourth last column) is the calculated length of a feature, at which reads may start. This is estimated in connection with the <b>mean read length</b> observed for the feature reads. The selected gene and its coverage is centered on the left hand side. The histogram shows the distribution of TPM values on the number of genes (log scale). The tooltip displays the actual count of features, which belong to a histogram bar. The histogram can be switched between TPM and RPKM values by the "<span style="text-decoration: underline;">Switch to ...</span>"-button at the top.</p>
+    </body>
+</html>

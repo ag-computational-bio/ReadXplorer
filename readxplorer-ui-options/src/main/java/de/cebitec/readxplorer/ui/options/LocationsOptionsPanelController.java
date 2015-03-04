@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 tronic3
+ * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,32 @@ package de.cebitec.readxplorer.ui.options;
 
 import org.netbeans.spi.options.OptionsPanelController;
 
+/**
+ * Locations options panel controller.
+ *
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
 @OptionsPanelController.SubRegistration(
-        displayName = "#AdvancedOption_DisplayName_Directories",
-        keywords = "#AdvancedOption_Keywords_Directories",
-        keywordsCategory = "Advanced/Directories"
+         displayName = "#AdvancedOption_DisplayName_Locations",
+         keywords = "#AdvancedOption_Keywords_Locations",
+         keywordsCategory = "Advanced/Directories"
 )
-@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_Directories=Directories", "AdvancedOption_Keywords_Directories=Directories"})
-public final class DirectoriesOptionsPanelController extends ChangeListeningOptionsPanelController {
+@org.openide.util.NbBundle.Messages( { "AdvancedOption_DisplayName_Locations=Locations", "AdvancedOption_Keywords_Locations=Locations" } )
+public final class LocationsOptionsPanelController extends ChangeListeningOptionsPanelController {
 
-    private DirectoriesPanel panel;
+    private LocationsPanel panel;
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected  DirectoriesPanel getPanel() {
-        if (panel == null) {
-            panel = new DirectoriesPanel(this);
+    protected LocationsPanel getPanel() {
+        if( panel == null ) {
+            panel = new LocationsPanel( this );
         }
         return panel;
     }
+
 
 }

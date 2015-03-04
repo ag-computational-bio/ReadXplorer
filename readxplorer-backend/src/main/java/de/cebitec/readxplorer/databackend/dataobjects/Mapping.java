@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.databackend.dataobjects;
 
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import java.util.TreeSet;
  * <p>
  * @author ddoppmeier, rhilker
  */
-public class Mapping implements ObjectWithId, Comparable<Mapping> {
+public class Mapping implements ObjectWithId, GenomicRange {
 
     private int id;
     private final int start;
@@ -130,8 +131,12 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
 
 
     /**
-     * @return direction of the mapping: 1 for fwd and -1 for rev
+     * Returns if the mapping is located on the fwd or rev strand.
+     * <p>
+     * @return <code>true</code> for mappings on forward and <code>false</code>
+     *         for mappings on the reverse strand
      */
+    @Override
     public boolean isFwdStrand() {
         return isFwdStrand;
     }
@@ -146,18 +151,30 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
 
 
     /**
-     * @return the absolute start position in genome coordinates.
+     * @return the absolute start position in genome coordinates. Always the
+     *         smaller value among start and stop.
      */
+    @Override
     public int getStart() {
         return start;
     }
 
 
     /**
-     * @return the absolute stop position in genome coordinates.
+     * @return the absolute stop position in genome coordinates. Always the
+     *         larger value among start and stop.
      */
+    @Override
     public int getStop() {
         return stop;
+    }
+
+
+    /**
+     * @return The length of the feature in base pairs.
+     */
+    public int getLength() {
+        return GenomicRange.Utils.getLength( this );
     }
 
 
@@ -267,23 +284,24 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
 
 
     /**
-     * Compares two mappings based on their start position. '0' is returned for
-     * equal start positions, 1, if the start position of the other is larger
-     * and -1, if the start position of this mapping is larger.
+     * Compares two genomic ranges (e.g. two Mappings) based on their start
+     * position. '0' is returned for equal start positions, 1, if the start
+     * position of the other is larger and -1, if the start position of this
+     * Mapping is larger.
      * <p>
-     * @param mapping mapping to compare to this mapping
+     * @param genomicRange genomic range to compare to this Mapping
      * <p>
-     * @return '0' for equal start positions, 1, if the start
-     *         position of the other is larger and -1, if the start position of this
-     *         mapping is larger.
+     * @return '0' for equal start positions, 1, if the start position of the
+     *         other is larger and -1, if the start position of this Mapping is
+     *         larger.
      */
     @Override
-    public int compareTo( Mapping mapping ) {
+    public int compareTo( GenomicRange genomicRange ) {
         int result = 0;
-        if( this.start < mapping.getStart() ) {
+        if( this.start < genomicRange.getStart() ) {
             result = -1;
         }
-        else if( this.start > mapping.getStart() ) {
+        else if( this.start > genomicRange.getStart() ) {
             result = 1;
         }
         return result;

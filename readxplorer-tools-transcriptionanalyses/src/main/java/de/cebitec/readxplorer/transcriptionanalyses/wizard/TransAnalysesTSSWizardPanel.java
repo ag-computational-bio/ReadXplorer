@@ -18,6 +18,12 @@
 package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.utils.Properties;
+import java.util.prefs.Preferences;
+import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
+
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ASSOCIATE_TSS_WINDOW;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
@@ -31,12 +37,7 @@ import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionA
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
-import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import static de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel.PROP_STRAND_OPTION;
-import de.cebitec.readxplorer.utils.Properties;
-import java.util.prefs.Preferences;
-import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**

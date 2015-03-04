@@ -34,6 +34,15 @@ public final class Properties {
     public static final String ADAPTER_H2 = "h2";
     public static final String ADAPTER_DIRECT_ACCESS = "direct";
 
+    // protein DB properties
+    public static final String DB_BRENDA = "http://www.brenda-enzymes.org/enzyme.php?ecno=";
+    public static final String DB_EC2PDB = "http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/enzymes/GetPage.pl?ec_number=";
+    public static final String DB_EXPASY = "http://enzyme.expasy.org/EC/";
+    public static final String DB_INTENZ = "http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec=";
+    public static final String DB_KEGG = "http://www.genome.jp/dbget-bin/www_bget?ec:";
+    public static final String DB_METACYC = "http://biocyc.org/META/substring-search?type=REACTION&object=";
+    public static final String DB_PRIAM = "http://priam.prabi.fr/cgi-bin/PRIAM_profiles_CurrentRelease.pl?EC=";
+
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";
@@ -190,6 +199,11 @@ public final class Properties {
     public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
 
     /**
+     * Protein database prefix used for creating EC-number links.
+     */
+    public static final String ENZYME_DB_LINK = "PROTEIN_DB_LINK";
+
+    /**
      * The CRAN Mirror used by Gnu R to load missing packages.
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
@@ -202,6 +216,18 @@ public final class Properties {
      * The RServe port we will connect to for GNU R computations.
      */
     public static final String RSERVE_PORT = "RSERVE_PORT";
+    /**
+     * Use username and password for authentication.
+     */
+    public static final String RSERVE_USE_AUTH = "RSERVE_USE_AUTH";
+    /**
+     * The RServe user we will use for the connection.
+     */
+    public static final String RSERVE_USER = "RSERVE_USER";
+    /**
+     * The RServe password we will use for the connection.
+     */
+    public static final String RSERVE_PASSWORD = "RSERVE_PASSWORD";
     /**
      * Holds the full path to the Rserve startup script if manual local setup is used.
      */

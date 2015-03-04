@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -137,7 +138,8 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add( coveredFeature.getPercentCovered() );
             coveredFeatureRow.add( coveredFeature.getNoCoveredBases() );
             coveredFeatureRow.add( feature.getLocus() );
-            coveredFeatureRow.add( feature.getEcNumber() );
+            UrlWithTitle url = GeneralUtils.createEcUrl( feature.getEcNumber() );
+            coveredFeatureRow.add( url != null ? url : "" );
             coveredFeatureRow.add( feature.getProduct() );
 
             coveredFeaturesResultList.add( coveredFeatureRow );

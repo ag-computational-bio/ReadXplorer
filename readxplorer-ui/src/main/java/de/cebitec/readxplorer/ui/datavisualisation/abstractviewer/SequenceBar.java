@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
@@ -28,6 +29,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.HighlightableI;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -438,7 +440,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         if( this.parentViewer instanceof ReferenceViewer ) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
             if( refViewer.getCurrentlySelectedFeature() != null ) {
-                frameCurrFeature = (byte) PersistentFeature.Utils.determineFrame( refViewer.getCurrentlySelectedFeature().getPersistentFeature() );
+                frameCurrFeature = (byte) PositionUtils.determineFrame( refViewer.getCurrentlySelectedFeature().getPersistentFeature() );
             }
         }
         return frameCurrFeature;
@@ -466,7 +468,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             length = 3;
         }
         JRegion jreg = new JRegion( length, 10, region.getType(), region.getStart(), region.getStop() );
-        if( region.isForwardStrand() ) {
+        if( region.isFwdStrand() ) {
             jreg.setBounds( from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height );
         }
         else {

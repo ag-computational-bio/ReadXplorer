@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
@@ -115,7 +116,7 @@ public class ReferenceViewer extends AbstractViewer {
 
         //only recalculate if reading frame was switched
         if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature()
-                                       != PersistentFeature.Utils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
+                                       != PositionUtils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -171,7 +172,7 @@ public class ReferenceViewer extends AbstractViewer {
         int frame = 0;
         for( Polytree featTree : featureTrees ) { //this means if two roots are on different frames,
             for( Node root : featTree.getRoots() ) { //all children are painted on the frame of the last root node
-                frame = PersistentFeature.Utils.determineFrame( (PersistentFeature) root );
+                frame = PositionUtils.determineFrame( (PersistentFeature) root );
             }
             PaintNodeVisitor paintVisitor = new PaintNodeVisitor( frame );
             featTree.bottomUp( paintVisitor );

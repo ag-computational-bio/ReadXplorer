@@ -23,8 +23,8 @@ import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
 
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_NORM_ANALYSIS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS;
-import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
@@ -43,6 +43,7 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
      * component from this class, just use getComponent().
      */
     private TransAnalysesSelectionVisualPanel component;
+    private Preferences pref = NbPreferences.forModule( Object.class );
 
 
     /**
@@ -71,25 +72,21 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
     @Override
     public void readSettings( final WizardDescriptor wiz ) {
         super.readSettings( wiz );
-        Preferences pref = NbPreferences.forModule( Object.class );
-        byte tssSelected = Byte.valueOf( pref.get( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, "0" ) );
-        byte operonSelected = Byte.valueOf( pref.get( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, "0" ) );
-        byte rpkmSelected = Byte.valueOf( pref.get( PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, "0" ) );
-        boolean isTssSelected = tssSelected == 1;
-        boolean isOperonSelected = operonSelected == 1;
-        boolean isRpkmSelected = rpkmSelected == 1;
+        boolean isTssSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, false );
+        boolean isOperonSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, false );
+        boolean isNormSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, false );
 
-        this.getComponent().updateAnalysisSelection( isTssSelected, isOperonSelected, isRpkmSelected );
+        this.getComponent().updateAnalysisSelection( isTssSelected, isOperonSelected, isNormSelected );
     }
 
 
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        if( this.isValid() ) {
-            wiz.putProperty( PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected() );
-            wiz.putProperty( PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected() );
-            wiz.putProperty( PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected() );
+        if( isValid() ) {
+            wiz.putProperty( PROP_TSS_ANALYSIS, component.isTSSAnalysisSelected() );
+            wiz.putProperty( PROP_OPERON_ANALYSIS, component.isOperonAnalysisSelected() );
+            wiz.putProperty( PROP_NORM_ANALYSIS, component.isNormAnalysisSelected() );
             this.storePrefs();
         }
     }
@@ -100,10 +97,9 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
      * after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected() ? "1" : "0" );
-        pref.put( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected() ? "1" : "0" );
-        pref.put( PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected() ? "1" : "0" );
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, component.isTSSAnalysisSelected() );
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, component.isOperonAnalysisSelected() );
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, component.isNormAnalysisSelected() );
     }
 
 

@@ -48,7 +48,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
      * @param reference
      * @param combineTracks
      * @param trackColumn
-     * @param filterColumn 
+     * @param filterColumn
      */
     public OperonDetectionResult( Map<Integer, PersistentTrack> trackList, List<Operon> detectedOperons,
                                   PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn ) {
@@ -63,7 +63,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
     public List<Operon> getResults() {
         return Collections.unmodifiableList( detectedOperons );
     }
-    
+
     /**
      * Use this method when adding new results to the current results. It
      * synchronizes the list and prevents making changes during the adding
@@ -92,6 +92,12 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
         dataColumnDescriptions.add( "Reads Overlap Start 2" );
         dataColumnDescriptions.add( "Internal Reads" );
         dataColumnDescriptions.add( "Spanning Reads" );
+        dataColumnDescriptions.add( "Feature 1 Locus" );
+        dataColumnDescriptions.add( "Feature 1 Product" );
+        dataColumnDescriptions.add( "Feature 1 EC Number" );
+        dataColumnDescriptions.add( "Feature 2 Locus" );
+        dataColumnDescriptions.add( "Feature 2 Product" );
+        dataColumnDescriptions.add( "Feature 2 EC Number" );
 
         allSheetDescriptions.add( dataColumnDescriptions );
 
@@ -121,16 +127,28 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
             String readsAnno2 = "";
             String internalReads = "";
             String spanningReads = "";
+            String anno1Locus = "";
+            String anno1Product = "";
+            String anno1EcNumber = "";
+            String anno2Locus = "";
+            String anno2Product = "";
+            String anno2EcNumber = "";
 
             for( OperonAdjacency opAdj : operon.getOperonAdjacencies() ) {
-                annoName1 += opAdj.getFeature1().getLocus() + "\n";
-                annoName2 += opAdj.getFeature2().getLocus() + "\n";
+                annoName1 += opAdj.getFeature1().toString() + "\n";
+                annoName2 += opAdj.getFeature2().toString() + "\n";
                 startAnno1 += opAdj.getFeature1().getStart() + "\n";
                 startAnno2 += opAdj.getFeature2().getStart() + "\n";
                 readsAnno1 += opAdj.getReadsFeature1() + "\n";
                 readsAnno2 += opAdj.getReadsFeature2() + "\n";
                 internalReads += opAdj.getInternalReads() + "\n";
                 spanningReads += opAdj.getSpanningReads() + "\n";
+                anno1Locus += opAdj.getFeature1().getLocus();
+                anno1Product += opAdj.getFeature1().getProduct();
+                anno1EcNumber += opAdj.getFeature1().getEcNumber();
+                anno2Locus += opAdj.getFeature2().getLocus();
+                anno2Product += opAdj.getFeature2().getProduct();
+                anno2EcNumber += opAdj.getFeature2().getEcNumber();
 
             }
             List<Object> operonsRow = new ArrayList<>();
@@ -145,6 +163,12 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
             operonsRow.add( readsAnno2 );
             operonsRow.add( internalReads );
             operonsRow.add( spanningReads );
+            operonsRow.add( anno1Locus );
+            operonsRow.add( anno1Product );
+            operonsRow.add( anno1EcNumber );
+            operonsRow.add( anno2Locus );
+            operonsRow.add( anno2Product );
+            operonsRow.add( anno2EcNumber );
 
             operonResults.add( operonsRow );
         }

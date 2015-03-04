@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.HighlightAreaListener;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -180,7 +181,7 @@ public class RegionManager {
         this.regionVisualizer.determineFeatureFrame();
         byte frameCurrFeature = this.regionVisualizer.getFrameCurrFeature();
 
-        this.codonFilter.setCurrFeatureData( frameCurrFeature );
+        this.codonFilter.setAnalysisFrame( frameCurrFeature );
         List<Region> codonHitsToHighlight = this.codonFilter.findRegions();
         for( Region region : codonHitsToHighlight ) {
 
@@ -214,8 +215,7 @@ public class RegionManager {
 
         if( patternHitsToHighlight.isEmpty() ) {
             return this.patternFilter.findNextOccurrence();
-        }
-        else {
+        } else {
             return -2;
         }
     }
@@ -223,8 +223,7 @@ public class RegionManager {
 
     /**
      * Identifies next (closest) occurrence from either forward or reverse
-     * strand of a pattern
-     * in the current reference genome.
+     * strand of a pattern in the current reference genome.
      * <p>
      * @return the position of the next occurrence of the pattern
      */

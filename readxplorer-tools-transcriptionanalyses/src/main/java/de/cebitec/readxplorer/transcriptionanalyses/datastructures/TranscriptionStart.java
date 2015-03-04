@@ -19,8 +19,11 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
 import de.cebitec.readxplorer.databackend.dataobjects.TrackChromResultEntry;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Integer.MIN_VALUE;
 
 
 /**
@@ -42,6 +45,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private boolean isPrimaryTss;
     private TranscriptionStart primaryTss;
     private List<TranscriptionStart> mergedTssList;
+    private Region startCodon;
+    private Region stopCodon;
 
 
     /**
@@ -80,6 +85,92 @@ public class TranscriptionStart extends TrackChromResultEntry {
      */
     public int getPos() {
         return this.pos;
+    }
+
+
+    /**
+     * @return The start codon associated to this TSS if there is one.
+     *         Otherwise <code>null</code>.
+     */
+    public Region getStartCodon() {
+        return startCodon;
+    }
+
+
+    /**
+     * @param startCodon The start codon associated to this TSS if there is one.
+     *                   Otherwise <code>null</code>.
+     */
+    public void setStartCodon( Region startCodon ) {
+        this.startCodon = startCodon;
+    }
+
+
+    /**
+     * @return <code>true</code> if a start codon is associated to this TSS,
+     *         <code>false</code> otherwise.
+     */
+    public boolean hasStartCodon() {
+        return getStartCodon() != null;
+    }
+
+
+    /**
+     * @return The stop codon associated to this TSS if there is one. Otherwise
+     *         <code>null</code>.
+     */
+    public Region getStopCodon() {
+        return stopCodon;
+    }
+
+
+    /**
+     * @param stopCodon The stop codon associated to this TSS if there is one.
+     *                  Otherwise <code>null</code>.
+     */
+    public void setStopCodon( Region stopCodon ) {
+        this.stopCodon = stopCodon;
+    }
+
+
+    /**
+     * @return <code>true</code> if a stop codon is associated to this TSS,
+     *         <code>false</code> otherwise.
+     */
+    public boolean hasStopCodon() {
+        return getStopCodon() != null;
+    }
+
+
+    /**
+     * @return Calculates and returns the length of the transcript defined by
+     *         the start and stop codon. If one or both of the codons are not
+     *         set, the method returns 0.
+     */
+    public int getCodonCDSLength() {
+        int length = 0;
+        if( startCodon != null && stopCodon != null ) {
+            int codonStart = startCodon.getStartOnStrand();
+            int codonStop = stopCodon.getStopOnStrand();
+
+            length = Math.abs( codonStart - codonStop );
+        }
+        return length;
+    }
+
+
+    /**
+     * @return Calculates and returns the absolute difference of the associated
+     *         start codon start and the tss position (leader sequence). <br/>
+     * 0 means both are identical and {@link Integer#MIN_VALUE} means that no
+     * start codon is associated to this novel transcript.
+     */
+    public int getStartPosDifference() {
+        int difference = MIN_VALUE;
+        if( startCodon != null ) {
+            difference = Math.abs( startCodon.getStartOnStrand() - pos );
+        }
+        return difference;
     }
 
 
@@ -129,7 +220,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     /**
      * A primary TSS is the most prominent of a gene, while all other ones are
      * secondary TSS.
-     * @param isPrimaryTss <code>true</code>, if this is a primary TSS, 
+     * @param isPrimaryTss <code>true</code>, if this is a primary TSS,
      * <code>false</code>, if it is a secondary TSS.
      */
     public void setIsPrimary(boolean isPrimaryTss) {
@@ -159,7 +250,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     /**
      * A primary TSS is the most prominent of a gene, while all other ones are
      * secondary TSS.
-     * @return If this is a secondary TSS, this method returns the associated 
+     * @return If this is a secondary TSS, this method returns the associated
      * primary TSS.
      */
     public TranscriptionStart getPrimaryTss() {
@@ -190,7 +281,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     public List<TranscriptionStart> getAssociatedTssList() {
         return mergedTssList;
     }
-    
+
     /**
      * @return The position of the TSS.
      */

@@ -108,7 +108,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                 ++lineNo;
                 //separate all mappings of same pair by read pair tag and hand it over to classification then
                 record = samItor.next();
-                if( !record.getReadUnmappedFlag() && record.getReferenceName().equals( refName ) ) {
+                if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
                     pairTag = CommonsMappingParser.getReadPairTag( record );
 
                     if( pairTag == Properties.EXT_A1 ) {

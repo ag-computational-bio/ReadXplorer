@@ -21,11 +21,12 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readxplorer.transcriptionanalyses.datastructures.RPKMvalue;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
@@ -35,7 +36,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import org.openide.util.Exceptions;
+import org.openide.windows.WindowManager;
 
 
 /**
@@ -44,17 +45,15 @@ import org.openide.util.Exceptions;
  * <p>
  * @author -Rolf Hilker-
  */
-public class ResultPanelRPKM extends ResultTablePanel {
+public class ResultPanelNormalization extends ResultTablePanel {
 
     private static final long serialVersionUID = 1L;
 
     public static final String RETURNED_FEATURES = "Total number of returned features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
 
-    private RPKMAnalysisResult rpkmCalcResult;
+    private NormalizationAnalysisResult normalizationResult;
     private final HashMap<String, Integer> filterStatisticsMap;
-    private PersistentFeature feature;
-    private final boolean statistics = false;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
 
@@ -63,24 +62,24 @@ public class ResultPanelRPKM extends ResultTablePanel {
      * Panel showing a result of an analysis filtering for features with a min
      * and max certain readcount.
      */
-    public ResultPanelRPKM() {
+    public ResultPanelNormalization() {
         initComponents();
         final int posIdx = 0;
         final int trackIdx = 2;
         final int chromIdx = 3;
         tableFilter = new TableRightClickFilter<>( UneditableTableModel.class, posIdx, trackIdx );
-        this.rpkmTable.getTableHeader().addMouseListener( tableFilter );
+        this.normalizationTable.getTableHeader().addMouseListener( tableFilter );
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put( RETURNED_FEATURES, 0 );
         this.refComp = ReferenceFeatureTopComp.findInstance();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
+        DefaultListSelectionModel model = (DefaultListSelectionModel) this.normalizationTable.getSelectionModel();
         model.addListSelectionListener( new ListSelectionListener() {
 
             @Override
             public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( rpkmTable, posIdx, chromIdx, getBoundsInfoManager() );
-                refComp.showTableFeature( rpkmTable, 0 );
+                TableUtils.showPosition(normalizationTable, posIdx, chromIdx, getBoundsInfoManager() );
+                refComp.showTableFeature(normalizationTable, 0 );
             }
 
 
@@ -101,32 +100,32 @@ public class ResultPanelRPKM extends ResultTablePanel {
         parametersLabel = new javax.swing.JLabel();
         histogramButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        rpkmTable = new javax.swing.JTable();
+        normalizationTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
         statisticsButton = new javax.swing.JButton();
 
-        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.parametersLabel.text_1")); // NOI18N
+        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.parametersLabel.text_1")); // NOI18N
 
-        histogramButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.histogramButton.text_1")); // NOI18N
+        histogramButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.histogramButton.text_1")); // NOI18N
         histogramButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 histogramButtonActionPerformed(evt);
             }
         });
 
-        rpkmTable.setModel(new javax.swing.table.DefaultTableModel(
+        normalizationTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Feature", "Feature Type", "Track", "Chromosome", "Strand", "Start", "Stop", "Length", "RPKM", "Read Count"
+                "Feature", "Feature Type", "Track", "Chromosome", "Strand", "Start", "Stop", "Length", "Effective Length", "TPM", "RPKM", "Read Count"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Long.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class, java.lang.Long.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -137,28 +136,30 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(rpkmTable);
-        if (rpkmTable.getColumnModel().getColumnCount() > 0) {
-            rpkmTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title0_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title5_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title8_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title9")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title4_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title7_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title3_1")); // NOI18N
-            rpkmTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title6_1")); // NOI18N
+        jScrollPane1.setViewportView(normalizationTable);
+        if (normalizationTable.getColumnModel().getColumnCount() > 0) {
+            normalizationTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.normalizationTable.columnModel.title0_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title5_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title8_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title9")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.normalizationTable.columnModel.title4_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title1_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title2_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.normalizationTable.columnModel.title7_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.normalizationTable.columnModel.title11")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.normalizationTable.columnModel.title10")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title3_1")); // NOI18N
+            normalizationTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelRPKM.rpkmTable.columnModel.title6_1")); // NOI18N
         }
 
-        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exportButton.text_1")); // NOI18N
+        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.exportButton.text_1")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
             }
         });
 
-        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.statisticsButton.text")); // NOI18N
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class, "ResultPanelNormalization.statisticsButton.text")); // NOI18N
         statisticsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statisticsButtonActionPerformed(evt);
@@ -193,36 +194,34 @@ public class ResultPanelRPKM extends ResultTablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void histogramButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramButtonActionPerformed
-        if( !statistics ) {
-            try {
-                ResultHistogramRPKM hist = new ResultHistogramRPKM( this.rpkmCalcResult );
-            }
-            catch( Exception ex ) {
-                Exceptions.printStackTrace( ex );
-            }
-        }
+        NormHistogramTopComponent normHistogramTopComp = (NormHistogramTopComponent) WindowManager.getDefault().findTopComponent( "NormHistogramTopComponent" );
+        String panelName = "Histogram for " + GeneralUtils.generateConcatenatedString( normalizationResult.getTrackNameList(), 20 );
+        NormalizedReadCountHist normalizedReadCountHist = new NormalizedReadCountHist( normalizationResult );
+        normalizedReadCountHist.showHistogram();
+        normHistogramTopComp.openAnalysisTab( panelName, normalizedReadCountHist );
     }//GEN-LAST:event_histogramButtonActionPerformed
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        TableExportFileChooser fileChooser = new TableExportFileChooser( TableExportFileChooser.getTableFileExtensions(), rpkmCalcResult );
+        TableExportFileChooser fileChooser = new TableExportFileChooser( TableExportFileChooser.getTableFileExtensions(), normalizationResult );
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog( this, new RpkmStatsPanel( filterStatisticsMap ), "RPKM and Read Count Statistics", JOptionPane.INFORMATION_MESSAGE );
+        JOptionPane.showMessageDialog( this, new NormalizationStatsPanel( filterStatisticsMap ), "TPM, RPKM and Read Count Statistics", JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JButton histogramButton;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable normalizationTable;
     private javax.swing.JLabel parametersLabel;
-    private javax.swing.JTable rpkmTable;
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
 
     /**
-     * Adds a list of features with read count and RPKM values to this panel.
+     * Adds a list of features with read count and normalized read count values
+     * (TPM and RPKM) to this panel.
      * <p>
      * @param newResult the new result to add
      */
@@ -231,49 +230,52 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
         tableFilter.setTrackMap( newResult.getTrackMap() );
 
-        if( newResult instanceof RPKMAnalysisResult ) {
-            RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
-//            boolean moreThanOneChrom = rpkmCalcResultNew.getChromosomeMap().size() > 1;
-            final int nbColumns = 10;
+        if( newResult instanceof NormalizationAnalysisResult ) {
+            NormalizationAnalysisResult normalizationResultNew = (NormalizationAnalysisResult) newResult;
+            final int nbColumns = 12;
 
-            if( this.rpkmCalcResult == null ) {
-                this.rpkmCalcResult = rpkmCalcResultNew;
-                this.filterStatisticsMap.put( FEATURES_TOTAL, rpkmCalcResultNew.getNoGenomeFeatures() );
+            if( normalizationResult == null ) {
+                normalizationResult = normalizationResultNew;
+                filterStatisticsMap.put( FEATURES_TOTAL, normalizationResultNew.getNoGenomeFeatures() );
             }
             else {
-                this.rpkmCalcResult.addAllToResult( rpkmCalcResultNew.getResults() );
+                this.normalizationResult.addAllToResult( normalizationResultNew.getResults() );
             }
-            DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();
+            DefaultTableModel model = (DefaultTableModel) normalizationTable.getModel();
 
             PersistentFeature feat;
-            for( RPKMvalue rpkm : rpkmCalcResult.getResults() ) {
-                feat = rpkm.getFeature();
+            for( NormalizedReadCount normValue : normalizationResult.getResults() ) {
+                feat = normValue.getFeature();
                 Object[] rowData = new Object[nbColumns];
                 int i = 0;
                 rowData[i++] = feat;
                 rowData[i++] = feat.getType();
-                rowData[i++] = this.rpkmCalcResult.getTrackEntry( rpkm.getTrackId(), false );
-                rowData[i++] = rpkmCalcResultNew.getChromosomeMap().get( feat.getChromId() );
+                rowData[i++] = normalizationResult.getTrackEntry( normValue.getTrackId(), false );
+                rowData[i++] = normalizationResultNew.getChromosomeMap().get( feat.getChromId() );
                 rowData[i++] = feat.isFwdStrandString();
                 rowData[i++] = feat.getStartOnStrand();
                 rowData[i++] = feat.getStopOnStrand();
                 rowData[i++] = feat.getLength();
-                rowData[i++] = rpkm.getRPKM();
-                rowData[i++] = rpkm.getReadCount();
+                rowData[i++] = normValue.getEffectiveFeatureLength();
+                rowData[i++] = normValue.getTPM();
+                rowData[i++] = normValue.getRPKM();
+                rowData[i++] = normValue.getReadCount();
 
                 model.addRow( rowData );
             }
 
             TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-            this.rpkmTable.setRowSorter( sorter );
+            normalizationTable.setRowSorter( sorter );
             sorter.setModel( model );
 
-            ParameterSetRPKM rpkmParams = (ParameterSetRPKM) rpkmCalcResult.getParameters();
-            this.parametersLabel.setText( org.openide.util.NbBundle.getMessage( ResultPanelRPKM.class,
-                                                                                "ResultPanelRPKM.parametersLabel.text", rpkmParams.getMinReadCount(), rpkmParams.getMaxReadCount() ) );
+            ParameterSetNormalization normParams = (ParameterSetNormalization) normalizationResult.getParameters();
+            parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelNormalization.class,
+                                                                                "ResultPanelNormalization.parametersLabel.text_1",
+                                                                                normParams.getMinReadCount(),
+                                                                                normParams.getMaxReadCount() ) );
 
-            filterStatisticsMap.put( RETURNED_FEATURES, filterStatisticsMap.get( RETURNED_FEATURES ) + rpkmCalcResultNew.getResults().size() );
-            rpkmCalcResult.setStatsMap( filterStatisticsMap );
+            filterStatisticsMap.put( RETURNED_FEATURES, filterStatisticsMap.get( RETURNED_FEATURES ) + normalizationResultNew.getResults().size() );
+            normalizationResult.setStatsMap( filterStatisticsMap );
         }
     }
 
@@ -283,7 +285,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
      */
     @Override
     public int getDataSize() {
-        return this.rpkmCalcResult.getResults().size();
+        return normalizationResult.getResults().size();
     }
 
 

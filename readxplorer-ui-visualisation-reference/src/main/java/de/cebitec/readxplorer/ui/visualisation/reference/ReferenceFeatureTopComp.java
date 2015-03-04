@@ -23,14 +23,22 @@ import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.JFeature;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
+import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
@@ -66,7 +74,8 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
      * reference feature.
      */
     public ReferenceFeatureTopComp() {
-        this.initComponents();
+        initComponents();
+        initAdditionalComponents();
         this.setName( NbBundle.getMessage( ReferenceFeatureTopComp.class, "CTL_ReferenceFeatureTopComp" ) );
         this.setToolTipText( NbBundle.getMessage( ReferenceFeatureTopComp.class, "HINT_ReferenceFeatureTopComp" ) );
 //        this.setIcon(ImageUtilities.loadImage(ICON_PATH, true));
@@ -74,6 +83,30 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
         this.putClientProperty( TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE );
         this.putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
 
+    }
+
+
+    /**
+     * Initialize all additional components.
+     */
+    private void initAdditionalComponents() {
+        ecNumberEditorPane.addHyperlinkListener( new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate( HyperlinkEvent e ) {
+                if( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
+                    if( Desktop.isDesktopSupported() ) {
+                        try {
+                            Desktop.getDesktop().browse( e.getURL().toURI() );
+                        } catch( IOException | URISyntaxException ex ) {
+                            JOptionPane.showMessageDialog(ecNumberEditorPane, "The automatically generated link for this EC number caused an "
+                                                                 + ex.getClass().getCanonicalName() + "!"
+                                                                 , "URL Error"
+                                                                 , JOptionPane.ERROR_MESSAGE );
+                        }
+                    }
+                }
+            }
+        } );
     }
 
 
@@ -93,7 +126,6 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
         strandText = new javax.swing.JTextField();
         ecNumLabel = new javax.swing.JLabel();
         stopLabel = new javax.swing.JLabel();
-        ecNumField = new javax.swing.JTextField();
         stopField = new javax.swing.JTextField();
         locusField = new javax.swing.JTextField();
         locusLabel = new javax.swing.JLabel();
@@ -109,6 +141,8 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
         jScrollPane3 = new javax.swing.JScrollPane();
         subfeatureList = new javax.swing.JList<>();
         subfeatureLabel = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        ecNumberEditorPane = new javax.swing.JEditorPane();
 
         typeLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.typeLabel.text")); // NOI18N
@@ -140,9 +174,6 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
         stopLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(stopLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.stopLabel.text")); // NOI18N
         stopLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.stopLabel.toolTipText")); // NOI18N
-
-        ecNumField.setEditable(false);
-        ecNumField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.ecNumField.toolTipText")); // NOI18N
 
         stopField.setEditable(false);
         stopField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.stopField.toolTipText")); // NOI18N
@@ -188,6 +219,20 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
         org.openide.awt.Mnemonics.setLocalizedText(subfeatureLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.subfeatureLabel.text")); // NOI18N
         subfeatureLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.subfeatureLabel.toolTipText")); // NOI18N
 
+        jScrollPane4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(171, 173, 179)));
+        jScrollPane4.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        jScrollPane4.setMaximumSize(new java.awt.Dimension(6, 32767));
+        jScrollPane4.setMinimumSize(new java.awt.Dimension(6, 23));
+        jScrollPane4.setPreferredSize(new java.awt.Dimension(6, 24));
+
+        ecNumberEditorPane.setEditable(false);
+        ecNumberEditorPane.setBackground(new java.awt.Color(240, 240, 240));
+        ecNumberEditorPane.setContentType("text/html"); // NOI18N
+        ecNumberEditorPane.setText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.ecNumberEditorPane.text")); // NOI18N
+        ecNumberEditorPane.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.ecNumberEditorPane.toolTipText")); // NOI18N
+        jScrollPane4.setViewportView(ecNumberEditorPane);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -212,11 +257,11 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
                     .addComponent(geneField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(startField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(stopField, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(ecNumField)
                     .addComponent(jScrollPane1)
                     .addComponent(strandText, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -243,9 +288,9 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
                     .addComponent(stopField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(stopLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ecNumField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ecNumLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(ecNumLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -271,13 +316,14 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
     }//GEN-LAST:event_typeTextActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField ecNumField;
     private javax.swing.JLabel ecNumLabel;
+    private javax.swing.JEditorPane ecNumberEditorPane;
     private javax.swing.JTextField geneField;
     private javax.swing.JLabel geneLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextField locusField;
     private javax.swing.JLabel locusLabel;
     private javax.swing.JLabel parentLabel;
@@ -414,38 +460,45 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
             Vector<PersistentFeature> parentVect = this.getFeatureVector( feat.getParents(), "Root feature" );
             Vector<PersistentFeature> childrenVect = this.getFeatureVector( feat.getNodeChildren(), "No children" );
 
-            this.ecNumField.setText( feat.getEcNumber() );
-            this.startField.setText( String.valueOf( feat.getStart() ) );
-            this.stopField.setText( String.valueOf( feat.getStop() ) );
-            this.productText.setText( feat.getProduct() );
-            this.productText.setToolTipText( feat.getProduct() );
-            this.locusField.setText( feat.getLocus() );
-            this.geneField.setText( feat.getName() );
-            this.typeText.setText( feat.getType().getTypeString() );
-            this.parentList.setListData( parentVect );
-            this.subfeatureList.setListData( childrenVect );
+            String ecLink = GeneralUtils.createEcHtmlLink( feat.getEcNumber() );
+            ecNumberEditorPane.setText( ecLink );
+            UrlWithTitle ecUrl = GeneralUtils.createEcUrl( feat.getEcNumber() );
+            if ( ecUrl != null ) {
+                ecNumberEditorPane.setToolTipText( ecUrl.getUrl().toString() );
+            } else {
+                ecNumberEditorPane.setToolTipText( null );
+            }
+            startField.setText( String.valueOf( feat.getStart() ) );
+            stopField.setText( String.valueOf( feat.getStop() ) );
+            productText.setText( feat.getProduct() );
+            productText.setToolTipText( feat.getProduct() );
+            locusField.setText( feat.getLocus() );
+            geneField.setText( feat.getName() );
+            typeText.setText( feat.getType().getTypeString() );
+            parentList.setListData( parentVect );
+            subfeatureList.setListData( childrenVect );
 
             strand = feat.isFwdStrand() ? "forward" : "reverse";
+
+        } else {
+            ecNumberEditorPane.setText( "" );
+            startField.setText( "" );
+            stopField.setText( "" );
+            productText.setText( "" );
+            productText.setToolTipText( "" );
+            locusField.setText( "" );
+            geneField.setText( "" );
+            typeText.setText( "" );
         }
-        else {
-            this.ecNumField.setText( "" );
-            this.startField.setText( "" );
-            this.stopField.setText( "" );
-            this.productText.setText( "" );
-            this.productText.setToolTipText( "" );
-            this.locusField.setText( "" );
-            this.geneField.setText( "" );
-            this.typeText.setText( "" );
-        }
-        this.strandText.setText( strand );
-        this.productText.setCaretPosition( 0 );
+        strandText.setText( strand );
+        productText.setCaretPosition( 0 );
     }
 
 
     /**
      * Transforms the given node list into a vector of persistent features.
      * The vector only contains elements, if the nodes are instances of
-     * <tt>PersistentFeature</tt>.
+     * {@link PersistentFeature}.
      * <p>
      * @param featureList The list of features to convert
      * @param replacement The replacement string in case the list is empty
@@ -484,6 +537,5 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
             }
         }
     }
-
 
 }

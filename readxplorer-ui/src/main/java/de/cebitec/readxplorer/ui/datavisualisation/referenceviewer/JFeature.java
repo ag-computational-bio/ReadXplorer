@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.referenceviewer;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -326,8 +327,11 @@ public class JFeature extends JComponent {
 
                     MenuItemFactory menuItemFactory = new MenuItemFactory();
 
-                    //add copy option
                     String selFeatureSequence = viewer.getReference().getActiveChromSequence( feature.getStart(), feature.getStop() );
+                    if ( !feature.isFwdStrand() ) {
+                        selFeatureSequence = SequenceUtils.getReverseComplement( selFeatureSequence );
+                    }
+                    //add copy option
                     popUp.add( menuItemFactory.getCopyItem( selFeatureSequence ) );
                     //add copy translated feature sequence option
                     popUp.add( menuItemFactory.getCopyTranslatedItem( selFeatureSequence ) );
