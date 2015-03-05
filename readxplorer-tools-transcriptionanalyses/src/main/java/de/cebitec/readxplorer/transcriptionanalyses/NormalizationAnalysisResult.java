@@ -43,6 +43,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
 
     private final List<NormalizedReadCount> normalizationResults;
     private int noGenomeFeatures;
+    private double totalMappings;
 
 
     /**
@@ -153,8 +154,8 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
             normRow.add( url != null ? url : "" );
             normRow.add( feat.getProduct() );
             normRow.add( feat.getType() );
-            normRow.add( this.getTrackEntry( normValue.getTrackId(), true ) );
-            normRow.add( this.getChromosomeMap().get( feat.getChromId() ) );
+            normRow.add( getTrackEntry( normValue.getTrackId(), true ) );
+            normRow.add( getChromosomeMap().get( feat.getChromId() ) );
             normRow.add( feat.isFwdStrandString() );
             normRow.add( feat.getStartOnStrand() );
             normRow.add( feat.getStopOnStrand() );
@@ -188,6 +189,8 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "TPM, RPKM and read count calculation statistics:" ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( ResultPanelNormalization.TOTAL_MAPPINGS,
+                                                                      getStatsMap().get( ResultPanelNormalization.TOTAL_MAPPINGS ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( ResultPanelNormalization.RETURNED_FEATURES,
                                                                       getStatsMap().get( ResultPanelNormalization.RETURNED_FEATURES ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( ResultPanelNormalization.FEATURES_TOTAL,
@@ -212,6 +215,24 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
      */
     public int getNoGenomeFeatures() {
         return this.noGenomeFeatures;
+    }
+
+
+    /**
+     * @param totalMappings The total number of mappings assignable to any
+     *                      features during this analysis.
+     */
+    public void setTotalMappings( double totalMappings ) {
+        this.totalMappings = totalMappings;
+    }
+
+
+    /**
+     * @return The total number of mappings assignable to any features during
+     *         this analysis.
+     */
+    public double getTotalMappings() {
+        return totalMappings;
     }
 
 

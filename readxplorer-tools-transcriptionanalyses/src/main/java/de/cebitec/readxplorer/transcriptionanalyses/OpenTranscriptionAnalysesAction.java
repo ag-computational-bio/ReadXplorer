@@ -90,6 +90,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
     private String readClassPropString;
     private String selNormFeatureTypesPropString;
+    private String propStringNormFeatureStartOffset;
+    private String propStringNormFeatureStopOffset;
     private String selOperonFeatureTypesPropString;
     private String combineTracksPropString;
 
@@ -129,10 +131,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings( "unchecked" )
         TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator( reference.getId() );
-        this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
-        this.selOperonFeatureTypesPropString = transWizardIterator.getPropSelectedOperonFeatTypes();
-        this.selNormFeatureTypesPropString = transWizardIterator.getPropSelectedNormFeatTypes();
-        this.combineTracksPropString = transWizardIterator.getCombineTracksPropForWiz();
+        readClassPropString = transWizardIterator.getReadClassPropForWiz();
+        selOperonFeatureTypesPropString = transWizardIterator.getPropSelectedOperonFeatTypes();
+        selNormFeatureTypesPropString = transWizardIterator.getPropSelectedNormFeatTypes();
+        propStringNormFeatureStartOffset = transWizardIterator.getPropNormFeatureStartOffset();
+        propStringNormFeatureStopOffset = transWizardIterator.getPropNormFeatureStopOffset();
+        combineTracksPropString = transWizardIterator.getCombineTracksPropForWiz();
         WizardDescriptor wiz = new WizardDescriptor( transWizardIterator );
         transWizardIterator.setWiz( wiz );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -143,14 +147,13 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
         List<PersistentTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if( !cancelled && !selectedTracks.isEmpty() ) {
-            this.tracks = selectedTracks;
-            this.trackMap = ProjectConnector.getTrackMap( tracks );
+            tracks = selectedTracks;
+            trackMap = ProjectConnector.getTrackMap( tracks );
 
-            this.transcAnalysesTopComp.open();
-            this.startTransciptionAnalyses( wiz );
+            transcAnalysesTopComp.open();
+            startTransciptionAnalyses( wiz );
 
-        }
-        else if( selectedTracks.isEmpty() && !cancelled ) {
+        } else if( selectedTracks.isEmpty() && !cancelled ) {
             String msg = NbBundle.getMessage( OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
                                               "No track selected. To start a transcription analysis at least one track has to be selected." );
             String title = NbBundle.getMessage( OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfoTitle", "Info" );
@@ -183,6 +186,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         int minSpanningReads = 0;
         Set<FeatureType> selNormFeatureTypes = new HashSet<>();
         Set<FeatureType> selOperonFeatureTypes = new HashSet<>();
+        int normFeatureStartOffset = 0;
+        int normFeatureStopOffset = 0;
 
         //obtain all analysis parameters
         boolean performTSSAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS );
@@ -218,14 +223,17 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             minNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS );
             maxNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS );
             selNormFeatureTypes = (Set<FeatureType>) wiz.getProperty( selNormFeatureTypesPropString );
+            normFeatureStartOffset = (int) wiz.getProperty( propStringNormFeatureStartOffset );
+            normFeatureStopOffset = (int) wiz.getProperty( propStringNormFeatureStopOffset );
         }
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS( performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                                              minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov,
                                              maxLeaderlessDistance, maxFeatureDistance, isAssociateTss, associateTssWindow, readClassParams );
         parametersOperonDet = new ParameterSetOperonDet( performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams );
-        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads, selNormFeatureTypes, readClassParams );
-
+        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads,
+                                                                 normFeatureStartOffset, normFeatureStopOffset,
+                                                                 selNormFeatureTypes, readClassParams );
 
         TrackConnector connector;
         if( !combineTracks ) {
@@ -378,9 +386,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                 normalizationResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
                             }
                             NormalizationAnalysisResult normAnalysisResult = new NormalizationAnalysisResult( trackMap,
-                                                                                            trackToAnalysisMap.get( trackId ).getAnalysisNorm().getResults(), reference, combineTracks, 1, 0 );
+                                                                                                              trackToAnalysisMap.get( trackId ).getAnalysisNorm().getResults(),
+                                                                                                              reference, combineTracks, 1, 0 );
                             normAnalysisResult.setParameters( parametersNormalization );
                             normAnalysisResult.setNoGenomeFeatures( normalizationAnalysis.getNoGenomeFeatures() );
+                            normAnalysisResult.setTotalMappings( normalizationAnalysis.getTotalMappings() );
                             normalizationResultPanel.addResult( normAnalysisResult );
 
                             if( finishedMappingAnalyses >= tracks.size() || combineTracks ) {

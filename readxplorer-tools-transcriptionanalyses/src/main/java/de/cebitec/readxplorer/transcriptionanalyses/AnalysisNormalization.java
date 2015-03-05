@@ -175,8 +175,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         for( PersistentFeature feature : genomeFeatures ) {
             if( feature.getChromId() == currentChromId ) {
 
-                int featStart = feature.getStart();
-                int featStop = feature.getStop();
+                int featStart = feature.getStart() - paramsNormalization.getFeatureStartOffset();
+                int featStop = feature.getStop() - paramsNormalization.getFeatureStopOffset();
                 boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
                 boolean fstFittingMapping = true;
                 int readLengthSum = 0; //sum of all mappings of a single feature
@@ -217,8 +217,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                 //store read count in feature
                 featureReadCount.get( feature.getId() ).setReadCount( featureReadCount.get( feature.getId() ).getReadCount() + currentCount );
                 featureReadCount.get( feature.getId() ).addReadLength( readLengthSum );
-                totalMappedReads += currentCount; //TODO: Decide on how to handle total mapped reads! whole data set or just for these feature types?
-            }//TODO: total mapped reads now counts several reads multiple times!
+            }
         }
 
         for( AssignedMapping assignedMapping : mappings ) {
@@ -283,37 +282,40 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
             PersistentFeature feature = countObject.getFeature();
             double readCount = countObject.getReadCount();
             //undesired feature types are not treated
-            if( readCount >= paramsNormalization.getMinReadCount() && readCount <= paramsNormalization.getMaxReadCount() &&
-                paramsNormalization.getSelFeatureTypes().contains( feature.getType() ) ) {
+            if( paramsNormalization.getSelFeatureTypes().contains( feature.getType() ) ) {
+                if( readCount >= paramsNormalization.getMinReadCount() && readCount <= paramsNormalization.getMaxReadCount() ) {
 
-                geneExonLength = 0; //gene length or sum of the exon length of a gene in bp
-                readLengthSum = 0;
-                noFeatureReads = 0; //no read for the feature itself or for gene/mRNA of the corresponding exons
+                    geneExonLength = 0; //gene length or sum of the exon length of a gene in bp
+                    readLengthSum = 0;
+                    noFeatureReads = 0; //no read for the feature itself or for gene/mRNA of the corresponding exons
 
-                //special handling of gene/mRNA/tRNA/rRNA - if they have exons, only the exon reads are counted
-                if( feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA ||
-                    feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
-                    calcFeatureData( feature, FeatureType.CDS ); //first we try to find CDS
-                    if( geneExonLength == 0 ) { //if no CDS are there, try exons
-                        calcFeatureData( feature, FeatureType.EXON );
+                    //special handling of gene/mRNA/tRNA/rRNA - if they have exons, only the exon reads are counted
+                    if( feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA ||
+                        feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
+                        calcFeatureData( feature, FeatureType.CDS ); //first we try to find CDS
+                        if( geneExonLength == 0 ) { //if no CDS are there, try exons
+                            calcFeatureData( feature, FeatureType.EXON );
+                        }
+                    }
+                    if( geneExonLength == 0 && feature.getType() == FeatureType.GENE ) {
+                        calcFeatureData( feature, FeatureType.MRNA );
+                        if( geneExonLength == 0 ) { //if the gene has a rRNA or tRNA instead of an mRNA, we have to check this, too
+                            calcFeatureData( feature, FeatureType.RRNA );
+                        }
+                        if( geneExonLength == 0 ) {
+                            calcFeatureData( feature, FeatureType.TRNA );
+                        }
+                    }
+
+                    if( geneExonLength > 0 ) { //we have multi exon/cds genes only in this case
+                        countObject.setReadCount( noFeatureReads ); //not needed for most prokaryotes
+                        countObject.setReadLengthSum( readLengthSum );
+                        double effectiveLength = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
+                        countObject.storeEffectiveFeatureLength( effectiveLength );
                     }
                 }
-                if( geneExonLength == 0 && feature.getType() == FeatureType.GENE ) {
-                    calcFeatureData( feature, FeatureType.MRNA );
-                    if( geneExonLength == 0 ) { //if the gene has a rRNA or tRNA instead of an mRNA, we have to check this, too
-                        calcFeatureData( feature, FeatureType.RRNA );
-                    }
-                    if( geneExonLength == 0 ) {
-                        calcFeatureData( feature, FeatureType.TRNA );
-                    }
-                }
-
-                if( geneExonLength > 0 ) { //we have multi exon/cds genes only in this case
-                    countObject.setReadCount( noFeatureReads ); //not needed for most prokaryotes
-                    countObject.setReadLengthSum( readLengthSum );
-                    double effectiveLength = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
-                    countObject.storeEffectiveFeatureLength( effectiveLength );
-                }
+                //sum all read counts assigned to any features
+                totalMappedReads += readCount;
             }
         }
     }
@@ -396,6 +398,15 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
      */
     public int getNoGenomeFeatures() {
         return this.noSelectedFeatures;
+    }
+
+
+    /**
+     * @return The total number of read mappings compatible with genomic
+     * features.
+     */
+    public double getTotalMappings() {
+        return totalMappedReads;
     }
 
 
