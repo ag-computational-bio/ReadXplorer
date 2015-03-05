@@ -175,8 +175,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         for( PersistentFeature feature : genomeFeatures ) {
             if( feature.getChromId() == currentChromId ) {
 
-                int featStart = feature.getStart() - paramsNormalization.getFeatureStartOffset();
-                int featStop = feature.getStop() - paramsNormalization.getFeatureStopOffset();
+                int featStart = paramsNormalization.calcFeatureStartOffset( feature );
+                int featStop = paramsNormalization.calcFeatureStopOffset( feature );
                 boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
                 boolean fstFittingMapping = true;
                 int readLengthSum = 0; //sum of all mappings of a single feature

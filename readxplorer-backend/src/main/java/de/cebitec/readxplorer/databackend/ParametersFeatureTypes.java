@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.Collections;
 import java.util.HashSet;
@@ -105,5 +106,44 @@ public class ParametersFeatureTypes {
         this.selFeatureTypes.addAll( selFeatureTypes );
     }
 
+
+    /**
+     * Calculates the offset of the feature start position (the smaller genomic
+     * position) according to the offset parameters stored in this instance.
+     * <p>
+     * @param feature The feature whose start including the offset is needed
+     * <p>
+     * @return The feature start corrected by the offset parameters stored in
+     *         this instance.
+     */
+    public int calcFeatureStartOffset( PersistentFeature feature ) {
+        int newStart = feature.getStart();
+        if ( feature.isFwdStrand() ) {
+            newStart -= featureStartOffset;
+        } else {
+            newStart -= featureStopOffset;
+        }
+        return newStart;
+    }
+
+
+    /**
+     * Calculates the offset of the feature start position (the smaller genomic
+     * position) according to the offset parameters stored in this instance.
+     * <p>
+     * @param feature The feature whose start including the offset is needed
+     * <p>
+     * @return The feature start corrected by the offset parameters stored in
+     *         this instance.
+     */
+    public int calcFeatureStopOffset( PersistentFeature feature ) {
+        int newStop = feature.getStop();
+        if( feature.isFwdStrand() ) {
+            newStop += featureStopOffset;
+        } else {
+            newStop += featureStartOffset;
+        }
+        return newStop;
+    }
 
 }
