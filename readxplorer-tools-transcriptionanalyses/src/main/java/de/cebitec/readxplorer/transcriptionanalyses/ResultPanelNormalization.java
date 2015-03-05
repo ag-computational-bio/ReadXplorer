@@ -29,6 +29,7 @@ import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
+import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -51,9 +52,10 @@ public class ResultPanelNormalization extends ResultTablePanel {
 
     public static final String RETURNED_FEATURES = "Total number of returned features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
+    public static final String TOTAL_MAPPINGS = "Number of assignable mappings";
 
     private NormalizationAnalysisResult normalizationResult;
-    private final HashMap<String, Integer> filterStatisticsMap;
+    private final Map<String, Integer> normStatsMap;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
 
@@ -69,8 +71,9 @@ public class ResultPanelNormalization extends ResultTablePanel {
         final int chromIdx = 3;
         tableFilter = new TableRightClickFilter<>( UneditableTableModel.class, posIdx, trackIdx );
         this.normalizationTable.getTableHeader().addMouseListener( tableFilter );
-        this.filterStatisticsMap = new HashMap<>();
-        this.filterStatisticsMap.put( RETURNED_FEATURES, 0 );
+        this.normStatsMap = new HashMap<>();
+        this.normStatsMap.put( RETURNED_FEATURES, 0 );
+        this.normStatsMap.put( TOTAL_MAPPINGS, 0 );
         this.refComp = ReferenceFeatureTopComp.findInstance();
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.normalizationTable.getSelectionModel();
@@ -206,7 +209,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog( this, new NormalizationStatsPanel( filterStatisticsMap ), "TPM, RPKM and Read Count Statistics", JOptionPane.INFORMATION_MESSAGE );
+        JOptionPane.showMessageDialog( this, new NormalizationStatsPanel( normStatsMap ), "TPM, RPKM and Read Count Statistics", JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -236,7 +239,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
 
             if( normalizationResult == null ) {
                 normalizationResult = normalizationResultNew;
-                filterStatisticsMap.put( FEATURES_TOTAL, normalizationResultNew.getNoGenomeFeatures() );
+                normStatsMap.put( FEATURES_TOTAL, normalizationResultNew.getNoGenomeFeatures() );
             }
             else {
                 this.normalizationResult.addAllToResult( normalizationResultNew.getResults() );
@@ -274,8 +277,9 @@ public class ResultPanelNormalization extends ResultTablePanel {
                                                                                 normParams.getMinReadCount(),
                                                                                 normParams.getMaxReadCount() ) );
 
-            filterStatisticsMap.put( RETURNED_FEATURES, filterStatisticsMap.get( RETURNED_FEATURES ) + normalizationResultNew.getResults().size() );
-            normalizationResult.setStatsMap( filterStatisticsMap );
+            normStatsMap.put( RETURNED_FEATURES, normStatsMap.get( RETURNED_FEATURES ) + normalizationResultNew.getResults().size() );
+            normStatsMap.put( TOTAL_MAPPINGS, normStatsMap.get( TOTAL_MAPPINGS ) + (int) Math.ceil( normalizationResultNew.getTotalMappings() ) );
+            normalizationResult.setStatsMap( normStatsMap );
         }
     }
 

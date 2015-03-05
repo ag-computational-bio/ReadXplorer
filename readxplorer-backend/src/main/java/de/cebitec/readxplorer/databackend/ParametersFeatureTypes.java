@@ -33,16 +33,59 @@ import java.util.Set;
 public class ParametersFeatureTypes {
 
     private final Set<FeatureType> selFeatureTypes;
+    private int featureStartOffset;
+    private int featureStopOffset;
 
 
     /**
      * Creates a parameters set which contains all parameters concerning the
      * usage of ReadXplorer's feature types.
      * <p>
-     * @param selFeatureTypes the set of selected feature types
+     * @param selFeatureTypes    The set of selected feature types
+     * @param featureStartOffset The start offset making genomic features start
+     *                           further upstream
+     * @param featureStopOffset  The stop offset making genomic features end
+     *                           further downstream
      */
-    public ParametersFeatureTypes( Set<FeatureType> selFeatureTypes ) {
+    public ParametersFeatureTypes( Set<FeatureType> selFeatureTypes, int featureStartOffset,
+                                                                     int featureStopOffset ) {
         this.selFeatureTypes = new HashSet<>( selFeatureTypes );
+        this.featureStartOffset = featureStartOffset;
+        this.featureStopOffset = featureStopOffset;
+    }
+
+
+    /**
+     * @return The start offset making genomic features start further upstream.
+     */
+    public int getFeatureStartOffset() {
+        return featureStartOffset;
+    }
+
+
+    /**
+     * @param featureStartOffset The start offset making genomic features start
+     *                           further upstream.
+     */
+    public void setFeatureStartOffset( int featureStartOffset ) {
+        this.featureStartOffset = featureStartOffset;
+    }
+
+
+    /**
+     * @return The stop offset making genomic features end further downstream.
+     */
+    public int getFeatureStopOffset() {
+        return featureStopOffset;
+    }
+
+
+    /**
+     * @param featureStopOffset The stop offset making genomic features end
+     *                          further downstream.
+     */
+    public void setFeatureStopOffset( int featureStopOffset ) {
+        this.featureStopOffset = featureStopOffset;
     }
 
 

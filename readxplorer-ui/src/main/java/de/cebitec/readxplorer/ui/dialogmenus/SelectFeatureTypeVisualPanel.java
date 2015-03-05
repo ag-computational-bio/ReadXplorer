@@ -19,12 +19,10 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
+import javax.swing.JTextField;
 
 
 /**
@@ -39,22 +37,47 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
     private static final String PANEL_NAME = "Feature Type Selection";
     private final String analysisName;
     private String displayName;
+    private final boolean hasOffsetOption;
 
 
     /**
      * A visual wizard job panel. It offers to select feature types of
      * annotations for any further processing.
      * <p>
-     * @param analysisName The name of the analysis using this panel
-     *                     panel. It will be used to store the selected settings for this pane
-     *                     under a unique identifier.
+     * @param analysisName    The name of the analysis using this panel panel.
+     *                        It will be used to store the selected settings for
+     *                        this pane under a unique identifier.
+     * @param hasOffsetOption <code>true</code> means the analysis should offer
+     *                        the option to set an offset for genomic features.
+     *                        <code>false</code> means that the offset options
+     *                        shall be hidden.
      */
-    public SelectFeatureTypeVisualPanel( String analysisName ) {
+    public SelectFeatureTypeVisualPanel( String analysisName, boolean hasOffsetOption ) {
         this.analysisName = analysisName;
+        this.hasOffsetOption = hasOffsetOption;
         this.displayName = PANEL_NAME;
-        this.initComponents();
-        this.featureList.addListSelectionListener( this.createListSelectionListener() );
-        this.updateListSelection();
+        initComponents();
+        updateOffsetOptionVisibility( this.hasOffsetOption );
+        featureList.addListSelectionListener( createListSelectionListener() );
+    }
+
+
+    /**
+     * Updates the visibility of all components associated to the offset option
+     * depending on the given boolean.
+     * <p>
+     * @param hasOffsetOption <code>true</code> means the analysis should offer
+     *                        the option to set an offset for genomic features.
+     *                        <code>false</code> means that the offset options
+     *                        shall be hidden.
+     */
+    private void updateOffsetOptionVisibility( boolean hasOffsetOption ) {
+        startOffsetLabel.setVisible( hasOffsetOption );
+        startOffsetField.setVisible( hasOffsetOption );
+        stopOffsetLabel.setVisible( hasOffsetOption );
+        stopOffsetField.setVisible( hasOffsetOption );
+        startOffsetField.getDocument().addDocumentListener( createDocumentListener() );
+        stopOffsetField.getDocument().addDocumentListener( createDocumentListener() );
     }
 
 
@@ -70,10 +93,24 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
         featureListPane = new javax.swing.JScrollPane();
         featureList = new javax.swing.JList<>(FeatureType.SELECTABLE_FEATURE_TYPES);
         featTypeLabel = new javax.swing.JLabel();
+        startOffsetLabel = new javax.swing.JLabel();
+        startOffsetField = new javax.swing.JTextField();
+        stopOffsetLabel = new javax.swing.JLabel();
+        stopOffsetField = new javax.swing.JTextField();
 
         featureListPane.setViewportView(featureList);
 
         org.openide.awt.Mnemonics.setLocalizedText(featTypeLabel, org.openide.util.NbBundle.getMessage(SelectFeatureTypeVisualPanel.class, "SelectFeatureTypeVisualPanel.featTypeLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(startOffsetLabel, org.openide.util.NbBundle.getMessage(SelectFeatureTypeVisualPanel.class, "SelectFeatureTypeVisualPanel.startOffsetLabel.text")); // NOI18N
+
+        startOffsetField.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        startOffsetField.setText(org.openide.util.NbBundle.getMessage(SelectFeatureTypeVisualPanel.class, "SelectFeatureTypeVisualPanel.startOffsetField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(stopOffsetLabel, org.openide.util.NbBundle.getMessage(SelectFeatureTypeVisualPanel.class, "SelectFeatureTypeVisualPanel.stopOffsetLabel.text")); // NOI18N
+
+        stopOffsetField.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        stopOffsetField.setText(org.openide.util.NbBundle.getMessage(SelectFeatureTypeVisualPanel.class, "SelectFeatureTypeVisualPanel.stopOffsetField.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -82,10 +119,18 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(featureListPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(featureListPane)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(featTypeLabel)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(startOffsetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(startOffsetField))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(stopOffsetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(stopOffsetField))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -95,6 +140,16 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
                 .addComponent(featTypeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(featureListPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(startOffsetLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(startOffsetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(stopOffsetLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(stopOffsetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -102,6 +157,10 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
     private javax.swing.JLabel featTypeLabel;
     private javax.swing.JList<FeatureType> featureList;
     private javax.swing.JScrollPane featureListPane;
+    private javax.swing.JTextField startOffsetField;
+    private javax.swing.JLabel startOffsetLabel;
+    private javax.swing.JTextField stopOffsetField;
+    private javax.swing.JLabel stopOffsetLabel;
     // End of variables declaration//GEN-END:variables
 
 
@@ -123,59 +182,75 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
 
 
     /**
+     * @return The field containing the configured start offset making the
+     *         feature start further upstream
+     */
+    public JTextField getStartOffsetField() {
+        return startOffsetField;
+    }
+
+
+    /**
+     * @return The field containing the configured stop offset making the
+     *         feature stop further downstream
+     */
+    public JTextField getStopOffsetField() {
+        return stopOffsetField;
+    }
+
+
+    /**
      * Sets the display name of this panel.
      * <p>
-     * @param showDisplayName True, if the display name shall be included in the
-     *                        title, false if only the plain panel name shall be shown
+     * @param showDisplayName <code>true</code>, if the display name shall be
+     *                        included in the title, <code>false</code> if only
+     *                        the plain panel name shall be shown
      */
     public void showDisplayName( boolean showDisplayName ) {
         if( showDisplayName ) {
-            this.displayName = this.analysisName + " " + PANEL_NAME;
-        }
-        else {
-            this.displayName = PANEL_NAME;
+            displayName = analysisName + " " + PANEL_NAME;
+        } else {
+            displayName = PANEL_NAME;
         }
 
     }
 
 
     /**
-     * @return True, if at least one feature type is selected, false otherwise
+     * @return <code>true</code>, if at least one feature type is selected,
+     *         <code>false</code> otherwise
      */
     @Override
     public boolean isRequiredInfoSet() {
         boolean requiredInfoSet = !this.featureList.getSelectedValuesList().isEmpty();
+        if( !GeneralUtils.isValidIntegerInput( getStartOffsetField().getText() ) ) {
+            requiredInfoSet = false;
+        }
+        if( !GeneralUtils.isValidIntegerInput( getStopOffsetField().getText() ) ) {
+            requiredInfoSet = false;
+        }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, requiredInfoSet );
         return requiredInfoSet;
     }
 
 
     /**
-     * Updates the checkboxes for the read classes with the globally stored
-     * settings for this wizard. If no settings were stored, the default
-     * configuration is chosen.
+     * @param selIndicesArray The array of indices which shall be selected in
+     * the list of feature types.
      */
-    private void updateListSelection() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        String featuresString = pref.get( analysisName + SelectFeatureTypeWizardPanel.PROP_SELECTED_FEAT_TYPES, "Gene,CDS" );
-        String[] featuresArray = featuresString.split( "," );
-
-        List<FeatureType> selectedFeatTypes = new ArrayList<>();
-        for( String featureString : featuresArray ) {
-            selectedFeatTypes.add( FeatureType.getFeatureType( featureString ) );
-        }
-
-        List<FeatureType> featTypeList = Arrays.asList( FeatureType.SELECTABLE_FEATURE_TYPES );
-        List<Integer> selectedInices = new ArrayList<>();
-        for( FeatureType selFeatureType : selectedFeatTypes ) {
-            selectedInices.add( featTypeList.indexOf( selFeatureType ) );
-        }
-
-        int[] selIndicesArray = new int[selectedInices.size()];
-        for( int i = 0; i < selectedInices.size(); ++i ) {
-            selIndicesArray[i] = selectedInices.get( i );
-        }
+    public void setSelectedFeatureTypes( int[] selIndicesArray ) {
         this.featureList.setSelectedIndices( selIndicesArray );
+    }
+
+
+    /**
+     * Sets both feature offsets.
+     * @param startOffset Start offset making the feature start further upstream
+     * @param stopOffset Stop offset making the feature end further downstream
+     */
+    public void setFeatureOffsets( String startOffset, String stopOffset ) {
+        startOffsetField.setText( startOffset );
+        stopOffsetField.setText( stopOffset );
     }
 
 

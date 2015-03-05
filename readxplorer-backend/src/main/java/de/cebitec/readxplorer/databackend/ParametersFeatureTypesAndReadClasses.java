@@ -23,6 +23,8 @@ import java.util.Set;
 
 
 /**
+ * Creates a parameter set which contains all parameters concerning the usage
+ * of ReadXplorer's feature types and read class parameters.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -31,10 +33,37 @@ public class ParametersFeatureTypesAndReadClasses extends ParametersFeatureTypes
     private final ParametersReadClasses parametersReadClasses;
 
 
+    /**
+     * Creates a parameter set which contains all parameters concerning the
+     * usage of ReadXplorer's feature types and read class parameters.
+     * <p>
+     * @param featureStartOffset    The start offset making genomic features
+     *                              start further upstream
+     * @param featureStopOffset     The stop offset making genomic features end
+     *                              further downstream
+     * @param selFeatureTypes       The set of selected feature types
+     * @param parametersReadClasses The read classification parameters
+     */
+    public ParametersFeatureTypesAndReadClasses( int featureStartOffset, int featureStopOffset,
+                                                                         Set<FeatureType> selFeatureTypes,
+                                                                         ParametersReadClasses parametersReadClasses ) {
+        super( selFeatureTypes, featureStartOffset, featureStopOffset );
+        this.parametersReadClasses = parametersReadClasses;
+    }
+
+    
+    /**
+     * Creates a parameter set which contains all parameters concerning the
+     * usage of ReadXplorer's feature types and read class parameters.
+     * Convenience constructor for analyses not using the feature offsets -
+     * setting the offset to 0.
+     * <p>
+     * @param selFeatureTypes       The set of selected feature types
+     * @param parametersReadClasses The read classification parameters
+     */
     public ParametersFeatureTypesAndReadClasses( Set<FeatureType> selFeatureTypes,
                                                  ParametersReadClasses parametersReadClasses ) {
-        super( selFeatureTypes );
-        this.parametersReadClasses = parametersReadClasses;
+        this( 0, 0, selFeatureTypes, parametersReadClasses );
     }
 
 

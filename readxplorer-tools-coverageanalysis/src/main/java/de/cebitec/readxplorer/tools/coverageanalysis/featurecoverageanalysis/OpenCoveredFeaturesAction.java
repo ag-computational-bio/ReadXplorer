@@ -126,7 +126,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         this.openTracksWizPanel = new OpenTracksWizardPanel( PROP_WIZARD_NAME, reference.getId() );
         this.readClassWizPanel = new SelectReadClassWizardPanel( PROP_WIZARD_NAME, true );
-        this.featTypeWizPanel = new SelectFeatureTypeWizardPanel( PROP_WIZARD_NAME );
+        this.featTypeWizPanel = new SelectFeatureTypeWizardPanel( PROP_WIZARD_NAME, false );
         panels.add( openTracksWizPanel );
         panels.add( new CoveredFeaturesWizardPanel() );
         panels.add( readClassWizPanel );

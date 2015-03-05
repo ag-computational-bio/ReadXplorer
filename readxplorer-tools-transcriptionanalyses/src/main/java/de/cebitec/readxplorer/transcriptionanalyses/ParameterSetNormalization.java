@@ -49,12 +49,20 @@ public class ParameterSetNormalization extends ParametersFeatureTypesAndReadClas
      *                             in the result
      * @param maxReadCount         maximum read count of a feature to return it
      *                             in the result
-     * @param selFeatureTypes      the set of selected feature types
-     * @param readClassParams
+     * @param featureStartOffset   The start offset making genomic features
+     *                             start further upstream
+     * @param featureStopOffset    The stop offset making genomic features end
+     *                             further downstream
+     * @param selFeatureTypes      The set of selected feature types
+     * @param readClassParams      The read classification parameters
      */
-    public ParameterSetNormalization( boolean performNormalization, int minReadCount, int maxReadCount, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams ) {
+    public ParameterSetNormalization( boolean performNormalization, int minReadCount, int maxReadCount,
+                                                                                      int featureStartOffset,
+                                                                                      int featureStopOffset,
+                                                                                      Set<FeatureType> selFeatureTypes,
+                                                                                      ParametersReadClasses readClassParams ) {
 
-        super( selFeatureTypes, readClassParams );
+        super( featureStartOffset, featureStopOffset, selFeatureTypes, readClassParams );
         this.performNormalization = performNormalization;
         this.minReadCount = minReadCount;
         this.maxReadCount = maxReadCount;

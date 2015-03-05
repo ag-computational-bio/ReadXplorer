@@ -32,7 +32,7 @@ public class NormalizationStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final Map<String, Integer> featureStatsMap;
+    private final Map<String, Integer> normStatsMap;
 
 
     /**
@@ -42,7 +42,7 @@ public class NormalizationStatsPanel extends javax.swing.JPanel {
      * @param featureStatsMap statistics to display
      */
     public NormalizationStatsPanel( Map<String, Integer> featureStatsMap ) {
-        this.featureStatsMap = featureStatsMap;
+        this.normStatsMap = featureStatsMap;
         this.initComponents();
         this.initAdditionalComponents();
     }
@@ -57,10 +57,10 @@ public class NormalizationStatsPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        returnedFeatureStatsScrollpane = new javax.swing.JScrollPane();
-        featureStatsTable = new javax.swing.JTable();
+        normStatsScrollpane = new javax.swing.JScrollPane();
+        normStatsTable = new javax.swing.JTable();
 
-        featureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
+        normStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null},
                 {null, null},
@@ -89,38 +89,39 @@ public class NormalizationStatsPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        returnedFeatureStatsScrollpane.setViewportView(featureStatsTable);
-        if (featureStatsTable.getColumnModel().getColumnCount() > 0) {
-            featureStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title0")); // NOI18N
-            featureStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title1")); // NOI18N
+        normStatsScrollpane.setViewportView(normStatsTable);
+        if (normStatsTable.getColumnModel().getColumnCount() > 0) {
+            normStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.normStatsTable.columnModel.title0")); // NOI18N
+            normStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.normStatsTable.columnModel.title1")); // NOI18N
         }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(returnedFeatureStatsScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+            .addComponent(normStatsScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(returnedFeatureStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(normStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable featureStatsTable;
-    private javax.swing.JScrollPane returnedFeatureStatsScrollpane;
+    private javax.swing.JScrollPane normStatsScrollpane;
+    private javax.swing.JTable normStatsTable;
     // End of variables declaration//GEN-END:variables
 
 
     private void initAdditionalComponents() {
-        featureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
+        normStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    { ResultPanelNormalization.RETURNED_FEATURES, this.featureStatsMap.get( ResultPanelNormalization.RETURNED_FEATURES ) },
-                    { ResultPanelNormalization.FEATURES_TOTAL, this.featureStatsMap.get( ResultPanelNormalization.FEATURES_TOTAL ) }
+                    { ResultPanelNormalization.TOTAL_MAPPINGS, this.normStatsMap.get( ResultPanelNormalization.TOTAL_MAPPINGS ) },
+                    { ResultPanelNormalization.RETURNED_FEATURES, this.normStatsMap.get( ResultPanelNormalization.RETURNED_FEATURES ) },
+                    { ResultPanelNormalization.FEATURES_TOTAL, this.normStatsMap.get( ResultPanelNormalization.FEATURES_TOTAL ) }
                 },
                 new String[]{
-                    NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title0" ),
-                    NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.featureStatsTable.columnModel.title1" )
+                    NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.normStatsTable.columnModel.title0" ),
+                    NbBundle.getMessage(NormalizationStatsPanel.class, "NormalizationStatsPanel.normStatsTable.columnModel.title1" )
                 } ) {
                     private static final long serialVersionUID = 1L;
                     Class<?>[] types = new Class<?>[]{

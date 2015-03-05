@@ -111,8 +111,8 @@ public final class TranscriptionAnalysesWizardIterator implements
             tSSPanel = new TransAnalysesTSSWizardPanel();
             operonPanel = new TransAnalysesOperonWizardPanel();
             normalizationPanel = new TransAnalysesNormWizardPanel();
-            featTypeNormPanel = new SelectFeatureTypeWizardPanel( PROP_NORM_ANALYSIS );
-            featTypeOperonPanel = new SelectFeatureTypeWizardPanel( PROP_OPERON_ANALYSIS );
+            featTypeNormPanel = new SelectFeatureTypeWizardPanel( PROP_NORM_ANALYSIS, true );
+            featTypeOperonPanel = new SelectFeatureTypeWizardPanel( PROP_OPERON_ANALYSIS, false );
             featTypeOperonPanel.getComponent().showDisplayName( true );
             featTypeNormPanel.getComponent().showDisplayName( true );
 
@@ -300,6 +300,24 @@ public final class TranscriptionAnalysesWizardIterator implements
      */
     public String getPropSelectedNormFeatTypes() {
         return featTypeNormPanel.getPropSelectedFeatTypes();
+    }
+
+
+    /**
+     * @return The property string for the feature start offset configured for
+     *         the read count normalization analysis.
+     */
+    public String getPropNormFeatureStartOffset() {
+        return featTypeNormPanel.getPropFeatureStartOffset();
+    }
+
+
+    /**
+     * @return The property string for the feature stop offset configured for
+     *         the read count normalization analysis.
+     */
+    public String getPropNormFeatureStopOffset() {
+        return featTypeNormPanel.getPropFeatureStopOffset();
     }
 
 
