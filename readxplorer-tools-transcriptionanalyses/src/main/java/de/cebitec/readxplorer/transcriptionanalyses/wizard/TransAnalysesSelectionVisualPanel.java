@@ -232,9 +232,9 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
      *                         <code>false</code> otherwise
      */
     void updateAnalysisSelection( boolean isTssSelected, boolean isOperonSelected, boolean isNormSelected ) {
-        this.transcriptionStartBox.setSelected( isTssSelected );
-        this.operonDetectionBox.setSelected( isOperonSelected );
-        this.normalizationValuesBox.setSelected( isNormSelected );
+        transcriptionStartBox.setSelected( isTssSelected );
+        operonDetectionBox.setSelected( isOperonSelected );
+        normalizationValuesBox.setSelected( isNormSelected );
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }
 

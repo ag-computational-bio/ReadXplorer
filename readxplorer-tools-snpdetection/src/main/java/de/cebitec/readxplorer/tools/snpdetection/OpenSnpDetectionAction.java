@@ -135,9 +135,9 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
         @SuppressWarnings( "unchecked" )
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksPanel = new OpenTracksWizardPanel( PROP_WIZARD_NAME, reference.getId() );
-        this.readClassWizPanel = new SelectReadClassWizardPanel( PROP_WIZARD_NAME, false );
-        this.featureTypePanel = new SelectFeatureTypeWizardPanel( PROP_WIZARD_NAME );
+        openTracksPanel = new OpenTracksWizardPanel( PROP_WIZARD_NAME, reference.getId() );
+        readClassWizPanel = new SelectReadClassWizardPanel( PROP_WIZARD_NAME, false );
+        featureTypePanel = new SelectFeatureTypeWizardPanel( PROP_WIZARD_NAME, false );
         panels.add( openTracksPanel );
         panels.add( new SNPWizardPanel() );
         panels.add( readClassWizPanel );
@@ -152,14 +152,14 @@ public final class OpenSnpDetectionAction implements ActionListener,
         boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
         List<PersistentTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if( !cancelled && !selectedTracks.isEmpty() ) {
-            this.tracks = selectedTracks;
-            this.trackMap = ProjectConnector.getTrackMap( tracks );
+            tracks = selectedTracks;
+            trackMap = ProjectConnector.getTrackMap( tracks );
 
-            this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent( "SNP_DetectionTopComponent" );
-            this.snpDetectionTopComp.setName( Bundle.TITLE_SNPDetectionTopComp() );
-            this.snpDetectionTopComp.setToolTipText( Bundle.HINT_SNP_DetectionTopComp() );
-            this.snpDetectionTopComp.open();
-            this.startSNPDetection( wiz );
+            snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent( "SNP_DetectionTopComponent" );
+            snpDetectionTopComp.setName( Bundle.TITLE_SNPDetectionTopComp() );
+            snpDetectionTopComp.setToolTipText( Bundle.HINT_SNP_DetectionTopComp() );
+            snpDetectionTopComp.open();
+            startSNPDetection( wiz );
         }
     }
 

@@ -454,50 +454,42 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         boolean isValidated = true;
         if( GeneralUtils.isValidPositiveIntegerInput( minTotalIncreaseField.getText() ) ) {
             this.minTotalIncrease = Integer.parseInt( minTotalIncreaseField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         if( GeneralUtils.isValidPositiveIntegerInput( minPercentIncreaseField.getText() ) ) {
             this.minTotalPercentIncrease = Integer.parseInt( minPercentIncreaseField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         if( GeneralUtils.isValidIntegerInput( maxInitialCountField.getText() ) ) {
             this.maxLowCovInitialCount = Integer.parseInt( maxInitialCountField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         if( GeneralUtils.isValidPositiveIntegerInput( minLowCovCountField.getText() ) ) {
             this.minLowCovIncrease = Integer.parseInt( minLowCovCountField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         if( GeneralUtils.isValidPositiveIntegerInput( transcriptExtensionField.getText() ) ) {
             this.minTranscriptExtensionCov = Integer.parseInt( transcriptExtensionField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         if( GeneralUtils.isValidPositiveIntegerInput( maxLeaderlessDistanceField.getText() ) ) {
             this.maxLeaderlessDistance = Integer.parseInt( maxLeaderlessDistanceField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         if( GeneralUtils.isValidPositiveIntegerInput( maxFeatureDistField.getText() ) ) {
             this.maxFeatureDistance = Integer.parseInt( maxFeatureDistField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidIntegerInput(associateTssWindowField.getText() ) ) {
-            this.associateTssWindow = Integer.parseInt(associateTssWindowField.getText() );
-        }
-        else {
+        if( GeneralUtils.isValidIntegerInput( associateTssWindowField.getText() ) ) {
+            this.associateTssWindow = Integer.parseInt( associateTssWindowField.getText() );
+        } else {
             isValidated = false;
         }
 

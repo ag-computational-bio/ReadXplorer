@@ -59,12 +59,12 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * read classes.
      * <p>
      * @param wizardName        the name of the wizard using this wizard panel.
-     *                          It will
-     *                          be used to store the selected settings for this wizard under a unique
-     *                          identifier.
+     *                          It will be used to store the selected settings
+     *                          for this wizard under a unique identifier.
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate texts. <code>false</code>
-     *                          means the analysis generally runs on both strands and should show
+     *                          genomic features and should show appropriate
+     *                          texts. <code>false</code> means the analysis
+     *                          generally runs on both strands and should show
      *                          appropriate texts for this case.
      */
     public SelectReadClassWizardPanel( String wizardName, boolean isFeatureAnalysis ) {
@@ -90,9 +90,9 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
-            ParametersReadClasses readClassParams = this.component.getReadClassParams();
+            ParametersReadClasses readClassParams = component.getReadClassParams();
             wiz.putProperty( getPropReadClassParams(), readClassParams );
-            this.storePrefs( readClassParams );
+            storePrefs( readClassParams );
         }
     }
 
@@ -129,7 +129,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      *         corresponding wizard.
      */
     public String getPropReadClassParams() {
-        return this.wizardName + PROP_READ_CLASS_PARAMS;
+        return wizardName + PROP_READ_CLASS_PARAMS;
     }
 
 

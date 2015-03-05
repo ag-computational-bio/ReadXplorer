@@ -70,9 +70,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
      * depending on the given boolean.
      * <p>
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate options. <code>false</code>
-     *                          means the analysis generally runs on the strands and should not show the
-     *                          strand option components.
+     *                          genomic features and should show appropriate
+     *                          options. <code>false</code> means the analysis
+     *                          generally runs on the strands and should not
+     *                          show the strand option components.
      */
     private void updateStrandOptionLabels( boolean isFeatureAnalysis ) {
         jSeparator2.setVisible( isFeatureAnalysis );
@@ -282,10 +283,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
     }//GEN-LAST:event_checkBoxCommonActionPerformed
 
     private void checkBoxUniqueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxUniqueActionPerformed
-        this.checkBoxPerfect.setEnabled( !this.checkBoxUnique.isSelected() );
-        this.checkBoxBestMatch.setEnabled( !this.checkBoxUnique.isSelected() );
-        this.checkBoxCommon.setEnabled( !this.checkBoxUnique.isSelected() );
-        this.isRequiredInfoSet();
+        checkBoxPerfect.setEnabled( !checkBoxUnique.isSelected() );
+        checkBoxBestMatch.setEnabled( !checkBoxUnique.isSelected() );
+        checkBoxCommon.setEnabled( !checkBoxUnique.isSelected() );
+        isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxUniqueActionPerformed
 
     private void checkBoxPerfectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPerfectActionPerformed
@@ -340,16 +341,15 @@ public class SelectReadClassVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated
-                = this.checkBoxPerfect.isSelected()
-                  || this.checkBoxBestMatch.isSelected()
-                  || this.checkBoxCommon.isSelected()
-                  || this.checkBoxSinglePerfect.isSelected()
-                  || this.checkBoxSingleBestMatch.isSelected();
+                = checkBoxPerfect.isSelected()
+                  || checkBoxBestMatch.isSelected()
+                  || checkBoxCommon.isSelected()
+                  || checkBoxSinglePerfect.isSelected()
+                  || checkBoxSingleBestMatch.isSelected();
 
         if( GeneralUtils.isValidByteInput( minMappingQualityField.getText() ) ) {
-            this.minMappingQual = Byte.parseByte( minMappingQualityField.getText() );
-        }
-        else {
+            minMappingQual = Byte.parseByte( minMappingQualityField.getText() );
+        } else {
             isValidated = false;
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
@@ -381,7 +381,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         if( !checkBoxSingleBestMatch.isSelected() ) {
             excludedClasses.add( MappingClass.SINGLE_BEST_MATCH );
         }
-        return new ParametersReadClasses( excludedClasses, this.minMappingQual, this.getSelectedStrandOption() );
+        return new ParametersReadClasses( excludedClasses, minMappingQual, getSelectedStrandOption() );
     }
 
 

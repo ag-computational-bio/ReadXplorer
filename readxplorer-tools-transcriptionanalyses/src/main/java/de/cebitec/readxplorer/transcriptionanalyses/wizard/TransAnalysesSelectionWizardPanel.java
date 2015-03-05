@@ -76,7 +76,7 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
         boolean isOperonSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, false );
         boolean isNormSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, false );
 
-        this.getComponent().updateAnalysisSelection( isTssSelected, isOperonSelected, isNormSelected );
+        component.updateAnalysisSelection( isTssSelected, isOperonSelected, isNormSelected );
     }
 
 

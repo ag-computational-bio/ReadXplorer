@@ -310,7 +310,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         }
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Transcription start site statistics:" ) );
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_TOTAL, statsMap.get( TSS_TOTAL ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_TOTAL, totalTSS ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_CORRECT, statsMap.get( TSS_CORRECT ), percentMap.get( TSS_CORRECT ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_FWD, statsMap.get( TSS_FWD ), percentMap.get( TSS_FWD ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_REV, statsMap.get( TSS_REV ), percentMap.get( TSS_REV ) ) );
@@ -398,8 +398,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @param tssResult The result to add to the statistics.
      */
     private void calcStats( List<TranscriptionStart> tssResult ) {
-        this.initStatsMap();
-        ParameterSetTSS params = (ParameterSetTSS) this.getParameters();
+        initStatsMap();
+        ParameterSetTSS params = (ParameterSetTSS) getParameters();
 
         int noCorrectStarts = 0;
         int noFwdFeatures = 0;
@@ -434,18 +434,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
             if( tss.isFwdStrand() ) {
                 ++noFwdFeatures;
-            }
-            else {
+            } else {
                 ++noRevFeatures;
             }
 
-            if (tss.isPrimaryTss()) {
+            if( tss.isPrimaryTss() ) {
                 ++noPrimaryTss;
             } else {
                 ++noSecondaryTss;
             }
 
-            if (tss.getAssociatedTssList().size() > 0) {
+            if( tss.getAssociatedTssList().size() > 0 ) {
                 ++noAssociatedTss;
             }
 
@@ -461,23 +460,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 distance = Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) );
                 if( distance == 1 ) {
                     ++noUpstreamFeature1;
-                }
-                else if( distance > 1 && distance < 6 ) {
+                } else if( distance > 1 && distance < 6 ) {
                     ++noUpstreamFeature5;
-                }
-                else if( distance > 5 && distance < 11 ) {
+                } else if( distance > 5 && distance < 11 ) {
                     ++noUpstreamFeature10;
-                }
-                else if( distance > 10 && distance < 21 ) {
+                } else if( distance > 10 && distance < 21 ) {
                     ++noUpstreamFeature20;
-                }
-                else if( distance > 20 && distance < 51 ) {
+                } else if( distance > 20 && distance < 51 ) {
                     ++noUpstreamFeature50;
-                }
-                else if( distance > 50 && distance < 101 ) {
+                } else if( distance > 50 && distance < 101 ) {
                     ++noUpstreamFeature100;
-                }
-                else if( distance > 100 && distance < 251 ) {
+                } else if( distance > 100 && distance < 251 ) {
                     ++noUpstreamFeature250;
                 }
             }
@@ -492,23 +485,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
                 if( distance == 1 ) {
                     ++noDownstreamFeature1;
-                }
-                else if( distance > 1 && distance < 6 ) {
+                } else if( distance > 1 && distance < 6 ) {
                     ++noDownstreamFeature5;
-                }
-                else if( distance > 5 && distance < 11 ) {
+                } else if( distance > 5 && distance < 11 ) {
                     ++noDownstreamFeature10;
-                }
-                else if( distance > 10 && distance < 21 ) {
+                } else if( distance > 10 && distance < 21 ) {
                     ++noDownstreamFeature20;
-                }
-                else if( distance > 20 && distance < 51 ) {
+                } else if( distance > 20 && distance < 51 ) {
                     ++noDownstreamFeature50;
-                }
-                else if( distance > 50 && distance < 101 ) {
+                } else if( distance > 50 && distance < 101 ) {
                     ++noDownstreamFeature100;
-                }
-                else if( distance > 100 && distance < 251 ) {
+                } else if( distance > 100 && distance < 251 ) {
                     ++noDownstreamFeature250;
                 }
             }

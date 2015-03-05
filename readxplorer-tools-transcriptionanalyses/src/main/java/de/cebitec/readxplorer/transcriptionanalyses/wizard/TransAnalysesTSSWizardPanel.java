@@ -83,26 +83,26 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
         byte strandOption = Byte.valueOf( NbPreferences.forModule( Object.class ).get(
                 PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1" ) );
         boolean isBothStrandOption = strandOption == Properties.STRAND_BOTH;
-        this.getComponent().setDirectionOptionsVisible( isBothStrandOption );
+        component.setDirectionOptionsVisible( isBothStrandOption );
     }
 
 
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
-        if( this.isValid() ) {
-            wiz.putProperty( PROP_AUTO_TSS_PARAMS, this.component.isTssAutomatic() );
-            wiz.putProperty( PROP_MIN_TOTAL_INCREASE, this.component.getMinTotalIncrease() );
-            wiz.putProperty( PROP_MIN_PERCENT_INCREASE, this.component.getMinTotalPercentIncrease() );
-            wiz.putProperty( PROP_MAX_LOW_COV_INIT_COUNT, this.component.getMaxLowCovInitialCount() );
-            wiz.putProperty( PROP_MIN_LOW_COV_INC, this.component.getMinLowCovIncrease() );
-            wiz.putProperty( PROP_UNANNOTATED_TRANSCRIPT_DET, this.component.getDetectUnannotatedTranscripts() );
-            wiz.putProperty( PROP_MIN_TRANSCRIPT_EXTENSION_COV, this.component.getMinTranscriptExtensionCov() );
-            wiz.putProperty( PROP_MAX_LEADERLESS_DISTANCE, this.component.getMaxLeaderlessDistance() );
-            wiz.putProperty( PROP_MAX_FEATURE_DISTANCE, this.component.getMaxFeatureDistance() );
-            wiz.putProperty(PROP_IS_ASSOCIATE_TSS, this.component.isAssociateTss() );
-            wiz.putProperty(PROP_ASSOCIATE_TSS_WINDOW, this.component.getAssociateTssWindow() );
-            wiz.putProperty( PROP_ANALYSIS_DIRECTION, this.component.isFwdDirectionSelected() );
-            this.storePrefs();
+        if( isValid() ) {
+            wiz.putProperty( PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() );
+            wiz.putProperty( PROP_MIN_TOTAL_INCREASE, component.getMinTotalIncrease() );
+            wiz.putProperty( PROP_MIN_PERCENT_INCREASE, component.getMinTotalPercentIncrease() );
+            wiz.putProperty( PROP_MAX_LOW_COV_INIT_COUNT, component.getMaxLowCovInitialCount() );
+            wiz.putProperty( PROP_MIN_LOW_COV_INC, component.getMinLowCovIncrease() );
+            wiz.putProperty( PROP_UNANNOTATED_TRANSCRIPT_DET, component.getDetectUnannotatedTranscripts() );
+            wiz.putProperty( PROP_MIN_TRANSCRIPT_EXTENSION_COV, component.getMinTranscriptExtensionCov() );
+            wiz.putProperty( PROP_MAX_LEADERLESS_DISTANCE, component.getMaxLeaderlessDistance() );
+            wiz.putProperty( PROP_MAX_FEATURE_DISTANCE, component.getMaxFeatureDistance() );
+            wiz.putProperty( PROP_IS_ASSOCIATE_TSS, component.isAssociateTss() );
+            wiz.putProperty( PROP_ASSOCIATE_TSS_WINDOW, component.getAssociateTssWindow() );
+            wiz.putProperty( PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() );
+            storePrefs();
         }
     }
 
