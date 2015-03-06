@@ -103,7 +103,7 @@ public class CollectCoverageData implements Observer {
 
             if( feature.getChromId() == result.getRequest().getChromId() ) {
 
-                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, startOffset );
+                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, stopOffset );
                 int featStart = featTypeParams.calcFeatureStartOffset( feature );
                 int featStop = featTypeParams.calcFeatureStopOffset( feature );
                 boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
