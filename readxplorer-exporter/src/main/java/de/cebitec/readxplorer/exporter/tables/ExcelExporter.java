@@ -202,9 +202,9 @@ public class ExcelExporter implements TableExporterI {
         int column = 0;
 
         for( String header : headerRow ) {
-            this.addColumn(sheet, TABLE_LABEL, header, column++, row );
+            this.addColumn( sheet, TABLE_LABEL, header, column++, row );
         }
-        ++row;
+        row++;
         this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
 
         String objectType;
@@ -215,8 +215,7 @@ public class ExcelExporter implements TableExporterI {
                 objectType = this.getObjectType( entry );
                 try {
                     this.addColumn( sheet, objectType, entry, column++, row );
-                }
-                catch( RowsExceededException e ) {
+                } catch( RowsExceededException e ) {
                     dataLeft = true;
                     break;
                 }
@@ -244,7 +243,7 @@ public class ExcelExporter implements TableExporterI {
      * @param entry the entry whose object type needs to be checked
      * <p>
      * @return The string representing the object type of the entry. Among
-     * {@link #TABLE_STRING} and all other constants defined above.
+     *         {@link #TABLE_STRING} and all other constants defined above.
      */
     private String getObjectType( Object entry ) {
         if( entry instanceof Integer || entry instanceof Byte || entry instanceof Long ) {
