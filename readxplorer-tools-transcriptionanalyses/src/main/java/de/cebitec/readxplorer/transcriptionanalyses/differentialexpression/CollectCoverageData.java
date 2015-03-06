@@ -18,13 +18,16 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.databackend.ParametersFeatureTypes;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,8 +103,9 @@ public class CollectCoverageData implements Observer {
 
             if( feature.getChromId() == result.getRequest().getChromId() ) {
 
-                int featStart = feature.getStart() - startOffset;
-                int featStop = feature.getStop() + stopOffset;
+                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, startOffset );
+                int featStart = featTypeParams.calcFeatureStartOffset( feature );
+                int featStop = featTypeParams.calcFeatureStopOffset( feature );
                 boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                 boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
@@ -113,7 +117,7 @@ public class CollectCoverageData implements Observer {
                     Mapping mapping = mappings.get( j );
                     //If the orientation of the read does not matter this one is always true.
                     //mappings identified within a feature
-                    if( mapping.getStop() > featStart && mapping.getStart() < featStop ) {
+                    if( mapping.getStop() >= featStart && mapping.getStart() <= featStop ) {
 
                         if( fstFittingMapping ) {
                             lastMappingIdx = j;
@@ -124,8 +128,7 @@ public class CollectCoverageData implements Observer {
                         }
 
                         //still mappings left, but need next feature
-                    }
-                    else if( mapping.getStart() > featStop ) {
+                    } else if( mapping.getStart() > featStop ) {
                         break;
                     }
                 }

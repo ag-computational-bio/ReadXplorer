@@ -64,7 +64,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
     private double totalMappedReads = 0;
     private boolean notInitialized;
 
-    private int lastMappingIdx;
     private double geneExonLength;
     private int noFeatureReads;
     private int readLengthSum;
@@ -88,7 +87,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         normValues = new ArrayList<>();
         featureReadCount = new HashMap<>();
         normalizationSumMap = new HashMap<>();
-        lastMappingIdx = 0;
         genomeFeatures = new ArrayList<>();
         usedFeatureTypes = new HashSet<>( paramsNormalization.getSelFeatureTypes() );
         notInitialized = true;
@@ -170,6 +168,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         boolean isStrandBothOption = paramsNormalization.getReadClassParams().isStrandBothOption();
         boolean isFeatureStrand = paramsNormalization.getReadClassParams().isStrandFeatureOption();
         List<AssignedMapping> mappings = createAssignedMappings( resultMappings );
+        int lastMappingIdx = 0;
 
         //every mapping is associated to overlapping feature via lastMappingIdx according to strategy in AssignedMapping
         for( PersistentFeature feature : genomeFeatures ) {
