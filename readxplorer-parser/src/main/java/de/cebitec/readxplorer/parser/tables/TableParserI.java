@@ -37,8 +37,8 @@ public interface TableParserI extends ParserI {
      * table.
      * <p>
      * @return A table into a list of lists of objects. The inner lists
-     *         represent the data of one row, while the outer list is the list of rows
-     *         in the table.
+     * represent the data of one row, while the outer list is the list of rows
+     * in the table.
      * <p>
      * @param fileToRead The file containing the table to parse.
      * <p>

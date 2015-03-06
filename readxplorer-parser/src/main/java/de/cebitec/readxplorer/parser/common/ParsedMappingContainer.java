@@ -28,8 +28,7 @@ import java.util.Map;
 
 /**
  * Container for all mappings belonging to one track. Contains statistics as
- * well
- * as a all mappings.
+ * well as a all mappings.
  *
  * @author ddoppmeier, rhilker
  */
@@ -133,7 +132,7 @@ public class ParsedMappingContainer {
             Iterator<ParsedMapping> mappingIt = mappingList.iterator();
             while( mappingIt.hasNext() ) {
                 ParsedMapping mapping = mappingIt.next();
-                if( mapping.isBestMapping() == true ) {
+                if( mapping.isBestMapping() ) {
                     numberOfBM++;
                     if( mapping.getErrors() == 0 ) {
                         numberOfPerfect++;

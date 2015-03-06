@@ -99,7 +99,7 @@ public class ParsedReference {
 
     /**
      * @param filter The feature filter of this reference genome. It defines,
-     *               which feature types can be added to the reference and which are excluded.
+     * which feature types can be added to the reference and which are excluded.
      */
     public void setFeatureFilter( FeatureFilter filter ) {
         this.filter = filter;
@@ -108,7 +108,7 @@ public class ParsedReference {
 
     /**
      * @return The feature filter of this reference genome. It defines, which
-     *         feature types can be added to the reference and which are excluded.
+     * feature types can be added to the reference and which are excluded.
      */
     public FeatureFilter getFeatureFilter() {
         return filter;

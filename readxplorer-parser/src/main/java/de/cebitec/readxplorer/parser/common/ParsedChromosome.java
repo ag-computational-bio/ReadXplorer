@@ -48,7 +48,7 @@ public class ParsedChromosome {
     /**
      * Data holder for a chromosome.
      * <p>
-     * @param name           Name of the chromosome
+     * @param name Name of the chromosome
      * @param chromLength
      * @param hasSubfeatures <tt>true</tt>, if it has subfeatures,
      * <tt>false</tt>, if it already relies on parent ids.
@@ -150,7 +150,7 @@ public class ParsedChromosome {
      * this reference.
      * <p>
      * @param featureList The list of features to add to the list of features of
-     *                    this reference
+     * this reference
      */
     public void addAllFeatures( List<ParsedFeature> featureList ) {
         for( ParsedFeature feature : featureList ) {
@@ -179,7 +179,7 @@ public class ParsedChromosome {
 
     /**
      * @param featId The latest feature id used in the db. Set it before
-     *               distributing feature ids with {@link distributeFeatureIds()}.
+     * distributing feature ids with {@link distributeFeatureIds()}.
      */
     public void setFeatId( int featId ) {
         this.featId = featId;
@@ -200,8 +200,7 @@ public class ParsedChromosome {
             this.mutateSubFeatureToParentIds( features );
             this.features = finalFeatures;
             finalFeatures = new ArrayList<>();
-        }
-        else {
+        } else {
             this.replaceParentNamesByIds();
         }
     }
@@ -213,11 +212,10 @@ public class ParsedChromosome {
      * identifier. Further replaces the parent names in the feature by the newly
      * assigned parent ids.
      * <p>
-     * @param id          The unique feature id to start with (will be increased
-     *                    by one
-     *                    for each feature in the reference
+     * @param id The unique feature id to start with (will be increased by one
+     * for each feature in the reference
      * @param featureList list of features for which the ids need to be
-     *                    distributed
+     * distributed
      */
     private void distributeFeatureIds( List<ParsedFeature> featureList ) {
 
@@ -261,11 +259,10 @@ public class ParsedChromosome {
      * identifier. Further replaces the parent names in the feature by the newly
      * assigned parent ids.
      * <p>
-     * @param id          The unique feature id to start with (will be increased
-     *                    by one
-     *                    for each feature in the reference
+     * @param id The unique feature id to start with (will be increased by one
+     * for each feature in the reference
      * @param featureList list of features for which the ids need to be
-     *                    distributed
+     * distributed
      */
     private void replaceParentNamesByIds() {
         //replace parent names by parent ids
@@ -284,7 +281,7 @@ public class ParsedChromosome {
 
     /**
      * @return <tt>true</tt>, if it has subfeatures, <tt>false</tt>, if it
-     *         already relies on parent ids.
+     * already relies on parent ids.
      */
     public boolean hasSubFeatures() {
         return hasSubFeatures;
@@ -296,7 +293,7 @@ public class ParsedChromosome {
      * ids.
      * <p>
      * @param hasSubFeatures True, if it has subfeatures, false, if it already
-     *                       relies on parent ids.
+     * relies on parent ids.
      */
     public void setHasSubFeatures( boolean hasSubFeatures ) {
         this.hasSubFeatures = hasSubFeatures;

@@ -28,7 +28,7 @@ import java.util.Map;
  * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class CommonsRefParser {
+public final class CommonsRefParser {
 
     private CommonsRefParser() {
 
@@ -37,11 +37,10 @@ public class CommonsRefParser {
 
     /**
      * Generates a mapping of the "toString()" result of each item in the given
-     * list
-     * to the item itself.
+     * list to the item itself.
      * <p>
      * @param mapToTransform the list of items to transform into a map with the
-     *                       toString key and the item as value
+     * toString key and the item as value
      * <p>
      * @return the map of the toString result to the item
      */

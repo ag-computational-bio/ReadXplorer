@@ -59,9 +59,9 @@ import org.openide.util.NbBundle;
  */
 public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
-    private static final String name = "SAM/BAM Parser";
-    private static final String[] fileExtension = new String[]{ "sam", "SAM", "Sam", "bam", "BAM", "Bam" };
-    private static final String fileDescription = "SAM/BAM Read Mappings";
+    private static final String NAME = "SAM/BAM Parser";
+    private static final String[] FILE_EXTENSIONS = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
+    private static final String FILE_DESCRIPTION = "SAM/BAM Read Mappings";
 
     private final List<Observer> observers;
     private StatsContainer statsContainer;
@@ -86,19 +86,19 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSIONS;
     }
 
 
@@ -107,9 +107,9 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * conversions.
      * <p>
      * @param trackJob
-     * @param chromLengthMap the mapping of chromosome name to chromosome length
-     *                       for this track
-     * <p>
+     * @param chromLengthMap the mapping of chromosome NAME to chromosome length
+ for this track
+ <p>
      * @return true
      * <p>
      * @throws ParsingException
@@ -122,8 +122,8 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
 
     /**
-     * Sorts the input sam/bam file contained in the track job by read name
-     * and stores the sorted data in a new file next to the input file.
+     * Sorts the input sam/bam file contained in the track job by read NAME and
+ stores the sorted data in a new file next to the input file.
      * <p>
      * @param trackJob the trackjob to preprocess
      * <p>
@@ -145,22 +145,21 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
     /**
      * First calls the preprocessing method, which sorts the input sam/bam file
-     * contained in the track job by read name and then classifies the read
-     * mapping classes of the input determined by the track job. After the
+ contained in the track job by read NAME and then classifies the read
+ mapping classes of the input determined by the track job. After the
      * classification is done, a new extended bam file is created next to the
      * original one, containing the SAMRecords including the classification
      * data.
      * <p>
-     * @param trackJob       the track job to parse
+     * @param trackJob the track job to parse
      * @param chromLengthMap the map of chromosome names to chromosome sequence
      * <p>
-     * @return a direct access data container constisting of:
-     *         a classification map: The key is the readname and each name
-     *         links to a pair consisting of the number of occurrences of the read name
-     *         in the dataset (no mappings) and the lowest diff rate among all hits.
-     *         Remember that replicates are not needed, they can be deduced from the
-     *         reads querried from an interval!
-     * <p>
+     * @return a direct access data container constisting of: a classification
+ map: The key is the readname and each NAME links to a pair consisting of
+ the number of occurrences of the read NAME in the dataset (no mappings)
+ and the lowest diff rate among all hits. Remember that replicates are not
+ needed, they can be deduced from the reads querried from an interval!
+ <p>
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
@@ -168,24 +167,24 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
     public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         //new algorithm:
-       /* 1. sort by read name
-         * 2. iterate all mappings, store record data including diffs for all with same read name
-         * 3. when read name finished: add mappings to bam writer with classification
+       /* 1. sort by read NAME
+         * 2. iterate all mappings, store record data including diffs for all with same read NAME
+         * 3. when read NAME finished: add mappings to bam writer with classification
          * 4. CommonsMappingParser.addClassificationData(record, differences, classificationMap);
-         * 5. clear data structures and contine with next read name...
+         * 5. clear data structures and contine with next read NAME...
          */
 
         this.refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
         Boolean success = this.preprocessData( trackJob );
         if( !success ) {
             throw new ParsingException( "Sorting of the input file by read name was not successful. Please either switch your RX temp directory "
-                                        + "(Tools->Options->Miscellaneous->Directories) to a disk with sufficient space or make sure to have "
-                                        + "enough free space in your systems temp directory to store intermediate files for sorting (e.g. on "
-                                        + "Windows 7 the standard disk and folder: "
-                                        + "C:\\Users\\UserName\\AppData\\Local\\Temp needs to have enough free space)." );
+                    + "(Tools->Options->Miscellaneous->Directories) to a disk with sufficient space or make sure to have "
+                    + "enough free space in your systems temp directory to store intermediate files for sorting (e.g. on "
+                    + "Windows 7 the standard disk and folder: "
+                    + "C:\\Users\\UserName\\AppData\\Local\\Temp needs to have enough free space)." );
         }
 
-        final File fileSortedByReadName = trackJob.getFile(); //sorted by read name bam file
+        final File fileSortedByReadName = trackJob.getFile(); //sorted by read NAME bam file
         final long startTime = System.currentTimeMillis();
         this.notifyObservers( NbBundle.getMessage( SamBamParser.class, "Parser.Parsing.Start", fileSortedByReadName.getName() ) );
 
@@ -205,10 +204,10 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             final File outputFile = writerAndFile.getSecond();
             trackJob.setFile( outputFile );
 
-            //record and read name specific variables
+            //record and read NAME specific variables
             String lastReadName = "";
             final Map<SAMRecord, Integer> diffMap = new HashMap<>(); //mapping of record to number of differences
-            ParsedClassification classificationData = new ParsedClassification( sortOrder ); //classification data for all reads with same read name
+            ParsedClassification classificationData = new ParsedClassification( sortOrder ); //classification data for all reads with same read NAME
 
             int lineno = 0;
             while( samItor.hasNext() ) {
@@ -227,7 +226,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                                 readName += "/2";
                             }
                         }
-                        //store data and clear data structure, if new read name is reached - file needs to be sorted by read name
+                        //store data and clear data structure, if new read NAME is reached - file needs to be sorted by read NAME
                         if( !lastReadName.equals( readName ) ) {
                             CommonsMappingParser.writeSamRecord( diffMap, classificationData, bamWriter );
                             classificationData = new ParsedClassification( sortOrder );
@@ -235,7 +234,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                         }
 
                         boolean classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap,
-                                                                                fileSortedByReadName.getName(), lineno, refSeqFetcher, diffMap, classificationData );
+                                fileSortedByReadName.getName(), lineno, refSeqFetcher, diffMap, classificationData );
                         if( !classified ) {
                             ++noSkippedReads;
                             continue; //continue, and ignore read, if it contains inconsistent information
@@ -243,22 +242,19 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                         lastReadName = readName;
 
 
-                    }
-                    else { // else read is unmapped or belongs to another reference
+                    } else { // else read is unmapped or belongs to another reference
                         if( record.getReadUnmappedFlag() ) {
                             this.sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
-                                                                        "Parser.Parsing.Unmapped", lineno, record.getSAMString() ) );
-                        }
-                        else {
+                                    "Parser.Parsing.Unmapped", lineno, record.getSAMString() ) );
+                        } else {
                             this.sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
-                                                                        "Parser.Parsing.WrongReference", lineno, record.getSAMString() ) );
+                                    "Parser.Parsing.WrongReference", lineno, record.getSAMString() ) );
                         }
                     }
-                }
-                catch( SAMFormatException | StringIndexOutOfBoundsException e ) {
+                } catch( SAMFormatException | StringIndexOutOfBoundsException e ) {
                     if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
                         this.sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
-                                                                    "Parser.Parsing.CorruptData", lineno, e.toString() ) );
+                                "Parser.Parsing.CorruptData", lineno, e.toString() ) );
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
 
@@ -286,11 +282,9 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                 utils.registerObserver( this );
                 success = utils.createIndex( samReaderNew, new File( outputFile + Properties.BAM_INDEX_EXT ) );
             }
-        }
-        catch( RuntimeEOFException e ) {
+        } catch( RuntimeEOFException e ) {
             this.notifyObservers( "Last read in the file is incomplete, ignoring it." );
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             this.notifyObservers( e.getMessage() != null ? e.getMessage() : e );
             Exceptions.printStackTrace( e );
         }
@@ -299,8 +293,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         if( deleteSortedFile ) {
             try {
                 GeneralUtils.deleteOldWorkFile( fileSortedByReadName );
-            }
-            catch( IOException e ) {
+            } catch( IOException e ) {
                 this.notifyObservers( e.getMessage() != null ? e.getMessage() : e );
                 Exceptions.printStackTrace( e );
             }

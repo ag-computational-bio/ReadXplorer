@@ -31,7 +31,7 @@ public interface CsvParserI extends TableParserI {
 
     /**
      * @param autoDelimiter <cc>true</cc>, if the delimiter shall be detected
-     *                      automatically, <cc>false</cc>, if the delimiter was selected by the user.
+     * automatically, <cc>false</cc>, if the delimiter was selected by the user.
      */
     public void setAutoDelimiter( boolean autoDelimiter );
 

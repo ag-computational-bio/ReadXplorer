@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.TribbleException;
@@ -40,8 +41,6 @@ import org.broad.tribble.bed.BEDCodec;
 import org.broad.tribble.bed.BEDFeature;
 import org.broad.tribble.bed.FullBEDFeature.Exon;
 import org.broad.tribble.readers.LineIterator;
-
-import static java.util.logging.Level.INFO;
 
 
 /**
@@ -55,7 +54,7 @@ public class TribbleBEDParser implements ReferenceParserI {
     private static final Logger LOG = Logger.getLogger( TribbleBEDParser.class.getName() );
 
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] FILE_EXTENSION = new String[]{ "bed", "BED" };
+    private static final String[] FILE_EXTENSION = new String[]{"bed", "BED"};
     // name of this parser for use in ComboBoxes
     private static final String PARSER_NAME = "BED file";
     private static final String FILE_DESCRIPTION = "BED file";
@@ -67,8 +66,7 @@ public class TribbleBEDParser implements ReferenceParserI {
      * the BED annotations from the BED file contained in the ReferenceJob.
      * <p>
      * @param referenceJob the reference job containing the files
-     * @param filter       the feature filter to use (removes undesired
-     *                     features)
+     * @param filter the feature filter to use (removes undesired features)
      * <p>
      * @return the parsed reference object with all parsed features
      * <p>
@@ -91,7 +89,7 @@ public class TribbleBEDParser implements ReferenceParserI {
             final AbstractFeatureReader<BEDFeature, LineIterator> reader = AbstractFeatureReader.getFeatureReader( referenceJob.getFile().getAbsolutePath(), bedCodec, false );
             if( bedCodec.canDecode( referenceJob.getFile().getAbsolutePath() ) ) {
 
-                Object header = reader.getHeader(); //TODO: something to do with the header?
+                Object header = reader.getHeader(); //TODO something to do with the header?
 
                 final Iterator<BEDFeature> featIt = reader.iterator();
                 while( reader.hasIndex() ) {
@@ -104,7 +102,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                         final int strand = feat.getStrand().equals( Strand.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         final String geneName = feat.getName();
                         final String locusTag = feat.getDescription();
-                        final String ecNumber = feat.getDescription(); //TODO: check this and test it
+                        final String ecNumber = feat.getDescription(); //TODO check this and test it
                         final String product = feat.getDescription();
                         final String parsedType = feat.getType();
 
@@ -115,7 +113,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                         final FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             this.notifyObservers( referenceJob.getFile().getName()
-                                                  + ": Using unknown feature type for " + parsedType );
+                                    + ": Using unknown feature type for " + parsedType );
                         }
 
                         final List<ParsedFeature> subFeatures = new ArrayList<>();
@@ -139,8 +137,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                 }
             }
 
-        }
-        catch( IOException | TribbleException ex ) {
+        } catch( IOException | TribbleException ex ) {
             throw new ParsingException( ex );
         }
 

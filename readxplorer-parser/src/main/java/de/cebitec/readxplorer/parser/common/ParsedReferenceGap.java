@@ -34,9 +34,9 @@ public class ParsedReferenceGap {
      * Data structure representing a gap in the reference genome.
      * <p>
      * @param absPos absolute position of the gap in the reference genome
-     * @param base   base of the gap in the mapping
-     * @param order  the order at which position in a larger gap it occurs (1,
-     *               2, 3...)
+     * @param base base of the gap in the mapping
+     * @param order the order at which position in a larger gap it occurs (1, 2,
+     * 3...)
      */
     public ParsedReferenceGap( int absPos, char base, int order ) {
         this.absPos = absPos;
@@ -76,8 +76,8 @@ public class ParsedReferenceGap {
         }
         final ParsedReferenceGap other = (ParsedReferenceGap) obj;
         if( this.absPos != other.getAbsPos()
-            || this.base != other.getBase()
-            || this.order != other.getOrder() ) {
+                || this.base != other.getBase()
+                || this.order != other.getOrder() ) {
             return false;
         }
         return true;

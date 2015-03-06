@@ -27,8 +27,8 @@ import java.util.Map;
 
 
 /**
- * Contains all data (description, mappings and coverageContainer) belonging
- * to a track, which can be stored into a database now.
+ * Contains all data (description, mappings and coverageContainer) belonging to
+ * a track, which can be stored into a database now.
  * <p>
  * @author ddoppmeier, rhilker
  */
@@ -99,8 +99,8 @@ public class ParsedTrack {
 
 
     /**
-     * @return true, if this is the first track of a stepwise import (which
-     *         then consists of many tracks. One for each chunk of data).
+     * @return true, if this is the first track of a stepwise import (which then
+     * consists of many tracks. One for each chunk of data).
      */
     public boolean isFirstTrack() {
         return this.isFirstTrack;
@@ -109,8 +109,7 @@ public class ParsedTrack {
 
     /**
      * @param isFirstTrack true, if this is the first track of a stepwise import
-     *                     (which
-     *                     then consists of many tracks. One for each chunk of data).
+     * (which then consists of many tracks. One for each chunk of data).
      */
     public void setIsFirstTrack( boolean isFirstTrack ) {
         this.isFirstTrack = isFirstTrack;
@@ -121,7 +120,7 @@ public class ParsedTrack {
      * Needed additional information from sequence pair parsers.
      * <p>
      * @param seqToIdMap mapping of readname to sequence id for read 1 of the
-     *                   pair
+     * pair
      */
     public void setReadnameToSeqIdMap1( HashMap<String, Integer> seqToIdMap ) {
         this.readNameToSeqIDMap1 = seqToIdMap;
@@ -132,7 +131,7 @@ public class ParsedTrack {
      * Needed additional information from sequence pair parsers.
      * <p>
      * @param seqToIdMap mapping of readname to sequence id for read 2 of the
-     *                   pair
+     * pair
      */
     public void setReadnameToSeqIdMap2( HashMap<String, Integer> seqToIdMap ) {
 //        this.readNameToSeqIDMap2 = seqToIdMap;
@@ -140,8 +139,8 @@ public class ParsedTrack {
 
 
     /**
-     * Clears the coverage container and ReadnameToseqIDMap.
-     * All other information persists!
+     * Clears the coverage container and ReadnameToseqIDMap. All other
+     * information persists!
      */
     public void clear() {
         this.readNameToSeqIDMap1.clear();
@@ -184,7 +183,7 @@ public class ParsedTrack {
 
     /**
      * @return The statistics container for this track. If it it currently null
-     *         a brand new StatsContainer is created and prepared for a standard track.
+     * a brand new StatsContainer is created and prepared for a standard track.
      */
     public StatsContainer getStatsContainer() {
         if( statsContainer == null ) {

@@ -48,12 +48,12 @@ public class ReferenceJob implements Job {
      * A reference job containing all information about the import of a
      * reference sequence.
      * <p>
-     * @param id          reference id, if already available
-     * @param file        the file in which the reference is stored, if needed
-     * @param parser      the parser for parsing the reference, if needed
+     * @param id reference id, if already available
+     * @param file the file in which the reference is stored, if needed
+     * @param parser the parser for parsing the reference, if needed
      * @param description the description of the reference
-     * @param name        the name of the reference
-     * @param timestamp   the timestamp of the import
+     * @param name the name of the reference
+     * @param timestamp the timestamp of the import
      */
     public ReferenceJob( Integer id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp ) {
         this.id = id;
@@ -72,15 +72,15 @@ public class ReferenceJob implements Job {
      * reference sequence. Use this constructor for importing GFF references,
      * which require an additional sequence file in fasta format.
      * <p>
-     * @param id          reference id, if already available
-     * @param fastaFile   the file in which the reference sequence is stored, if
-     *                    needed
-     * @param gffFile     the file in which the reference features are stored,
-     *                    if needed
-     * @param parser      the parser for parsing the reference, if needed
+     * @param id reference id, if already available
+     * @param fastaFile the file in which the reference sequence is stored, if
+     * needed
+     * @param gffFile the file in which the reference features are stored, if
+     * needed
+     * @param parser the parser for parsing the reference, if needed
      * @param description the description of the reference
-     * @param name        the name of the reference
-     * @param timestamp   the timestamp of the import
+     * @param name the name of the reference
+     * @param timestamp the timestamp of the import
      */
     public ReferenceJob( Integer id, File fastaFile, File gffFile, ReferenceParserI parser, String description, String name, Timestamp timestamp ) {
         this( id, fastaFile, parser, description, name, timestamp );
@@ -129,7 +129,7 @@ public class ReferenceJob implements Job {
 
 
     /**
-     * @param file Reset the file of this {@link ReferenceJob}. 
+     * @param file Reset the file of this {@link ReferenceJob}.
      */
     public void setFile( File file ) {
         this.file = file;
@@ -138,8 +138,7 @@ public class ReferenceJob implements Job {
 
     /**
      * @return the file in which the reference features are stored, if this is
-     *         an
-     *         import of a GFF reference.
+     * an import of a GFF reference.
      */
     public File getGffFile() {
         return gffFile;
@@ -192,8 +191,7 @@ public class ReferenceJob implements Job {
     public String toString() {
         if( isPersistent() ) {
             return " db: " + name + " " + timestamp;
-        }
-        else {
+        } else {
             return "new: " + name + " " + timestamp;
         }
     }

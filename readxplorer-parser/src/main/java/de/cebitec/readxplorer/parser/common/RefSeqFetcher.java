@@ -49,20 +49,18 @@ public class RefSeqFetcher implements Observable {
      * file.
      * <p>
      * @param indexedFastaFile The indexed fasta file from which the data shall
-     *                         be read.
-     * @param observer         The observer for receiving error messages
+     * be read.
+     * @param observer The observer for receiving error messages
      */
     public RefSeqFetcher( File indexedFastaFile, Observer observer ) {
         this.observers = new ArrayList<>();
         this.observers.add( observer );
         try {
             refFile = new IndexedFastaSequenceFile( indexedFastaFile );
-        }
-        catch( FileNotFoundException ex ) {
+        } catch( FileNotFoundException ex ) {
             this.notifyObservers( "Fasta reference index file not found. Please make sure it exist." );
             this.notifyObservers( ex.getMessage() );
-        }
-        catch( PicardException e ) {
+        } catch( PicardException e ) {
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + indexedFastaFile.getAbsolutePath();
             JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
         }
@@ -74,21 +72,20 @@ public class RefSeqFetcher implements Observable {
      * the reference file stored in this object.
      * <p>
      * @param refName name of the reference from which the sequence shall be
-     *                retrieved
-     * @param start   start position of the interval of interest
-     * @param stop    stop position of the interval of interest
+     * retrieved
+     * @param start start position of the interval of interest
+     * @param stop stop position of the interval of interest
      * <p>
      * @return The subsequence defined by start, stop and a reference name from
-     *         the reference file stored in this object.
+     * the reference file stored in this object.
      */
     public String getSubSequence( String refName, int start, int stop ) {
         String refSeq = "";
         try {
             refSeq = new String( refFile.getSubsequenceAt( refName, start, stop ).getBases(), Charset.forName( "UTF-8" ) ).toUpperCase();
-        }
-        catch( PicardException e ) {
+        } catch( PicardException e ) {
             String msg = "Mapping and reference data are out of sync for reference " + refName + ". One of the queried positions is out of reach!"
-                         + "Reimport the correct reference or fix the mapping data!";
+                    + "Reimport the correct reference or fix the mapping data!";
             JOptionPane.showMessageDialog( new JPanel(), msg, "Reference sequence error", JOptionPane.ERROR_MESSAGE );
             Exceptions.printStackTrace( e );
         }

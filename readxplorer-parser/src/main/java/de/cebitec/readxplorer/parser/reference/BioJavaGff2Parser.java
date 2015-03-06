@@ -56,10 +56,10 @@ import org.biojava.utils.ParserException;
 public class BioJavaGff2Parser implements ReferenceParserI {
 
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtension = new String[]{ "gff", "GFF", "gff2", "GFF2", "gtf", "GTF" };
+    private static final String[] FILE_EXTENSION = new String[]{"gff", "GFF", "gff2", "GFF2", "gtf", "GTF"};
     // name of this parser for use in ComboBoxes
-    private static final String parserName = "GFF2/GTF file";
-    private static final String fileDescription = parserName;
+    private static final String PARSER_NAME = "GFF2/GTF file";
+    private static final String FILE_DESCRIPTION = PARSER_NAME;
     private static final String UNKNOWN_LOCUS_TAG = "unknown locus tag";
 
     private final List<Observer> observers = new ArrayList<>();
@@ -70,8 +70,7 @@ public class BioJavaGff2Parser implements ReferenceParserI {
      * the GFF2 annotations from the GFF2 file contained in the ReferenceJob.
      * <p>
      * @param referenceJob the reference job containing the files
-     * @param filter       the feature filter to use (removes undesired
-     *                     features)
+     * @param filter the feature filter to use (removes undesired features)
      * <p>
      * @return the parsed reference object with all parsed features
      * <p>
@@ -110,12 +109,12 @@ public class BioJavaGff2Parser implements ReferenceParserI {
 
                 @Override
                 public void commentLine( String string ) {
-                    //TODO: anything to do here? check for extra information?
+                    //TODO anything to do here? check for extra information?
                 }
 
 
                 @Override
-                @SuppressWarnings( "unchecked" )
+                @SuppressWarnings("unchecked")
                 public void recordLine( final GFFRecord gffr ) {
 
                     if( chromMap.containsKey( gffr.getSeqName() ) ) {
@@ -154,26 +153,22 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                                             if( locusTag.equals( UNKNOWN_LOCUS_TAG ) ) {
                                                 locusTag = attrString;
                                             }
-                                        }
-                                        else if( keyString.equalsIgnoreCase( "product" ) ) {
+                                        } else if( keyString.equalsIgnoreCase( "product" ) ) {
                                             product = attrString;
-                                        }
-                                        else if( attrString.length() < 20
-                                                 && (keyString.equalsIgnoreCase( "name" )
-                                                     || keyString.equalsIgnoreCase( "gene" )
-                                                     || keyString.equalsIgnoreCase( "gene_name" )
-                                                     || keyString.equalsIgnoreCase( "genename" )) ) {
+                                        } else if( attrString.length() < 20
+                                                && (keyString.equalsIgnoreCase( "name" )
+                                                || keyString.equalsIgnoreCase( "gene" )
+                                                || keyString.equalsIgnoreCase( "gene_name" )
+                                                || keyString.equalsIgnoreCase( "genename" )) ) {
                                             geneName = attrString;
-                                        }
-                                        else if( (keyString.equalsIgnoreCase( "name" )
-                                                  || keyString.equalsIgnoreCase( "gene_id" )
-                                                  || keyString.equalsIgnoreCase( "gene_name" )
-                                                  || keyString.equalsIgnoreCase( "gene" )) && product.isEmpty() ) {
+                                        } else if( (keyString.equalsIgnoreCase( "name" )
+                                                || keyString.equalsIgnoreCase( "gene_id" )
+                                                || keyString.equalsIgnoreCase( "gene_name" )
+                                                || keyString.equalsIgnoreCase( "gene" )) && product.isEmpty() ) {
                                             product = attrString;
-                                        }
-                                        else if( keyString.equalsIgnoreCase( "alias" )
-                                                 || keyString.equalsIgnoreCase( "locus" )
-                                                 || keyString.equalsIgnoreCase( "locus_tag" ) ) {
+                                        } else if( keyString.equalsIgnoreCase( "alias" )
+                                                || keyString.equalsIgnoreCase( "locus" )
+                                                || keyString.equalsIgnoreCase( "locus_tag" ) ) {
                                             locusTag = attrString;
                                         }
                                         if( keyString.equalsIgnoreCase( parsedType ) ) {
@@ -199,17 +194,17 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                         FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             notifyObservers( referenceJob.getFile().getName()
-                                             + ": Using unknown feature type for " + parsedType );
+                                    + ": Using unknown feature type for " + parsedType );
                         }
 
                         int start = gffr.getStart();
                         int stop = gffr.getEnd();
                         int strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand,
-                                                                          locusTag, product, ecNumber, geneName, null, new ArrayList<String>(), identifier );
+                                locusTag, product, ecNumber, geneName, null, new ArrayList<String>(), identifier );
                         ParsedChromosome currentChrom = chromMap.get( gffr.getSeqName() );
                         currentChrom.addFeature( currentFeature );
-                        
+
                     }
 
                 }
@@ -217,8 +212,7 @@ public class BioJavaGff2Parser implements ReferenceParserI {
 
             } );
 
-        }
-        catch( IOException | BioException | ParserException ex ) {
+        } catch( IOException | BioException | ParserException ex ) {
             JOptionPane.showMessageDialog( new JPanel(), ex.toString(), "Exception", JOptionPane.ERROR_MESSAGE );
             throw new ParsingException( ex );
         }
@@ -229,19 +223,19 @@ public class BioJavaGff2Parser implements ReferenceParserI {
 
     @Override
     public String getName() {
-        return parserName;
+        return PARSER_NAME;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSION;
     }
 
 

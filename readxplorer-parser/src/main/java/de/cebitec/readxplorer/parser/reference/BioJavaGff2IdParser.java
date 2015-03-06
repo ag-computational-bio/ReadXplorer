@@ -65,8 +65,7 @@ public class BioJavaGff2IdParser implements IdParserI {
 
             gff2Parser.parse( br, handler );
 
-        }
-        catch( IOException | BioException | ParserException ex ) {
+        } catch( IOException | BioException | ParserException ex ) {
             this.notifyObservers( ex );
         }
         return Collections.unmodifiableList( seqIds );

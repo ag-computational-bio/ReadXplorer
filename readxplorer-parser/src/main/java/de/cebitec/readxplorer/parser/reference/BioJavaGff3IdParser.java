@@ -66,8 +66,7 @@ public class BioJavaGff3IdParser implements IdParserI {
             GFF3Handler handler = new GFF3Handler();
             gff3Parser.parse( br, handler, new Ontology.Impl( "Ontologyname", "name of ontology" ) );
 
-        }
-        catch( IOException | BioException | ParserException ex ) {
+        } catch( IOException | BioException | ParserException ex ) {
             this.notifyObservers( ex );
         }
 

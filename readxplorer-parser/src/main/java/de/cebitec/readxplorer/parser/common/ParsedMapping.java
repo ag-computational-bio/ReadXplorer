@@ -25,10 +25,9 @@ import java.util.List;
 /**
  * Container for a parsed mapping. It contains all data a mapping should have.
  * ID, start, stop (start is always the smaller value), direction (1 for fwd and
- * -1 for rev),
- * errors, diffs, gaps, bestmapping and number of replicates. Also the read
- * sequence can be stored here,
- * but should be removed when not needed anymore.
+ * -1 for rev), errors, diffs, gaps, bestmapping and number of replicates. Also
+ * the read sequence can be stored here, but should be removed when not needed
+ * anymore.
  *
  * @author ddoppmeier, rhilker
  */
@@ -48,12 +47,12 @@ public class ParsedMapping {
     /**
      * Standard constructor for a parsed mapping.
      * <p>
-     * @param start     start of the mapping
-     * @param stop      end of the mapping
+     * @param start start of the mapping
+     * @param stop end of the mapping
      * @param direction direction of the mapping: 1 for fwd and -1 for rev
-     * @param diffs     the list of diffs between the reference and the mapping
-     * @param gaps      list of gaps between the reference and the mapping
-     * @param errors    number of errors
+     * @param diffs the list of diffs between the reference and the mapping
+     * @param gaps list of gaps between the reference and the mapping
+     * @param errors number of errors
      */
     public ParsedMapping( int start, int stop, byte direction, List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps, int errors ) {
         this.start = start;
@@ -72,7 +71,7 @@ public class ParsedMapping {
      * reference.
      * <p>
      * @param isBestMapping <cc>true</cc> if this is the best mapping for the
-     *                      read, <cc>false</cc> otherwise
+     * read, <cc>false</cc> otherwise
      */
     public void setIsBestMapping( boolean isBestMapping ) {
         this.bestMapping = isBestMapping;
@@ -100,7 +99,7 @@ public class ParsedMapping {
 
     /**
      * @return Start position of this mapping. Always the smaller value among
-     *         start and stop.
+     * start and stop.
      */
     public int getStart() {
         return start;
@@ -109,7 +108,7 @@ public class ParsedMapping {
 
     /**
      * @return Stop position of this mapping. Always the larger value among
-     *         start and stop.
+     * start and stop.
      */
     public int getStop() {
         return stop;

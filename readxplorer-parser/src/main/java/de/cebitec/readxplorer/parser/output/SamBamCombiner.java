@@ -42,8 +42,8 @@ import org.openide.util.NbBundle;
 /**
  * Combines two mapping files (e.g. read 1 and read2 of the same pairs) in one
  * file. The first trackjob contains the new file name afterwards, while the
- * second trackjob contains an empty file name to prevent reuse of it after
- * the combination.
+ * second trackjob contains an empty file name to prevent reuse of it after the
+ * combination.
  *
  * @author -Rolf Hilker-
  */
@@ -62,14 +62,12 @@ public class SamBamCombiner implements CombinerI {
      * prevent reuse of it after the combination. The merge process is started
      * by calling "combineData".
      * <p>
-     * @param trackJob1      containing the first file before the merge and the
-     *                       new
-     *                       file name after the merge process
-     * @param trackJob2      containing the second file, which is merged with
-     *                       the first
-     *                       an its file path is reset to an empty string afterwards
+     * @param trackJob1 containing the first file before the merge and the new
+     * file name after the merge process
+     * @param trackJob2 containing the second file, which is merged with the
+     * first an its file path is reset to an empty string afterwards
      * @param sortCoordinate true, if the combined file should be sorted by
-     *                       coordinate and false otherwise
+     * coordinate and false otherwise
      */
     public SamBamCombiner( TrackJob trackJob1, TrackJob trackJob2, boolean sortCoordinate ) {
         this.trackJob1 = trackJob1;
@@ -108,8 +106,7 @@ public class SamBamCombiner implements CombinerI {
             SAMFileHeader header = samBamReader.getFileHeader();
             if( sortCoordinate ) {
                 header.setSortOrder( SAMFileHeader.SortOrder.coordinate );
-            }
-            else {
+            } else {
                 header.setSortOrder( SAMFileHeader.SortOrder.unsorted );
             }
 
@@ -156,11 +153,10 @@ public class SamBamCombiner implements CombinerI {
      * Carries out the actual I/O stuff. Observers are noticed in case a read
      * cannot be processed.
      * <p>
-     * @param samBamItor       the iterator to read sam records from
+     * @param samBamItor the iterator to read sam records from
      * @param samBamFileWriter the writer to write to
-     * @param isFstFile        true, if this is the file containing read1, false
-     *                         if
-     *                         this is the file containing read2 of the pairs
+     * @param isFstFile true, if this is the file containing read1, false if
+     * this is the file containing read2 of the pairs
      */
     private void readAndWrite( final SAMRecordIterator samBamItor, final SAMFileWriter samBamFileWriter, final boolean isFstFile ) {
 
@@ -172,11 +168,9 @@ public class SamBamCombiner implements CombinerI {
                 record = samBamItor.next();
                 CommonsMappingParser.checkOrAddPairTag( record, isFstFile );
                 samBamFileWriter.addAlignment( record );
-            }
-            catch( RuntimeEOFException e ) {
+            } catch( RuntimeEOFException e ) {
                 this.notifyObservers( "Read could not be added to new file: " + record.getReadName() );
-            }
-            catch( SAMFormatException e ) {
+            } catch( SAMFormatException e ) {
                 if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
                     this.notifyObservers( e.getMessage() );
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored

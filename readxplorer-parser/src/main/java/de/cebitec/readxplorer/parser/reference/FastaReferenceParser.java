@@ -31,18 +31,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
 import static java.util.logging.Level.INFO;
+import java.util.logging.Logger;
 
 
 /**
- * The FastaReferenceParser can parse a reference genome from a fasta file.
- * This means, the sequence dictonary is checked for multiple sequences,
+ * The FastaReferenceParser can parse a reference genome from a fasta file. This
+ * means, the sequence dictonary is checked for multiple sequences,
  * corresponding chromosomes are created and the fasta file is indexed, if that
  * is not already the case. Later, the data has to be directly fetched from the
- * now indexed fasta file.
- * Attention: there will be no features in this file just the sequence.
+ * now indexed fasta file. Attention: there will be no features in this file
+ * just the sequence.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -51,9 +50,9 @@ public class FastaReferenceParser implements ReferenceParserI {
     private static final Logger LOG = Logger.getLogger( FastaReferenceParser.class.getName() );
 
 
-    private static final String parsername = "Fasta file";
-    private static final String[] fileExtension = new String[]{ "fas", "fasta", "fna", "fa" };
-    private static final String fileDescription = "Fasta File";
+    private static final String PARSER_NAME = "Fasta file";
+    private static final String[] FILE_EXTENSION = new String[]{"fas", "fasta", "fna", "fa"};
+    private static final String FILE_DESCRIPTION = "Fasta File";
 
     private final List<Observer> observers = new ArrayList<>();
 //    private String errorMsg;
@@ -80,12 +79,11 @@ public class FastaReferenceParser implements ReferenceParserI {
      * sequence.
      * <p>
      * @param referenceJob the reference job, for which the data shall be parsed
-     * @param filter       the feature filter to use for this reference. Not
-     *                     needed
-     *                     for fasta, since it does not have features.
+     * @param filter the feature filter to use for this reference. Not needed
+     * for fasta, since it does not have features.
      * <p>
-     * @return returns the object parsedReference with the name, description
-     *         and chromosomes for the reference genome
+     * @return returns the object parsedReference with the name, description and
+     * chromosomes for the reference genome
      * <p>
      * @throws de.cebitec.readxplorer.parser.common.ParsingException
      */
@@ -115,12 +113,11 @@ public class FastaReferenceParser implements ReferenceParserI {
             }
 
 
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             this.notifyObservers( ex.getMessage() );
         }
 
-        LOG.log( INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{ referenceJob.getFile(), chromCounter } );
+        LOG.log( INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{referenceJob.getFile(), chromCounter} );
         return refGenome;
 
     }
@@ -143,19 +140,19 @@ public class FastaReferenceParser implements ReferenceParserI {
 
     @Override
     public String getName() {
-        return parsername;
+        return PARSER_NAME;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSION;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 

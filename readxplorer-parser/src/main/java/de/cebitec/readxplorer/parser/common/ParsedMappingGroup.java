@@ -26,8 +26,7 @@ import java.util.List;
 
 /**
  * The dna sequence of all parsed mappings in this group is always identical,
- * but
- * positions and direction deviate.
+ * but positions and direction deviate.
  * <p>
  * @author ddoppmeier
  */
@@ -49,8 +48,7 @@ public class ParsedMappingGroup {
         // if mapping already existed, increase the count of it
         if( mappings.contains( mapping ) ) {
             mappings.get( mappings.lastIndexOf( mapping ) ).increaseCounter();
-        }
-        else {
+        } else {
             // otherwise just add it
             mappings.add( mapping );
             bestMappingTagged = false;
@@ -67,8 +65,7 @@ public class ParsedMappingGroup {
             ParsedMapping m = it.next();
             if( m.getErrors() == minError ) {
                 m.setIsBestMapping( true );
-            }
-            else {
+            } else {
                 m.setIsBestMapping( false );
             }
 
