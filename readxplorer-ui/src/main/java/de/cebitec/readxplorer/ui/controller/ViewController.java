@@ -171,7 +171,7 @@ public class ViewController implements MousePositionListener {
                 // show the panel and the track
                 getApp().showTrackPanel( trackPanel );
 
-                trackPanel.addPrefListener( this.getPrefChangeListener( trackPanel ) );
+                trackPanel.addPrefListener( getPrefChangeListener( trackPanel ) );
             }
         }
     }
@@ -190,14 +190,15 @@ public class ViewController implements MousePositionListener {
 
         if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && !otp.getSelectedTracks().isEmpty() ) {
             if( otp.isCombineTracks() ) {
-                BasePanelFactory factory = this.getBasePanelFac();
-                factory.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
+                BasePanelFactory factory = getBasePanelFac();
+                BasePanel multTracksBp = factory.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
+                multTracksBp.addPrefListener( getPrefChangeListener( multTracksBp ) );
+
+            } else {
+                openTracksOnCurrentGenome( otp.getSelectedTracks() );
             }
-            else {
-                this.openTracksOnCurrentGenome( otp.getSelectedTracks() );
-            }
-        }
-        else if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().isEmpty() ) {
+
+        } else if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().isEmpty() ) {
             String msg = NbBundle.getMessage( ViewController.class, "CTL_OpenTrackInfo",
                                               "No track selected. To open a track, at least one track has to be selected." );
             String title = NbBundle.getMessage( ViewController.class, "CTL_OpenTrackInfoTitle", "Info" );
@@ -225,17 +226,17 @@ public class ViewController implements MousePositionListener {
         boolean okSelected = false;
         if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().size() == 2 ) {
             okSelected = true;
-        }
-        else if( !(dialogDescriptor.getValue().equals( DialogDescriptor.CANCEL_OPTION )
-                   || dialogDescriptor.getValue().equals( DialogDescriptor.CLOSED_OPTION )) ) {
+
+        } else if( !(dialogDescriptor.getValue().equals( DialogDescriptor.CANCEL_OPTION ) ||
+                 dialogDescriptor.getValue().equals( DialogDescriptor.CLOSED_OPTION )) ) {
             DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message( Bundle.DT_ErrorMsg(),
                                                                                NotifyDescriptor.INFORMATION_MESSAGE ) );
             this.openDoubleTrack();
         }
         if( okSelected ) {
-            BasePanelFactory factory = this.getBasePanelFac();
+            BasePanelFactory factory = getBasePanelFac();
             BasePanel tracksPanel = factory.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, false );
-            tracksPanel.addPrefListener( this.getPrefChangeListener( tracksPanel ) );
+            tracksPanel.addPrefListener( getPrefChangeListener( tracksPanel ) );
         }
     }
 
@@ -266,8 +267,8 @@ public class ViewController implements MousePositionListener {
                     viewer.updatePhysicalBounds();
                     viewer.setNewDataRequestNeeded( true );
                     viewer.boundsChangedHook();
-                }
-                else if( evt.getKey().equals( Properties.VIEWER_AUTO_SCALING ) ) {
+
+                } else if( evt.getKey().equals( Properties.VIEWER_AUTO_SCALING ) ) {
                     if( viewer instanceof TrackViewer ) {
                         ((TrackViewer) viewer).setAutomaticScaling( evt.getNewValue().equals( "true" ) );
                     }
