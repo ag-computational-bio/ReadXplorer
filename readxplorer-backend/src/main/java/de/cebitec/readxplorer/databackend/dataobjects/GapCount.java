@@ -141,6 +141,8 @@ public class GapCount {
             case 'N':
                 baseInt = GAP_N;
                 break;
+            default:
+                break;
         }
 
         return baseInt;

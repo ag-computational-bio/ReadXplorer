@@ -33,7 +33,7 @@ import static java.util.logging.Logger.getLogger;
  * <p>
  * @author Rolf Hilker
  */
-public class GenericSQLQueries {
+public final class GenericSQLQueries {
 
     private static final Logger LOG = getLogger( GenericSQLQueries.class.getName() );
 
@@ -66,8 +66,7 @@ public class GenericSQLQueries {
                 num = rs.getInt( identifier );
             }
             rs.close();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -91,8 +90,7 @@ public class GenericSQLQueries {
             if( rs.next() ) {
                 id = rs.getLong( "LATEST_ID" );
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
         return ++id;

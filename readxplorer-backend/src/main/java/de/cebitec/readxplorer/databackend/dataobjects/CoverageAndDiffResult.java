@@ -37,7 +37,7 @@ public class CoverageAndDiffResult extends AnalysisResult implements
     public static final long serialVersionUID = 42L;
 
     private List<CoverageManager> covManagers;
-    private CoverageManager readStarts; //TODO: do the same for the other data structures as for the coverage
+    private CoverageManager readStarts; //TODO do the same for the other data structures as for the coverage
     private List<Difference> diffs;
     private List<ReferenceGap> gaps;
 
@@ -94,8 +94,7 @@ public class CoverageAndDiffResult extends AnalysisResult implements
     public List<Difference> getDiffs() {
         if( diffs != null ) {
             return Collections.unmodifiableList( diffs );
-        }
-        else {
+        } else {
             return Collections.emptyList();
         }
     }
@@ -107,8 +106,7 @@ public class CoverageAndDiffResult extends AnalysisResult implements
     public List<ReferenceGap> getGaps() {
         if( gaps != null ) {
             return Collections.unmodifiableList( gaps );
-        }
-        else {
+        } else {
             return Collections.emptyList();
         }
     }
@@ -121,8 +119,7 @@ public class CoverageAndDiffResult extends AnalysisResult implements
     public CoverageManager getCovManager() {
         if( covManagers != null && !covManagers.isEmpty() ) {
             return covManagers.get( 0 );
-        }
-        else {
+        } else {
             return new CoverageManager( 0, 0 );
         }
     }
@@ -135,8 +132,7 @@ public class CoverageAndDiffResult extends AnalysisResult implements
     public List<CoverageManager> getCovManagers() {
         if( covManagers != null && !covManagers.isEmpty() ) {
             return Collections.unmodifiableList( covManagers );
-        }
-        else {
+        } else {
             return Collections.singletonList( new CoverageManager( 0, 0 ) );
         }
     }

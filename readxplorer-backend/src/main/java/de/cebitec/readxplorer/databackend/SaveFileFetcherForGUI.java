@@ -45,6 +45,7 @@ import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
@@ -61,7 +62,6 @@ import static java.util.logging.Logger.getLogger;
 public class SaveFileFetcherForGUI {
 
     private static final Logger LOG = getLogger( SaveFileFetcherForGUI.class.getName() );
-
 
 
     /**
@@ -88,19 +88,16 @@ public class SaveFileFetcherForGUI {
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             tc = connector.getTrackConnector( track );
-        }
-        catch( FileNotFoundException e ) {
+        } catch( FileNotFoundException e ) {
             PersistentTrack newTrack = getNewFilePath( track, connector );
             if( newTrack != null ) {
                 try {
                     tc = connector.getTrackConnector( newTrack );
-                }
-                catch( FileNotFoundException ex ) {
+                } catch( FileNotFoundException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                     LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
                 }
-            }
-            else {
+            } else {
                 //If the new path is not set by the user throw exception notifying about this
                 throw new UserCanceledTrackPathUpdateException();
             }
@@ -130,8 +127,7 @@ public class SaveFileFetcherForGUI {
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             tc = connector.getTrackConnector( tracks, combineTracks );
-        }
-        catch( FileNotFoundException e ) {
+        } catch( FileNotFoundException e ) {
             //we keep track about the number of tracks with unresolved path errors.
             int unresolvedTracks = 0;
             for( int i = 0; i < tracks.size(); ++i ) {
@@ -141,8 +137,7 @@ public class SaveFileFetcherForGUI {
                     //Everything is fine, path is set correctly
                     if( newTrack != null ) {
                         tracks.set( i, newTrack );
-                    }
-                    else {
+                    } else {
                         //User canceled path update, add an unresolved track
                         unresolvedTracks++;
                         //And remove the track with wrong path from the list of processed tracks.
@@ -156,8 +151,7 @@ public class SaveFileFetcherForGUI {
             }
             try {
                 tc = connector.getTrackConnector( tracks, combineTracks );
-            }
-            catch( FileNotFoundException ex ) {
+            } catch( FileNotFoundException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
             }
@@ -220,13 +214,12 @@ public class SaveFileFetcherForGUI {
                 SamBamFileReader reader = new SamBamFileReader( newTrackFile, track.getId(), connector.getRefGenomeConnector( track.getRefGenID() ).getRefGenome() );
                 try {
                     connector.resetTrackPath( newTrack );
-                }
-                catch( StorageException ex ) {
+                } catch( StorageException ex ) {
                     JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                 }
-            }
-            catch( RuntimeIOException e ) {
+            } catch( RuntimeIOException e ) {
                 //nothing to do, we return a null track
+                LOG.log( FINE, e.getMessage(), e );
             }
         }
         return newTrack;
@@ -265,22 +258,18 @@ public class SaveFileFetcherForGUI {
                         connector.resetTrackPath( newTrack );
                         try {
                             TrackConnector trackConnector = connector.getTrackConnector( newTrack );
-                        }
-                        catch( FileNotFoundException ex ) {
+                        } catch( FileNotFoundException ex ) {
                             JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                         }
-                    }
-                    catch( StorageException ex ) {
+                    } catch( StorageException ex ) {
                         JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                     }
-                }
-                else if( !selectedFile.getName().endsWith( ".bam" ) ) {
+                } else if( !selectedFile.getName().endsWith( ".bam" ) ) {
                     JOptionPane.showMessageDialog( null, Bundle.MSG_WrongTrackFileChosen(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                     this.openResetFilePathDialog( track, connector );
                 }
             }
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
         }
         return newTrack;
@@ -292,19 +281,16 @@ public class SaveFileFetcherForGUI {
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             mtc = connector.getMultiTrackConnector( track );
-        }
-        catch( FileNotFoundException e ) {
+        } catch( FileNotFoundException e ) {
             PersistentTrack newTrack = getNewFilePath( track, connector );
             if( newTrack != null ) {
                 try {
                     mtc = connector.getMultiTrackConnector( newTrack );
-                }
-                catch( FileNotFoundException ex ) {
+                } catch( FileNotFoundException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                     LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
                 }
-            }
-            else {
+            } else {
                 //If the new path is not set by the user throw exception notifying about this
                 throw new UserCanceledTrackPathUpdateException();
             }
@@ -329,8 +315,7 @@ public class SaveFileFetcherForGUI {
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             mtc = connector.getMultiTrackConnector( tracks );
-        }
-        catch( FileNotFoundException e ) {
+        } catch( FileNotFoundException e ) {
             //we keep track about the number of tracks with unresolved path errors.
             int unresolvedTracks = 0;
             for( int i = 0; i < tracks.size(); ++i ) {
@@ -340,8 +325,7 @@ public class SaveFileFetcherForGUI {
                     //Everything is fine, path is set correctly
                     if( newTrack != null ) {
                         tracks.set( i, newTrack );
-                    }
-                    else {
+                    } else {
                         //User canceled path update, add an unresolved track
                         unresolvedTracks++;
                         //And remove the track with wrong path from the list of processed tracks.
@@ -355,8 +339,7 @@ public class SaveFileFetcherForGUI {
             }
             try {
                 mtc = connector.getMultiTrackConnector( tracks );
-            }
-            catch( FileNotFoundException ex ) {
+            } catch( FileNotFoundException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
             }
@@ -390,20 +373,17 @@ public class SaveFileFetcherForGUI {
     public IndexedFastaSequenceFile checkRefFile( PersistentReference ref ) throws UserCanceledTrackPathUpdateException {
         File fastaFile = ref.getFastaFile();
         IndexedFastaSequenceFile indexedRefFile;
-        FastaUtils fastaUtils = new FastaUtils(); //TODO: observers are empty, add observers!
+        FastaUtils fastaUtils = new FastaUtils(); //TODO observers are empty, add observers!
         if( fastaFile.exists() && fastaFile.isFile() ) {
             try { //check for index and recreate it with notificaiton, if necessary
-                new IndexedFastaSequenceFile( fastaFile );
-            }
-            catch( FileNotFoundException e ) {
+                IndexedFastaSequenceFile indexedFastaSequenceFile = new IndexedFastaSequenceFile( fastaFile );
+            } catch( FileNotFoundException e ) {
                 fastaUtils.recreateMissingIndex( fastaFile );
-            }
-            catch( PicardException e ) { //should not occur, since we test existence of fasta before
+            } catch( PicardException e ) { //should not occur, since we test existence of fasta before
                 JOptionPane.showMessageDialog( new JPanel(), Bundle.MSG_FastaMissing( fastaFile.getAbsolutePath() ), Bundle.TITLE_FastaMissing(), JOptionPane.ERROR_MESSAGE );
             }
             indexedRefFile = fastaUtils.getIndexedFasta( fastaFile );
-        }
-        else {
+        } else {
             indexedRefFile = this.resetRefFile( ref );
         }
         if( indexedRefFile == null ) {
@@ -442,18 +422,15 @@ public class SaveFileFetcherForGUI {
             try {
                 try {
                     newFastaFile = new IndexedFastaSequenceFile( newFile );
-                }
-                catch( FileNotFoundException ex ) { //we know the file exists, so only the index can be missing
-                    FastaUtils fastaUtils = new FastaUtils();  //TODO: observers are empty, add observers!
+                } catch( FileNotFoundException ex ) { // we know the file exists, so only the index can be missing
+                    FastaUtils fastaUtils = new FastaUtils();  //TODO observers are empty, add observers!
                     fastaUtils.recreateMissingIndex( newFile );
                 }
                 connector.resetRefPath( newFile, ref );
-            }
-            catch( StorageException ex ) {
+            } catch( StorageException ex ) {
                 JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
             }
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
         }
 
@@ -494,20 +471,17 @@ public class SaveFileFetcherForGUI {
             if( newFile.exists() && newFile.isFile() && correctEnding ) {
                 return newFile;
 
-            }
-            else if( !correctEnding ) {
+            } else if( !correctEnding ) {
                 String msg;
                 if( fileEndings.size() > 1 ) {
                     msg = Bundle.MSG_WrongFileChosen( fileEndings.get( 0 ) );
-                }
-                else {
+                } else {
                     msg = Bundle.MSG_WrongFileChosen( "correct" );
                 }
                 JOptionPane.showMessageDialog( null, msg, Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                 newFile = this.openResetFilePathDialog( oldFile, fileEndings );
             }
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
         }
         return newFile;
@@ -520,8 +494,8 @@ public class SaveFileFetcherForGUI {
      */
     public static class UserCanceledTrackPathUpdateException extends Exception {
 
-        private static final String errorMessage = "The user canceled the track path update. Thus, no TrackConnector can be created!";
-        private static final long serialVersionUID = 1L;
+        private static final String ERROR_MSG = "The user canceled the track path update. Thus, no TrackConnector can be created!";
+//        private static final long serialVersionUID = 1L;
 
 
         /**
@@ -529,9 +503,9 @@ public class SaveFileFetcherForGUI {
          * missing track file path.
          */
         public UserCanceledTrackPathUpdateException() {
-            super( errorMessage );
+            super( ERROR_MSG );
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( WARNING, "{0}: " + errorMessage, currentTimestamp );
+            LOG.log( WARNING, "{0}: " + ERROR_MSG, currentTimestamp );
         }
 
 

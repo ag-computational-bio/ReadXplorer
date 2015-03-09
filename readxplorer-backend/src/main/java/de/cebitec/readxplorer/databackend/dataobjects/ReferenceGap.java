@@ -79,20 +79,16 @@ public class ReferenceGap extends BasicDiff implements Comparable<ReferenceGap>,
         // order by position
         if( this.getPosition() < o.getPosition() ) {
             return -1;
-        }
-        else if( this.getPosition() > o.getPosition() ) {
+        } else if( this.getPosition() > o.getPosition() ) {
             return 1;
-        }
-        else {
+        } else {
 
             // order by position in mapping
             if( order < o.getOrder() ) {
                 return -1;
-            }
-            else if( order > o.getOrder() ) {
+            } else if( order > o.getOrder() ) {
                 return 1;
-            }
-            else {
+            } else {
                 return 0;
             }
         }

@@ -40,6 +40,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
 
     private static final Logger LOG = getLogger( CoverageThreadAnalyses.class.getName() );
 
+
     /**
      * Thread for retrieving the coverage for a list of tracks from their
      * mapping files.
@@ -63,22 +64,18 @@ public class CoverageThreadAnalyses extends CoverageThread {
             if( request != null ) {
                 if( request.getDesiredData() == Properties.READ_STARTS ) {
                     currentCov = this.loadReadStartsAndCoverageMultiple( request );
-                }
-                else if( !currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() ) ) {
+                } else if( !currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() ) ) {
                     if( this.getTrackId2() != 0 ) {
                         currentCov = this.loadCoverageDouble( request ); //at the moment we only need the complete coverage here
-                    }
-                    else if( this.getTrackId() != 0 || this.canQueryCoverage() ) {
+                    } else if( this.getTrackId() != 0 || this.canQueryCoverage() ) {
                         currentCov = this.loadCoverageMultiple( request );
                     }
                 }
                 request.getSender().receiveData( currentCov );
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep( 10 );
-                }
-                catch( InterruptedException ex ) {
+                } catch( InterruptedException ex ) {
                     LOG.log( Level.SEVERE, null, ex );
                 }
             }

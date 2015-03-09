@@ -161,10 +161,9 @@ public class ParametersReadClasses {
         String strandOptionString = "Feature/analysis strand"; //default
         if( getStrandOption() == Properties.STRAND_OPPOSITE ) {
             strandOptionString += "Opposite Strand";
-        }
-        else if( getStrandOption() == Properties.STRAND_BOTH
-                 || getStrandOption() == Properties.STRAND_BOTH_FWD
-                 || getStrandOption() == Properties.STRAND_BOTH_REV ) {
+        } else if( getStrandOption() == Properties.STRAND_BOTH
+                   || getStrandOption() == Properties.STRAND_BOTH_FWD
+                   || getStrandOption() == Properties.STRAND_BOTH_REV ) {
             strandOptionString += "Combine both strands";
         }
         return strandOptionString;

@@ -37,8 +37,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -53,12 +54,12 @@ public class MappingThread extends RequestThread {
     private static final Logger LOG = Logger.getLogger( MappingThread.class.getName() );
 
 
-    public static int FIXED_INTERVAL_LENGTH = 1000;
+    private static final int FIXED_INTERVAL_LENGTH = 1000;
     private final List<PersistentTrack> tracks;
-    ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private List<Mapping> currentMappings;
     private Collection<ReadPairGroup> currentReadPairs;
     private PersistentReference refGenome;
+    protected ConcurrentLinkedQueue<IntervalRequest> requestQueue;
 
 
     /**
@@ -100,7 +101,7 @@ public class MappingThread extends RequestThread {
      */
     List<Mapping> loadMappings( final IntervalRequest request ) {
         ArrayList<Mapping> mappingList = new ArrayList<>();
-        if( request.getFrom() < request.getTo()  &&  request.getFrom() > 0  &&  request.getTo() > 0 ) {
+        if( request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0 ) {
 
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.log( INFO, "{0}: Reading mapping data from file...", currentTimestamp );
@@ -194,28 +195,23 @@ public class MappingThread extends RequestThread {
                 if( doesNotMatchLatestRequestBounds( request ) ) {
                     if( request.getDesiredData() == Properties.READ_PAIRS ) {
                         this.currentReadPairs = this.getReadPairMappings( request );
-                    }
-                    else if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
+                    } else if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
                         currentMappings = this.loadReducedMappings( request );
-                    }
-                    else {
+                    } else {
                         currentMappings = this.loadMappings( request );
                     }
                     //switch between ordinary mappings and read pairs
                     if( request.getDesiredData() != Properties.READ_PAIRS ) {
                         request.getSender().receiveData( new MappingResult( currentMappings, request ) );
-                    }
-                    else {
+                    } else {
                         request.getSender().receiveData( new ReadPairResultPersistent( currentReadPairs, request ) );
                     }
                 }
 
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep( 10 );
-                }
-                catch( InterruptedException ex ) {
+                } catch( InterruptedException ex ) {
                     LOG.log( Level.SEVERE, null, ex );
                 }
             }

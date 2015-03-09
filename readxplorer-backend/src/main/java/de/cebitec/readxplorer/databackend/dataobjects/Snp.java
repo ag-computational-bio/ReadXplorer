@@ -44,7 +44,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
     private int coverage;
     private double frequency;
     private SequenceComparison type;
-    List<CodonSnp> codons;
+    private List<CodonSnp> codons;
     private SequenceComparison effect;
     private int gapOrderIndex;
     private int averageBaseQual;
@@ -119,7 +119,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
         this.nRate = nRate;
         this.gapRate = gapRate;
         this.coverage = coverage;
-        this.frequency = GeneralUtils.formatDouble(frequency);
+        this.frequency = GeneralUtils.formatDouble( frequency );
         this.type = type;
         this.codons = new ArrayList<>();
         this.gapOrderIndex = gapOrderIndex;
@@ -296,11 +296,9 @@ public class Snp extends TrackChromResultEntry implements SnpI {
         int value;
         if( this.getPosition() < other.getPosition() ) {
             value = -1;
-        }
-        else if( this.getPosition() > other.getPosition() ) {
+        } else if( this.getPosition() > other.getPosition() ) {
             value = 1;
-        }
-        else { //pos are equal
+        } else { //pos are equal
             value = 0;
         }
         return value;

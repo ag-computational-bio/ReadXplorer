@@ -173,8 +173,7 @@ public class PersistentTrack {
                     && (otrack.getRefGenID() == this.refGenID)
                     && (otrack.getActiveChromId() == this.activeChromId)
                     && (otrack.getReadPairId() == this.readPairId));
-        }
-        else {
+        } else {
             return super.equals( o );
         }
     }

@@ -55,7 +55,7 @@ public class TrackConnector {
 
     private static final Logger LOG = Logger.getLogger( TrackConnector.class.getName() );
 
-    public static int FIXED_INTERVAL_LENGTH = 1000;
+    public static final int FIXED_INTERVAL_LENGTH = 1000;
 
     private int trackID;
     private CoverageThread coverageThread;
@@ -145,14 +145,14 @@ public class TrackConnector {
      */
     private void startDataThreads( final boolean combineTracks ) {
 
-       mappingThread = new MappingThread( associatedTracks );
-       coverageThread = new CoverageThread( associatedTracks, combineTracks );
-       mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks );
-       coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, combineTracks );
-       coverageThread.start();
-       coverageThreadAnalyses.start();
-       mappingThread.start();
-       mappingThreadAnalyses.start();
+        mappingThread = new MappingThread( associatedTracks );
+        coverageThread = new CoverageThread( associatedTracks, combineTracks );
+        mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks );
+        coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, combineTracks );
+        coverageThread.start();
+        coverageThreadAnalyses.start();
+        mappingThread.start();
+        mappingThreadAnalyses.start();
 
     }
 
@@ -257,8 +257,7 @@ public class TrackConnector {
                 }
             }
 
-        }
-        catch( SQLException e ) {
+        } catch( SQLException e ) {
             LOG.log( Level.SEVERE, null, e );
         }
         return statsContainer;
@@ -312,7 +311,7 @@ public class TrackConnector {
 
 
     /**
-     * @return TODO: remove this method for encapsulation: hand data from here
+     * @return TODO remove this method for encapsulation: hand data from here
      *         to thread
      */
     public CoverageThread getCoverageThread() {
@@ -321,7 +320,7 @@ public class TrackConnector {
 
 
     public int getNumOfReadPairsCalculate() {
-        return -1; //TODO: implement read pair stats calculate
+        return -1; //TODO implement read pair stats calculate
     }
 
 
@@ -385,8 +384,7 @@ public class TrackConnector {
                     num = rs.getInt( FieldNames.TRACK_ID );
                 }
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -423,8 +421,7 @@ public class TrackConnector {
                     }
                 }
 
-            }
-            catch( SQLException ex ) {
+            } catch( SQLException ex ) {
                 LOG.log( Level.SEVERE, null, ex );
             }
         }

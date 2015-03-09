@@ -59,6 +59,8 @@ import javax.swing.JPanel;
 import org.h2.jdbc.JdbcSQLException;
 import org.openide.util.NbBundle;
 
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * Responsible for the connection between user interface and data base.
@@ -66,11 +68,11 @@ import org.openide.util.NbBundle;
  *
  * @author ddoppmeier, rhilker
  */
-public class ProjectConnector extends Observable {
+public final class ProjectConnector extends Observable {
 
     private static final Logger LOG = Logger.getLogger( ProjectConnector.class.getName() );
 
-    private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
+    private static final int BATCH_SIZE = 100000; //TODO test larger batch sizes
     private static final int FEATURE_BATCH_SIZE = BATCH_SIZE;
     private static final int DB_VERSION_NO = 3;
 
@@ -137,8 +139,8 @@ public class ProjectConnector extends Observable {
         if( con != null ) {
             try {
                 return con.isValid( 0 );
-            }
-            catch( SQLException e ) {
+            } catch( SQLException e ) {
+                LOG.log( WARNING, e.getMessage(), e );
             }
         }
 
@@ -155,11 +157,9 @@ public class ProjectConnector extends Observable {
         LOG.info( "Closing database connection" );
         try {
             con.close();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
-        }
-        finally {
+        } finally {
             con = null;
             cleanUp();
 
@@ -192,8 +192,7 @@ public class ProjectConnector extends Observable {
             this.password = password;
             connectMySql( url, user, password );
             setupMySQLDatabase();
-        }
-        else if( adapter.equalsIgnoreCase( Properties.ADAPTER_H2 ) ) {
+        } else if( adapter.equalsIgnoreCase( Properties.ADAPTER_H2 ) ) {
             //CACHE_SIZE is measured in KB
             this.url = "jdbc:" + adapter + ":" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
             //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
@@ -285,8 +284,7 @@ public class ProjectConnector extends Observable {
             con.setAutoCommit( true );
             LOG.info( "Finished creating tables and indices if not existent before" );
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -319,8 +317,7 @@ public class ProjectConnector extends Observable {
             con.setAutoCommit( true );
             LOG.info( "Finished creating tables and indices if not existent before" );
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -355,10 +352,12 @@ public class ProjectConnector extends Observable {
                 FieldNames.TABLE_TRACK, FieldNames.TRACK_PATH, VARCHAR400 ) );
 
 
-        /** delete old "RUN_ID" field from the database to avoid problems with null values in insert statement
-        * an error will be raised by the query, if the field does not exist
-        * (simply ignore the error)
-        */
+        /**
+         * delete old "RUN_ID" field from the database to avoid problems with
+         * null values in insert statement
+         * an error will be raised by the query, if the field does not exist
+         * (simply ignore the error)
+         */
         runSqlStatement( GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_TRACK, "RUN_ID" ) );
 
@@ -389,8 +388,7 @@ public class ProjectConnector extends Observable {
 
         try {
             con.prepareStatement( statement ).executeUpdate();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             checkRollback( ex );
         }
 
@@ -426,14 +424,12 @@ public class ProjectConnector extends Observable {
                 //connection is still open. try rollback
                 con.rollback();
                 LOG.info( "Successfully rolled back" );
-            }
-            else {
+            } else {
                 //connection was closed before, open a new one
                 connectMySql( url, user, password );
             }
 
-        }
-        catch( SQLException ex1 ) {
+        } catch( SQLException ex1 ) {
             LOG.log( Level.INFO, "Rollback failed", ex1 );
         }
     }
@@ -450,8 +446,7 @@ public class ProjectConnector extends Observable {
             unlock.execute( MySQLStatements.UNLOCK_TABLES );
             con.commit();
             con.setAutoCommit( true );
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
         LOG.info( "done unlocking tables" );
@@ -514,8 +509,7 @@ public class ProjectConnector extends Observable {
             }
 
             con.setAutoCommit( true );
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -556,8 +550,7 @@ public class ProjectConnector extends Observable {
 
             con.commit();
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -591,8 +584,7 @@ public class ProjectConnector extends Observable {
 
             con.commit();
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -643,12 +635,10 @@ public class ProjectConnector extends Observable {
 
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
             LOG.log( Level.SEVERE, ex.getMessage() );
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             LOG.log( Level.SEVERE, e.getMessage() );
         }
 
@@ -681,8 +671,7 @@ public class ProjectConnector extends Observable {
             insertTrack.setString( 5, track.getFile().getAbsolutePath() );
             insertTrack.execute();
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -754,8 +743,7 @@ public class ProjectConnector extends Observable {
                 deleteStats.setString( 2, key );
                 deleteStats.execute();
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -785,8 +773,7 @@ public class ProjectConnector extends Observable {
 
             insert.executeBatch();
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
     }
@@ -814,8 +801,7 @@ public class ProjectConnector extends Observable {
                 setReadPairIds.execute();
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
     }
@@ -840,8 +826,7 @@ public class ProjectConnector extends Observable {
         LOG.log( Level.INFO, "start locking {0} domain tables...", domainName );
         try( PreparedStatement lock = con.prepareStatement( lockStatement ) ) {
             lock.execute();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
         LOG.log( Level.INFO, "...done locking {0} domain tables...", domainName );
@@ -882,8 +867,7 @@ public class ProjectConnector extends Observable {
 
         try( PreparedStatement disableDomainIndices = con.prepareStatement( sqlStatement ) ) {
             disableDomainIndices.execute();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -907,8 +891,7 @@ public class ProjectConnector extends Observable {
         }
         try( PreparedStatement enableDomainIndices = con.prepareStatement( sqlStatement ) ) {
             enableDomainIndices.execute();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -1050,8 +1033,7 @@ public class ProjectConnector extends Observable {
                 File fastaFile = new File( fileName );
                 refGens.add( new PersistentReference( id, name, description, timestamp, fastaFile ) );
             }
-        }
-        catch( SQLException e ) {
+        } catch( SQLException e ) {
             LOG.log( Level.SEVERE, null, e );
         }
 
@@ -1126,8 +1108,7 @@ public class ProjectConnector extends Observable {
                 int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
                 tracks.add( new PersistentTrack( id, filePath, description, date, refGenID, -1, readPairId ) );
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -1158,8 +1139,7 @@ public class ProjectConnector extends Observable {
                     track = new PersistentTrack( id, filePath, description, date, refGenID, readPairId );
                 }
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -1209,8 +1189,7 @@ public class ProjectConnector extends Observable {
             con.setAutoCommit( true );
             trackConnectors.remove( trackID );
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             throw new StorageException( ex );
         }
 
@@ -1261,8 +1240,7 @@ public class ProjectConnector extends Observable {
             con.setAutoCommit( true );
             refConnectors.remove( refGenID );
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             throw new StorageException( ex );
         }
 
@@ -1302,8 +1280,7 @@ public class ProjectConnector extends Observable {
             resetTrackPath.setString( 1, track.getFilePath() );
             resetTrackPath.setLong( 2, track.getId() );
             resetTrackPath.execute();
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -1339,8 +1316,7 @@ public class ProjectConnector extends Observable {
             resetRefPath.setLong( 2, ref.getId() );
             resetRefPath.execute();
             ref.resetFastaPath( fastaFile );
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
@@ -1398,16 +1374,14 @@ public class ProjectConnector extends Observable {
                     PreparedStatement setDBVersion = con.prepareStatement( SQLStatements.INSERT_DB_VERSION_NO );
                     setDBVersion.setInt( 1, DB_VERSION_NO );
                     setDBVersion.executeUpdate();
-                }
-                else { //the entry already exists and has to be replaced
+                } else { //the entry already exists and has to be replaced
                     PreparedStatement updateDBVersion = con.prepareStatement( SQLStatements.UPDATE_DB_VERSION_NO );
                     updateDBVersion.setInt( 1, DB_VERSION_NO );
                     updateDBVersion.executeUpdate();
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
         LOG.info( "Done checking DB version and updated to latest version" );
@@ -1496,8 +1470,7 @@ public class ProjectConnector extends Observable {
                 }
             }
 
-        }
-        catch( SQLException e ) {
+        } catch( SQLException e ) {
             LOG.log( Level.SEVERE, null, e );
             JOptionPane.showMessageDialog( new JPanel(), "Unfortunately, the Statistics table seems to be broken. In this case the DB has to be re-created"
                                                          + " to get the correct statistics entries for each track again.",
@@ -1555,8 +1528,7 @@ public class ProjectConnector extends Observable {
                             updateRefFile.execute();
                             FastaUtils fastaUtils = new FastaUtils();
                             fastaUtils.getIndexedFasta( fastaPath.toFile() );
-                        }
-                        catch( IOException ex ) {
+                        } catch( IOException ex ) {
                             JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!",
                                                            "Reference fasta cannot be written to DB folder", JOptionPane.ERROR_MESSAGE );
                             throw new SQLException( "Cannot update reference table, since fasta file is missing. Please retry after changing the permissions in the DB folder!" );
@@ -1578,8 +1550,7 @@ public class ProjectConnector extends Observable {
                         updateFeatureTable.executeUpdate();
                     }
                 }
-            }
-            catch( SQLException e ) {
+            } catch( SQLException e ) {
                 JOptionPane.showMessageDialog( new JPanel(), "Unfortunately, the DB seems to have a broken reference table. In this case the DB has to be re-created.",
                                                "Reference table format error", JOptionPane.ERROR_MESSAGE );
             }
@@ -1627,8 +1598,7 @@ public class ProjectConnector extends Observable {
                 File fastaFile = new File( fileName );
                 refGens.add( new PersistentReference( id, 1, name, description, timestamp, fastaFile, false ) );
             }
-        }
-        catch( SQLException e ) {
+        } catch( SQLException e ) {
             LOG.log( Level.SEVERE, null, e );
         }
 

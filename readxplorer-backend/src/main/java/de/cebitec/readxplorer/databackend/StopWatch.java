@@ -49,12 +49,12 @@ public class StopWatch {
     public String getElapsedTimeAsString() {
         long millis = this.getElapsedTime();
         long secs = TimeUnit.MILLISECONDS.toSeconds( millis );
-        long millis_carryover = millis - TimeUnit.SECONDS.toMillis( secs );
+        long millisCarryover = millis - TimeUnit.SECONDS.toMillis( secs );
         String s = "";
         if( secs > 0 ) {
             s = String.format( "%d s ", secs );
         }
-        s += String.format( "%d ms", millis_carryover );
+        s += String.format( "%d ms", millisCarryover );
         return s;
     }
 

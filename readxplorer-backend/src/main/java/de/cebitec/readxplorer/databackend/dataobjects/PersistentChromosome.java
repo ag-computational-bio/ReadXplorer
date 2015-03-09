@@ -121,8 +121,7 @@ public class PersistentChromosome {
                    && other.getId() == this.id
                    && other.getRefGenID() == this.refGenID
                    && other.getLength() == this.chromLength;
-        }
-        else {
+        } else {
             return super.equals( object );
         }
     }

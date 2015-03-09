@@ -136,8 +136,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             }
 
 
-        }
-        else if( this.mappingsNeeded ) {
+        } else if( this.mappingsNeeded ) {
 
             int stepSize = 150000;
             for( PersistentChromosome chrom : chroms.values() ) {
@@ -155,8 +154,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 to = chromLength;
                 trackConnector.addMappingAnalysisRequest( new IntervalRequest( from, to, chrom.getId(), this, false, desiredData, readClassParams ) );
             }
-        }
-        else {
+        } else {
             this.progressHandle.finish();
         }
     }
@@ -288,8 +286,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             observer.update( data );
             if( this.nbCarriedOutRequests == this.nbCovRequests ) {
                 observer.update( COVERAGE_QUERRIES_FINISHED );
-            }
-            else if( this.nbCarriedOutRequests == this.nbMappingRequests ) {
+            } else if( this.nbCarriedOutRequests == this.nbMappingRequests ) {
                 observer.update( MAPPING_QUERRIES_FINISHED );
             }
         }
@@ -319,8 +316,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         if( neededData == COVERAGE_QUERRIES_FINISHED ) {
             this.nbCovRequests += chromLength / stepSize + additionalRequest;
             this.nbRequests = this.nbCovRequests;
-        }
-        else if( neededData == MAPPING_QUERRIES_FINISHED ) {
+        } else if( neededData == MAPPING_QUERRIES_FINISHED ) {
             this.nbMappingRequests += chromLength / stepSize + additionalRequest;
             this.nbRequests = this.nbMappingRequests;
         }

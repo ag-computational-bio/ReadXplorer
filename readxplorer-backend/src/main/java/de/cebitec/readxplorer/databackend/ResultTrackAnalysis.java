@@ -119,8 +119,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         for( PersistentTrack track : trackMap.values() ) {
             if( fullLength || track.getDescription().length() <= 20 ) {
                 description = track.getDescription();
-            }
-            else {
+            } else {
                 description = track.getDescription().substring( 0, 20 ) + "...";
             }
             concatTrackNames += description + ", ";
@@ -156,8 +155,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         Object trackEntry;
         if( isCombineTracks() ) {
             trackEntry = getCombinedTrackNames( getFullengthName );
-        }
-        else {
+        } else {
             trackEntry = getTrackMap().get( trackId );
         }
         return trackEntry;
@@ -264,7 +262,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * Update the stats map of this track analysis result with the given data.
      * <p>
      * @param newStatsMap A new stats map, whose content shall be merged /
-     *                    summed with the content of the stats map contained in 
+     *                    summed with the content of the stats map contained in
      *                    this result object.
      */
     public void updateStatsMap( Map<String, Integer> newStatsMap ) {
@@ -273,8 +271,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
             Integer value = entrySet.getValue();
             if( statsMap.containsKey( key ) ) {
                 statsMap.put( key, statsMap.get( key ) + value );
-            }
-            else {
+            } else {
                 statsMap.put( key, value );
             }
         }
