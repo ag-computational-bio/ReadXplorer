@@ -130,7 +130,6 @@
             <property name="max" value="150"/>
             <property name="severity" value="warning"/>
         </module>
-        <module name="MethodLength"/>
         <module name="ParameterNumber">
             <property name="max" value="10"/>
             <property name="tokens" value="METHOD_DEF"/>
@@ -139,7 +138,9 @@
 
         <!-- Checks for whitespace                               -->
         <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-        <module name="EmptyForIteratorPad"/>
+        <module name="EmptyForIteratorPad">
+            <property name="option" value="space"/>
+        </module>
         <module name="GenericWhitespace"/>
         <module name="MethodParamPad"/>
         <!--<module name="NoWhitespaceAfter"/>-->
@@ -163,6 +164,16 @@
                 LITERAL_FINALLY, LITERAL_RETURN, LOR,
                 MINUS_ASSIGN, MOD_ASSIGN, EQUAL, NOT_EQUAL, PLUS_ASSIGN, QUESTION,
                 SL, SL_ASSIGN, SR_ASSIGN, STAR, STAR_ASSIGN"/>
+            <property name="severity" value="warning"/>
+        </module>
+
+
+        <module name="EmptyLineSeparator">
+            <!-- Checks for empty line separators after header, package,
+            all import declarations, fields, constructors, methods,
+            nested classes, static initializers and instance initializers.
+            -->
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
             <property name="severity" value="warning"/>
         </module>
 
@@ -207,7 +218,9 @@
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
-        <module name="TodoComment"/>
+        <module name="TodoComment">
+            <property name="severity" value="warning"/>
+        </module>
         <module name="UpperEll"/>
 
     </module>
