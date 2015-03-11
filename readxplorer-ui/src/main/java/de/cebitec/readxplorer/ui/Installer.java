@@ -42,7 +42,7 @@ import org.openide.windows.WindowManager;
  */
 public class Installer extends ModuleInstall {
 
-    public static final String ReadXplorer_VERSION = "2.1.0";
+    public static final String READXPLORER_VERSION = "2.1.0";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 
@@ -50,7 +50,7 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         //set version number
-        System.setProperty( "netbeans.buildnumber", ReadXplorer_VERSION );
+        System.setProperty("netbeans.buildnumber", READXPLORER_VERSION );
 
 
         // redirect systemouts to internal netbeans platform outputwindow
@@ -104,8 +104,7 @@ public class Installer extends ModuleInstall {
             NotifyDescriptor nd = new NotifyDescriptor.Message( "ReadXplorer is performing a non-interruptible task and may only be closed after it has finished.", NotifyDescriptor.WARNING_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
             return Boolean.FALSE;
-        }
-        else {
+        } else {
             LogoutAction logoutAction = new LogoutAction( CentralLookup.getDefault().lookup( LoginCookie.class ) );
             logoutAction.actionPerformed( new ActionEvent( this, 1, "close" ) );
 
@@ -130,7 +129,7 @@ public class Installer extends ModuleInstall {
     private void redirectSystemStreams() {
         OutputStream out = new OutputStream() {
 
-            InputOutput io = IOProvider.getDefault().getIO( "Output", true );
+            private InputOutput io = IOProvider.getDefault().getIO( "Output", true );
 
 
             @Override

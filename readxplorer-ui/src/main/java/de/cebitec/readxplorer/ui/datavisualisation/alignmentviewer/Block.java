@@ -70,13 +70,11 @@ public class Block implements BlockI {
             for( int i = absStart; i <= absStop; i++ ) {
                 if( (mapping.getStart() > i) || (i > mapping.getStop()) ) {
                     bricks.add( Brick.TRIMMED );
-                }
-                else {
+                } else {
                     if( gapManager.hasGapAt( i ) ) {
                         if( mapping.hasGenomeGapAtPosition( i ) ) {
                             this.fillWithOwnGenomeGaps( mapping, i );
-                        }
-                        else {
+                        } else {
                             this.fillWithForeignGaps( gapManager.getNumOfGapsAt( i ) );
                         }
                     }
@@ -86,8 +84,7 @@ public class Block implements BlockI {
                     this.addDiffOrMatchBrick( mapping, i );
                 }
             }
-        }
-        else {
+        } else {
             for( int i = 0; i < mapping.getAlignmentBlocks().size(); ++i ) {
                 SamAlignmentBlock alignmentBlock = mapping.getAlignmentBlocks().get( i );
                 int start = alignmentBlock.getRefStart() < absStart ? absStart : alignmentBlock.getRefStart();
@@ -95,13 +92,11 @@ public class Block implements BlockI {
                 for( int j = start; j <= stop; j++ ) {
                     if( (mapping.getStart() > j) || (j > mapping.getStop()) ) {
                         bricks.add( Brick.TRIMMED );
-                    }
-                    else {
+                    } else {
                         if( gapManager.hasGapAt( j ) ) {
                             if( mapping.hasGenomeGapAtPosition( j ) ) {
                                 this.fillWithOwnGenomeGaps( mapping, j );
-                            }
-                            else {
+                            } else {
                                 this.fillWithForeignGaps( gapManager.getNumOfGapsAt( j ) );
                             }
                         }
@@ -143,8 +138,7 @@ public class Block implements BlockI {
         Brick type;
         if( mapping.hasDiffAtPosition( position ) ) {
             type = Brick.determineDiffType( mapping.getDiffAtPosition( position ) );
-        }
-        else {
+        } else {
             type = Brick.MATCH;
         }
         bricks.add( type );

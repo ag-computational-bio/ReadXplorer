@@ -102,9 +102,7 @@ public class GenomeGapManager {
 
 
     public void addNumOfGapsAtPosition( int position, int numOfGaps ) {
-        if( !fitsIntoBounds( position ) ) {
-        }
-        else {
+        if( fitsIntoBounds( position ) ) {
             int oldValue = getNumOfGapsAt( position );
             if( oldValue < numOfGaps ) {
                 accCalced = false;
@@ -151,19 +149,16 @@ public class GenomeGapManager {
     public int getNumOfGapsSmaller( int absPos ) {
         if( fitsIntoBounds( absPos ) ) {
             return addedGapsOriginalPosition.get( absPos );
-        }
-        else {
+        } else {
             // return gaps smaller than upperBound
             if( absPos > upperBound ) {
                 Set<Integer> gaps = addedGapsOriginalPosition.keySet();
                 if( gaps.isEmpty() ) {
                     return 0;
-                }
-                else {
+                } else {
                     return addedGapsOriginalPosition.get( Collections.max( gaps ) );
                 }
-            }
-            else {
+            } else {
                 return 0;
             }
         }
@@ -180,12 +175,10 @@ public class GenomeGapManager {
             Map.Entry<Integer, Integer> entry = addedGapsAccumulatedPositions.floorEntry( absPos ); // minus 1, because floorEntry(x) returns values equal to x, but we need strictly smaller than x
             if( entry == null ) {
                 result = 0;
-            }
-            else {
+            } else {
                 result = entry.getValue();
             }
-        }
-        else {
+        } else {
             result = 0;
         }
         return result;
@@ -195,14 +188,8 @@ public class GenomeGapManager {
     public boolean hasGapAt( int absPos ) {
         if( !fitsIntoBounds( absPos ) ) {
             return false;
-        }
-        else {
-            if( maxNumGapsPerOriginalPosition.get( absPos ) == 0 ) {
-                return false;
-            }
-            else {
-                return true;
-            }
+        } else {
+            return maxNumGapsPerOriginalPosition.get( absPos ) != 0;
         }
     }
 
@@ -210,8 +197,7 @@ public class GenomeGapManager {
     public int getNumOfGapsAt( int absPos ) {
         if( !fitsIntoBounds( absPos ) ) {
             return 0;
-        }
-        else {
+        } else {
             return maxNumGapsPerOriginalPosition.get( absPos );
         }
     }
@@ -241,22 +227,19 @@ public class GenomeGapManager {
 
             if( maxNumGapsPerOriginalPosition.containsKey( position ) ) {
                 sb.append( maxNumGapsPerOriginalPosition.get( position ) ).append( "\t" );
-            }
-            else {
+            } else {
                 sb.append( "#\t" );
             }
 
             if( addedGapsOriginalPosition.containsKey( position ) ) {
                 sb.append( addedGapsOriginalPosition.get( position ) ).append( "\t" );
-            }
-            else {
+            } else {
                 sb.append( "#\t" );
             }
 
             if( addedGapsAccumulatedPositions.containsKey( position ) ) {
                 sb.append( addedGapsAccumulatedPositions.get( position ) ).append( "\n" );
-            }
-            else {
+            } else {
                 sb.append( "#\n" );
             }
 

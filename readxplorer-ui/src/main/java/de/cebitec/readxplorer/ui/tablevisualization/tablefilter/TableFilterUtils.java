@@ -55,8 +55,7 @@ public class TableFilterUtils<E extends DefaultTableModel> {
                 columnNames[i] = tableModel.getColumnName( i );
             }
             newTableModel.setColumnIdentifiers( columnNames );
-        }
-        catch( InstantiationException | IllegalAccessException ex ) {
+        } catch( InstantiationException | IllegalAccessException ex ) {
             Exceptions.printStackTrace( ex );
         }
         return newTableModel;

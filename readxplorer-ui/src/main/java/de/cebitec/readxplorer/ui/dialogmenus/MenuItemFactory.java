@@ -403,8 +403,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                 if( !cdsRegions.isEmpty() ) {
                     if( cdsRegions.get( 0 ).isFwdStrand() ) {
                         boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStop() );
-                    }
-                    else {
+                    } else {
                         boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStart() );
                     }
                 }
@@ -500,11 +499,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
         if( hasTransferableText ) {
             try {
                 result = (String) contents.getTransferData( DataFlavor.stringFlavor );
-            }
-            catch( UnsupportedFlavorException ex ) {
+            } catch( UnsupportedFlavorException ex ) {
                 JOptionPane.showMessageDialog( this, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE );
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 JOptionPane.showMessageDialog( this, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             }
         }

@@ -179,8 +179,7 @@ public class BoundsInfo {
         logLeft = currentLogPos - logWidth / 2;
         if( logWidth % 2 == 0 ) {
             logRight = currentLogPos + logWidth / 2 - 1;
-        }
-        else {
+        } else {
             logRight = currentLogPos + logWidth / 2;
         }
 

@@ -74,8 +74,7 @@ public class FileSelectionPanel extends JPanel {
              Exceptions.printStackTrace(e);
              } */
             mappingFileField.setText( file.getAbsolutePath() );
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE );
         }
     }
@@ -106,8 +105,7 @@ public class FileSelectionPanel extends JPanel {
     public File getMappingFile() {
         if( mappingFiles.isEmpty() ) {
             return null;
-        }
-        else {
+        } else {
             return mappingFiles.get( 0 );
         }
     }
@@ -178,8 +176,7 @@ public class FileSelectionPanel extends JPanel {
             fillMultipleImportTable( model, mappingFiles, "Mapping file list:" );
             multiTrackList.setModel( model );
             this.setSize( this.getPreferredSize() );
-        }
-        else {
+        } else {
             fileTextField.setText( getMappingFile() != null ? getMappingFile().getAbsolutePath() : "" );
             multiTrackList.setModel( new DefaultListModel<String>() );
         }

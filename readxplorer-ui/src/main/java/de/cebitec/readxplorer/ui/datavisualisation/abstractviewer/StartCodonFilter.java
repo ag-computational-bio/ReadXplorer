@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 
-
 /**
  * Filter for start and stop codons of a DNA sequence.
  *
@@ -44,6 +43,7 @@ public class StartCodonFilter extends PatternFilter {
     private String[] startCodons;
     private String[] stopCodons;
 
+
     /**
      * Filter for start and stop codons of a DNA sequence.
      * <p>
@@ -54,11 +54,12 @@ public class StartCodonFilter extends PatternFilter {
      * @param refGen   the reference in which to search
      */
     public StartCodonFilter( int absStart, int absStop, PersistentReference refGen ) {
-        super(absStart, absStop, refGen );
+        super( absStart, absStop, refGen );
         this.regions = new ArrayList<>();
 
         this.resetCodons();
     }
+
 
     /**
      * @return Identifies the currently selected start and stop codons in the
@@ -76,6 +77,7 @@ public class StartCodonFilter extends PatternFilter {
         }
         return Collections.unmodifiableList( regions );
     }
+
 
     /**
      * Configures and runs a search for the next codon of the currently set
@@ -130,6 +132,7 @@ public class StartCodonFilter extends PatternFilter {
         return selectedStarts.contains( true ) || selectedStops.contains( true );
     }
 
+
     /**
      * Starts the pattern search for both strands and all selected codons.
      * <p>
@@ -147,6 +150,7 @@ public class StartCodonFilter extends PatternFilter {
             }
         }
     }
+
 
     /**
      * Sets if all start codons are currently selected.
@@ -187,7 +191,8 @@ public class StartCodonFilter extends PatternFilter {
      * Sets if the start codon with the index i is currently selected.
      * <p>
      * @param i          The index of the current start codon
-     * @param isSelected <code>true</code>, if the start codon is selected, <code>false</code> otherwise
+     * @param isSelected <code>true</code>, if the start codon is selected,
+     *                   <code>false</code> otherwise
      */
     public void setStartCodonSelected( final int i, final boolean isSelected ) {
         this.selectedStarts.set( i, isSelected );
@@ -250,5 +255,6 @@ public class StartCodonFilter extends PatternFilter {
             this.selectedStops.add( false );
         }
     }
+
 
 }

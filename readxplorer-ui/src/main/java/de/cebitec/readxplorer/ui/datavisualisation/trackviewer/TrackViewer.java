@@ -191,8 +191,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                     newClassToColorMap.put( classType, new Color( Integer.parseInt( colorRGB ) ) );
                 }
             }
-        }
-        else {
+        } else {
 
             newClassToColorMap = ColorUtils.updateMappingClassColors();
         }
@@ -224,8 +223,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
             this.paintCoverage( g );
 
-        }
-        else {
+        } else {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
@@ -294,8 +292,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     protected double getNormalizedValue( int trackID, double value ) {
         if( this.normSetting != null && this.normSetting.getHasNormFac( trackID ) ) {
             return this.normSetting.getIsLogNorm( trackID ) ? TrackViewer.log2( value ) : value * this.normSetting.getFactors( trackID );
-        }
-        else {
+        } else {
             return value;
         }
     }
@@ -346,8 +343,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         if( this.covManager == null || this.isNewDataRequestNeeded()
             || !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
             this.requestCoverage();
-        }
-        else {
+        } else {
             // coverage already loaded
             this.createCoveragePaths();
 
@@ -424,8 +420,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                         }
                         yValue = max;
 
-                    }
-                    else {
+                    } else {
                         yValue = this.getCoverageValue( isFwdStrand, classType, left );
                     }
 
@@ -500,8 +495,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         double value = 0;
         try {
             value = covManager.getCoverage( classType ).getCoverage( absPos, isFwdStrand );
-        }
-        catch( IllegalArgumentException e ) {
+        } catch( IllegalArgumentException e ) {
             LOG.log( SEVERE, "found unknown mapping classification type!" );
         }
         value = getNormalizedValue( id1, value );
@@ -602,8 +596,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         String classType = classification.getTypeString();
         if( hasNormalizationFactor ) {
             sb.append( createTableRow( classType, coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
-        }
-        else {
+        } else {
             sb.append( createTableRow( classType, coverage ) );
         }
     }
@@ -670,53 +663,37 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
         if( visibleCoverage <= 10 ) {
             this.scaleLineStep = 1;
-        }
-        else if( visibleCoverage <= 50 ) {
+        } else if( visibleCoverage <= 50 ) {
             this.scaleLineStep = 10;
-        }
-        else if( visibleCoverage <= 100 ) {
+        } else if( visibleCoverage <= 100 ) {
             this.scaleLineStep = 20;
-        }
-        else if( visibleCoverage <= 200 ) {
+        } else if( visibleCoverage <= 200 ) {
             this.scaleLineStep = 50;
-        }
-        else if( visibleCoverage <= 500 ) {
+        } else if( visibleCoverage <= 500 ) {
             this.scaleLineStep = 100;
-        }
-        else if( visibleCoverage <= 1000 ) {
+        } else if( visibleCoverage <= 1000 ) {
             this.scaleLineStep = 250;
-        }
-        else if( visibleCoverage <= 3000 ) {
+        } else if( visibleCoverage <= 3000 ) {
             this.scaleLineStep = 500;
-        }
-        else if( visibleCoverage <= 4000 ) {
+        } else if( visibleCoverage <= 4000 ) {
             this.scaleLineStep = 750;
-        }
-        else if( visibleCoverage <= 7500 ) {
+        } else if( visibleCoverage <= 7500 ) {
             this.scaleLineStep = 1000;
-        }
-        else if( visibleCoverage <= 15000 ) {
+        } else if( visibleCoverage <= 15000 ) {
             this.scaleLineStep = 2500;
-        }
-        else if( visibleCoverage <= 25000 ) {
+        } else if( visibleCoverage <= 25000 ) {
             this.scaleLineStep = 5000;
-        }
-        else if( visibleCoverage <= 45000 ) {
+        } else if( visibleCoverage <= 45000 ) {
             this.scaleLineStep = 7500;
-        }
-        else if( visibleCoverage <= 65000 ) {
+        } else if( visibleCoverage <= 65000 ) {
             this.scaleLineStep = 10000;
-        }
-        else if( visibleCoverage <= 200000 ) {
+        } else if( visibleCoverage <= 200000 ) {
             this.scaleLineStep = 20000;
-        }
-        else if( visibleCoverage <= 500000 ) {
+        } else if( visibleCoverage <= 500000 ) {
             this.scaleLineStep = 50000;
-        }
-        else if( visibleCoverage <= 1000000 ) {
+        } else if( visibleCoverage <= 1000000 ) {
             this.scaleLineStep = 100000;
-        }
-        else {
+        } else {
             this.scaleLineStep = 300000;
         }
     }
@@ -794,15 +771,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         if( logPos >= 1000 && step >= 1000 ) {
             if( logPos % 1000 == 0 ) {
                 label = String.valueOf( logPos / 1000 );
-            }
-            else if( logPos % 500 == 0 ) {
+            } else if( logPos % 500 == 0 ) {
                 label = String.valueOf( logPos / 1000 );
                 label += ".5";
             }
             label += "K";
 
-        }
-        else {
+        } else {
             label = String.valueOf( logPos );
         }
 

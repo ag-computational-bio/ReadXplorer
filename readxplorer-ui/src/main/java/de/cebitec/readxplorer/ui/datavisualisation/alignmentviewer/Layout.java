@@ -123,16 +123,14 @@ public class Layout implements LayoutI {
                 if( mapping.getTrimmedFromLeft() > 0 ) {
                     if( mapping.isFwdStrand() ) {
                         start -= mapping.getTrimmedFromLeft();
-                    }
-                    else {
+                    } else {
                         stop += mapping.getTrimmedFromLeft();
                     }
                 }
                 if( mapping.getTrimmedFromRight() > 0 ) {
                     if( mapping.isFwdStrand() ) {
                         stop += mapping.getTrimmedFromRight();
-                    }
-                    else {
+                    } else {
                         start -= mapping.getTrimmedFromRight();
                     }
                 }
@@ -147,8 +145,7 @@ public class Layout implements LayoutI {
                 BlockI block = new Block( start, stop, mapping, gapManager );
                 if( mapping.isFwdStrand() ) {
                     forwardBlockContainer.addBlock( block );
-                }
-                else {
+                } else {
                     reverseBlockContainer.addBlock( block );
                 }
             }

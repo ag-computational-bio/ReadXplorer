@@ -227,8 +227,7 @@ public class PaintingAreaInfo {
     public double getAvailableHeight( boolean isFwdStrand ) {
         if( isFwdStrand ) {
             return this.getAvailableForwardHeight();
-        }
-        else {
+        } else {
             return this.getAvailableReverseHeight();
         }
     }
@@ -253,8 +252,7 @@ public class PaintingAreaInfo {
     public boolean fitsIntoAvailableSpace( double yValue, boolean isFwdStrand ) {
         if( isFwdStrand ) {
             return yValue <= availableForwardHeight;
-        }
-        else {
+        } else {
             return yValue <= availableReverseHeight;
         }
     }

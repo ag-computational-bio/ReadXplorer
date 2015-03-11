@@ -27,7 +27,7 @@ import java.awt.Rectangle;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class PaintUtilities {
+public final class PaintUtilities {
 
     /**
      * No instantiation allowed.

@@ -35,7 +35,7 @@ import org.openide.windows.WindowManager;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TopComponentHelper {
+public final class TopComponentHelper {
 
 
     /**
@@ -46,14 +46,17 @@ public class TopComponentHelper {
 
 
     /**
-     * Fetches the first <code>TopComponent</code>, which is currently visible on
+     * Fetches the first <code>TopComponent</code>, which is currently visible
+     * on
      * the screen and of the given subclass instance handed over to the method.
      * <p>
      * @param <T>                Class type of the TopComponent
-     * @param activeTopCompToGet the specific subclass of <code>TopComponent</code>
-     * which is desired.
+     * @param activeTopCompToGet the specific subclass of
+     *                           <code>TopComponent</code>
+     *                           which is desired.
      * <p>
-     * @return The first <code>TopComponent</code>, which is currently visible on
+     * @return The first <code>TopComponent</code>, which is currently visible
+     *         on
      *         the screen and of the given subclass instance handed over to the method.
      */
     @SuppressWarnings( "unchecked" )
@@ -72,14 +75,17 @@ public class TopComponentHelper {
 
 
     /**
-     * Fetches all <code>TopComponent</code>s of the given subclass instance handed
+     * Fetches all <code>TopComponent</code>s of the given subclass instance
+     * handed
      * over to the method, which are currently available.
      * <p>
      * @param <T>               Class type of the TopComponent
-     * @param topCompClassToGet the specific subclass of <code>TopComponent</code>
-     * which is desired.
+     * @param topCompClassToGet the specific subclass of
+     *                          <code>TopComponent</code>
+     *                          which is desired.
      * <p>
-     * @return All <code>TopComponent</code>s of the given subclass instance handed
+     * @return All <code>TopComponent</code>s of the given subclass instance
+     *         handed
      *         over to the method, which are currently available.
      */
     @SuppressWarnings( { "unchecked" } )

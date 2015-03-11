@@ -146,8 +146,7 @@ public class DoubleTrackViewer extends TrackViewer {
                     }
                     covPixel = max;
 
-                }
-                else {
+                } else {
                     covPixel = this.getCoverageValue( isFwdStrand, classType, left );
                 }
 
@@ -192,18 +191,14 @@ public class DoubleTrackViewer extends TrackViewer {
                 int value1 = (int) this.getNormalizedValue( id1, cov1.getCoverage( absPos, isFwdStrand ) );
                 int value2 = (int) this.getNormalizedValue( id2, cov2.getCoverage( absPos, isFwdStrand ) );
                 value = Math.abs( value2 - value1 );
-            }
-            else if( classType == ComparisonClass.TRACK2_COVERAGE ) {
+            } else if( classType == ComparisonClass.TRACK2_COVERAGE ) {
                 value = this.getNormalizedValue( id2, cov2.getCoverage( absPos, isFwdStrand ) );
-            }
-            else if( classType == ComparisonClass.TRACK1_COVERAGE ) {
+            } else if( classType == ComparisonClass.TRACK1_COVERAGE ) {
                 value = this.getNormalizedValue( id1, cov1.getCoverage( absPos, isFwdStrand ) );
-            }
-            else {
+            } else {
                 LOG.log( SEVERE, "found unknown coverage type!" );
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException( "The size of the coverage manager list is not equal to 2." );
         }
         return value;
@@ -277,8 +272,7 @@ public class DoubleTrackViewer extends TrackViewer {
         String classType = classification.getTypeString() + " " + strandString;
         if( this.hasNormalizationFactor() ) {
             sb.append( createTableRow( classType, coverage, coverageNorm ) );
-        }
-        else {
+        } else {
             sb.append( createTableRow( classType, coverage ) );
         }
     }

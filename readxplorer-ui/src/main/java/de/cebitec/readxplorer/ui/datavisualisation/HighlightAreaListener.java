@@ -96,8 +96,7 @@ public class HighlightAreaListener extends MouseAdapter {
             this.keepPainted = false;
             this.freezeRect = false;
             this.setHighlightRectangle( null );
-        }
-        else if( inRect ) {
+        } else if( inRect ) {
             this.showPopUp( e );
         }
         //highlight interval from current start to next stop codon in frame
@@ -381,6 +380,7 @@ public class HighlightAreaListener extends MouseAdapter {
 
     /**
      * Identifies the CDS belonging to the given
+     * <p>
      * @param cdsStart  The first position in the correct reading frame, on
      *                  which stop codons should be detected.
      * @param reference The reference to analyze for the next stop position
@@ -429,4 +429,6 @@ public class HighlightAreaListener extends MouseAdapter {
     public void clearSpecialRegions() {
         this.specialRegionList.clear();
     }
+
+
 }

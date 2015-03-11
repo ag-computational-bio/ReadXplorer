@@ -24,8 +24,6 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JSlider;
-//import javax.swing.event.ChangeEvent;
-//import javax.swing.event.ChangeListener;
 
 
 /**
@@ -34,7 +32,7 @@ import javax.swing.JSlider;
  */
 public class ExtendedSlider extends JSlider implements SynchronousNavigator {
 
-    private final static long serialVersionUID = 2347624;
+    private static final long serialVersionUID = 2347624;
 
     private int current;
 

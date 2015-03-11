@@ -139,8 +139,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         if( this.isActive() ) {
             this.setInDrawingMode( true );
             this.setupComponents();
-        }
-        else {
+        } else {
             this.setInDrawingMode( false );
         }
 
@@ -288,8 +287,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
             blockComp.setBounds( blockComp.getPhyStart(), yPosition, blockComp.getPhyWidth(), blockComp.getHeight() );
             this.jBlockList.add( blockComp );
             return true;
-        }
-        else {
+        } else {
             return false;
         }
 

@@ -120,8 +120,7 @@ public abstract class ChangeListeningWizardPanel implements
                 isValidated = (boolean) evt.getNewValue();
                 if( isValidated ) {
                     wiz.putProperty( WizardDescriptor.PROP_ERROR_MESSAGE, null );
-                }
-                else {
+                } else {
                     wiz.putProperty( WizardDescriptor.PROP_ERROR_MESSAGE, errorMsg );
                 }
                 changeSupport.fireChange();

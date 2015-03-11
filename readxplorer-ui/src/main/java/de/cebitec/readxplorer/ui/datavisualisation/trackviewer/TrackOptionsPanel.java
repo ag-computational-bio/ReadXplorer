@@ -174,11 +174,9 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             for( String name : trackViewer.getTrackCon().getAssociatedTrackNames() ) {
                 this.createNormalizationEntry( name, k++ );
             }
-        }
-        else if( trackViewer.isTwoTracks() ) {
+        } else if( trackViewer.isTwoTracks() ) {
             this.createNormalizationEntry( "All tracks: ", 0 );
-        }
-        else {
+        } else {
             this.createNormalizationEntry( "", 0 );
         }
     }
@@ -217,8 +215,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         if( trackViewer.getNormalizationSettings() == null ) {
             ns = setNewNormalizationSettings();
             trackViewer.setNormalizationSettings( ns );
-        }
-        else {
+        } else {
             ns = trackViewer.getNormalizationSettings();
             boolean isLogNorm = ns.getIsLogNorm( trackID );
             boolean hasNorm = ns.getHasNormFac( trackID );

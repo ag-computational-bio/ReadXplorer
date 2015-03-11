@@ -80,11 +80,9 @@ public class OccurrenceSelectionPanel extends javax.swing.JPanel {
         String selectedButton;
         if( allTracksButton.isSelected() ) {
             selectedButton = "all";
-        }
-        else if( minimumOccurrenceButton.isSelected() ) {
+        } else if( minimumOccurrenceButton.isSelected() ) {
             selectedButton = "min";
-        }
-        else { //if (maximumOccurrenceButton.isSelected()) {
+        } else { //if (maximumOccurrenceButton.isSelected()) {
             selectedButton = "max";
         }
         return selectedButton;

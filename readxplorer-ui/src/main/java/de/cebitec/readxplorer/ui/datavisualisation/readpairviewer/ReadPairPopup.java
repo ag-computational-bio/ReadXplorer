@@ -310,10 +310,10 @@ public class ReadPairPopup extends JPopupMenu {
 
         private static final long serialVersionUID = 1L;
 
-        String content[] = new String[1];
+        private String[] content = new String[1];
 
 
-        public void setContent( ArrayList<String> content ) {
+        public void setContent( List<String> content ) {
             this.content = content.toArray( this.content );
         }
 

@@ -28,7 +28,11 @@ import javax.swing.table.TableRowSorter;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TableComparatorProvider {
+public final class TableComparatorProvider {
+
+
+    private TableComparatorProvider() {
+    }
 
 
     /**
@@ -106,8 +110,7 @@ public class TableComparatorProvider {
                     Integer intA = Integer.parseInt( a );
                     Integer intB = Integer.parseInt( b );
                     return intA.compareTo( intB );
-                }
-                catch( NumberFormatException e ) {
+                } catch( NumberFormatException e ) {
                     return a.compareTo( b );
                 }
             }

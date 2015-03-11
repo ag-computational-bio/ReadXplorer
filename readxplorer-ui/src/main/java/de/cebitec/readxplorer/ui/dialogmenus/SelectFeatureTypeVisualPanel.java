@@ -131,8 +131,7 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
     public void showDisplayName( boolean showDisplayName ) {
         if( showDisplayName ) {
             this.displayName = this.analysisName + " " + PANEL_NAME;
-        }
-        else {
+        } else {
             this.displayName = PANEL_NAME;
         }
 

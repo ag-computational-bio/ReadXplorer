@@ -63,7 +63,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private int oldLogLeft;
     private int oldLogRight;
     private boolean showBaseQualities;
-    MappingResult mappingResult;
+    private MappingResult mappingResult;
 
 
     /**
@@ -137,8 +137,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         if( this.isInMaxZoomLevel() && isActive() ) {
             //  updatePhysicalBounds();
             setInDrawingMode( true );
-        }
-        else {
+        } else {
             setInDrawingMode( false );
         }
         this.setupComponents();
@@ -176,8 +175,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             this.trackConnector.addMappingRequest( new IntervalRequest( from, to, this.getReference().getActiveChromId(), this, true, this.getReadClassParams() ) );
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
-        }
-        else { //needed when e.g. mapping classes are deselected
+        } else { //needed when e.g. mapping classes are deselected
             showData();
         }
     }

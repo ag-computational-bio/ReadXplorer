@@ -20,6 +20,10 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 import java.awt.Frame;
 import java.awt.IllegalComponentStateException;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -28,6 +32,8 @@ import java.awt.IllegalComponentStateException;
  * @author kstaderm
  */
 public class LoadingDialog extends javax.swing.JDialog {
+
+    private static final Logger LOG = getLogger( LoadingDialog.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -62,9 +68,9 @@ public class LoadingDialog extends javax.swing.JDialog {
         this.getContentPane().setBackground( new java.awt.Color( 0, 0, 0, 0 ) );
         try {
             this.setBackground( new java.awt.Color( 0, 0, 0, 0 ) );
-        }
-        catch( UnsupportedOperationException | IllegalComponentStateException e ) {
+        } catch( UnsupportedOperationException | IllegalComponentStateException e ) {
             //do nothing, just ignore command
+            LOG.log( FINE, e.getMessage(), e );
         }
         this.setVisible( true );
     }

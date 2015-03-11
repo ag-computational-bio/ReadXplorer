@@ -89,8 +89,7 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
             for( PersistentReference r : refs ) {
                 refJobList.add( new ReferenceJob( r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp() ) );
             }
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( this );
         }
         return refJobList;

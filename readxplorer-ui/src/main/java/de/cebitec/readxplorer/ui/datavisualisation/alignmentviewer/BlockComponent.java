@@ -269,8 +269,7 @@ public class BlockComponent extends JComponent {
 
         if( mapping.isUnique() ) {
             sb.append( createTableRow( "Unique", "yes" ) );
-        }
-        else {
+        } else {
             sb.append( createTableRow( "Unique", "no" ) );
         }
         sb.append( createTableRow( "Number of mappings for read", mapping.getNumMappingsForRead() + "" ) );
@@ -330,11 +329,9 @@ public class BlockComponent extends JComponent {
         }
         if( baseQualString.endsWith( "," ) ) {
             baseQualString = baseQualString.substring( 0, baseQualString.length() - 1 ) + "]";
-        }
-        else if( baseQualString.endsWith( "<br>" ) ) {
+        } else if( baseQualString.endsWith( "<br>" ) ) {
             baseQualString = baseQualString.substring( 0, baseQualString.length() - 5 ) + "]";
-        }
-        else if( baseQualString.length() == 1 ) {
+        } else if( baseQualString.length() == 1 ) {
             baseQualString = "";
         }
         return baseQualString;
@@ -462,8 +459,7 @@ public class BlockComponent extends JComponent {
                             gapCount = 0;
                     }
 
-                }
-                else {
+                } else {
                     if( mapping.getBaseQualities().length > brickCount ) {
                         brickColor = ColorUtils.getAdaptedColor( mapping.getBaseQualities()[brickCount], SequenceUtils.MAX_PHRED, blockColor );
                     }
@@ -473,8 +469,7 @@ public class BlockComponent extends JComponent {
                 if( brickColor != null ) {
                     this.brickDataList.add( new BrickData( brick, rectangle, brickColor, labelCenter ) );
                 }
-            }
-            else {
+            } else {
                 gapCount = 0;
             }
 
@@ -486,10 +481,10 @@ public class BlockComponent extends JComponent {
     /**
      * Calculates the alignment blocks to paint for the given mapping.
      * <p>
-     * @param ObjectWithId The ObjectWithId, which should be a Mapping
+     * @param objectWithId The ObjectWithId, which should be a Mapping
      */
-    private void calcAlignmentBlocks( ObjectWithId ObjectWithId ) {
-        ObjectWithId persObj = ObjectWithId;
+    private void calcAlignmentBlocks( ObjectWithId objectWithId ) {
+        ObjectWithId persObj = objectWithId;
         if( persObj instanceof Mapping ) {
             this.blockColor = this.determineBlockColor();
             Mapping mapping = (Mapping) persObj;
@@ -498,8 +493,7 @@ public class BlockComponent extends JComponent {
                 Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
                         mapping.getStart(), mapping.getStop(), parentViewer, phyLeft, height );
                 this.rectList.add( blockRect );
-            }
-            else {
+            } else {
                 for( SamAlignmentBlock aBlock : mapping.getAlignmentBlocks() ) {
                     Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
                             aBlock.getRefStart(), aBlock.getRefStop(), parentViewer, phyLeft, height );

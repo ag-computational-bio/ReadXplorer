@@ -80,8 +80,7 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
                     if( lastTable.isRowSelected( lastSelectedRow ) ) {
                         model.removeRow( lastSelectedRow );
                     }
-                }
-                catch( Exception ex ) {
+                } catch( Exception ex ) {
                     JOptionPane.showMessageDialog( null, "Please select a row." );
                 }
             }

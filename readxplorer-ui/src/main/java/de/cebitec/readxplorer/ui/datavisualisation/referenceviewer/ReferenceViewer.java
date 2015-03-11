@@ -33,6 +33,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -51,8 +52,8 @@ import org.openide.util.Lookup;
  */
 public class ReferenceViewer extends AbstractViewer {
 
-    private final static long serialVersionUID = 7964236;
-    private static final int height = 230;
+    private static final long serialVersionUID = 7964236;
+    private static final int HEIGHT = 230;
     private static final int FRAMEHEIGHT = 20;
     private final Map<FeatureType, Integer> featureStats;
     private JFeature selectedFeature;
@@ -60,8 +61,8 @@ public class ReferenceViewer extends AbstractViewer {
     private ReferenceConnector refGenConnector;
     private final List<JFeature> features;
 
-    public final static String PROP_FEATURE_STATS_CHANGED = "feats changed";
-    public final static String PROP_FEATURE_SELECTED = "feat selected";
+    public static final String PROP_FEATURE_STATS_CHANGED = "feats changed";
+    public static final String PROP_FEATURE_SELECTED = "feat selected";
     public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
     private int trackCount = 0;
 
@@ -102,8 +103,7 @@ public class ReferenceViewer extends AbstractViewer {
         if( selectedFeature == feature ) {
             selectedFeature.setSelected( false );
             selectedFeature = null;
-        }
-        else {
+        } else {
 
             // if there was a feature selected before, de-select it
             if( selectedFeature != null ) {
@@ -134,7 +134,7 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public int getMaximalHeight() {
-        return height;
+        return HEIGHT;
     }
 
 
@@ -172,7 +172,7 @@ public class ReferenceViewer extends AbstractViewer {
         int frame = 0;
         for( Polytree featTree : featureTrees ) { //this means if two roots are on different frames,
             for( Node root : featTree.getRoots() ) { //all children are painted on the frame of the last root node
-                frame = PositionUtils.determineFrame( (PersistentFeature) root );
+                frame = PositionUtils.determineFrame( (GenomicRange) root );
             }
             PaintNodeVisitor paintVisitor = new PaintNodeVisitor( frame );
             featTree.bottomUp( paintVisitor );
@@ -258,8 +258,7 @@ public class ReferenceViewer extends AbstractViewer {
         if( frame < 0 ) {
             result = this.getPaintingAreaInfo().getReverseLow();
             result += offset;
-        }
-        else {
+        } else {
             result = this.getPaintingAreaInfo().getForwardLow();
             result -= offset;
         }
@@ -332,8 +331,7 @@ public class ReferenceViewer extends AbstractViewer {
     public void changeToolTipText( int logPos ) {
         if( isMouseOverPaintingRequested() ) {
             setToolTipText( String.valueOf( logPos ) );
-        }
-        else {
+        } else {
             setToolTipText( "" );
         }
     }

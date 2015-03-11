@@ -348,8 +348,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
 
         if( GeneralUtils.isValidByteInput( minMappingQualityField.getText() ) ) {
             this.minMappingQual = Byte.parseByte( minMappingQualityField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
@@ -393,8 +392,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         byte strandOption = Properties.STRAND_FEATURE;
         if( this.strandOppositeRadioButton.isSelected() ) {
             strandOption = Properties.STRAND_OPPOSITE;
-        }
-        else if( this.strandBothRadioButton.isSelected() ) {
+        } else if( this.strandBothRadioButton.isSelected() ) {
             strandOption = Properties.STRAND_BOTH;
         }
         return strandOption;

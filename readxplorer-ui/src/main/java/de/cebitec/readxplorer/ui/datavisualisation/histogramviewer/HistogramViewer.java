@@ -62,7 +62,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 234765253;
     private static final int MININTERVALLENGTH = 3000;
 //    private InputOutput io;
-    private static final int height = 200;
+    private static final int HEIGHT = 200;
     private final TrackConnector trackConnector;
     private final PersistentReference refGen;
     private GenomeGapManager gapManager;
@@ -123,7 +123,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public int getMaximalHeight() {
-        return height;
+        return HEIGHT;
     }
 
 
@@ -171,8 +171,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
             sb.append( "</html>" );
             this.setToolTipText( sb.toString() );
-        }
-        else {
+        } else {
             setToolTipText( null );
         }
     }
@@ -253,8 +252,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             if( this.diffsLoaded ) {
                 this.setupData();
             }
-        }
-        else {
+        } else {
             this.setNewDataRequestNeeded( false );
             setCursor( new Cursor( Cursor.WAIT_CURSOR ) );
             this.coverageLoaded = false;
@@ -422,7 +420,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private void createLogoBlocks() {
         maxCoverage = logoData.getMaxFoundCoverage();
         PaintingAreaInfo info = this.getPaintingAreaInfo();
-        // asuming forward and reverse height are equal
+        // asuming forward and reverse HEIGHT are equal
         int availableHeight = info.getAvailableForwardHeight();
 
         pxPerCoverageUnit = (double) availableHeight / maxCoverage;
@@ -486,8 +484,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if( value > 0 ) {
             if( !isColored ) {
                 c = ColorProperties.LOGO_MATCH;
-            }
-            else {
+            } else {
                 if( !isForwardStrand ) {
                     base = SequenceUtils.getDnaComplement( base );
                 }
@@ -548,12 +545,12 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * Creates a histogram block (BarComponent) for the given value at the given
      * positon.
      * <p>
-     * @param value                 the height value of the current histogram
-     *                              bar
+     * @param value                 the HEIGHT value of the current histogram
+                              bar
      * @param isForwardStrand       true, if this bar is on the fwd strand,
      *                              false otherwise
-     * @param heightPerCoverageUnit the height of each coverage unit in the
-     *                              current viewer
+     * @param heightPerCoverageUnit the HEIGHT of each coverage unit in the
+                              current viewer
      * @param bounds                the bounds of the viewer
      * @param color                 the color to paint the current histogram bar
      *                              with
@@ -573,8 +570,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if( isForwardStrand ) {
             y -= featureHeight;
             block.setBounds( x, y, (int) bounds.getPhysWidth(), featureHeight );
-        }
-        else {
+        } else {
             block.setBounds( x, y + 1, (int) bounds.getPhysWidth(), featureHeight );
             y += featureHeight;
         }
@@ -666,8 +662,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             if( position > lowerBound && position < upperBound ) {
                 relPos = position + gapManager.getNumOfGapsAt( d.getPosition() ) + gapManager.getNumOfGapsSmaller( d.getPosition() );
                 logoData.addExtendedPersistentDiff( d, relPos );
-            }
-            else if( position > upperBound ) {
+            } else if( position > upperBound ) {
                 break;
             }
         }

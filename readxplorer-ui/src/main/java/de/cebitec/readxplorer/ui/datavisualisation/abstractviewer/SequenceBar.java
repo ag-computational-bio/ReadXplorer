@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
 import de.cebitec.readxplorer.utils.sequence.Region;
-import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
@@ -195,8 +194,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         while( temp <= logright ) {
             if( temp % markingWidth == 0 ) {
                 this.drawThickLine( g, temp );
-            }
-            else {
+            } else {
                 this.drawThinLine( g, temp );
             }
             temp += halfMarkingWidth;
@@ -349,15 +347,13 @@ public class SequenceBar extends JComponent implements HighlightableI {
         if( logPos >= 1000 && markingWidth >= 1000 ) {
             if( logPos % 1000 == 0 ) {
                 label = String.valueOf( logPos / 1000 );
-            }
-            else if( logPos % 500 == 0 ) {
+            } else if( logPos % 500 == 0 ) {
                 label = String.valueOf( logPos / 1000 );
                 label += ".5";
             }
             label += "K";
 
-        }
-        else {
+        } else {
             label = String.valueOf( logPos );
         }
 
@@ -398,29 +394,21 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
         if( 10 * pxPerBp > labelWidth ) {
             markingWidth = 10;
-        }
-        else if( 20 * pxPerBp > labelWidth ) {
+        } else if( 20 * pxPerBp > labelWidth ) {
             markingWidth = 20;
-        }
-        else if( 50 * pxPerBp > labelWidth ) {
+        } else if( 50 * pxPerBp > labelWidth ) {
             markingWidth = 50;
-        }
-        else if( 100 * pxPerBp > labelWidth ) {
+        } else if( 100 * pxPerBp > labelWidth ) {
             markingWidth = 100;
-        }
-        else if( 250 * pxPerBp > labelWidth ) {
+        } else if( 250 * pxPerBp > labelWidth ) {
             markingWidth = 250;
-        }
-        else if( 500 * pxPerBp > labelWidth ) {
+        } else if( 500 * pxPerBp > labelWidth ) {
             markingWidth = 500;
-        }
-        else if( 1000 * pxPerBp > labelWidth ) {
+        } else if( 1000 * pxPerBp > labelWidth ) {
             markingWidth = 1000;
-        }
-        else if( 5000 * pxPerBp > labelWidth ) {
+        } else if( 5000 * pxPerBp > labelWidth ) {
             markingWidth = 5000;
-        }
-        else if( 10000 * pxPerBp > labelWidth ) {
+        } else if( 10000 * pxPerBp > labelWidth ) {
             markingWidth = 10000;
         }
 
@@ -470,8 +458,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         JRegion jreg = new JRegion( length, 10, region.getType(), region.getStart(), region.getStop() );
         if( region.isFwdStrand() ) {
             jreg.setBounds( from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height );
-        }
-        else {
+        } else {
             jreg.setBounds( from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height );
         }
 

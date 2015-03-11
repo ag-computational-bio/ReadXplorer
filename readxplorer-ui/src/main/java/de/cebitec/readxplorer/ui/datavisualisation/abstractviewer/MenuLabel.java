@@ -77,8 +77,7 @@ public class MenuLabel extends JLabel implements Observer, Observable {
                 if( isShowingLabel ) {
                     isShowingLabel = false;
                     MenuLabel.this.setIcon( expandIcon );
-                }
-                else {
+                } else {
                     isShowingLabel = true;
                     MenuLabel.this.setIcon( collapseIcon );
                     notifyObservers( true ); //means it is true to hide other option/legend panels

@@ -241,8 +241,7 @@ public class RegionManager {
     public void setCdsRegions( List<Region> cdsRegions ) {
         if( this.cdsRegions.containsAll( cdsRegions ) ) {
             this.cdsRegions.removeAll( cdsRegions );
-        }
-        else {
+        } else {
             this.cdsRegions = cdsRegions;
         }
         this.showCdsRegions();

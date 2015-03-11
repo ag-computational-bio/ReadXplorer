@@ -277,8 +277,7 @@ public class LogoDataManager {
 
                 counts[shiftedPos][row] += count;
 
-            }
-            else if( origPos > this.stop ) {
+            } else if( origPos > this.stop ) {
                 break;
             }
         }

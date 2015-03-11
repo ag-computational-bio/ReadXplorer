@@ -72,8 +72,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
         if( value instanceof Property ) {
             try {
                 valueToDisplay = ((Property) value).getValue();
-            }
-            catch( IllegalAccessException | InvocationTargetException ex ) {
+            } catch( IllegalAccessException | InvocationTargetException ex ) {
                 Exceptions.printStackTrace( ex );
             }
         }
@@ -83,16 +82,14 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
                 cell = renderer.getTableCellRendererComponent( table, valueToDisplay, isSelected,
                                                                hasFocus, row, column );
             }
-        }
-        else {
+        } else {
             cell = super.getTableCellRendererComponent( table, valueToDisplay, isSelected, hasFocus, row, column );
         }
         if( cell != null ) {
             if( centered ) {
                 if( cell instanceof HtmlRenderer.Renderer ) {
                     ((HtmlRenderer.Renderer) cell).setCentered( centered );
-                }
-                else if( cell instanceof DefaultTableCellRenderer.UIResource ) {
+                } else if( cell instanceof DefaultTableCellRenderer.UIResource ) {
                     ((JLabel) cell).setHorizontalAlignment( JLabel.CENTER );
                 }
             }

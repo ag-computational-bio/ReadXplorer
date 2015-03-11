@@ -27,8 +27,12 @@ import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
+
+import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -36,7 +40,10 @@ import javax.swing.JTable;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TableUtils {
+public final class TableUtils {
+
+    private static final Logger LOG = getLogger( TableUtils.class.getName() );
+
 
     private TableUtils() {
         //do not instantiate
@@ -66,9 +73,9 @@ public class TableUtils {
                 if( table.getModel().getRowCount() > selectedModelIdx ) {
                     wantedModelIdx = selectedModelIdx;
                 }
-            }
-            catch( ArrayIndexOutOfBoundsException e ) {
+            } catch( ArrayIndexOutOfBoundsException e ) {
                 //do nothing, just return -1 since the transformation was not possible
+                LOG.log( Level.FINE, e.getMessage(), e );
             }
         }
         return wantedModelIdx;
@@ -143,14 +150,12 @@ public class TableUtils {
                 int pos = feature.getStartOnStrand();
                 bim.navigatorBarUpdated( pos );
 
-            }
-            else {
+            } else {
                 Object chromValue = table.getModel().getValueAt( selectedModelRow, chromColumnIdx );
                 PersistentChromosome chrom = null;
                 if( chromValue instanceof PersistentChromosome ) {
                     bim.chromosomeChanged( ((PersistentChromosome) chromValue).getId() );
-                }
-                else if( chromValue instanceof String && reference != null ) {
+                } else if( chromValue instanceof String && reference != null ) {
                     Map<String, PersistentChromosome> chromMap = PersistentChromosome.getChromNameMap( reference.getChromosomes().values() );
                     String chromName = (String) chromValue;
                     if( chromMap.containsKey( chromName ) ) {
@@ -162,15 +167,13 @@ public class TableUtils {
                 if( posValue instanceof Integer ) {
                     bim.navigatorBarUpdated( (Integer) posValue );
 
-                }
-                else if( posValue instanceof String ) {
+                } else if( posValue instanceof String ) {
                     String[] posArray = ((String) posValue).split( "\n" );
                     try {
                         // Get first position in the array
                         bim.navigatorBarUpdated( PositionUtils.convertPosition( posArray[0] ) );
 
-                    }
-                    catch( NumberFormatException e ) {
+                    } catch( NumberFormatException e ) {
                         //could be a feature locus then for imported tables
                         if( reference != null && chrom != null ) {
                             List<PersistentFeature> features = ProjectConnector.getInstance().getRefGenomeConnector( reference.getId() )
@@ -237,13 +240,15 @@ public class TableUtils {
 
     /**
      * Adds empty columns to a table row. They contain the empty string.
+     * <p>
      * @param noColumns The number of empty columns to add
-     * @param tableRow The table row to update with empty rows
+     * @param tableRow  The table row to update with empty rows
      */
     public static void addEmptyColumns( int noColumns, List<Object> tableRow ) {
-        for ( int i = 0; i < noColumns; i++ ) {
+        for( int i = 0; i < noColumns; i++ ) {
             tableRow.add( "" );
         }
     }
+
 
 }

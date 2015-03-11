@@ -44,8 +44,7 @@ public class BoundsInfoManagerFactory {
     public BoundsInfoManager get( PersistentReference genome ) {
         if( data.containsKey( genome.getId() ) ) {
             return data.get( genome.getId() );
-        }
-        else {
+        } else {
             BoundsInfoManager boundsManager = new BoundsInfoManager( genome );
             data.put( genome.getId(), boundsManager );
             return boundsManager;

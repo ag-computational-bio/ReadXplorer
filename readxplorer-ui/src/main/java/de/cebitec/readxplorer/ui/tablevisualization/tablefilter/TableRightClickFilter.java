@@ -195,8 +195,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Double cutoff = Double.parseDouble( input );
                         setNewTableModel( filterValuesSmallerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
-                    }
-                    catch( NumberFormatException nfe ) {
+                    } catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid number value." );
                     }
                 }
@@ -216,8 +215,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Double cutoff = Double.parseDouble( input );
                         setNewTableModel( filterValuesLargerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
-                    }
-                    catch( NumberFormatException nfe ) {
+                    } catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid value." );
                     }
                 }
@@ -236,8 +234,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Pattern.compile( input );
                         setNewTableModel( filterRegExp( (E) lastTable.getModel(), input, lastSelectedColumn ) );
-                    }
-                    catch( PatternSyntaxException pse ) {
+                    } catch( PatternSyntaxException pse ) {
                         JOptionPane.showMessageDialog( null, "Please enter a valid pattern." );
                     }
                 }
