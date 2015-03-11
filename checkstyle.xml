@@ -79,7 +79,9 @@
 
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
-    <module name="FileLength"/>
+    <module name="FileLength">
+        <property name="severity" value="warning"/>
+    </module>
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -130,10 +132,13 @@
             <property name="max" value="150"/>
             <property name="severity" value="warning"/>
         </module>
-        <module name="MethodLength"/>
+        <module name="MethodLength">
+            <property name="severity" value="warning"/>
+        </module>
         <module name="ParameterNumber">
             <property name="max" value="10"/>
             <property name="tokens" value="METHOD_DEF"/>
+            <property name="severity" value="warning"/>
         </module>
 
 
@@ -144,7 +149,9 @@
         <module name="MethodParamPad"/>
         <!--<module name="NoWhitespaceAfter"/>-->
         <module name="NoWhitespaceBefore"/>
-        <module name="OperatorWrap"/>
+        <module name="OperatorWrap">
+            <property name="severity" value="warning"/>
+        </module>
         <module name="ParenPad">
             <property name="tokens" value="CTOR_CALL, METHOD_CALL,SUPER_CTOR_CALL"/>
             <property name="option" value="space"/>
@@ -153,7 +160,7 @@
         <module name="TypecastParenPad"/>
         <!--<module name="WhitespaceAfter"/>-->
         <module name="WhitespaceAround">
-            <!-- Checks that various tokens are surrounded by whitespace.
+<!--             Checks that various tokens are surrounded by whitespace.
             This includes most binary operators and keywords followed
             by regular or curly braces.
             -->
@@ -179,7 +186,9 @@
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
-        <module name="LeftCurly"/>
+        <module name="LeftCurly">
+            <property name="severity" value="warning"/>
+        </module>
         <module name="NeedBraces"/>
         <module name="RightCurly"/>
 
@@ -200,6 +209,7 @@
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true"/>
             <property name="protectedAllowed" value="true"/>
         </module>
 
@@ -207,7 +217,7 @@
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
-        <module name="TodoComment"/>
+        <!--<module name="TodoComment"/>-->
         <module name="UpperEll"/>
 
     </module>
