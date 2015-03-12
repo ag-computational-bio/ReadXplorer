@@ -156,9 +156,10 @@
             <property name="severity" value="warning"/>
         </module>
         <module name="ParenPad">
-            <property name="tokens" value="CTOR_CALL, METHOD_CALL,SUPER_CTOR_CALL"/>
+            <!--<property name="tokens" value="CTOR_CALL, METHOD_CALL,SUPER_CTOR_CALL"/>-->
+            <property name="tokens" value="CTOR_CALL, SUPER_CTOR_CALL"/>
             <property name="option" value="space"/>
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <module name="TypecastParenPad"/>
         <!--<module name="WhitespaceAfter"/>-->
