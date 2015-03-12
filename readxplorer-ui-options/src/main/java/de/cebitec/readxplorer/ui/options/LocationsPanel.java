@@ -29,6 +29,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
+import static jdk.nashorn.internal.codegen.Compiler.LOG;
+
 /**
  * A panel displaying options for important locations needed by ReadXplorer.
  *
@@ -383,7 +385,7 @@ final class LocationsPanel extends OptionsPanel {
             URL url = new URL( selectedDbLink );
             isValid = true;
         } catch( MalformedURLException ex ) {
-//            selectedDbLink = Properties.DB_EXPASY;
+            LOG.info( "Encountered a malformed enzyme DB url." );
         }
         return isValid;
     }
