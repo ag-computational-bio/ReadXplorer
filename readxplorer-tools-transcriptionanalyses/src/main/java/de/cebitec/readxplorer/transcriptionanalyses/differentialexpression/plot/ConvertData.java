@@ -26,6 +26,7 @@ import de.cebitec.readxplorer.utils.Pair;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool.DeSeq;
@@ -36,10 +37,19 @@ import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpressio
  *
  * @author kstaderm
  */
-public class ConvertData {
+public final class ConvertData {
+
+    private static final Logger LOG = Logger.getLogger( ConvertData.class.getName() );
 
     private static final int BAY_SEQ_OFFSET = 3;
     private static final int CUT_OFF = 30;
+
+
+    /**
+     * Instantiation not allowed.
+     */
+    private ConvertData() {
+    }
 
 
     public static Map<PersistentFeature, Pair<Double, Double>> ratioABagainstConfidence( ResultDeAnalysis result ) {
@@ -64,25 +74,25 @@ public class ConvertData {
             case ExpressTest:
                 input = createDataPairForFeature( result.getTableContents(), 0, 3, 5 );
                 break;
+            default:
+                LOG.severe( "Encountered unknown DGE tool value." );
         }
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
         for( PersistentFeature key : input.keySet() ) {
             Pair<Double, Double> pair = input.get( key );
-            Double R = pair.getFirst();
-            Double G = pair.getSecond();
-            if( (R > CUT_OFF) || (G > CUT_OFF) ) {
+            Double r = pair.getFirst();
+            Double g = pair.getSecond();
+            if( (r > CUT_OFF) || (g > CUT_OFF) ) {
 
-                Double M = (Math.log( R ) / Math.log( 2 )) - (Math.log( G ) / Math.log( 2 ));
-                Double A;
-                if( R == 0 ) {
-                    A = (Math.log( G ) / Math.log( 2 ));
-                }
-                else {
-                    if( G == 0 ) {
-                        A = (Math.log( R ) / Math.log( 2 ));
-                    }
-                    else {
-                        A = ((Math.log( R ) / Math.log( 2 )) + (Math.log( G ) / Math.log( 2 ))) / 2;
+                Double m = (Math.log( r ) / Math.log( 2 )) - (Math.log( g ) / Math.log( 2 ));
+                Double a;
+                if( r == 0 ) {
+                    a = (Math.log( g ) / Math.log( 2 ));
+                } else {
+                    if( g == 0 ) {
+                        a = (Math.log( r ) / Math.log( 2 ));
+                    } else {
+                        a = ((Math.log( r ) / Math.log( 2 )) + (Math.log( g ) / Math.log( 2 ))) / 2;
                     }
                 }
                 //Values have to be added in other order than one would think, because
@@ -90,7 +100,7 @@ public class ConvertData {
                 //this point the values are in correct order for plotting, meaning that
                 //the value corresponding to the X-Axis is the first and the one corresponding
                 //to the Y-Axis is the second one.
-                ret.put( key, new Pair<>( A, M ) );
+                ret.put( key, new Pair<>( a, m ) );
             }
         }
         return ret;

@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static de.cebitec.readxplorer.utils.classification.FeatureType.CDS;
 import static de.cebitec.readxplorer.utils.classification.FeatureType.EXON;
@@ -56,6 +57,8 @@ import static de.cebitec.readxplorer.utils.classification.FeatureType.TRNA;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class AnalysisNormalization implements Observer, AnalysisI<List<NormalizedReadCount>> {
+
+    private static final Logger LOG = Logger.getLogger( AnalysisNormalization.class.getName() );
 
     private final TrackConnector trackConnector;
     private final List<NormalizedReadCount> normValues;
@@ -209,8 +212,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                             lastMappingIdx = j; //even if next feature starts at same start position no mapping will be found until mapping index j
                         }
                         break;
-                    } else if ( mapping.getStart() < featStart ) {
-                        //nothing
+//                    } else if ( mapping.getStart() < featStart ) {
+//                        //Comment for information purpose: do nothing in this case
                     }
                 }
 
@@ -340,7 +343,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                         noFeatureReads += featureReadCount.get( subFeature.getId() ).getReadCount();
                         readLengthSum += featureReadCount.get( subFeature.getId() ).getReadLengthSum();
                     } catch( NullPointerException e ) {
-                        //continue
+                        LOG.info( "Queried subfeature not contained in list." );
                     }
                 }
             }

@@ -57,8 +57,8 @@ public class Operon extends TrackResultEntry {
 
 
     /**
-     * @param operon the operon adjacencies to associate with this operon
-     *               object.
+     * @param newOperonAdjacencys the operon adjacencies to associate with this
+     *                            operon object.
      */
     public void setOperonAdjacencies( List<OperonAdjacency> newOperonAdjacencys ) {
         operonAdjacencies.clear();
@@ -77,7 +77,8 @@ public class Operon extends TrackResultEntry {
     /**
      * Adds the operon adjacency to the list of OperonAdjacencies.
      * <p>
-     * @param operonAdjacency
+     * @param operonAdjacency An operon adjacency to associate with this operon
+     *                              object.
      */
     public void addOperonAdjacency( OperonAdjacency operonAdjacency ) {
         operonAdjacencies.add( operonAdjacency );
@@ -87,7 +88,8 @@ public class Operon extends TrackResultEntry {
     /**
      * Adds the operon adjacencies to the end of the list of OperonAdjacencies.
      * <p>
-     * @param operonAdjacencies
+     * @param operonAdjacencies the new operon adjacencies to associate with
+     *                          this operon object.
      */
     public void addAllOperonAdjacencies( List<OperonAdjacency> operonAdjacencies ) {
         this.operonAdjacencies.addAll( operonAdjacencies );

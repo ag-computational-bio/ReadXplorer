@@ -38,13 +38,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
  * Carries out the analysis of a data set for operons.
- *
+ * <p>
  * @author MKD, rhilker
  */
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
@@ -113,12 +114,11 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 if( operonDetParameters.getSelFeatureTypes().contains( feature1.getType() ) ) {
 
                     int featureIndex = i + 1; //find feature 2
-                    while( feature1.isFwdStrand() != chromFeatures.get( featureIndex ).isFwdStrand()
-                           || !feature1.getType().equals( chromFeatures.get( featureIndex ).getType() ) ) {
+                    while( feature1.isFwdStrand() != chromFeatures.get( featureIndex ).isFwdStrand() ||
+                             !feature1.getType().equals( chromFeatures.get( featureIndex ).getType() ) ) {
                         if( featureIndex < chromFeatures.size() - 1 ) {
                             ++featureIndex;
-                        }
-                        else {
+                        } else {
                             reachedEnd = true;
                             break;
                         }
@@ -128,7 +128,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                         PersistentFeature feature2 = chromFeatures.get( featureIndex );
 
                         if( feature2.getStart() + 20 > feature1.getStop() && //features may overlap at the ends, happens quite often
-                                feature2.getStart() - feature1.getStop() < 1000 ) { //TODO: parameter for this
+                            feature2.getStart() - feature1.getStop() < 1000 ) { //TODO: parameter for this
                             this.featureToPutativeOperonMap.put( feature1.getId(), new OperonAdjacency( feature1, feature2, chrom.getId() ) );
                         }
                     }
@@ -162,8 +162,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
     /**
      * Method to be called when the analysis is finished. Starts the detection
-     * of
-     * operons after the read counts for all mappings have been stored.
+     * of operons after the read counts for all mappings have been stored.
      */
     public void finish() {
         Date currentTimestamp = new java.sql.Timestamp( Calendar.getInstance().getTime().getTime() );
@@ -217,22 +216,18 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
                     if( mapping.getStart() > feature2Stop ) {
                         break; //since the mappings are sorted by start position
-                    }
-                    else if( !isStrandBothOption && (mapping.isFwdStrand() != analysisStrand || mapping.getStop() < feature1Stop) ) {
+                    } else if( !isStrandBothOption && (mapping.isFwdStrand() != analysisStrand || mapping.getStop() < feature1Stop) ) {
                         continue;
                     }
 
                     //mappings identified between both features
                     if( mapping.getStart() <= feature1Stop && mapping.getStop() > feature1Stop && mapping.getStop() < feature2Start ) {
                         ++readsFeature1;
-                    }
-                    else if( mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start ) {
+                    } else if( mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start ) {
                         ++readsFeature2;
-                    }
-                    else if( mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start ) {
+                    } else if( mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start ) {
                         ++spanningReads;
-                    }
-                    else if( mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start ) {
+                    } else if( mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start ) {
                         ++internalReads;
                     }
 
@@ -255,16 +250,15 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
     /**
      * Method for identifying operons after all read counts were summed up for
-     * each
-     * genome feature.
+     * each genome feature.
      */
     public void findOperons() {
         Integer[] featureIds = featureToPutativeOperonMap.keySet().toArray( new Integer[featureToPutativeOperonMap.size()] );
         Arrays.sort( featureIds );
 
         /*
-         * If we have read pairs, we calculate the average read pair length
-         * and if we only have single reads, we use the average read length.
+         * If we have read pairs, we calculate the average read pair length and
+         * if we only have single reads, we use the average read length.
          */
         //TODO: incorporate read pair handling in the detection. currently only reads are used
         int minimumSpanningReads;
@@ -286,8 +280,8 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             internalReads = putativeOperon.getInternalReads();
             PersistentFeature feature1 = putativeOperon.getFeature1();
             PersistentFeature feature2 = putativeOperon.getFeature2();
-            /* Detect an operon only, if the number of spanning reads is larger than
-             * the threshold. */
+            /* Detect an operon only, if the number of spanning reads is larger
+             * than the threshold. */
             if( spanningReads >= minimumSpanningReads ) {
 
                 //only in this case a new operon starts:
@@ -302,11 +296,10 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 lastAnnoId = feature2.getId();
 
                 // TODO: check if parameter ok or new parameter
-            }
-            else if( feature2.getStart() - feature1.getStop() > averageReadLength
-                     && internalReads > operonDetParameters.getMinSpanningReads() ) {
+            } else if( feature2.getStart() - feature1.getStop() > averageReadLength &&
+                     internalReads > operonDetParameters.getMinSpanningReads() ) {
                 //TODO: think about creating an operon
-                LOG.log(INFO, "found case {0}", ++count); 
+                LOG.log( INFO, "found case {0}", ++count );
             }
         }
         if( !operonAdjacencies.isEmpty() ) {

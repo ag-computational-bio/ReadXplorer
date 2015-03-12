@@ -33,7 +33,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Holds all the overlapping dataset between all analysis handlers.
- *
+ * <p>
  * @author kstaderm
  */
 public class DeAnalysisData {
@@ -62,7 +62,7 @@ public class DeAnalysisData {
 
     /**
      * Creates a new instance of the DeAnalysisData class.
-     *
+     * <p>
      * @param capacity Number of selected tracks.
      */
     public DeAnalysisData( int capacity ) {
@@ -76,7 +76,7 @@ public class DeAnalysisData {
      * Adds count data as an Integer array to a Queue holding all count data
      * necessary for the analysis. The data must be added in an ascending order
      * starting with the count data belonging to the track with the lowest ID.
-     *
+     * <p>
      * @param data count data
      */
     public void addCountDataForTrack( int[] data ) {
@@ -86,9 +86,10 @@ public class DeAnalysisData {
 
     /**
      * Return the first count data value on the Queue and removes it. So this
-     * method will give you back the cound data added bei the @see addCountDataForTrack() method.
-     * The count data added first will also be the first this method returns.
-     *
+     * method will give you back the cound data added bei the @see
+     * addCountDataForTrack() method. The count data added first will also be
+     * the first this method returns.
+     * <p>
      * @return count data as int[]
      */
     public int[] pollFirstCountData() {
@@ -100,7 +101,7 @@ public class DeAnalysisData {
 
     /**
      * Checks if there is still count data on the Queue
-     *
+     * <p>
      * @return true if there is at least on count data on the Queue or false if
      *         it is empty.
      */
@@ -111,7 +112,7 @@ public class DeAnalysisData {
 
     /**
      * Return the start positions of the reference features.
-     *
+     * <p>
      * @return Start positions of the reference features.
      */
     public int[] getStart() {
@@ -127,7 +128,7 @@ public class DeAnalysisData {
 
     /**
      * Return the stop positions of the reference features.
-     *
+     * <p>
      * @return stop positions of the reference features.
      */
     public int[] getStop() {
@@ -143,7 +144,7 @@ public class DeAnalysisData {
 
     /**
      * Return the names of the reference features.
-     *
+     * <p>
      * @return Names of the reference features as an String Array.
      */
     public String[] getFeatureNames() {
@@ -171,7 +172,7 @@ public class DeAnalysisData {
 
     /**
      * Returns the tracks selected by the user to perform the analysis on.
-     *
+     * <p>
      * @return List of PersistentTrack containing the selected tracks.
      */
     public List<PersistentTrack> getSelectedTracks() {
@@ -200,8 +201,7 @@ public class DeAnalysisData {
         for( PersistentFeature persistentFeature : features ) {
             if( featureData.containsKey( persistentFeature.getLocus() ) ) {
                 featureData.put( persistentFeature.getLocus() + "_DN_" + counter++, persistentFeature );
-            }
-            else {
+            } else {
                 featureData.put( persistentFeature.getLocus(), persistentFeature );
             }
         }

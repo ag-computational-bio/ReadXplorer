@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -197,8 +197,8 @@ public class UnionFractionMappingTest {
         boolean countIt = assignedMapping.checkAssignment( feature1.getStart(), feature1.getStop(), feature1 );
         boolean countIt2 = assignedMapping.checkAssignment( feature3.getStart(), feature3.getStop(), feature3 );
         assignedMapping.fractionAssignmentCheck( featureReadCount );
-        assertEquals ( 499.5, normaReadCount.getReadCount(), 0.0 );
-        assertEquals ( 699.5, normaReadCount2.getReadCount(), 0.0 );
+        assertEquals( 499.5, normaReadCount.getReadCount(), 0.0 );
+        assertEquals( 699.5, normaReadCount2.getReadCount(), 0.0 );
         // - rev strand
         // 1. Fst added mapping - does it work, is it added?
         boolean countIt3 = assignedMapping2.checkAssignment( feature5.getStart(), feature5.getStop(), feature5 );

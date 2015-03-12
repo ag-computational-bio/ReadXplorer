@@ -122,8 +122,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
         while( results.isEmpty() ) {
             try {
                 sleep( 500 );
-            }
-            catch( InterruptedException ex ) {
+            } catch( InterruptedException ex ) {
                 Exceptions.printStackTrace( ex );
             }
         }

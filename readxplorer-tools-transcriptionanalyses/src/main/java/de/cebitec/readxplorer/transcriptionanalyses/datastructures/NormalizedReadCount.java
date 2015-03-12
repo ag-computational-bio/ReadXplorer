@@ -237,7 +237,7 @@ public class NormalizedReadCount extends TrackResultEntry {
     /**
      * Utility class providing special methods for NormalizedReadCount objects.
      */
-    public static class Utils {
+    public static final class Utils {
 
         /**
          * Instantiation not allowed.

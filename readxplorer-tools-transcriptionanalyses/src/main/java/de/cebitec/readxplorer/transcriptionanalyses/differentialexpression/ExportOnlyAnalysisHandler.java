@@ -78,14 +78,13 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             boolean allZero = true;
             final Object[] tmp = new Object[data.getSelectedTracks().size() + offset];
             /*
-            * Here the additional fields are added. If one field is added or
-            * remove the "offset" value must be changed accordingly.
-            */
+             * Here the additional fields are added. If one field is added or
+             * remove the "offset" value must be changed accordingly.
+             */
             tmp[0] = referenceConnector.getChromosomeForGenome( feature[i].getChromId() );
             if( feature[i].isFwdStrand() ) {
                 tmp[1] = "fw";
-            }
-            else {
+            } else {
                 tmp[1] = "rv";
             }
             tmp[2] = feature[i].getStart();
@@ -133,8 +132,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             if( nodeType == FeatureType.EXON ) {
                 PersistentFeature current = (PersistentFeature) n;
                 length += current.getLength();
-            }
-            else {
+            } else {
                 PersistentFeature current = (PersistentFeature) n;
                 length += calculateExonLength( current );
             }

@@ -150,8 +150,7 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
         boolean isValidated = true;
         if( GeneralUtils.isValidPositiveIntegerInput( spanningReadsField.getText() ) ) {
             this.minSpanningReads = Integer.parseInt( spanningReadsField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
 
@@ -161,8 +160,8 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
 
 
     /**
-     * @return the minimum number of spanning reads between two features
-     *         to assign them to an operon
+     * @return the minimum number of spanning reads between two features to
+     *         assign them to an operon
      */
     public int getMinSpanningReads() {
         return this.minSpanningReads;

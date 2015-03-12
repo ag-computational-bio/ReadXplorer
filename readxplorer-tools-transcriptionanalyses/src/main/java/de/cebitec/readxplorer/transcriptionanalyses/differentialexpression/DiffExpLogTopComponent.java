@@ -42,18 +42,18 @@ import static java.util.logging.Level.SEVERE;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DiffExpLog//EN",
-    autostore = false )
+         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DiffExpLog//EN",
+         autostore = false )
 @TopComponent.Description(
-    preferredID = "DiffExpLogTopComponent",
-    //iconBase="SET/PATH/TO/ICON/HERE",
-    persistenceType = TopComponent.PERSISTENCE_NEVER )
+         preferredID = "DiffExpLogTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpLogTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_DiffExpLogAction",
-    preferredID = "DiffExpLogTopComponent" )
+         displayName = "#CTL_DiffExpLogAction",
+         preferredID = "DiffExpLogTopComponent" )
 @Messages( {
     "CTL_DiffExpLogAction=DiffExpLog",
     "CTL_DiffExpLogTopComponent=Differential Gene Expression Analysis Log",
@@ -144,8 +144,7 @@ public final class DiffExpLogTopComponent extends TopComponentExtended
                     writer = new FileWriter( output );
                     writer.write( log );
                     writer.close();
-                }
-                catch( IOException ex ) {
+                } catch( IOException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                     LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                     JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );

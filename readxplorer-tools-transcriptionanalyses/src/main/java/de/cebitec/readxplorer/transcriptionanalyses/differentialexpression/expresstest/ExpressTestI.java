@@ -37,7 +37,7 @@ public interface ExpressTestI {
      * @throws IllegalArgumentException if not all arrays have a proper
      *                                  dimension
      */
-    public void performAnalysis( PersistentFeature[] regionNames, int[] start, int[] stop, int[][] groupA, int[][] groupB, double cutOff ) throws IllegalArgumentException;
+    void performAnalysis( PersistentFeature[] regionNames, int[] start, int[] stop, int[][] groupA, int[][] groupB, double cutOff ) throws IllegalArgumentException;
 
 
     /**
@@ -45,7 +45,7 @@ public interface ExpressTestI {
      *
      * @param o the observer to be added.
      */
-    public void addObserver( ExpressTestObserver o );
+    void addObserver( ExpressTestObserver o );
 
 
     /**
@@ -53,7 +53,7 @@ public interface ExpressTestI {
      *
      * @param o the observer to be removed.
      */
-    public void removeObserver( ExpressTestObserver o );
+    void removeObserver( ExpressTestObserver o );
 
 
     /**
@@ -63,7 +63,7 @@ public interface ExpressTestI {
      *
      * @return results of the analysis.
      */
-    public List<List<Object>> getResults();
+    List<List<Object>> getResults();
 
 
     /**
@@ -74,7 +74,7 @@ public interface ExpressTestI {
      *
      * @return normalized results of the analysis.
      */
-    public List<List<Object>> getResultsNormalized();
+    List<List<Object>> getResultsNormalized();
 
 
     /**
@@ -82,7 +82,7 @@ public interface ExpressTestI {
      *
      * @return columnNames for the current analysis run.
      */
-    public List<Object> getColumnNames();
+    List<Object> getColumnNames();
 
 
     /**
@@ -90,7 +90,7 @@ public interface ExpressTestI {
      *
      * @return columnNames for the current analysis run.
      */
-    public List<Object> getRowNames();
+    List<Object> getRowNames();
 
 
     /**
@@ -99,7 +99,7 @@ public interface ExpressTestI {
      * <p>
      * @param normalizationFeatures features for normalization
      */
-    public void setNormalizationFeatures( int[] normalizationFeatures );
+    void setNormalizationFeatures( int[] normalizationFeatures );
 
 
 }

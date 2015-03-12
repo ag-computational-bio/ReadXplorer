@@ -24,12 +24,12 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Transcription
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface TssLinker {
-    
+
     /**
      * Performs some linking action for the given TSS.
      * @param previousTss Some previous TSS to the current TSS
      * @param prevTssIdx The index of the previous TSS
      * @param tss The current TSS
      */
-    public void linkTss(TranscriptionStart previousTss, int prevTssIdx, TranscriptionStart tss);
+    void linkTss(TranscriptionStart previousTss, int prevTssIdx, TranscriptionStart tss);
 }

@@ -66,8 +66,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         public static Plot[] getValues( boolean moreThanTwoConditions ) {
             if( moreThanTwoConditions ) {
                 return new Plot[]{ DispEsts };
-            }
-            else {
+            } else {
                 return new Plot[]{ DispEsts, DE, HIST, MAplot };
             }
         }
@@ -78,7 +77,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public DeSeqAnalysisHandler( List<PersistentTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
                                  List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-                                 File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+                                 File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams ) {
         super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
         deSeq = new DeSeq();
         deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(),
@@ -92,7 +91,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );
-        results = deSeq.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        results = deSeq.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile() );
         return results;
 
     }
@@ -110,8 +109,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
     }
 
 
-    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException, 
-                                            RserveException, REngineException, REXPMismatchException {
+    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException,
+                                         RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.DE ) {
