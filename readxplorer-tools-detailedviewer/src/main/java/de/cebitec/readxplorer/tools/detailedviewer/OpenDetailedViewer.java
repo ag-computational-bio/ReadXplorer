@@ -38,7 +38,6 @@ public final class OpenDetailedViewer implements ActionListener {
 
 //    private final List<TrackViewer> context;
 
-
     public OpenDetailedViewer( List<TrackViewer> context ) {
 //        this.context = context;
     }
@@ -55,18 +54,16 @@ public final class OpenDetailedViewer implements ActionListener {
             List<AbstractViewer> openTrackViewers = getTrackViewerList( viewCon.getOpenTracks() );
 
             if( trackPanels.size() > 1 ) {
-                JList<AbstractViewer> trackList = new JList<>( openTrackViewers.toArray( new AbstractViewer[ openTrackViewers.size() ] ) );
+                JList<AbstractViewer> trackList = new JList<>( openTrackViewers.toArray( new AbstractViewer[openTrackViewers.size()] ) );
                 DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation( trackList, NbBundle.getMessage( OpenDetailedViewer.class, "CTL_OpenDetailedViewer" ) );
                 dd.setOptionType( DialogDescriptor.OK_CANCEL_OPTION );
                 DialogDisplayer.getDefault().notify( dd );
                 if( dd.getValue().equals( DialogDescriptor.OK_OPTION ) && !trackList.isSelectionEmpty() ) {
                     currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
-                }
-                else {
+                } else {
                     return;
                 }
-            }
-            else {
+            } else {
                 // context cannot be emtpy, so no check here
                 currentTrackViewer = (TrackViewer) trackPanels.get( 0 ).getViewer();
             }
