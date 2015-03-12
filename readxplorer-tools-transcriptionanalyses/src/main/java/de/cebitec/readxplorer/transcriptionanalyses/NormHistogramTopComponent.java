@@ -144,4 +144,5 @@ public final class NormHistogramTopComponent extends TopComponentExtended {
         return histogramTabbedPane.getComponentCount() > 0;
     }
 
+
 }

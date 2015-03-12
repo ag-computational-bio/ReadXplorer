@@ -175,8 +175,7 @@ public class DoubleTrackViewer extends TrackViewer {
      * @param classType   the mapping classification type of the coverage path
      *                    handled here
      * @param absPos      the reference position for which the coverage should
-     *                    be
-     *                    obtained
+     *                    be obtained
      * <p>
      * @return the coverage value for the given strand, coverage type and
      *         position.

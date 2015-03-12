@@ -48,7 +48,7 @@ import org.openide.util.NbBundle;
  * It shows all details of the read pair and all mappings belonging to that
  * pair. Furthermore it offers the possibility to jump to a certain mapping by
  * clicking on it.
- *
+ * <p>
  * @author Rolf Hilker
  */
 public class ReadPairPopup extends JPopupMenu {
@@ -62,9 +62,8 @@ public class ReadPairPopup extends JPopupMenu {
 
 
     /**
-     * Displays information regarding a read pair in a popup.
-     * It shows all details of the read pair and all mappings belonging to that
-     * pair.
+     * Displays information regarding a read pair in a popup. It shows all
+     * details of the read pair and all mappings belonging to that pair.
      * Furthermore it offers the possibility to jump to a certain mapping by
      * clicking on it.
      * <p>
@@ -241,8 +240,8 @@ public class ReadPairPopup extends JPopupMenu {
 
 
     /**
-     * @return all information about this components read pair from the DB
-     *         to show in the popup. If the parent viewer ist not a ReadPairViewer
+     * @return all information about this components read pair from the DB to
+     *         show in the popup. If the parent viewer ist not a ReadPairViewer
      *         <code>null</code> is returned.
      */
     private ReadPairGroup getReadPairInfo() {
@@ -313,7 +312,7 @@ public class ReadPairPopup extends JPopupMenu {
         private String[] content = new String[1];
 
 
-        public void setContent( List<String> content ) {
+        public void setContent( ArrayList<String> content ) {
             this.content = content.toArray( this.content );
         }
 

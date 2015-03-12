@@ -156,8 +156,7 @@ public class Layout implements LayoutI {
 
     /**
      * Fills each single layer until all blocks were added from the block
-     * container
-     * to the layer list
+     * container to the layer list
      * <p>
      * @param layers list of layers to add the blocks to
      * @param blocks block container to add to layers
@@ -174,8 +173,7 @@ public class Layout implements LayoutI {
 
     /**
      * Fills a single layer with as many blocks as possible, while obeying to
-     * the
-     * rule, that the blocks in one layer are not allowed to overlap.
+     * the rule, that the blocks in one layer are not allowed to overlap.
      * <p>
      * @param l      single layer to fill with blocks
      * @param blocks block container

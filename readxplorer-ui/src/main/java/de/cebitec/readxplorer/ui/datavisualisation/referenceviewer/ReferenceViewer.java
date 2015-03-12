@@ -33,7 +33,6 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
-import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -47,13 +46,13 @@ import org.openide.util.Lookup;
 
 /**
  * Viewer for genome sequences / chromosomes.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class ReferenceViewer extends AbstractViewer {
 
     private static final long serialVersionUID = 7964236;
-    private static final int HEIGHT = 230;
+    private static final int VIEW_HEIGHT = 230;
     private static final int FRAMEHEIGHT = 20;
     private final Map<FeatureType, Integer> featureStats;
     private JFeature selectedFeature;
@@ -73,8 +72,8 @@ public class ReferenceViewer extends AbstractViewer {
      * @param boundsInfoManager the global bounds info manager
      * @param basePanel         the base panel
      * @param refGenome         the persistent reference, which is always
-     *                          accessible through the getReference
-     *                          method in any abstract viewer.
+     *                          accessible through the getReference method in
+     *                          any abstract viewer.
      */
     public ReferenceViewer( BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGenome ) {
         super( boundsInfoManager, basePanel, refGenome );
@@ -115,8 +114,8 @@ public class ReferenceViewer extends AbstractViewer {
         }
 
         //only recalculate if reading frame was switched
-        if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature()
-                                       != PositionUtils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
+        if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature() !=
+             PositionUtils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -134,7 +133,7 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public int getMaximalHeight() {
-        return HEIGHT;
+        return VIEW_HEIGHT;
     }
 
 
@@ -172,7 +171,7 @@ public class ReferenceViewer extends AbstractViewer {
         int frame = 0;
         for( Polytree featTree : featureTrees ) { //this means if two roots are on different frames,
             for( Node root : featTree.getRoots() ) { //all children are painted on the frame of the last root node
-                frame = PositionUtils.determineFrame( (GenomicRange) root );
+                frame = PositionUtils.determineFrame( (PersistentFeature) root );
             }
             PaintNodeVisitor paintVisitor = new PaintNodeVisitor( frame );
             featTree.bottomUp( paintVisitor );
@@ -365,9 +364,8 @@ public class ReferenceViewer extends AbstractViewer {
 
 
     /**
-     * Increases count of corresponding tracks.
-     * If more information is needed implement listener model
-     * with possibility to get track viewers.
+     * Increases count of corresponding tracks. If more information is needed
+     * implement listener model with possibility to get track viewers.
      */
     public void increaseTrackCount() {
         trackCount++;
@@ -375,9 +373,8 @@ public class ReferenceViewer extends AbstractViewer {
 
 
     /**
-     * Decreases count of corresponding tracks.
-     * If more information is needed implement listener model
-     * with possibility to get track viewers.
+     * Decreases count of corresponding tracks. If more information is needed
+     * implement listener model with possibility to get track viewers.
      */
     public void decreaseTrackCount() {
         if( trackCount > 0 ) {

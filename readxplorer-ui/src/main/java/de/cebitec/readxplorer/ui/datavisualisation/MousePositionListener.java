@@ -25,10 +25,10 @@ package de.cebitec.readxplorer.ui.datavisualisation;
  */
 public interface MousePositionListener {
 
-    public void setCurrentMousePosition( int logPos );
+    void setCurrentMousePosition( int logPos );
 
 
-    public void setMouseOverPaintingRequested( boolean requested );
+    void setMouseOverPaintingRequested( boolean requested );
 
 
 }

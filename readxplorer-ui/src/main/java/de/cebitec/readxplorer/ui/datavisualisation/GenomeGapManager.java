@@ -66,10 +66,10 @@ public class GenomeGapManager {
 
 
     /**
-     * Add GenomeGaps from a PersistentMapping to this GenomeGapManager.
-     * Each TreeSet of this Collection contains gaps for one position. Mulitple
-     * values in the TreeSet indicate multiple genome gaps at one position
-     * in the reference genome.
+     * Add GenomeGaps from a PersistentMapping to this GenomeGapManager. Each
+     * TreeSet of this Collection contains gaps for one position. Mulitple
+     * values in the TreeSet indicate multiple genome gaps at one position in
+     * the reference genome.
      * <p>
      * @param values
      */

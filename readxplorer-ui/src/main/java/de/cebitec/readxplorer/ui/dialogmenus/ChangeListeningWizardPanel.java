@@ -32,8 +32,8 @@ import org.openide.util.HelpCtx;
 /**
  * A wizard panel which is able to listen to changes with a property change
  * listener, which is added in the readSettings method. When firering the
- * ChangeListeningWizardPanel.PROP_VALIDATE property change with either true
- * or false, the listener either displays the given error message, or nothing.
+ * ChangeListeningWizardPanel.PROP_VALIDATE property change with either true or
+ * false, the listener either displays the given error message, or nothing.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */

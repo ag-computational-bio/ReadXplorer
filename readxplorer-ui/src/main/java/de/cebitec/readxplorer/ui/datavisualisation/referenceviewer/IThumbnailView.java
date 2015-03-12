@@ -37,25 +37,25 @@ public interface IThumbnailView {
      * @param feature
      * @param refViewer the currently viewed ReferenceViewer
      */
-    public void addFeatureToList( PersistentFeature feature, ReferenceViewer refViewer );
+    void addFeatureToList( PersistentFeature feature, ReferenceViewer refViewer );
 
 
-    public void showThumbnailView( ReferenceViewer refViewer );
+    void showThumbnailView( ReferenceViewer refViewer );
 
 
-    public void showThumbnailView( ReferenceViewer refViewer, ViewController con );
+    void showThumbnailView( ReferenceViewer refViewer, ViewController con );
 
 
-    public void removeAllFeatures( ReferenceViewer refViewer );
+    void removeAllFeatures( ReferenceViewer refViewer );
 
 
-    public void removeCertainFeature( PersistentFeature feature );
+    void removeCertainFeature( PersistentFeature feature );
 
 
-    public void showPopUp( PersistentFeature feature, ReferenceViewer refViewer, MouseEvent e, JPopupMenu popUp );
+    void showPopUp( PersistentFeature feature, ReferenceViewer refViewer, MouseEvent e, JPopupMenu popUp );
 
 
-    public void showTablePopUp( JTable table, ReferenceViewer refViewer, MouseEvent e );
+    void showTablePopUp( JTable table, ReferenceViewer refViewer, MouseEvent e );
 
 
 }

@@ -59,17 +59,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.openide.util.Exceptions;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.WARNING;
 
 
 /**
- * AbstractViewer ist a superclass for displaying genome related information.
- * It provides methods to compute the physical position (meaning pixel) for any
+ * AbstractViewer ist a superclass for displaying genome related information. It
+ * provides methods to compute the physical position (meaning pixel) for any
  * logical position (base position in genome) and otherwise. Depending on it's
  * own size and settings in the ViewerController AbstractViewer knows, which
  * interval from the genome should currently be displayed and provides getter
- * methods for these values. Tooltips in this viewer are initially shown for
- * 20 seconds.
+ * methods for these values. Tooltips in this viewer are initially shown for 20
+ * seconds.
  * <p>
  * @author ddoppmeier, rhilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -173,7 +173,7 @@ public abstract class AbstractViewer extends JPanel implements
 
         this.excludedClassifications = new ArrayList<>();
         this.setLayout( null );
-        this.setBackground(AbstractViewer.BACKGROUND_COLOR );
+        this.setBackground( AbstractViewer.BACKGROUND_COLOR );
         this.boundsManager = boundsManager;
         this.basePanel = basePanel;
         this.reference = reference;
@@ -292,8 +292,8 @@ public abstract class AbstractViewer extends JPanel implements
      * <p>
      * @param showSeqBar   true, if the sequence bar shall be visible, false
      *                     otherwise
-     * @param centerSeqBar true, if the sequence bar shall be centered, false
-     *                     if it shall be shown at the top
+     * @param centerSeqBar true, if the sequence bar shall be centered, false if
+     *                     it shall be shown at the top
      */
     public void showSequenceBar( boolean showSeqBar, boolean centerSeqBar ) {
         if( showSeqBar ) {
@@ -402,8 +402,8 @@ public abstract class AbstractViewer extends JPanel implements
             @Override
             public void mouseWheelMoved( MouseWheelEvent e ) {
 
-                if( canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0)
-                                || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
+                if( canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) ||
+                     (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
                     int oldZoom = zoom;
                     zoom += e.getUnitsToScroll();
                     if( zoom > 500 ) {
@@ -575,8 +575,7 @@ public abstract class AbstractViewer extends JPanel implements
      * @param logPos position in the reference genome
      * <p>
      * @return the physical boundaries (left, right) of a single base of the
-     *         sequence
-     *         in the viewer.
+     *         sequence in the viewer.
      */
     public PhysicalBaseBounds getPhysBoundariesForLogPos( int logPos ) {
         double left = this.transformToPhysicalCoord( logPos );
@@ -681,8 +680,7 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * Update the physical coordinates of this panel, available width for
-     * painting.
-     * Method is called automatically, when this panel resizes
+     * painting. Method is called automatically, when this panel resizes
      */
     public void updatePhysicalBounds() {
         this.setSizes();
@@ -721,10 +719,10 @@ public abstract class AbstractViewer extends JPanel implements
         if( this.scrollPane != null && this.centerScrollBar ) {
             try {
                 JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
-                verticalBar.setValue( verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2 );
+                verticalBar.setValue( verticalBar.getMaximum() / 2 - getParent().getHeight() / 2 );
             } catch( ArrayIndexOutOfBoundsException e ) {
+                LOG.log( WARNING, "AbstractViewer: Parent height cannot be resolved." );
                 //ignore this problem, TODO: identify source of ArrayIndexOutOfBoundsException
-                LOG.log( FINE, e.getMessage(), e );
             }
         }
     }
@@ -980,8 +978,8 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @return true, if this viewer is currently active (in the foreground)
-     *         and false, if it is inactive
+     * @return true, if this viewer is currently active (in the foreground) and
+     *         false, if it is inactive
      */
     public boolean isActive() {
         return this.isActive;
@@ -1061,8 +1059,8 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @return The list of classification types, which are currently
-     *         excluded from the view/calculations by the user.
+     * @return The list of classification types, which are currently excluded
+     *         from the view/calculations by the user.
      */
     public List<Classification> getExcludedClassifications() {
         return Collections.unmodifiableList( excludedClassifications );
@@ -1081,7 +1079,8 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * @return The minimum mapping quality for data queries. If at least one
-     *         mapping does not contain a mapping quality, this filter is not used!
+     *         mapping does not contain a mapping quality, this filter is not
+     *         used!
      */
     public byte getMinMappingQuality() {
         return this.minMappingQuality;
@@ -1090,8 +1089,9 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * @param minMappingQuality Sets this value as the minimum mapping quality
-     *                          to use for data queries. If at least one mapping does not contain a
-     *                          mapping quality, this filter is not used!
+     *                          to use for data queries. If at least one mapping
+     *                          does not contain a mapping quality, this filter
+     *                          is not used!
      */
     public void setMinMappingQuality( byte minMappingQuality ) {
         this.minMappingQuality = minMappingQuality;
@@ -1100,7 +1100,8 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * @return Queries the excluded feature type list for the read class
-     *         parameter selection and converts them to a ParametersReadClasses object.
+     *         parameter selection and converts them to a ParametersReadClasses
+     *         object.
      */
     public ParametersReadClasses getReadClassParams() {
         return new ParametersReadClasses( this.getExcludedClassifications(), this.getMinMappingQuality() );

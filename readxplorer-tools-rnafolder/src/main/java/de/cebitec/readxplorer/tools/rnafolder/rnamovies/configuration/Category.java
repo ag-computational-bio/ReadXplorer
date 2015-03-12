@@ -38,7 +38,7 @@ public class Category {
 
 
     protected Category( String name, Map<String, TypeWrapper> values ) {
-         this( -1, name, values );
+        this( -1, name, values );
     }
 
 
@@ -66,8 +66,7 @@ public class Category {
                 try {
                     localId = Integer.parseInt( tw.getAttribute( "id" ) );
                     localId = localId < -1 ? -1 : localId;
-                }
-                catch( NumberFormatException e ) {
+                } catch( NumberFormatException e ) {
                     localId = -1;
                 }
             }
@@ -79,8 +78,9 @@ public class Category {
     public void set( String key, Object value ) {
         int localId = -1;
 
-        if( !values.containsKey( key ) )
+        if( !values.containsKey( key ) ) {
             throw new NoSuchElementException( "Key " + key + " does not exsist in Configuration." );
+        }
 
         TypeWrapper tw = values.get( key );
 
@@ -88,14 +88,14 @@ public class Category {
             try {
                 localId = Integer.parseInt( tw.getAttribute( "id" ) );
                 localId = localId < -1 ? -1 : localId;
-            }
-            catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 localId = -1;
             }
         }
 
-        if( value.getClass() != tw.getObject().getClass() )
+        if( value.getClass() != tw.getObject().getClass() ) {
             throw new IllegalArgumentException( "Invalid argument: " + value.getClass().getName() + " where " + values.get( key ).getObject().getClass().getName() + " is expected." );
+        }
 
         tw.setObject( value );
         fire( new ConfigChangedEvent( this, localId, key, value ) );
@@ -113,8 +113,9 @@ public class Category {
 
 
     public Object get( String key ) {
-        if( !values.containsKey( key ) )
+        if( !values.containsKey( key ) ) {
             throw new NoSuchElementException( "Key " + key + " does not exsist in Configuration." );
+        }
 
         return values.get( key ).getObject();
     }
@@ -124,10 +125,11 @@ public class Category {
         Object value;
 
         value = get( key );
-        if( value instanceof Integer )
+        if( value instanceof Integer ) {
             return ((Integer) value);
-        else
+        } else {
             throw new IllegalArgumentException( "Invalid argument: " + key + ": " + value.getClass().getName() + " where java.lang.Integer is expected." );
+        }
 
     }
 
@@ -136,10 +138,11 @@ public class Category {
         Object value;
 
         value = get( key );
-        if( value instanceof Boolean )
+        if( value instanceof Boolean ) {
             return ((Boolean) value);
-        else
+        } else {
             throw new IllegalArgumentException( "Invalid argument: " + key + ": " + value.getClass().getName() + " where java.lang.Boolean is expected." );
+        }
 
     }
 
@@ -170,8 +173,9 @@ public class Category {
 
         listeners = listenerList.getListenerList();
         for( i = 0; i < listeners.length; i += 2 ) {
-            if( listeners[i] == ConfigListener.class )
+            if( listeners[i] == ConfigListener.class ) {
                 ((ConfigListener) listeners[i + 1]).configurationChanged( e );
+            }
         }
     }
 

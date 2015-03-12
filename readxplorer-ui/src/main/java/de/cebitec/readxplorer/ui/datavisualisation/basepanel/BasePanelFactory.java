@@ -77,7 +77,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * Factory used to initialize all different kinds of base panels.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class BasePanelFactory {
@@ -377,8 +377,8 @@ public class BasePanelFactory {
 
     /**
      * Create an <code>AdjustmentPanel</code> for the given parameters. This
-     * panel may contain a scrollbar for scrolling along a reference and
-     * a slider for zooming in and out.
+     * panel may contain a scrollbar for scrolling along a reference and a
+     * slider for zooming in and out.
      * <p>
      * @param hasScrollbar true, if a scrollbar for the reference sequence is
      *                     needed, false otherwise
@@ -416,8 +416,9 @@ public class BasePanelFactory {
      * @param typeColor color of the feature type
      * @param type      the feature type whose legend entry is created
      * @param viewer    the viewer to which the legend entry belongs. If no
-     *                  function is assigend to the legend entry, viewer can be set to null. In
-     *                  this case a simple label is returned instead of the checkbox.
+     *                  function is assigend to the legend entry, viewer can be
+     *                  set to null. In this case a simple label is returned
+     *                  instead of the checkbox.
      * <p>
      * @return A legend entry for a feature type.
      */
@@ -454,11 +455,11 @@ public class BasePanelFactory {
 
 
     /**
-     * @param typeColor color of the feature type
      * @param type      the feature type whose legend entry is created
      * @param viewer    the viewer to which the legend entry belongs. If no
-     *                  function is assigend to the legend entry, viewer can be set to null. In
-     *                  this case a simple label is returned instead of the checkbox.
+     *                  function is assigend to the legend entry, viewer can be
+     *                  set to null. In this case a simple label is returned
+     *                  instead of the checkbox.
      * <p>
      * @return A legend entry for a feature type.
      */
@@ -819,8 +820,8 @@ public class BasePanelFactory {
      */
     private class FeatureTypeListener implements ActionListener {
 
-        private final Classification type;
-        private final AbstractViewer viewer;
+        private Classification type;
+        private AbstractViewer viewer;
 
 
         /**

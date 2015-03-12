@@ -41,7 +41,7 @@ public class BlockContainer {
     /**
      * Adds a block to the container. The block order is sorted according to
      * start position.
-     *
+     * <p>
      * @param block block to add
      */
     public void addBlock( BlockI block ) {

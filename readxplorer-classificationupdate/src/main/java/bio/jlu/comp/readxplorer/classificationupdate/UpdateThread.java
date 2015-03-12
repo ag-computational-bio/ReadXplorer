@@ -51,7 +51,7 @@ import org.openide.windows.InputOutput;
 /**
  * A thread for updating the read mapping classification of ReadXplorer to
  * version 1.9.5 or later.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class UpdateThread extends SwingWorker<Object, Object> implements
@@ -74,8 +74,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
         CentralLookup.getDefault().add( this );
         try {
             io.getOut().reset();
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             Exceptions.printStackTrace( ex );
         }
         io.select();
@@ -161,21 +160,18 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
                             projectConnector.deleteSpecificTrackStatistics( statsKeysToDelete, trackJob.getID() );
                             projectConnector.storeTrackStatistics( statsContainer, trackJob.getID() );
-                        }
-                        catch( StorageException ex ) {
+                        } catch( StorageException ex ) {
                             Exceptions.printStackTrace( ex );
                             noErrors = false;
                         }
                     }
-                }
-                catch( ParsingException | OutOfMemoryError ex ) {
+                } catch( ParsingException | OutOfMemoryError ex ) {
                     Exceptions.printStackTrace( ex );
                     noErrors = false;
                 }
                 if( noErrors ) {
                     io.getOut().println( "Re-calculation of classification for track " + trackJob.getName() + " finished successfully!" );
-                }
-                else {
+                } else {
                     io.getOut().println( "Re-calculation of classification for track " + trackJob.getName() + " failed!" );
                 }
                 ph.progress( "Re-calculate classification of track " + trackJob.getName(), ++workunits );
@@ -232,8 +228,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
     public void update( Object data ) {
         if( data.toString().contains( "processed" ) || data.toString().contains( "converted" ) || data.toString().contains( "indexed" ) ) {
             this.ph.progress( data.toString() );
-        }
-        else {
+        } else {
             this.showMsg( data.toString() );
             this.ph.progress( "" );
         }
@@ -246,8 +241,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
         ph.finish();
         if( this.noErrors ) {
             io.getOut().println( "Re-calculation of classification for all tracks finished successfully! (If no error messages were printed!)" );
-        }
-        else {
+        } else {
             io.getOut().println( "At least the update of one data set failed (check earlier log messages for more info)" );
         }
         io.getOut().close();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ public abstract class AssignedMapping implements MappingAssignment {
         revRemoveList = null;
     }
 
-    
+
     /**
      * Checks if the read count has to be decreased for any features. It has to
      * be decreased for all features in the reverse remove list. By default,

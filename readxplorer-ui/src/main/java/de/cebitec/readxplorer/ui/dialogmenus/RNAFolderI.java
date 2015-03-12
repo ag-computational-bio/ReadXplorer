@@ -32,7 +32,7 @@ public interface RNAFolderI {
      * @param header         the description of the folded sequence to use as
      *                       header
      */
-    public void showRNAFolderView( String sequenceToFold, String header );
+    void showRNAFolderView( String sequenceToFold, String header );
 
 
 }

@@ -21,8 +21,8 @@ package de.cebitec.readxplorer.ui.datavisualisation;
 /**
  * This class stores information about a region that should be displayed for
  * example by an AbstractViewer. It stores left and right borders, current
- * center position,
- * current width and zoom level and also maximal left and right values.
+ * center position, current width and zoom level and also maximal left and right
+ * values.
  * <p>
  * @author ddoppmeier, rhilker
  */
@@ -46,7 +46,8 @@ public class BoundsInfo {
      * <p>
      * @param maxLogLeft     the leftmost position of the reference to be shown
      * @param maxLogRight    the maximal position of the reference that can be
-     *                       displayed. Normally equals the size of the reference.
+     *                       displayed. Normally equals the size of the
+     *                       reference.
      * @param currentLogPos  the current center position that should be
      *                       displayed
      * @param zoomValue      The current zoom value.
@@ -72,7 +73,8 @@ public class BoundsInfo {
      * <p>
      * @param maxLogLeft     the leftmost position of the reference to be shown
      * @param maxLogRight    the maximal position of the reference that can be
-     *                       displayed. Normally equals the size of the reference.
+     *                       displayed. Normally equals the size of the
+     *                       reference.
      * @param currentLogPos  the current center position that should be
      *                       displayed
      * @param zoomValue      The current zoom value.
@@ -172,8 +174,8 @@ public class BoundsInfo {
 
     /**
      * Udate the left and right logical bounds depending on the current center
-     * position.
-     * Restricts bounds, so that they do not reach out of the maximal bounds
+     * position. Restricts bounds, so that they do not reach out of the maximal
+     * bounds
      */
     private void updateLeftAndRight() {
         logLeft = currentLogPos - logWidth / 2;
@@ -228,14 +230,14 @@ public class BoundsInfo {
     public boolean equals( Object other ) {
         if( other instanceof BoundsInfo ) {
             BoundsInfo otherBounds = (BoundsInfo) other;
-            return otherBounds.getCurrentLogPos() == this.getCurrentLogPos()
-                   && otherBounds.getLogLeft() == this.getLogLeft()
-                   && otherBounds.getLogRight() == this.getLogRight()
-                   && otherBounds.getLogWidth() == this.getLogWidth()
-                   && otherBounds.getMaxLogLeft() == this.getMaxLogLeft()
-                   && otherBounds.getMaxLogRight() == this.getMaxLogRight()
-                   && otherBounds.getZoomValue() == this.getZoomValue()
-                   && otherBounds.getCurrentChromId() == this.getCurrentChromId();
+            return otherBounds.getCurrentLogPos() == this.getCurrentLogPos() &&
+                     otherBounds.getLogLeft() == this.getLogLeft() &&
+                     otherBounds.getLogRight() == this.getLogRight() &&
+                     otherBounds.getLogWidth() == this.getLogWidth() &&
+                     otherBounds.getMaxLogLeft() == this.getMaxLogLeft() &&
+                     otherBounds.getMaxLogRight() == this.getMaxLogRight() &&
+                     otherBounds.getZoomValue() == this.getZoomValue() &&
+                     otherBounds.getCurrentChromId() == this.getCurrentChromId();
         }
         return false;
     }

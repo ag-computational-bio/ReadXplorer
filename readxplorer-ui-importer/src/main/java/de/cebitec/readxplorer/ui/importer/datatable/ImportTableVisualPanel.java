@@ -38,7 +38,7 @@ import org.supercsv.prefs.CsvPreference;
 /**
  * Creates a panel for displaying the selection of different table parsers and
  * their options.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ImportTableVisualPanel extends JobPanel {
@@ -267,15 +267,14 @@ public final class ImportTableVisualPanel extends JobPanel {
     private void tableComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tableComboBoxActionPerformed
 
         boolean isCsvParser = (this.parserComboBox.getSelectedItem() instanceof CsvTableParser);
-        if( isCsvParser
-            && ((TableType) tableComboBox.getSelectedItem() == TableType.OPERON_DETECTION_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.NOVEL_TRANSCRIPT_DETECTION_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.RPKM_ANALYSIS_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.TSS_DETECTION_JR) ) {
+        if( isCsvParser &&
+                 ((TableType) tableComboBox.getSelectedItem() == TableType.OPERON_DETECTION_JR ||
+             (TableType) tableComboBox.getSelectedItem() == TableType.NOVEL_TRANSCRIPT_DETECTION_JR ||
+             (TableType) tableComboBox.getSelectedItem() == TableType.RPKM_ANALYSIS_JR ||
+             (TableType) tableComboBox.getSelectedItem() == TableType.TSS_DETECTION_JR) ) {
             statsAndParamsButton.setEnabled( true );
             statsAndParamsFileTextField.setEnabled( true );
-        }
-        else {
+        } else {
             statsAndParamsButton.setEnabled( false );
             statsAndParamsFileTextField.setEnabled( false );
         }
@@ -327,8 +326,8 @@ public final class ImportTableVisualPanel extends JobPanel {
 
     @Override
     public boolean isRequiredInfoSet() {
-        boolean isValidated = tableComboBox.getSelectedIndex() > -1 && refComboBox.getSelectedIndex() > -1
-                              && fileLocation != null && !fileLocation.isEmpty();
+        boolean isValidated = tableComboBox.getSelectedIndex() > -1 && refComboBox.getSelectedIndex() > -1 &&
+                 fileLocation != null && !fileLocation.isEmpty();
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
@@ -376,8 +375,8 @@ public final class ImportTableVisualPanel extends JobPanel {
 
     /**
      * @return <code>true</code>, if the delimiter shall be detected
-     *         automatically, <code>false</code>, if the delimiter was selected by the
-     *         user.
+     *         automatically, <code>false</code>, if the delimiter was selected
+     *         by the user.
      */
     public boolean isAutodetectDelimiter() {
         return this.delimiterCheckBox.isSelected();

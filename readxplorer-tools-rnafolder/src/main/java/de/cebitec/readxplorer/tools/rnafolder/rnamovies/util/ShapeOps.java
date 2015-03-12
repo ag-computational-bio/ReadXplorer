@@ -68,18 +68,21 @@ public class ShapeOps {
                                        int numstep ) {
         double f;
 
-        if( numstep <= 0 || step < 0 || step > numstep )
-            throw new IllegalArgumentException( "Illegal argument(s) passed "
-                                                + "to interpolate "
-                                                + ((numstep <= 0) ? "(numstep[" + numstep + "] <= 0) " : "")
-                                                + ((step < 0) ? "(step[" + step + "] < 0) " : "")
-                                                + ((step > numstep) ? "(step[" + step + "] > numstep[" + numstep + "])" : "") );
+        if( numstep <= 0 || step < 0 || step > numstep ) {
+            throw new IllegalArgumentException( "Illegal argument(s) passed " +
+                     "to interpolate " +
+                     ((numstep <= 0) ? "(numstep[" + numstep + "] <= 0) " : "") +
+                     ((step < 0) ? "(step[" + step + "] < 0) " : "") +
+                     ((step > numstep) ? "(step[" + step + "] > numstep[" + numstep + "])" : "") );
+        }
 
-        if( a.equals( b ) || step == 0 )
+        if( a.equals( b ) || step == 0 ) {
             return a;
+        }
 
-        if( step == numstep )
+        if( step == numstep ) {
             return b;
+        }
 
         f = 1 - (numstep - step) / (double) numstep;
 
@@ -108,11 +111,12 @@ public class ShapeOps {
 
         l = p1.distance( p2 );
 
-        if( l + (dl1 + dl2) <= 0 )
+        if( l + (dl1 + dl2) <= 0 ) {
             return new Line2D.Double( p1.getX() + 0.5 * (p2.getX() - p1.getX()),
                                       p1.getY() + 0.5 * (p2.getY() - p1.getY()),
                                       p1.getX() + 0.5 * (p2.getX() - p1.getX()),
                                       p1.getY() + 0.5 * (p2.getY() - p1.getY()) );
+        }
 
         f1 = (l + dl1) / l;
         f2 = (l + dl2) / l;
@@ -206,8 +210,9 @@ public class ShapeOps {
         l = Math.sqrt( x1x2 * x1x2 + y1y2 * y1y2 ) * Math.sqrt( x3x2 * x3x2 + y3y2 * y3y2 );
         cosalpha = dot / l;
 
-        if( Math.abs( cosalpha ) >= 1d )
+        if( Math.abs( cosalpha ) >= 1d ) {
             return Math.PI;
+        }
 
         return Math.acos( cosalpha );
     }
@@ -289,12 +294,14 @@ public class ShapeOps {
         Ellipse2D el;
 
         length = Math.min( curr.length, next.length );
-        if( chars.length() < length )
-            throw new IllegalArgumentException( "Illegal argument(s) passed "
-                                                + "to drawInterpolate." );
-        if( pt.size() < length )
-            throw new IllegalArgumentException( "Illegal argument(s) passed "
-                                                + "to drawInterpolate." );
+        if( chars.length() < length ) {
+            throw new IllegalArgumentException( "Illegal argument(s) passed " +
+                     "to drawInterpolate." );
+        }
+        if( pt.size() < length ) {
+            throw new IllegalArgumentException( "Illegal argument(s) passed " +
+                     "to drawInterpolate." );
+        }
 
         if( length > 2 ) {
             e = interpolate( curr[length - 1], next[length - 1], step, numstep );
@@ -303,25 +310,26 @@ public class ShapeOps {
             a = transRot( a, center, rotAngle );
             b = interpolate( curr[1], next[1], step, numstep );
             b = transRot( b, center, rotAngle );
-            if( show5End )
+            if( show5End ) {
                 drawLabel( gc, e, a, b, "5'" );
-            else if( period > 0 && showNumberLabels )
+            } else if( period > 0 && showNumberLabels ) {
                 drawLabel( gc, e, a, b, "1" );
+            }
 
             c = interpolate( curr[length - 2], next[length - 2], step, numstep );
             c = transRot( c, center, rotAngle );
-            if( show3End )
+            if( show3End ) {
                 drawLabel( gc, c, e, a, "3'" );
-            else if( period > 0 && showNumberLabels && length % period == 0 )
+            } else if( period > 0 && showNumberLabels && length % period == 0 ) {
                 drawLabel( gc, c, e, a, String.valueOf( length ) );
+            }
         }
 
         for( i = 0; i < length; i++ ) {
             if( i == 0 ) {
                 a = interpolate( curr[i], next[i], step, numstep );
                 a = transRot( a, center, rotAngle );
-            }
-            else {
+            } else {
                 e = a;
                 a = b;
             }
@@ -329,10 +337,11 @@ public class ShapeOps {
             if( i < length - 1 ) {
                 b = interpolate( curr[i + 1], next[i + 1], step, numstep );
                 b = transRot( b, center, rotAngle );
-                if( period > 0
-                    && showNumberLabels
-                    && (i + 1) % period == 0 )
+                if( period > 0 &&
+                         showNumberLabels &&
+                         (i + 1) % period == 0 ) {
                     drawLabel( gc, e, a, b, String.valueOf( i + 1 ) );
+                }
             }
 
             mate = pt.getMate( i );
@@ -340,9 +349,9 @@ public class ShapeOps {
                 c = interpolate( curr[mate], next[mate], step, numstep );
                 c = transRot( c, center, rotAngle );
                 // draw pseudo-knots
-                if( mate <= i
-                    && pt.getType( i ) >= PairTable.PK1
-                    && showPseudoknots ) {
+                if( mate <= i &&
+                         pt.getType( i ) >= PairTable.PK1 &&
+                         showPseudoknots ) {
                     if( pt.getType( i < 1 ? length - 1 : i - 1 ) != pt.getType( i ) ) {
                         gc.setStroke( bondStroke );
                         gc.setColor( pseudoknotColor );
@@ -384,8 +393,8 @@ public class ShapeOps {
                             }
                             break;
                         default:
-                            if( pt.getType( i < 1 ? length - 1 : i - 1 ) != pt.getType( i )
-                                && showPseudoknots ) {
+                            if( pt.getType( i < 1 ? length - 1 : i - 1 ) != pt.getType( i ) &&
+                                     showPseudoknots ) {
                                 gc.setStroke( bondStroke );
                                 gc.setColor( pseudoknotColor );
                                 gc.draw( showBases ? resizeLine( a, c, -5 ) : new Line2D.Double( a, c ) );
@@ -398,14 +407,14 @@ public class ShapeOps {
             if( i < length - 1 ) {
                 if( showBackbone ) {
                     gc.setStroke( backboneStroke );
-                    if( pt.getType( i ) >= PairTable.PK1
-                        && pt.getType( i >= length - 1 ? 0 : i + 1 ) >= PairTable.PK1
-                        && pt.getType( mate < 1 ? length - 1 : mate - 1 ) == pt.getType( i )
-                        && showPseudoknots ) {
+                    if( pt.getType( i ) >= PairTable.PK1 &&
+                             pt.getType( i >= length - 1 ? 0 : i + 1 ) >= PairTable.PK1 &&
+                             pt.getType( mate < 1 ? length - 1 : mate - 1 ) == pt.getType( i ) &&
+                             showPseudoknots ) {
                         gc.setColor( pseudoknotColor );
-                    }
-                    else
+                    } else {
                         gc.setColor( backboneColor );
+                    }
                     gc.draw( showBases ? resizeLine( a, b, -5 ) : new Line2D.Double( a, b ) );
                 }
             }
@@ -435,8 +444,7 @@ public class ShapeOps {
                         default:
                             gc.setColor( textColor );
                     }
-                }
-                else {
+                } else {
                     gc.setColor( textColor );
                 }
                 gc.drawString( chars.substring( i, i + 1 ),

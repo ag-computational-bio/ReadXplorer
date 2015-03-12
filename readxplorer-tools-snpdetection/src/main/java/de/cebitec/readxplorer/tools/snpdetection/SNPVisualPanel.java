@@ -292,10 +292,9 @@ public final class SNPVisualPanel extends JobPanel {
 
     /**
      * @return <cc>true</cc>, if the minMismatchBases count corresponds to the
-     *         count of the most frequent base at the current position. <cc>false</cc>,
-     *         if the minMismatchBases count corresponds to the overall mismatch count
-     *         at
-     *         the current position.
+     *         count of the most frequent base at the current position.
+     *         <cc>false</cc>, if the minMismatchBases count corresponds to the
+     *         overall mismatch count at the current position.
      */
     public boolean isUseMainBase() {
         return this.useMainBaseBox.isSelected();
@@ -327,32 +326,30 @@ public final class SNPVisualPanel extends JobPanel {
 
 
     /**
-     * @return Checks if all required information to start the SNP analysis is set.
+     * @return Checks if all required information to start the SNP analysis is
+     *         set.
      */
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
         if( GeneralUtils.isValidPositiveIntegerInput( absNumText.getText() ) ) {
             this.minMismatchBases = Integer.parseInt( absNumText.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidByteInput( minBaseQualityField.getText() )
-            && GeneralUtils.isValidByteInput( minAvrgBaseQualField.getText() )
-            && GeneralUtils.isValidByteInput( minAvrgMappingQualField.getText() ) ) {
+        if( GeneralUtils.isValidByteInput( minBaseQualityField.getText() ) &&
+                 GeneralUtils.isValidByteInput( minAvrgBaseQualField.getText() ) &&
+                 GeneralUtils.isValidByteInput( minAvrgMappingQualField.getText() ) ) {
             this.minBaseQuality = Byte.parseByte( minBaseQualityField.getText() );
             this.minAverageBaseQual = Byte.parseByte( minAvrgBaseQualField.getText() );
             this.minAverageMappingQual = Byte.parseByte( minAvrgMappingQualField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         JTextField spinnerField = ((DefaultEditor) percentSpinner.getEditor()).getTextField();
         if( GeneralUtils.isValidDoublePercentage( spinnerField.getText() ) ) {
             this.minPercentage = Double.valueOf( spinnerField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
 
@@ -362,8 +359,8 @@ public final class SNPVisualPanel extends JobPanel {
 
 
     /**
-     * Updates the parameters for this panel with the globally stored
-     * settings for this wizard panel. If no settings were stored, the default
+     * Updates the parameters for this panel with the globally stored settings
+     * for this wizard panel. If no settings were stored, the default
      * configuration is chosen.
      */
     private void loadLastParameterSelection() {

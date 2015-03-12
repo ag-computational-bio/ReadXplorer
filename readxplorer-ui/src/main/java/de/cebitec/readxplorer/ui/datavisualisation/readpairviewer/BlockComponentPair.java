@@ -50,8 +50,8 @@ import org.openide.util.NbBundle;
 
 /**
  * A BlockComponent represents one read pair and displays all mappings of the
- * pair in the currently shown interval of the genome.
- * TODO: think about overlaps in pairs: enlarge layer height!
+ * pair in the currently shown interval of the genome. TODO: think about
+ * overlaps in pairs: enlarge layer height!
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -61,11 +61,12 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     private static final float SAT_AND_BRIGHT_SUBTRAHEND = 0.3f;
 
     /*
-     * In order to be efficient this class holds its main information in 4 arraylists.
-     * Therefore it is important to check that the rectangles representing mappings,
-     * their corresponding colors and their mappingType are added in the SAME order
-     * to the lists, to have access to one mappings data via the same index in
-     * all three arrays. The line list is a bit independent, since it is always grey.
+     * In order to be efficient this class holds its main information in 4
+     * arraylists. Therefore it is important to check that the rectangles
+     * representing mappings, their corresponding colors and their mappingType
+     * are added in the SAME order to the lists, to have access to one mappings
+     * data via the same index in all three arrays. The line list is a bit
+     * independent, since it is always grey.
      */
 
     private final ArrayList<Rectangle> rectList = new ArrayList<>();
@@ -84,7 +85,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     private static final String COPY_TOOLTIP = NbBundle.getMessage( BlockComponentPair.class, "CopyAttention" );
     private JPopupMenu copyMenu = new JPopupMenu();
     private ReadPairPopup readPairPopup;
-    private static JMenuItem copeySequenceItem;
+    private static JMenuItem copySequenceItem;
 
 
     public BlockComponentPair( BlockPair block, final AbstractViewer parentViewer, int height, float minSaturationAndBrightness ) {
@@ -195,8 +196,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     public boolean inExclusionList( ReadPairType readPairType ) {
         List<Classification> excludedFeatureTypes = this.parentViewer.getExcludedClassifications();
         FeatureType typeOfPair;
-        if( readPairType == ReadPairType.PERFECT_PAIR
-            || readPairType == ReadPairType.PERFECT_UNQ_PAIR ) {
+        if( readPairType == ReadPairType.PERFECT_PAIR ||
+                 readPairType == ReadPairType.PERFECT_UNQ_PAIR ) {
             typeOfPair = FeatureType.PERFECT_PAIR;
         } else if( readPairType == ReadPairType.UNPAIRED_PAIR ) {
             typeOfPair = FeatureType.SINGLE_MAPPING;
@@ -210,9 +211,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     /**
      * Determines the bounds of the rectangle representing the mapping and
-     * adjusts its color
-     * depending on the mapping type. Also paints the line for a read pair, if
-     * both mappings are visible.
+     * adjusts its color depending on the mapping type. Also paints the line for
+     * a read pair, if both mappings are visible.
      * <p>
      * @param pairColor basic color of the current read pair
      * @param mapping   mapping to create a colored rectangle for
@@ -266,7 +266,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * copying the sequence).
      */
     private void setPopupMenu() {
-        this.copyMenu.add( copeySequenceItem );
+        this.copyMenu.add( copySequenceItem );
     }
 
 
@@ -274,12 +274,12 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * Initialize this copy item only once for all instances.
      */
     private void initCopySeqItem() {
-        if( copeySequenceItem == null ) {
-            copeySequenceItem = new JMenuItem();
-            copeySequenceItem.addActionListener( this );
-            copeySequenceItem.setActionCommand( BlockComponentPair.COPY_SEQUENCE );
-            copeySequenceItem.setText( BlockComponentPair.COPY_SEQUENCE );
-            copeySequenceItem.setToolTipText( COPY_TOOLTIP );
+        if( copySequenceItem == null ) {
+            copySequenceItem = new JMenuItem();
+            copySequenceItem.addActionListener( this );
+            copySequenceItem.setActionCommand( BlockComponentPair.COPY_SEQUENCE );
+            copySequenceItem.setText( BlockComponentPair.COPY_SEQUENCE );
+            copySequenceItem.setToolTipText( COPY_TOOLTIP );
         }
     }
 
@@ -376,8 +376,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
 
     /**
-     * Creates the popup displaying all information regarding this read pair
-     * and allowing to jump to the position of other mappings of the pair.
+     * Creates the popup displaying all information regarding this read pair and
+     * allowing to jump to the position of other mappings of the pair.
      */
     private void createPopup( MouseEvent e ) {
         String pairType = this.determineReadPairType( this.block );
@@ -408,8 +408,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     /**
      * @return true, if this component contains rectangles to paint and thus is
-     *         paintable;
-     *         false otherwise.
+     *         paintable; false otherwise.
      */
     public boolean isPaintable() {
         return !this.rectList.isEmpty();

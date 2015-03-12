@@ -41,8 +41,7 @@ import javax.swing.table.TableRowSorter;
 
 /**
  * CoverageIntervalContainer panel for the coverage analysis. It displays the
- * table with
- * all covered or uncovered intervals of the reference.
+ * table with all covered or uncovered intervals of the reference.
  * <p>
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
@@ -61,8 +60,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
     /**
      * CoverageIntervalContainer panel for the coverage analysis. It displays
-     * the table
-     * with all covered or uncovered intervals of the reference.
+     * the table with all covered or uncovered intervals of the reference.
      */
     public ResultPanelCoverageAnalysis() {
         initComponents();
@@ -214,8 +212,8 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
 
     /**
-     * @param boundsInformationManager The bounds info manager to update, when
-     *                                 a result is clicked.
+     * @param boundsInformationManager The bounds info manager to update, when a
+     *                                 result is clicked.
      */
     public void setBoundsInfoManager( BoundsInfoManager boundsInformationManager ) {
         this.bim = boundsInformationManager;
@@ -233,8 +231,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
         if( this.coverageAnalysisResult == null ) {
             this.coverageAnalysisResult = coverageAnalysisResultNew;
-        }
-        else {
+        } else {
             CoverageIntervalContainer results = coverageAnalysisResult.getResults();
             List<CoverageInterval> coverageIntervals = new ArrayList<>( results.getCoverageIntervals() );
             List<CoverageInterval> coverageIntervalsRev = new ArrayList<>( results.getCoverageIntervalsRev() );
@@ -312,11 +309,11 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
 
     /**
-     * Retrieves the reference sequence of each interval in the result shown
-     * in this panel. A header describing the reference, chromosome and
-     * position is created and the reference sequence is appended in fasta
-     * format. Eventually, a StringFileChooser enables storing a file containing
-     * all interval sequences in mutliple fasta format.
+     * Retrieves the reference sequence of each interval in the result shown in
+     * this panel. A header describing the reference, chromosome and position is
+     * created and the reference sequence is appended in fasta format.
+     * Eventually, a StringFileChooser enables storing a file containing all
+     * interval sequences in mutliple fasta format.
      */
     private void exportSeqAsMultipleFasta() {
         StringBuilder results = new StringBuilder( 100 );
@@ -332,8 +329,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
                 start = coverageInterval.getStart();
                 stop = coverageInterval.getStop();
                 seq = reference.getChromSequence( chromId, start, stop );
-            }
-            else {
+            } else {
                 start = coverageInterval.getStop();
                 stop = coverageInterval.getStart();
                 seq = SequenceUtils.getReverseComplement( reference.getChromSequence( chromId, stop, start ) );

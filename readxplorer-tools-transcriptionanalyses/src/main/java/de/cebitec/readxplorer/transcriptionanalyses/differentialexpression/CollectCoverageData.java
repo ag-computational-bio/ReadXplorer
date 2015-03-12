@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * Collect the coverage data for a given track.
- *
+ * <p>
  * @author kstaderm
  */
 public class CollectCoverageData implements Observer {
@@ -50,17 +50,14 @@ public class CollectCoverageData implements Observer {
     /**
      * Adjusts how many bases downstream from the start position of a feature a
      * mapping should still be considered a hit. The features in the database
-     * are
-     * sometimes CDS positions. So it is normal that a lot of mappings will
-     * start in
-     * an are downstream of the start position of the feature.
+     * are sometimes CDS positions. So it is normal that a lot of mappings will
+     * start in an are downstream of the start position of the feature.
      */
     private final int startOffset;
     /**
      * Adjusts how many bases upstream from the stop position of a feature a
      * mapping should still be considered a hit. The features in the database
-     * are
-     * sometimes CDS positions. So it is normales that some mappings are not
+     * are sometimes CDS positions. So it is normales that some mappings are not
      * located exactly indside the feature positions.
      */
     private final int stopOffset;
@@ -69,7 +66,7 @@ public class CollectCoverageData implements Observer {
 
     /**
      * Constructor of the class.
-     *
+     * <p>
      * @param trackID      The ID of the track the instance of this class should
      *                     collect the coverage data for
      * @param perfAnalysis Instance of the calling instance of
@@ -86,7 +83,7 @@ public class CollectCoverageData implements Observer {
 
     /**
      * Updates the read count for the features with the given mappings.
-     *
+     * <p>
      * @param mappings the mappings
      */
     private void updateReadCountForFeatures( MappingResult result ) {
@@ -124,8 +121,7 @@ public class CollectCoverageData implements Observer {
                         }
 
                         //still mappings left, but need next feature
-                    }
-                    else if( mapping.getStart() > featStop ) {
+                    } else if( mapping.getStart() > featStop ) {
                         break;
                     }
                 }

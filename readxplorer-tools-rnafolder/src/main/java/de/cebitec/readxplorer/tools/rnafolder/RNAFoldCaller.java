@@ -33,17 +33,23 @@ import org.w3c.dom.Element;
 /**
  * Executes RNAFold on the bibiserv of the Bielefeld University at
  * http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html with the
- * given
- * intput data and returns the resulting string.
- *
+ * given intput data and returns the resulting string.
+ * <p>
  * @author Rolf Hilker
  */
-public class RNAFoldCaller {
+public final class RNAFoldCaller {
+
+
+    /**
+     * Instantiation not allowed.
+     */
+    private RNAFoldCaller() {
+    }
+
 
     /**
      * Calls http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html
-     * with the given string
-     * and returns the result string of the program.
+     * with the given string and returns the result string of the program.
      * <p>
      * @param selSequence the sequence to start RNA folder with
      * @param header      header string for the query
@@ -65,7 +71,7 @@ public class RNAFoldCaller {
             final URL wsdl = new URL( "http://bibiserv.techfak.uni-bielefeld.de/wsdl/RNAfold.wsdl" );
 
             /* declare where to find the describing WSDL */
-            if( selSequence == null  ||  selSequence.isEmpty() ) {
+            if( selSequence == null || selSequence.isEmpty() ) {
                 throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.HighlightError" ) );
                 //System.err.println("java RNAfoldCOrig -F <FastaFile> [-T <double>] \n"); //return popup with msg
             }
@@ -84,11 +90,9 @@ public class RNAFoldCaller {
                     // call and get result as DOM Tree(if finished)
                     return (String) call.invoke( new Object[]{ id } );
 
-                }
-                catch( InterruptedException e ) {
+                } catch( InterruptedException e ) {
                     throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ThreadError" ) );
-                }
-                catch( RemoteException e ) {
+                } catch( RemoteException e ) {
                     // on error WS will throw a soapfault as hobitstatuscode
                     Element root = ((AxisFault) e).lookupFaultDetail( new QName(
                             "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode" ) );
@@ -104,15 +108,13 @@ public class RNAFoldCaller {
 
             /* error handling with proper information for the user */
 
-        }
-        catch( RemoteException e ) {
+        } catch( RemoteException e ) {
             /* on error WS will throw a soapfault as hobitstatuscode */
             Element root = ((AxisFault) e).lookupFaultDetail( new QName(
                     "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode" ) );
             if( root == null ) {
                 throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ThreadError" ) + " " + e.toString() );
-            }
-            else {
+            } else {
                 String description = root.getLastChild().getFirstChild().getNodeValue();
                 String code = root.getFirstChild().getFirstChild().getNodeValue();
                 throw new RNAFoldException( "Remote Error: Statuscode:  " + code + ", Description: " + description );
@@ -120,17 +122,15 @@ public class RNAFoldCaller {
 
             /*
              * Using this kind of Webservice there is only one one field for
-             * returning an error message. When an axception occours, the
-             * client side of Axis will throw a RemoteException which includes
-             * the class name of the thrown exception. There is no way to get
-             * more information, like the original stacktrace !!!
+             * returning an error message. When an axception occours, the client
+             * side of Axis will throw a RemoteException which includes the
+             * class name of the thrown exception. There is no way to get more
+             * information, like the original stacktrace !!!
              */
-        }
-        catch( MalformedURLException e ) {
+        } catch( MalformedURLException e ) {
             throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.URLError" ) );
             //System.err.println("failed (" + e.toString() + ")");
-        }
-        catch( ServiceException e ) {
+        } catch( ServiceException e ) {
             throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ServiceError" ) + " " + server );
         }
 

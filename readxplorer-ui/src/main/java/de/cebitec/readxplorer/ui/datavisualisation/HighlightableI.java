@@ -30,7 +30,7 @@ import java.awt.Rectangle;
  */
 public interface HighlightableI {
 
-    public void setHighlightRectangle( Rectangle rect );
+    void setHighlightRectangle( Rectangle rect );
 
 
 }

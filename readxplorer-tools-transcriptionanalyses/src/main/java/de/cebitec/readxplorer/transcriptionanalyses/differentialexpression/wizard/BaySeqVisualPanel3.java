@@ -34,6 +34,8 @@ import javax.swing.event.ListSelectionListener;
 public final class BaySeqVisualPanel3 extends JPanel implements
         ListSelectionListener {
 
+    private static final long serialVersionUID = 1L;
+
     private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private final DefaultListModel<String> groupListModel = new DefaultListModel<>();
     private final List<Group> createdGroups = new ArrayList<>();
@@ -53,7 +55,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
 
     public void updateTrackList( List<PersistentTrack> selectedTracks ) {
         if( !this.selectedTracks.equals( selectedTracks ) ) {
-            this.selectedTracks = new ArrayList<>(selectedTracks );
+            this.selectedTracks = new ArrayList<>( selectedTracks );
             currentGroupNumber = 1;
             selectedIndex = -1;
             currentGroupBeingCreated = null;
@@ -61,14 +63,13 @@ public final class BaySeqVisualPanel3 extends JPanel implements
             groupListModel.clear();
             int[] defaultGroup = new int[selectedTracks.size()];
             StringBuilder strBuilder = new StringBuilder( "{" );
-            for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
+            for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
                 PersistentTrack persistentTrack = it.next();
                 defaultGroup[selectedTracks.indexOf( persistentTrack )] = currentGroupNumber;
                 strBuilder.append( persistentTrack.getDescription() );
                 if( it.hasNext() ) {
                     strBuilder.append( "," );
-                }
-                else {
+                } else {
                     strBuilder.append( "}" );
                 }
             }
@@ -227,15 +228,14 @@ public final class BaySeqVisualPanel3 extends JPanel implements
         if( !trackList.isSelectionEmpty() ) {
             List<PersistentTrack> tracks = trackList.getSelectedValuesList();
             StringBuilder strBuilder = new StringBuilder( groupCreationField.getText() + "{" );
-            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
+            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
                 PersistentTrack persistentTrack = it.next();
                 currentGroupBeingCreated[selectedTracks.indexOf( persistentTrack )] = currentGroupNumber;
                 strBuilder.append( persistentTrack.getDescription() );
                 trackListModel.removeElement( persistentTrack );
                 if( it.hasNext() ) {
                     strBuilder.append( "," );
-                }
-                else {
+                } else {
                     strBuilder.append( "}" );
                 }
             }

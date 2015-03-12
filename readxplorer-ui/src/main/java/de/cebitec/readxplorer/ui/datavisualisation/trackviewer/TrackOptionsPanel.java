@@ -46,8 +46,8 @@ import org.openide.util.NbPreferences;
 
 
 /**
- * Panel containing the display options for a track viewer like
- * automatic sclaing and normalizing the coverage.
+ * Panel containing the display options for a track viewer like automatic
+ * sclaing and normalizing the coverage.
  * <p>
  * @author jstraube, rhilker
  */
@@ -61,8 +61,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     /**
      * Creates a new Panel containing the display options for a track viewer
-     * like
-     * automatic sclaing and normalizing the coverage.
+     * like automatic sclaing and normalizing the coverage.
      * <p>
      * @param parentTrackViewer parent track viewer
      */

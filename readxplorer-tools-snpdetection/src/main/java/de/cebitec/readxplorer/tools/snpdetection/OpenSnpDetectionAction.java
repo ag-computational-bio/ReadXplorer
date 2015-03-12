@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -62,7 +64,7 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID( category = "Tools",
-    id = "de.cebitec.readxplorer.tools.snpdetection.OpenSnpDetectionAction" )
+           id = "de.cebitec.readxplorer.tools.snpdetection.OpenSnpDetectionAction" )
 @ActionRegistration( iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
                      displayName = "#CTL_OpenSNPDetection" )
 @ActionReferences( {
@@ -74,6 +76,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
                                                      DataVisualisationI {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger( OpenSnpDetectionAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "SNP_Wizard";
 
     private final ReferenceViewer context;
@@ -81,7 +84,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
     private final PersistentReference reference;
     private List<PersistentTrack> tracks;
     private Map<Integer, PersistentTrack> trackMap;
-    private SNP_DetectionTopComponent snpDetectionTopComp;
+    private SnpDetectionTopComponent snpDetectionTopComp;
     private OpenTracksWizardPanel openTracksPanel;
     private SelectReadClassWizardPanel readClassWizPanel;
     private SelectFeatureTypeWizardPanel featureTypePanel;
@@ -91,7 +94,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
     private Map<Integer, AnalysisSNPs> trackToAnalysisMap;
 
     private int finishedCovAnalyses = 0;
-    private SNP_DetectionResultPanel snpDetectionResultPanel;
+    private SNPDetectionResultPanel snpDetectionResultPanel;
 
 
     /**
@@ -155,7 +158,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             this.tracks = selectedTracks;
             this.trackMap = ProjectConnector.getTrackMap( tracks );
 
-            this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent( "SNP_DetectionTopComponent" );
+            this.snpDetectionTopComp = (SnpDetectionTopComponent) WindowManager.getDefault().findTopComponent( "SnpDetectionTopComponent" );
             this.snpDetectionTopComp.setName( Bundle.TITLE_SNPDetectionTopComp() );
             this.snpDetectionTopComp.setToolTipText( Bundle.HINT_SNP_DetectionTopComp() );
             this.snpDetectionTopComp.open();
@@ -188,8 +191,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             for( PersistentTrack track : tracks ) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
-                }
-                catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
@@ -197,14 +199,12 @@ public final class OpenSnpDetectionAction implements ActionListener,
                 //every track has its own analysis handlers
                 this.createAnalysis( connector, readClassParams );
             }
-        }
-        else {
+        } else {
             try {
                 connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassParams );
 
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
@@ -233,8 +233,9 @@ public final class OpenSnpDetectionAction implements ActionListener,
      * Actually prepares and shows the SNP detection result.
      * <p>
      * @param dataTypeObject a pair of an integer and a string = trackId and
-     *                       dataType. dataType has to be AnalysesHandler.DATA_TYPE_COVERAGE, if the
-     *                       SNPs shall be shown
+     *                       dataType. dataType has to be
+     *                       AnalysesHandler.DATA_TYPE_COVERAGE, if the SNPs
+     *                       shall be shown
      */
     @Override
     public void showData( Object dataTypeObject ) {
@@ -257,7 +258,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
                     @Override
                     public void run() {
                         if( snpDetectionResultPanel == null ) {
-                            snpDetectionResultPanel = new SNP_DetectionResultPanel();
+                            snpDetectionResultPanel = new SNPDetectionResultPanel();
                             snpDetectionResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
                         }
                         snpDetectionResultPanel.setReferenceGenome( context.getReference() );
@@ -276,8 +277,8 @@ public final class OpenSnpDetectionAction implements ActionListener,
                 } );
             }
 
-        }
-        catch( ClassCastException e ) {
+        } catch( ClassCastException e ) {
+            LOG.log(Level.INFO, "Passed wrong data container to {0}", getClass().getName());
             //do nothing, we dont handle other data in this class
         }
     }

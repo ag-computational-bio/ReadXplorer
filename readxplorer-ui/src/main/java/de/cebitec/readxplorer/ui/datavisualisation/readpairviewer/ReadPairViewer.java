@@ -53,7 +53,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * Viewer for read pairs.
- *
+ * <p>
  * @author rhilker
  */
 public class ReadPairViewer extends AbstractViewer implements ThreadListener {
@@ -264,9 +264,9 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 
 
     /**
-     * Creates a new visible component (BlockComponentPair) representing a
-     * read pair no matter if it only consists of a single mapping, one
-     * mapping of the pair, or both pair mappings and other single mappings.
+     * Creates a new visible component (BlockComponentPair) representing a read
+     * pair no matter if it only consists of a single mapping, one mapping of
+     * the pair, or both pair mappings and other single mappings.
      * <p>
      * @param block        the pair data to show is stored in this object
      * @param layerCounter determines the y-position of the component

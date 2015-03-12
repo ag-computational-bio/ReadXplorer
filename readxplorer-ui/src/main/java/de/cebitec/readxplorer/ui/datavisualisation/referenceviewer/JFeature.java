@@ -22,7 +22,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -44,7 +43,7 @@ import static java.util.logging.Level.SEVERE;
 /**
  * Contains the content of a feature and takes care of the painting process.
  * Also contains its popup menu.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class JFeature extends JComponent {
@@ -217,43 +216,61 @@ public class JFeature extends JComponent {
     private Color determineColor( PersistentFeature feature ) {
         Color c;
 
-        if( feature.getType() == FeatureType.CDS ) {
-            c = ColorProperties.CDS;
-        } else if( feature.getType() == FeatureType.MRNA ) {
-            c = ColorProperties.MRNA;
-        } else if( feature.getType() == FeatureType.MISC_RNA ) {
-            c = ColorProperties.MISC_RNA;
-        } else if( feature.getType() == FeatureType.REPEAT_UNIT ) {
-            c = ColorProperties.REPEAT_UNIT;
-        } else if( feature.getType() == FeatureType.RRNA ) {
-            c = ColorProperties.RRNA;
-        } else if( feature.getType() == FeatureType.SOURCE ) {
-            c = ColorProperties.SOURCE;
-        } else if( feature.getType() == FeatureType.TRNA ) {
-            c = ColorProperties.TRNA;
-        } else if( feature.getType() == FeatureType.GENE ) {
-            c = ColorProperties.GENE;
-        } else if( feature.getType() == FeatureType.MIRNA ) {
-            c = ColorProperties.MI_RNA;
-        } else if( feature.getType() == FeatureType.EXON ) {
-            c = ColorProperties.EXON;
-        } else if( feature.getType() == FeatureType.UNDEFINED ) {
-            c = ColorProperties.UNDEF_FEATURE;
-        } else if( feature.getType() == FeatureType.FIVE_UTR ) {
-            c = ColorProperties.FIVE_UTR;
-        } else if( feature.getType() == FeatureType.THREE_UTR ) {
-            c = ColorProperties.THREE_UTR;
-        } else if( feature.getType() == FeatureType.NC_RNA ) {
-            c = ColorProperties.NC_RNA;
-        } else if( feature.getType() == FeatureType.RBS ) {
-            c = ColorProperties.RBS;
-        } else if( feature.getType() == FeatureType.MINUS_THIRTYFIVE ) {
-            c = ColorProperties.MINUS_THIRTYFIVE;
-        } else if( feature.getType() == FeatureType.MINUS_TEN ) {
-            c = ColorProperties.MINUS_TEN;
-        } else {
-            LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
-            c = ColorProperties.UNDEF_FEATURE;
+        switch( feature.getType() ) {
+            case CDS:
+                c = ColorProperties.CDS;
+                break;
+            case MRNA:
+                c = ColorProperties.MRNA;
+                break;
+            case MISC_RNA:
+                c = ColorProperties.MISC_RNA;
+                break;
+            case REPEAT_UNIT:
+                c = ColorProperties.REPEAT_UNIT;
+                break;
+            case RRNA:
+                c = ColorProperties.RRNA;
+                break;
+            case SOURCE:
+                c = ColorProperties.SOURCE;
+                break;
+            case TRNA:
+                c = ColorProperties.TRNA;
+                break;
+            case GENE:
+                c = ColorProperties.GENE;
+                break;
+            case MIRNA:
+                c = ColorProperties.MI_RNA;
+                break;
+            case EXON:
+                c = ColorProperties.EXON;
+                break;
+            case UNDEFINED:
+                c = ColorProperties.UNDEF_FEATURE;
+                break;
+            case FIVE_UTR:
+                c = ColorProperties.FIVE_UTR;
+                break;
+            case THREE_UTR:
+                c = ColorProperties.THREE_UTR;
+                break;
+            case NC_RNA:
+                c = ColorProperties.NC_RNA;
+                break;
+            case RBS:
+                c = ColorProperties.RBS;
+                break;
+            case MINUS_THIRTYFIVE:
+                c = ColorProperties.MINUS_THIRTYFIVE;
+                break;
+            case MINUS_TEN:
+                c = ColorProperties.MINUS_TEN;
+                break;
+            default:
+                LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
+                c = ColorProperties.UNDEF_FEATURE;
         }
 
         return c;

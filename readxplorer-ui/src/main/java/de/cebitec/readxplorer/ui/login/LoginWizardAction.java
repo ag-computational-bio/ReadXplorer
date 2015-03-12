@@ -44,7 +44,7 @@ import org.openide.windows.WindowManager;
 
 /**
  * Action for opening the login wizard.
- *
+ * <p>
  * @author ddoppmeier, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @Messages( {

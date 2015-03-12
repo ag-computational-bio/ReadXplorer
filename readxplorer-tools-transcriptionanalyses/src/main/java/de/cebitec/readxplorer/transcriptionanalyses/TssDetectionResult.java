@@ -113,7 +113,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * <p>
      * @param newTss Promotor regions of the detected TSS
      */
-    public void addTss(List<TranscriptionStart> newTss) {
+    public void addTss( List<TranscriptionStart> newTss ) {
         this.results.addAll( newTss );
     }
 
@@ -139,8 +139,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
     /**
      * @return creates and returns the list of transcription start site
-     *         descriptions
-     *         for the columns of the table.
+     *         descriptions for the columns of the table.
      */
     @Override
     public List<List<String>> dataColumnDescriptions() {
@@ -184,7 +183,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add( "Stop Codon Pos" );
         dataColumnDescriptions.add( "Codon CDS Stop" );
         dataColumnDescriptions.add( "Codon CDS Length" );
-        if ( tssParameters.isAssociateTss() ) {
+        if( tssParameters.isAssociateTss() ) {
             dataColumnDescriptions.add( "Associated TSS" );
         }
         dataColumnDescriptions.add( "70bp Upstream of Start" );
@@ -205,8 +204,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
     /**
      * @return creates and returns the list of transcription start rows
-     *         belonging
-     *         to the transcription start site table.
+     *         belonging to the transcription start site table.
      */
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
@@ -228,7 +226,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             DetectedFeatures detFeatures = tss.getDetFeatures();
             tssRow.add( detFeatures.isLeaderless() ? "yes" : "" );
             tssRow.add( tss.isPrimaryTss() ? "primary" : "secondary" );
-            if (tss.isPrimaryTss()) {
+            if( tss.isPrimaryTss() ) {
                 tssRow.add( "-" );
             } else {
                 tssRow.add( tss.getPrimaryTss().getPos() );
@@ -258,8 +256,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 TableUtils.addEmptyColumns( 7, tssRow );
             }
 
-            if (tssParameters.isAssociateTss()) {
-                tssRow.add( GeneralUtils.implode(",", tss.getAssociatedTssList().toArray()) );
+            if( tssParameters.isAssociateTss() ) {
+                tssRow.add( GeneralUtils.implode( ",", tss.getAssociatedTssList().toArray() ) );
             }
 
             tssRow.add( promotorRegions.get( i ) );
@@ -292,7 +290,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                                                                       tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no" ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Minimum transcript extension coverage:",
                                                                       tssParameters.isPerformUnannotatedTranscriptDet()
-                                                                              ? tssParameters.getMinTranscriptExtensionCov() : "-" ) );
+                                                                      ? tssParameters.getMinTranscriptExtensionCov() : "-" ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Maximum distance to feature of leaderless transcripts:",
                                                                       tssParameters.getMaxFeatureDistance() ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Associate nearby neighboring TSS?",
@@ -317,10 +315,10 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_LEADERLESS, statsMap.get( TSS_LEADERLESS ), percentMap.get( TSS_LEADERLESS ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_PRIMARY, statsMap.get( TSS_PRIMARY ), percentMap.get( TSS_PRIMARY ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_SECONDARY, statsMap.get( TSS_SECONDARY ), percentMap.get( TSS_SECONDARY ) ) );
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(TSS_ASSOCIATED,
-                tssParameters.isAssociateTss() ? statsMap.get(TSS_ASSOCIATED) : "-", percentMap.get(TSS_ASSOCIATED)));
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_ASSOCIATED,
+                                                                      tssParameters.isAssociateTss() ? statsMap.get( TSS_ASSOCIATED ) : "-", percentMap.get( TSS_ASSOCIATED ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_NOVEL,
-                tssParameters.isPerformUnannotatedTranscriptDet() ? statsMap.get( TSS_NOVEL ) : "-", percentMap.get( TSS_NOVEL ) ) );
+                                                                      tssParameters.isPerformUnannotatedTranscriptDet() ? statsMap.get( TSS_NOVEL ) : "-", percentMap.get( TSS_NOVEL ) ) );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_UPSTREAM, statsMap.get( TSS_UPSTREAM ), percentMap.get( TSS_UPSTREAM ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( TSS_UPSTREAM1, statsMap.get( TSS_UPSTREAM1 ), percentMap.get( TSS_UPSTREAM1 ) ) );
@@ -360,8 +358,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * start, stop).
      * <p>
      * @param feature     the feature to add. In case it is null the row
-     *                    receives
-     *                    "-" entries.
+     *                    receives "-" entries.
      * @param tssRow      the row to which the data should be added
      * @param tss         The TSS fo which the data shall be added
      * @param addDistance true, if the distance from the feature start to the
@@ -434,18 +431,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
             if( tss.isFwdStrand() ) {
                 ++noFwdFeatures;
-            }
-            else {
+            } else {
                 ++noRevFeatures;
             }
 
-            if (tss.isPrimaryTss()) {
+            if( tss.isPrimaryTss() ) {
                 ++noPrimaryTss;
             } else {
                 ++noSecondaryTss;
             }
 
-            if (tss.getAssociatedTssList().size() > 0) {
+            if( tss.getAssociatedTssList().size() > 0 ) {
                 ++noAssociatedTss;
             }
 
@@ -461,23 +457,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 distance = Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) );
                 if( distance == 1 ) {
                     ++noUpstreamFeature1;
-                }
-                else if( distance > 1 && distance < 6 ) {
+                } else if( distance > 1 && distance < 6 ) {
                     ++noUpstreamFeature5;
-                }
-                else if( distance > 5 && distance < 11 ) {
+                } else if( distance > 5 && distance < 11 ) {
                     ++noUpstreamFeature10;
-                }
-                else if( distance > 10 && distance < 21 ) {
+                } else if( distance > 10 && distance < 21 ) {
                     ++noUpstreamFeature20;
-                }
-                else if( distance > 20 && distance < 51 ) {
+                } else if( distance > 20 && distance < 51 ) {
                     ++noUpstreamFeature50;
-                }
-                else if( distance > 50 && distance < 101 ) {
+                } else if( distance > 50 && distance < 101 ) {
                     ++noUpstreamFeature100;
-                }
-                else if( distance > 100 && distance < 251 ) {
+                } else if( distance > 100 && distance < 251 ) {
                     ++noUpstreamFeature250;
                 }
             }
@@ -492,23 +482,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
                 if( distance == 1 ) {
                     ++noDownstreamFeature1;
-                }
-                else if( distance > 1 && distance < 6 ) {
+                } else if( distance > 1 && distance < 6 ) {
                     ++noDownstreamFeature5;
-                }
-                else if( distance > 5 && distance < 11 ) {
+                } else if( distance > 5 && distance < 11 ) {
                     ++noDownstreamFeature10;
-                }
-                else if( distance > 10 && distance < 21 ) {
+                } else if( distance > 10 && distance < 21 ) {
                     ++noDownstreamFeature20;
-                }
-                else if( distance > 20 && distance < 51 ) {
+                } else if( distance > 20 && distance < 51 ) {
                     ++noDownstreamFeature50;
-                }
-                else if( distance > 50 && distance < 101 ) {
+                } else if( distance > 50 && distance < 101 ) {
                     ++noDownstreamFeature100;
-                }
-                else if( distance > 100 && distance < 251 ) {
+                } else if( distance > 100 && distance < 251 ) {
                     ++noDownstreamFeature250;
                 }
             }
@@ -548,7 +532,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statsMap.put( TSS_DOWNSTREAM100, statsMap.get( TSS_DOWNSTREAM100 ) + noDownstreamFeature100 );
         statsMap.put( TSS_DOWNSTREAM250, statsMap.get( TSS_DOWNSTREAM250 ) + noDownstreamFeature250 );
 
-        setStatsMap(statsMap); //since we want to store the update in the result itself
+        setStatsMap( statsMap ); //since we want to store the update in the result itself
     }
 
 
@@ -556,7 +540,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * Initializes the statistics map.
      */
     private void initStatsMap() {
-        Map<String, Integer> statsMap = new HashMap<>(getStatsMap());
+        Map<String, Integer> statsMap = new HashMap<>( getStatsMap() );
 
         statsMap.put( TSS_TOTAL, 0 );
         statsMap.put( TSS_CORRECT, 0 );
@@ -584,6 +568,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statsMap.put( TSS_DOWNSTREAM100, 0 );
         statsMap.put( TSS_DOWNSTREAM250, 0 );
 
-        setStatsMap(statsMap); //since we want to store the update in the result itself
+        setStatsMap( statsMap ); //since we want to store the update in the result itself
     }
+
+
 }

@@ -27,7 +27,7 @@ import java.util.List;
 
 
 /**
- * Contains all available information about a persistent feature.
+ * Contains all available information about a parsed feature.
  * <p>
  * @author ddoppmeier, rhilker
  */
@@ -47,7 +47,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
 
     /**
-     * Contains all available information about a persistent feature.
+     * Contains all available information about a parsed feature.
      * <p>
      * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA,
      * FeatureType.SOURCE, FeatureType.T_RNA, FeatureType.MISC_RNA,
@@ -58,7 +58,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * SequenceUtils.STRAND_REV on reverse strand
      * @param locusTag locus information
      * @param product description of the protein product
-     * @param ecNumber ec number
+     * @param ecNumber The EC number, if it exists, empty string otherwise
      * @param geneName name of the gene, if it exists (e.g. "dnaA")
      * @param subFeatures the list of sub features belonging to this feature
      * @param parentIds the ids of the features to which the current feature
@@ -91,7 +91,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * SequenceUtils.STRAND_REV on reverse strand
      * @param locusTag locus information
      * @param product description of the protein product
-     * @param ecNumber ec number
+     * @param ecNumber The EC number, if it exists, empty string otherwise
      * @param geneName name of the gene, if it exists (e.g. "dnaA")
      * @param subFeatures the list of sub features belonging to this feature
      * @param parentIds the ids of the features to which the current feature
@@ -117,41 +117,67 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     }
 
 
+    /**
+     * @return true, if it has an EC number, false otherwise
+     */
     public boolean hasEcNumber() {
-        return ecNumber != null;
+        return ecNumber != null && !ecNumber.isEmpty();
     }
 
 
+    /**
+     * @return The EC number, if it exists, empty string otherwise
+     */
     public String getEcNumber() {
         return ecNumber;
     }
 
 
+    /**
+     * @return true, if it has a gene name, false otherwise
+     */
     public boolean hasGeneName() {
-        return this.geneName != null;
+        return geneName != null && !geneName.isEmpty();
     }
 
 
+    /**
+     * @return name of the gene, if it exists (e.g. "dnaA"), empty string
+     *         otherwise
+     */
     public String getGeneName() {
         return this.geneName;
     }
 
 
+    /**
+     * @return true, if it has locus information, false otherwise
+     */
     public boolean hasLocusTag() {
-        return locusTag != null;
+        return locusTag != null && !locusTag.isEmpty();
     }
 
 
+    /**
+     * @return locus information if it exists, empty string otherwise
+     */
     public String getLocusTag() {
         return locusTag;
     }
 
 
+    /**
+     * @return true, if it has protein product information, false otherwise
+     */
     public boolean hasProduct() {
         return product != null;
     }
 
 
+    /**
+     * @return description of the protein product if it exists, empty string
+     *         otherwise
+     */
     public String getProduct() {
         return product;
     }
@@ -175,18 +201,30 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     }
 
 
+    /**
+     * @return true, if it has strand information, false otherwise
+     */
     public boolean hasStrand() {
         return strand != null && strand != 0;
     }
 
 
+    /**
+     * @return SequenceUtils.STRAND_FWD for featues on forward and
+     *         SequenceUtils.STRAND_REV on reverse strand
+     */
     public int getStrand() {
         return strand;
     }
 
 
+    /**
+     * Convenience method for getting the {@link FeatureType} of this feature
+     * instead of calling {@link #getNodeType()}.
+     * @return The {@link FeatureType} of this feature
+     */
     public FeatureType getType() {
-        return this.getNodeType(); //TODO remove this method, if everything works
+        return this.getNodeType();
     }
 
 

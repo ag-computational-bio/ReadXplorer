@@ -51,8 +51,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * <p>
      * @param results      the results of the covered feature detection
      * @param trackMap     the map of track ids to the tracks, for which the
-     *                     covered
-     *                     feature detection was carried out
+     *                     covered feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
     public CoveredFeatureResult( List<CoveredFeature> results, Map<Integer, PersistentTrack> trackMap, PersistentReference reference,
@@ -187,8 +186,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         String tableHeader;
         if( parameters.isGetCoveredFeatures() ) {
             tableHeader = "Covered Features Table";
-        }
-        else {
+        } else {
             tableHeader = "Uncovered Features Table";
         }
         sheetNames.add( tableHeader );

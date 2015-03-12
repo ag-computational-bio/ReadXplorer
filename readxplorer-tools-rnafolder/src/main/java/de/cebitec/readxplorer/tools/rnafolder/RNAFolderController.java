@@ -32,7 +32,7 @@ import org.openide.windows.WindowManager;
 
 /**
  * Controls and creates the content of a RNAFolderTopComponent.
- *
+ * <p>
  * @author Rolf Hilker
  */
 @ServiceProvider( service = RNAFolderI.class )
@@ -78,8 +78,7 @@ public class RNAFolderController implements RNAFolderI {
                     rnaFolderTopComp.openRNAMovie( rnaMovie, header );
                     progressHandle.finish();
 
-                }
-                catch( RNAFoldException ex ) {
+                } catch( RNAFoldException ex ) {
                     NotifyDescriptor nd = new NotifyDescriptor.Message( ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE );
                     DialogDisplayer.getDefault().notify( nd );
                 }

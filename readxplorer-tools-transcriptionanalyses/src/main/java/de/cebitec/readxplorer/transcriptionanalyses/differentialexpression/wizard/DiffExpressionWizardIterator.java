@@ -89,7 +89,7 @@ public final class DiffExpressionWizardIterator implements
 
     /**
      * Action, which is performed, when this wizard shall be opened.
-     *
+     * <p>
      * @param e
      */
     @Override
@@ -116,9 +116,8 @@ public final class DiffExpressionWizardIterator implements
 
             if( tool == DeAnalysisHandler.Tool.BaySeq ) {
                 handler = new BaySeqAnalysisHandler( selectedTracks, createdGroups, genomeID,
-                                                     replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams);
-            }
-            else if( tool == DeAnalysisHandler.Tool.DeSeq ) {
+                                                     replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+            } else if( tool == DeAnalysisHandler.Tool.DeSeq ) {
                 boolean moreThanTwoConditions = (boolean) wiz.getProperty( "moreThanTwoConditions" );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
@@ -130,16 +129,14 @@ public final class DiffExpressionWizardIterator implements
                 }
                 handler = new DeSeqAnalysisHandler( selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
                                                     fittingGroupTwo, genomeID, workingWithoutReplicates,
-                                                    saveFile, featureTypes, startOffset, stopOffset, readClassParams);
-            }
-            else if( tool == DeAnalysisHandler.Tool.DeSeq2 ) {
+                                                    saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+            } else if( tool == DeAnalysisHandler.Tool.DeSeq2 ) {
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
                 handler = new DeSeq2AnalysisHandler( selectedTracks, design, null,
                                                      null, genomeID, workingWithoutReplicates,
-                                                     saveFile, featureTypes, startOffset, stopOffset, readClassParams);
-            }
-            else if( tool == DeAnalysisHandler.Tool.ExpressTest ) {
+                                                     saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+            } else if( tool == DeAnalysisHandler.Tool.ExpressTest ) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty( "groupA" );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
                 int[] groupA = new int[groupAList.size()];
@@ -162,8 +159,7 @@ public final class DiffExpressionWizardIterator implements
                 handler = new ExpressTestAnalysisHandler( selectedTracks, groupA, groupB, genomeID, workingWithoutReplicates,
                                                           saveFile, featureTypes, startOffset, stopOffset, readClassParams, normalizationFeatures );
 
-            }
-            else if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
+            } else if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
                 handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams );
             }
 
@@ -335,8 +331,7 @@ public final class DiffExpressionWizardIterator implements
             if( moreThanTwoConditions ) {
                 currentPanels = deSeqMoreCondsPanels;
                 contentData = deSeqMoreCondsIndex;
-            }
-            else {
+            } else {
                 contentData = deSeqTwoCondsIndex;
             }
             if( contentData != null ) {
@@ -381,8 +376,8 @@ public final class DiffExpressionWizardIterator implements
 
     /**
      * @return The dynamically generated property name for the read class
-     *         selection for this wizard. Can be used to obtain the corresponding read
-     *         class parameters.
+     *         selection for this wizard. Can be used to obtain the
+     *         corresponding read class parameters.
      */
     public String getReadClassPropForWiz() {
         return this.readClassPanel.getPropReadClassParams();

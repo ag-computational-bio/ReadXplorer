@@ -136,10 +136,10 @@ public class DBItem extends StandardItem {
 
 
     /**
-     * @param RefID the unique Reference ID to set
+     * @param refID the unique Reference ID to set
      */
-    public void setRefID( Long RefID ) {
-        this.refID = RefID;
+    public void setRefID( Long refID ) {
+        this.refID = refID;
     }
 
 

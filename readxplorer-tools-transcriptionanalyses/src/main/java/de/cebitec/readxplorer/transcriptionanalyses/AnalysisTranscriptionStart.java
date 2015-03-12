@@ -53,26 +53,20 @@ import static java.util.logging.Logger.getLogger;
 /**
  * Carries out the logic behind the transcription start site (TSS) anaylsis.
  * When executing the transcription start site detection increaseReadCount is
- * always active
- * and maxInitialReadCount + increaseReadCount2 are optional parameters. They
- * can
- * further constrain the search space (e.g. inc = 100, max = 10, inc2 = 50 means
- * that read starts above 50 with an initial read count of 0-10 are detected
- * as transcription start sites, but also all increases of 100 and bigger. When
- * the parameters are
- * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases
- * above 100
- * with an initial read count of 0-10 are detected as transcription start sites,
- * but for all positions
- * with an initial read count > 10 an increase of 50 read counts is enough to be
+ * always active and maxInitialReadCount + increaseReadCount2 are optional
+ * parameters. They can further constrain the search space (e.g. inc = 100, max
+ * = 10, inc2 = 50 means that read starts above 50 with an initial read count of
+ * 0-10 are detected as transcription start sites, but also all increases of 100
+ * and bigger. When the parameters are switched, e.g. inc = 50, max = 10, inc2 =
+ * 100, then all coverage increases above 100 with an initial read count of 0-10
+ * are detected as transcription start sites, but for all positions with an
+ * initial read count > 10 an increase of 50 read counts is enough to be
  * detected.
  * <p>
  * 1. Nach Coverage: a) More read starts than threshold of 99,75% of read starts
- * in data set
- * b) Coverage Increase in percent larger than 99,75% of the increase
- * percentages
- * 2. Nach Mappingstarts: a) Nach Chernoff-Formel
- * b) Nach Wahrscheinlichkeitsformel (Binomialverteilung)
+ * in data set b) Coverage Increase in percent larger than 99,75% of the
+ * increase percentages 2. Nach Mappingstarts: a) Nach Chernoff-Formel b) Nach
+ * Wahrscheinlichkeitsformel (Binomialverteilung)
  * <p>
  * @author -Rolf Hilker-
  * <p>
@@ -106,25 +100,18 @@ public class AnalysisTranscriptionStart implements Observer,
     private final Map<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
 
 
-
     /**
-     * Carries out the logic behind the transcription start site analysis.
-     * When executing the transcription start site detection increaseReadCount
-     * is always active
-     * and maxInitialReadCount + increaseReadCount2 are optional parameters.
-     * They can
-     * further constrain the search space (e.g. inc = 100, max = 10, inc2 = 50
-     * means
-     * that coverage increases above 50 with an initial read count of 0-10 are
-     * detected
-     * as transcription start sites, but also all increases of 100 and bigger.
-     * When the parameters are
-     * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage
-     * increases above 100
-     * with an initial read count of 0-10 are detected as transcription start
-     * sites, but for all positions
-     * with an initial read count > 10 an increase of 50 read counts is enough
-     * to be detected.
+     * Carries out the logic behind the transcription start site analysis. When
+     * executing the transcription start site detection increaseReadCount is
+     * always active and maxInitialReadCount + increaseReadCount2 are optional
+     * parameters. They can further constrain the search space (e.g. inc = 100,
+     * max = 10, inc2 = 50 means that coverage increases above 50 with an
+     * initial read count of 0-10 are detected as transcription start sites, but
+     * also all increases of 100 and bigger. When the parameters are switched,
+     * e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases above
+     * 100 with an initial read count of 0-10 are detected as transcription
+     * start sites, but for all positions with an initial read count > 10 an
+     * increase of 50 read counts is enough to be detected.
      * <p>
      * @param trackConnector the track viewer for which the analyses should be
      *                       carried out
@@ -183,13 +170,14 @@ public class AnalysisTranscriptionStart implements Observer,
      * 10, but for small data sets the formula calculates the rounded up value
      * of number of mappings in data set / ( 0.1 * genome length ). This is
      * meant as a rough estimator for a useful initial threshold.
+     * <p>
      * @param genomeLength Total length of the genome under analysis
      */
     private void calcInitialReadStartThreshold( int genomeLength ) {
         int noMappings = trackConnector.getTrackStats().getStatsMap().get( StatsContainer.NO_MAPPINGS );
         //for small read numbers calculate a lower initial threshold
-        int defaultMinReadStarts = (int) Math.floor(noMappings / ( 0.1 * genomeLength ) ); //always round down but the minimum is 1
-        if (defaultMinReadStarts > 10) {
+        int defaultMinReadStarts = (int) Math.floor( noMappings / (0.1 * genomeLength) ); //always round down but the minimum is 1
+        if( defaultMinReadStarts > 10 ) {
             defaultMinReadStarts = 10; // to ensure values smaller or equal to 10 as initial threshold
         } else if( defaultMinReadStarts < 1 ) {
             defaultMinReadStarts = 1;
@@ -324,8 +312,7 @@ public class AnalysisTranscriptionStart implements Observer,
                 readStartsFwd = readStartArrayRev[pos];
                 readStartsRev = readStartArrayFwd[pos + 1];
             }
-        }
-        else {
+        } else {
             if( isBothFwdDirection ) { //TODO: Strand options disrupt distributions! calculate one for each strand option!
                 increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
                 increaseRev = 0;
@@ -357,15 +344,13 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * Method for analyzing the coverage of one pair of neighboring positions
-     * and
-     * detecting a transcription start site, if the parameters are satisfied.
+     * and detecting a transcription start site, if the parameters are
+     * satisfied.
      * <p>
      * @param coverage      the CoverageManager container
      * @param pos           the position defining the pair to analyse: pos and
-     *                      (pos + 1)
-     *                      on the fwd strand the TSS pos is "pos+1" and on the reverse strand the
-     *                      TSS
-     *                      position is "pos"
+     *                      (pos + 1) on the fwd strand the TSS pos is "pos+1"
+     *                      and on the reverse strand the TSS position is "pos"
      * @param readStartsFwd
      * @param readStartsRev
      * @param revCov1
@@ -376,21 +361,21 @@ public class AnalysisTranscriptionStart implements Observer,
     private void detectStart( int pos, int chromId, int chromLength, List<PersistentFeature> chromFeatures, int readStartsFwd,
                               int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev ) {
 
-        if( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts())
-             || readStartsFwd > parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts())
-            && percentIncreaseFwd > parametersTSS.getMinPercentIncrease() ) {
+        if( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts()) ||
+                 readStartsFwd > parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts()) &&
+                 percentIncreaseFwd > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos + 1, chromLength, chromFeatures, true );
             addDetectStart( new TranscriptionStart( pos + 1, true, readStartsFwd,
-                    percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId ) );
+                                                    percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
-        if( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts())
-             || readStartsRev > parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts())
-            && percentIncreaseRev > parametersTSS.getMinPercentIncrease() ) {
+        if( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts()) ||
+                 readStartsRev > parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts()) &&
+                 percentIncreaseRev > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos, chromLength, chromFeatures, false );
             addDetectStart( new TranscriptionStart( pos, false, readStartsRev,
-                    percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID(), chromId ) );
+                                                    percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
 
         if( this.parametersTSS.isAutoTssParamEstimation() ) {
@@ -402,8 +387,10 @@ public class AnalysisTranscriptionStart implements Observer,
         }
     }
 
+
     /**
      * Add the detected TSS to the result list.
+     * <p>
      * @param tss The TSS to add
      */
     protected void addDetectStart( TranscriptionStart tss ) {
@@ -417,16 +404,15 @@ public class AnalysisTranscriptionStart implements Observer,
      * starting at the predicted transcription start site, which would be a
      * correct start, or it will contain the maximal two closest features found
      * in a vicinity of 1000bp up- or downstream of the transcription start
-     * site.
-     * If more than one feature start at the detected TSS position, only the
-     * last fitting feature is returned as correct start.
+     * site. If more than one feature start at the detected TSS position, only
+     * the last fitting feature is returned as correct start.
      * <p>
      * @param tssPos      the predicted transcription start site position
      * @param isFwdStrand the strand, on which the transcription start site is
      *                    located
      * <p>
-     * @return the genomic features, which can be associated to the
-     *         given transcription start site and strand.
+     * @return the genomic features, which can be associated to the given
+     *         transcription start site and strand.
      */
     private DetectedFeatures findNextFeatures( int tssPos, int chromLength, List<PersistentFeature> chromFeatures, boolean isFwdStrand ) {
         final int maxFeatureDist = parametersTSS.getMaxFeatureDistance();
@@ -442,8 +428,9 @@ public class AnalysisTranscriptionStart implements Observer,
                 start = feature.getStart();
 
                 /*
-                 * We use all features, because also mRNA or rRNA features can contribute to TSS detection,
-                 * as they also depict expressed sequences from the reference
+                 * We use all features, because also mRNA or rRNA features can
+                 * contribute to TSS detection, as they also depict expressed
+                 * sequences from the reference
                  */
                 if( start >= minStartPos && feature.isFwdStrand() && start <= maxStartPos ) {
 
@@ -457,17 +444,19 @@ public class AnalysisTranscriptionStart implements Observer,
                         //upstream feature & correctly annotated transcription start site
 
                         /*
-                         * Also check, if gene and CDS feature are available and covering each other.
-                         * Handle this case by not storing the current feature, if it is
-                         * a CDS feature completely covered by a gene feature. In all other
-                         * cases the feature can be stored, since we also use CDS features for TSS detection,
-                         * if no gene feature is available.
+                         * Also check, if gene and CDS feature are available and
+                         * covering each other. Handle this case by not storing
+                         * the current feature, if it is a CDS feature
+                         * completely covered by a gene feature. In all other
+                         * cases the feature can be stored, since we also use
+                         * CDS features for TSS detection, if no gene feature is
+                         * available.
                          */
                         PersistentFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
-                        if( upstreamAnno != null
-                            && feature.getType() == FeatureType.CDS
-                            && upstreamAnno.getType() == FeatureType.GENE
-                            && upstreamAnno.getStop() >= feature.getStop() ) {
+                        if( upstreamAnno != null &&
+                                 feature.getType() == FeatureType.CDS &&
+                                 upstreamAnno.getType() == FeatureType.GENE &&
+                                 upstreamAnno.getStop() >= feature.getStop() ) {
 //                            LOG.log( Level.INFO, null, "CDS covered by gene feature Fwd");
                             continue;
                         }
@@ -482,13 +471,14 @@ public class AnalysisTranscriptionStart implements Observer,
 
                     } else if( start > tssPos ) {
                         /*
-                         * Store next downstream feature, transcription start is earlier than annotated,
-                         * except the current feature is a CDS feature and no gene feature is present for
-                         * that gene, starting earlier.
+                         * Store next downstream feature, transcription start is
+                         * earlier than annotated, except the current feature is
+                         * a CDS feature and no gene feature is present for that
+                         * gene, starting earlier.
                          */
-                        if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size()
-                            && feature.getStart() == chromFeatures.get( i + 1 ).getStart()
-                            && chromFeatures.get( i + 1 ).getType() == FeatureType.GENE ) {
+                        if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size() &&
+                                 feature.getStart() == chromFeatures.get( i + 1 ).getStart() &&
+                                 chromFeatures.get( i + 1 ).getType() == FeatureType.GENE ) {
                             detectedFeatures.setDownstreamFeature( chromFeatures.get( i + 1 ) );
                             detectedFeatures.setIsLeaderless( isLeaderless( chromFeatures.get( i + 1 ), tssPos ) );
 //                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Fwd");
@@ -508,8 +498,7 @@ public class AnalysisTranscriptionStart implements Observer,
                     break;
                 }
             }
-        }
-        else { //means: strand == SequenceUtils.STRAND_REV
+        } else { //means: strand == SequenceUtils.STRAND_REV
 
             for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); ++i ) {
                 feature = chromFeatures.get( i );
@@ -527,15 +516,16 @@ public class AnalysisTranscriptionStart implements Observer,
                         //bigger feature & correctly annotated transcription start site
 
                         /*
-                         * Store next upstream feature. transcription start is earlier than annotated,
-                         * except the current feature is a CDS feature and no gene feature is present for
-                         * that gene, starting earlier.
+                         * Store next upstream feature. transcription start is
+                         * earlier than annotated, except the current feature is
+                         * a CDS feature and no gene feature is present for that
+                         * gene, starting earlier.
                          */
                         PersistentFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
-                        if( upstreamAnno != null
-                            && feature.getType() == FeatureType.CDS
-                            && start == upstreamAnno.getStop()
-                            && upstreamAnno.getType() == FeatureType.GENE ) {
+                        if( upstreamAnno != null &&
+                                 feature.getType() == FeatureType.CDS &&
+                                 start == upstreamAnno.getStop() &&
+                                 upstreamAnno.getType() == FeatureType.GENE ) {
                             //TODO: this does not work if features start at the same position on rev and fwd strand!
 //                            LOG.log( Level.INFO, null, "CDS covered by gene feature Rev");
                             continue; // we want to keep the gene instead the CDS feature
@@ -553,13 +543,12 @@ public class AnalysisTranscriptionStart implements Observer,
                     } else if( start > tssPos && feature.getStart() < tssPos ) {
                         //store next upstream feature, translation start is further in gene
 
-                        if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size()
-                            && chromFeatures.get( i + 1 ).getType() == FeatureType.GENE
-                            && chromFeatures.get( i + 1 ).getStart() <= feature.getStart() ) {
+                        if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size() &&
+                                 chromFeatures.get( i + 1 ).getType() == FeatureType.GENE &&
+                                 chromFeatures.get( i + 1 ).getStart() <= feature.getStart() ) {
                             detectedFeatures.setUpstreamFeature( chromFeatures.get( i + 1 ) );
 //                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Rev");
-                        }
-                        else {
+                        } else {
                             detectedFeatures.setUpstreamFeature( feature );
                         }
                         break;
@@ -590,10 +579,11 @@ public class AnalysisTranscriptionStart implements Observer,
         return Math.abs( feature.getStartOnStrand() - tssPos ) <= parametersTSS.getMaxLeaderlessDistance();
     }
 
+
     /**
      * The method first checks for all neighboring transcription start site
-     * pairs, if they need to be associated according to the given parameters and
-     * their distance. Then it checks, if they are located within the given
+     * pairs, if they need to be associated according to the given parameters
+     * and their distance. Then it checks, if they are located within the given
      * maximum feature distance bp of the checked transcription start site on
      * the same strand. If that's the case, the transcription start site with
      * the higher number of TOTAL read starts is marked as "primary TSS". All
@@ -601,23 +591,23 @@ public class AnalysisTranscriptionStart implements Observer,
      */
     private void linkTssInSameRegion() {
 
-        if (detectedStarts.size() > 0) {
-            detectedStarts.get(0).setIsPrimary(true);
+        if( detectedStarts.size() > 0 ) {
+            detectedStarts.get( 0 ).setIsPrimary( true );
         }
 
-        if (detectedStarts.size() > 1) {
+        if( detectedStarts.size() > 1 ) {
 
-            if (parametersTSS.isAssociateTss()) {
+            if( parametersTSS.isAssociateTss() ) {
                 TssAssociater tssAssociater = new TssAssociater();
-                tssAssociater.setParametersTSS(parametersTSS);
-                tssAssociater.setDetectedStarts(Collections.unmodifiableList(detectedStarts));
-                iterateTssForLinking(tssAssociater);
+                tssAssociater.setParametersTSS( parametersTSS );
+                tssAssociater.setDetectedStarts( Collections.unmodifiableList( detectedStarts ) );
+                iterateTssForLinking( tssAssociater );
                 detectedStarts = tssAssociater.getAssociatedTss();
             }
             PrimaryTssFlagger primaryTssFlagger = new PrimaryTssFlagger();
-            primaryTssFlagger.setParametersTSS(parametersTSS);
-            primaryTssFlagger.setDetectedStarts(Collections.unmodifiableList(detectedStarts));
-            iterateTssForLinking(primaryTssFlagger);
+            primaryTssFlagger.setParametersTSS( parametersTSS );
+            primaryTssFlagger.setDetectedStarts( Collections.unmodifiableList( detectedStarts ) );
+            iterateTssForLinking( primaryTssFlagger );
         }
     }
 
@@ -625,21 +615,22 @@ public class AnalysisTranscriptionStart implements Observer,
     /**
      * Iterates all TSS in the result list and runs the TssLinker implementation
      * on each pair of neighboring TSS.
+     * <p>
      * @param tssLinker A TssLinker implementation instance performing some
-     * linking action for all neighboring TSS
+     *                  linking action for all neighboring TSS
      */
-    private void iterateTssForLinking(TssLinker tssLinker) {
+    private void iterateTssForLinking( TssLinker tssLinker ) {
 
-        for (int tssIdx = 1; tssIdx < detectedStarts.size(); tssIdx++) {
+        for( int tssIdx = 1; tssIdx < detectedStarts.size(); tssIdx++ ) {
 
-            TranscriptionStart tss = detectedStarts.get(tssIdx);
+            TranscriptionStart tss = detectedStarts.get( tssIdx );
             int prevTssIdx = tssIdx - 1;
-            TranscriptionStart previousTss = this.detectedStarts.get(prevTssIdx);
-            while (previousTss.isFwdStrand() != tss.isFwdStrand() && prevTssIdx > 0) {
-                previousTss = this.detectedStarts.get(--prevTssIdx);
+            TranscriptionStart previousTss = this.detectedStarts.get( prevTssIdx );
+            while( previousTss.isFwdStrand() != tss.isFwdStrand() && prevTssIdx > 0 ) {
+                previousTss = this.detectedStarts.get( --prevTssIdx );
             }
 
-            tssLinker.linkTss(previousTss, prevTssIdx, tss);
+            tssLinker.linkTss( previousTss, prevTssIdx, tss );
         }
     }
 
@@ -664,11 +655,11 @@ public class AnalysisTranscriptionStart implements Observer,
      * still find all true positives.
      * <p>
      * @param distribution      the underlying distribution
-     * @param thresholdEnlarger Absolute value
-     *                          if 0,2% is to tight as a threshold, you can set a value to be added to
-     *                          the standard 0,2% threshold.
-     *                          if 0,3% of the whole distribution should be used as threshold use
-     *                          "this.genomeSize * 3 / 1000"
+     * @param thresholdEnlarger Absolute value if 0,2% is to tight as a
+     *                          threshold, you can set a value to be added to
+     *                          the standard 0,2% threshold. if 0,3% of the
+     *                          whole distribution should be used as threshold
+     *                          use "this.genomeSize * 3 / 1000"
      * <p>
      * @return The lower bound value associated with the index from the given
      *         <code>distribution</code> FIRST EXCEEDING the number of expected
@@ -692,10 +683,11 @@ public class AnalysisTranscriptionStart implements Observer,
             }
         }
         /*
-         * number of active genes in the current genome
-         * in prokaryotic genomes gene density approx 1 per 1000bp, max 1,16 in Sulfolobus solfataricus according to
-         * I. B. Rogozin, et al., “Congruent evolution of different classes of non-coding DNA in prokaryotic genomes,”
-         * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
+         * number of active genes in the current genome in prokaryotic genomes
+         * gene density approx 1 per 1000bp, max 1,16 in Sulfolobus solfataricus
+         * according to I. B. Rogozin, et al., “Congruent evolution of different
+         * classes of non-coding DNA in prokaryotic genomes,” Nucleic Acids Res,
+         * vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
          */
         return distribution.getMinValueForIndex( selectedIndex );
     }
@@ -712,7 +704,7 @@ public class AnalysisTranscriptionStart implements Observer,
      *                  the map
      */
     private void increaseDistribution( Map<Integer, Integer> map, int value, int threshold ) {
-        if (threshold > 1) {
+        if( threshold > 1 ) {
             threshold--; //this value is also needed for small data sets
         }
         if( value >= threshold ) {
@@ -757,8 +749,8 @@ public class AnalysisTranscriptionStart implements Observer,
         List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>( detectedStarts );
         for( TranscriptionStart tss : detectedStarts ) {
 
-            if( (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
-                 || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) // && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
+            if( (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts() ||
+                     tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) // && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
                     ) {
                 copiedDetectedStarts.remove( tss );
             }
@@ -769,9 +761,8 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * Calculates the exact threshold for a map containing a coverage increase
-     * or read start distribution.
-     * The threshold is set exactly to 0,25% and can be enlarged by setting the
-     * threshold enlarger.
+     * or read start distribution. The threshold is set exactly to 0,25% and can
+     * be enlarged by setting the threshold enlarger.
      * <p>
      * @param distribution      The exact distribution of coverage increases or
      *                          read starts
@@ -804,7 +795,8 @@ public class AnalysisTranscriptionStart implements Observer,
 
     /**
      * @return An updated set of the current parameters. It can be updated,
-     *         because this analysis contains an automatic parameter erstimation.
+     *         because this analysis contains an automatic parameter
+     *         erstimation.
      */
     public ParameterSetTSS getParametersTSS() {
         return this.parametersTSS;

@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * Filter for start and stop codons of a DNA sequence.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class StartCodonFilter extends PatternFilter {

@@ -49,9 +49,9 @@ public class ParsedChromosome {
      * Data holder for a chromosome.
      * <p>
      * @param name Name of the chromosome
-     * @param chromLength
-     * @param hasSubfeatures <tt>true</tt>, if it has subfeatures,
-     * <tt>false</tt>, if it already relies on parent ids.
+     * @param chromLength Length of the chromosome in bp
+     * @param hasSubfeatures <code>true</code>, if it has subfeatures,
+     * <code>false</code>, if it already relies on parent ids.
      */
     public ParsedChromosome( String name, long chromLength, boolean hasSubfeatures ) {
         this.features = new ArrayList<>();
@@ -146,7 +146,7 @@ public class ParsedChromosome {
 
 
     /**
-     * Adds all features in the <tt>featureList</tt> to the list of features of
+     * Adds all features in the <code>featureList</code> to the list of features of
      * this reference.
      * <p>
      * @param featureList The list of features to add to the list of features of
@@ -212,8 +212,6 @@ public class ParsedChromosome {
      * identifier. Further replaces the parent names in the feature by the newly
      * assigned parent ids.
      * <p>
-     * @param id The unique feature id to start with (will be increased by one
-     * for each feature in the reference
      * @param featureList list of features for which the ids need to be
      * distributed
      */
@@ -259,15 +257,11 @@ public class ParsedChromosome {
      * identifier. Further replaces the parent names in the feature by the newly
      * assigned parent ids.
      * <p>
-     * @param id The unique feature id to start with (will be increased by one
-     * for each feature in the reference
-     * @param featureList list of features for which the ids need to be
-     * distributed
      */
     private void replaceParentNamesByIds() {
         //replace parent names by parent ids
         List<String> newParentIds;
-        for( ParsedFeature feature : this.features ) {
+        for( ParsedFeature feature : features ) {
             newParentIds = new ArrayList<>();
             for( String parentName : feature.getParentIds() ) {
                 if( featureIdMap.containsKey( parentName ) ) {
@@ -280,7 +274,7 @@ public class ParsedChromosome {
 
 
     /**
-     * @return <tt>true</tt>, if it has subfeatures, <tt>false</tt>, if it
+     * @return <code>true</code>, if it has subfeatures, <code>false</code>, if it
      * already relies on parent ids.
      */
     public boolean hasSubFeatures() {

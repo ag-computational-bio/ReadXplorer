@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
@@ -30,6 +29,7 @@ import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -245,8 +245,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * <p>
      * @param g        Graphics2D object to paint on
      * @param pos      position of the base in the reference genome starting
-     *                 with 1 (not 0!).
-     *                 To get the correct base 1 is substracted from pos within this method.
+     *                 with 1 (not 0!). To get the correct base 1 is substracted
+     *                 from pos within this method.
      * @param chromSeq complete chromosome sequence
      */
     private void drawChar( Graphics2D g, int pos, String chromSeq ) {
@@ -268,9 +268,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
         }
         String base = chromSeq.substring( basePosition, basePosition + 1 );
         int offset = metrics.stringWidth( base ) / 2;
-        /*BaseBackground b = new BaseBackground(12,5, base);
-         b.setBounds((int)physX-offset,baseLineY-10,b.getSize().width, b.getSize().height);
-         this.add(b);*/
+        /* BaseBackground b = new BaseBackground(12,5, base);
+         * b.setBounds((int)physX-offset,baseLineY-10,b.getSize().width,
+         * b.getSize().height);
+         this.add(b); */
         g.drawString( base, (float) physX - offset, (float) baseLineY - offsetY );
     }
 
@@ -418,8 +419,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * Determines the frame of the currently selected feature. if there is none
-     * it
-     * is set to 10.
+     * it is set to 10.
      * <p>
      * @return the correct reading frame (-3 to 3 excluding 0)
      */
@@ -437,8 +437,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * Transforms a region object into a JRegion object for visualization in
-     * this
-     * sequence bar.
+     * this sequence bar.
      * <p>
      * @param region the region object to transform for this sequence bar
      * <p>
@@ -468,8 +467,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * Calculates the position of the first pixel of the region handed over to
-     * the method.
-     * Gaps do not play a role here, because they are not extended to the left.
+     * the method. Gaps do not play a role here, because they are not extended
+     * to the left.
      * <p>
      * @param bounds the bounds info object of the context of the region
      * @param r      the region, whose start is to be calculated
@@ -488,8 +487,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * Calculates the position of the last pixel of the region handed over to
-     * the method.
-     * This includes gaps that might occur in the reference.
+     * the method. This includes gaps that might occur in the reference.
      * <p>
      * @param bounds the bounds info object of the context of the region
      * @param r      the region, whose end is to be calculated
@@ -597,9 +595,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
 
     /**
-     * Paints the background of each base with a base specific color.
-     * Before calling this method make sure to call "removeAll" on this sequence
-     * bar! Otherwise the colors accumulate.
+     * Paints the background of each base with a base specific color. Before
+     * calling this method make sure to call "removeAll" on this sequence bar!
+     * Otherwise the colors accumulate.
      * <p>
      * @param basePosition Position of the current base in the genome
      */
@@ -709,8 +707,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * This method is to be called, when a mouse listener associated to this
-     * component
-     * registered a mouse moved event.
+     * component registered a mouse moved event.
      * <p>
      * @param e the mouse event which triggered this call
      */
@@ -723,10 +720,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
 
     /**
-     * Removes all JRegions from this component of all the given types.
-     * Removed by Properties.START, Properties.STOP, Properties.PATTERN,
-     * Properties.CDS and
-     * Properties.ALL
+     * Removes all JRegions from this component of all the given types. Removed
+     * by Properties.START, Properties.STOP, Properties.PATTERN, Properties.CDS
+     * and Properties.ALL
      * <p>
      * @param typeList list of types of components to remove
      */
@@ -743,9 +739,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
 
     /**
-     * Removes all JRegions from this component of a given type.
-     * Removed by Properties.START, Properties.STOP, Properties.PATTERN,
-     * Properties.CDS and
+     * Removes all JRegions from this component of a given type. Removed by
+     * Properties.START, Properties.STOP, Properties.PATTERN, Properties.CDS and
      * Properties.ALL
      * <p>
      * @param type the type of components to remove
@@ -759,8 +754,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * Sets a list of cds regions for the sequence bar and replaces the list
-     * stored in this
-     * variable until now.
+     * stored in this variable until now.
      * <p>
      * @param cdsRegions the cdsRegions to set
      */

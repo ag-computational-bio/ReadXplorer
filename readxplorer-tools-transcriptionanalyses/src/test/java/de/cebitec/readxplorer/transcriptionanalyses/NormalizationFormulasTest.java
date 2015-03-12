@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,11 +43,11 @@ import static org.junit.Assert.assertEquals;
 public class NormalizationFormulasTest {
 
 
-    private static final List<Double> featureReadList = new ArrayList<>();
-    private static final List<Integer> featLengthList = new ArrayList<>();
-    private static final List<Double> effFeatLengthList = new ArrayList<>();
-    private static final List<PersistentFeature> featList = new ArrayList<>();
-    private static final List<NormalizedReadCount> normalizedRCList = new ArrayList<>();
+    private static final List<Double> FEATURE_READ_LIST = new ArrayList<>();
+    private static final List<Integer> FEAT_LENGTH_LIST = new ArrayList<>();
+    private static final List<Double> EFF_FEAT_LENGTH_LIST = new ArrayList<>();
+    private static final List<PersistentFeature> FEAT_LIST = new ArrayList<>();
+    private static final List<NormalizedReadCount> NORMALIZED_RC_LIST = new ArrayList<>();
 
 
     public NormalizationFormulasTest() {
@@ -57,28 +57,28 @@ public class NormalizationFormulasTest {
     @BeforeClass
     public static void setUpClass() {
         double meanReadLength = 203.7;
-        featureReadList.add( 4250.0 );
-        featureReadList.add( 3300.0 );
-        featureReadList.add( 200.0 );
-        featureReadList.add( 1750.0 );
-        featureReadList.add( 50.0 );
-        featureReadList.add( 0.0 );
-        featLengthList.add( 900 );
-        featLengthList.add( 1020 );
-        featLengthList.add( 2000 );
-        featLengthList.add( 770 );
-        featLengthList.add( 3000 );
-        featLengthList.add( 1777 );
+        FEATURE_READ_LIST.add( 4250.0 );
+        FEATURE_READ_LIST.add( 3300.0 );
+        FEATURE_READ_LIST.add( 200.0 );
+        FEATURE_READ_LIST.add( 1750.0 );
+        FEATURE_READ_LIST.add( 50.0 );
+        FEATURE_READ_LIST.add( 0.0 );
+        FEAT_LENGTH_LIST.add( 900 );
+        FEAT_LENGTH_LIST.add( 1020 );
+        FEAT_LENGTH_LIST.add( 2000 );
+        FEAT_LENGTH_LIST.add( 770 );
+        FEAT_LENGTH_LIST.add( 3000 );
+        FEAT_LENGTH_LIST.add( 1777 );
         int start = 1;
         int featSpacing = 500;
-        for( int i = 0; i < featureReadList.size(); i++ ) {
-            double readCount = featureReadList.get( i );
-            int length = featLengthList.get( i );
-            effFeatLengthList.add( length - meanReadLength );
+        for( int i = 0; i < FEATURE_READ_LIST.size(); i++ ) {
+            double readCount = FEATURE_READ_LIST.get( i );
+            int length = FEAT_LENGTH_LIST.get( i );
+            EFF_FEAT_LENGTH_LIST.add( length - meanReadLength );
             int stop = start + length - 1;
-            featList.add( new PersistentFeature( i, 1, "", "", "", "", start, stop, true, FeatureType.CDS, "feat" + i ) );
-            normalizedRCList.add( new NormalizedReadCount( featList.get( i ), 0, 0, (int) readCount, 1 ) );
-            normalizedRCList.get( i ).storeEffectiveFeatureLength( effFeatLengthList.get( i ) );
+            FEAT_LIST.add( new PersistentFeature( i, 1, "", "", "", "", start, stop, true, FeatureType.CDS, "feat" + i ) );
+            NORMALIZED_RC_LIST.add( new NormalizedReadCount( FEAT_LIST.get( i ), 0, 0, (int) readCount, 1 ) );
+            NORMALIZED_RC_LIST.get( i ).storeEffectiveFeatureLength( EFF_FEAT_LENGTH_LIST.get( i ) );
             start += stop + featSpacing;
         }
     }
@@ -115,8 +115,8 @@ public class NormalizationFormulasTest {
         resultList.add( 1872.3320438582548 ); //1871.663
         resultList.add( 0.0 );
 
-        for( int i = 0; i < featureReadList.size(); i++ ) {
-            double result = NormalizationFormulas.calculateRpkm( featureReadList.get( i ), totalMappedReads, effFeatLengthList.get( i ) );
+        for( int i = 0; i < FEATURE_READ_LIST.size(); i++ ) {
+            double result = NormalizationFormulas.calculateRpkm( FEATURE_READ_LIST.get( i ), totalMappedReads, EFF_FEAT_LENGTH_LIST.get( i ) );
             assertEquals( resultList.get( i ), result, 0.0001 );
         }
     }
@@ -138,8 +138,8 @@ public class NormalizationFormulasTest {
         resultList.add( 1337.802492 );
         resultList.add( 0.0 );
 
-        for( int i = 0; i < featureReadList.size(); i++ ) {
-            double result = NormalizationFormulas.calculateTpm( featureReadList.get( i ), effFeatLengthList.get( i ), normalizationSum );
+        for( int i = 0; i < FEATURE_READ_LIST.size(); i++ ) {
+            double result = NormalizationFormulas.calculateTpm( FEATURE_READ_LIST.get( i ), EFF_FEAT_LENGTH_LIST.get( i ), normalizationSum );
             assertEquals( resultList.get( i ), result, 0.0001 );
         }
     }
@@ -152,7 +152,7 @@ public class NormalizationFormulasTest {
     public void testCalculateNormalizationSums() {
         System.out.println( "calculateNormalizationSums" );
         Map<Integer, NormalizedReadCount> featureReadCount = new HashMap<>();
-        for( NormalizedReadCount normRC : normalizedRCList ) {
+        for( NormalizedReadCount normRC : NORMALIZED_RC_LIST ) {
             featureReadCount.put( normRC.getFeature().getId(), normRC );
         }
         Map<FeatureType, Double> normalizationSumMap = new HashMap<>();

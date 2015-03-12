@@ -74,8 +74,7 @@ public class ThumbGridLayout implements Layout {
             if( child.isVisible() ) {
                 child.resolveBounds( new Point( lx, ly ), new Rectangle( x, y, width, height ) );
                 posX += maxWidth;
-            }
-            else {
+            } else {
                 child.resolveBounds( new Point( lx, ly ), new Rectangle( x, y, 0, 0 ) );
             }
             col++;

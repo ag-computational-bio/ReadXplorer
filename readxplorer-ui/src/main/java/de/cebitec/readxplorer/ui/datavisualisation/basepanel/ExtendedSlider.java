@@ -24,6 +24,8 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JSlider;
+//import javax.swing.event.ChangeEvent;
+//import javax.swing.event.ChangeListener;
 
 
 /**

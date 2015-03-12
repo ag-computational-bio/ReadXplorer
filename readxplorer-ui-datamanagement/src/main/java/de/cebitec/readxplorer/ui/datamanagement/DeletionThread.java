@@ -43,7 +43,7 @@ import static java.util.logging.Level.SEVERE;
 
 /**
  * Thread for the deletion of tracks and references from the ReadXplorer DB.
- *
+ * <p>
  * @author ddoppmeier
  */
 public class DeletionThread extends SwingWorker<Object, Object> {
@@ -81,8 +81,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         CentralLookup.getDefault().add( this );
         try {
             io.getOut().reset();
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             Exceptions.printStackTrace( ex );
         }
         io.select();
@@ -102,8 +101,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     ProjectConnector.getInstance().deleteTrack( t.getID() );
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
 
-                }
-                catch( StorageException ex ) {
+                } catch( StorageException ex ) {
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                     //  invalidRuns.add(t.getRunJob());
@@ -121,13 +119,11 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                 ph.progress( ++workunits );
                 if( invalidGens.contains( r ) ) {
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.after" ) );
-                }
-                else {
+                } else {
                     try {
                         ProjectConnector.getInstance().deleteGenome( r.getID() );
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
-                    }
-                    catch( StorageException ex ) {
+                    } catch( StorageException ex ) {
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
                         LOG.log( SEVERE, null, ex );
                     }

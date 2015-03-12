@@ -71,18 +71,13 @@ public class SnpTranslator {
 
     /**
      * Generates all translations possible for a given snp for the given genomic
-     * features
-     * and a reference sequence. A translation is only generated if one of the
-     * following holds:
-     * - The current feature has no subfeatures and the position is not at a
-     * border while the current
-     * triplet violates the border.
-     * - The current feature has subfeatures and the snp is located in such a
-     * subfeature.
-     * - The snp is located in a subfeature at a border, but this is not the
-     * last subfeature
-     * (depending on the strand) and the triplet can be completed from the
-     * neighboring subfeature.
+     * features and a reference sequence. A translation is only generated if one
+     * of the following holds: - The current feature has no subfeatures and the
+     * position is not at a border while the current triplet violates the
+     * border. - The current feature has subfeatures and the snp is located in
+     * such a subfeature. - The snp is located in a subfeature at a border, but
+     * this is not the last subfeature (depending on the strand) and the triplet
+     * can be completed from the neighboring subfeature.
      * <p>
      * @param genomicFeatures all features of the reference genome of the
      *                        desired feature types
@@ -122,11 +117,9 @@ public class SnpTranslator {
                     stopIndex = featIdx - 1;
                     fstFoundFeat = false;
                 }
-            }
-            else if( feature.getStop() < position ) {
-                //do nothing
-            }
-            else if( feature.getStop() > position && feature.getStart() > position ) {
+//            } else if( feature.getStop() < position ) {
+//                //Comment just for info purpose: do nothing in this case
+            } else if( feature.getStop() > position && feature.getStart() > position ) {
                 break; //stop
             }
         }
@@ -139,19 +132,14 @@ public class SnpTranslator {
 
     /**
      * Generates all translations possible for a given snp for the given genomic
-     * features (genes)
-     * and reference sequence (set in the constructor) and stores them in the
-     * given Snp object.
-     * A translation is only generated if one of the following holds:
-     * - The current feature has no subfeatures and the position is not at a
-     * border while the current
-     * triplet violates the border.
-     * - The current feature has subfeatures and the snp is located in such a
-     * subfeature.
-     * - The snp is located in a subfeature at a border, but this is not the
-     * last subfeature
-     * (depending on the strand) and the triplet can be completed from the
-     * neighboring subfeature.
+     * features (genes) and reference sequence (set in the constructor) and
+     * stores them in the given Snp object. A translation is only generated if
+     * one of the following holds: - The current feature has no subfeatures and
+     * the position is not at a border while the current triplet violates the
+     * border. - The current feature has subfeatures and the snp is located in
+     * such a subfeature. - The snp is located in a subfeature at a border, but
+     * this is not the last subfeature (depending on the strand) and the triplet
+     * can be completed from the neighboring subfeature.
      * <p>
      * @param snp the snp object to check
      */
@@ -170,9 +158,8 @@ public class SnpTranslator {
 
     /**
      * Calculates the list of snp codons belonging to a single snp. This list is
-     * larger than one
-     * if more than one features have been found at the "pos" position in the
-     * reference genome.
+     * larger than one if more than one features have been found at the "pos"
+     * position in the reference genome.
      * <p>
      * @param featuresFound list of features in the reference genome for current
      *                      position "pos"
@@ -201,15 +188,17 @@ public class SnpTranslator {
             subPos = 0;
 
             /*
-             * Check for subfeatures and calculate length of spliced mRNA and snp position on this mRNA.
-             * Also need to check, if the current position is at a border of its subfeature. Then we need
-             * the neighboring subfeatures for the refrence sequence of the translation triplet and also
-             * the distance along all subfeatures up to our snp position.
+             * Check for subfeatures and calculate length of spliced mRNA and
+             * snp position on this mRNA. Also need to check, if the current
+             * position is at a border of its subfeature. Then we need the
+             * neighboring subfeatures for the refrence sequence of the
+             * translation triplet and also the distance along all subfeatures
+             * up to our snp position.
              */
             boolean fwdStrand = feature.isFwdStrand();
 
-            if( feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA
-                || feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
+            if( feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA ||
+                     feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
                 this.calcFeatureData( feature, pos, FeatureType.CDS );
                 if( !subFeatureFound ) {
                     this.calcFeatureData( feature, pos, FeatureType.EXON );
@@ -237,25 +226,21 @@ public class SnpTranslator {
 
                     if( subPos == 0 ) { //feature without subfeatures
                         mod = (Math.abs( pos - featureStartOnStrand ) + 1) % 3;
-                    }
-                    else { //feature with subfeatures, we just have to get the mod
+                    } else { //feature with subfeatures, we just have to get the mod
                         mod = subPos % 3;
                     }
 
                     if( !posAtRightChromBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0) ) { //left base of triplet, get pos to pos+2
                         tripletRef = reference.getChromSequence( chromosome.getId(), pos, pos + 2 );
                         tripletSnp = snp.getBase().toLowerCase().concat( tripletRef.substring( 1 ) );
-                    }
-                    else if( mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder ) { //middle base of triplet, get pos-1, pos and pos+1
+                    } else if( mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder ) { //middle base of triplet, get pos-1, pos and pos+1
                         tripletRef = reference.getChromSequence( chromosome.getId(), pos - 1, pos + 1 );
                         tripletSnp = tripletRef.charAt( 0 ) + snp.getBase().toLowerCase() + tripletRef.charAt( 2 );
-                    }
-                    else if( !posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1) ) { //right base of triplet, get pos-2 to pos
+                    } else if( !posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1) ) { //right base of triplet, get pos-2 to pos
                         tripletRef = reference.getChromSequence( chromosome.getId(), pos - 2, pos );
                         tripletSnp = tripletRef.substring( 0, 2 ).concat( snp.getBase().toLowerCase() );
                     }
-                }
-                else { //snp is located in a subfeature (exon) and at a border of a subfeature
+                } else { //snp is located in a subfeature (exon) and at a border of a subfeature
 
                     mod = subPos % 3;
                     boolean posDirectAtLeftSubBorder = pos - 1 < borderSubfeat.getStart();
@@ -266,45 +251,37 @@ public class SnpTranslator {
                         if( posAtRightSubBorder ) {
                             if( posDirectAtRightSubBorder ) { //get only last base from current subfeature and two from next subfeature
                                 tripletRef = reference.getChromSequence( chromosome.getId(), pos, pos ) + reference.getChromSequence( chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart() + 1 );
-                            }
-                            else { //get last two bases from current subfeature and first base of next subfeature
+                            } else { //get last two bases from current subfeature and first base of next subfeature
                                 tripletRef = reference.getChromSequence( chromosome.getId(), pos, pos + 1 ) + reference.getChromSequence( chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart() );
                             }
-                        }
-                        else {
+                        } else {
                             tripletRef = reference.getChromSequence( chromosome.getId(), pos, pos + 2 );
                         }
                         tripletSnp = snp.getBase().toLowerCase().concat( tripletRef.substring( 1 ) );
 
-                    }
-                    else if( mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder ) { //middle base of triplet, get pos-1, pos and pos+1
+                    } else if( mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder ) { //middle base of triplet, get pos-1, pos and pos+1
 
                         if( posDirectAtLeftSubBorder ) { //get one base from left subfeature and one from right subfeature, adding last base later
                             tripletRef = reference.getChromSequence( chromosome.getId(), subfeatBefore.getStop(), subfeatBefore.getStop() ) + reference.getChromSequence( chromosome.getId(), pos, pos );
-                        }
-                        else {
+                        } else {
                             tripletRef = reference.getChromSequence( chromosome.getId(), pos - 1, pos );
                         }
                         if( posDirectAtRightSubBorder ) {
                             tripletRef += reference.getChromSequence( chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart() );
-                        }
-                        else {
+                        } else {
                             tripletRef += reference.getChromSequence( chromosome.getId(), pos + 1, pos + 1 );
                         }
                         tripletSnp = tripletRef.charAt( 0 ) + snp.getBase().toLowerCase() + tripletRef.charAt( 2 );
 
-                    }
-                    else if( !posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1) ) { //right base of triplet, get pos-2 to pos
+                    } else if( !posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1) ) { //right base of triplet, get pos-2 to pos
 
                         if( posAtLeftSubBorder ) {
                             if( posDirectAtLeftSubBorder ) { //get both left bases from other subfeature
                                 tripletRef = reference.getChromSequence( chromosome.getId(), subfeatBefore.getStop() - 1, subfeatBefore.getStop() ) + reference.getChromSequence( chromosome.getId(), pos, pos );
-                            }
-                            else { //get last base from feature before
+                            } else { //get last base from feature before
                                 tripletRef = reference.getChromSequence( chromosome.getId(), subfeatBefore.getStop(), subfeatBefore.getStop() ) + reference.getChromSequence( chromosome.getId(), pos - 1, pos );
                             }
-                        }
-                        else {
+                        } else {
                             tripletRef = reference.getChromSequence( chromosome.getId(), pos - 2, pos );
                         }
                         tripletSnp = tripletRef.substring( 0, 2 ).concat( snp.getBase().toLowerCase() );
@@ -315,8 +292,7 @@ public class SnpTranslator {
                     tripletRef = SequenceUtils.getReverseComplement( tripletRef );
                     tripletSnp = SequenceUtils.getReverseComplement( tripletSnp );
                 }
-            }
-            catch( ArrayIndexOutOfBoundsException | NullPointerException e ) {
+            } catch( ArrayIndexOutOfBoundsException | NullPointerException e ) {
                 continue;
             }
 
@@ -330,15 +306,13 @@ public class SnpTranslator {
                 if( type == SequenceComparison.SUBSTITUTION ) {
                     if( AminoAcidProperties.getPropertyForAA( aminoRef ).equals( AminoAcidProperties.getPropertyForAA( aminoSnp ) ) ) {
                         type = SequenceComparison.NEUTRAL;
-                    }
-                    else {
+                    } else {
                         type = SequenceComparison.MISSENSE;
                     }
                 }
 
                 codonSnpList.add( new CodonSnp( tripletRef, tripletSnp, aminoRef, aminoSnp, type, feature ) );
-            }
-            catch( NullPointerException | AssertionError e ) {
+            } catch( NullPointerException | AssertionError e ) {
                 codonSnpList.add( new CodonSnp( tripletRef, tripletSnp, '-', '-', SequenceComparison.UNKNOWN, feature ) );
                 //nothing to do, ignore translations with N's or gaps
             }
@@ -354,8 +328,7 @@ public class SnpTranslator {
      * @param feature the feature whose subfeature length and readcount is
      *                needed
      * @param type    the feature type for which the length sum and total read
-     *                count
-     *                is needed
+     *                count is needed
      */
     private void calcFeatureData( final PersistentFeature feature, final int pos, final FeatureType type ) {
         //calc length of all exons of the mRNA and number of reads mapped to exon regions
@@ -383,8 +356,7 @@ public class SnpTranslator {
                         posAtRightSubBorder = pos + 2 > subFeature.getStop();
                         borderSubfeat = !posAtLeftSubBorder && !posAtRightSubBorder ? null : subFeature;
                         snpInSubfeature = true;
-                    }
-                    else if( featureStart < pos ) {
+                    } else if( featureStart < pos ) {
                         //get distance in feature and left neighbor subFeature of subFeature with position
                         if( fwdStrand ) {
                             subPos += (subFeature.getStop() - (featureStart - 1));
@@ -392,8 +364,7 @@ public class SnpTranslator {
                         if( subfeatBefore == null || subfeatBefore.getStart() < subFeature.getStart() ) {
                             subfeatBefore = subFeature;
                         }
-                    }
-                    else if( featureStart > pos ) {
+                    } else if( featureStart > pos ) {
                         if( !fwdStrand ) {
                             subPos += (featureStartOnStrand - (subFeature.getStart() - 1));
                         }

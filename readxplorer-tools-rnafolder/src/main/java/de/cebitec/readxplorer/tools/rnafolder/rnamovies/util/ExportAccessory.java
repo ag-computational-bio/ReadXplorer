@@ -40,9 +40,9 @@ import javax.swing.text.JTextComponent;
 
 
 /**
- * ExportAccessory define some extra Components in Panel to integrate
- * into a Open/Export Dialog.
- *
+ * ExportAccessory define some extra Components in Panel to integrate into a
+ * Open/Export Dialog.
+ * <p>
  * @author Alexander Kaiser <akaiser@techfak.uni-bielefeld.de>
  * Jan Krueger <jkrueger@techfak.uni-bielefeld.de>
  */
@@ -214,8 +214,9 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
 
         String prop = evt.getPropertyName();
         if( prop.equals( "fileFilterChanged" ) ) {
-            /* insert a  try/catch block because on MACOSX adding additional filefilters leads to
-             * an NullPointerException; don't know what's exactly the problem here, JK */
+            /* insert a try/catch block because on MACOSX adding additional
+             * filefilters leads to an NullPointerException; don't know what's
+             * exactly the problem here, JK */
             try {
 //                if (evt.getNewValue().getClass().getName().equals("de.cebitec.readxplorer.tools.rnaFolder.rnamovies.actions.Export$GIFFilter")){
 //                    fps.setEnabled(true);
@@ -226,12 +227,10 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
 //                }
                 if( evt.getNewValue().getClass().getName().equals( "de.cebitec.readxplorer.tools.rnaFolder.rnamovies.actions.Export$JPGFilter" ) ) {
                     trans.setEnabled( false );
-                }
-                else {
+                } else {
                     trans.setEnabled( true );
                 }
-            }
-            catch( NullPointerException e ) {
+            } catch( NullPointerException e ) {
                 LOG.severe( "A NullPointerException occurred during evaluate the PropertyChangeEvent!" );
             }
 
@@ -260,13 +259,11 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
                 if( e.getSource().equals( w ) ) {
                     int value = (int) Math.round( ((double) Integer.parseInt( jt.getText() )) / scale );
                     h.setText( value + "" );
-                }
-                else {
+                } else {
                     int value = (int) Math.round( ((double) Integer.parseInt( jt.getText() )) * scale );
                     w.setText( value + "" );
                 }
-            }
-            else {
+            } else {
                 jt.setForeground( Color.RED );
             }
         }
@@ -276,8 +273,7 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
             try {
                 Integer.parseInt( text );
                 return true;
-            }
-            catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 return false;
             }
         }

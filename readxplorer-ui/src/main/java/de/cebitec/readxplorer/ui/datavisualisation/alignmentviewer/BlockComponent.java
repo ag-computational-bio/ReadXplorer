@@ -60,7 +60,7 @@ import static java.util.logging.Level.SEVERE;
 /**
  * A <code>BlockComponent</code> represents a read alignment as a colored
  * rectangle and has knowledge of all important information of the alignment.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class BlockComponent extends JComponent {
@@ -313,8 +313,8 @@ public class BlockComponent extends JComponent {
     /**
      * @param baseQualities The array of phred scaled base qualities to convert
      * <p>
-     * @return A String representation of the phred scaled base qualities in
-     *         the array.
+     * @return A String representation of the phred scaled base qualities in the
+     *         array.
      */
     private String generateBaseQualString( byte[] baseQualities ) {
         String baseQualString = "[";
@@ -421,7 +421,7 @@ public class BlockComponent extends JComponent {
         int brickCount = 0;
         int gapCount = 0;
         Brick brick;
-        for( Iterator<Brick> it = block.getBrickIterator(); it.hasNext(); ) {
+        for( Iterator<Brick> it = block.getBrickIterator(); it.hasNext();) {
             brick = it.next();
 
             if( brick != Brick.MATCH || showBaseQualities ) {

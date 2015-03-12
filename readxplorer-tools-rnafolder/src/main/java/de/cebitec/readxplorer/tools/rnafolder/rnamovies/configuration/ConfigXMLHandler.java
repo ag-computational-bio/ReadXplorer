@@ -35,7 +35,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class ConfigXMLHandler implements ContentHandler {
 
     private static final Logger LOG = Logger.getLogger( ConfigXMLHandler.class.getName() );
-    
+
 
     /**
      * The 3 different states the parser can be in
@@ -85,13 +85,11 @@ public class ConfigXMLHandler implements ContentHandler {
             lastMode.push( mode );
             mode = MODE_CATEGORY;
             vals = new LinkedHashMap<>();
-        }
-        else if( qName.equalsIgnoreCase( "value" ) ) {
+        } else if( qName.equalsIgnoreCase( "value" ) ) {
             lastMode.push( mode );
             mode = MODE_VALUE;
             value = null;
-        }
-        else if( qName.equalsIgnoreCase( "object" ) ) {
+        } else if( qName.equalsIgnoreCase( "object" ) ) {
             lastMode.push( mode );
             mode = MODE_CONSTRUCTOR;
             lastCons.push( new ArrayList<Class<?>>( 5 ) );
@@ -116,16 +114,14 @@ public class ConfigXMLHandler implements ContentHandler {
                 text = atts.getValue( "id" );
                 id = text == null ? -1 : Integer.parseInt( text );
                 id = id < -1 ? -1 : id;
-            }
-            catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 LOG.log( Level.WARNING, "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
                 id = -1;
             }
 
             //log.info("Adding new category: "+key+", with "+vals.size()+" values");
             cats.put( key, new Category( id, key, vals ) );
-        }
-        else if( qName.equalsIgnoreCase( "value" ) ) {
+        } else if( qName.equalsIgnoreCase( "value" ) ) {
             mode = lastMode.pop();
             final String key = atts.getValue( "key" );
 
@@ -140,8 +136,7 @@ public class ConfigXMLHandler implements ContentHandler {
                 vals.put( key == null ? "unnamed" : key, tw );
             }
 
-        }
-        else if( qName.equalsIgnoreCase( "object" ) ) {
+        } else if( qName.equalsIgnoreCase( "object" ) ) {
             mode = lastMode.pop();
 
             final Class<?>[] paramTypes = lastCons.pop().toArray( new Class<?>[]{} );
@@ -154,78 +149,64 @@ public class ConfigXMLHandler implements ContentHandler {
                 //log.info("Loaded "+obj_.getClass().getName()+": "+obj_.toString());
 
                 if( mode == MODE_CONSTRUCTOR ) {
-                    if( lastCons.empty() || lastArgs.empty() )
+                    if( lastCons.empty() || lastArgs.empty() ) {
                         return;
+                    }
 
                     lastCons.peek().add( class_ );
                     lastArgs.peek().add( obj_ );
-                }
-                else if( mode == MODE_VALUE ) {
+                } else if( mode == MODE_VALUE ) {
                     value = obj_;
                 }
-            }
-            catch( NoSuchMethodException e ) {
+            } catch( NoSuchMethodException e ) {
                 LOG.log( Level.WARNING, "Could not find Constructor: {0}", e.getMessage() );
-            }
-            catch( InstantiationException e ) {
+            } catch( InstantiationException e ) {
                 LOG.log( Level.WARNING, "Could not instantiate: {0}", e.getMessage() );
-            }
-            catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
+            } catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
                 LOG.warning( e.getMessage() );
-            }
-            catch( ClassNotFoundException e ) {
+            } catch( ClassNotFoundException e ) {
                 LOG.log( Level.WARNING, "Could not find class: {0}", e.getMessage() );
             }
-        }
-        else if( qName.equalsIgnoreCase( "string" ) ) {
+        } else if( qName.equalsIgnoreCase( "string" ) ) {
             if( mode == MODE_CONSTRUCTOR ) {
                 lastCons.peek().add( text.getClass() );
                 lastArgs.peek().add( text );
-            }
-            else if( mode == MODE_VALUE ) {
+            } else if( mode == MODE_VALUE ) {
                 value = text;
             }
-        }
-        else if( qName.equalsIgnoreCase( "int" ) ) {
+        } else if( qName.equalsIgnoreCase( "int" ) ) {
             Integer ival;
             try {
                 ival = new Integer( text );
                 if( mode == MODE_CONSTRUCTOR ) {
                     lastCons.peek().add( Integer.TYPE );
                     lastArgs.peek().add( ival );
-                }
-                else if( mode == MODE_VALUE ) {
+                } else if( mode == MODE_VALUE ) {
                     value = ival;
                 }
-            }
-            catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 LOG.log( Level.WARNING, "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
             }
-        }
-        else if( qName.equalsIgnoreCase( "float" ) ) {
+        } else if( qName.equalsIgnoreCase( "float" ) ) {
             Float fval;
             try {
                 fval = new Float( text );
                 if( mode == MODE_CONSTRUCTOR ) {
                     lastCons.peek().add( Float.TYPE );
                     lastArgs.peek().add( fval );
-                }
-                else if( mode == MODE_VALUE ) {
+                } else if( mode == MODE_VALUE ) {
                     value = fval;
                 }
-            }
-            catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 LOG.log( Level.WARNING, "Cannot convert {0} to java.lang.Float.", e.getMessage() );
             }
-        }
-        else if( qName.equalsIgnoreCase( "boolean" ) ) {
+        } else if( qName.equalsIgnoreCase( "boolean" ) ) {
             Boolean bval;
             bval = Boolean.valueOf( text );
             if( mode == MODE_CONSTRUCTOR ) {
                 lastCons.peek().add( Boolean.TYPE );
                 lastArgs.peek().add( bval );
-            }
-            else if( mode == MODE_VALUE ) {
+            } else if( mode == MODE_VALUE ) {
                 value = bval;
             }
         }

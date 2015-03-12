@@ -35,6 +35,7 @@ import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -102,7 +103,8 @@ public final class LoginVisualPanel extends JPanel {
             }
             user = null;
             password = null;
-        } else /* <editor-fold defaultstate="collapsed" desc="should not reach here">*/ {
+        } else /* <editor-fold
+         * defaultstate="collapsed" desc="should not reach here"> */ {
             hostname = null;
             database = null;
             user = null;
@@ -133,9 +135,6 @@ public final class LoginVisualPanel extends JPanel {
                 prefs.put( LoginProperties.LOGIN_DATABASE_MYSQL, loginData.get( LoginWizardPanel.PROP_DATABASE ) );
             } else if( adapter.equalsIgnoreCase( "h2" ) ) {
                 prefs.put( LoginProperties.LOGIN_DATABASE_H2, loginData.get( LoginWizardPanel.PROP_DATABASE ) );
-            } else {
-                // should not reach here
-                LOG.fine( "should not reach here!" );
             }
         } else {
             if( adapter.equalsIgnoreCase( "mysql" ) ) {
@@ -144,9 +143,6 @@ public final class LoginVisualPanel extends JPanel {
                 prefs.put( LoginProperties.LOGIN_USER, "" );
             } else if( adapter.equalsIgnoreCase( "h2" ) ) {
                 prefs.put( LoginProperties.LOGIN_DATABASE_H2, "" );
-            } else {
-                // should not reach here
-                LOG.fine( "should not reach here!" );
             }
         }
 
@@ -307,8 +303,7 @@ public final class LoginVisualPanel extends JPanel {
                 try { //store current directory
                     NbPreferences.forModule( Object.class ).put( Properties.READXPLORER_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
                 } catch( IOException ex ) {
-                    // do nothing, path is not stored in properties...
-                    LOG.log( FINE, ex.getMessage(), ex );
+                    LOG.log( WARNING, Properties.READXPLORER_DATABASE_DIRECTORY + " could not be stored" );
                 }
                 databaseField.setText( fileLocation );
             }
@@ -372,7 +367,7 @@ public final class LoginVisualPanel extends JPanel {
 
     /**
      * Updates the choose button text.
-     *
+     * <p>
      * @param chooseButtonText
      */
     public void setChooseButtonText( String chooseButtonText ) {

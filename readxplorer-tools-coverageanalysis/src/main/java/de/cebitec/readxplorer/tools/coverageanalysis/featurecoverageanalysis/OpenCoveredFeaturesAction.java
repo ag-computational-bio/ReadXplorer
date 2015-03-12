@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
@@ -54,6 +55,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * Action for opening the feature coverage analysis. It opens the wizard and
@@ -62,11 +65,11 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID(
-    category = "Tools",
-    id = "de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis.OpenCoveredFeaturesAction" )
+         category = "Tools",
+         id = "de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis.OpenCoveredFeaturesAction" )
 @ActionRegistration(
-    iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/coveredFeatures.png",
-    displayName = "#CTL_OpenCoveredFeaturesAction" )
+         iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/coveredFeatures.png",
+         displayName = "#CTL_OpenCoveredFeaturesAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 146 ),
     @ActionReference( path = "Toolbars/Tools", position = 231 )
@@ -75,6 +78,7 @@ import org.openide.windows.WindowManager;
 public final class OpenCoveredFeaturesAction implements ActionListener,
                                                         DataVisualisationI {
 
+    private static final Logger LOG = Logger.getLogger( OpenCoveredFeaturesAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
 
     private final ReferenceViewer context;
@@ -153,8 +157,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                 this.coveredAnnoAnalysisTopComp.open();
                 this.startCoveredFeaturesDetection( wiz );
 
-            }
-            else {
+            } else {
                 String msg = NbBundle.getMessage( OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfo",
                                                   "No track selected. To start a feature coverage analysis at least one track has to be selected." );
                 String title = NbBundle.getMessage( OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfoTitle", "Info" );
@@ -186,8 +189,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
             for( PersistentTrack track : this.tracks ) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
-                }
-                catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
@@ -195,14 +197,12 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                 //every track has its own analysis handlers
                 this.createAnalysis( connector, readClassesParams );
             }
-        }
-        else {
+        } else {
             try {
                 connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassesParams );  //every track has its own analysis handlers
 
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
@@ -211,7 +211,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
 
     /**
      * Creates the analysis for a TrackConnector.
-     *
+     * <p>
      * @param connector         the connector
      * @param readClassesParams the read class parameters
      */
@@ -231,8 +231,8 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
      * Shows the results in the corresponding top component.
      * <p>
      * @param dataTypeObject the pair describing the result data. It has to
-     *                       consist of the track id as the first element and the data type string
-     *                       as the second element.
+     *                       consist of the track id as the first element and
+     *                       the data type string as the second element.
      */
     @Override
     public void showData( Object dataTypeObject ) {
@@ -281,8 +281,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                             String title;
                             if( parameters.isGetCoveredFeatures() ) {
                                 title = "Detected covered features for ";
-                            }
-                            else {
+                            } else {
                                 title = "Detected uncovered features for ";
                             }
                             String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
@@ -294,9 +293,8 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                 } );
             }
 
-        }
-        catch( ClassCastException e ) {
-            //do nothing, we dont handle other data in this class
+        } catch( ClassCastException e ) {
+            LOG.log( SEVERE, "Unknown data received in " + this.getClass().getName() );
         }
     }
 

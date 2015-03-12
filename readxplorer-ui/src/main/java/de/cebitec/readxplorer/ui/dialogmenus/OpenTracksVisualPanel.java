@@ -42,7 +42,7 @@ import org.openide.util.Exceptions;
 
 /**
  * A panel for the selection of tracks for a given reference.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTracksVisualPanel extends JobPanel implements

@@ -49,7 +49,7 @@ public class ExpressTest implements ExpressTestI {
 //        this.meanCache = new HashMap<>( 1024 );
         this.observers = new LinkedList<>();
         this.colNames = Arrays.asList( new Object[]{ "Region", "Start",
-            "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence" } );
+                                                     "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence" } );
 
     }
 
@@ -101,15 +101,15 @@ public class ExpressTest implements ExpressTestI {
             meanCountsB = calculateMeanCountsForEachReplicate( houseKeepingB );
             if( !zeroFreeValues( meanCountsA ) ) {
                 meanCountContainsZero = true;
-                String msg = "One of the selected house keeping genes has no mapping read under condition A."
-                             + " The default normalization method will be used.";
+                String msg = "One of the selected house keeping genes has no mapping read under condition A." +
+                         " The default normalization method will be used.";
                 String title = "Unable to normalize using house keeping genes.";
                 JOptionPane.showMessageDialog( null, msg, title, JOptionPane.INFORMATION_MESSAGE );
             }
             if( !zeroFreeValues( meanCountsB ) ) {
                 meanCountContainsZero = true;
-                String msg = "One of the selected house keeping genes has no mapping read under condition B."
-                             + " The default normalization method will be used.";
+                String msg = "One of the selected house keeping genes has no mapping read under condition B." +
+                         " The default normalization method will be used.";
                 String title = "Unable to normalize using house keeping genes.";
                 JOptionPane.showMessageDialog( null, msg, title, JOptionPane.INFORMATION_MESSAGE );
             }
@@ -117,8 +117,7 @@ public class ExpressTest implements ExpressTestI {
                 meanCountsA = calculateMeanCountsForEachReplicate( groupA );
                 meanCountsB = calculateMeanCountsForEachReplicate( groupB );
             }
-        }
-        else {
+        } else {
             meanCountsA = calculateMeanCountsForEachReplicate( groupA );
             meanCountsB = calculateMeanCountsForEachReplicate( groupB );
         }
@@ -180,14 +179,12 @@ public class ExpressTest implements ExpressTestI {
 
                 if( groupA.length < 2 && groupB.length < 2 ) {
                     currentResult.add( -1.0d );
-                }
-                else {
+                } else {
                     currentResult.add( computeConfidence( meanA[i], meanB[i], varA[i], varB[i] ) );
                 }
                 if( groupA.length < 2 && groupB.length < 2 ) {
                     currentResultNormalized.add( -1.0d );
-                }
-                else {
+                } else {
                     currentResultNormalized.add( computeConfidence( meanANormalized[i], meanBNormalized[i], varANormalized[i], varBNormalized[i] ) );
                 }
                 results.add( currentResult );
@@ -280,9 +277,9 @@ public class ExpressTest implements ExpressTestI {
     private ExpressTest.MeanVarianceGroup computeMeanAndVar( final int[][] group, final double[] normalizationRatios ) {
 
         final double[] mean = new double[group[0].length];
-        final double[] var  = new double[group[0].length];
+        final double[] var = new double[group[0].length];
         final double[] meanNormalized = new double[group[0].length];
-        final double[] varNormalized  = new double[group[0].length];
+        final double[] varNormalized = new double[group[0].length];
 
         for( int j = 0; j < group[0].length; j++ ) {
 
@@ -314,13 +311,13 @@ public class ExpressTest implements ExpressTestI {
 
     private static double mean( final double[] values ) {
 
-/**
- * Deactivated
- * as computations of List hashcodes are even more expensive than actual computations of the means!
- * For arrays, it doesn't even make sense, as by default no deep hashcode computation is used but
- * the object reference.
- * Please, have a look at the standard java hashcode implementations of List/Array to double check.
- */
+        /**
+         * Deactivated as computations of List hashcodes are even more expensive
+         * than actual computations of the means! For arrays, it doesn't even
+         * make sense, as by default no deep hashcode computation is used but
+         * the object reference. Please, have a look at the standard java
+         * hashcode implementations of List/Array to double check.
+         */
 
 //        if( meanCache.containsKey( values ) ) {
 //            return meanCache.get( values );

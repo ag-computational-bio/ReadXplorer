@@ -46,6 +46,12 @@ public class ParsingException extends Exception {
     }
 
 
+    /**
+     * Constructs an instance of <code>ParsingException</code> with the
+     * specified {@link Throwable}.
+     * <p>
+     * @param ex the {@link Throwable}.
+     */
     public ParsingException( Throwable ex ) {
         super( ex );
     }

@@ -47,9 +47,9 @@ import javax.swing.table.TableRowSorter;
 
 
 /**
- * This panel is capable of showing a table with detected operons and
- * contains an export button, which exports the data into an excel file.
- *
+ * This panel is capable of showing a table with detected operons and contains
+ * an export button, which exports the data into an excel file.
+ * <p>
  * @author -Rolf Hilker-
  */
 public class ResultPanelOperonDetection extends ResultTablePanel {
@@ -217,8 +217,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
     /**
      * Adds the data from this OperonDetectionResult to the data already
-     * available
-     * in this result panel. All statistics etc. are also updated.
+     * available in this result panel. All statistics etc. are also updated.
      * <p>
      * @param newResult the result to add
      */
@@ -234,8 +233,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             if( this.operonResult == null ) {
                 this.operonResult = operonResultNew;
-            }
-            else {
+            } else {
                 this.operonResult.addAllToResult( operonResultNew.getResults() );
             }
 

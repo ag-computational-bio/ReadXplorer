@@ -55,18 +55,19 @@ import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
+
 /**
  * Abstract analysis handler for the differential gene expression. Takes care of
  * collecting all count data from each single AnalysisHandler of each track,
  * starting the processing by the chosen tool and displaying the results after
  * the calculations.
- *
+ * <p>
  * @author kstaderm
  */
 public abstract class DeAnalysisHandler extends Thread implements Observable,
                                                                   DataVisualisationI {
 
- private static final Logger LOG = Logger.getLogger( DeAnalysisHandler.class.getName() );
+    private static final Logger LOG = Logger.getLogger( DeAnalysisHandler.class.getName() );
 
     private final int refGenomeID;
     private final int startOffset;
@@ -76,13 +77,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
     private final Set<FeatureType> selectedFeatureTypes;
     private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
-    
+
     private int resultsReceivedBack = 0;
     private ReferenceConnector referenceConnector;
     private File saveFile = null;
     private final List<PersistentFeature> genomeAnnos;
     private final List<ResultDeAnalysis> results;
     private final Map<Integer, CollectCoverageData> collectCoverageDataInstances;
+
 
     public static enum Tool {
 
@@ -104,16 +106,17 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
         public static Tool[] usableTools() {
-            if(GnuR.gnuRSetupCorrect()) {
+            if( GnuR.gnuRSetupCorrect() ) {
                 return Tool.values();
                 //If one Tool should not be available to the user return something like :
                 //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
-            }
-            else {
+            } else {
                 Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
                 return ret;
             }
         }
+
+
     }
 
 
@@ -129,7 +132,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * care of collecting all count data from each single AnalysisHandler of
      * each track, starting the processing by the chosen tool and displaying the
      * results after the calculations.
-     *
+     * <p>
      * @param selectedTracks       list of selected tracks for the analysis
      * @param refGenomeID          id of the selected reference genome
      * @param saveFile             file, in which some data for this analysis
@@ -139,8 +142,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * @param startOffset          offset in bases left of each feature start
      * @param stopOffset           offset in bases right of each feature stop
      * @param readClassParams      Parameter set of the selected read classes
-     *                             for
-     *                             this analysis
+     *                             for this analysis
      */
     public DeAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID,
                               File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
@@ -181,14 +183,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
                 CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
                 collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
-                AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track "
-                                                                         + currentTrack.getDescription() + ".", readClassParams );
+                AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
+                                                                currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
                 handler.setDesiredData( Properties.REDUCED_MAPPINGS );
                 handler.registerObserver( collCovData );
                 allHandler.add( handler );
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 ProcessingLog.getInstance().addProperty( "Unresolved track", currentTrack );
                 notifyObservers( AnalysisStatus.ERROR );
@@ -228,12 +229,12 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     /**
      * When all countData is collected this method is called and the processing
      * with the tool corresponding to the implementing class should start.
-     *
+     * <p>
      * @return
      */
     protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
                                                                        IllegalStateException,
-                                                                       UnknownGnuRException, 
+                                                                       UnknownGnuRException,
                                                                        RserveException,
                                                                        IOException;
 
@@ -309,8 +310,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         if( this.observerList.isEmpty() ) {
             try {
                 endAnalysis();
-            } catch (RserveException ex) {
-                Exceptions.printStackTrace(ex);
+            } catch( RserveException ex ) {
+                Exceptions.printStackTrace( ex );
             }
             this.interrupt();
         }
@@ -347,13 +348,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            } catch (RserveException ex) {
+            } catch( RserveException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
                 notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
-            } catch (IOException ex) {
+            } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );

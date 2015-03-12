@@ -45,8 +45,8 @@ import org.openide.util.NbBundle;
 
 
 /**
- * CorrelationAnalysisProcessor is a process of analysing correlation
- * of two tracks.
+ * CorrelationAnalysisProcessor is a process of analysing correlation of two
+ * tracks.
  * <p>
  * @author Evgeny Anisiforov
  */
@@ -99,8 +99,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         for( PersistentTrack track : analysisParams.getSelectedTracks() ) {
             try {
                 trackConnectors.add( fetcher.getMultiTrackConnector( track ) );
-            }
-            catch( UserCanceledTrackPathUpdateException ex ) {
+            } catch( UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 continue;
             }
@@ -145,9 +144,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
 
     /**
-     * If any message should be printed to the console, this method is used.
-     * If an error occured during the run of the parser, which does not
-     * interrupt
+     * If any message should be printed to the console, this method is used. If
+     * an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print
@@ -203,14 +201,13 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
 
     /**
-     * copy coverage from the coverageResult to a double-Array to be
-     * passed to the statistics package
+     * copy coverage from the coverageResult to a double-Array to be passed to
+     * the statistics package
      * <p>
      * @param coverageResult
      * @param strand
      * @param from
-     * @param to
-     *                       <p>
+     * @param to             <p>
      * @return
      */
     private double[] copyCoverage( CoverageAndDiffResult coverageResult, byte strand, int from, int to ) {
@@ -245,8 +242,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
         while( this.currentPosition < maximumCoveredPosition - analysisParams.getIntervalLength() ) {
             //ignore areas containing zeros
-            while( (this.currentPosition < maximumCoveredPosition - analysisParams.getIntervalLength())
-                   && allCoverageEqualZero( strand, this.currentPosition ) ) {
+            while( (this.currentPosition < maximumCoveredPosition - analysisParams.getIntervalLength()) &&
+                   allCoverageEqualZero( strand, this.currentPosition ) ) {
                 ++this.currentPosition;
                 ++this.currentTotalPos;
             }
@@ -265,8 +262,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                     double correlation = 0;
                     if( analysisParams.getCorrelationCoefficient().equals( CorrelationCoefficient.PEARSON ) ) {
                         correlation = new PearsonsCorrelation().correlation( x, y );
-                    }
-                    else if( analysisParams.getCorrelationCoefficient().equals( CorrelationCoefficient.SPEARMAN ) ) {
+                    } else if( analysisParams.getCorrelationCoefficient().equals( CorrelationCoefficient.SPEARMAN ) ) {
                         correlation = new SpearmansCorrelation().correlation( x, y );
                     }
                     double minCorr = analysisParams.getMinCorrelation() / 100.0;
@@ -279,10 +275,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                         this.resultView.addData( resultLine );
                     }
 
-                }
-                else {
-                    this.showMsg( "ignore correlation of interval [" + this.currentPosition + "-" + to
-                                  + "] is because min coverage is " + peakCov1 + " and " + peakCov2 );
+                } else {
+                    this.showMsg( "ignore correlation of interval [" + this.currentPosition + "-" + to +
+                                  "] is because min coverage is " + peakCov1 + " and " + peakCov2 );
                 }
                 this.currentPosition = to + 1;
                 this.currentTotalPos = currentTotalPos + analysisParams.getIntervalLength() + 1;
@@ -295,12 +290,10 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             ph.progress( this.currentTotalPos );
             if( canceled ) {
                 this.finish();
-            }
-            else {
+            } else {
                 requestNextStep();
             }
-        }
-        else {
+        } else {
 
             if( strand == SequenceUtils.STRAND_FWD ) {
                 ph.finish();
@@ -310,8 +303,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 //compute again from the beginning with the other strand strand
                 this.currentPosition = 1;
                 requestNextStep();
-            }
-            else {
+            } else {
                 this.finish();
             }
 
@@ -320,9 +312,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
 
     /**
-     * This method is called to indicate that the analysis execution
-     * is finished. The resultView will be notified to display an
-     * appropriate message.
+     * This method is called to indicate that the analysis execution is
+     * finished. The resultView will be notified to display an appropriate
+     * message.
      */
     private void finish() {
         ph.finish();
@@ -348,8 +340,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
         try {
             Thread.sleep( 50 );
-        }
-        catch( InterruptedException ex ) {
+        } catch( InterruptedException ex ) {
             Exceptions.printStackTrace( ex );
         }
 
@@ -360,8 +351,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
 
     /**
-     * this method is called, if the user clicks on the cancel button
-     * to stop the execution of this analysis
+     * this method is called, if the user clicks on the cancel button to stop
+     * the execution of this analysis
      * <p>
      * @return
      */
@@ -373,8 +364,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
 
     /**
-     * Receive data from CoverageThread and save it.
-     * Wait until the data for all tracks has arrived
+     * Receive data from CoverageThread and save it. Wait until the data for all
+     * tracks has arrived
      */
     @Override
     public synchronized void receiveData( Object data ) {

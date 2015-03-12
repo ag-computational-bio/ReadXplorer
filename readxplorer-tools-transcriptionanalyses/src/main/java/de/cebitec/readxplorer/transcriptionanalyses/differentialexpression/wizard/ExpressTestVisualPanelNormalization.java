@@ -93,8 +93,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         //If current expression doesn't parse, don't update.
         try {
             rf = RowFilter.regexFilter( searchField.getText(), 0 );
-        }
-        catch( java.util.regex.PatternSyntaxException e ) {
+        } catch( java.util.regex.PatternSyntaxException e ) {
             return;
         }
         trs.setRowFilter( rf );

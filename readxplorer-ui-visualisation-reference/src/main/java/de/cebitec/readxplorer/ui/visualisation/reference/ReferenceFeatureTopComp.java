@@ -57,7 +57,7 @@ import org.openide.windows.WindowManager;
 public final class ReferenceFeatureTopComp extends TopComponentExtended
         implements LookupListener {
 
-    private final static Logger LOG = Logger.getLogger( ReferenceFeatureTopComp.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ReferenceFeatureTopComp.class.getName() );
 
     private static ReferenceFeatureTopComp instance;
     private static final long serialVersionUID = 1L;

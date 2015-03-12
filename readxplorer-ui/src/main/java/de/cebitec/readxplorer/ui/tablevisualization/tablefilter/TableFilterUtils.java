@@ -24,22 +24,28 @@ import org.openide.util.Exceptions;
 
 /**
  * Provides some standard table filter util methods.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @param <E> A DefaultTableModel implementation
  */
 public class TableFilterUtils<E extends DefaultTableModel> {
 
     private final Class<E> classType;
 
 
+    /**
+     * Provides some standard table filter util methods.
+     * <p>
+     * @param classType The class type of this table
+     */
     public TableFilterUtils( Class<E> classType ) {
         this.classType = classType;
     }
 
 
     /**
-     * Prepares a new table model of the same type and with the same headers,
-     * as the given model.
+     * Prepares a new table model of the same type and with the same headers, as
+     * the given model.
      * <p>
      * @param tableModel the tabel model to recreate with headers, but without
      *                   content.

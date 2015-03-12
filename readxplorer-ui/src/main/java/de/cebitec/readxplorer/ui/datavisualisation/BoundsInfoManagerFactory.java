@@ -23,11 +23,11 @@ import java.util.HashMap;
 
 
 /**
- * This class keeps track of created BoundsInfoManager-Instances and
- * ensures that there is only one BoundsInfoManager per genome
+ * This class keeps track of created BoundsInfoManager-Instances and ensures
+ * that there is only one BoundsInfoManager per genome
  * <p>
- * This is to ensure, that the panel navigation (i.e. "Jump to") still
- * works even if there are multiple genome object instances in use
+ * This is to ensure, that the panel navigation (i.e. "Jump to") still works
+ * even if there are multiple genome object instances in use
  * <p>
  * @author Evgeny Anisiforov
  */

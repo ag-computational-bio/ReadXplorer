@@ -25,7 +25,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * Class for filtering integer or double value entries from a table.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class FilterDoubleValues<T extends DefaultTableModel> implements
@@ -63,7 +63,7 @@ public class FilterDoubleValues<T extends DefaultTableModel> implements
         TableFilterUtils<T> utils = new TableFilterUtils<>( classType );
         T filteredTableModel = utils.prepareNewTableModel( tableModel );
         Vector dataVector = tableModel.getDataVector();
-        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext(); ) {
+        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext();) {
             Vector row = it.next();
             Object currentEntry = row.get( column );
             if( currentEntry instanceof Integer ) {

@@ -27,10 +27,10 @@ import java.util.Iterator;
  */
 public interface LayerI {
 
-    public Iterator<BlockI> getBlockIterator();
+    Iterator<BlockI> getBlockIterator();
 
 
-    public void addBlock( BlockI block );
+    void addBlock( BlockI block );
 
 
 }

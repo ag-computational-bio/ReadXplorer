@@ -22,12 +22,18 @@ import de.cebitec.readxplorer.parser.common.ParsedFeature;
 
 
 /**
+ * A filter rule.
  *
  * @author ddoppmeier
  */
 public interface FilterRuleI {
 
-    public boolean appliesRule( ParsedFeature feature );
+    /**
+     * Applies this rule to the given feature.
+     * @param feature The feature to which to apply the rule
+     * @return true, if the rule applies, false otherwise
+     */
+    boolean appliesRule( ParsedFeature feature );
 
 
 }

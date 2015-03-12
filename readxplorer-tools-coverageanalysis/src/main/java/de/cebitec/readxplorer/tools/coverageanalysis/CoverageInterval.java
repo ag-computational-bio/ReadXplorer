@@ -92,11 +92,9 @@ public class CoverageInterval {
         String output = "no strand";
         if( strand == Properties.STRAND_BOTH ) {
             output = SequenceUtils.STRAND_BOTH_STRING;
-        }
-        else if( strand == SequenceUtils.STRAND_FWD ) {
+        } else if( strand == SequenceUtils.STRAND_FWD ) {
             output = SequenceUtils.STRAND_FWD_STRING;
-        }
-        else if( strand == SequenceUtils.STRAND_REV ) {
+        } else if( strand == SequenceUtils.STRAND_REV ) {
             output = SequenceUtils.STRAND_REV_STRING;
         }
         return output;

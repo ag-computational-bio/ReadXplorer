@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package de.cebitec.readxplorer.vcfhandling.visualization;
 
@@ -18,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -33,20 +50,23 @@ import org.openide.util.NbPreferences;
  */
 public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
 
+    private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger( SnpVcfViewer.class.getName() );
+
     private List<VariantContext> snpVcfList;
 
-    private static final int height = 70;
+    private static final int VIEWER_HEIGHT = 70;
     private final int labelMargin;
     private final int scaleFactor;
     private final boolean snpsLoaded;
     private final List<VariantContext> visibleSNPs;
 
 
-    private static Color SNP_A = new Color( 178, 34, 34 );
-    private static Color SNP_C = new Color( 106, 90, 205 );
-    private static Color SNP_G = new Color( 0, 0, 128 );
-    private static Color SNP_T = new Color( 255, 140, 0 );
-    private static Color SNP_N = new Color( 0, 0, 0 );
+    private static Color snpA = new Color( 178, 34, 34 );
+    private static Color snpC = new Color( 106, 90, 205 );
+    private static Color snpG = new Color( 0, 0, 128 );
+    private static Color snpT = new Color( 255, 140, 0 );
+    private static Color snpN = new Color( 0, 0, 0 );
     private final boolean colorChanges = false;
     private final boolean automaticScaling = false;
     private final JSlider verticalSlider = null;
@@ -54,7 +74,7 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Create a new panel to show SNP information
-     *
+     * <p>
      * @param boundsManager manager for component bounds
      * @param basePanel     serves as basis for other visual components
      * @param refGen        reference genome
@@ -76,7 +96,7 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
         final Preferences pref = NbPreferences.forModule( Object.class );
         this.setColors( pref );
 
-        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+        pref.addPreferenceChangeListener( new PreferenceChangeListener() {
 
             @Override
             public void preferenceChange( PreferenceChangeEvent evt ) {
@@ -93,7 +113,7 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Sets the Colors for each SNP.
-     *
+     * <p>
      * @param pref
      */
     private void setColors( Preferences pref ) {
@@ -102,15 +122,14 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
             String colourRGB = pref.get( "uniformColour", "" );
             //TODO check if this method is used anywhere
             if( !colourRGB.isEmpty() ) {
-                SNP_A = new Color( Integer.parseInt( colourRGB ) );
-                SNP_C = new Color( Integer.parseInt( colourRGB ) );
-                SNP_G = new Color( Integer.parseInt( colourRGB ) );
-                SNP_T = new Color( Integer.parseInt( colourRGB ) );
-                SNP_N = new Color( Integer.parseInt( colourRGB ) );
+                snpA = new Color( Integer.parseInt( colourRGB ) );
+                snpC = new Color( Integer.parseInt( colourRGB ) );
+                snpG = new Color( Integer.parseInt( colourRGB ) );
+                snpT = new Color( Integer.parseInt( colourRGB ) );
+                snpN = new Color( Integer.parseInt( colourRGB ) );
 
             }
-        }
-        else {
+        } else {
             String snpAColor = pref.get( "SNP: A", "" );
             String snpCColor = pref.get( "SNP: C", "" );
             String snpGColor = pref.get( "SNP: G", "" );
@@ -118,19 +137,19 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
             String snpNColor = pref.get( "SNP: N", "" );
 
             if( !snpAColor.isEmpty() ) {
-                SNP_A = new Color( Integer.parseInt( snpAColor ) );
+                snpA = new Color( Integer.parseInt( snpAColor ) );
             }
             if( !snpCColor.isEmpty() ) {
-                SNP_C = new Color( Integer.parseInt( snpCColor ) );
+                snpC = new Color( Integer.parseInt( snpCColor ) );
             }
             if( !snpGColor.isEmpty() ) {
-                SNP_G = new Color( Integer.parseInt( snpGColor ) );
+                snpG = new Color( Integer.parseInt( snpGColor ) );
             }
             if( !snpTColor.isEmpty() ) {
-                SNP_T = new Color( Integer.parseInt( snpTColor ) );
+                snpT = new Color( Integer.parseInt( snpTColor ) );
             }
             if( !snpNColor.isEmpty() ) {
-                SNP_N = new Color( Integer.parseInt( snpNColor ) );
+                snpN = new Color( Integer.parseInt( snpNColor ) );
             }
 
         }
@@ -162,20 +181,22 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
                     for( Allele snpAllele : snpAlleles ) {
                         switch( snpAllele.getBaseString() ) {
                             case "A":
-                                g.setColor( SNP_A );
+                                g.setColor( snpA );
                                 break;
                             case "C":
-                                g.setColor( SNP_C );
+                                g.setColor( snpC );
                                 break;
                             case "G":
-                                g.setColor( SNP_G );
+                                g.setColor( snpG );
                                 break;
                             case "T":
-                                g.setColor( SNP_T );
+                                g.setColor( snpT );
                                 break;
                             case "N":
-                                g.setColor( SNP_N );
+                                g.setColor( snpN );
                                 break;
+                            default:
+                                LOG.info( "Encountered unknown SNP nucleotide." );
                         }
                         PhysicalBaseBounds bounds = this.getPhysBoundariesForLogPos( snpPosition );
                         snpRectangle = new Rectangle( (int) bounds.getLeftPhysBound(), 1, (int) bounds.getPhysWidth(), 20 );
@@ -192,14 +213,14 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
      * Sets the initial size of the track viewer.
      */
     private void setViewerSize() {
-        this.setPreferredSize( new Dimension( 1, height ) );
+        this.setPreferredSize( new Dimension( 1, VIEWER_HEIGHT ) );
         this.revalidate();
     }
 
 
     @Override
     protected int getMaximalHeight() {
-        return height;
+        return VIEWER_HEIGHT;
     }
 
 
@@ -261,11 +282,10 @@ public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Automatically detects the most suitable scaling value to fit the coverage
-     * to the track viewer.
-     * This Method transforms highest coverage to slider value, where the slider
-     * values range from 1-200. A scaleFactor of 1 means a 1:1 translation of
-     * coverage to pixels. A larger scaleFactor means, that the coverage is
-     * shrinked to fit the available painting area.
+     * to the track viewer. This Method transforms highest coverage to slider
+     * value, where the slider values range from 1-200. A scaleFactor of 1 means
+     * a 1:1 translation of coverage to pixels. A larger scaleFactor means, that
+     * the coverage is shrinked to fit the available painting area.
      */
 //    private void computeAutomaticScaling() {
 //        if (this.automaticScaling && this.cov != null && this.verticalSlider != null) {

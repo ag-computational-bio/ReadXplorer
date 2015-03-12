@@ -44,7 +44,7 @@ public interface TableParserI extends ParserI {
      * <p>
      * @throws de.cebitec.readxplorer.parser.common.ParsingException
      */
-    public List<List<?>> parseTable( File fileToRead ) throws ParsingException;
+    List<List<?>> parseTable( File fileToRead ) throws ParsingException;
 
 
 }

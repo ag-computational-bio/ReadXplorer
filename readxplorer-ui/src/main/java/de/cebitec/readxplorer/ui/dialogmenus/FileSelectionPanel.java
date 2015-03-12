@@ -35,7 +35,7 @@ import org.openide.util.NbBundle;
 /**
  * A standard JPanel with functionality to handle multiple files, a list of
  * mapping files and manage a used directory.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class FileSelectionPanel extends JPanel {
@@ -47,8 +47,8 @@ public class FileSelectionPanel extends JPanel {
 
 
     /**
-     * A standard JPanel with functionality to handle multiple files
-     * and manage a used directory.
+     * A standard JPanel with functionality to handle multiple files and manage
+     * a used directory.
      */
     public FileSelectionPanel() {
     }
@@ -65,14 +65,14 @@ public class FileSelectionPanel extends JPanel {
     public void addFile( File file, JTextField mappingFileField ) {
         if( file.canRead() ) {
             addMappingFile( file );
-            /*TODO: Read sam header & check against reference, show a mapping of references up to 100? entries. Show button to list more/all
-             //try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
-             //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
-             //SAMFileHeader header = samReader.getFileHeader();
-             //} } catch (Exception e) {
-             this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
-             Exceptions.printStackTrace(e);
-             } */
+            /* TODO: Read sam header & check against reference, show a mapping of
+             * references up to 100? entries. Show button to list more/all //try
+             * (SAMFileReader samReader = new SAMFileReader(trackJob.getFile()))
+             * {
+             * //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+             * //SAMFileHeader header = samReader.getFileHeader(); //} } catch
+             * (Exception e) { this.notifyObservers(e.getMessage() != null ?
+             * e.getMessage() : e); Exceptions.printStackTrace(e); } */
             mappingFileField.setText( file.getAbsolutePath() );
         } else {
             JOptionPane.showMessageDialog( this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE );
@@ -156,13 +156,12 @@ public class FileSelectionPanel extends JPanel {
      *                               once, false otherwise
      * @param multiTrackScrollPane   scrollpane to display multiple files
      * @param multiTrackList         list which actually displays the multiple
-     *                               files on
-     *                               the scrollpane
+     *                               files on the scrollpane
      * @param multiTrackListLabel    the label which should only be visible for
      *                               multiple file handling
      * @param fileTextField          text field displaying either the file path
-     *                               for
-     *                               single files or the count of files to handle for multiple file handling
+     *                               for single files or the count of files to
+     *                               handle for multiple file handling
      */
     public void updateGuiForMultipleFiles( boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
                                            JLabel multiTrackListLabel, JTextField fileTextField ) {

@@ -25,12 +25,15 @@ import javax.swing.table.TableRowSorter;
 
 /**
  * Provides different table row comparators for different sorting purposes.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class TableComparatorProvider {
 
 
+    /**
+     * Instantiation not allowed.
+     */
     private TableComparatorProvider() {
     }
 

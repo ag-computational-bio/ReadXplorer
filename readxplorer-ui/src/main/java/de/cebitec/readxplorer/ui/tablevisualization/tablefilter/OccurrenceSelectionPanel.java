@@ -43,16 +43,15 @@ public class OccurrenceSelectionPanel extends javax.swing.JPanel {
 
 
     /**
-     * This method regulates the activity of the buttons.
-     * The field should only be able to work if the allOccurrenceButton
-     * is not selected.
+     * This method regulates the activity of the buttons. The field should only
+     * be able to work if the allOccurrenceButton is not selected.
      */
     private void buttonAction() {
         if( allTracksButton.isSelected() ) {
             trackNumberField.setEditable( false );
         }
-        if( minimumOccurrenceButton.isSelected()
-            || maximumOccurrenceButton.isSelected() ) {
+        if( minimumOccurrenceButton.isSelected() ||
+                 maximumOccurrenceButton.isSelected() ) {
             trackNumberField.setEditable( true );
         }
     }
@@ -72,8 +71,8 @@ public class OccurrenceSelectionPanel extends javax.swing.JPanel {
     /**
      * Getter for selected Buttons.
      * <p>
-     * @return String "all" if the user selects all in the dialog, "min" for
-     *         min or "max" for a max occurrence.
+     * @return String "all" if the user selects all in the dialog, "min" for min
+     *         or "max" for a max occurrence.
      */
     public String getSelectedButton() {
 
