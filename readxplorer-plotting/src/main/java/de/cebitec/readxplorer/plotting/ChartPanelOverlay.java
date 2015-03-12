@@ -41,9 +41,9 @@ public class ChartPanelOverlay implements Overlay {
     @Override
     public void paintOverlay( Graphics2D gd, ChartPanel pnl ) {
         PlotDataItem selectedItem = mouseActions.getSelectedItem();
-        if( selectedItem != null ) {
-
-        }
+//        if( selectedItem != null ) {
+//
+//        }
     }
 
 
