@@ -33,7 +33,7 @@ public interface Observer {
      * <p>
      * @param args the arguments to be send to the observer
      */
-    public void update( Object args );
+    void update( Object args );
 
 
 }

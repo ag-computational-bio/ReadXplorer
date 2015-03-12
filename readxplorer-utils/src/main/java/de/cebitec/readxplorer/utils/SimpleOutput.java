@@ -26,10 +26,10 @@ package de.cebitec.readxplorer.utils;
  */
 public interface SimpleOutput {
 
-    public void showMessage( String s );
+    void showMessage( String s );
 
 
-    public void showError( String s );
+    void showError( String s );
 
 
 }

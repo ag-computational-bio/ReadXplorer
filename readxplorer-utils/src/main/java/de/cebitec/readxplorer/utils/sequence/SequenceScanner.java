@@ -174,7 +174,7 @@ public abstract class SequenceScanner {
      * method assures that the stop position is never larger than the
      * <code>totalStop</code> position.
      * <p>
-     * @param stopPos The start position of the current interval
+     * @param startPos The start position of the current interval
      * <p>
      * @return The revised stop position
      */

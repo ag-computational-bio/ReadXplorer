@@ -31,7 +31,7 @@ public interface Observable {
      * <p>
      * @param observer the observer to register
      */
-    public void registerObserver( Observer observer );
+    void registerObserver( Observer observer );
 
 
     /**
@@ -39,7 +39,7 @@ public interface Observable {
      * <p>
      * @param observer the observer to remove
      */
-    public void removeObserver( Observer observer );
+    void removeObserver( Observer observer );
 
 
     /**
@@ -48,7 +48,7 @@ public interface Observable {
      * @param data object for which the notification is created. It is often
      * passed on to the observers.
      */
-    public void notifyObservers( Object data );
+    void notifyObservers( Object data );
 
 
 }

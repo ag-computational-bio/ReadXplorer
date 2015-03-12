@@ -30,14 +30,14 @@ public interface GenomicRange extends Comparable<GenomicRange> {
      * @return The start of the genomic range. Always smaller than stop, also
      * when on the reverse strand.
      */
-    public int getStart();
+    int getStart();
 
 
     /**
      * @return The stop of the genomic range. Always larger than start, also
      * when on the reverse strand.
      */
-    public int getStop();
+    int getStop();
 
 
     /**
@@ -46,7 +46,7 @@ public interface GenomicRange extends Comparable<GenomicRange> {
      * @return <code>true</code> for featues on forward and <code>false</code>
      * on reverse strand
      */
-    public boolean isFwdStrand();
+    boolean isFwdStrand();
 
 
     /**

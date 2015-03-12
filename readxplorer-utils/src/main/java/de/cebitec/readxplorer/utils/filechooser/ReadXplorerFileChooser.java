@@ -21,7 +21,6 @@ package de.cebitec.readxplorer.utils.filechooser;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.io.IOException;
-import static java.util.logging.Level.SEVERE;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -31,6 +30,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -156,7 +157,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
      * and prompts for replacement. If it doesn't exist yet, it is created.
      *
      * @param fileLocation the file location to store the file
-     * @param this the JFileChooser
+     * @param jfc the JFileChooser
      */
     @NbBundle.Messages({"ReadxplorerFileChooser_FileExists=File already exists. Do you want to overwrite the existing file?",
         "ReadXplorerFileChooser_Dialog=Overwrite File Dialog"})
