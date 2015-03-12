@@ -39,8 +39,8 @@ package de.cebitec.readxplorer.rnatrimming;
  */
 public class HalfedLengthTrimMethod extends RegularExpressionTrimMethod {
 
-    public HalfedLengthTrimMethod( String regularexpression, int groupnumber_main, int groupnumber_trimLeft, int groupnumber_trimRight, String name, String shortName ) {
-        super( regularexpression, groupnumber_main, groupnumber_trimLeft, groupnumber_trimRight, name, shortName );
+    public HalfedLengthTrimMethod( String regularexpression, int groupnumberMain, int groupnumberTrimLeft, int groupnumberTrimRight, String name, String shortName ) {
+        super( regularexpression, groupnumberMain, groupnumberTrimLeft, groupnumberTrimRight, name, shortName );
     }
 
 

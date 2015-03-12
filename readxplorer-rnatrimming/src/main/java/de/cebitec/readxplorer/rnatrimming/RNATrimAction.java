@@ -53,11 +53,11 @@ import org.openide.util.NbBundle.Messages;
 @Messages( "CTL_RNATrimAction=Trim upmapped RNA reads in a file" )
 public final class RNATrimAction implements ActionListener {
 
-    static String PROP_TRIMMETHOD = "PROP_TRIMMETHOD";
-    static String PROP_TRIMMAXIMUM = "PROP_TRIMMAXIMUM";
-    static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
-    static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
-    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
+    static final String PROP_TRIMMETHOD = "PROP_TRIMMETHOD";
+    static final String PROP_TRIMMAXIMUM = "PROP_TRIMMAXIMUM";
+    static final String PROP_SOURCEPATH = "PROP_SOURCEPATH";
+    static final String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
+    static final String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
 
     private final LoginCookie context;
     private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
