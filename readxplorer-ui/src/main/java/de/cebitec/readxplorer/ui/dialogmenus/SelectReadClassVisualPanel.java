@@ -35,7 +35,7 @@ import org.openide.util.NbPreferences;
 /**
  * A visual wizard job panel. It offers to select read mapping classes and
  * unique or all mapped reads for any further processing.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectReadClassVisualPanel extends JobPanel {
@@ -51,9 +51,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
      * <p>
      * @param wizardName        the name of the corresponding wizard
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate options. <code>false</code>
-     *                          means the analysis generally runs on the strands and should not show the
-     *                          strand option components.
+     *                          genomic features and should show appropriate
+     *                          options. <code>false</code> means the analysis
+     *                          generally runs on the strands and should not
+     *                          show the strand option components.
      */
     public SelectReadClassVisualPanel( String wizardName, boolean isFeatureAnalysis ) {
         this.wizardName = wizardName;
@@ -70,9 +71,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
      * depending on the given boolean.
      * <p>
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate options. <code>false</code>
-     *                          means the analysis generally runs on the strands and should not show the
-     *                          strand option components.
+     *                          genomic features and should show appropriate
+     *                          options. <code>false</code> means the analysis
+     *                          generally runs on the strands and should not
+     *                          show the strand option components.
      */
     private void updateStrandOptionLabels( boolean isFeatureAnalysis ) {
         jSeparator2.setVisible( isFeatureAnalysis );
@@ -340,16 +342,15 @@ public class SelectReadClassVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated
-                = this.checkBoxPerfect.isSelected()
-                  || this.checkBoxBestMatch.isSelected()
-                  || this.checkBoxCommon.isSelected()
-                  || this.checkBoxSinglePerfect.isSelected()
-                  || this.checkBoxSingleBestMatch.isSelected();
+                = this.checkBoxPerfect.isSelected() ||
+                 this.checkBoxBestMatch.isSelected() ||
+                 this.checkBoxCommon.isSelected() ||
+                 this.checkBoxSinglePerfect.isSelected() ||
+                 this.checkBoxSingleBestMatch.isSelected();
 
         if( GeneralUtils.isValidByteInput( minMappingQualityField.getText() ) ) {
             this.minMappingQual = Byte.parseByte( minMappingQualityField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
@@ -393,8 +394,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         byte strandOption = Properties.STRAND_FEATURE;
         if( this.strandOppositeRadioButton.isSelected() ) {
             strandOption = Properties.STRAND_OPPOSITE;
-        }
-        else if( this.strandBothRadioButton.isSelected() ) {
+        } else if( this.strandBothRadioButton.isSelected() ) {
             strandOption = Properties.STRAND_BOTH;
         }
         return strandOption;

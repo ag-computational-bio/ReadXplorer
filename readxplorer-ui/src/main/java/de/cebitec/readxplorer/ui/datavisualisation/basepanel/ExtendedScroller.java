@@ -33,7 +33,7 @@ import javax.swing.JSlider;
  */
 public class ExtendedScroller extends JScrollBar implements SynchronousNavigator {
 
-    private final static long serialVersionUID = 7416234;
+    private static final long serialVersionUID = 7416234;
 
     private int currentValue;
     private final List<AdjustmentPanelListenerI> listeners;

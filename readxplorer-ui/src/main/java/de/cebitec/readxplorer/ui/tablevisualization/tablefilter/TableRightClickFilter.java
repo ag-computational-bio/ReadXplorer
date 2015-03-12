@@ -46,9 +46,9 @@ import org.openide.util.NbBundle;
 
 
 /**
- * A MouseAdapter, which offers a filter for the columns of a table. An
- * instance of this class must be added as a listener to the TableHeader of the
- * table that should be filtered. Only tables using a model extending
+ * A MouseAdapter, which offers a filter for the columns of a table. An instance
+ * of this class must be added as a listener to the TableHeader of the table
+ * that should be filtered. Only tables using a model extending
  * DefaultTableModel can be used!
  * <p>
  * @param <E> the table model, which has to extend the DefaultTableModel.
@@ -80,7 +80,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
      * instance of this class must be added as a listener to the TableHeader of
      * the table that should be filtered. Only tables using a model extending
      * DefaultTableModel can be used!
-     *
+     * <p>
      * @param classType   the type of the table model, which has to extend the
      *                    DefaultTableModel.
      * @param posColumn   column containing the position information
@@ -107,7 +107,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
 
     /**
      * Getter for lastTable. needed in FilterOccurrence class.
-     *
+     * <p>
      * @return lastTable
      */
     public JTable getLastTable() {
@@ -195,8 +195,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Double cutoff = Double.parseDouble( input );
                         setNewTableModel( filterValuesSmallerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
-                    }
-                    catch( NumberFormatException nfe ) {
+                    } catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid number value." );
                     }
                 }
@@ -216,8 +215,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Double cutoff = Double.parseDouble( input );
                         setNewTableModel( filterValuesLargerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
-                    }
-                    catch( NumberFormatException nfe ) {
+                    } catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid value." );
                     }
                 }
@@ -236,8 +234,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Pattern.compile( input );
                         setNewTableModel( filterRegExp( (E) lastTable.getModel(), input, lastSelectedColumn ) );
-                    }
-                    catch( PatternSyntaxException pse ) {
+                    } catch( PatternSyntaxException pse ) {
                         JOptionPane.showMessageDialog( null, "Please enter a valid pattern." );
                     }
                 }
@@ -293,8 +290,8 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
 
 
     /**
-     * Sets the model of the lastTable. Also sets the original table model,
-     * if this is the first call of the method.
+     * Sets the model of the lastTable. Also sets the original table model, if
+     * this is the first call of the method.
      * <p>
      * @param newTableModel the new table model to set
      */
@@ -303,7 +300,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         if( originalTableModel == null ) {
             TableFilterUtils<E> utils = new TableFilterUtils<>( classType );
             E tmpModel = utils.prepareNewTableModel( tableModel );
-            for( Iterator<Vector> it = tableModel.getDataVector().iterator(); it.hasNext(); ) {
+            for( Iterator<Vector> it = tableModel.getDataVector().iterator(); it.hasNext();) {
                 Vector row = it.next();
                 tmpModel.addRow( row );
             }

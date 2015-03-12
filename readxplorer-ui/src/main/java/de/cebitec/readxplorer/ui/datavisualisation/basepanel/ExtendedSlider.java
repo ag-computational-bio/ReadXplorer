@@ -34,7 +34,7 @@ import javax.swing.JSlider;
  */
 public class ExtendedSlider extends JSlider implements SynchronousNavigator {
 
-    private final static long serialVersionUID = 2347624;
+    private static final long serialVersionUID = 2347624;
 
     private int current;
 

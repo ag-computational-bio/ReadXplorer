@@ -28,7 +28,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * Wizard panel for showing and handling the selection of feature types.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
@@ -46,8 +46,8 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
      * Wizard panel for showing and handling the selection of feature types.
      * <p>
      * @param analysisName the name of the analysis using this wizard panel. It
-     *                     will be used to store the selected settings for this wizard panel under a
-     *                     unique identifier.
+     *                     will be used to store the selected settings for this
+     *                     wizard panel under a unique identifier.
      */
     public SelectFeatureTypeWizardPanel( String analysisName ) {
         super( "Please select at least one feature type to continue." );

@@ -33,8 +33,8 @@ import org.openide.util.NbPreferences;
 
 
 /**
- * Manages the detection and highlighting of regions in a sequence bar.
- * It currently supports start and stop codons and exact sequence region
+ * Manages the detection and highlighting of regions in a sequence bar. It
+ * currently supports start and stop codons and exact sequence region
  * highlighting.
  * <p>
  * @author Rolf Hilker
@@ -60,9 +60,10 @@ public class RegionManager {
      *                          embedded
      * @param refGen            the reference genome
      * @param highlightListener the listener for highlighting a sequence of
-     *                          choice and
-     *                          displaying a corresponding menu. It is needed here, because all regions
-     *                          detected by this manager play a special role for this listener.
+     *                          choice and displaying a corresponding menu. It
+     *                          is needed here, because all regions detected by
+     *                          this manager play a special role for this
+     *                          listener.
      */
     public RegionManager( SequenceBar regionVisualizer, AbstractViewer parentViewer,
                           PersistentReference refGen, HighlightAreaListener highlightListener ) {
@@ -138,8 +139,7 @@ public class RegionManager {
 
     /**
      * Detects the occurrences of the given pattern in the currently shown
-     * interval
-     * or the next occurrence of the pattern in the genome.
+     * interval or the next occurrence of the pattern in the genome.
      * <p>
      * @param pattern Pattern to search for
      * <p>
@@ -241,8 +241,7 @@ public class RegionManager {
     public void setCdsRegions( List<Region> cdsRegions ) {
         if( this.cdsRegions.containsAll( cdsRegions ) ) {
             this.cdsRegions.removeAll( cdsRegions );
-        }
-        else {
+        } else {
             this.cdsRegions = cdsRegions;
         }
         this.showCdsRegions();

@@ -34,7 +34,7 @@ public interface RegionFilterI {
      * <p>
      * @return a list of the identified regions
      */
-    public List<Region> findRegions();
+    List<Region> findRegions();
 
 
     /**
@@ -45,7 +45,7 @@ public interface RegionFilterI {
      * @param stop  the rightmost position of the interval, alway larger than
      *              <code>start</code>
      */
-    public void setInterval( int start, int stop );
+    void setInterval( int start, int stop );
 
 
 }

@@ -25,10 +25,17 @@ import javax.swing.table.TableRowSorter;
 
 /**
  * Provides different table row comparators for different sorting purposes.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TableComparatorProvider {
+public final class TableComparatorProvider {
+
+
+    /**
+     * Instantiation not allowed.
+     */
+    private TableComparatorProvider() {
+    }
 
 
     /**
@@ -106,8 +113,7 @@ public class TableComparatorProvider {
                     Integer intA = Integer.parseInt( a );
                     Integer intB = Integer.parseInt( b );
                     return intA.compareTo( intB );
-                }
-                catch( NumberFormatException e ) {
+                } catch( NumberFormatException e ) {
                     return a.compareTo( b );
                 }
             }

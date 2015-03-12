@@ -41,7 +41,7 @@ import org.openide.util.Lookup;
 /**
  * Listener for highlighting areas on a sequence bar. Note that classes with a
  * HighlightAreaListener have to implement IHighlightable
- *
+ * <p>
  * @author Rolf Hilker
  */
 public class HighlightAreaListener extends MouseAdapter {
@@ -65,8 +65,7 @@ public class HighlightAreaListener extends MouseAdapter {
      * @param parentComponent the component the listener is associated to
      * @param baseLineY       the baseline of the vie
      * @param offsetY         the y offset from the middle, which determines
-     *                        where to
-     *                        start painting the highlighting rectangle
+     *                        where to start painting the highlighting rectangle
      */
     public HighlightAreaListener( final SequenceBar parentComponent, final int baseLineY, final int offsetY ) {
         this.parentComponent = parentComponent;
@@ -96,8 +95,7 @@ public class HighlightAreaListener extends MouseAdapter {
             this.keepPainted = false;
             this.freezeRect = false;
             this.setHighlightRectangle( null );
-        }
-        else if( inRect ) {
+        } else if( inRect ) {
             this.showPopUp( e );
         }
         //highlight interval from current start to next stop codon in frame
@@ -276,7 +274,7 @@ public class HighlightAreaListener extends MouseAdapter {
     /**
      * Allows to add special regions within this sequence bar. These regions
      * receive additional treatment, when the mouse was clicked in one of them.
-     *
+     * <p>
      * @param jreg a JRegion, which has to be treated in a special way
      */
     public void addSpecialRegion( JRegion jreg ) {
@@ -292,8 +290,7 @@ public class HighlightAreaListener extends MouseAdapter {
 
     /**
      * Shows the complete menu for any position on the sequence bar. This is
-     * context
-     * sensitive, depending on special regions (start, stop codons and
+     * context sensitive, depending on special regions (start, stop codons and
      * patterns).
      * <p>
      * @param e the mouse event which triggered the call of this method
@@ -381,6 +378,7 @@ public class HighlightAreaListener extends MouseAdapter {
 
     /**
      * Identifies the CDS belonging to the given
+     * <p>
      * @param cdsStart  The first position in the correct reading frame, on
      *                  which stop codons should be detected.
      * @param reference The reference to analyze for the next stop position
@@ -429,4 +427,6 @@ public class HighlightAreaListener extends MouseAdapter {
     public void clearSpecialRegions() {
         this.specialRegionList.clear();
     }
+
+
 }

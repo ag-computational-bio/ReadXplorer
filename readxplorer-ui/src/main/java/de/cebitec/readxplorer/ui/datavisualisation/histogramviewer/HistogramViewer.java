@@ -52,9 +52,8 @@ import javax.swing.SwingUtilities;
 
 /**
  * The histogram viewer. Showing the match an deviating coverage for each
- * position
- * in a reference genome as a histogram.
- *
+ * position in a reference genome as a histogram.
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class HistogramViewer extends AbstractViewer implements ThreadListener {
@@ -62,7 +61,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 234765253;
     private static final int MININTERVALLENGTH = 3000;
 //    private InputOutput io;
-    private static final int height = 200;
+    private static final int VIEW_HEIGHT = 200;
     private final TrackConnector trackConnector;
     private final PersistentReference refGen;
     private GenomeGapManager gapManager;
@@ -123,7 +122,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public int getMaximalHeight() {
-        return height;
+        return VIEW_HEIGHT;
     }
 
 
@@ -171,8 +170,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
             sb.append( "</html>" );
             this.setToolTipText( sb.toString() );
-        }
-        else {
+        } else {
             setToolTipText( null );
         }
     }
@@ -253,8 +251,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             if( this.diffsLoaded ) {
                 this.setupData();
             }
-        }
-        else {
+        } else {
             this.setNewDataRequestNeeded( false );
             setCursor( new Cursor( Cursor.WAIT_CURSOR ) );
             this.coverageLoaded = false;
@@ -319,8 +316,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public void boundsChangedHook() {
-        if( this.getBoundsInfo().getLogLeft() != lowerBound || this.getBoundsInfo().getLogRight() != upperBound
-            || this.isNewDataRequestNeeded() ) {
+        if( this.getBoundsInfo().getLogLeft() != lowerBound || this.getBoundsInfo().getLogRight() != upperBound ||
+                 this.isNewDataRequestNeeded() ) {
             this.lowerBound = super.getBoundsInfo().getLogLeft();
             this.upperBound = super.getBoundsInfo().getLogRight();
             this.width = upperBound - lowerBound + 1;
@@ -422,7 +419,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private void createLogoBlocks() {
         maxCoverage = logoData.getMaxFoundCoverage();
         PaintingAreaInfo info = this.getPaintingAreaInfo();
-        // asuming forward and reverse height are equal
+        // asuming forward and reverse VIEW_HEIGHT are equal
         int availableHeight = info.getAvailableForwardHeight();
 
         pxPerCoverageUnit = (double) availableHeight / maxCoverage;
@@ -438,8 +435,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             relPos = i + gapManager.getNumOfGapsSmaller( i ) + gapManager.getNumOfGapsAt( i );
 
             // get physical x coordinate
-            x = (int) getPhysBoundariesForLogPos( i ).getLeftPhysBound()
-                + (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * gapManager.getNumOfGapsAt( i );
+            x = (int) getPhysBoundariesForLogPos( i ).getLeftPhysBound() +
+                     (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * gapManager.getNumOfGapsAt( i );
 
             this.cycleBases( i, relPos, x, pxPerCoverageUnit, true, isColored );
             this.cycleBases( i, relPos, x, pxPerCoverageUnit, false, isColored );
@@ -452,8 +449,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                     relPos = i + gapManager.getNumOfGapsSmaller( i );
                     relPos += j;
 
-                    x = (int) getPhysBoundariesForLogPos( i ).getLeftPhysBound()
-                        + (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * j;
+                    x = (int) getPhysBoundariesForLogPos( i ).getLeftPhysBound() +
+                             (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * j;
 
                     this.cycleBases( i, relPos, x, pxPerCoverageUnit, true, isColored );
                     this.cycleBases( i, relPos, x, pxPerCoverageUnit, false, isColored );
@@ -486,8 +483,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if( value > 0 ) {
             if( !isColored ) {
                 c = ColorProperties.LOGO_MATCH;
-            }
-            else {
+            } else {
                 if( !isForwardStrand ) {
                     base = SequenceUtils.getDnaComplement( base );
                 }
@@ -548,11 +544,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * Creates a histogram block (BarComponent) for the given value at the given
      * positon.
      * <p>
-     * @param value                 the height value of the current histogram
-     *                              bar
+     * @param value                 the VIEW_HEIGHT value of the current
+     *                              histogram bar
      * @param isForwardStrand       true, if this bar is on the fwd strand,
      *                              false otherwise
-     * @param heightPerCoverageUnit the height of each coverage unit in the
+     * @param heightPerCoverageUnit the VIEW_HEIGHT of each coverage unit in the
      *                              current viewer
      * @param bounds                the bounds of the viewer
      * @param color                 the color to paint the current histogram bar
@@ -573,8 +569,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if( isForwardStrand ) {
             y -= featureHeight;
             block.setBounds( x, y, (int) bounds.getPhysWidth(), featureHeight );
-        }
-        else {
+        } else {
             block.setBounds( x, y + 1, (int) bounds.getPhysWidth(), featureHeight );
             y += featureHeight;
         }
@@ -617,7 +612,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int gapPosition;
         int gapOrder;
         int oldValue;
-        for( Iterator<ReferenceGap> it = gaps.iterator(); it.hasNext(); ) {
+        for( Iterator<ReferenceGap> it = gaps.iterator(); it.hasNext();) {
             gap = it.next();
             gapPosition = gap.getPosition();
             gapOrder = gap.getOrder() + 1;
@@ -633,7 +628,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
         int position;
         int numOfGaps;
-        for( Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext(); ) {
+        for( Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext();) {
             position = it.next();
             numOfGaps = positionToNum.get( position );
             gapManager.addNumOfGapsAtPosition( position, numOfGaps );
@@ -645,9 +640,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * Sets up the histogram bars for the visual bases.
      */
     private void setUpLogoData() {
-        logoData = new LogoDataManager( lowerBound, width
-                                                    + gapManager.getNumOfGapsSmaller( upperBound )
-                                                    + gapManager.getNumOfGapsAt( upperBound ) );
+        logoData = new LogoDataManager( lowerBound, width +
+                                         gapManager.getNumOfGapsSmaller( upperBound ) +
+                                         gapManager.getNumOfGapsAt( upperBound ) );
 
         // store coverage information in logo data
         int relPos;
@@ -660,14 +655,13 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         // store diff information from the reference genome in logo data
         Difference d;
         int position;
-        for( Iterator<Difference> it = diffs.iterator(); it.hasNext(); ) {
+        for( Iterator<Difference> it = diffs.iterator(); it.hasNext();) {
             d = it.next();
             position = d.getPosition();
             if( position > lowerBound && position < upperBound ) {
                 relPos = position + gapManager.getNumOfGapsAt( d.getPosition() ) + gapManager.getNumOfGapsSmaller( d.getPosition() );
                 logoData.addExtendedPersistentDiff( d, relPos );
-            }
-            else if( position > upperBound ) {
+            } else if( position > upperBound ) {
                 break;
             }
         }

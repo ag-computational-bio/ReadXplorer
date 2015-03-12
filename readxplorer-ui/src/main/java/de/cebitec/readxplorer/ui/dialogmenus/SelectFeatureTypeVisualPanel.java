@@ -30,7 +30,7 @@ import org.openide.util.NbPreferences;
 /**
  * A visual wizard job panel. It offers to select feature types of annotations
  * for any further processing.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectFeatureTypeVisualPanel extends JobPanel {
@@ -45,9 +45,9 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
      * A visual wizard job panel. It offers to select feature types of
      * annotations for any further processing.
      * <p>
-     * @param analysisName The name of the analysis using this panel
-     *                     panel. It will be used to store the selected settings for this pane
-     *                     under a unique identifier.
+     * @param analysisName The name of the analysis using this panel panel. It
+     *                     will be used to store the selected settings for this
+     *                     pane under a unique identifier.
      */
     public SelectFeatureTypeVisualPanel( String analysisName ) {
         this.analysisName = analysisName;
@@ -126,13 +126,13 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
      * Sets the display name of this panel.
      * <p>
      * @param showDisplayName True, if the display name shall be included in the
-     *                        title, false if only the plain panel name shall be shown
+     *                        title, false if only the plain panel name shall be
+     *                        shown
      */
     public void showDisplayName( boolean showDisplayName ) {
         if( showDisplayName ) {
             this.displayName = this.analysisName + " " + PANEL_NAME;
-        }
-        else {
+        } else {
             this.displayName = PANEL_NAME;
         }
 

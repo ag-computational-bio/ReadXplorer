@@ -48,8 +48,7 @@ public final class LogoutAction implements ActionListener {
             NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( LogoutAction.class, "MSG_LogoutAction.warning.busy" ), NotifyDescriptor.WARNING_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
 
-        }
-        else {
+        } else {
 
             //do not close the dashboard window, if opened!
             TopComponent dashboard = WindowManager.getDefault().findTopComponent( "DashboardWindowTopComponent" );

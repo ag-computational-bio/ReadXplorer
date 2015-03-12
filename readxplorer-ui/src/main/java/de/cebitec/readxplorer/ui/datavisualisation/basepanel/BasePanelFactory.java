@@ -77,7 +77,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * Factory used to initialize all different kinds of base panels.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class BasePanelFactory {
@@ -171,8 +171,7 @@ public class BasePanelFactory {
         TrackConnector tc;
         try {
             tc = (new SaveFileFetcherForGUI()).getTrackConnector( track );
-        }
-        catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+        } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
             JOptionPane.showMessageDialog( null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE );
             return null;
         }
@@ -184,8 +183,7 @@ public class BasePanelFactory {
             basePanel.setTitlePanel( this.getTitlePanel( track.getDescription() ) );
 
             return basePanel;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -205,8 +203,7 @@ public class BasePanelFactory {
     public BasePanel getMultipleTracksBasePanel( List<PersistentTrack> tracks, PersistentReference refGen, boolean combineTracks ) {
         if( tracks.size() > 2 && !combineTracks ) {
             throw new UnsupportedOperationException( "More than two tracks not supported in non-combined mode." );
-        }
-        else if( tracks.size() == 2 && !combineTracks || combineTracks ) {
+        } else if( tracks.size() == 2 && !combineTracks || combineTracks ) {
             BasePanel basePanel = new BasePanel( boundsManager, viewController );
             viewController.addMousePositionListener( basePanel );
 
@@ -214,8 +211,7 @@ public class BasePanelFactory {
             TrackConnector trackCon;
             try {
                 trackCon = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 JOptionPane.showMessageDialog( null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE );
                 return null;
             }
@@ -223,8 +219,7 @@ public class BasePanelFactory {
             TrackViewer trackV;
             if( combineTracks ) {
                 trackV = new MultipleTrackViewer( boundsManager, basePanel, refGen, trackCon, combineTracks );
-            }
-            else {
+            } else {
                 trackV = new DoubleTrackViewer( boundsManager, basePanel, refGen, trackCon );
             }
 
@@ -235,11 +230,9 @@ public class BasePanelFactory {
 
             viewController.openTrack2( basePanel );
             return basePanel;
-        }
-        else if( tracks.size() == 1 ) {
+        } else if( tracks.size() == 1 ) {
             return this.getTrackBasePanel( tracks.get( 0 ), refGen );
-        }
-        else {
+        } else {
             throw new UnknownError();
         }
     }
@@ -258,8 +251,7 @@ public class BasePanelFactory {
         JPanel trackPanelLegend;
         if( combineTracks || !trackV.isTwoTracks() ) {
             trackPanelLegend = this.getTrackPanelLegend( trackV );
-        }
-        else {
+        } else {
             trackPanelLegend = this.getDoubleTrackPanelLegend( trackV );
         }
         MenuLabel legendLabel = new MenuLabel( trackPanelLegend, MenuLabel.TITLE_LEGEND );
@@ -385,8 +377,8 @@ public class BasePanelFactory {
 
     /**
      * Create an <code>AdjustmentPanel</code> for the given parameters. This
-     * panel may contain a scrollbar for scrolling along a reference and
-     * a slider for zooming in and out.
+     * panel may contain a scrollbar for scrolling along a reference and a
+     * slider for zooming in and out.
      * <p>
      * @param hasScrollbar true, if a scrollbar for the reference sequence is
      *                     needed, false otherwise
@@ -424,8 +416,9 @@ public class BasePanelFactory {
      * @param typeColor color of the feature type
      * @param type      the feature type whose legend entry is created
      * @param viewer    the viewer to which the legend entry belongs. If no
-     *                  function is assigend to the legend entry, viewer can be set to null. In
-     *                  this case a simple label is returned instead of the checkbox.
+     *                  function is assigend to the legend entry, viewer can be
+     *                  set to null. In this case a simple label is returned
+     *                  instead of the checkbox.
      * <p>
      * @return A legend entry for a feature type.
      */
@@ -453,8 +446,7 @@ public class BasePanelFactory {
         entry.add( colorPanel );
         if( viewer != null ) {
             entry.add( this.getFeatureTypeBox( type, viewer ) );
-        }
-        else {
+        } else {
             entry.add( new JLabel( type.getTypeString() ) );
         }
         entry.setAlignmentX( Component.LEFT_ALIGNMENT );
@@ -463,11 +455,11 @@ public class BasePanelFactory {
 
 
     /**
-     * @param typeColor color of the feature type
      * @param type      the feature type whose legend entry is created
      * @param viewer    the viewer to which the legend entry belongs. If no
-     *                  function is assigend to the legend entry, viewer can be set to null. In
-     *                  this case a simple label is returned instead of the checkbox.
+     *                  function is assigend to the legend entry, viewer can be
+     *                  set to null. In this case a simple label is returned
+     *                  instead of the checkbox.
      * <p>
      * @return A legend entry for a feature type.
      */
@@ -489,8 +481,7 @@ public class BasePanelFactory {
         //special cases are handled here
         if( type != FeatureType.UNDEFINED ) {
             checker.setSelected( true );
-        }
-        else {
+        } else {
             checker.setSelected( false );
         }
         checker.setBackground( ColorProperties.LEGEND_BACKGROUND );
@@ -829,8 +820,8 @@ public class BasePanelFactory {
      */
     private class FeatureTypeListener implements ActionListener {
 
-        Classification type;
-        AbstractViewer viewer;
+        private Classification type;
+        private AbstractViewer viewer;
 
 
         /**
@@ -853,8 +844,7 @@ public class BasePanelFactory {
         public void actionPerformed( ActionEvent e ) {
             if( ((AbstractButton) e.getSource()).isSelected() ) {
                 viewer.removeExcludedClassifications( type );
-            }
-            else {
+            } else {
                 viewer.addExcludedClassifications( type );
             }
             this.viewer.setNewDataRequestNeeded( true );

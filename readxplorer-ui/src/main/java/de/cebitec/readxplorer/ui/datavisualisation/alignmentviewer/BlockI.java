@@ -28,19 +28,19 @@ import java.util.Iterator;
  */
 public interface BlockI {
 
-    public int getAbsStart();
+    int getAbsStart();
 
 
-    public int getAbsStop();
+    int getAbsStop();
 
 
-    public Iterator<Brick> getBrickIterator();
+    Iterator<Brick> getBrickIterator();
 
 
-    public ObjectWithId getObjectWithId();
+    ObjectWithId getObjectWithId();
 
 
-    public int getNumOfBricks();
+    int getNumOfBricks();
 
 
 }

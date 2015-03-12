@@ -35,8 +35,7 @@ import org.openide.util.Exceptions;
 /**
  * Renderer used to remove the property editor button and the grey appearance of
  * the cells of an outline view. It uses the <@link PropertyTextRenderer/> of
- * the property if any was set.
- * From:
+ * the property if any was set. From:
  * http://jnkjava.wordpress.com/2011/11/28/recipe-7-how-do-i-decorate-a-read-only-outlineview/
  * <p>
  * @author Evgeny Anisiforov
@@ -72,8 +71,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
         if( value instanceof Property ) {
             try {
                 valueToDisplay = ((Property) value).getValue();
-            }
-            catch( IllegalAccessException | InvocationTargetException ex ) {
+            } catch( IllegalAccessException | InvocationTargetException ex ) {
                 Exceptions.printStackTrace( ex );
             }
         }
@@ -83,16 +81,14 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
                 cell = renderer.getTableCellRendererComponent( table, valueToDisplay, isSelected,
                                                                hasFocus, row, column );
             }
-        }
-        else {
+        } else {
             cell = super.getTableCellRendererComponent( table, valueToDisplay, isSelected, hasFocus, row, column );
         }
         if( cell != null ) {
             if( centered ) {
                 if( cell instanceof HtmlRenderer.Renderer ) {
                     ((HtmlRenderer.Renderer) cell).setCentered( centered );
-                }
-                else if( cell instanceof DefaultTableCellRenderer.UIResource ) {
+                } else if( cell instanceof DefaultTableCellRenderer.UIResource ) {
                     ((JLabel) cell).setHorizontalAlignment( JLabel.CENTER );
                 }
             }
@@ -127,7 +123,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
 
     /**
      * Center the content of the cells displaying text.
-     *
+     * <p>
      * @param value true to center, false for default alignment.
      */
     public void setCentered( final boolean value ) {
@@ -145,7 +141,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
 
     /**
      * Highlight the non editable cells making the foreground lighter.
-     *
+     * <p>
      * @param value true to activate this feature.
      */
     public void setLighterEditableFields( final boolean value ) {

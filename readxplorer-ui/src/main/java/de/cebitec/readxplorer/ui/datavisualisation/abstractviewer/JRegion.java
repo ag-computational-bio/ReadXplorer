@@ -50,11 +50,9 @@ public class JRegion extends JComponent {
 
         if( type == Properties.PATTERN ) {
             this.backgroundColor = ColorProperties.PATTERN;
-        }
-        else if( type == Properties.STOP ) {
+        } else if( type == Properties.STOP ) {
             this.backgroundColor = ColorProperties.STOP_CODON;
-        }
-        else if( type == Properties.CDS ) {
+        } else if( type == Properties.CDS ) {
             this.backgroundColor = ColorProperties.HIGHLIGHT_FILL;
         } // else { //currently not needed, because start codon color already set.
     }

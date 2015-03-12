@@ -46,13 +46,13 @@ import org.openide.util.Lookup;
 
 /**
  * Viewer for genome sequences / chromosomes.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class ReferenceViewer extends AbstractViewer {
 
-    private final static long serialVersionUID = 7964236;
-    private static final int height = 230;
+    private static final long serialVersionUID = 7964236;
+    private static final int VIEW_HEIGHT = 230;
     private static final int FRAMEHEIGHT = 20;
     private final Map<FeatureType, Integer> featureStats;
     private JFeature selectedFeature;
@@ -60,8 +60,8 @@ public class ReferenceViewer extends AbstractViewer {
     private ReferenceConnector refGenConnector;
     private final List<JFeature> features;
 
-    public final static String PROP_FEATURE_STATS_CHANGED = "feats changed";
-    public final static String PROP_FEATURE_SELECTED = "feat selected";
+    public static final String PROP_FEATURE_STATS_CHANGED = "feats changed";
+    public static final String PROP_FEATURE_SELECTED = "feat selected";
     public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
     private int trackCount = 0;
 
@@ -72,8 +72,8 @@ public class ReferenceViewer extends AbstractViewer {
      * @param boundsInfoManager the global bounds info manager
      * @param basePanel         the base panel
      * @param refGenome         the persistent reference, which is always
-     *                          accessible through the getReference
-     *                          method in any abstract viewer.
+     *                          accessible through the getReference method in
+     *                          any abstract viewer.
      */
     public ReferenceViewer( BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGenome ) {
         super( boundsInfoManager, basePanel, refGenome );
@@ -102,8 +102,7 @@ public class ReferenceViewer extends AbstractViewer {
         if( selectedFeature == feature ) {
             selectedFeature.setSelected( false );
             selectedFeature = null;
-        }
-        else {
+        } else {
 
             // if there was a feature selected before, de-select it
             if( selectedFeature != null ) {
@@ -115,8 +114,8 @@ public class ReferenceViewer extends AbstractViewer {
         }
 
         //only recalculate if reading frame was switched
-        if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature()
-                                       != PositionUtils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
+        if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature() !=
+             PositionUtils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -134,7 +133,7 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public int getMaximalHeight() {
-        return height;
+        return VIEW_HEIGHT;
     }
 
 
@@ -258,8 +257,7 @@ public class ReferenceViewer extends AbstractViewer {
         if( frame < 0 ) {
             result = this.getPaintingAreaInfo().getReverseLow();
             result += offset;
-        }
-        else {
+        } else {
             result = this.getPaintingAreaInfo().getForwardLow();
             result -= offset;
         }
@@ -332,8 +330,7 @@ public class ReferenceViewer extends AbstractViewer {
     public void changeToolTipText( int logPos ) {
         if( isMouseOverPaintingRequested() ) {
             setToolTipText( String.valueOf( logPos ) );
-        }
-        else {
+        } else {
             setToolTipText( "" );
         }
     }
@@ -367,9 +364,8 @@ public class ReferenceViewer extends AbstractViewer {
 
 
     /**
-     * Increases count of corresponding tracks.
-     * If more information is needed implement listener model
-     * with possibility to get track viewers.
+     * Increases count of corresponding tracks. If more information is needed
+     * implement listener model with possibility to get track viewers.
      */
     public void increaseTrackCount() {
         trackCount++;
@@ -377,9 +373,8 @@ public class ReferenceViewer extends AbstractViewer {
 
 
     /**
-     * Decreases count of corresponding tracks.
-     * If more information is needed implement listener model
-     * with possibility to get track viewers.
+     * Decreases count of corresponding tracks. If more information is needed
+     * implement listener model with possibility to get track viewers.
      */
     public void decreaseTrackCount() {
         if( trackCount > 0 ) {

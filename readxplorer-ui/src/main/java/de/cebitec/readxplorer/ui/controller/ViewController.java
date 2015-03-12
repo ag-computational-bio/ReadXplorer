@@ -54,7 +54,7 @@ import org.openide.util.NbBundle.Messages;
 
 /**
  * Controls the view for one <code>ApplicationFrameI</code>.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class ViewController implements MousePositionListener {
@@ -179,8 +179,7 @@ public class ViewController implements MousePositionListener {
 
     /**
      * Opens a dialog with all available tracks for the current reference
-     * genome.
-     * After selecting a track, the associated track viewer is opened.
+     * genome. After selecting a track, the associated track viewer is opened.
      */
     public void openTrack() {
         OpenTracksVisualPanel otp = new OpenTracksVisualPanel( currentRefGen.getId() );
@@ -192,12 +191,10 @@ public class ViewController implements MousePositionListener {
             if( otp.isCombineTracks() ) {
                 BasePanelFactory factory = this.getBasePanelFac();
                 factory.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
-            }
-            else {
+            } else {
                 this.openTracksOnCurrentGenome( otp.getSelectedTracks() );
             }
-        }
-        else if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().isEmpty() ) {
+        } else if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().isEmpty() ) {
             String msg = NbBundle.getMessage( ViewController.class, "CTL_OpenTrackInfo",
                                               "No track selected. To open a track, at least one track has to be selected." );
             String title = NbBundle.getMessage( ViewController.class, "CTL_OpenTrackInfoTitle", "Info" );
@@ -225,9 +222,8 @@ public class ViewController implements MousePositionListener {
         boolean okSelected = false;
         if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().size() == 2 ) {
             okSelected = true;
-        }
-        else if( !(dialogDescriptor.getValue().equals( DialogDescriptor.CANCEL_OPTION )
-                   || dialogDescriptor.getValue().equals( DialogDescriptor.CLOSED_OPTION )) ) {
+        } else if( !(dialogDescriptor.getValue().equals( DialogDescriptor.CANCEL_OPTION ) ||
+                 dialogDescriptor.getValue().equals( DialogDescriptor.CLOSED_OPTION )) ) {
             DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message( Bundle.DT_ErrorMsg(),
                                                                                NotifyDescriptor.INFORMATION_MESSAGE ) );
             this.openDoubleTrack();
@@ -266,8 +262,7 @@ public class ViewController implements MousePositionListener {
                     viewer.updatePhysicalBounds();
                     viewer.setNewDataRequestNeeded( true );
                     viewer.boundsChangedHook();
-                }
-                else if( evt.getKey().equals( Properties.VIEWER_AUTO_SCALING ) ) {
+                } else if( evt.getKey().equals( Properties.VIEWER_AUTO_SCALING ) ) {
                     if( viewer instanceof TrackViewer ) {
                         ((TrackViewer) viewer).setAutomaticScaling( evt.getNewValue().equals( "true" ) );
                     }

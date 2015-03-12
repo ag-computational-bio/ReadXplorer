@@ -20,16 +20,20 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 import java.awt.Frame;
 import java.awt.IllegalComponentStateException;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.WARNING;
 
 
 /**
  * Displays a large loading progress bar.
- *
+ * <p>
  * @author kstaderm
  */
 public class LoadingDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger( LoadingDialog.class.getName() );
 
     private final Frame parent;
 
@@ -62,17 +66,16 @@ public class LoadingDialog extends javax.swing.JDialog {
         this.getContentPane().setBackground( new java.awt.Color( 0, 0, 0, 0 ) );
         try {
             this.setBackground( new java.awt.Color( 0, 0, 0, 0 ) );
-        }
-        catch( UnsupportedOperationException | IllegalComponentStateException e ) {
-            //do nothing, just ignore command
+        } catch( UnsupportedOperationException | IllegalComponentStateException e ) {
+            LOG.log( WARNING, "Setting the background color of the LoadingDialog window failed." );
         }
         this.setVisible( true );
     }
 
 
     /**
-     * Call this method, when the parent can be enabled again and the loading
-     * is finished.
+     * Call this method, when the parent can be enabled again and the loading is
+     * finished.
      */
     public void finished() {
         parent.setEnabled( true );

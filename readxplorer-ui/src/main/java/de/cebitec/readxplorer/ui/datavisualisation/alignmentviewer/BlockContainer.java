@@ -41,7 +41,7 @@ public class BlockContainer {
     /**
      * Adds a block to the container. The block order is sorted according to
      * start position.
-     *
+     * <p>
      * @param block block to add
      */
     public void addBlock( BlockI block ) {
@@ -62,8 +62,7 @@ public class BlockContainer {
                 sortedMappings.remove( key );
             }
             return b;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -81,28 +80,22 @@ public class BlockContainer {
             // order by start of block
             if( o1.getAbsStart() < o2.getAbsStart() ) {
                 return -1;
-            }
-            else if( o1.getAbsStart() > o2.getAbsStart() ) {
+            } else if( o1.getAbsStart() > o2.getAbsStart() ) {
                 return 1;
-            }
-            else {
+            } else {
                 // if blocks start at identical position use stop position
                 if( o1.getAbsStop() < o2.getAbsStop() ) {
                     return -1;
-                }
-                else if( o1.getAbsStop() > o2.getAbsStop() ) {
+                } else if( o1.getAbsStop() > o2.getAbsStop() ) {
                     return 1;
-                }
-                else {
+                } else {
                     // stop position are identical, too
                     // use mapping id to distinguish and order
                     if( o1.getObjectWithId().getId() < o2.getObjectWithId().getId() ) {
                         return -1;
-                    }
-                    else if( o1.getObjectWithId().getId() > o2.getObjectWithId().getId() ) {
+                    } else if( o1.getObjectWithId().getId() > o2.getObjectWithId().getId() ) {
                         return 1;
-                    }
-                    else {
+                    } else {
                         return 0;
                     }
                 }

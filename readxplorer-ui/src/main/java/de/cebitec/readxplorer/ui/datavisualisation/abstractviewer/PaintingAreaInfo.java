@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
 /**
- * Contains useful info about a painting area, such as heights, widths,
- * left and right end positions.
- *
+ * Contains useful info about a painting area, such as heights, widths, left and
+ * right end positions.
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class PaintingAreaInfo {
@@ -51,8 +51,8 @@ public class PaintingAreaInfo {
 
 
     /**
-     * @return Highest pixel on the y-axis available for painting
-     *         something belonging to the forward strand.
+     * @return Highest pixel on the y-axis available for painting something
+     *         belonging to the forward strand.
      */
     public int getForwardHigh() {
         return forwardHigh;
@@ -227,8 +227,7 @@ public class PaintingAreaInfo {
     public double getAvailableHeight( boolean isFwdStrand ) {
         if( isFwdStrand ) {
             return this.getAvailableForwardHeight();
-        }
-        else {
+        } else {
             return this.getAvailableReverseHeight();
         }
     }
@@ -253,8 +252,7 @@ public class PaintingAreaInfo {
     public boolean fitsIntoAvailableSpace( double yValue, boolean isFwdStrand ) {
         if( isFwdStrand ) {
             return yValue <= availableForwardHeight;
-        }
-        else {
+        } else {
             return yValue <= availableReverseHeight;
         }
     }

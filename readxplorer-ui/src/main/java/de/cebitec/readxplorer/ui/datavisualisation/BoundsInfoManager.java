@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Manages the bounds information for a reference sequence.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class BoundsInfoManager implements AdjustmentPanelListenerI {
@@ -133,8 +133,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
 
     /**
-     * @param d
-     *          <p>
+     * @param d <p>
      * @return The current horizontal bounds in connection to the reference
      *         sequence.
      */

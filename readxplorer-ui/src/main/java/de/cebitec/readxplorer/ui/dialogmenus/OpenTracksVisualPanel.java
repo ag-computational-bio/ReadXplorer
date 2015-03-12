@@ -42,7 +42,7 @@ import org.openide.util.Exceptions;
 
 /**
  * A panel for the selection of tracks for a given reference.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTracksVisualPanel extends JobPanel implements
@@ -243,7 +243,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
             StandardNode markedNode = (StandardNode) node;
             selectedTracks.add( ((TrackItem) markedNode.getData()).getTrack() );
         }
-        
+
     }
 
 
@@ -266,8 +266,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
         boolean requiredInfoSet = this.getAllMarkedNodes().size() > 0;
         if( requiredInfoSet ) {
             this.storeSelectedTracks();
-        }
-        else {
+        } else {
             this.selectedTracks.clear();
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, requiredInfoSet );
@@ -344,8 +343,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
                 try {
                     PersistentTrack track = trackList.get( i );
                     trackNodes[i] = new TrackNode( new TrackItem( track ) );
-                }
-                catch( IntrospectionException ex ) {
+                } catch( IntrospectionException ex ) {
                     Exceptions.printStackTrace( ex );
                 }
             }

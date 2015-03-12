@@ -158,9 +158,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
 
     /**
-     * @return The list of classifications used in this viewer. The order of
-     *         the classes is important for painting the classes later. They are painted
-     *         ascending from index 0.
+     * @return The list of classifications used in this viewer. The order of the
+     *         classes is important for painting the classes later. They are
+     *         painted ascending from index 0.
      */
     protected List<Classification> createVisibleClasses() {
         List<Classification> newClassList = new ArrayList<>();
@@ -191,8 +191,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                     newClassToColorMap.put( classType, new Color( Integer.parseInt( colorRGB ) ) );
                 }
             }
-        }
-        else {
+        } else {
 
             newClassToColorMap = ColorUtils.updateMappingClassColors();
         }
@@ -224,8 +223,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
             this.paintCoverage( g );
 
-        }
-        else {
+        } else {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
@@ -253,7 +251,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     private void paintCoverage( Graphics2D g ) {
         // fill and draw all coverage paths
-        for( int i = classList.size(); --i >= 0; ) {
+        for( int i = classList.size(); --i >= 0;) {
             Classification classType = classList.get( i );
             if( classList.contains( classType ) && classToPathsMap.containsKey( classType ) ) {
                 Pair<GeneralPath, GeneralPath> pathPair = classToPathsMap.get( classType );
@@ -294,8 +292,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     protected double getNormalizedValue( int trackID, double value ) {
         if( this.normSetting != null && this.normSetting.getHasNormFac( trackID ) ) {
             return this.normSetting.getIsLogNorm( trackID ) ? TrackViewer.log2( value ) : value * this.normSetting.getFactors( trackID );
-        }
-        else {
+        } else {
             return value;
         }
     }
@@ -343,11 +340,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public void boundsChangedHook() {
-        if( this.covManager == null || this.isNewDataRequestNeeded()
-            || !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
+        if( this.covManager == null || this.isNewDataRequestNeeded() ||
+                 !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
             this.requestCoverage();
-        }
-        else {
+        } else {
             // coverage already loaded
             this.createCoveragePaths();
 
@@ -424,8 +420,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                         }
                         yValue = max;
 
-                    }
-                    else {
+                    } else {
                         yValue = this.getCoverageValue( isFwdStrand, classType, left );
                     }
 
@@ -462,8 +457,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param classType   the mapping classification type of the coverage path
      *                    handled here
      * @param absPos      the reference position for which the coverage should
-     *                    be
-     *                    obtained
+     *                    be obtained
      * <p>
      * @return the coverage value for the given strand, coverage type and
      *         position.
@@ -489,8 +483,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param classType   the mapping classification type of the coverage path
      *                    handled here
      * @param absPos      the reference position for which the coverage should
-     *                    be
-     *                    obtained
+     *                    be obtained
      * <p>
      * @return the coverage value for the given strand, coverage type and
      *         position.
@@ -500,8 +493,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         double value = 0;
         try {
             value = covManager.getCoverage( classType ).getCoverage( absPos, isFwdStrand );
-        }
-        catch( IllegalArgumentException e ) {
+        } catch( IllegalArgumentException e ) {
             LOG.log( SEVERE, "found unknown mapping classification type!" );
         }
         value = getNormalizedValue( id1, value );
@@ -515,8 +507,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param coverage the coverage for a certain position
      * <p>
      * @return The current y value of the given coverage path. This represents
-     *         the absoulte position on the screen (pixel) up to which the coverage path
-     *         should reach.
+     *         the absoulte position on the screen (pixel) up to which the
+     *         coverage path should reach.
      */
     protected int getCoverageYValue( double coverage ) {
         int value = (int) Math.round( coverage / this.scaleFactor );
@@ -602,8 +594,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         String classType = classification.getTypeString();
         if( hasNormalizationFactor ) {
             sb.append( createTableRow( classType, coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
-        }
-        else {
+        } else {
             sb.append( createTableRow( classType, coverage ) );
         }
     }
@@ -630,9 +621,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     /**
      * Method to be called when the vertical zoom level of this track viewer was
      * changed, thus the coverage paths have to be recalculated acodeording to
-     * the
-     * new zoom level. A scaleFactor of 1 means a 1:1 translation of coverage to
-     * pixels. A value smaller than 1 is adjusted to 1.
+     * the new zoom level. A scaleFactor of 1 means a 1:1 translation of
+     * coverage to pixels. A value smaller than 1 is adjusted to 1.
      * <p>
      * @param value the new vertical zoom slider value
      */
@@ -670,53 +660,37 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
         if( visibleCoverage <= 10 ) {
             this.scaleLineStep = 1;
-        }
-        else if( visibleCoverage <= 50 ) {
+        } else if( visibleCoverage <= 50 ) {
             this.scaleLineStep = 10;
-        }
-        else if( visibleCoverage <= 100 ) {
+        } else if( visibleCoverage <= 100 ) {
             this.scaleLineStep = 20;
-        }
-        else if( visibleCoverage <= 200 ) {
+        } else if( visibleCoverage <= 200 ) {
             this.scaleLineStep = 50;
-        }
-        else if( visibleCoverage <= 500 ) {
+        } else if( visibleCoverage <= 500 ) {
             this.scaleLineStep = 100;
-        }
-        else if( visibleCoverage <= 1000 ) {
+        } else if( visibleCoverage <= 1000 ) {
             this.scaleLineStep = 250;
-        }
-        else if( visibleCoverage <= 3000 ) {
+        } else if( visibleCoverage <= 3000 ) {
             this.scaleLineStep = 500;
-        }
-        else if( visibleCoverage <= 4000 ) {
+        } else if( visibleCoverage <= 4000 ) {
             this.scaleLineStep = 750;
-        }
-        else if( visibleCoverage <= 7500 ) {
+        } else if( visibleCoverage <= 7500 ) {
             this.scaleLineStep = 1000;
-        }
-        else if( visibleCoverage <= 15000 ) {
+        } else if( visibleCoverage <= 15000 ) {
             this.scaleLineStep = 2500;
-        }
-        else if( visibleCoverage <= 25000 ) {
+        } else if( visibleCoverage <= 25000 ) {
             this.scaleLineStep = 5000;
-        }
-        else if( visibleCoverage <= 45000 ) {
+        } else if( visibleCoverage <= 45000 ) {
             this.scaleLineStep = 7500;
-        }
-        else if( visibleCoverage <= 65000 ) {
+        } else if( visibleCoverage <= 65000 ) {
             this.scaleLineStep = 10000;
-        }
-        else if( visibleCoverage <= 200000 ) {
+        } else if( visibleCoverage <= 200000 ) {
             this.scaleLineStep = 20000;
-        }
-        else if( visibleCoverage <= 500000 ) {
+        } else if( visibleCoverage <= 500000 ) {
             this.scaleLineStep = 50000;
-        }
-        else if( visibleCoverage <= 1000000 ) {
+        } else if( visibleCoverage <= 1000000 ) {
             this.scaleLineStep = 100000;
-        }
-        else {
+        } else {
             this.scaleLineStep = 300000;
         }
     }
@@ -724,11 +698,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Automatically detects the most suitable scaling value to fit the coverage
-     * to the track viewer.
-     * This Method transforms highest coverage to slider value, where the slider
-     * values range from 1-200. A scaleFactor of 1 means a 1:1 translation of
-     * coverage to pixels. A larger scaleFactor means, that the coverage is
-     * shrinked to fit the available painting area.
+     * to the track viewer. This Method transforms highest coverage to slider
+     * value, where the slider values range from 1-200. A scaleFactor of 1 means
+     * a 1:1 translation of coverage to pixels. A larger scaleFactor means, that
+     * the coverage is shrinked to fit the available painting area.
      */
     private void computeAutomaticScaling() {
         if( this.automaticScaling && this.covManager != null && this.verticalSlider != null ) {
@@ -794,15 +767,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         if( logPos >= 1000 && step >= 1000 ) {
             if( logPos % 1000 == 0 ) {
                 label = String.valueOf( logPos / 1000 );
-            }
-            else if( logPos % 500 == 0 ) {
+            } else if( logPos % 500 == 0 ) {
                 label = String.valueOf( logPos / 1000 );
                 label += ".5";
             }
             label += "K";
 
-        }
-        else {
+        } else {
             label = String.valueOf( logPos );
         }
 
@@ -816,7 +787,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     public void normalizationValueChanged() {
         this.hasNormalizationFactor = this.normSetting.getIdToValue().keySet().size() == 2
-                                      ? (normSetting.getHasNormFac( id1 ) || normSetting.getHasNormFac( id2 )) : normSetting.getHasNormFac( id1 );
+                                      ? (normSetting.getHasNormFac( id1 ) || normSetting.getHasNormFac( id2 ))
+                                      : normSetting.getHasNormFac( id1 );
         this.boundsChangedHook();
         this.repaint();
     }
@@ -841,8 +813,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * @return true, if this is a double track viewer, which combines the
-     *         selected
-     *         tracks into a single coverage wave.
+     *         selected tracks into a single coverage wave.
      */
     public boolean isCombineTracks() {
         return this.combineTracks;
@@ -905,9 +876,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * @param automaticScaling Set <code>true</code>, if the coverage slider
-     *                         should automatically adapt to the coverage shown (the complete coverage
-     *                         in the interval always is visible). <code>false</code>, if the slider
-     *                         value should only be changed manually by the user.
+     *                         should automatically adapt to the coverage shown
+     *                         (the complete coverage in the interval always is
+     *                         visible). <code>false</code>, if the slider value
+     *                         should only be changed manually by the user.
      */
     public void setAutomaticScaling( boolean automaticScaling ) {
         this.automaticScaling = automaticScaling;
@@ -923,9 +895,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * @return <code>true</code> if the queried interval length should be
-     *         extended
-     *         to the <code>MININTERVALLENGTH</code>, <code>false</code> if the original
-     *         bounds should be used for the coverage queries.
+     *         extended to the <code>MININTERVALLENGTH</code>,
+     *         <code>false</code> if the original bounds should be used for the
+     *         coverage queries.
      */
     public boolean isUseMinimalIntervalLength() {
         return useMinimalIntervalLength;
@@ -934,9 +906,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * @param useMinimalIntervalLength <code>true</code> if the queried interval
-     *                                 length should be extended to the <code>MININTERVALLENGTH</code>,
-     *                                 <code>false</code> if the original bounds should be used for the coverage
-     *                                 queries.
+     *                                 length should be extended to the
+     *                                 <code>MININTERVALLENGTH</code>,
+     *                                 <code>false</code> if the original bounds
+     *                                 should be used for the coverage queries.
      */
     public void setUseMinimalIntervalLength( boolean useMinimalIntervalLength ) {
         this.useMinimalIntervalLength = useMinimalIntervalLength;
