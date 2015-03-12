@@ -39,10 +39,17 @@ public interface ConverterI extends ParserI, Observable {
      * @throws Exception can throw any exception, which has to be specified by
      * the implementation
      */
-    public boolean convert() throws Exception;
+    boolean convert() throws Exception;
 
 
-    public void setDataToConvert( Object... data ) throws IllegalArgumentException;
+    /**
+     * Sets the data to convert. Depends on the implementation.
+     * @param data The data to set - as many objects as necessary for the
+     *             implementation.
+     * <p>
+     * @throws IllegalArgumentException
+     */
+    void setDataToConvert( Object... data ) throws IllegalArgumentException;
 
 
 }

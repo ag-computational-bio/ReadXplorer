@@ -38,7 +38,7 @@ public interface CombinerI extends Observable, Observer {
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
-    public boolean combineData() throws ParsingException, OutOfMemoryError;
+    boolean combineData() throws ParsingException, OutOfMemoryError;
 
 
 }

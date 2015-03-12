@@ -70,8 +70,8 @@ public class ParsedMapping {
      * Sets if this is the best mapping for the given read in the complete
      * reference.
      * <p>
-     * @param isBestMapping <cc>true</cc> if this is the best mapping for the
-     * read, <cc>false</cc> otherwise
+     * @param isBestMapping <code>true</code> if this is the best mapping for the
+     * read, <code>false</code> otherwise
      */
     public void setIsBestMapping( boolean isBestMapping ) {
         this.bestMapping = isBestMapping;
@@ -79,19 +79,25 @@ public class ParsedMapping {
 
 
     /**
-     * @return <cc>true</cc> if this is the best mapping for the read,
-     * <cc>false</cc> otherwise
+     * @return <code>true</code> if this is the best mapping for the read,
+     * <code>false</code> otherwise
      */
     public boolean isBestMapping() {
         return this.bestMapping;
     }
 
 
+    /**
+     * @return The number of replicates of this mapping.
+     */
     public int getNumReplicates() {
         return numOfReplicates;
     }
 
 
+    /**
+     * Increase the number of replicates of this mapping.
+     */
     public void increaseCounter() {
         ++numOfReplicates;
     }
@@ -123,33 +129,45 @@ public class ParsedMapping {
     }
 
 
+    /**
+     * @return The list of differences to the reference of this mapping.
+     */
     public List<ParsedDiff> getDiffs() {
         return Collections.unmodifiableList( diffs );
     }
 
 
+    /**
+     * @return <code>true</code> if this mapping has differences to the
+     *         reference, <code>false</code> otherwise
+     */
     public boolean hasDiffs() {
         return !diffs.isEmpty();
     }
 
 
+    /**
+     * @return The list of genome gaps induced by this mapping.
+     */
     public List<ParsedReferenceGap> getGenomeGaps() {
         return Collections.unmodifiableList( gaps );
     }
 
 
+    /**
+     * @return <code>true</code> if this mapping has genome gaps,
+     *         <code>false</code> otherwise
+     */
     public boolean hasGenomeGaps() {
         return !gaps.isEmpty();
     }
 
 
+    /**
+     * @return The number of mismatches to the reference of this mapping.
+     */
     public int getErrors() {
         return errors;
-    }
-
-
-    public int getNumOfDiffs() {
-        return this.getDiffs().size();
     }
 
 
@@ -201,16 +219,27 @@ public class ParsedMapping {
     }
 
 
+    /**
+     * A unique mapping id.
+     * @param mappingID the id
+     */
     public void setID( long mappingID ) {
         this.id = mappingID;
     }
 
 
+    /**
+     * @return A unique mapping id.
+     */
     public long getID() {
         return id;
     }
 
 
+    /**
+     * Set the number of replicates of this mapping to a certain value.
+     * @param count The number of replicates to set
+     */
     public void setCount( int count ) {
         this.numOfReplicates = count;
     }

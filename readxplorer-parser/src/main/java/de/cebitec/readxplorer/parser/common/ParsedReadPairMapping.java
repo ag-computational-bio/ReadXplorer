@@ -128,18 +128,23 @@ public class ParsedReadPairMapping {
 
 
     /**
-     * Increases the count of repliactes by one.
+     * Increases the count of replicates by one.
      */
     public void addReplicate() {
         ++this.nbReplicates;
     }
 
 
+    /**
+     * @return The number of replicates of this pair.
+     */
     public int getReplicates() {
         return this.nbReplicates;
     }
 
-
+    /**
+     * @return The read pair distance
+     */
     public int getDistance() {
         return distance;
     }

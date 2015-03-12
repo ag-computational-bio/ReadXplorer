@@ -31,12 +31,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
+
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -61,6 +62,9 @@ public final class CommonsMappingParser {
     public static final String CIGAR_REGEX = "[MIDNSPXH=]+";
 
 
+    /**
+     * Instantiation not allowed.
+     */
     private CommonsMappingParser() {
 
     }
@@ -82,14 +86,15 @@ public final class CommonsMappingParser {
      * <p>
      * @return diff and gap result for the read and reference seq pair
      * <p>
-     * @throws NumberFormatException
+     * @throws NumberFormatException thrown if cigar operation count is not an
+     *                               integer
      */
     public static int countDiffsAndGaps( final String cigar, final String readSeq, final String refSeq, final boolean isRevStrand ) throws NumberFormatException {
 
         int differences = 0;
         int refPos = 0;
         int readPos = 0;
-        final String[] num = cigar.split(CIGAR_REGEX );
+        final String[] num = cigar.split( CIGAR_REGEX );
         final String[] charCigar = cigar.split( "\\d+" );
 
         for( int i = 1; i < charCigar.length; ++i ) {
@@ -168,12 +173,13 @@ public final class CommonsMappingParser {
      * <p>
      * @return diff and gap result for the read and reference seq pair
      * <p>
-     * @throws NumberFormatException
+     * @throws NumberFormatException thrown if cigar operation count is not an
+     *                               integer
      */
     public static DiffAndGapResult createDiffsAndGaps( final String cigar, final String readSeq, final String refSeq, final boolean isRevStrand, final int start ) throws NumberFormatException {
 
 
-        final String[] num = cigar.split(CIGAR_REGEX );
+        final String[] num = cigar.split( CIGAR_REGEX );
         final String[] charCigar = cigar.split( "\\d+" );
         final List<ParsedDiff> diffs = new ArrayList<>();
         final List<ParsedReferenceGap> gaps = new ArrayList<>();
@@ -343,13 +349,13 @@ public final class CommonsMappingParser {
      * @param cigar contains mapping information of reference and read sequence
      * M can be a Match or Mismatch, D is a deletion on the read, I insertion on
      * the read, S softclipped read
-     * @param refSeq
-     * @param readSeq
+     * @param refSeq reference sequence corresponding to read seq
+     * @param readSeq read sequence
      * <p>
      * @return the refSeq with gaps in fact of insertions in the reads
-     * TODO check this
      */
     public static String[] createMappingOfRefAndRead( String cigar, String refSeq, String readSeq ) {
+        // TODO: check this
         String newRefSeqwithGaps = null;
         String newreadSeq = null;
 
@@ -357,7 +363,7 @@ public final class CommonsMappingParser {
         int readPos = 0;
         int softclipped = 0;
 
-        final String[] num = cigar.split(CIGAR_REGEX );
+        final String[] num = cigar.split( CIGAR_REGEX );
         final String[] charCigar = cigar.split( "\\d+" );
         for( int i = 1; i < charCigar.length; i++ ) {
             String op = charCigar[i];
@@ -583,14 +589,14 @@ public final class CommonsMappingParser {
      * @param startPosition of the mapping
      * @param readLength the length of the read
      * <p>
-     * @return
+     * @return Corrected stop position of the read
      */
     public static int countStopPosition( String cigar, Integer startPosition, Integer readLength ) {
 
         int numberofDeletion = 0;
         int numberofInsertion = 0;
         int numberofSoftclipped = 0;
-        final String[] num = cigar.split(CIGAR_REGEX );
+        final String[] num = cigar.split( CIGAR_REGEX );
         final String[] charCigar = cigar.split( "\\d+" );
         for( int i = 1; i < charCigar.length; i++ ) {
             String op = charCigar[i];
@@ -741,13 +747,13 @@ public final class CommonsMappingParser {
 
 
     /**
-     * Converts the the decimal number(flag) into binary code and checks if 4 is
-     * 1 or 0
+     * Converts the the decimal number (flag) into binary code and checks if 4
+     * is 1 or 0
      * <p>
-     * @param flag
-     * @param startPosition of mapping
+     * @param flag The flag to check
+     * @param startPosition start pos of mapping
      * <p>
-     * @return
+     * @return true, if it is a mapped sequence, false otherwise
      */
     public static boolean isMappedSequence( final int flag, final int startPosition ) {
         boolean isMapped = true;
@@ -771,7 +777,7 @@ public final class CommonsMappingParser {
      * to update with classification data
      * @param classification the classification for the current list of records
      * <p>
-     * @throws AssertionError
+     * @throws AssertionError thrown if something could not be asserted
      */
     public static void addClassificationData( final Map<SAMRecord, Integer> recordToDiffMap,
             final ParsedClassification classification ) throws AssertionError {

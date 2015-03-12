@@ -43,7 +43,7 @@ public class ParsedClassification {
     /**
      * Class for the classification data of a read.
      * <p>
-     * @param sortOrder
+     * @param sortOrder Sort order
      */
     public ParsedClassification( SAMFileHeader.SortOrder sortOrder ) {
         this.sortOrder = sortOrder;
