@@ -150,6 +150,7 @@
         <!--<module name="NoWhitespaceAfter"/>-->
         <module name="NoWhitespaceBefore"/>
         <module name="OperatorWrap">
+            <property name="option" value="eol"/>
             <property name="severity" value="warning"/>
         </module>
         <module name="ParenPad">
