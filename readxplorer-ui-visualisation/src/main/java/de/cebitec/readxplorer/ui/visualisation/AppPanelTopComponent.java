@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
@@ -58,26 +59,26 @@ import org.openide.windows.WindowManager;
 
 
 /**
- * Top component which displays the main work area of ReadXplorer,
- * which contains the reference and track viewers.
+ * Top component which displays the main work area of ReadXplorer, which
+ * contains the reference and track viewers.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readxplorer.ui.visualisation//AppPanel//EN",
-    autostore = false
+         dtd = "-//de.cebitec.readxplorer.ui.visualisation//AppPanel//EN",
+         autostore = false
 )
 @TopComponent.Description(
-    preferredID = "AppPanelTopComponent",
-    //iconBase="SET/PATH/TO/ICON/HERE",
-    persistenceType = TopComponent.PERSISTENCE_ALWAYS
+         preferredID = "AppPanelTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_AppPanelAction",
-    preferredID = "AppPanelTopComponent"
+         displayName = "#CTL_AppPanelAction",
+         preferredID = "AppPanelTopComponent"
 )
 @Messages( {
     "CTL_AppPanelAction=AppPanel",
@@ -93,6 +94,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "AppPanelTopComponent";
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger( AppPanelTopComponent.class.getName() );
     private static AppPanelTopComponent instance;
     private final InstanceContent content = new InstanceContent();
     private final Lookup localLookup;
@@ -106,8 +108,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 
     /**
      * Top component which displays the main work area of ReadXplorer, which
-     * contains
-     * the reference and track viewers.
+     * contains the reference and track viewers.
      */
     public AppPanelTopComponent() {
         initComponents();
@@ -198,8 +199,8 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
             if( comp instanceof BasePanel ) {
                 try {
                     ((BasePanel) comp).getViewer().close();
-                }
-                catch( NullPointerException e ) {
+                } catch( NullPointerException e ) {
+                    LOG.info( "AppPanelTopComponent: Trying to close an already closed BasePanel" );
                     //do nothing, we want to close something, which is already destroyed
                 }
             }
@@ -424,8 +425,8 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 //    }
 
     /*
-     * Overriding these two methods ensures that only displayed components are updated
-     * and thus increases performance of the viewers.
+     * Overriding these two methods ensures that only displayed components are
+     * updated and thus increases performance of the viewers.
      */
     @Override
     public void componentShowing() {
@@ -463,13 +464,12 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 
     public List<Action> allTrackCloseActions() {
         List<Action> result = new ArrayList<>( all.size() );
-        for( Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext(); ) {
+        for( Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext();) {
             Reference<JPanel> cookieRef = it.next();
             JPanel cookie = cookieRef.get();
             if( cookie == null ) {
                 it.remove();
-            }
-            else {
+            } else {
                 result.add( new ShowAction( cookie.getName(), cookieRef, new WeakReference<>( getLookup().lookup( ViewController.class ) ) ) );
             }
         }
@@ -504,8 +504,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
             JPanel comp = tc.get();
             if( comp != null ) { //Could have been garbage collected
                 vc.get().closeTrackPanel( comp );
-            }
-            else {
+            } else {
                 //will almost never happen
                 Toolkit.getDefaultToolkit().beep();
             }
@@ -526,8 +525,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
     public void paint( Graphics g ) {
         try {
             super.paint( g );
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( this );
         }
     }

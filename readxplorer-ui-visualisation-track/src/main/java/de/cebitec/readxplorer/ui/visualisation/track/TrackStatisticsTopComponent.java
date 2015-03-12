@@ -41,7 +41,7 @@ import org.openide.windows.WindowManager;
 public final class TrackStatisticsTopComponent extends TopComponentExtended
         implements LookupListener {
 
-    private final static Logger LOG = Logger.getLogger( TrackStatisticsTopComponent.class.getName() );
+    private static final Logger LOG = Logger.getLogger( TrackStatisticsTopComponent.class.getName() );
 
     private static final long serialVersionUID = 1L;
 

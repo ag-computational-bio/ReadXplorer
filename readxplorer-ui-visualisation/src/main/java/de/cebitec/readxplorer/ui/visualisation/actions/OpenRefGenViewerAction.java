@@ -52,8 +52,7 @@ public final class OpenRefGenViewerAction implements ActionListener {
         if( canOpenRefViewer ) {
             appPanelTopComponent.setName( vc.getDisplayName() );
             appPanelTopComponent.requestActive();
-        }
-        else {
+        } else {
             appPanelTopComponent.close();
         }
     }

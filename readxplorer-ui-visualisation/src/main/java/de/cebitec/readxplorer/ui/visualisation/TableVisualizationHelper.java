@@ -30,8 +30,11 @@ import java.util.Collection;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class TableVisualizationHelper {
+public final class TableVisualizationHelper {
 
+    /**
+     * Do not instantiate.
+     */
     private TableVisualizationHelper() {
     }
 

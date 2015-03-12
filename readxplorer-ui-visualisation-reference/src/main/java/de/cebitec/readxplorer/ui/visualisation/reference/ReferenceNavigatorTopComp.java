@@ -42,7 +42,7 @@ import org.openide.windows.WindowManager;
 public final class ReferenceNavigatorTopComp extends TopComponentExtended
         implements LookupListener {
 
-    private final static Logger LOG = Logger.getLogger( ReferenceNavigatorTopComp.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ReferenceNavigatorTopComp.class.getName() );
 
     private static final long serialVersionUID = 1L;
 

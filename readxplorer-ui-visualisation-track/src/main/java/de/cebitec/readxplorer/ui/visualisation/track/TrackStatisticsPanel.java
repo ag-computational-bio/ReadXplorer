@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
  */
 public class TrackStatisticsPanel extends javax.swing.JPanel {
 
-    private final static long serialVersionUID = 1239345;
+    private static final long serialVersionUID = 1239345;
     private TrackConnector trackCon;
     private int trackID = -1;
 
