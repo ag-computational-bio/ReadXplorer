@@ -37,12 +37,12 @@ import org.openide.windows.WindowManager;
 
 
 /**
- * Manages a module's lifecycle.
- * Makes sure that ReadXplorer is not closed while a task is still running
+ * Manages a module's lifecycle. Makes sure that ReadXplorer is not closed while
+ * a task is still running
  */
 public class Installer extends ModuleInstall {
 
-    public static final String ReadXplorer_VERSION = "2.1.0";
+    public static final String READXLORER_VERSION = "2.1.0";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 
@@ -50,7 +50,7 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         //set version number
-        System.setProperty( "netbeans.buildnumber", ReadXplorer_VERSION );
+        System.setProperty( "netbeans.buildnumber", READXLORER_VERSION );
 
 
         // redirect systemouts to internal netbeans platform outputwindow
@@ -58,43 +58,30 @@ public class Installer extends ModuleInstall {
 
         //The TopComponent we're interested in isn't immediately available.
         //This method allows us to delay start of our procedure until later.
-/*        WindowManager.getDefault().invokeWhenUIReady(new Runnable()
-         {
-         @Override
-         public void run()
-         {
-         //Locate the Output Window instance
-         final String OUTPUT_ID = "output";
-         logger.log(Level.FINE, "LOG_FindingWindow", OUTPUT_ID);
-         TopComponent outputWindow = WindowManager.getDefault().findTopComponent(OUTPUT_ID);
-
-         //Determine if it is opened
-         if (outputWindow != null && outputWindow.isOpened())
-         {
-         logger.log(Level.FINE, "LOG_WindowOpen", OUTPUT_ID);
-         final String FOLDER = "Actions/ui/";
-         final String INSTANCE_FILE = "org-netbeans-core-actions-LogAction";
-
-         //Use Lookup to find the instance in the file system
-         logger.log(Level.FINE, "LOG_LookupAction", new Object[]{FOLDER, INSTANCE_FILE});
-         Lookup pathLookup = Lookups.forPath(FOLDER);
-         Template<Action> actionTemplate = new Template<Action>(Action.class, FOLDER + INSTANCE_FILE, null);
-         Result<Action> lookupResult = pathLookup.lookup(actionTemplate);
-         Collection<? extends Action> foundActions = lookupResult.allInstances();
-
-         //For each instance (should ony be one) call actionPerformed()
-         for (Action action : foundActions)
-         {
-         logger.log(Level.FINE, "LOG_FoundAction", action);
-         action.actionPerformed(null);
-         }
-         }
-         else
-         {
-         logger.log(Level.FINE, "LOG_WindowClosed", OUTPUT_ID);
-         }
-         }
-         });*/
+/* WindowManager.getDefault().invokeWhenUIReady(new
+         * Runnable() { @Override public void run() { //Locate the Output Window
+         * instance final String OUTPUT_ID = "output"; logger.log(Level.FINE,
+         * "LOG_FindingWindow", OUTPUT_ID); TopComponent outputWindow =
+         * WindowManager.getDefault().findTopComponent(OUTPUT_ID);
+         *
+         * //Determine if it is opened if (outputWindow != null &&
+         * outputWindow.isOpened()) { logger.log(Level.FINE, "LOG_WindowOpen",
+         * OUTPUT_ID); final String FOLDER = "Actions/ui/"; final String
+         * INSTANCE_FILE = "org-netbeans-core-actions-LogAction";
+         *
+         * //Use Lookup to find the instance in the file system
+         * logger.log(Level.FINE, "LOG_LookupAction", new Object[]{FOLDER,
+         * INSTANCE_FILE}); Lookup pathLookup = Lookups.forPath(FOLDER);
+         * Template<Action> actionTemplate = new Template<Action>(Action.class,
+         * FOLDER + INSTANCE_FILE, null); Result<Action> lookupResult =
+         * pathLookup.lookup(actionTemplate); Collection<? extends Action>
+         * foundActions = lookupResult.allInstances();
+         *
+         * //For each instance (should ony be one) call actionPerformed() for
+         * (Action action : foundActions) { logger.log(Level.FINE,
+         * "LOG_FoundAction", action); action.actionPerformed(null); } } else {
+         * logger.log(Level.FINE, "LOG_WindowClosed", OUTPUT_ID); } }
+         }); */
     }
 
 
@@ -104,8 +91,7 @@ public class Installer extends ModuleInstall {
             NotifyDescriptor nd = new NotifyDescriptor.Message( "ReadXplorer is performing a non-interruptible task and may only be closed after it has finished.", NotifyDescriptor.WARNING_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
             return Boolean.FALSE;
-        }
-        else {
+        } else {
             LogoutAction logoutAction = new LogoutAction( CentralLookup.getDefault().lookup( LoginCookie.class ) );
             logoutAction.actionPerformed( new ActionEvent( this, 1, "close" ) );
 
@@ -130,7 +116,7 @@ public class Installer extends ModuleInstall {
     private void redirectSystemStreams() {
         OutputStream out = new OutputStream() {
 
-            InputOutput io = IOProvider.getDefault().getIO( "Output", true );
+            private InputOutput io = IOProvider.getDefault().getIO( "Output", true );
 
 
             @Override
