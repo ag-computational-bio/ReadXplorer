@@ -98,7 +98,7 @@ public class NormalizedReadCount extends TrackResultEntry {
      *                               where calculated
      */
     public NormalizedReadCount( PersistentFeature feature, double rpkm, double tpm, double readCount, double effectiveFeatureLength, int trackID ) {
-        this(feature, rpkm, tpm, readCount, trackID );
+        this( feature, rpkm, tpm, readCount, trackID );
         this.effectiveFeatureLength = effectiveFeatureLength;
     }
 

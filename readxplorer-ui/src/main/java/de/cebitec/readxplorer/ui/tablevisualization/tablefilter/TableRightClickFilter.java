@@ -300,7 +300,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         if( originalTableModel == null ) {
             TableFilterUtils<E> utils = new TableFilterUtils<>( classType );
             E tmpModel = utils.prepareNewTableModel( tableModel );
-            for( Iterator<Vector> it = tableModel.getDataVector().iterator(); it.hasNext();) {
+            for( Iterator<Vector> it = tableModel.getDataVector().iterator(); it.hasNext(); ) {
                 Vector row = it.next();
                 tmpModel.addRow( row );
             }

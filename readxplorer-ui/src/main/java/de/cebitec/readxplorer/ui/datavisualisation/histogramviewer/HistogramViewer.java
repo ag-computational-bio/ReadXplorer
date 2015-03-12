@@ -612,7 +612,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int gapPosition;
         int gapOrder;
         int oldValue;
-        for( Iterator<ReferenceGap> it = gaps.iterator(); it.hasNext();) {
+        for( Iterator<ReferenceGap> it = gaps.iterator(); it.hasNext(); ) {
             gap = it.next();
             gapPosition = gap.getPosition();
             gapOrder = gap.getOrder() + 1;
@@ -628,7 +628,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
         int position;
         int numOfGaps;
-        for( Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext();) {
+        for( Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext(); ) {
             position = it.next();
             numOfGaps = positionToNum.get( position );
             gapManager.addNumOfGapsAtPosition( position, numOfGaps );
@@ -655,7 +655,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         // store diff information from the reference genome in logo data
         Difference d;
         int position;
-        for( Iterator<Difference> it = diffs.iterator(); it.hasNext();) {
+        for( Iterator<Difference> it = diffs.iterator(); it.hasNext(); ) {
             d = it.next();
             position = d.getPosition();
             if( position > lowerBound && position < upperBound ) {

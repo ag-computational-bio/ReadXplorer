@@ -307,7 +307,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         int layerCounter = countingStep;
         while( layerIt.hasNext() ) {
             LayerI b = layerIt.next();
-            for( Iterator<BlockI> blockIt = b.getBlockIterator(); blockIt.hasNext();) {
+            for( Iterator<BlockI> blockIt = b.getBlockIterator(); blockIt.hasNext(); ) {
                 BlockI block = blockIt.next();
                 createJBlock( block, layerCounter );
             }

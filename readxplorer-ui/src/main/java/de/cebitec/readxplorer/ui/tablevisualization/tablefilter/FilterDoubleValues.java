@@ -63,7 +63,7 @@ public class FilterDoubleValues<T extends DefaultTableModel> implements
         TableFilterUtils<T> utils = new TableFilterUtils<>( classType );
         T filteredTableModel = utils.prepareNewTableModel( tableModel );
         Vector dataVector = tableModel.getDataVector();
-        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext();) {
+        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext(); ) {
             Vector row = it.next();
             Object currentEntry = row.get( column );
             if( currentEntry instanceof Integer ) {

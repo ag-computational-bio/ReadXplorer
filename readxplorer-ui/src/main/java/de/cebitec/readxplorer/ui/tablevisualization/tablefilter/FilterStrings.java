@@ -55,7 +55,7 @@ public class FilterStrings<T extends DefaultTableModel> implements FilterI<T> {
         TableFilterUtils<T> utils = new TableFilterUtils( classType );
         T filteredTableModel = utils.prepareNewTableModel( tableModel );
         Vector dataVector = tableModel.getDataVector();
-        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext();) {
+        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext(); ) {
             Vector row = it.next();
             if( ((String) row.get( column )).contains( pattern ) ) {
                 filteredTableModel.addRow( row );

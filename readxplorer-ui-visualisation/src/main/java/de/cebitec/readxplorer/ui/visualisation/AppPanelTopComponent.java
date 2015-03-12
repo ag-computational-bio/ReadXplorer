@@ -464,7 +464,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 
     public List<Action> allTrackCloseActions() {
         List<Action> result = new ArrayList<>( all.size() );
-        for( Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext();) {
+        for( Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext(); ) {
             Reference<JPanel> cookieRef = it.next();
             JPanel cookie = cookieRef.get();
             if( cookie == null ) {

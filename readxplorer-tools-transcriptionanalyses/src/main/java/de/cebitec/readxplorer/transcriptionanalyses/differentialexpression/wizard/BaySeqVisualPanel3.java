@@ -63,7 +63,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
             groupListModel.clear();
             int[] defaultGroup = new int[selectedTracks.size()];
             StringBuilder strBuilder = new StringBuilder( "{" );
-            for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+            for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
                 defaultGroup[selectedTracks.indexOf( persistentTrack )] = currentGroupNumber;
                 strBuilder.append( persistentTrack.getDescription() );
@@ -228,7 +228,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
         if( !trackList.isSelectionEmpty() ) {
             List<PersistentTrack> tracks = trackList.getSelectedValuesList();
             StringBuilder strBuilder = new StringBuilder( groupCreationField.getText() + "{" );
-            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
                 currentGroupBeingCreated[selectedTracks.indexOf( persistentTrack )] = currentGroupNumber;
                 strBuilder.append( persistentTrack.getDescription() );

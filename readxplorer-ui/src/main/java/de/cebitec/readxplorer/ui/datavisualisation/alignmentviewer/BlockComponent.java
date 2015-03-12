@@ -35,6 +35,7 @@ import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -224,8 +225,8 @@ public class BlockComponent extends JComponent {
      * @return The reference sequence
      */
     public String getSequence() {
-        int start = ((Mapping) block.getObjectWithId()).getStart();
-        int stop = ((Mapping) block.getObjectWithId()).getStop();
+        int start = ((GenomicRange) block.getObjectWithId()).getStart();
+        int stop = ((GenomicRange) block.getObjectWithId()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getActiveChromSequence( start - 1, stop );
         return readSequence;
@@ -420,9 +421,8 @@ public class BlockComponent extends JComponent {
         //Used for determining location of brick in viewer
         int brickCount = 0;
         int gapCount = 0;
-        Brick brick;
-        for( Iterator<Brick> it = block.getBrickIterator(); it.hasNext();) {
-            brick = it.next();
+        for( Iterator<Brick> it = block.getBrickIterator(); it.hasNext(); ) {
+            Brick brick = it.next();
 
             if( brick != Brick.MATCH || showBaseQualities ) {
                 // get start of brick

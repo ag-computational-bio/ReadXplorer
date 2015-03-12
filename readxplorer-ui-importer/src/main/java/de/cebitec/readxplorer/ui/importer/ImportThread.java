@@ -148,7 +148,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
             long finish;
             String msg;
 
-            for( Iterator<ReferenceJob> it = referenceJobs.iterator(); it.hasNext();) {
+            for( Iterator<ReferenceJob> it = referenceJobs.iterator(); it.hasNext(); ) {
                 start = System.currentTimeMillis();
                 ReferenceJob r = it.next();
 
@@ -225,12 +225,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.readPairs" ) + ":" );
 
-            long start;
-            long finish;
-            String msg;
-
-            for( Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext();) {
-                start = System.currentTimeMillis();
+            for( Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext(); ) {
+                long start = System.currentTimeMillis();
                 ReadPairJobContainer readPairJobContainer = it.next();
 
                 int distance = readPairJobContainer.getDistance();
@@ -256,7 +252,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     this.setChromLengthMap( trackJob1 );
                     File inputFile1 = trackJob1.getFile();
                     inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                    Boolean success;
                     StatsContainer statsContainer = new StatsContainer();
                     statsContainer.prepareForTrack();
                     statsContainer.prepareForReadPairTrack();
@@ -266,7 +261,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         try {
                             //executes any conversion before other calculations, if the parser supports any
                             trackJob1.getParser().registerObserver( this );
-                            success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
+                            Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
                             trackJob1.getParser().removeObserver( this );
                             if( !success ) {
                                 this.noErrors = false;
@@ -275,8 +270,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             }
                             File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
 
-                            boolean isTwoTracks = trackJob2 != null;
-                            if( isTwoTracks ) { //only combine, if data is not already combined
+                            if( trackJob2 != null ) { //only combine, if data is not already combined
                                 File inputFile2 = trackJob2.getFile();
                                 inputFile2.setReadOnly();
                                 trackJob2.getParser().registerObserver( this );

@@ -251,7 +251,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     private void paintCoverage( Graphics2D g ) {
         // fill and draw all coverage paths
-        for( int i = classList.size(); --i >= 0;) {
+        for( int i = classList.size(); --i >= 0; ) {
             Classification classType = classList.get( i );
             if( classList.contains( classType ) && classToPathsMap.containsKey( classType ) ) {
                 Pair<GeneralPath, GeneralPath> pathPair = classToPathsMap.get( classType );
