@@ -31,7 +31,7 @@ import org.openide.windows.TopComponent;
 /**
  * TopComponent of the coverage analysis. It displays all results of all carried
  * out coverage analyses.
- *
+ * <p>
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -44,7 +44,7 @@ import org.openide.windows.TopComponent;
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
 @ActionID( category = "Window", id = "CoverageAnalysis.CoverageAnalysisTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_CoverageAnalysisTopComponent",
          preferredID = "CoverageAnalysisTopComponent" )
@@ -58,8 +58,8 @@ public final class CoverageAnalysisTopComponent extends TopComponentExtended {
 
 
     /**
-     * TopComponent of the coverage analysis. It displays all results of
-     * all carried out coverage analyses.
+     * TopComponent of the coverage analysis. It displays all results of all
+     * carried out coverage analyses.
      */
     public CoverageAnalysisTopComponent() {
         initComponents();
@@ -122,9 +122,9 @@ public final class CoverageAnalysisTopComponent extends TopComponentExtended {
 
 
     /**
-     * This method needs to be called in order to open a new tab for a
-     * covered feature detection. Make sure to call {@link setAnalysisContext()}
-     * first in order to display the correct context for the analysis result.
+     * This method needs to be called in order to open a new tab for a covered
+     * feature detection. Make sure to call {@link setAnalysisContext()} first
+     * in order to display the correct context for the analysis result.
      * <p>
      * @param panelName   title of the new tab to create
      * @param resultPanel the panel to place in the new tab

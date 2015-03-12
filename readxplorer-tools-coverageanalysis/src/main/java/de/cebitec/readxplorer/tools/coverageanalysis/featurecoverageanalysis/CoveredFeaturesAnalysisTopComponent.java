@@ -30,24 +30,23 @@ import org.openide.windows.TopComponent;
 
 /**
  * TopComponent for displaying all gui elements belonging to the feature
- * coverage
- * analysis.
+ * coverage analysis.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis//CoveredFeaturesAnalysis//EN",
-    autostore = false )
+         dtd = "-//de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis//CoveredFeaturesAnalysis//EN",
+         autostore = false )
 @TopComponent.Description(
-    preferredID = "CoveredFeaturesAnalysisTopComponent",
-    iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/coveredFeatures.png",
-    persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+         preferredID = "CoveredFeaturesAnalysisTopComponent",
+         iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/coveredFeatures.png",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis.CoveredFeaturesAnalysisTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_CoveredFeaturesAnalysisAction",
-    preferredID = "FeatureCoverageAnalysisTopComponent" )
+         displayName = "#CTL_CoveredFeaturesAnalysisAction",
+         preferredID = "FeatureCoverageAnalysisTopComponent" )
 @Messages( {
     "CTL_CoveredFeaturesAnalysisAction=FeatureCoverageAnalysis",
     "CTL_CoveredFeaturesAnalysisTopComponent=Feature Coverage Analysis Window",
@@ -125,9 +124,9 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExten
 
 
     /**
-     * This method needs to be called in order to open a new tab for a
-     * covered feature detection. Make sure to call {@link setAnalysisContext()}
-     * first in order to display the correct context for the analysis result.
+     * This method needs to be called in order to open a new tab for a covered
+     * feature detection. Make sure to call {@link setAnalysisContext()} first
+     * in order to display the correct context for the analysis result.
      * <p>
      * @param panelName   title of the new tab to create
      * @param resultPanel the panel to place in the new tab
