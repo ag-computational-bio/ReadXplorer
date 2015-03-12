@@ -51,13 +51,15 @@ public class PairTable {
 
         // extract region labels from the helix numbering
         final int h_idx = helices.indexOf( 'H' );
-        if( h_idx < 0 )
+        if( h_idx < 0 ) {
             throw new IllegalArgumentException( "Missing terminating 'H' character in helix numbering." );
+        }
         final String[] blubb = helices.substring( 0, h_idx ).split( "(\\s*-\\s*)+" );
         for( String blubb1 : blubb ) {
             String tmp = blubb1.trim();
-            if( tmp.matches( "\\d+('?)" ) )
+            if( tmp.matches( "\\d+('?)" ) ) {
                 labels.add( tmp );
+            }
         }
 
         // extract pseudoknot labels
@@ -119,63 +121,64 @@ public class PairTable {
                     end = true;
                     break;
                 default:
-                    if( ++pos >= sequence.length() )
+                    if( ++pos >= sequence.length() ) {
                         throw new IllegalArgumentException( "Length of structure exceeds length of sequence!" );
+                    }
                     if( paired ) {
-                        if( regions > labels.size() )
+                        if( regions > labels.size() ) {
                             throw new IllegalArgumentException( "Structure contains more regions than helix numbering." );
+                        }
                         final String label = labels.get( regions - 1 );
                         if( label.endsWith( "'" ) ) {
                             if( pseudoknots.contains( label ) ) {
                                 type_list.add( PK1 );
-                                if( s1.empty() )
+                                if( s1.empty() ) {
                                     throw new IllegalArgumentException( "Unbalanced pseudoknot pair(s) in structure." );
+                                }
                                 mate = s1.pop();
-                            }
-                            else {
-                                if( s0.empty() )
+                            } else {
+                                if( s0.empty() ) {
                                     throw new IllegalArgumentException( "Unbalanced base pair(s) in structure." );
+                                }
                                 mate = s0.pop();
-                                sum = sequence.toUpperCase().charAt( pos - 1 )
-                                      + sequence.toUpperCase().charAt( mate );
+                                sum = sequence.toUpperCase().charAt( pos - 1 ) +
+                                         sequence.toUpperCase().charAt( mate );
                                 boolean gu = sum == GU || sum == GT;
                                 if( knots.contains( label ) ) {
                                     type_list.add( gu ? KNOT_GU : KNOT );
                                     type_list.set( mate, gu ? KNOT_GU : KNOT );
-                                }
-                                else {
+                                } else {
                                     type_list.add( gu ? GU_BOND : NORMAL_BOND );
                                     type_list.set( mate, gu ? GU_BOND : NORMAL_BOND );
                                 }
                             }
                             pt_list.set( mate, pos - 1 );
                             pt_list.add( mate );
-                        }
-                        else {
+                        } else {
                             if( pseudoknots.contains( label ) ) {
                                 type_list.add( PK1 );
                                 s1.push( pos - 1 );
-                            }
-                            else {
+                            } else {
                                 type_list.add( NORMAL_BOND );
                                 s0.push( pos - 1 );
                             }
                             pt_list.add( -1 );
                         }
-                    }
-                    else {
+                    } else {
                         pt_list.add( -1 );
                         type_list.add( NONE );
                     }
                     break;
             }
         }
-        if( !(s0.empty() && s1.empty() && s2.empty()) )
+        if( !(s0.empty() && s1.empty() && s2.empty()) ) {
             throw new IllegalArgumentException( "Unbalanced pair(s) in structure." );
+        }
 
         // convert lists to arrays
-        if( pt_list.size() != type_list.size() )
+        if( pt_list.size() != type_list.size() ) {
             throw new IllegalArgumentException( "Something went wrong..." );
+        }
 
         length = pt_list.size();
         pairTable = new int[length];
@@ -196,8 +199,9 @@ public class PairTable {
         int sp2 = 0;
         int sp3 = 0;
 
-        if( structure.length() > sequence.length() )
+        if( structure.length() > sequence.length() ) {
             throw new IllegalArgumentException( "Length of structure exceeds length of sequence!" );
+        }
 
         length = structure.length();
         int[] s0 = new int[length];
@@ -223,39 +227,43 @@ public class PairTable {
                     s3[sp3++] = i;
                     break;
                 case ')':
-                    if( --sp0 < 0 )
-                        throw new IllegalArgumentException( "Unbalanced braces in "
-                                                            + "dot-bracket string." );
+                    if( --sp0 < 0 ) {
+                        throw new IllegalArgumentException( "Unbalanced braces in " +
+                                 "dot-bracket string." );
+                    }
                     int mate = s0[sp0];
                     pairTable[i] = mate;
                     pairTable[mate] = i;
-                    int sum = sequence.toUpperCase().charAt( i )
-                              + sequence.toUpperCase().charAt( mate );
+                    int sum = sequence.toUpperCase().charAt( i ) +
+                             sequence.toUpperCase().charAt( mate );
                     boolean gu = sum == GU || sum == GT;
                     bondTypes[i] = bondTypes[mate] = gu ? GU_BOND : NORMAL_BOND;
                     break;
                 case ']':
-                    if( --sp1 < 0 )
-                        throw new IllegalArgumentException( "Unbalanced braces in "
-                                                            + "dot-bracket string." );
+                    if( --sp1 < 0 ) {
+                        throw new IllegalArgumentException( "Unbalanced braces in " +
+                                 "dot-bracket string." );
+                    }
                     mate = s1[sp1];
                     pairTable[i] = mate;
                     pairTable[mate] = i;
                     bondTypes[i] = bondTypes[mate] = PK1;
                     break;
                 case '}':
-                    if( --sp2 < 0 )
-                        throw new IllegalArgumentException( "Unbalanced braces in "
-                                                            + "dot-bracket string." );
+                    if( --sp2 < 0 ) {
+                        throw new IllegalArgumentException( "Unbalanced braces in " +
+                                 "dot-bracket string." );
+                    }
                     mate = s2[sp2];
                     pairTable[i] = mate;
                     pairTable[mate] = i;
                     bondTypes[i] = bondTypes[mate] = PK2;
                     break;
                 case '>':
-                    if( --sp3 < 0 )
-                        throw new IllegalArgumentException( "Unbalanced braces in "
-                                                            + "dot-bracket string." );
+                    if( --sp3 < 0 ) {
+                        throw new IllegalArgumentException( "Unbalanced braces in " +
+                                 "dot-bracket string." );
+                    }
                     mate = s3[sp3];
                     pairTable[i] = mate;
                     pairTable[mate] = i;
@@ -267,14 +275,15 @@ public class PairTable {
                     bondTypes[i] = NONE;
                     break;
                 default:
-                    throw new IllegalArgumentException( "Unrecognized token '" + c + "' in "
-                                                        + "dot-bracket string." );
+                    throw new IllegalArgumentException( "Unrecognized token '" + c + "' in " +
+                             "dot-bracket string." );
             }
         }
 
-        if( sp0 != 0 || sp1 != 0 || sp2 != 0 || sp3 != 0 )
-            throw new IllegalArgumentException( "Unbalanced braces in "
-                                                + "dot-bracket string." );
+        if( sp0 != 0 || sp1 != 0 || sp2 != 0 || sp3 != 0 ) {
+            throw new IllegalArgumentException( "Unbalanced braces in " +
+                     "dot-bracket string." );
+        }
 
     }
 

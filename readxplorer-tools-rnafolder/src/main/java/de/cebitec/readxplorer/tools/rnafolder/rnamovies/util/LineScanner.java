@@ -62,10 +62,8 @@ public class LineScanner implements Enumeration<String> {
         try {
             do {
                 next = br.readLine();
-            }
-            while( next != null && next.trim().isEmpty() );
-        }
-        catch( IOException e ) {
+            } while( next != null && next.trim().isEmpty() );
+        } catch( IOException e ) {
             next = null;
         }
     }
