@@ -24,7 +24,6 @@ nbbuild/
 dist/
 nbdist/
 nbactions.xml
-nb-configuration.xml
 
 !/branding/src/main/nbm-branding/core/core.jar/
 !/branding/src/main/nbm-branding/modules/org-netbeans-core-windows.jar/
