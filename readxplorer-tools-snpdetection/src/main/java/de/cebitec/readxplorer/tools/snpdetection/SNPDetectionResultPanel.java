@@ -154,24 +154,24 @@ public class SNPDetectionResultPanel extends ResultTablePanel {
             snpTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title0_1")); // NOI18N
             snpTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title17_1")); // NOI18N
             snpTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title2")); // NOI18N
-            snpTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title20")); // NOI18N
-            snpTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title1_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title5_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title6_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title7_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title8_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title9_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title10_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title11_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title3_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title4_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title12_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title14_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title13_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title19_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title20")); // NOI18N
+            snpTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title1_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title5_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title6_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title7_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title8_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title9_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title10_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title11_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title3_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.jTable1.columnModel.title4_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title12_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title14_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title13_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title19_1")); // NOI18N
             snpTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title18_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title15_1")); // NOI18N
-            snpTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title16_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title15_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title16_1")); // NOI18N
             snpTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title21")); // NOI18N
             snpTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(SNPDetectionResultPanel.class, "SNPDetectionResultPanel.snpTable.columnModel.title22")); // NOI18N
         }
@@ -497,7 +497,7 @@ public class SNPDetectionResultPanel extends ResultTablePanel {
                 ParameterSetSNPs params = (ParameterSetSNPs) snpData.getParameters();
                 String useMainBaseString = params.isUseMainBase() ? "yes" : "no";
                 this.parametersLabel.setText( org.openide.util.NbBundle.getMessage( SNPDetectionResultPanel.class,
-                                                                                    "SNP_DetectionResultPanel.parametersLabel.text", params.getMinPercentage(), params.getMinMismatchingBases(), useMainBaseString ) );
+                                                                                    "SNPDetectionResultPanel.parametersLabel.text", params.getMinPercentage(), params.getMinMismatchingBases(), useMainBaseString ) );
 
             }
         }
