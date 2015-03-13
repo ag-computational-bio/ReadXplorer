@@ -135,22 +135,19 @@ public class PersistentReference implements Observable {
                 if( chromIt.hasNext() ) {
                     activeChromID = chromIt.next().getId();
                 }
-            }
-            else {
+            } else {
                 this.activeChromID = activeChromId;
             }
             try {
                 this.getChromSequence( activeChromID, 1, 1 );
-            }
-            catch( PicardException | NullPointerException e ) {
+            } catch( PicardException | NullPointerException e ) {
                 if( e.getMessage() != null && e.getMessage().contains( "Unable to find entry for contig" ) ) {
                     String msg = "The fasta file \n" + fastaFile.getAbsolutePath()
                                  + "\ndoes not contain the expected sequence:\n" + e.getMessage();
                     JOptionPane.showMessageDialog( new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE );
                 }
             }
-        }
-        catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+        } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
             String msg = "If the missing fasta file is not replaced, the reference cannot be shown and analyses for this reference cannot be run.";
             JOptionPane.showMessageDialog( new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE );
         }
@@ -313,8 +310,7 @@ public class PersistentReference implements Observable {
                     //in most cases the id should be enough
                     //&& ogenome.getSequence().equals(this.sequence);
                     );
-        }
-        else {
+        } else {
             return super.equals( o );
         }
     }

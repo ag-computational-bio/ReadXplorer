@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,15 +40,15 @@ public interface MappingAssignment {
      * @return <code>true</code> if the mapping should be counted for the
      *         current feature, <code>false</code> otherwise.
      */
-    public boolean checkAssignment( int featStart, int featStop, PersistentFeature feature );
+    boolean checkAssignment( int featStart, int featStop, PersistentFeature feature );
 
-    
+
     /**
      * Allows calculating fractions of the read count of the mapping for all
      * features associated to this mapping according to the implemented model.
      * @param featureReadCount The map containing the read counts for each
      * feature (accessible via it's id)
      */
-    public void fractionAssignmentCheck( Map<Integer, NormalizedReadCount> featureReadCount );
+    void fractionAssignmentCheck( Map<Integer, NormalizedReadCount> featureReadCount );
 
 }

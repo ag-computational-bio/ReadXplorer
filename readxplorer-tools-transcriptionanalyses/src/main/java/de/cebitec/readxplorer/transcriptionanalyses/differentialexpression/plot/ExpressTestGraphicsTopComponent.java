@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import org.jfree.chart.ChartPanel;
 import org.netbeans.api.progress.ProgressHandle;
@@ -50,20 +51,20 @@ import org.openide.windows.TopComponent;
  * TopComponent, which displays all graphics available for the express test.
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot//Plot//EN",
-    autostore = false )
+         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot//Plot//EN",
+         autostore = false )
 @TopComponent.Description(
-    preferredID = "PlotTopComponent",
-    //iconBase="SET/PATH/TO/ICON/HERE",
-    persistenceType = TopComponent.PERSISTENCE_NEVER )
+         preferredID = "PlotTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 //@ActionID(category = "Tools", id = "de.cebitec.readxplorer.differentialExpression.plot.PlotTopComponent")
 //@ActionReference(path = "Menu/Tools")
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.PlotTopComponent" )
 @ActionReference( path = "Menu/Window" )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_PlotAction",
-    preferredID = "PlotTopComponent" )
+         displayName = "#CTL_PlotAction",
+         preferredID = "PlotTopComponent" )
 @Messages( {
     "CTL_PlotAction=Plot",
     "CTL_PlotTopComponent=Express Test Graphics",
@@ -73,6 +74,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
         implements Observer {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger( ExpressTestGraphicsTopComponent.class.getName() );
 
     private final DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>( PlotTypes.values() );
     private final DefaultComboBoxModel<String> cbmDataSet;
@@ -135,8 +137,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
             if( random > 0.95 ) {
                 points.put( dummyFeature, new Pair<>( r.nextDouble() * 256.0d, Double.POSITIVE_INFINITY ) );
                 points.put( dummyFeature, new Pair<>( r.nextDouble() * 256.0d, Double.NEGATIVE_INFINITY ) );
-            }
-            else {
+            } else {
                 points.put( dummyFeature, new Pair<>( 2 * i + (r.nextGaussian() - 0.5d), r.nextDouble() * 256.0d ) );
             }
         }
@@ -280,7 +281,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
     }// </editor-fold>//GEN-END:initComponents
 
     private void createPlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPlotButtonActionPerformed
-        progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+        progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
         progressHandle.start();
         progressHandle.switchToIndeterminate();
         plotPanel.removeAll();
@@ -304,6 +305,8 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
                 plotPanel.add( chartPanel );
                 plotPanel.updateUI();
                 break;
+            default:
+                LOG.severe( "Encountered unknown plot type." );
         }
         saveButton.setEnabled( true );
         progressHandle.switchToDeterminate( 100 );

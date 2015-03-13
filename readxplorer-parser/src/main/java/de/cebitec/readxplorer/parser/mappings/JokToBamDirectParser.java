@@ -39,9 +39,9 @@ import java.util.Map;
  */
 public class JokToBamDirectParser implements MappingParserI, Observer {
 
-    private static final String name = "Jok to Bam Direct Access Parser";
-    private static final String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
-    private static final String fileDescription = "Jok Read Mappings converted to BAM";
+    private static final String NAME = "Jok to Bam Direct Access Parser";
+    private static final String[] FILE_EXTENSION = new String[]{"out", "Jok", "jok", "JOK"};
+    private static final String FILE_DESCRIPTION = "Jok Read Mappings converted to BAM";
     private final SamBamParser bamParser;
     private final List<Observer> observers;
     private final boolean alreadyConverted = false;
@@ -85,8 +85,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
             bamParser.registerObserver( this );
             success = bamParser.parseInput( trackJob, chromLengthMap );
             bamParser.removeObserver( this );
-        }
-        else {
+        } else {
             throw new ParsingException( "Preprocessing of the data did not work." );
         }
 
@@ -98,10 +97,10 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * Converts a jok file into a bam file sorted by mapping start position.
      * Also updates the file in the track job to the new file.
      * <p>
-     * @param trackJob       the track job containing the jok file
-     * @param chromLengthMap the mapping of chromosome name to chromosome length
-     *                       for this track
-     * <p>
+     * @param trackJob the track job containing the jok file
+     * @param chromLengthMap the mapping of chromosome NAME to chromosome length
+ for this track
+ <p>
      * @return true, if the conversion was successful, false otherwise
      * <p>
      * @throws ParsingException
@@ -126,8 +125,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
             //update the track job with the new bam file
             trackJob.setFile( jokConverter.getOutputFile() );
-        }
-        else {
+        } else {
             success = false;
         }
         return success;
@@ -136,19 +134,19 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSION;
     }
 
 

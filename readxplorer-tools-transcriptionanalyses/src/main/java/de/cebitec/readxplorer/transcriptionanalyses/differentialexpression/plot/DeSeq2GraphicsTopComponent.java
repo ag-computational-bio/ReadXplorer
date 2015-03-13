@@ -65,18 +65,18 @@ import static java.util.logging.Level.SEVERE;
  * TopComponent, which displays all graphics available for a DESeq analysis.
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DeSeq2Graphics//EN",
-    autostore = false )
+         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DeSeq2Graphics//EN",
+         autostore = false )
 @TopComponent.Description(
-    preferredID = "DeSeq2GraphicsTopComponent",
-    //iconBase="SET/PATH/TO/ICON/HERE",
-    persistenceType = TopComponent.PERSISTENCE_NEVER )
+         preferredID = "DeSeq2GraphicsTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq2GraphicsTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_DeSeq2GraphicsAction",
-    preferredID = "DeSeq2GraphicsTopComponent" )
+         displayName = "#CTL_DeSeq2GraphicsAction",
+         preferredID = "DeSeq2GraphicsTopComponent" )
 @Messages( {
     "CTL_DeSeq2GraphicsAction=DeSeq2Graphics",
     "CTL_DeSeq2GraphicsTopComponent=DESeq2 Graphics",
@@ -108,7 +108,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
 
     /**
      * TopComponent, which displays all graphics available for a DESeq analysis.
-     *
+     * <p>
      * @param handler The analysis handler containing the results
      */
     public DeSeq2GraphicsTopComponent( DeAnalysisHandler handler ) {
@@ -251,8 +251,8 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
         try {
             messages.setText( "" );
             plotButton.setEnabled( false );
-            saveButton.setEnabled(false);
-            progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+            saveButton.setEnabled( false );
+            progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
             progressHandle.start();
             progressHandle.switchToIndeterminate();
             DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
@@ -269,18 +269,15 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
             svgCanvas.repaint();
 
             plotDescriptionArea.repaint();
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-        }
-        catch( GnuR.PackageNotLoadableException ex ) {
+        } catch( GnuR.PackageNotLoadableException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-        }
-        catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
+        } catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
@@ -304,13 +301,11 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
                 try {
                     Path outputFile = Files.copy( from, to, StandardCopyOption.REPLACE_EXISTING );
                     NotificationDisplayer.getDefault().notify( Bundle.DeSeq2SuccessHeader(), new ImageIcon(), Bundle.DeSeq2SuccessMsg() + outputFile.toString(), null );
-                }
-                catch( IOException ex ) {
+                } catch( IOException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                     LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                     JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
-                }
-                finally {
+                } finally {
                     plotProgressHandle.switchToDeterminate( 100 );
                     plotProgressHandle.finish();
                 }

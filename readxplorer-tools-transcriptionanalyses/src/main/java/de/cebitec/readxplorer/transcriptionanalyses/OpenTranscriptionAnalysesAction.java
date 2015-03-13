@@ -40,6 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
@@ -57,13 +59,13 @@ import org.openide.windows.WindowManager;
  * Action for opening a new transcription analyses frame. It opens a track list
  * containing all tracks of the selected reference and creates a new
  * transcription analyses frame when a track was chosen.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID( category = "Tools",
-    id = "de.cebitec.readxplorer.transcriptionanalyses.OpenTranscriptionAnalysesAction" )
+           id = "de.cebitec.readxplorer.transcriptionanalyses.OpenTranscriptionAnalysesAction" )
 @ActionRegistration( iconBase = "de/cebitec/readxplorer/transcriptionanalyses/transcriptionAnalyses.png",
-    displayName = "#CTL_OpenTranscriptionAnalysesAction" )
+                     displayName = "#CTL_OpenTranscriptionAnalysesAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 142, separatorAfter = 150 ),
     @ActionReference( path = "Toolbars/Tools", position = 187 )
@@ -71,6 +73,8 @@ import org.openide.windows.WindowManager;
 @Messages( "CTL_OpenTranscriptionAnalysesAction=Transcription Analyses" )
 public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                                               DataVisualisationI {
+
+    private static final Logger LOG = Logger.getLogger( OpenTranscriptionAnalysesAction.class.getName() );
 
     private final TranscriptionAnalysesTopComponent transcAnalysesTopComp;
     private final ReferenceViewer refViewer;
@@ -116,7 +120,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
      * Carries out the logic behind the transcription analyses action. This
      * means, it opens a configuration wizard and starts the analyses after
      * successfully finishing the wizard.
-     *
+     * <p>
      * @param ev the event, which is currently not used
      */
     @Override
@@ -164,7 +168,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
     /**
      * Starts the transcription analyses.
-     *
+     * <p>
      * @param wiz the wizard containing the transcription analyses parameters
      */
     @SuppressWarnings( "unchecked" )
@@ -192,7 +196,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         //obtain all analysis parameters
         boolean performTSSAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS );
         boolean performOperonAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS );
-        boolean performNormAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_NORM_ANALYSIS );
+        boolean performNormAnalysis = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_NORM_ANALYSIS );
 
         ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty( readClassPropString );
         this.combineTracks = (boolean) wiz.getProperty( combineTracksPropString );
@@ -207,8 +211,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             minTranscriptExtensionCov = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV );
             maxLeaderlessDistance = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE );
             maxFeatureDistance = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE );
-            isAssociateTss = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_IS_ASSOCIATE_TSS );
-            associateTssWindow = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_ASSOCIATE_TSS_WINDOW );
+            isAssociateTss = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_IS_ASSOCIATE_TSS );
+            associateTssWindow = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ASSOCIATE_TSS_WINDOW );
             boolean isFwdAnalysisDirection = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION );
             if( readClassParams.isStrandBothOption() ) {
                 readClassParams.setStrandOption( isFwdAnalysisDirection ? Properties.STRAND_BOTH_FWD : Properties.STRAND_BOTH_REV );
@@ -241,8 +245,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
-                }
-                catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
@@ -250,14 +253,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                 //every track has its own analysis handlers
                 this.createAnalysis( connector, readClassParams );
             }
-        }
-        else {
+        } else {
             try {
                 connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassParams ); //every track has its own analysis handlers
 
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
 
@@ -318,7 +319,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
     /**
      * Visualizes the data handed over to this method as defined by the
      * implementation.
-     *
+     * <p>
      * @param dataTypeObject the data object to visualize.
      */
     @Override
@@ -404,8 +405,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
 
             } );
-        }
-        catch( ClassCastException e ) {
+        } catch( ClassCastException e ) {
+            LOG.log(Level.INFO, "Unknown data passed to {0}", getClass().getName());
             //do nothing, we dont handle other data in this class
         }
 
@@ -426,7 +427,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
          * Container class for all available transcription analyses.
          */
         AnalysisContainer( AnalysisTranscriptionStart analysisTSS, AnalysisOperon analysisOperon,
-                                                                   AnalysisNormalization analysisNormalization ) {
+                           AnalysisNormalization analysisNormalization ) {
             this.analysisTSS = analysisTSS;
             this.analysisOperon = analysisOperon;
             this.analysisNormalization = analysisNormalization;

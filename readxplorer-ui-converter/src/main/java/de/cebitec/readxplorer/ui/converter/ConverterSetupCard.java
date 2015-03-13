@@ -37,7 +37,7 @@ import org.openide.util.NbBundle;
 /**
  * Visual wizard panel for selection of files to convert and selection of a
  * converter.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ConverterSetupCard extends FileSelectionPanel {
@@ -296,8 +296,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
                     DefaultListModel<String> model = new DefaultListModel<>();
                     fillMultipleImportTable( model, mappingFiles, "Mapping file list:" );
                     multiTrackList.setModel( model );
-                }
-                else {
+                } else {
                     File file = this.getSelectedFile();
                     addFile( file, fileTextField );
                 }
@@ -320,8 +319,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
         char input = evt.getKeyChar();
         if( input != '\b' ) {
             this.refChromName = this.referenceNameField.getText() + evt.getKeyChar();
-        }
-        else {
+        } else {
             this.refChromName = this.referenceNameField.getText();
         }
         this.isRequiredInfoSet();
@@ -334,15 +332,12 @@ public class ConverterSetupCard extends FileSelectionPanel {
         if( input.equals( "\b" ) ) {
             if( GeneralUtils.isValidPositiveIntegerInput( value ) ) {
                 this.chromLength = Integer.valueOf( value );
-            }
-            else {
+            } else {
                 this.chromLength = -1;
             }
-        }
-        else if( GeneralUtils.isValidPositiveIntegerInput( wholeInput ) ) {
+        } else if( GeneralUtils.isValidPositiveIntegerInput( wholeInput ) ) {
             this.chromLength = Integer.valueOf( wholeInput );
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( this, "Please enter a numerical reference length larger than 0!", "Invalid Length", JOptionPane.ERROR_MESSAGE );
             this.chromLength = -1;
         }
@@ -407,8 +402,8 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * conversion can be started or not.
      */
     public void isRequiredInfoSet() {
-        canConvert = !mappingFiles.isEmpty() && currentConverter != null
-                     && (refChromName != null && !refChromName.isEmpty() && chromLength >= 0 || refCheckBox.isSelected());
+        canConvert = !mappingFiles.isEmpty() && currentConverter != null &&
+                 (refChromName != null && !refChromName.isEmpty() && chromLength >= 0 || refCheckBox.isSelected());
         firePropertyChange( ConverterAction.PROP_CAN_CONVERT, null, canConvert );
     }
 
@@ -424,8 +419,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     public int getChromosomeLength() {
         if( this.refCheckBox.isSelected() && selectedChrom != null ) {
             return selectedChrom.getLength();
-        }
-        else {
+        } else {
             return chromLength;
         }
     }
@@ -438,8 +432,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     public String getRefChromosomeName() {
         if( this.refCheckBox.isSelected() && selectedChrom != null ) {
             return selectedChrom.getName();
-        }
-        else {
+        } else {
             return refChromName;
         }
     }
@@ -455,8 +448,9 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * Set the reference genome components to their correct visibility state.
      * <p>
      * @param useRefFromDb true, if the options for a reference sequence from
-     *                     the DB should be visible, false, if the options for manually entering
-     *                     the reference data should be visible.
+     *                     the DB should be visible, false, if the options for
+     *                     manually entering the reference data should be
+     *                     visible.
      */
     private void setVisibleComponents( boolean useRefFromDb ) {
         this.refCheckBox.setSelected( useRefFromDb );

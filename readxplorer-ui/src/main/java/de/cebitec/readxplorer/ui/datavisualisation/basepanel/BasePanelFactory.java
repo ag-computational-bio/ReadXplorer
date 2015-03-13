@@ -171,7 +171,6 @@ public class BasePanelFactory {
         TrackConnector tc;
         try {
             tc = (new SaveFileFetcherForGUI()).getTrackConnector( track );
-
         } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
             JOptionPane.showMessageDialog( null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE );
             return null;
@@ -184,7 +183,6 @@ public class BasePanelFactory {
             basePanel.setTitlePanel( this.getTitlePanel( track.getDescription() ) );
 
             return basePanel;
-
         } else {
             return null;
         }
@@ -203,10 +201,8 @@ public class BasePanelFactory {
      * @return A <code>BasePanel</code> for multiple tracks.
      */
     public BasePanel getMultipleTracksBasePanel( List<PersistentTrack> tracks, PersistentReference refGen, boolean combineTracks ) {
-
         if( tracks.size() > 2 && !combineTracks ) {
             throw new UnsupportedOperationException( "More than two tracks not supported in non-combined mode." );
-
         } else if( tracks.size() == 2 && !combineTracks || combineTracks ) {
             BasePanel basePanel = new BasePanel( boundsManager, viewController );
             viewController.addMousePositionListener( basePanel );
@@ -234,10 +230,8 @@ public class BasePanelFactory {
 
             viewController.openTrack2( basePanel );
             return basePanel;
-
         } else if( tracks.size() == 1 ) {
-            return getTrackBasePanel( tracks.get( 0 ), refGen );
-
+            return this.getTrackBasePanel( tracks.get( 0 ), refGen );
         } else {
             throw new UnknownError();
         }
@@ -256,9 +250,9 @@ public class BasePanelFactory {
         // create and set up legend
         JPanel trackPanelLegend;
         if( combineTracks || !trackV.isTwoTracks() ) {
-            trackPanelLegend = getTrackPanelLegend( trackV );
+            trackPanelLegend = this.getTrackPanelLegend( trackV );
         } else {
-            trackPanelLegend = getDoubleTrackPanelLegend( trackV );
+            trackPanelLegend = this.getDoubleTrackPanelLegend( trackV );
         }
         MenuLabel legendLabel = new MenuLabel( trackPanelLegend, MenuLabel.TITLE_LEGEND );
         trackV.setupLegend( legendLabel, trackPanelLegend );
@@ -461,7 +455,6 @@ public class BasePanelFactory {
 
 
     /**
-     * @param typeColor color of the feature type
      * @param type      the feature type whose legend entry is created
      * @param viewer    the viewer to which the legend entry belongs. If no
      *                  function is assigend to the legend entry, viewer can be
@@ -827,8 +820,8 @@ public class BasePanelFactory {
      */
     private class FeatureTypeListener implements ActionListener {
 
-        Classification type;
-        AbstractViewer viewer;
+        private Classification type;
+        private AbstractViewer viewer;
 
 
         /**

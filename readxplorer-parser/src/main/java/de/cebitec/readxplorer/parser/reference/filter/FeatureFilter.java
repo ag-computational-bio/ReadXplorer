@@ -64,8 +64,7 @@ public class FeatureFilter {
                     break;
                 }
             }
-        }
-        else {
+        } else {
             // no rules in whitelist to apply: feature is accepted
             whitelistAccepted = true;
         }
@@ -78,8 +77,7 @@ public class FeatureFilter {
                     break;
                 }
             }
-        }
-        else {
+        } else {
             // no rules in blacklist to apply: feature is accepted
             blacklistAccepted = true;
         }

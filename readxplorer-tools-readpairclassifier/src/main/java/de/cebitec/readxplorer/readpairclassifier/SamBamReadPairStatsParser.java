@@ -40,10 +40,10 @@ import static java.util.logging.Level.INFO;
 
 
 /**
- * A parser only responsible for parsing read pair statistics for a track.
- * This parser is mainly used for track, which have already been imported into
+ * A parser only responsible for parsing read pair statistics for a track. This
+ * parser is mainly used for track, which have already been imported into
  * another ReadXplorer DB and are now reimported.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
@@ -57,15 +57,14 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
 
     /**
-     * A parser only responsible for parsing read pair statistics for a
-     * track. This parser is mainly used for track, which have already been
-     * imported into another ReadXplorer DB and are now reimported.
+     * A parser only responsible for parsing read pair statistics for a track.
+     * This parser is mainly used for track, which have already been imported
+     * into another ReadXplorer DB and are now reimported.
      * <p>
      * @param readPairJobContainer container with both track jobs of this pair
      * @param chromLengthMap       mapping of chromosome names to their length
      * @param classificationMap    the classification map of the track - not
-     *                             needed
-     *                             in this parser until now
+     *                             needed in this parser until now
      */
     public SamBamReadPairStatsParser( ReadPairJobContainer readPairJobContainer, Map<String, Integer> chromLengthMap, Map<String, ParsedClassification> classificationMap ) {
         super( readPairJobContainer, chromLengthMap );
@@ -124,13 +123,11 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                                 }
                             }
 
-                        }
-                        else {
+                        } else {
                             this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
                         }
 
-                    }
-                    else if( pairTag == Properties.EXT_A2 ) {
+                    } else if( pairTag == Properties.EXT_A2 ) {
 
                         classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
                         if( classobj != null && classobj instanceof Integer ) {
@@ -138,8 +135,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                             if( pairClass == ReadPairType.UNPAIRED_PAIR ) {
                                 this.statsContainer.incReadPairStats( pairClass, 1 );
                             } //else we have already counted read 1 of the pair
-                        }
-                        else {
+                        } else {
                             this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
                         }
                     }
@@ -160,8 +156,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
             this.statsContainer.setReadPairDistribution( this.readPairSizeDistribution );
 
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Error", e.getMessage() ) );
             LOG.log( INFO, e.getMessage() );
         }

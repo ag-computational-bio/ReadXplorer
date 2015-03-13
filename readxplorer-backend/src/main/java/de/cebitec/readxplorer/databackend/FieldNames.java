@@ -23,7 +23,7 @@ package de.cebitec.readxplorer.databackend;
  *
  * @author ddoppmeier, rhilker
  */
-public class FieldNames {
+public final class FieldNames {
 
     /**
      * Private constructor so this utility class can not be instantiated.

@@ -30,7 +30,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * Wizard panel for showing and handling the selection of feature types.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
@@ -52,13 +52,9 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     /**
      * Wizard panel for showing and handling the selection of feature types.
      * <p>
-     * @param analysisName    the name of the analysis using this wizard panel.
-     *                        It will be used to store the selected settings for
-     *                        this wizard panel under a unique identifier.
-     * @param hasOffsetOption <code>true</code> means the analysis should offer
-     *                        the option to set an offset for genomic features.
-     *                        <code>false</code> means that the offset options
-     *                        shall be hidden.
+     * @param analysisName the name of the analysis using this wizard panel. It
+     *                     will be used to store the selected settings for this
+     *                     wizard panel under a unique identifier.
      */
     public SelectFeatureTypeWizardPanel( String analysisName, boolean hasOffsetOption ) {
         super( "At least one feature type has to be selected & offsets have to be integers >= 0!" );

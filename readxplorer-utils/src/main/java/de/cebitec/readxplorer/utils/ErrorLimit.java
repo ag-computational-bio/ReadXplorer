@@ -43,8 +43,7 @@ public class ErrorLimit {
 
     /**
      * A simple limit to set a maximum to how often an error message can be
-     * shown.
-     * The default error limit for this constructor is 20.
+     * shown. The default error limit for this constructor is 20.
      */
     public ErrorLimit() {
         this( 20 );

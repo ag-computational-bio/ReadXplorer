@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 package de.cebitec.readxplorer.utils.sequence;
 
 
-import de.cebitec.readxplorer.utils.sequence.SequenceMatcher;
-import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.readxplorer.utils.Properties;
@@ -29,11 +27,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -44,6 +41,7 @@ public class SequenceMatcherTest {
 
     private static Pattern[] startCodonPatterns;
     private static Pattern[] stopCodonPatterns;
+
 
     public SequenceMatcherTest() {
 
@@ -214,5 +212,6 @@ public class SequenceMatcherTest {
         assertTrue( result.size() == 4 );
 
     }
+
 
 }

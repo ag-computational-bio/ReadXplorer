@@ -41,8 +41,6 @@ public class MappingThreadAnalyses extends MappingThread {
     private static final Logger LOG = getLogger( MappingThreadAnalyses.class.getName() );
 
 
-    
-
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * file.
@@ -67,18 +65,15 @@ public class MappingThreadAnalyses extends MappingThread {
             if( request != null ) {
                 if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
                     currentMappings = this.loadReducedMappings( request );
-                }
-                else {
+                } else {
                     currentMappings = this.loadMappings( request );
                 }
                 request.getSender().receiveData( new MappingResult( currentMappings, request ) );
 
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep( 10 );
-                }
-                catch( InterruptedException ex ) {
+                } catch( InterruptedException ex ) {
                     LOG.log( SEVERE, null, ex );
                 }
             }

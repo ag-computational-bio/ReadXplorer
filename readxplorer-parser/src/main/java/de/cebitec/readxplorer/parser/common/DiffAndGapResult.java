@@ -37,10 +37,10 @@ public class DiffAndGapResult {
     /**
      * Stores the parsed results for diffs and gaps for one mapping.
      * <p>
-     * @param diffs       differences to the reference
-     * @param gaps        gaps in the reference (insertions of the read)
+     * @param diffs differences to the reference
+     * @param gaps gaps in the reference (insertions of the read)
      * @param differences number of differences between the read and the
-     *                    reference
+     * reference
      */
     public DiffAndGapResult( List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps, int differences ) {
         this.diffs = diffs;

@@ -242,9 +242,9 @@ public final class TranscriptionAnalysesWizardIterator implements
     // when needed
 
     /**
-     * @param wiz the wizard, in which this wizard iterator is contained.
-     *            If it is not set, no properties can be stored, thus it always has to be
-     *            set.
+     * @param wiz the wizard, in which this wizard iterator is contained. If it
+     *            is not set, no properties can be stored, thus it always has to
+     *            be set.
      */
     public void setWiz( WizardDescriptor wiz ) {
         this.wiz = wiz;
@@ -261,24 +261,22 @@ public final class TranscriptionAnalysesWizardIterator implements
 
     /**
      * Updates the wizard's panel list with the given analysis panel and it's
-     * steps with the newStep string, if the given analysis is selected and
-     * the analysis panel is not already contained in the wizard panel list.
+     * steps with the newStep string, if the given analysis is selected and the
+     * analysis panel is not already contained in the wizard panel list.
      * <p>
      * @param analysisSelected true, if the analysis is selected, false
      *                         otherwise
      * @param analysisPanel    the analysis panel to add to the list of panels
      * @param newSteps         the list of steps for this wizard
      * @param newStep          the new step, which should be added to the step
-     *                         list in case
-     *                         the analysis is selected
+     *                         list in case the analysis is selected
      */
     private void updatePanelList( boolean analysisSelected, Panel<WizardDescriptor> analysisPanel ) {
         if( analysisSelected ) {
             if( !currentPanels.contains( analysisPanel ) ) {
                 currentPanels.add( analysisPanel );
             }
-        }
-        else if( currentPanels.contains( analysisPanel ) ) {
+        } else if( currentPanels.contains( analysisPanel ) ) {
             currentPanels.remove( analysisPanel );
         }
     }
@@ -286,8 +284,8 @@ public final class TranscriptionAnalysesWizardIterator implements
 
     /**
      * @return The dynamically generated property name for the read class
-     *         selection for this wizard. Can be used to obtain the corresponding
-     *         read class parameters.
+     *         selection for this wizard. Can be used to obtain the
+     *         corresponding read class parameters.
      */
     public String getReadClassPropForWiz() {
         return readClassPanel.getPropReadClassParams();
@@ -332,8 +330,8 @@ public final class TranscriptionAnalysesWizardIterator implements
 
     /**
      * @return The dynamically generated property name for the combine tracks
-     *         selection for this wizard. Can be used to obtain the corresponding
-     *         boolean if the tracks shall be combined.
+     *         selection for this wizard. Can be used to obtain the
+     *         corresponding boolean if the tracks shall be combined.
      */
     public String getCombineTracksPropForWiz() {
         return openTracksPanel.getPropCombineTracks();

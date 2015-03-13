@@ -33,31 +33,31 @@ public interface Job {
     /**
      * @return The name of the job
      */
-    public String getName();
+    String getName();
 
 
     /**
      * @return The file belonging to the job
      */
-    public File getFile();
+    File getFile();
 
 
     /**
      * @return The description of the job
      */
-    public String getDescription();
+    String getDescription();
 
 
     /**
      * @return The timestamp of the creation of the job
      */
-    public Timestamp getTimestamp();
+    Timestamp getTimestamp();
 
 
     /**
      * @return The id of the job
      */
-    public int getID();
+    int getID();
 
 
 }

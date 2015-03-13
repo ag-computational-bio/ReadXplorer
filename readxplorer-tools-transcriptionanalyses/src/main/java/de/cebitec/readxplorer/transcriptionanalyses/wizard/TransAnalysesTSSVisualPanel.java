@@ -392,7 +392,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         minTranscriptExtensionCov = Integer.parseInt( transcriptExtensionField.getText() );
         maxLeaderlessDistance = Integer.parseInt( maxLeaderlessDistanceField.getText() );
         maxFeatureDistance = Integer.parseInt( maxFeatureDistField.getText() );
-        associateTssWindow = Integer.parseInt(associateTssWindowField.getText() );
+        associateTssWindow = Integer.parseInt( associateTssWindowField.getText() );
 
         minTotalIncreaseField.getDocument().addDocumentListener( createDocumentListener() );
         minPercentIncreaseField.getDocument().addDocumentListener( createDocumentListener() );
@@ -423,8 +423,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         String minExtensionCov = pref.get( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText() );
         String maxLeaderlessDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText() );
         String maxFeatureDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, maxFeatureDistField.getText() );
-        isAssociateTss = pref.getBoolean(PROP_WIZARD_NAME + PROP_IS_ASSOCIATE_TSS, true );
-        String associateTssWindowTxt = pref.get(PROP_WIZARD_NAME + PROP_ASSOCIATE_TSS_WINDOW, associateTssWindowField.getText() );
+        isAssociateTss = pref.getBoolean( PROP_WIZARD_NAME + PROP_IS_ASSOCIATE_TSS, true );
+        String associateTssWindowTxt = pref.get( PROP_WIZARD_NAME + PROP_ASSOCIATE_TSS_WINDOW, associateTssWindowField.getText() );
         boolean fwdAnalysisDirection = pref.getBoolean( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, true );
 
         transcriptionStartAutomaticBox.setSelected( tssAutomatic );
@@ -535,7 +535,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
     /**
      * @return <code>true</code>, if TSS within the given window shall be
-     * associated, <code>false</code> otherwise.
+     *         associated, <code>false</code> otherwise.
      */
     public boolean isAssociateTss() {
         return isAssociateTss;
@@ -544,7 +544,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
     /**
      * @return The bp window in which all TSS shall be associated if
-     * <code>isAssociateTss()</code> is <code>true</code> otherwise.
+     *         <code>isAssociateTss()</code> is <code>true</code> otherwise.
      */
     public int getAssociateTssWindow() {
         return associateTssWindow;
@@ -571,9 +571,9 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
     /**
      * @return <code>true</code>, if the analysis direction for the TSS is fwd,
-     *         <code>false</code> if the analysis direction is rev. This means either
-     *         only genes on the fwd or genes on the reverse strand can be assigned to
-     *         TSS.
+     *         <code>false</code> if the analysis direction is rev. This means
+     *         either only genes on the fwd or genes on the reverse strand can
+     *         be assigned to TSS.
      */
     public boolean isFwdDirectionSelected() {
         return dirFwdRadioButton.isSelected();
@@ -581,8 +581,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
 
     /**
-     * Set all components belonging to the analysis direction options visible
-     * or not.
+     * Set all components belonging to the analysis direction options visible or
+     * not.
      * <p>
      * @param isVisible <code>true</code> if the components shall be visible,
      *                  <code>true</code> if not.

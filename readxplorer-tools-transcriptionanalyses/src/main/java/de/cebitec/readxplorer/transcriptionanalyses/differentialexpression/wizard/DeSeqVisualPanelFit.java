@@ -49,9 +49,9 @@ public final class DeSeqVisualPanelFit extends JPanel {
     public void updateConditionGroupsList( Set<String> conditionGroups ) {
         boolean newDataSet = false;
         for( String currentGroup : conditionGroups ) {
-            if( !allConditionGroupsModel.contains( currentGroup )
-                && !fittingOneModel.contains( currentGroup )
-                && !fittingTwoModel.contains( currentGroup ) ) {
+            if( !allConditionGroupsModel.contains( currentGroup ) &&
+                     !fittingOneModel.contains( currentGroup ) &&
+                     !fittingTwoModel.contains( currentGroup ) ) {
                 newDataSet = true;
                 break;
             }
@@ -224,8 +224,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 fittingGroupOne.add( currentGroup );
                 assignedGroups.add( currentGroup );
                 infoLabel.setText( "" );
-            }
-            else {
+            } else {
                 infoLabel.setText( "Each group can just be added once to a fitting group." );
             }
         }
@@ -249,8 +248,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 fittingGroupTwo.add( currentGroup );
                 assignedGroups.add( currentGroup );
                 infoLabel.setText( "" );
-            }
-            else {
+            } else {
                 infoLabel.setText( "Each group can just be added once to a fitting group." );
             }
         }

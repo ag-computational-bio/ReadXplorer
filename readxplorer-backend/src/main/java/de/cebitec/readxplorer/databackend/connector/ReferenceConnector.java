@@ -98,8 +98,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -130,8 +129,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -163,8 +161,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -195,8 +192,7 @@ public class ReferenceConnector {
                 fetch.setLong( 1, chromId );
                 fetch.setInt( 2, from );
                 fetch.setInt( 3, to );
-            }
-            else {
+            } else {
                 fetch = con.prepareStatement( SQLStatements.FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL );
                 fetch.setLong( 1, chromId );
                 fetch.setInt( 2, from );
@@ -223,8 +219,7 @@ public class ReferenceConnector {
             }
             fetch.close();
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -348,8 +343,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -378,8 +372,7 @@ public class ReferenceConnector {
                     associatedTracks.add( new PersistentTrack( id, filePath, description, date, refGenomeID, readPairId ) );
                 }
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -447,8 +440,7 @@ public class ReferenceConnector {
                 if( type == FeatureType.ANY ) {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_EXIST );
                     fetch.setLong( 1, currentID );
-                }
-                else {
+                } else {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
                     fetch.setLong( 1, currentID );
                     fetch.setLong( 2, type.getTypeByte() );
@@ -459,8 +451,7 @@ public class ReferenceConnector {
                     rs.close();
                     return true;
                 }
-            }
-            catch( SQLException ex ) {
+            } catch( SQLException ex ) {
                 LOG.log( Level.SEVERE, null, ex );
                 return false;
             }

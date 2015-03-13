@@ -27,7 +27,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * Visual panel of the coverage analysis wizard.
- *
+ * <p>
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -160,8 +160,7 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
         boolean isValidated = true;
         if( GeneralUtils.isValidPositiveIntegerInput( minCoverageCountField.getText() ) ) {
             this.minCoverageCount = Integer.parseInt( minCoverageCountField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
@@ -180,8 +179,8 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
 
     /**
      * @return <code>true</code> if the coverage of both strands shall be
-     *         combined, <code>false</code> if the coverage of each strand shall be
-     *         treated separately.
+     *         combined, <code>false</code> if the coverage of each strand shall
+     *         be treated separately.
      */
     public boolean isSumCoverageOfBothStrands() {
         return this.sumCoverageButton.isSelected();

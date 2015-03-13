@@ -112,8 +112,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
                 trackJobs.add( t );
             }
 
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( this.component );
         }
 

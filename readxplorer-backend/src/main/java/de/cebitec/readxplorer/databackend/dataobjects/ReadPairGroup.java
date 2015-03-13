@@ -66,7 +66,7 @@ public class ReadPairGroup implements ObjectWithId {
 
         boolean stored = false;
         if( type != ReadPairType.UNPAIRED_PAIR ) {
-            for( ReadPair readPair : this.readPairs ) { //TODO: exponential!!! reduce complexity by hash or else...
+            for( ReadPair readPair : this.readPairs ) { //TODO exponential!!! reduce complexity by hash or else...
 
                 if( mapping.getId() == readPair.getVisibleMapping().getId()
                     || mapping.getId() == readPair.getMapping2Id() && readPair.hasVisibleMapping2() ) {
@@ -76,8 +76,7 @@ public class ReadPairGroup implements ObjectWithId {
                     stored = true;
                     break;
 
-                }
-                else if( mapping.getId() == readPair.getMapping2Id() ) {
+                } else if( mapping.getId() == readPair.getMapping2Id() ) {
 
                     // pair already exists, this is the second mapping of that pair = add it
                     readPair.setVisiblemapping2( mapping );
@@ -89,8 +88,7 @@ public class ReadPairGroup implements ObjectWithId {
                 // this mapping defines a new read pair for this pair id
                 this.readPairs.add( new ReadPair( this.readPairId, mapping1Id, mapping2Id, type, replicates, mapping ) );
             }
-        }
-        else {
+        } else {
             //this is a single mapping, just add id to the list
             this.singleMappings.add( mapping );
         }
@@ -130,8 +128,7 @@ public class ReadPairGroup implements ObjectWithId {
                 // this mapping defines a new read pair for this pair id
                 this.readPairs.add( new ReadPair( this.readPairId, mapping.getId(), -1, type, 1, mapping, mate ) );
             }
-        }
-        else {
+        } else {
             //this is a single mapping, just add id to the list
             this.singleMappings.add( mapping );
         }

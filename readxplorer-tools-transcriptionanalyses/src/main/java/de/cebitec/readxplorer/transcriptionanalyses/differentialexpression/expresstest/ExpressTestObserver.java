@@ -24,7 +24,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expr
  */
 public interface ExpressTestObserver {
 
-    public void update( ExpressTestI origin, ExpressTestStatus status );
+    void update( ExpressTestI origin, ExpressTestStatus status );
 
 
 }

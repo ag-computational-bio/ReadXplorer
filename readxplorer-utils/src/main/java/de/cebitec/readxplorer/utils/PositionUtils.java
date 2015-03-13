@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author rhilker
  */
-public class PositionUtils {
+public final class PositionUtils {
 
     /**
      * Utility class. Instantiation is not allowed.
@@ -55,8 +55,7 @@ public class PositionUtils {
     /**
      * @param genomicRange feature whose frame has to be determined
      * <p>
-     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the
-     *         feature
+     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the feature
      */
     public static int determineFrame( GenomicRange genomicRange ) {
         int frame;
@@ -94,6 +93,7 @@ public class PositionUtils {
         return (position - 1) % 3 - 3;
     }
 
+
     /**
      * Sorts the given <code>GenomicRange</code> implementation list according
      * to the given sort order. For items with <code>isFwdOrder</code> =
@@ -102,7 +102,7 @@ public class PositionUtils {
      * natural order.
      * <p>
      * @param isFwdOrder The sort order to use for the list
-     * @param codons     The list of genomic ranges to sort
+     * @param codons The list of genomic ranges to sort
      */
     public static void sortList( boolean isFwdOrder, List<? extends GenomicRange> codons ) {
         if( isFwdOrder ) {
@@ -119,15 +119,14 @@ public class PositionUtils {
      * last interval in the list. The passed list has to be sorted by position.
      * <p>
      * @param intervals list of current intervals
-     * @param start     start pos of new interval to add
-     * @param stop      stop pos of new interval to add
+     * @param start start pos of new interval to add
+     * @param stop stop pos of new interval to add
      */
     public static void updateIntervals( List<Pair<Integer, Integer>> intervals, int start, int stop ) {
         int lastIndex = intervals.size() - 1;
         if( intervals.get( lastIndex ).getSecond() < start ) { //add new pair
             intervals.add( new Pair<>( start, stop ) );
-        }
-        else { //increase length of first pair (start remains, stop is enlarged)
+        } else { //increase length of first pair (start remains, stop is enlarged)
             intervals.get( lastIndex ).setSecond( stop );
         }
     }

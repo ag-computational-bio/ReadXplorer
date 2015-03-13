@@ -48,24 +48,18 @@ public class FieldAdapter implements ConfigListener {
             field = configurable.getClass().getDeclaredField( name );
             if( value instanceof Boolean ) {
                 field.setBoolean( configurable, ((Boolean) value) );
-            }
-            else if( value instanceof Integer ) {
+            } else if( value instanceof Integer ) {
                 field.setInt( configurable, ((Integer) value) );
-            }
-            else if( value instanceof Float ) {
+            } else if( value instanceof Float ) {
                 field.setFloat( configurable, ((Float) value) );
-            }
-            else if( value instanceof BoundedRangeModel ) {
+            } else if( value instanceof BoundedRangeModel ) {
                 field.setInt( configurable, ((BoundedRangeModel) e.getValue()).getValue() );
-            }
-            else {
+            } else {
                 field.set( configurable, value );
             }
-        }
-        catch( NoSuchFieldException ex ) {
+        } catch( NoSuchFieldException ex ) {
             LOG.severe( "No such field: ".concat( ex.getMessage() ) );
-        }
-        catch( IllegalAccessException ex ) {
+        } catch( IllegalAccessException ex ) {
             LOG.severe( ex.getMessage() );
         }
     }

@@ -23,7 +23,7 @@ package de.cebitec.readxplorer.databackend;
  * <p>
  * @author jstraube, rhilker
  */
-public class MySQLStatements {
+public final class MySQLStatements {
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -33,7 +33,7 @@ public class MySQLStatements {
     //////////////////  statements for table creation  /////////////////////////
 
 
-    public final static String SETUP_REFERENCE_GENOME
+    public static final String SETUP_REFERENCE_GENOME
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REFERENCE + " "
               + "("
               + FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, "
@@ -45,7 +45,7 @@ public class MySQLStatements {
               + ") ";
 
 
-    public final static String SETUP_CHROMOSOME
+    public static final String SETUP_CHROMOSOME
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_CHROMOSOME + " "
               + "("
               + FieldNames.CHROM_ID + " BIGINT PRIMARY KEY, "
@@ -57,7 +57,7 @@ public class MySQLStatements {
               + ") ";
 
 
-    public final static String SETUP_FEATURES
+    public static final String SETUP_FEATURES
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
               + " ("
               + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
@@ -91,39 +91,39 @@ public class MySQLStatements {
     // Removes a constraint or a primary key from a table. This command commits an open and faster transaction.
     // Enable KEYS and DISABLE KEYS are functions only use for mysql not for h2
     // for an open transaction in h2 use the methode connectH2DataBaseforImport
-    public final static String DISABLE_TRACK_INDICES
+    public static final String DISABLE_TRACK_INDICES
             = "ALTER TABLE " + FieldNames.TABLE_TRACK + " DISABLE KEYS";
 
-    public final static String ENABLE_TRACK_INDICES
+    public static final String ENABLE_TRACK_INDICES
             = "ALTER TABLE " + FieldNames.TABLE_TRACK + " ENABLE KEYS";
 
 
-    public final static String ENABLE_REFERENCE_INDICES
+    public static final String ENABLE_REFERENCE_INDICES
             = "ALTER TABLE " + FieldNames.TABLE_REFERENCE + " ENABLE KEYS";
 
 
-    public final static String DISABLE_REFERENCE_INDICES
+    public static final String DISABLE_REFERENCE_INDICES
             = "ALTER TABLE " + FieldNames.TABLE_REFERENCE + " DISABLE KEYS";
 
 
-    public final static String ENABLE_FEATURE_INDICES
+    public static final String ENABLE_FEATURE_INDICES
             = "ALTER TABLE " + FieldNames.TABLE_FEATURES + " ENABLE KEYS";
 
 
-    public final static String DISABLE_FEATURE_INDICES
+    public static final String DISABLE_FEATURE_INDICES
             = "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DISABLE KEYS";
 
 
-    public final static String UNLOCK_TABLES
+    public static final String UNLOCK_TABLES
             = "UNLOCK TABLES";
 
-    public final static String LOCK_TABLE_REFERENCE_DOMAIN
+    public static final String LOCK_TABLE_REFERENCE_DOMAIN
             = "LOCK TABLE "
               + FieldNames.TABLE_REFERENCE + " WRITE, "
               + FieldNames.TABLE_FEATURES + " WRITE,";
 
 
-    public final static String LOCK_TABLE_TRACK_DOMAIN
+    public static final String LOCK_TABLE_TRACK_DOMAIN
             = "LOCK TABLE "
               + FieldNames.TABLE_TRACK + " WRITE, "
               + FieldNames.TABLE_STATISTICS + " WRITE ";

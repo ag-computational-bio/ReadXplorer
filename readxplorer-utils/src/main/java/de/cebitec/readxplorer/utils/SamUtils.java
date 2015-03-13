@@ -111,11 +111,9 @@ public class SamUtils implements Observable {
                         this.notifyObservers( totalRecords + " reads indexed ..." );
                     }
                     indexer.processAlignment( record );
-                }
-                catch( RuntimeEOFException e ) {
+                } catch( RuntimeEOFException e ) {
                     this.notifyObservers( e );
-                }
-                catch( SAMFormatException e ) {
+                } catch( SAMFormatException e ) {
                     if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
                         this.notifyObservers( e.getMessage() );
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
@@ -123,11 +121,10 @@ public class SamUtils implements Observable {
             }
             samItor.close();
             this.notifyObservers( "All " + totalRecords + " reads indexed!" );
-        }
-        catch( SAMException e ) {
+        } catch( SAMException e ) {
             this.notifyObservers( "If you tried to create an index on a sam "
-                                  + "file this is the reason for the exception. Indexes"
-                                  + "can only be created for bam files!" );
+                    + "file this is the reason for the exception. Indexes"
+                    + "can only be created for bam files!" );
             this.notifyObservers( e );
             success = false;
         }
@@ -161,20 +158,19 @@ public class SamUtils implements Observable {
 
     /**
      * Creates a bam file writer. The output file of the new writer is the old
-     * file name + the new
-     * ending and the appropriate file extension (.sam or .bam).
+     * file name + the new ending and the appropriate file extension (.sam or
+     * .bam).
      * <p>
-     * @param oldFile   the old file (if data is not stored in a file, just
-     *                  create
-     *                  a file with a name of your choice
-     * @param header    the header of the new file
+     * @param oldFile the old file (if data is not stored in a file, just create
+     * a file with a name of your choice
+     * @param header the header of the new file
      * @param presorted if true, SAMRecords must be added to the SAMFileWriter
-     *                  in order that agrees with header.sortOrder.
+     * in order that agrees with header.sortOrder.
      * @param newEnding the ending is added to the end of the file name of the
-     *                  old file (this is not the file extension)
+     * old file (this is not the file extension)
      * <p>
      * @return a pair consisting of: the sam or bam file writer ready for
-     *         writing as the first element and the new file as the second element
+     * writing as the first element and the new file as the second element
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter( File oldFile, SAMFileHeader header, boolean presorted, String newEnding ) {
 
@@ -187,7 +183,7 @@ public class SamUtils implements Observable {
 //        }
 //        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
-        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Properties.TMP_IMPORT_DIR, System.getProperty("java.io.tmpdir") ) ) );
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Properties.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
 //        if (extension.toLowerCase().contains("sam")) {
 //            outputFile = new File(newFileName + newEnding + ".sam");
 //            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
@@ -202,10 +198,10 @@ public class SamUtils implements Observable {
      *
      * @param inputFile the input file whose extension should be changed
      * @param newEnding the ending is added to the end of the file name of the
-     *                  old file (this is not the file extension)
+     * old file (this is not the file extension)
      * <p>
      * @return a new bam file, which does not already exist with the given new
-     *         ending
+     * ending
      */
     public static File getFileWithBamExtension( File inputFile, String newEnding ) {
         String[] nameParts = inputFile.getAbsolutePath().split( "\\." );
@@ -218,8 +214,7 @@ public class SamUtils implements Observable {
             newFilePath = SamUtils.removeReadXplorerFileEndings( SORT_READNAME_STRING, newFilePath );
             newFilePath = SamUtils.removeReadXplorerFileEndings( SORT_READSEQ_STRING, newFilePath );
             newFilePath = SamUtils.removeReadXplorerFileEndings( EXTENDED_STRING, newFilePath );
-        }
-        else {
+        } else {
             newFilePath = inputFile.getAbsolutePath();
         }
         File newFile = new File( newFilePath + newEnding + ".bam" );
@@ -233,11 +228,10 @@ public class SamUtils implements Observable {
 
     /**
      * Removes a file ending used by ReadXplorer from the end of a file name.
-     * Note:
-     * This is not the file extension!
+     * Note: This is not the file extension!
      * <p>
      * @param fileEnding the file ending to remove
-     * @param filePath   the file path to chech for the ending
+     * @param filePath the file path to chech for the ending
      * <p>
      * @return the new file path without the given ending
      */
@@ -254,20 +248,18 @@ public class SamUtils implements Observable {
      * returns true, if the file is sorted according to the sort order handed
      * over as sortOrderToCheck
      * <p>
-     * @param fileToCheck      the sam/bam file, whose sort order has to be
-     *                         checked
+     * @param fileToCheck the sam/bam file, whose sort order has to be checked
      * @param sortOrderToCheck the sort order of the file, which is expected/
-     *                         needed
+     * needed
      * <p>
      * @return true, if the sort order of the file equals the given
-     *         sortOrderToCheck
+     * sortOrderToCheck
      */
     public static boolean isSortedBy( File fileToCheck, SAMFileHeader.SortOrder sortOrderToCheck ) {
         try( SAMFileReader samReader = new SAMFileReader( fileToCheck ) ) {
             try {
                 return samReader.getFileHeader().getSortOrder().equals( sortOrderToCheck );
-            }
-            catch( IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
+            } catch( IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
                 return false;
             }
         }
@@ -276,15 +268,13 @@ public class SamUtils implements Observable {
 
     /**
      * Returns blocks of the read sequence that have been aligned directly to
-     * the
-     * reference sequence. Note that clipped portions of the read and inserted
-     * and
-     * deleted bases (vs. the reference) are not represented in the alignment
-     * blocks.
+     * the reference sequence. Note that clipped portions of the read and
+     * inserted and deleted bases (vs. the reference) are not represented in the
+     * alignment blocks.
      * <p>
      * @param cigar
      * @param refStartPos
-     *                    <p>
+     * <p>
      * @return
      */
     public List<SamAlignmentBlock> getAlignmentBlocks( Cigar cigar, int refStartPos ) {

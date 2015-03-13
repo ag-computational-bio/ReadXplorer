@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -63,8 +64,6 @@ import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
-
-import static java.util.logging.Level.INFO;
 
 
 /**
@@ -87,13 +86,13 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      */
     public static final int GENBANK = 2;
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtensionEmbl = new String[]{ "embl", "EMBL" };
-    private static final String[] fileExtensionGbk = new String[]{ "gbk", "gb", "genbank", "GBK", "GB", "GENBANK" };
+    private static final String[] FILE_EXTENSION_EMBL = new String[]{"embl", "EMBL"};
+    private static final String[] FILE_EXTENSION_GBK = new String[]{"gbk", "gb", "genbank", "GBK", "GB", "GENBANK"};
     // name of this parser for use in ComboBoxes
-    private static final String parserNameEmbl = "EMBL file";
-    private static final String parserNameGbk = "GenBank file";
-    private static final String fileDescriptionEmbl = "EMBL file";
-    private static final String fileDescriptionGbk = "GenBank file";
+    private static final String PARSER_NAME_EMBL = "EMBL file";
+    private static final String PARSER_NAME_GBK = "GenBank file";
+    private static final String FILE_DESCRIPTION_EMBL = "EMBL file";
+    private static final String FILE_DESCRIPTION_GBK = "GenBank file";
     private final String[] fileExtension;
     private final String parserName;
     private final String fileDescription;
@@ -107,21 +106,20 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * parses them into a ParsedReference object.
      *
      * @param type the type of the parser, either BioJavaParser.EMBL or
-     *             BioJavaParser.GENBANK
+     * BioJavaParser.GENBANK
      */
     public BioJavaParser( int type ) {
 
         if( type == BioJavaParser.EMBL ) {
-            this.fileExtension = fileExtensionEmbl;
-            this.parserName = parserNameEmbl;
-            this.fileDescription = fileDescriptionEmbl;
+            this.fileExtension = FILE_EXTENSION_EMBL;
+            this.parserName = PARSER_NAME_EMBL;
+            this.fileDescription = FILE_DESCRIPTION_EMBL;
             this.seqFormat = new EMBLFormat();
 
-        }
-        else { //for your info: if (type == BioJavaParser.GENBANK){
-            this.fileExtension = fileExtensionGbk;
-            this.parserName = parserNameGbk;
-            this.fileDescription = fileDescriptionGbk;
+        } else { //for your info: if (type == BioJavaParser.GENBANK){
+            this.fileExtension = FILE_EXTENSION_GBK;
+            this.parserName = PARSER_NAME_GBK;
+            this.fileDescription = FILE_DESCRIPTION_GBK;
             this.seqFormat = new GenbankFormat();
         }
 
@@ -130,7 +128,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public ParsedReference parseReference( final ReferenceJob refGenJob, final FeatureFilter filter ) throws ParsingException {
 
         final ParsedReference refGenome = new ParsedReference();
@@ -157,8 +155,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             Converter seqConverter;
             if( seqFormat instanceof EMBLFormat ) {
                 seqConverter = EmblSequenceToFastaConverterParser.fileConverter( refGenJob.getFile().toPath(), fastaPath );
-            }
-            else {
+            } else {
                 seqConverter = GenbankSequenceToFastaConverterParser.fileConverter( refGenJob.getFile().toPath(), fastaPath );
             }
             seqConverter.convert();
@@ -189,8 +186,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         final String parsedType = richFeature.getType();
                         try {
                             strand = richFeature.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
-                        }
-                        catch( IllegalStateException e ) {
+                        } catch( IllegalStateException e ) {
                             this.sendMsgIfAllowed( e.getMessage() );
                             continue;
                         }
@@ -206,25 +202,19 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
                             if( name.equals( "locus_tag" ) ) {
                                 locusTag = value;
-                            }
-                            else if( name.equalsIgnoreCase( "locus" ) ) {
+                            } else if( name.equalsIgnoreCase( "locus" ) ) {
                                 locusTag = value;
-                            }
-                            else if( name.equalsIgnoreCase( "name" ) && locusTag.equals( "unknown locus tag" ) ) {
+                            } else if( name.equalsIgnoreCase( "name" ) && locusTag.equals( "unknown locus tag" ) ) {
                                 locusTag = value;
-                            }
-                            else if( name.equalsIgnoreCase( "product" ) ) {
+                            } else if( name.equalsIgnoreCase( "product" ) ) {
                                 product = value;
-                            }
-                            else if( name.equalsIgnoreCase( "EC_number" ) ) {
+                            } else if( name.equalsIgnoreCase( "EC_number" ) ) {
                                 ecNumber = value;
-                            }
-                            else if( name.equalsIgnoreCase( "gene" ) ) {
+                            } else if( name.equalsIgnoreCase( "gene" ) ) {
                                 if( value.length() > 20 ) {
                                     geneName = value.substring( 0, 20 );
                                     this.sendMsgIfAllowed( "Gene name too long, only keeping first 20 characters: " + geneName );
-                                }
-                                else {
+                                } else {
                                     geneName = value;
                                 }
                             }
@@ -237,7 +227,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             this.sendMsgIfAllowed( refGenJob.getFile().getName()
-                                                   + ": Using unknown feature type for " + parsedType );
+                                    + ": Using unknown feature type for " + parsedType );
                         }
 
 
@@ -262,7 +252,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 //                                    locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
 //                        }
                         final int start = location.getMin();
-                        final int stop  = location.getMax();
+                        final int stop = location.getMax();
 
                         boolean featAcrossBorder = false;
                         int index = 0;
@@ -272,18 +262,18 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
                             Iterator<Location> subFeatureIter = location.blockIterator();
                             while( subFeatureIter.hasNext() ) {
-                                Location subLocation = subFeatureIter.next(); //TODO: check if handling here is correct
+                                Location subLocation = subFeatureIter.next(); //TODO check if handling here is correct
                                 //array always contains at least 2 entries
                                 int subStart = subLocation.getMin();
                                 int subStop = subLocation.getMax();
                                 subFeatures.add( new ParsedFeature( type, subStart, subStop, strand,
-                                                                    locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null ) );
+                                        locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null ) );
                                 featAcrossBorder = subStart == 1 && index > 0; //feature across circular chrom start, separate in two features
                                 ++index;
                             }
                         }
 
-                        //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
+                        //TODO filter unknown features, if a known feature exists with same locus! best to do not here
                         if( featAcrossBorder ) { //feature across circular chrom start, add each subfeature separately
                             for( ParsedFeature subFeature : subFeatures ) {
                                 if( !featMap.containsKey( type ) ) {
@@ -291,8 +281,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 }
                                 featMap.get( type ).add( subFeature );
                             }
-                        }
-                        else {
+                        } else {
                             ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
                             if( !featMap.containsKey( type ) ) {
                                 featMap.put( type, new ArrayList<ParsedFeature>() );
@@ -305,16 +294,14 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                     chrom.addAllFeatures( this.createFeatureHierarchy( featMap ) );
                     refGenome.addChromosome( chrom );
 
-                }
-                catch( BioException | NoSuchElementException e ) {
+                } catch( BioException | NoSuchElementException e ) {
                     JOptionPane.showMessageDialog( new JPanel(), "One of the imported chromosomes does not contain any sequence data or is in corrupted format!",
-                                                   "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE );
+                            "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE );
                     throw new ParsingException( e );
                 }
             }
 
-        }
-        catch( Exception ex ) {
+        } catch( Exception ex ) {
             throw new ParsingException( ex );
         }
 
@@ -372,8 +359,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             exonList = featureMap.get( FeatureType.EXON );
             featureMap.remove( FeatureType.EXON );
             exonList = this.addSubfeatures( cdsList, exonList );
-        }
-        else {
+        } else {
             exonList = cdsList;
         }
 
@@ -394,10 +380,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * feature has no parent, it is added to the return list of features.
      * <p>
      * @param subFeatures The subfeatures to add to their parents
-     * @param features    The feature list containing the parents
+     * @param features The feature list containing the parents
      * <p>
      * @return The feature list with the parents, now knowing their children and
-     *         all features without a parent
+     * all features without a parent
      */
     private List<ParsedFeature> addSubfeatures( final List<ParsedFeature> subFeatures, final List<ParsedFeature> features ) {
 
@@ -411,16 +397,15 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             for( int i = lastIndex; i < features.size(); ++i ) {
                 final ParsedFeature feature = features.get( i );
                 if( feature.getStrand() == subFeature.getStrand()
-                    && feature.getStart() <= subFeature.getStart()
-                    && feature.getStop() >= subFeature.getStop() ) {
+                        && feature.getStart() <= subFeature.getStart()
+                        && feature.getStop() >= subFeature.getStop() ) {
 
                     feature.addSubFeature( subFeature );
                     added = true;
                     lastIndex = i == 0 ? 0 : --i;
                     break;
 
-                }
-                else if( feature.getStart() > subFeature.getStop() ) {
+                } else if( feature.getStart() > subFeature.getStop() ) {
                     break;
                 }
             }

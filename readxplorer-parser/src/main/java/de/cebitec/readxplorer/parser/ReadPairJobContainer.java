@@ -20,9 +20,8 @@ package de.cebitec.readxplorer.parser;
 
 /**
  * Container for data necessary for parsing and storing sequence pair (paired
- * end, mate pair) tracks.
- * Contains two TrackJobs, the distance, deviation and orientation of the
- * ReadPairJobContainer.
+ * end, mate pair) tracks. Contains two TrackJobs, the distance, deviation and
+ * orientation of the ReadPairJobContainer.
  *
  * @author Rolf Hilker
  */

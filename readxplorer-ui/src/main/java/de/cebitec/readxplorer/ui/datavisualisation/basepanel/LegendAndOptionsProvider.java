@@ -38,10 +38,10 @@ import org.openide.util.NbBundle;
 
 /**
  * A provider for panels containing generally available options.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class LegendAndOptionsProvider {
+public final class LegendAndOptionsProvider {
 
     /**
      * A provider for panels containing generally available options.
@@ -97,8 +97,7 @@ public class LegendAndOptionsProvider {
             viewer.setMinMappingQuality( minMappingQual );
             viewer.setNewDataRequestNeeded( true );
             viewer.boundsChangedHook();
-        }
-        else if( !minMappingQualityField.getText().isEmpty() ) {
+        } else if( !minMappingQualityField.getText().isEmpty() ) {
             JOptionPane.showMessageDialog( minMappingQualityField, "Please enter a valid mapping quality value! (1-127)", "Invalid Position", JOptionPane.ERROR_MESSAGE );
         }
     }

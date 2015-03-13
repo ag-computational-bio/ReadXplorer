@@ -146,8 +146,7 @@ public class CoverageManager implements Serializable {
     public boolean coversBounds( int left, int right ) {
         if( leftBound == 0 && rightBound == 0 ) {
             return false;
-        }
-        else {
+        } else {
             return leftBound <= left && right <= rightBound;
         }
     }

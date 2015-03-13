@@ -25,7 +25,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * Class for filtering integer or double value entries from a table.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class FilterDoubleValues<T extends DefaultTableModel> implements

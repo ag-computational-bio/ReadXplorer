@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.utils;
 
 
 /**
- * Subject in the Observer pattern.
- * Observer can be registered, removed and notified.
+ * Subject in the Observer pattern. Observer can be registered, removed and
+ * notified.
  *
  * @author rhilker
  */
@@ -31,7 +31,7 @@ public interface Observable {
      * <p>
      * @param observer the observer to register
      */
-    public void registerObserver( Observer observer );
+    void registerObserver( Observer observer );
 
 
     /**
@@ -39,16 +39,16 @@ public interface Observable {
      * <p>
      * @param observer the observer to remove
      */
-    public void removeObserver( Observer observer );
+    void removeObserver( Observer observer );
 
 
     /**
      * Notifies all observers currently observing the observable.
      * <p>
      * @param data object for which the notification is created. It is often
-     *             passed on to the observers.
+     * passed on to the observers.
      */
-    public void notifyObservers( Object data );
+    void notifyObservers( Object data );
 
 
 }

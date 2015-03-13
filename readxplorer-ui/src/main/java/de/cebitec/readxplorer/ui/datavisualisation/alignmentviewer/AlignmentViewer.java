@@ -63,7 +63,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private int oldLogLeft;
     private int oldLogRight;
     private boolean showBaseQualities;
-    MappingResult mappingResult;
+    private MappingResult mappingResult;
 
 
     /**
@@ -137,8 +137,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         if( this.isInMaxZoomLevel() && isActive() ) {
             //  updatePhysicalBounds();
             setInDrawingMode( true );
-        }
-        else {
+        } else {
             setInDrawingMode( false );
         }
         this.setupComponents();
@@ -176,8 +175,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             this.trackConnector.addMappingRequest( new IntervalRequest( from, to, this.getReference().getActiveChromId(), this, true, this.getReadClassParams() ) );
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
-        }
-        else { //needed when e.g. mapping classes are deselected
+        } else { //needed when e.g. mapping classes are deselected
             showData();
         }
     }
@@ -185,8 +183,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Method called, when data is available. If the avialable data is a
-     * MappingResult, then the viewer is updated with the new mapping
-     * data.
+     * MappingResult, then the viewer is updated with the new mapping data.
      * <p>
      * @param data the new mapping data to show
      */
@@ -235,8 +232,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Determines the (min and) max count of mappingResult on a given set of
-     * mappingResult.
-     * Minimum count is currently disabled as it was not needed.
+     * mappingResult. Minimum count is currently disabled as it was not needed.
      * <p>
      * @param mappingResult
      */
@@ -277,8 +273,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * After creating a layout this method creates all visual components which
-     * represent the layout. Thus, it creates all block components.
-     * Each block component depicts one mapping.
+     * represent the layout. Thus, it creates all block components. Each block
+     * component depicts one mapping.
      * <p>
      * @param layout the layout containing all information about the
      *               mappingResult to paint
@@ -304,8 +300,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * component depicts one mapping.
      * <p>
      * @param layerIt      the layer iterator containing all information about
-     *                     the
-     *                     mappings to paint on the current layer
+     *                     the mappings to paint on the current layer
      * @param countingStep define how to count each step (e.g. +1 or -1)
      */
     private void addBlocks( Iterator<LayerI> layerIt, final int countingStep ) {
@@ -314,7 +309,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             LayerI b = layerIt.next();
             for( Iterator<BlockI> blockIt = b.getBlockIterator(); blockIt.hasNext(); ) {
                 BlockI block = blockIt.next();
-                this.createJBlock( block, layerCounter );
+                createJBlock( block, layerCounter );
             }
 
             layerCounter += countingStep;
@@ -339,8 +334,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Creates a new block component vertically in the current layer and
-     * horizontally
-     * covering it's aligned genome positions.
+     * horizontally covering it's aligned genome positions.
      * <p>
      * @param block        the block to create a jblock (block component) for
      * @param layerCounter determines in which layer the block should be painted

@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class NormalizationFormulas {
+public final class NormalizationFormulas {
 
     /**
      * Instantiation not allowed!

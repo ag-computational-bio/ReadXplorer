@@ -25,7 +25,6 @@ import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
-import org.rosuda.REngine.RFactor;
 
 
 /**
@@ -50,7 +49,8 @@ public class ResultDeAnalysis {
         this.rowNames = rowNames;
         this.description = description;
     }
-    
+
+
     public ResultDeAnalysis( List<REXPVector> rawTableContents, REXP rawColNames, REXP rawRowNames, String description, DeAnalysisData dEAdata ) {
         this.rawTableContents = rawTableContents;
         this.rawColNames = rawColNames;
@@ -99,55 +99,56 @@ public class ResultDeAnalysis {
     }
 
     /*
-     * The manual array copy used in this method several times is intended!
-     * This way the primitive data types are automatically converted to their
+     * The manual array copy used in this method several times is intended! This
+     * way the primitive data types are automatically converted to their
      * corresponding Object presentation.
      */
-    private List<Object> convertNames(REXP currentValues) {
+
+    private List<Object> convertNames( REXP currentValues ) {
 
         List<Object> current = new ArrayList<>();
         try {
-            if (currentValues.isString()) {
+            if( currentValues.isString() ) {
                 String[] currentStringValues = currentValues.asStrings();
-                for (String name : currentStringValues) {
-                    if (dEAdata.existsPersistentFeatureForGNURName(name)) {
-                        current.add(dEAdata.getPersistentFeatureByGNURName(name));
+                for( String name : currentStringValues ) {
+                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
+                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
                     } else {
-                        current.add(name);
+                        current.add( name );
                     }
                 }
-            } else if (currentValues.isNumeric()) {
+            } else if( currentValues.isNumeric() ) {
                 Object currentValuesAsObject = currentValues.asNativeJavaObject();
-                if (currentValuesAsObject instanceof double[]) {
+                if( currentValuesAsObject instanceof double[] ) {
                     double[] tmp = (double[]) currentValuesAsObject;
-                    for (int i = 0; i < tmp.length; i++) {
-                        current.add(tmp[i]);
+                    for( int i = 0; i < tmp.length; i++ ) {
+                        current.add( tmp[i] );
                     }
                 }
-                if (currentValuesAsObject instanceof int[]) {
+                if( currentValuesAsObject instanceof int[] ) {
                     int[] tmp = (int[]) currentValuesAsObject;
-                    for (int i = 0; i < tmp.length; i++) {
-                        current.add(tmp[i]);
+                    for( int i = 0; i < tmp.length; i++ ) {
+                        current.add( tmp[i] );
                     }
                 }
-                if (currentValuesAsObject instanceof float[]) {
+                if( currentValuesAsObject instanceof float[] ) {
                     float[] tmp = (float[]) currentValuesAsObject;
-                    for (int i = 0; i < tmp.length; i++) {
-                        current.add(tmp[i]);
+                    for( int i = 0; i < tmp.length; i++ ) {
+                        current.add( tmp[i] );
                     }
-                } else if (currentValuesAsObject instanceof String[]) {
+                } else if( currentValuesAsObject instanceof String[] ) {
                     String[] currentStringValues = (String[]) currentValuesAsObject;
-                    for (String name : currentStringValues) {
-                        if (dEAdata.existsPersistentFeatureForGNURName(name)) {
-                            current.add(dEAdata.getPersistentFeatureByGNURName(name));
+                    for( String name : currentStringValues ) {
+                        if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
+                            current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
                         } else {
-                            current.add(name);
+                            current.add( name );
                         }
                     }
                 }
             }
-        } catch (REXPMismatchException ex) {
-            Exceptions.printStackTrace(ex);
+        } catch( REXPMismatchException ex ) {
+            Exceptions.printStackTrace( ex );
         }
         return current;
     }
@@ -155,7 +156,7 @@ public class ResultDeAnalysis {
 
     /**
      * Converts and RVector of data into a Vector of Vectors = table content.
-     *
+     * <p>
      * @param currentRVector The RVector to convert
      * <p>
      * @return A Vector of Vectors = table content, generated from the given
@@ -164,16 +165,15 @@ public class ResultDeAnalysis {
     private List<List<Object>> convertRresults( final List<REXPVector> currentRVector ) {
 
         List<List<Object>> current = new ArrayList<>();
-        for (REXPVector currentRVector1 : currentRVector) {
-            List<Object> converted = convertNames(currentRVector1);
+        for( REXPVector currentRVector1 : currentRVector ) {
+            List<Object> converted = convertNames( currentRVector1 );
             for( int j = 0; j < converted.size(); j++ ) {
 
 //                if( j>=current.size() )
 //                    current.add( new ArrayList<>() );
                 try {
                     current.get( j );
-                }
-                catch( IndexOutOfBoundsException e ) {
+                } catch( IndexOutOfBoundsException e ) {
                     current.add( new ArrayList<>() );
                 }
                 current.get( j ).add( converted.get( j ) );

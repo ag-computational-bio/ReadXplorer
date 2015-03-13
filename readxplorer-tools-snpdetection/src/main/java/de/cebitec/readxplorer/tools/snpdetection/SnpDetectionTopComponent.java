@@ -35,15 +35,15 @@ import org.openide.windows.TopComponent;
  */
 @ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.tools.snpdetection//SNP_Detection//EN",
     autostore = false )
-@TopComponent.Description( preferredID = "SNP_DetectionTopComponent",
+@TopComponent.Description( preferredID = "SnpDetectionTopComponent",
     iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
     persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.snpdetection.SNP_DetectionTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.snpdetection.SnpDetectionTopComponent" )
 @ActionReference( path = "Menu/Window", position = 950 )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_SNP_DetectionAction",
-                                      preferredID = "SNP_DetectionTopComponent" )
-public final class SNP_DetectionTopComponent extends TopComponentExtended {
+                                      preferredID = "SnpDetectionTopComponent" )
+public final class SnpDetectionTopComponent extends TopComponentExtended {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,7 +51,7 @@ public final class SNP_DetectionTopComponent extends TopComponentExtended {
     @NbBundle.Messages( {
         "CTL_SNP_DetectionTopComp=SNP Detection Window",
         "HINT_SNP_DetectionTopComp=This is a SNP Detection window" } )
-    public SNP_DetectionTopComponent() {
+    public SnpDetectionTopComponent() {
         initComponents();
         setName( Bundle.CTL_SNP_DetectionTopComp() );
         setToolTipText( Bundle.HINT_SNPDetectionTopComp() );

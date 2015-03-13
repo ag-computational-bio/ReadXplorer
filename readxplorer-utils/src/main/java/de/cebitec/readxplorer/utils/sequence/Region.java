@@ -18,11 +18,9 @@
 package de.cebitec.readxplorer.utils.sequence;
 
 
-
 /**
- * A region marked by a start and stop position and if it should
- * be read in fwd or reverse direction. Furthermore, it holds the type of the
- * region.
+ * A region marked by a start and stop position and if it should be read in fwd
+ * or reverse direction. Furthermore, it holds the type of the region.
  * <p>
  * @author ddoppmeier, rhilker
  */
@@ -38,14 +36,13 @@ public class Region implements GenomicRange {
      * A region marked by a start and stop position and if it should be read in
      * fwd or reverse direction. Furthermore, it holds the type of the region.
      * <p>
-     * @param start           the start of the region as base position, always
-     *                        smaller than stop
-     * @param stop            the stop of the region as base position, always
-     *                        larger than start
+     * @param start the start of the region as base position, always smaller
+     * than stop
+     * @param stop the stop of the region as base position, always larger than
+     * start
      * @param isForwardStrand true, if it is on the fwd strand, false otherwise
-     * @param type            type of the region. Use Properties.CDS,
-     *                        Properties.START, Properties.STOP,
-     *                        Properties.PATTERN or Properties.ALL
+     * @param type type of the region. Use Properties.CDS, Properties.START,
+     * Properties.STOP, Properties.PATTERN or Properties.ALL
      */
     public Region( int start, int stop, boolean isForwardStrand, int type ) {
         this.start = start;
@@ -57,7 +54,7 @@ public class Region implements GenomicRange {
 
     /**
      * @return the start of this region = the starting position in the genome.
-     *         Always smaller than stop.
+     * Always smaller than stop.
      */
     @Override
     public int getStart() {
@@ -67,7 +64,7 @@ public class Region implements GenomicRange {
 
     /**
      * @return The stop of this region. = the ending position in the genome.
-     *         Always larger than start.
+     * Always larger than start.
      */
     @Override
     public int getStop() {
@@ -85,8 +82,7 @@ public class Region implements GenomicRange {
 
     /**
      * @return The start position on the feature strand = smaller position for
-     *         features on the fwd and larger position for features on the rev
-     *         strand.
+     * features on the fwd and larger position for features on the rev strand.
      */
     public int getStartOnStrand() {
         return GenomicRange.Utils.getStartOnStrand( this );
@@ -95,8 +91,7 @@ public class Region implements GenomicRange {
 
     /**
      * @return The stop position on the feature strand = smaller position for
-     *         features on the rev and larger position for features on the fwd
-     *         strand.
+     * features on the rev and larger position for features on the fwd strand.
      */
     public int getStopOnStrand() {
         return GenomicRange.Utils.getStopOnStrand( this );
@@ -114,8 +109,7 @@ public class Region implements GenomicRange {
 
     /**
      * @return The type of the region. Either Properties.CDS, Properties.START,
-     *         Properties.STOP,
-     *         Properties.PATTERN or Properties.ALL
+     * Properties.STOP, Properties.PATTERN or Properties.ALL
      */
     public int getType() {
         return this.type;
@@ -124,12 +118,12 @@ public class Region implements GenomicRange {
 
     /**
      * Compares the start positions of both Regions.
+     *
      * @param other Region to compare to this one
-     * @return The value 0 if this position is equal to the argument position;
-     *         a value less than 0 if this position is numerically less than the
-     *         argument position; and a value greater than 0 if this position is
-     *         numerically greater than the argument position (signed
-     *         comparison).
+     * @return The value 0 if this position is equal to the argument position; a
+     * value less than 0 if this position is numerically less than the argument
+     * position; and a value greater than 0 if this position is numerically
+     * greater than the argument position (signed comparison).
      */
     @Override
     public int compareTo( GenomicRange other ) {
@@ -142,9 +136,9 @@ public class Region implements GenomicRange {
         if( other instanceof Region ) {
             Region otherRegion = (Region) other;
             if( otherRegion.isFwdStrand() == this.isFwdStrand()
-                && otherRegion.getType() == this.getType()
-                && otherRegion.getStart() == this.getStart()
-                && otherRegion.getStop() == this.getStop() ) {
+                    && otherRegion.getType() == this.getType()
+                    && otherRegion.getStart() == this.getStart()
+                    && otherRegion.getStop() == this.getStop() ) {
                 return true;
             }
         }

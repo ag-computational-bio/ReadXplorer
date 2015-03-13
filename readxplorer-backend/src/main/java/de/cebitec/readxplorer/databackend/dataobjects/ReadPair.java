@@ -26,7 +26,7 @@ import java.awt.Color;
 /**
  * Creates a new persistent read pair. If both mappings of the pair are
  * visible the second mapping has to be added separately.
- * TODO: persistent objects vereinheitlichen, wo möglich
+ * TODO persistent objects vereinheitlichen, wo möglich
  * <p>
  * @author Rolf Hilker
  */
@@ -170,8 +170,7 @@ public class ReadPair implements ObjectWithId {
     public long getStart() {
         if( this.visiblemapping2 == null ) {
             return this.visibleMapping.getStart();
-        }
-        else {
+        } else {
             long start1 = this.visibleMapping.getStart();
             long start2 = this.visiblemapping2.getStart();
             return start1 < start2 ? start1 : start2;
@@ -186,8 +185,7 @@ public class ReadPair implements ObjectWithId {
     public long getStop() {
         if( this.visiblemapping2 == null ) {
             return this.visibleMapping.getStop();
-        }
-        else {
+        } else {
             long stop1 = this.visibleMapping.getStop();
             long stop2 = this.visiblemapping2.getStop();
             return stop1 > stop2 ? stop1 : stop2;
@@ -215,11 +213,9 @@ public class ReadPair implements ObjectWithId {
         Color blockColor;
         if( type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR ) {
             blockColor = ColorProperties.BLOCK_PERFECT;
-        }
-        else if( type == ReadPairType.UNPAIRED_PAIR ) {
+        } else if( type == ReadPairType.UNPAIRED_PAIR ) {
             blockColor = ColorProperties.BLOCK_UNPAIRED;
-        }
-        else {
+        } else {
             blockColor = ColorProperties.BLOCK_DIST_SMALL;
         }
         return blockColor;

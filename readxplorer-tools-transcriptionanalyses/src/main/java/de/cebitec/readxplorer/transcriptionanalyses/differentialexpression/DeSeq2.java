@@ -46,12 +46,13 @@ public class DeSeq2 {
 
     private static final Logger LOG = Logger.getLogger( DeSeq2.class.getName() );
 
+
     public DeSeq2( int referenceId ) {
     }
 
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile)
+                                           int numberOfFeatures, int numberOfTracks, File saveFile )
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
@@ -103,9 +104,9 @@ public class DeSeq2 {
             }
 
             if( analysisData.moreThanTwoConditions() ) {
+                LOG.info( "moreThanTwoConditions is still a TODO" );
                 //TODO
-            }
-            else {
+            } else {
                 //If this is just a two conditons experiment we only create the conds array
                 gnuR.eval( "conds <- factor(" + concatenate.toString() + ')' );
                 gnuR.eval( "design <- data.frame(row.names = colnames(inputData),conds)" );
@@ -129,9 +130,8 @@ public class DeSeq2 {
                 path = path.replace( "\\", "\\\\" );
                 gnuR.eval( "save.image(\"" + path + "\")" );
             }
-        } //We don't know what errors Gnu R might cause, so we have to catch all.
-        //The new generated exception can than be caught an handelt by the DeAnalysisHandler
-        catch( Exception e ) {
+        } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
+            //The new generated exception can than be caught an handelt by the DeAnalysisHandler
             //If something goes wrong try to shutdown Rserve so that no instance keeps running
             this.shutdown();
             throw new UnknownGnuRException( e );
@@ -148,7 +148,7 @@ public class DeSeq2 {
     public void shutdown() throws RserveException {
         //Might happen that gnuR is null if something went wrong during Rserve
         //startup or connection process.
-        if (gnuR != null) {
+        if( gnuR != null ) {
             gnuR.shutdown();
         }
     }
@@ -161,14 +161,14 @@ public class DeSeq2 {
     }
 
 
-    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException, 
-                                            RserveException, REngineException, REXPMismatchException, IOException {
+    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException,
+                                                 RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "plotDispEsts(dds)" );
     }
 
 
-    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException, 
-                                            RserveException, REngineException, REXPMismatchException, IOException {
+    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException,
+                                             RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
 

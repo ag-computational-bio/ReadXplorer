@@ -114,9 +114,6 @@ public final class CorrelationAnalysisAction implements ActionListener {
 
             new CorrelationAnalysisProcessor( context, parametersCorrelationAnalysis );
         }
-        else {
-            //do nothing
-        }
     }
 
 

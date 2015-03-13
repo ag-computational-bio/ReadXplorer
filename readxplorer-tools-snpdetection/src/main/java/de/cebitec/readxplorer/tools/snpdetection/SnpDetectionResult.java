@@ -228,21 +228,21 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "SNP effect statistics:" ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_TOTAL ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_INTERGENEIC ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_SYNONYMOUS ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_STOPS ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_AA_INSERTIONS ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_AA_DELETIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_TOTAL ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_INTERGENEIC ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_SYNONYMOUS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_CHEMIC_NEUTRAL ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_CHEMIC_DIFF ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_STOPS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_AA_INSERTIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_AA_DELETIONS ) );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "SNP type statistics:" ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_INSERTIONS ) );
-        statisticsExportData.add( createStatisticTableRow( SNP_DetectionResultPanel.SNPS_DELETIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_SUBSTITUTIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_INSERTIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_DELETIONS ) );
 
         allData.add( statisticsExportData );
 

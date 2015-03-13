@@ -32,7 +32,7 @@ import static java.util.logging.Level.SEVERE;
  * After setting the coverage for each position and adding all diffs and gaps,
  * it can return the count of each DNA base or gap for each position in the
  * interval.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class LogoDataManager {
@@ -277,8 +277,7 @@ public class LogoDataManager {
 
                 counts[shiftedPos][row] += count;
 
-            }
-            else if( origPos > this.stop ) {
+            } else if( origPos > this.stop ) {
                 break;
             }
         }
@@ -286,8 +285,8 @@ public class LogoDataManager {
 
 
     /**
-     * @return The highest coverage observed in the interval stored in this
-     *         logo data manager.
+     * @return The highest coverage observed in the interval stored in this logo
+     *         data manager.
      */
     public int getMaxFoundCoverage() {
         return maxFoundCoverage;

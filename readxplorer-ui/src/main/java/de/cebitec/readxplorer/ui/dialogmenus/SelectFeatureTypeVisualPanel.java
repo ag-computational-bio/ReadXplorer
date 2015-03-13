@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 /**
  * A visual wizard job panel. It offers to select feature types of annotations
  * for any further processing.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectFeatureTypeVisualPanel extends JobPanel {
@@ -44,13 +44,9 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
      * A visual wizard job panel. It offers to select feature types of
      * annotations for any further processing.
      * <p>
-     * @param analysisName    The name of the analysis using this panel panel.
-     *                        It will be used to store the selected settings for
-     *                        this pane under a unique identifier.
-     * @param hasOffsetOption <code>true</code> means the analysis should offer
-     *                        the option to set an offset for genomic features.
-     *                        <code>false</code> means that the offset options
-     *                        shall be hidden.
+     * @param analysisName The name of the analysis using this panel panel. It
+     *                     will be used to store the selected settings for this
+     *                     pane under a unique identifier.
      */
     public SelectFeatureTypeVisualPanel( String analysisName, boolean hasOffsetOption ) {
         this.analysisName = analysisName;
@@ -202,9 +198,9 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
     /**
      * Sets the display name of this panel.
      * <p>
-     * @param showDisplayName <code>true</code>, if the display name shall be
-     *                        included in the title, <code>false</code> if only
-     *                        the plain panel name shall be shown
+     * @param showDisplayName True, if the display name shall be included in the
+     *                        title, false if only the plain panel name shall be
+     *                        shown
      */
     public void showDisplayName( boolean showDisplayName ) {
         if( showDisplayName ) {

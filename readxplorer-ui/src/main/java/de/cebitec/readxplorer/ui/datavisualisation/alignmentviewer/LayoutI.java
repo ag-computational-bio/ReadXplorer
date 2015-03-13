@@ -31,19 +31,19 @@ public interface LayoutI {
     /**
      * @return An iterator for the forward layer.
      */
-    public Iterator<LayerI> getForwardIterator();
+    Iterator<LayerI> getForwardIterator();
 
 
     /**
      * @return An iterator for the reverse layer.
      */
-    public Iterator<LayerI> getReverseIterator();
+    Iterator<LayerI> getReverseIterator();
 
 
     /**
      * @return The genome gap manager for this layout.
      */
-    public GenomeGapManager getGenomeGapManager();
+    GenomeGapManager getGenomeGapManager();
 
 
 }

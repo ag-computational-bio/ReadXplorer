@@ -131,11 +131,11 @@ public final class ViewerPanel extends OptionsPanel {
         return new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate( HyperlinkEvent e ) {
-                if( HyperlinkEvent.EventType.ACTIVATED.equals( e.getEventType() ) ) {
+//                if( HyperlinkEvent.EventType.ACTIVATED.equals( e.getEventType() ) ) {
 //                    HelpCtx.setHelpIDString(jEditorPane1, e.getURL().toString());
 //                    HelpCtx help = new HelpCtx(e.getURL().toString());
 //                    help.display();
-                }
+//                }
             }
 
 

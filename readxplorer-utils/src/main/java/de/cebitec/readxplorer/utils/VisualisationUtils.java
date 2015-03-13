@@ -32,7 +32,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class VisualisationUtils {
+public final class VisualisationUtils {
 
     private VisualisationUtils() {
     }
@@ -41,7 +41,7 @@ public class VisualisationUtils {
     /**
      * Recursive method to get all buttons belonging to a parent component.
      * <p>
-     * @param comp    the component whose buttons are needed
+     * @param comp the component whose buttons are needed
      * @param buttons the list to be filled with the identified buttons
      */
     public static void getButtons( JComponent comp, List<JButton> buttons ) {
@@ -53,8 +53,7 @@ public class VisualisationUtils {
             if( c instanceof JButton ) {
                 buttons.add( (JButton) c );
 
-            }
-            else if( c instanceof JComponent ) {
+            } else if( c instanceof JComponent ) {
                 VisualisationUtils.getButtons( (JComponent) c, buttons );
             }
         }
@@ -62,15 +61,14 @@ public class VisualisationUtils {
 
 
     /**
-     * Initialize panels representing individual wizard's steps and sets
-     * various properties for them influencing wizard appearance for static
-     * wizards.
+     * Initialize panels representing individual wizard's steps and sets various
+     * properties for them influencing wizard appearance for static wizards.
      * <p>
      * @param wizardPanels the panels belonging to the wizard
      * <p>
      * @return the configured wizard panel array
      */
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public static List<WizardDescriptor.Panel<WizardDescriptor>> getWizardPanels( List<WizardDescriptor.Panel<WizardDescriptor>> wizardPanels ) {
 
         String[] steps = new String[wizardPanels.size() + 1];
@@ -94,7 +92,7 @@ public class VisualisationUtils {
 
     public static void displayOutOfMemoryError( Component parentPanel ) {
         String msg = NbBundle.getMessage( VisualisationUtils.class, "OOM_Message",
-                                          "An out of memory error occured during fetching the references. Please restart the software with more memory." );
+                "An out of memory error occured during fetching the references. Please restart the software with more memory." );
         String title = NbBundle.getMessage( VisualisationUtils.class, "OOM_Header", "Restart Software" );
         JOptionPane.showMessageDialog( parentPanel, msg, title, JOptionPane.INFORMATION_MESSAGE );
     }

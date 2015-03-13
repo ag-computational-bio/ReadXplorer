@@ -35,7 +35,7 @@ import org.openide.windows.WindowManager;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TopComponentHelper {
+public final class TopComponentHelper {
 
 
     /**

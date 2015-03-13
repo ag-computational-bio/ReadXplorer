@@ -34,29 +34,28 @@ import javax.swing.UIManager;
 
 
 /**
- * A class to monitor the progress of some operation. If it looks
- * like the operation will take a while, a progress dialog will be popped up.
- * When the ProgressMonitor is created it is given a numeric range and a
- * descriptive string. As the operation progresses, call the setProgress method
- * to indicate how far along the [min,max] range the operation is.
- * Initially, there is no ProgressDialog. After the first millisToDecideToPopup
- * milliseconds (default 500) the progress monitor will predict how long
- * the operation will take. If it is longer than millisToPopup (default 2000,
- * 2 seconds) a ProgressDialog will be popped up.
+ * A class to monitor the progress of some operation. If it looks like the
+ * operation will take a while, a progress dialog will be popped up. When the
+ * ProgressMonitor is created it is given a numeric range and a descriptive
+ * string. As the operation progresses, call the setProgress method to indicate
+ * how far along the [min,max] range the operation is. Initially, there is no
+ * ProgressDialog. After the first millisToDecideToPopup milliseconds (default
+ * 500) the progress monitor will predict how long the operation will take. If
+ * it is longer than millisToPopup (default 2000, 2 seconds) a ProgressDialog
+ * will be popped up.
  * <p>
- * From time to time, when the Dialog box is visible, the progress bar will
- * be updated when setProgress is called. setProgress won't always update
- * the progress bar, it will only be done if the amount of progress is
- * visibly significant.
- *
+ * From time to time, when the Dialog box is visible, the progress bar will be
+ * updated when setProgress is called. setProgress won't always update the
+ * progress bar, it will only be done if the amount of progress is visibly
+ * significant.
+ * <p>
  * <p>
  * <p>
  * For further documentation and examples see
  * <a
  * href="http://java.sun.com/docs/books/tutorial/uiswing/components/progress.html">How
- * to Monitor Progress</a>,
- * a section in <em>The Java Tutorial.</em>
- *
+ * to Monitor Progress</a>, a section in <em>The Java Tutorial.</em>
+ * <p>
  * @see ProgressMonitorInputStream
  * @author James Gosling
  * @author Lynn Monsanto (accessibility)
@@ -79,22 +78,21 @@ public class ModalProgressMonitor extends Object {
 
 
     /**
-     * Constructs a graphic object that shows progress, typically by filling
-     * in a rectangular bar as the process nears completion.
-     *
-     * @param message a descriptive message that will be shown
-     *                to the user to indicate what operation is being monitored.
-     *                This does not change as the operation progresses.
-     *                See the message parameters to methods in
-     *                {@link JOptionPane#message}
-     *                for the range of values.
-     * @param note    a short note describing the state of the
-     *                operation. As the operation progresses, you can call
-     *                setNote to change the note displayed. This is used,
-     *                for example, in operations that iterate through a
-     *                list of files to show the name of the file being processes.
-     *                If note is initially null, there will be no note line
-     *                in the dialog box and setNote will be ineffective
+     * Constructs a graphic object that shows progress, typically by filling in
+     * a rectangular bar as the process nears completion.
+     * <p>
+     * @param message a descriptive message that will be shown to the user to
+     *                indicate what operation is being monitored. This does not
+     *                change as the operation progresses. See the message
+     *                parameters to methods in {@link JOptionPane#message} for
+     *                the range of values.
+     * @param note    a short note describing the state of the operation. As the
+     *                operation progresses, you can call setNote to change the
+     *                note displayed. This is used, for example, in operations
+     *                that iterate through a list of files to show the name of
+     *                the file being processes. If note is initially null, there
+     *                will be no note line in the dialog box and setNote will be
+     *                ineffective
      * @param min     the lower bound of the range
      * @param max     the upper bound of the range
      * <p>
@@ -150,9 +148,9 @@ public class ModalProgressMonitor extends Object {
         pane.addPropertyChangeListener( new PropertyChangeListener() {
             @Override
             public void propertyChange( PropertyChangeEvent event ) {
-                if( dialog.isVisible() && event.getSource() == pane
-                    && (event.getPropertyName().equals( JOptionPane.VALUE_PROPERTY )
-                        || event.getPropertyName().equals( JOptionPane.INPUT_VALUE_PROPERTY )) ) {
+                if( dialog.isVisible() && event.getSource() == pane &&
+                         (event.getPropertyName().equals( JOptionPane.VALUE_PROPERTY ) ||
+                     event.getPropertyName().equals( JOptionPane.INPUT_VALUE_PROPERTY )) ) {
                     dialog.setVisible( false );
                     dialog.dispose();
                 }
@@ -170,9 +168,9 @@ public class ModalProgressMonitor extends Object {
 
     /**
      * Show this ModalProgressMonitor.
-     *
+     * <p>
      * @param parent The parent Component of this Dialog.
-     *
+     * <p>
      * @see #close
      */
     public void show( Component parent ) {
@@ -183,9 +181,9 @@ public class ModalProgressMonitor extends Object {
 
 
     /**
-     * Indicate that the operation is complete. This happens automatically
-     * when the value set by setProgress is >= max, but it may be called
-     * earlier if the operation ends early.
+     * Indicate that the operation is complete. This happens automatically when
+     * the value set by setProgress is >= max, but it may be called earlier if
+     * the operation ends early.
      */
     public void close() {
         if( dialog != null ) {
@@ -199,12 +197,11 @@ public class ModalProgressMonitor extends Object {
 
 
     /**
-     * Indicate the progress of the operation being monitored.
-     * If the specified value is >= the maximum, the progress
-     * monitor is closed.
+     * Indicate the progress of the operation being monitored. If the specified
+     * value is >= the maximum, the progress monitor is closed.
      * <p>
-     * @param nv an int specifying the current value, between the
-     *           maximum and minimum specified for this component
+     * @param nv an int specifying the current value, between the maximum and
+     *           minimum specified for this component
      * <p>
      * @see #setMinimum
      * @see #setMaximum
@@ -213,8 +210,7 @@ public class ModalProgressMonitor extends Object {
         v = nv;
         if( nv >= max ) {
             close();
-        }
-        else if( nv >= lastDisp + reportDelta ) {
+        } else if( nv >= lastDisp + reportDelta ) {
             lastDisp = nv;
             myBar.setValue( nv );
         }
@@ -223,7 +219,7 @@ public class ModalProgressMonitor extends Object {
 
     /**
      * Returns the minimum value -- the lower end of the progress value.
-     *
+     * <p>
      * @return an int representing the minimum value
      * <p>
      * @see #setMinimum
@@ -235,7 +231,7 @@ public class ModalProgressMonitor extends Object {
 
     /**
      * Specifies the minimum value.
-     *
+     * <p>
      * @param m an int specifying the minimum value
      * <p>
      * @see #getMinimum
@@ -247,7 +243,7 @@ public class ModalProgressMonitor extends Object {
 
     /**
      * Returns the maximum value -- the higher end of the progress value.
-     *
+     * <p>
      * @return an int representing the maximum value
      * <p>
      * @see #setMaximum
@@ -259,7 +255,7 @@ public class ModalProgressMonitor extends Object {
 
     /**
      * Specifies the maximum value.
-     *
+     * <p>
      * @param m an int specifying the maximum value
      * <p>
      * @see #getMaximum
@@ -280,16 +276,16 @@ public class ModalProgressMonitor extends Object {
         }
 
         obj = pane.getValue();
-        return ((obj != null) && (cancelOption.length == 1)
-                && (obj.equals( cancelOption[0] )));
+        return ((obj != null) && (cancelOption.length == 1) &&
+                 (obj.equals( cancelOption[0] )));
     }
 
 
     /**
-     * Specifies the additional note that is displayed along with the
-     * progress message. Used, for example, to show which file the
-     * is currently being copied during a multiple-file copy.
-     *
+     * Specifies the additional note that is displayed along with the progress
+     * message. Used, for example, to show which file the is currently being
+     * copied during a multiple-file copy.
+     * <p>
      * @param note a String specifying the note to display
      * <p>
      * @see #getNote
@@ -301,9 +297,9 @@ public class ModalProgressMonitor extends Object {
 
 
     /**
-     * Specifies the additional note that is displayed along with the
-     * progress message.
-     *
+     * Specifies the additional note that is displayed along with the progress
+     * message.
+     * <p>
      * @return a String specifying the note to display
      * <p>
      * @see #setNote

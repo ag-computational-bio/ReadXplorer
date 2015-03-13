@@ -171,7 +171,7 @@ public final class SequenceUtils {
      * @param sequence input sequence to check
      * <p>
      * @return <code>true</code> if it is a valid DNA string, <code>false</code>
-     *         otherwise
+     * otherwise
      */
     public static boolean isValidDnaString( String sequence ) {
         return sequence.matches( "[acgtnACGTN]+" );

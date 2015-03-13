@@ -44,22 +44,21 @@ import org.openide.util.NbBundle;
 
 /**
  * Converts a jok file from Saruman into a bam file sorted by read start
- * positions
- * for a single reference chromosome.
+ * positions for a single reference chromosome.
  * <p>
  * @author -Rolf Hilker-
  */
 public class JokToBamConverter implements ConverterI, Observable, Observer,
-                                          MessageSenderI {
+        MessageSenderI {
 
     private List<File> jokFiles;
     private String refSeqName;
     private Integer refSeqLength;
     private File outputFile;
 
-    private static final String name = "Jok to BAM";
-    private static final String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
-    private static final String fileDescription = "Saruman Output (jok)";
+    private static final String NAME = "Jok to BAM";
+    private static final String[] FILE_EXTENSIONS = new String[]{"out", "Jok", "jok", "JOK"};
+    private static final String FILE_DESCRIPTION = "Saruman Output (jok)";
     private final ArrayList<Observer> observers;
     private String msg;
     private final ErrorLimit errorLimit;
@@ -67,8 +66,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     /**
      * Converts a jok file from Saruman into a bam file sorted by read start
-     * positions
-     * for a single reference chromosome.
+     * positions for a single reference chromosome.
      */
     public JokToBamConverter() {
         this.observers = new ArrayList<>();
@@ -79,42 +77,38 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
     /**
      * A JokToBamConverter needs exactly the following three parameters:
      * <br>param1 jokFiles a list of jok files to convert into BAM format.
-     * <br>param2 refSeqName name of the single reference chromosome sequence
-     * <br>param3 refSeqLength length of the single reference chromosome
+     * <br>param2 refSeqName NAME of the single reference chromosome sequence
+ <br>param3 refSeqLength length of the single reference chromosome
      * sequence
      * <p>
      * @throws IllegalArgumentException
      */
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public void setDataToConvert( final Object... data ) throws IllegalArgumentException {
         boolean works = true;
         if( data.length >= 3 ) {
             if( data[0] instanceof List ) {
                 this.jokFiles = (List<File>) data[0];
-            }
-            else {
+            } else {
                 works = false;
             }
             if( data[1] instanceof String ) {
                 this.refSeqName = (String) data[1];
-            }
-            else {
+            } else {
                 works = false;
             }
             if( data[2] instanceof Integer ) {
                 this.refSeqLength = (Integer) data[2];
-            }
-            else {
+            } else {
                 works = false;
             }
-        }
-        else {
+        } else {
             works = false;
         }
         if( !works ) {
             throw new IllegalArgumentException( NbBundle.getMessage( JokToBamConverter.class,
-                                                                     "Converter.SetDataError", "Inappropriate arguments passed to the converter!" ) );
+                    "Converter.SetDataError", "Inappropriate arguments passed to the converter!" ) );
         }
     }
 
@@ -167,18 +161,17 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             final int stop;
                             try {
                                 start = Integer.parseInt( tokens[1] ) + 1;
-                                stop  = Integer.parseInt( tokens[2] ) + 1; // some people (no names here...) start counting at 0, I count genome position starting with 1
-                            }
-                            catch( NumberFormatException e ) { //
+                                stop = Integer.parseInt( tokens[2] ) + 1; // some people (no names here...) start counting at 0, I count genome position starting with 1
+                            } catch( NumberFormatException e ) { //
                                 if( !tokens[1].equals( "*" ) ) {
                                     this.sendMsgIfAllowed( "Value for current start position in "
-                                                           + outFileName + " line " + lineNo + " is not a number or *. "
-                                                           + "Found start: " + tokens[1] );
+                                            + outFileName + " line " + lineNo + " is not a number or *. "
+                                            + "Found start: " + tokens[1] );
                                 }
                                 if( !tokens[2].equals( "*" ) ) {
                                     this.sendMsgIfAllowed( "Value for current stop position in "
-                                                           + outFileName + " line " + lineNo + " is not a number or *. "
-                                                           + "Found stop: " + tokens[2] );
+                                            + outFileName + " line " + lineNo + " is not a number or *. "
+                                            + "Found stop: " + tokens[2] );
                                 }
                                 continue; //*'s are ignored = unmapped read
                             }
@@ -230,13 +223,12 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             //                    samRecord.setFlags(stop); //other fields which could be set
                             //                    samRecord.setAttribute(tag, value);
                             //                    samRecord.setReferenceIndex(lineno);
-                            //                    samRecord.setBaseQualityString(name);
+                            //                    samRecord.setBaseQualityString(NAME);
 
                             bamFileWriter.addAlignment( samRecord );
                             //                    samFileWriter.addAlignment(samRecord);
 
-                        }
-                        else {
+                        } else {
                             this.sendMsgIfAllowed( NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.MissingData", lineNo, line ) );
                         }
 
@@ -261,8 +253,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                 msg = NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.Finished", outFileName );
                 this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 throw new ParsingException( ex );
             }
         }
@@ -273,11 +264,10 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     /**
      * Creates the cigar string (String of matches and mismatches: 8=2X3N ...)
-     * for
-     * a given read and reference sequence
+     * for a given read and reference sequence
      * <p>
      * @param readSeq read sequence
-     * @param refSeq  reference sequence to which the read was mapped
+     * @param refSeq reference sequence to which the read was mapped
      * <p>
      * @return
      */
@@ -295,18 +285,15 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
             byte currentBase;
             if( readSeq.charAt( i ) == refSeq.charAt( i ) ) { //match
                 currentBase = 7;
-            }
-            else {
+            } else {
                 if( refSeq.charAt( i ) != '_' ) { //a base in the genome, most frequent case
                     char base = readSeq.charAt( i );
                     if( base != '_' ) { //ACGT or N in the read as well
                         currentBase = 8;
-                    }
-                    else {//a gap in the read
+                    } else {//a gap in the read
                         currentBase = 2;
                     }
-                }
-                else {// a gap in genome
+                } else {// a gap in genome
                     currentBase = 1;
                 }
             }
@@ -327,15 +314,14 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     /**
      * Returns the sam format character representing the alignment value at the
-     * given base (cigar operation). The cigar values are as follows:
-     * 0 (M) = alignment match (both, match or mismatch), 1 (I) = insertion,
-     * 2 (D) = deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard
-     * clipped,
-     * 6 (P) = padding, 7 (=) = sequene match, 8 (X) = sequence mismatch.
-     * If the input value is not among 0-8 an 'N' (3) is returned.
+     * given base (cigar operation). The cigar values are as follows: 0 (M) =
+     * alignment match (both, match or mismatch), 1 (I) = insertion, 2 (D) =
+     * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard clipped, 6
+     * (P) = padding, 7 (=) = sequene match, 8 (X) = sequence mismatch. If the
+     * input value is not among 0-8 an 'N' (3) is returned.
      * <p>
      * @param cigarOp value of a cigar operation, whose char representation is
-     *                needed
+     * needed
      * <p>
      * @return the character representation of the cigar operation
      */
@@ -380,19 +366,19 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSIONS;
     }
 
 
@@ -438,7 +424,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     @Override
     public String toString() {
-        return name;
+        return NAME;
     }
 
 

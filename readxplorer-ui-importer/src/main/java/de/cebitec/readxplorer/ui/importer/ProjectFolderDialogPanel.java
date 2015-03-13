@@ -101,7 +101,7 @@ public class ProjectFolderDialogPanel extends javax.swing.JPanel implements
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
-        JFileChooser chooser = new JFileChooser( NbPreferences.forModule( Object.class ).get( Properties.ReadXplorer_DATABASE_DIRECTORY, null ) );
+        JFileChooser chooser = new JFileChooser( NbPreferences.forModule( Object.class ).get( Properties.READXPLORER_DATABASE_DIRECTORY, null ) );
         chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
 
         int result = chooser.showOpenDialog( this );

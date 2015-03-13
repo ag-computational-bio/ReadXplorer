@@ -31,18 +31,18 @@ import java.util.regex.Pattern;
 public class RegularExpressionTrimMethod extends TrimMethod {
 
     private Pattern regularexpression;
-    private final String regularexpression_template;
-    private final int groupnumber_main;
-    private final int groupnumber_trimLeft;
-    private final int groupnumber_trimRight;
+    private final String regularexpressionTemplate;
+    private final int groupnumberMain;
+    private final int groupnumberTrimLeft;
+    private final int groupnumberTrimRight;
     private final String name;
 
 
-    public RegularExpressionTrimMethod( String regularexpression, int groupnumber_main, int groupnumber_trimLeft, int groupnumber_trimRight, String name, String shortName ) {
-        this.regularexpression_template = regularexpression;
-        this.groupnumber_main = groupnumber_main;
-        this.groupnumber_trimLeft = groupnumber_trimLeft;
-        this.groupnumber_trimRight = groupnumber_trimRight;
+    public RegularExpressionTrimMethod( String regularexpression, int groupnumberMain, int groupnumberTrimLeft, int groupnumberTrimRight, String name, String shortName ) {
+        this.regularexpressionTemplate = regularexpression;
+        this.groupnumberMain = groupnumberMain;
+        this.groupnumberTrimLeft = groupnumberTrimLeft;
+        this.groupnumberTrimRight = groupnumberTrimRight;
         this.name = name;
         this.setMaximumTrimLength( 10 );
         this.setShortName( shortName );
@@ -50,7 +50,7 @@ public class RegularExpressionTrimMethod extends TrimMethod {
 
 
     public void replacePlaceholder( String placeholder, String value ) {
-        this.regularexpression = Pattern.compile( regularexpression_template.replace( placeholder, value ) );
+        this.regularexpression = Pattern.compile( regularexpressionTemplate.replace( placeholder, value ) );
     }
 
 
@@ -66,12 +66,12 @@ public class RegularExpressionTrimMethod extends TrimMethod {
         Matcher matcher = regularexpression.matcher( sequence );
         TrimMethodResult result = new TrimMethodResult( sequence, sequence, 0, 0 );
         if( matcher.find() ) {
-            result.setSequence( matcher.group( this.groupnumber_main ) );
-            if( this.groupnumber_trimLeft > 0 ) {
-                result.setTrimmedCharsFromLeft( matcher.group( this.groupnumber_trimLeft ).length() );
+            result.setSequence( matcher.group( this.groupnumberMain ) );
+            if( this.groupnumberTrimLeft > 0 ) {
+                result.setTrimmedCharsFromLeft( matcher.group( this.groupnumberTrimLeft ).length() );
             }
-            if( this.groupnumber_trimRight > 0 ) {
-                result.setTrimmedCharsFromRight( matcher.group( this.groupnumber_trimRight ).length() );
+            if( this.groupnumberTrimRight > 0 ) {
+                result.setTrimmedCharsFromRight( matcher.group( this.groupnumberTrimRight ).length() );
             }
         }
         //if the pattern does not match, just return the full string
@@ -92,28 +92,28 @@ public class RegularExpressionTrimMethod extends TrimMethod {
 
     };
 
-    public final static int GROUPNUMBER_UNUSED = -1;
+    public static final int GROUPNUMBER_UNUSED = -1;
 
     /*
      * a list of default instances is provided here
      */
 
     public static RegularExpressionTrimMethod createNewInstance( Type t ) {
-        if( t.equals( Type.VARIABLE_RIGHT ) )
+        if( t.equals( Type.VARIABLE_RIGHT ) ) {
             return new RegularExpressionTrimMethod( "^(.*?)(A{0,%X%})$", 1, GROUPNUMBER_UNUSED, 2, "trim poly-A from 3' end (right to left) by variable length", "v_r" );
-        else if( t.equals( Type.VARIABLE_LEFT ) )
+        } else if( t.equals( Type.VARIABLE_LEFT ) ) {
             return new RegularExpressionTrimMethod( "^(A{0,%X%})(.*?)$", 2, 1, GROUPNUMBER_UNUSED, "trim poly-A from 5' end (left to right) by variable length", "v_l" );
-        else if( t.equals( Type.VARIABLE_BOTH ) )
+        } else if( t.equals( Type.VARIABLE_BOTH ) ) {
             return new HalfedLengthTrimMethod( "^(A{0,%X%})(.*?)(A{0,%X%})$", 2, 1, 3, "trim poly-A from 3' and from 5' end by variable length", "v_lr" );
-        else if( t.equals( Type.FIXED_RIGHT ) )
+        } else if( t.equals( Type.FIXED_RIGHT ) ) {
             return new RegularExpressionTrimMethod( "^(.*?)(.{%X%})$", 1, GROUPNUMBER_UNUSED, 2, "trim all nucleotides from 3' end (right to left) by fixed length", "f_r" );
-        else if( t.equals( Type.FIXED_LEFT ) )
+        } else if( t.equals( Type.FIXED_LEFT ) ) {
             return new RegularExpressionTrimMethod( "^(.{%X%})(.*?)$", 2, 1, GROUPNUMBER_UNUSED, "trim all nucleotides from 5' end (left to right) by fixed length", "f_l" );
-        else if( t.equals( Type.FIXED_BOTH ) )
+        } else if( t.equals( Type.FIXED_BOTH ) ) {
             return new HalfedLengthTrimMethod( "^(.{%X%})(.*?)(.{%X%})$", 2, 1, 3, "trim all nucleotides from 3' and from 5' end by fixed length", "f_lr" );
-
-        else
+        } else {
             return new HalfedLengthTrimMethod( "^(.{%X%})(.*?)(.{%X%})$", 2, 1, 3, "UNKNOWN", "unkn" );
+        }
     }
 
 

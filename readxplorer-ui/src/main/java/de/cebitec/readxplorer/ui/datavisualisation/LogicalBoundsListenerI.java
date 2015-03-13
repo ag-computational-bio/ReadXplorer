@@ -35,7 +35,7 @@ public interface LogicalBoundsListenerI {
      * <p>
      * @param bounds
      */
-    public void updateLogicalBounds( BoundsInfo bounds );
+    void updateLogicalBounds( BoundsInfo bounds );
 
 
     /**
@@ -43,7 +43,7 @@ public interface LogicalBoundsListenerI {
      * @return the size of the area, that is used for drawing. Logical bounds
      *         depend on the available size of each listener.
      */
-    public Dimension getPaintingAreaDimension();
+    Dimension getPaintingAreaDimension();
 
 
 }

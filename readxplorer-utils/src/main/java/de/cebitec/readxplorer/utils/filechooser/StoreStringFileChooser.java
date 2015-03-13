@@ -48,9 +48,9 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
      * Creates a new String file chooser. Contains the save method storing an
      * arbitrary string.
      * <p>
-     * @param fileExtension   file extension to use for this file
+     * @param fileExtension file extension to use for this file
      * @param fileDescription file description
-     * @param string          string to store in the file
+     * @param string string to store in the file
      */
     public StoreStringFileChooser( final String[] fileExtension, final String fileDescription, final String string ) {
         super( fileExtension, fileDescription, string );
@@ -58,11 +58,11 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
     }
 
 
-    @Messages( { "NoStringError=Given data is not a string and cannot be saved as fasta.",
-                 "Error=An error occured during the file saving process.",
-                 "ProgressName=Storing data in file...",
-                 "SuccessMsg=Data successfully stored in ",
-                 "SuccessHeader=Success" } )
+    @Messages({"NoStringError=Given data is not a string and cannot be saved as fasta.",
+        "Error=An error occured during the file saving process.",
+        "ProgressName=Storing data in file...",
+        "SuccessMsg=Data successfully stored in ",
+        "SuccessHeader=Success"})
     @Override
     public void save( final String fileLocation ) {
 
@@ -79,8 +79,7 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
                     try( final BufferedWriter outputWriter = new BufferedWriter( new FileWriter( fileLocation ) ); ) {
                         outputWriter.write( dataString );
                         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + fileLocation, null );
-                    }
-                    catch( IOException | MissingResourceException | HeadlessException e ) {
+                    } catch( IOException | MissingResourceException | HeadlessException e ) {
                         JOptionPane.showMessageDialog( StoreStringFileChooser.this, Bundle.Error() );
                     }
                     progressHandle.finish();
@@ -90,8 +89,7 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
             } );
             exportThread.start();
 
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( this, Bundle.NoStringError() );
         }
     }

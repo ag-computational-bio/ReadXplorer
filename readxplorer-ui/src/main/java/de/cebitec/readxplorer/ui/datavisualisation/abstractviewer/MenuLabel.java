@@ -36,7 +36,7 @@ import javax.swing.JPanel;
  * A MenuLabel only displays a "closed menu" icon, as long as the menu is
  * closed. When the MenuLabel is clicked, the menu is displayed below the menu
  * "expanded" icon.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class MenuLabel extends JLabel implements Observer, Observable {
@@ -77,8 +77,7 @@ public class MenuLabel extends JLabel implements Observer, Observable {
                 if( isShowingLabel ) {
                     isShowingLabel = false;
                     MenuLabel.this.setIcon( expandIcon );
-                }
-                else {
+                } else {
                     isShowingLabel = true;
                     MenuLabel.this.setIcon( collapseIcon );
                     notifyObservers( true ); //means it is true to hide other option/legend panels

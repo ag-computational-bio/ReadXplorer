@@ -23,7 +23,7 @@ package de.cebitec.readxplorer.parser.output;
  *
  * @author Rolf Hilker
  */
-public class OutputWriter {
+public final class OutputWriter {
 
     private OutputWriter() {
     }
@@ -32,9 +32,9 @@ public class OutputWriter {
     /**
      * Generates a string formatted in fasta format.
      * <p>
-     * @param sequence         the sequence to be stored
+     * @param sequence the sequence to be stored
      * @param headerParameters the strings to be contained in the header line of
-     *                         the fasta
+     * the fasta
      * <p>
      * @return the sequence string formatted in fasta format
      */

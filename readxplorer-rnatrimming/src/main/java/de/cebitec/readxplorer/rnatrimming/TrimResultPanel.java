@@ -52,6 +52,8 @@ import org.openide.util.Exceptions;
  */
 public class TrimResultPanel extends JPanel implements Observer {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates new form CorrelationResultPanel
      */
@@ -62,8 +64,7 @@ public class TrimResultPanel extends JPanel implements Observer {
             public void run() {
                 try {
                     createStatisticsWindow();
-                }
-                catch( InterruptedException ex ) {
+                } catch( InterruptedException ex ) {
                     Exceptions.printStackTrace( ex );
                 }
             }
@@ -170,8 +171,9 @@ public class TrimResultPanel extends JPanel implements Observer {
 
 
     public PrintStream getOutput() {
-        if( this.output == null )
+        if( this.output == null ) {
             this.output = new PrintStream( new TextAreaOutputStream( this.jTextArea1, "" ) );
+        }
         return this.output;
     }
 
@@ -188,8 +190,9 @@ public class TrimResultPanel extends JPanel implements Observer {
      * @param analysisResult the analysisResult to set
      */
     public void setAnalysisResult( TrimProcessResult analysisResult ) {
-        if( this.analysisResult != null )
+        if( this.analysisResult != null ) {
             this.analysisResult.deleteObserver( this );
+        }
         this.analysisResult = analysisResult;
         this.analysisResult.addObserver( this );
         //use html to allow automatic word wrap for the text in the label
@@ -203,10 +206,10 @@ public class TrimResultPanel extends JPanel implements Observer {
     String trimmed = "trimmed";
 
 
-    XYChart.Data<String, Number> whole_mapped_data;
-    XYChart.Data<String, Number> whole_unmapped_data;
-    XYChart.Data<String, Number> trimmed_mapped_data;
-    XYChart.Data<String, Number> trimmed_unmapped_data;
+    XYChart.Data<String, Number> wholeMappedData;
+    XYChart.Data<String, Number> wholeUnmappedData;
+    XYChart.Data<String, Number> trimmedMappedData;
+    XYChart.Data<String, Number> trimmedUnmappedData;
     StackedBarChart<String, Number> chart;
 
     private boolean platformIsSupported = true;
@@ -235,11 +238,11 @@ public class TrimResultPanel extends JPanel implements Observer {
                 this.statisticsFrame.add( fxPanel, BorderLayout.CENTER );
                 this.statisticsFrame.repaint();
 
-                /*statisticsWindow.add(fxPanel);
-                 statisticsWindow.setVisible(true);
-                 statisticsWindow.toFront();*/
+                /* statisticsWindow.add(fxPanel);
+                 * statisticsWindow.setVisible(true);
+                 statisticsWindow.toFront(); */
 
-                Platform.runLater( new Runnable() {
+                Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
                         Group root = new Group();
@@ -259,15 +262,15 @@ public class TrimResultPanel extends JPanel implements Observer {
 
                         series1.getData().clear();
                         series1.getData().clear();
-                        whole_unmapped_data = new XYChart.Data<String, Number>( all, 1 );
-                        whole_mapped_data = new XYChart.Data<String, Number>( all, 1 );
-                        trimmed_unmapped_data = new XYChart.Data<String, Number>( trimmed, 1 );
-                        trimmed_mapped_data = new XYChart.Data<String, Number>( trimmed, 1 );
+                        wholeUnmappedData = new XYChart.Data<String, Number>( all, 1 );
+                        wholeMappedData = new XYChart.Data<String, Number>( all, 1 );
+                        trimmedUnmappedData = new XYChart.Data<String, Number>( trimmed, 1 );
+                        trimmedMappedData = new XYChart.Data<String, Number>( trimmed, 1 );
 
-                        series1.getData().add( trimmed_mapped_data );
-                        series2.getData().add( trimmed_unmapped_data );
-                        series1.getData().add( whole_mapped_data );
-                        series2.getData().add( whole_unmapped_data );
+                        series1.getData().add(trimmedMappedData );
+                        series2.getData().add(trimmedUnmappedData );
+                        series1.getData().add(wholeMappedData );
+                        series2.getData().add(wholeUnmappedData );
 
                         xAxis.setLabel( "Data" );
                         xAxis.setCategories( FXCollections.<String>observableArrayList(
@@ -300,8 +303,7 @@ public class TrimResultPanel extends JPanel implements Observer {
 
 
                 } );
-            }
-            catch( UnsupportedOperationException e ) {
+            } catch( UnsupportedOperationException e ) {
                 this.showMsg( "Could not intialize statistics window: " + e.getLocalizedMessage() );
                 this.platformIsSupported = false;
             }
@@ -312,13 +314,13 @@ public class TrimResultPanel extends JPanel implements Observer {
     private void updateChartData() {
         if( this.platformIsSupported ) {
             //the changes have to be run on the javafx thread
-            Platform.runLater( new Runnable() {
+            Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    whole_mapped_data.setYValue( analysisResult.getMappedReads() );
-                    whole_unmapped_data.setYValue( analysisResult.getAllReads() - analysisResult.getMappedReads() );
-                    trimmed_mapped_data.setYValue( analysisResult.getTrimmedMappedReads() );
-                    trimmed_unmapped_data.setYValue( analysisResult.getTrimmedReads() - analysisResult.getTrimmedMappedReads() );
+                    wholeMappedData.setYValue( analysisResult.getMappedReads() );
+                    wholeUnmappedData.setYValue( analysisResult.getAllReads() - analysisResult.getMappedReads() );
+                    trimmedMappedData.setYValue( analysisResult.getTrimmedMappedReads() );
+                    trimmedUnmappedData.setYValue( analysisResult.getTrimmedReads() - analysisResult.getTrimmedMappedReads() );
                 }
 
 
@@ -328,9 +330,8 @@ public class TrimResultPanel extends JPanel implements Observer {
 
 
     /**
-     * If any message should be printed to the console, this method is used.
-     * If an error occured during the run of the parser, which does not
-     * interrupt
+     * If any message should be printed to the console, this method is used. If
+     * an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print

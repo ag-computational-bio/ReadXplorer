@@ -42,7 +42,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public abstract class ReadXplorerFileChooser extends JFileChooser {
 
-    private final static Logger LOG = Logger.getLogger( ReadXplorerFileChooser.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ReadXplorerFileChooser.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -56,9 +56,8 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
     /**
      * Creates a new readxplorer file chooser.
      *
-     * @param fileExtensions  The file extensions to use. If set to null or the
-     *                        first entry is the empty string, no file filter is
-     *                        set
+     * @param fileExtensions The file extensions to use. If set to null or the
+     * first entry is the empty string, no file filter is set
      * @param fileDescription Description for the files in the file filter
      */
     public ReadXplorerFileChooser( final String[] fileExtensions, String fileDescription ) {
@@ -69,17 +68,13 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
     /**
      * Creates a new readxplorer file chooser.
      *
-     * @param fileExtensions  The file extensions to use. If set to null or the
-     *                        first entry is the empty string, no file filter is
-     *                        set
+     * @param fileExtensions The file extensions to use. If set to null or the
+     * first entry is the empty string, no file filter is set
      * @param fileDescription Description for the files in the file filter
-     * @param data            The data which might be used for file choosers
-     *                        storing data
+     * @param data The data which might be used for file choosers storing data
      */
     public ReadXplorerFileChooser( final String[] fileExtensions, String fileDescription, final Object data ) {
         this.data = data;
-//        this.fileExtensions = fileExtensions;
-//        this.fileDescription = fileDescription;
         if( fileExtensions != null && !fileExtensions[0].isEmpty() ) {
             setFileFilter( new FileNameExtensionFilter( fileDescription, fileExtensions ) );
         }
@@ -92,7 +87,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
      * Opens a file chooser for input or output file selection/creation.
      *
      * @param option the option: readxplorerFileChooser.OPEN_DIALOG for file
-     *               selection and readxplorerFileChooser.SAVE_DIALOG for storing a file.
+     * selection and readxplorerFileChooser.SAVE_DIALOG for storing a file.
      */
     public void openFileChooser( final int option ) {
 
@@ -105,19 +100,16 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
         }
         try {
             this.setCurrentDirectory( new File( new File( currentDirectory ).getCanonicalPath() ) );
-        }
-        catch( final IOException exception ) {
+        } catch( final IOException exception ) {
             this.setCurrentDirectory( null );
         }
         int result;
         if( option == ReadXplorerFileChooser.OPEN_DIALOG ) {
             result = this.showOpenDialog( this.getParent() );
-        }
-        else {
+        } else {
             if( option == ReadXplorerFileChooser.CUSTOM_DIALOG ) {
                 result = this.showDialog( this.getParent(), "Select" );
-            }
-            else {
+            } else {
                 result = this.showSaveDialog( null );
             }
         }
@@ -126,11 +118,10 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
             currentDirectory = this.getCurrentDirectory().getCanonicalPath();
             pref.put( directoryProperty, currentDirectory );
             pref.flush();
-        }
-        catch( BackingStoreException e ) {
+        } catch( BackingStoreException e ) {
             LOG.log( SEVERE, null, e );
-        }
-        catch( IOException ex ) {
+        } catch( IOException ioe ) {
+            LOG.fine( ioe.getMessage() );
             // do nothing, path is not stored in properties...
         }
         ////////////// handle return events /////////////////////////////////////////
@@ -143,8 +134,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
 
         if( option == ReadXplorerFileChooser.OPEN_DIALOG ) {
             open( fileLocation );
-        }
-        else if( option == ReadXplorerFileChooser.SAVE_DIALOG ) {
+        } else if( option == ReadXplorerFileChooser.SAVE_DIALOG ) {
             fileLocation = ReadXplorerFileChooser.getSelectedFileWithExtension( this ).getAbsolutePath();
             boolean done = checkFileExists( fileLocation, this );
             if( !done ) {
@@ -155,8 +145,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
             File file = new File( fileLocation );
             if( file.exists() ) {
                 open( fileLocation );
-            }
-            else {
+            } else {
                 save( fileLocation );
             }
         }
@@ -168,18 +157,17 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
      * and prompts for replacement. If it doesn't exist yet, it is created.
      *
      * @param fileLocation the file location to store the file
-     * @param this         the JFileChooser
+     * @param jfc the JFileChooser
      */
-    @NbBundle.Messages( {"ReadxplorerFileChooser_FileExists=File already exists. Do you want to overwrite the existing file?",
-                         "ReadXplorerFileChooser_Dialog=Overwrite File Dialog"} )
+    @NbBundle.Messages({"ReadxplorerFileChooser_FileExists=File already exists. Do you want to overwrite the existing file?",
+        "ReadXplorerFileChooser_Dialog=Overwrite File Dialog"})
     private boolean checkFileExists( final String fileLocation, final JFileChooser jfc ) {
         File file = new File( fileLocation );
         if( file.exists() ) {
             final int overwriteFile = JOptionPane.showConfirmDialog( jfc, Bundle.ReadxplorerFileChooser_FileExists(), Bundle.ReadXplorerFileChooser_Dialog(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
             if( overwriteFile == JOptionPane.YES_OPTION ) {
                 save( fileLocation );
-            }
-            else {
+            } else {
                 openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
             }
             return true;
@@ -221,7 +209,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
      * Sets the directory to use as starting directory for this file chooser.
      *
      * @param directory the directory to use as starting directory for this file
-     *                  chooser
+     * chooser
      */
     public void setDirectory( String directory ) {
         this.currentDirectory = directory;
@@ -247,8 +235,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
             }
             // if not, append the first extension from the selected filter
             file = new File( file.getAbsolutePath() + '.' + extensions[0] );
-        }
-        else { //if no appropriate filter is currently selected, the first extensions of the first appropriate extension filter is appended to the file name
+        } else { //if no appropriate filter is currently selected, the first extensions of the first appropriate extension filter is appended to the file name
             FileFilter[] filters = chooser.getChoosableFileFilters();
             if( filters.length > 0 ) {
                 for( FileFilter filter : filters ) {

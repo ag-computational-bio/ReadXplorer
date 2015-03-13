@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -221,8 +221,7 @@ public class Coverage {
     public int[] getCoverage( boolean isFwdStrand ) {
         if( isFwdStrand ) {
             return this.getFwdCov();
-        }
-        else {
+        } else {
             return this.getRevCov();
         }
     }
@@ -295,8 +294,7 @@ public class Coverage {
         int internalPos = this.getInternalPos( logPos );
         if( internalPos < coverageArray.length && internalPos >= 0 ) {
             return coverageArray[internalPos];
-        }
-        else {
+        } else {
             return 0;
         }
     }

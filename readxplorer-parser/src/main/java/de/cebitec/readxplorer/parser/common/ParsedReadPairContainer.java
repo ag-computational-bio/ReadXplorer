@@ -56,9 +56,8 @@ public class ParsedReadPairContainer {
 
 
     /**
-     * Adds all mappings to a MappingGroup with same pair id,
-     * but different mapping positions
-     * Mapping = is unique to a sequence and position
+     * Adds all mappings to a MappingGroup with same pair id, but different
+     * mapping positions Mapping = is unique to a sequence and position
      * <p>
      * @param mappingIDs
      * @param parsedReadPair
@@ -66,14 +65,13 @@ public class ParsedReadPairContainer {
     public void addParsedReadPair( Pair<Long, Long> mappingIDs, ParsedReadPairMapping parsedReadPair ) {
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
         if( !this.parsedReadPairs.containsKey( mappingIDs ) ) {
-            this.parsedReadPairs.put( mappingIDs, parsedReadPair ); //TODO: mappingIDs can be vice versa
+            this.parsedReadPairs.put( mappingIDs, parsedReadPair ); //TODO mappingIDs can be vice versa
 
             if( parsedReadPair.getType() == ReadPairType.PERFECT_PAIR || parsedReadPair.getType() == ReadPairType.PERFECT_UNQ_PAIR ) {
                 statsContainer.addStatsValue( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) + 1 );
             }
             statsContainer.addStatsValue( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) + 1 );
-        }
-        else {
+        } else {
             this.parsedReadPairs.get( mappingIDs ).addReplicate();
             if( parsedReadPair.getType() == ReadPairType.PERFECT_PAIR || parsedReadPair.getType() == ReadPairType.PERFECT_UNQ_PAIR ) {
                 statsContainer.addStatsValue( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) - 1 );
@@ -106,10 +104,9 @@ public class ParsedReadPairContainer {
 
     /**
      * @return The mapping list of all mapping ids to their corresponding
-     *         sequence pair ids. Only contains the mappings which don't form a proper
-     *         pair.
-     *         To get this mapping for paired sequences use
-     *         <code>getParsedReadPairs()</code>.
+     * sequence pair ids. Only contains the mappings which don't form a proper
+     * pair. To get this mapping for paired sequences use
+     * <code>getParsedReadPairs()</code>.
      */
     public List<Pair<Long, Long>> getMappingToPairIdList() {
         return Collections.unmodifiableList( mappingToPairIDList );

@@ -72,15 +72,14 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
         List<List<?>> parseTable = new ArrayList<>();
 
         if( tableType == TableType.TSS_DETECTION_JR
-            || tableType == TableType.OPERON_DETECTION_JR
-            || tableType == TableType.RPKM_ANALYSIS_JR
-            || tableType == TableType.NOVEL_TRANSCRIPT_DETECTION_JR ) {
+                || tableType == TableType.OPERON_DETECTION_JR
+                || tableType == TableType.RPKM_ANALYSIS_JR
+                || tableType == TableType.NOVEL_TRANSCRIPT_DETECTION_JR ) {
 
             ExcelToTable exlToTable = null;
             try {
                 exlToTable = new ExcelToTable( fileToRead );
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 Exceptions.printStackTrace( ex );
             }
 
@@ -88,8 +87,7 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
             this.secondSheetMap = exlToTable.getSecondSheetData();
             this.secondSheetMapThirdCol = exlToTable.getSecondSheetDataThirdColumn();
 
-        }
-        else {
+        } else {
             parseTable = super.parseTable( fileToRead );
         }
 

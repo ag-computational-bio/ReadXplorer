@@ -23,7 +23,8 @@ package de.cebitec.readxplorer.utils;
  * <p>
  * @author Rolf Hilker
  */
-public class Properties {
+public final class Properties {
+
 
     private Properties() {
     }
@@ -55,7 +56,7 @@ public class Properties {
 
     // ReadXplorer file chooser properties
     public static final String READXPLORER_FILECHOOSER_DIRECTORY = "readXplorerFileChooser.Directory";
-    public static final String ReadXplorer_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
+    public static final String READXPLORER_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
 
     //Properties to set different viewers active
     public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
@@ -92,15 +93,14 @@ public class Properties {
     /**
      * Value for obtaining read starts instead of coverage (9).
      */
-    public static byte READ_STARTS = 9;
+    public static final byte READ_STARTS = 9;
     /**
-     * Value for viewing all mappings as if they came from the fwd. strand
-     * (10). This should only be used in combination with {@link STRAND_BOTH}
-     * to infer, if all mappings shall be treated as if the came from the fwd.
-     * or
+     * Value for viewing all mappings as if they came from the fwd. strand (10).
+     * This should only be used in combination with {@link STRAND_BOTH} to
+     * infer, if all mappings shall be treated as if the came from the fwd. or
      * the rev. strand ()
      */
-    public static byte STRAND_FWD_ANALYSIS = 10;
+    public static final byte STRAND_FWD_ANALYSIS = 10;
 
     /**
      * Value for read start distribution = 5.
@@ -229,7 +229,8 @@ public class Properties {
      */
     public static final String RSERVE_PASSWORD = "RSERVE_PASSWORD";
     /**
-     * Holds the full path to the Rserve startup script if manual local setup is used.
+     * Holds the full path to the Rserve startup script if manual local setup is
+     * used.
      */
     public static final String RSERVE_STARTUP_SCRIPT = "RSERVE_STARTUP_SCRIPT";
     /**
@@ -237,7 +238,8 @@ public class Properties {
      */
     public static final String RSERVE_MANUAL_REMOTE_SETUP = "RSERVE_MANUAL_REMOTE_SETUP";
     /**
-     * Is Rserve manually configured to connect to a local server with custom startup script.
+     * Is Rserve manually configured to connect to a local server with custom
+     * startup script.
      */
     public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
 

@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  * Carries out the logic behind the covered features analysis.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class AnalysisCoveredFeatures implements Observer,
@@ -60,17 +60,17 @@ public class AnalysisCoveredFeatures implements Observer,
      * @param trackViewer        the track viewer for which the analyses should
      *                           be carried out
      * @param getCoveredFeatures <code>true</code> if the covered features
-     *                           should be
-     *                           returned, <code>false</code> if the uncovered features should be returned
-     * @param minCoveragePercent minimum percentage of an feature which has
-     *                           to be classified as covered, in order to detect it as 'present' in the
-     *                           analysis
+     *                           should be returned, <code>false</code> if the
+     *                           uncovered features should be returned
+     * @param minCoveragePercent minimum percentage of an feature which has to
+     *                           be classified as covered, in order to detect it
+     *                           as 'present' in the analysis
      * @param minCountedCoverage minimum coverage at a certain position to be
      *                           taken into account for the analysis
      * @param whateverStrand     <tt>true</tt>, if the strand does not matter
-     *                           for
-     *                           this analysis, false, if only mappings on the strand of the
-     *                           respective feature should be considered.
+     *                           for this analysis, false, if only mappings on
+     *                           the strand of the respective feature should be
+     *                           considered.
      */
     public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters ) {
         this.trackConnector = trackConnector;
@@ -117,8 +117,7 @@ public class AnalysisCoveredFeatures implements Observer,
         if( data.getClass() == coverageAndDiffResult.getClass() ) {
             coverageAndDiffResult = (CoverageAndDiffResult) data;
             this.updateCoverageCountForFeatures( coverageAndDiffResult );
-        }
-        else if( data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED ) { //1 means coverage analysis is finished
+        } else if( data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED ) { //1 means coverage analysis is finished
             this.findCoveredFeatures();
         }
     }
@@ -165,8 +164,7 @@ public class AnalysisCoveredFeatures implements Observer,
                                 ++noCoveredBases;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                         for( int j = featureStart; j <= featureStop; ++j ) {
                             if( this.checkCanIncreaseAndSumOneStrand( covManager, j, analysisStrand ) ) {
@@ -186,8 +184,7 @@ public class AnalysisCoveredFeatures implements Observer,
                         coveredFeature.setMeanCoverage( meanCov );
                     }
                     coveredFeature.setNoCoveredBases( coveredBases + noCoveredBases );
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -196,8 +193,8 @@ public class AnalysisCoveredFeatures implements Observer,
 
 
     /**
-     * Detects all features, which satisfy the given minimum coverage value
-     * at at least the given minimum percentage of bases of the feature.
+     * Detects all features, which satisfy the given minimum coverage value at
+     * at least the given minimum percentage of bases of the feature.
      */
     private void findCoveredFeatures() {
         int percentCovered;
@@ -208,8 +205,7 @@ public class AnalysisCoveredFeatures implements Observer,
                     this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
                 }
             }
-        }
-        else {
+        } else {
             for( Integer id : coveredFeatureCount.keySet() ) {
                 percentCovered = coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered <= analysisParams.getMinCoveredPercent() ) {
@@ -241,8 +237,8 @@ public class AnalysisCoveredFeatures implements Observer,
      */
     private boolean checkCanIncreaseAndSumBothStrands( CoverageManager coverage, int j ) {
         List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
-        int cov = coverage.getTotalCoverage( excludedClasses, j, true )
-                  + coverage.getTotalCoverage( excludedClasses, j, false );
+        int cov = coverage.getTotalCoverage( excludedClasses, j, true ) +
+                 coverage.getTotalCoverage( excludedClasses, j, false );
         return this.increaseSumIfCanIncrease( cov );
     }
 

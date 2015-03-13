@@ -34,21 +34,21 @@ public interface LogicalBoundsListener {
      * <p>
      * @param bounds the new boudns to set
      */
-    public void updateLogicalBounds( BoundsInfo bounds );
+    void updateLogicalBounds( BoundsInfo bounds );
 
 
     /**
      * @return The size of the area, that is used for drawing. Logical bounds
      *         depend on the available size of each listener.
      */
-    public Dimension getPaintingAreaDimension();
+    Dimension getPaintingAreaDimension();
 
 
     /**
      * @return true, if the PaintingArea has coordinates to calculate bounds,
      *         false otherwise.
      */
-    public boolean isPaintingAreaAvailable();
+    boolean isPaintingAreaAvailable();
 
 
 }

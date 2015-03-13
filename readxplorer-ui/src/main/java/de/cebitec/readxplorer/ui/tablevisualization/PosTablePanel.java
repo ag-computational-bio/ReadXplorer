@@ -151,8 +151,7 @@ public class PosTablePanel extends TablePanel {
     public int getDataSize() {
         if( tableData != null ) {
             return tableData.getRowCount();
-        }
-        else {
+        } else {
             return 0;
         }
     }

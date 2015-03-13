@@ -368,6 +368,7 @@ public class NormalizedReadCountHist extends JPanel implements ComponentListener
             bar.getData().add( entry );
         }
 
+
 //            /**
 //             * Adds a label to a data entry of a javafx chart. The label is able
 //             * to reposition and resize, depending on change events of their

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 
-
 /**
  * Filters for a given pattern in two ways: First for all available occurrences
  * of the pattern in a given interval of a given DNA sequence and second for the
@@ -42,7 +41,9 @@ import java.util.regex.Pattern;
 public class PatternFilter implements RegionFilterI {
 
     public static final int INIT = 10;
-    /** Default size of a single scanning step. */
+    /**
+     * Default size of a single scanning step.
+     */
     public static final int INTERVAL_SIZE = 3000000;
     private List<Region> matchedPatterns;
     private int absStart;
@@ -65,9 +66,10 @@ public class PatternFilter implements RegionFilterI {
      * occurrences of the pattern in a given interval of a given DNA sequence
      * and second for the next occurrence of the pattern along a DNA sequence,
      * such as a whole genome sequence.
+     * <p>
      * @param absStart Absolute start of the sequence to analyze
-     * @param absStop Absolute stop of the sequence to analyze
-     * @param refGen Reference genome to analyze
+     * @param absStop  Absolute stop of the sequence to analyze
+     * @param refGen   Reference genome to analyze
      */
     public PatternFilter( int absStart, int absStop, PersistentReference refGen ) {
         this.absStart = absStart;
@@ -87,8 +89,8 @@ public class PatternFilter implements RegionFilterI {
 
     /**
      * @return Identifies the currently set pattern in the given interval of
-     * the currently set reference according to the current filter
-     * configuration.
+     *         the currently set reference according to the current filter
+     *         configuration.
      */
     @Override
     public List<Region> findRegions() {
@@ -118,7 +120,7 @@ public class PatternFilter implements RegionFilterI {
 
             int start = absStart;
             int stop = absStop;
-            if ( addOffset ) { //shift by pattern length to both sides
+            if( addOffset ) { //shift by pattern length to both sides
                 int offset = this.pattern.toString().length();
                 start -= offset;
                 stop += offset - 1;
@@ -236,6 +238,7 @@ public class PatternFilter implements RegionFilterI {
     /**
      * Revises the pattern for the reverse strand analysis according to the
      * current filter configuration.
+     * <p>
      * @param pattern The pattern to revise
      */
     private void setRevPattern( String pattern ) {
@@ -302,7 +305,7 @@ public class PatternFilter implements RegionFilterI {
     /**
      * @return A value among {@link SequenceUtils#STRAND_FWD},
      * {@link SequenceUtils#STRAND_REV} and 0 to indicate using both strands. 0
-     * is also the default value, thus does not have to be set explictly.
+     *         is also the default value, thus does not have to be set explictly.
      */
     public byte getAnalysisStrand() {
         return analysisStrand;
@@ -356,10 +359,10 @@ public class PatternFilter implements RegionFilterI {
 
     /**
      * @return <code>true</code> if an offset of the pattern length should be
-     * added to the start and stop positions of the search interval. This is
-     * useful when hits partly overlapping the actual interval borders have to
-     * be identified as well. <code>false</code> if the interval borders are
-     * used as is.
+     *         added to the start and stop positions of the search interval. This is
+     *         useful when hits partly overlapping the actual interval borders have to
+     *         be identified as well. <code>false</code> if the interval borders are
+     *         used as is.
      */
     public boolean isAddOffset() {
         return addOffset;
@@ -377,6 +380,7 @@ public class PatternFilter implements RegionFilterI {
     public void setAddOffset( boolean addOffset ) {
         this.addOffset = addOffset;
     }
+
 
     /**
      * @return <code>true</code> if results should only be calculated for the
@@ -399,6 +403,7 @@ public class PatternFilter implements RegionFilterI {
         this.requireSameFrame = requireSameFrame;
     }
 
+
     /**
      * @return The reference used in this filter.
      */
@@ -411,6 +416,7 @@ public class PatternFilter implements RegionFilterI {
      * A scanner for patterns in a sequence.
      */
     private class PatternScanner extends SequenceScanner {
+
         private final SequenceMatcher seqMatcher;
         private byte analysisStrand;
 
@@ -418,6 +424,7 @@ public class PatternFilter implements RegionFilterI {
         /**
          * A scanner for patterns in a sequence. By default both strands are
          * analyzed for the pattern.
+         * <p>
          * @param totalStart   The absolute start of the whole interval to scan.
          *                     Always smaller than {@link getTotalStop()}.
          * @param totalStop    The absolute stop of the whole interval to scan.
@@ -477,6 +484,7 @@ public class PatternFilter implements RegionFilterI {
             this.analysisStrand = analysisStrand;
         }
 
+
         /**
          * Allows performing extra calculations. This class checks whether the
          * {@link #getMaxNoResults()} value has been set and exceeded. If so,
@@ -488,6 +496,7 @@ public class PatternFilter implements RegionFilterI {
                 setDone( true );
             }
         }
+
 
     }
 
@@ -528,6 +537,7 @@ public class PatternFilter implements RegionFilterI {
         public void executeNextScan( int currentStart, int currentStop ) {
             super.executeNextScan( currentStart, currentStop );
         }
+
 
         /**
          * Performing extra calculations. This class checks if already a
@@ -572,11 +582,13 @@ public class PatternFilter implements RegionFilterI {
 
         /**
          * @return The start of the identified pattern hit. If no hit has been
-         * identified it returns -1.
+         *         identified it returns -1.
          */
         public int getPatternStart() {
             return patternStart;
         }
+
+
     }
 
 }

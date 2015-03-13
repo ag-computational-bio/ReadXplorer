@@ -31,8 +31,8 @@ public class Loop {
     private double r = 0.0;
     protected List<Connection> connections;
     private boolean mark = false;
-    final static double rt2_2 = 0.7071068;
-    final static double lencut = 0.5;
+    static final double rt2_2 = 0.7071068;
+    static final double lencut = 0.5;
 
 
     protected Loop( int number ) {

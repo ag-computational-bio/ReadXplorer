@@ -29,7 +29,12 @@ import javax.swing.table.TableRowSorter;
  *
  * @author kstaderm
  */
-public class GenerateRowSorter {
+public final class GenerateRowSorter {
+
+
+    private GenerateRowSorter() {
+    }
+
 
     /**
      * Creates a row sorter for the underlying table model and table contents.
@@ -48,6 +53,7 @@ public class GenerateRowSorter {
                 Object object = it1.next();
                 if( object instanceof Double ) {
                     rowSorter.setComparator( columnCounter, new Comparator<Double>() {
+
                         @Override
                         public int compare( Double o1, Double o2 ) {
                             return o1.compareTo( o2 );
@@ -58,6 +64,7 @@ public class GenerateRowSorter {
                 }
                 if( object instanceof Integer ) {
                     rowSorter.setComparator( columnCounter, new Comparator<Integer>() {
+
                         @Override
                         public int compare( Integer o1, Integer o2 ) {
                             return o1.compareTo( o2 );

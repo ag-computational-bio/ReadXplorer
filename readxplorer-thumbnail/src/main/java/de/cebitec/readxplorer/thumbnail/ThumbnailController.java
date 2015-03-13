@@ -88,10 +88,9 @@ import static java.util.logging.Level.WARNING;
 
 
 /**
- * ServiceProvider for IThumbnailView.
- * This Module can display all Tracks for a given List of Features in a
- * Thumbnail-like View.
- *
+ * ServiceProvider for IThumbnailView. This Module can display all Tracks for a
+ * given List of Features in a Thumbnail-like View.
+ * <p>
  * @author denis, rhilker
  */
 @ServiceProvider( service = IThumbnailView.class )
@@ -138,8 +137,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         activeViewer = refViewer;
         if( refThumbTopComponents.containsKey( activeViewer ) ) {
             activeTopComp = refThumbTopComponents.get( activeViewer );
-        }
-        else {
+        } else {
             activeTopComp = new ThumbnailViewTopComponent();
             refThumbTopComponents.put( activeViewer, activeTopComp );
         }
@@ -160,8 +158,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         if( selectedFeatures.containsKey( activeViewer ) && selectedFeatures.get( activeViewer ).size() > 40 ) {
             NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( ThumbnailController.class, "MSG_TooManyFeatures" ), NotifyDescriptor.INFORMATION_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
-        }
-        else {
+        } else {
             drawScene();
             //Cookie Stuff
             removeThumbSpecificCookies();
@@ -181,8 +178,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         activeViewer = refViewer;
         if( refThumbTopComponents.containsKey( refViewer ) ) {
             activeTopComp = refThumbTopComponents.get( refViewer );
-        }
-        else {
+        } else {
             activeTopComp = new ThumbnailViewTopComponent();
             refThumbTopComponents.put( activeViewer, activeTopComp );
         }
@@ -197,8 +193,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         if( selectedFeatures.containsKey( activeViewer ) && selectedFeatures.get( activeViewer ).size() > 40 ) {
             NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( ThumbnailController.class, "MSG_TooManyFeatures" ), NotifyDescriptor.INFORMATION_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
-        }
-        else {
+        } else {
             drawScene();
             removeThumbSpecificCookies();
             //Activate Synchronize-Action for ZoomSliders
@@ -231,12 +226,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * Activates don't-synchronize-Sliders Action in Menu.
      */
     private void addASynchCookieToLookup() {
-        getLookup().add(new AsyncSliderCookie() {
+        getLookup().add( new AsyncSliderCookie() {
 
             @Override
             public void async() {
                 sliderSynchronisation( false );
-                getLookup().removeAll(AsyncSliderCookie.class );
+                getLookup().removeAll( AsyncSliderCookie.class );
                 addSyncCookieToLookup();
             }
 
@@ -265,15 +260,13 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                 if( sync ) {
                                     slider.addChangeListener( zoomChangeListener );
                                     zoomChangeListener.addMapValue( (TrackViewer) panel.getComponent( 0 ), slider );
-                                }
-                                else {
+                                } else {
                                     while( slider.getChangeListeners().length > 1 ) {
                                         slider.removeChangeListener( slider.getChangeListeners()[0] );
                                     }
                                 }
                             }
-                        }
-                        catch( ClassCastException e ) {
+                        } catch( ClassCastException e ) {
                             LOG.log( WARNING, e.getMessage() );
                         }
                     }
@@ -296,8 +289,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             if( !(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp) ) {
                 activeTopComp.requestAttention( true );
             }
-        }
-        else {
+        } else {
             NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( ThumbnailController.class, "MSG_NoFeatures" ), NotifyDescriptor.INFORMATION_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
             activeTopComp.close();
@@ -321,8 +313,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
         try {
             tc = fetcher.getMultiTrackConnector( track );
-        }
-        catch( UserCanceledTrackPathUpdateException ex ) {
+        } catch( UserCanceledTrackPathUpdateException ex ) {
             SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             return null;
         }
@@ -359,8 +350,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     /**
      * TitlePanel for TrackPanel with Label and Checkbox.
      * <p>
-     * @param title
-     *              <p>
+     * @param title <p>
      * @return
      */
     private JPanel getTitlePanel( String title, CheckBoxActionListener cbListener ) {
@@ -396,8 +386,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             ArrayList<PersistentFeature> list = new ArrayList<>( 1 );
             list.add( feature );
             selectedFeatures.put( refViewer, list );
-        }
-        else {
+        } else {
             selectedFeatures.get( refViewer ).add( feature );
         }
         activeTopComp = refThumbTopComponents.get( refViewer );
@@ -405,7 +394,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         if( WindowManager.getDefault().getRegistry().getOpened().contains( activeTopComp ) ) {
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( controller.getCurrentRefGen().getId() );
             addFeatureToView( feature, refCon );
-            if( getLookup().lookup(AsyncSliderCookie.class ) != null ) {
+            if( getLookup().lookup( AsyncSliderCookie.class ) != null ) {
                 sliderSynchronisation( true );
             }
             if( !(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp) ) {
@@ -476,7 +465,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     void removeThumbSpecificCookies() {
         getLookup().removeAll( SyncSliderCookie.class );
-        getLookup().removeAll(AsyncSliderCookie.class );
+        getLookup().removeAll( AsyncSliderCookie.class );
     }
 
 
@@ -690,8 +679,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 trackList.add( trackPanelToTrack.get( firstTrackPanelToCompare ) );
                 trackList.add( trackPanelToTrack.get( secondTrackBP ) );
                 this.compareTwoTracks( trackList, currentFeature );
-            }
-            catch( ClassCastException ex ) {
+            } catch( ClassCastException ex ) {
                 LOG.log( WARNING, ex.getMessage() );
             }
         }
@@ -709,7 +697,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             bp.addMouseListener( ThumbnailController.this );
             featureToTrackpanelList.get( feature ).add( bp );
             //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
-            if( getLookup().lookup(AsyncSliderCookie.class ) != null ) {
+            if( getLookup().lookup( AsyncSliderCookie.class ) != null ) {
                 sliderSynchronisation( true );
             }
             ComponentWidget compWidg = new ComponentWidget( activeTopComp.getScene(), bp );
@@ -751,8 +739,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
             try {
                 trackCon = fetcher.getMultiTrackConnector( tracks );
-            }
-            catch( UserCanceledTrackPathUpdateException ex ) {
+            } catch( UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 return null; //cannot occur, since both tracks are already open in the thumbnail viewer
             }
@@ -774,8 +761,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             try {
                 int sValue = ((JSlider) ((Container) p.getComponent( 0 )).getComponent( 1 )).getValue();
                 slider.setValue( sValue );
-            }
-            catch( ClassCastException e ) {
+            } catch( ClassCastException e ) {
                 Logger.getLogger( ThumbnailController.class.getName() ).log(
                         Level.WARNING, "{0}: Can't set value MultipleTrackPanel-Slider", e.getMessage() );
             }
@@ -806,31 +792,26 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 JCheckBox src = (JCheckBox) e.getSource();
                 if( src.isSelected() ) {
                     countTracks++;
-                    switch( countTracks ) {
-                        case 1:
-                            firstTrackPanelToCompare = bp;
-                            break;
-                        case 2: {
-                            if( featureToTrackpanelList.get( currentFeature ).contains( firstTrackPanelToCompare ) ) {
-                                startCompare( e );
+                    if( countTracks == 1 ) {
+                        firstTrackPanelToCompare = bp;
+                    } else if( countTracks == 2 ) {
+                        if( featureToTrackpanelList.get( currentFeature ).contains( firstTrackPanelToCompare ) ) {
+                            startCompare( e );
 
-                            }
-                            else {
-                                countTracks--;
-                                src.setSelected( false );
-                            }
-                            break;
-                        }
-                        default:
+                        } else {
                             countTracks--;
                             src.setSelected( false );
-                            break;
+                        }
+                    } else {
+                        countTracks--;
+                        src.setSelected( false );
                     }
-                }
-                else {
+                } else {
                     countTracks--;
                 }
             }
+
+
         }
 
 

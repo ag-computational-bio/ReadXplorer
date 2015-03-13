@@ -61,9 +61,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
 
     /**
-     * Creates and stores the statistics for a track, which needs
-     * to be sorted by position. The data to store is directly forwarded to the
-     * observer, which should then further process it (store it in the db).
+     * Creates and stores the statistics for a track, which needs to be sorted
+     * by position. The data to store is directly forwarded to the observer,
+     * which should then further process it (store it in the db).
      */
     public SamBamStatsParser() {
         this.observers = new ArrayList<>();
@@ -78,17 +78,17 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      * to be sorted by position. The data to store is directly forwarded to the
      * observer, which should then further process it (store it in the db).
      * <p>
-     * @param trackJob       track job whose position table needs to be created
+     * @param trackJob track job whose position table needs to be created
      * @param chromLengthMap mapping of chromosome name
      * <p>
      * @return
      */
-    @SuppressWarnings( "fallthrough" )
-    @NbBundle.Messages( {
+    @SuppressWarnings("fallthrough")
+    @NbBundle.Messages({
         "# {0} - track file path",
         "StatsParser.Finished=Finished creating track statistics for {0}. ",
         "# {0} - track file path",
-        "StatsParser.Start=Start creating track statistics for {0}" } )
+        "StatsParser.Start=Start creating track statistics for {0}"})
     public ParsedTrack createTrackStats( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) {
 
         final long startTime = System.currentTimeMillis();
@@ -157,8 +157,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             if( readsDifferentPos.size() == 1 ) { //1 means all reads since last clean started at same pos
                                 if( seqCount == 1 ) { // only one sequence found at same position
                                     statsContainer.increaseValue( StatsContainer.NO_UNIQUE_SEQS, seqCount );
-                                }
-                                else {
+                                } else {
                                     statsContainer.increaseValue( StatsContainer.NO_REPEATED_SEQ, 1 );
                                     //counting the repeated seq and not in how many reads they are contained
                                 }
@@ -184,13 +183,12 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 //                            starti = System.currentTimeMillis();
 //                        }
                     }
-                }
-                catch( NumberFormatException nfe ) {
+                } catch( NumberFormatException nfe ) {
                     //skip error messages, if too many occur to prevent bug in the output panel
                     if( nfe.getMessage() == null || !nfe.getMessage().contains( "MAPQ should be 0" ) ) {
                         //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                         this.sendMsgIfAllowed( NbBundle.getMessage( SamBamStatsParser.class,
-                                                                    "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
+                                "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
                         Exceptions.printStackTrace( nfe );
                     }
                 }
@@ -205,16 +203,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             }
             samItor.close();
 
-        }
-        catch( RuntimeEOFException e ) {
+        } catch( RuntimeEOFException e ) {
             this.notifyObservers( "Last read in file is incomplete, ignoring it!" );
-        }
-        catch( Exception e ) {
-            Exceptions.printStackTrace( e ); //TODO: correct error handling or remove
+        } catch( Exception e ) {
+            Exceptions.printStackTrace( e ); //TODO correct error handling or remove
         }
 
         //finish statistics and return the track with the statistics data in the end
-        //TODO: claculate separately for all chromosomes for extended stats panel
+        //TODO claculate separately for all chromosomes for extended stats panel
         statsContainer.setCoveredPositionsImport( classToCoveredIntervalsMap );
 
         ParsedTrack track = new ParsedTrack( trackJob );
@@ -270,7 +266,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
     /**
      * @return The statistics parser for handling statistics for the extended
-     *         track.
+     * track.
      */
     public StatsContainer getStatsContainer() {
         return statsContainer;

@@ -60,7 +60,8 @@ public class TableToExcel implements ExportDataI {
             columnName.add( tableModel.getColumnName( i ) );
         }
         tableContent = new ArrayList<>();
-        for( Iterator<Vector> it = dataVector.iterator(); it.hasNext(); ) {
+        Iterator<Vector> it = dataVector.iterator();
+        while( it.hasNext() ) {
             Vector row = it.next();
             tableContent.add( new ArrayList<>( row ) );
         }

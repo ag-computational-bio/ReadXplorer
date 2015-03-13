@@ -22,8 +22,8 @@ import org.openide.windows.InputOutput;
 
 
 /**
- * This class implements the SimpleOutput interface for the usage
- * with Netbeans' InputOutput-Class
+ * This class implements the SimpleOutput interface for the usage with Netbeans'
+ * InputOutput-Class
  * <p>
  * @author Evgeny Anisiforov
  */

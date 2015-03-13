@@ -129,8 +129,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                     public synchronized void run() {
                         try {
                             this.wait( 200 );
-                        }
-                        catch( InterruptedException ex ) {
+                        } catch( InterruptedException ex ) {
                             Exceptions.printStackTrace( ex );
                         }
                         try {
@@ -143,8 +142,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
 
                             } );
-                        }
-                        catch( Exception e ) {
+                        } catch( Exception e ) {
                             LOG.log( WARNING, e.getMessage() );
                         }
                     }
@@ -170,8 +168,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             explorerSplitPane.setVisible( false );
             openButton.setVisible( false );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedOut() );
-        }
-        else {
+        } else {
             quickstartLabel.setVisible( false );
             explorerSplitPane.setVisible( true );
             openButton.setVisible( true );
@@ -192,12 +189,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                                     trackItems.add( new DBItem( track ) );
                                 }
                                 return new Node[]{ new DBItemNode( new DBItem( genome ), new DBItemChildren( trackItems ) ) };
-                            }
-                            else {
+                            } else {
                                 return new Node[]{ new DBItemNode( new DBItem( genome ) ) };
                             }
-                        }
-                        catch( IntrospectionException ex ) {
+                        } catch( IntrospectionException ex ) {
                             Exceptions.printStackTrace( ex );
                             return new Node[]{};
                         }
@@ -222,8 +217,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 //or like this for one special node:
                 //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
 
-            }
-            catch( OutOfMemoryError e ) {
+            } catch( OutOfMemoryError e ) {
                 VisualisationUtils.displayOutOfMemoryError( this );
             }
         }
@@ -250,8 +244,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                     if( !genomesAndTracksToOpen.containsKey( item.getID() ) ) {
                         genomesAndTracksToOpen.put( item.getID(), new HashSet<Long>() );
                     }
-                }
-                else {
+                } else {
                     if( !genomesAndTracksToOpen.containsKey( item.getRefID() ) ) {
                         genomesAndTracksToOpen.put( item.getRefID(), new HashSet<Long>() );
                         DBItem parentItem = this.getItemForNode( n.getParentNode() );
@@ -488,11 +481,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
      */
     private void initAdditionalComponents() {
 
-        String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - "
-                       + "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> "
-                       + "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore "
-                       + "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via "
-                       + "toolbar buttons or \"Tools\" menu)</p></html>";
+        String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - " +
+                 "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
+                 "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
+                 "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
+                 "toolbar buttons or \"Tools\" menu)</p></html>";
         quickstartLabel.setText( sText );
 
         Border paddingBorder = BorderFactory.createEmptyBorder( 50, 100, 100, 100 );
@@ -530,12 +523,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
-                        }
-                        else {
+                        } else {
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
                                 dbItem.setSelected( true );
-                            }
-                            else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
+                            } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
                         }
@@ -670,6 +661,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         loginAction.actionPerformed( evt );
     }
 
+
     /**
      * Opens a TableFileChooser and fetches the track statistics for all tracks
      * stored in the DB to store their statistics in a table file.
@@ -678,5 +670,6 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         TableExportFileChooser fileChooser = new TableExportFileChooser(
                 TableExportFileChooser.getTableFileExtensions(), new TrackStatisticsGenerator() );
     }
+
 
 }

@@ -300,8 +300,7 @@ public class Mapping implements ObjectWithId, GenomicRange {
         int result = 0;
         if( this.start < genomicRange.getStart() ) {
             result = -1;
-        }
-        else if( this.start > genomicRange.getStart() ) {
+        } else if( this.start > genomicRange.getStart() ) {
             result = 1;
         }
         return result;

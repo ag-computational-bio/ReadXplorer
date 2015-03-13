@@ -61,20 +61,20 @@ public class SamBamSorter implements Observable {
      * SamFileHeader.SortOrder and sets the new sorted file as the file in the
      * trackJob.
      * <p>
-     * @param trackJob     track job containing the file to sort
-     * @param sortOrder    the sort order to use
+     * @param trackJob track job containing the file to sort
+     * @param sortOrder the sort order to use
      * @param sortOrderMsg the string representation of the sort order for
-     *                     status messages
+     * status messages
      * <p>
      * @return true, if the sorting was successful, false otherwise
      */
-    @NbBundle.Messages( {
+    @NbBundle.Messages({
         "# {0} - sort order",
         "MSG_SamBamSorter.sort.Start=Start sorting file by {0}...",
         "# {0} - sort order",
         "MSG_SamBamSorter.sort.Finish=Finished sorting file by {0}. ",
         "# {0} - track file",
-        "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported." } )
+        "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported."})
     public boolean sortSamBam( final TrackJob trackJob, final SAMFileHeader.SortOrder sortOrder, final String sortOrderMsg ) {
 
         boolean success = true;
@@ -99,8 +99,7 @@ public class SamBamSorter implements Observable {
                             long finish = System.currentTimeMillis();
                             this.notifyObservers( Benchmark.calculateDuration( start, finish, lineNo + " mappings processed in " ) );
                         }
-                    }
-                    catch( SAMFormatException e ) {
+                    } catch( SAMFormatException e ) {
                         if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
                             this.notifyObservers( e.getMessage() );
                         } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
@@ -115,12 +114,10 @@ public class SamBamSorter implements Observable {
 
             msg = Bundle.MSG_SamBamSorter_sort_Finish( sortOrderMsg );
 
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             if( writerAndFile != null ) {
                 trackJob.setFile( writerAndFile.getSecond() );
-            }
-            else {
+            } else {
                 trackJob.setFile( new File( trackJob.getFile(), sortOrderMsg ) );
             }
             success = false;

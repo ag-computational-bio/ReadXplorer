@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package de.cebitec.readxplorer.parser.tables;
@@ -11,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import jxl.Cell;
 import jxl.Sheet;
@@ -26,6 +40,8 @@ import jxl.read.biff.BiffException;
  */
 public class ExcelToTable implements ExcelImportDataI {
 
+    private static final Logger LOG = Logger.getLogger( ExcelToTable.class.getName() );
+
     private String tableName;
     private final List<String> columnNames;
     private Object[][] fileContentFirstSheet;
@@ -37,7 +53,7 @@ public class ExcelToTable implements ExcelImportDataI {
      * Constructor for this class, which needs an excel file and a
      * ProgressHandle.
      *
-     * @param file   excel file.
+     * @param file excel file.
      * @param handle ProgressHandle
      * <p>
      * @throws IOException
@@ -51,7 +67,7 @@ public class ExcelToTable implements ExcelImportDataI {
     /**
      * This method extracts the data from the sheets in the given excel file.
      *
-     * @param file   excel file.
+     * @param file excel file.
      * @param handle ProgressHandle
      * <p>
      * @throws IOException
@@ -98,8 +114,8 @@ public class ExcelToTable implements ExcelImportDataI {
             }
 
             w.close();
-        }
-        catch( BiffException e ) {
+        } catch( BiffException e ) {
+            LOG.log( Level.WARNING, e.getMessage(), e );
         }
 
     }

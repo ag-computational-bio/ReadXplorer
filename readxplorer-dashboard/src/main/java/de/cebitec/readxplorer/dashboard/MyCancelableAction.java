@@ -34,14 +34,14 @@ import static java.util.logging.Logger.getLogger;
 
 /**
  * An action, which can be canceled.
- *
+ * <p>
  * @author jeff
  */
 public final class MyCancelableAction implements ActionListener {
 
     private static final Logger LOG = getLogger( MyCancelableAction.class.getName() );
 
-    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
+    private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private RequestProcessor.Task theTask = null;
 
 
@@ -59,7 +59,7 @@ public final class MyCancelableAction implements ActionListener {
 
         Runnable runnable = new Runnable() {
 
-            private final int NUM = 60000;
+            private static final int NUM = 60000;
 
 
             @Override
@@ -73,8 +73,7 @@ public final class MyCancelableAction implements ActionListener {
                         Thread.sleep( 0 ); //throws InterruptedException is the task was cancelled
                     }
 
-                }
-                catch( InterruptedException ex ) {
+                } catch( InterruptedException ex ) {
                     LOG.info( "the task was CANCELLED" );
                 }
 

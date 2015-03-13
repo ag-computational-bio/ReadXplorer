@@ -101,7 +101,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     private ResultDeAnalysis result;
     private List<Group> groups;
     private ChartPanel chartPanel;
-    private boolean SVGCanvasActive;
+    private boolean svgCanvasActive;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -155,7 +155,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
 
 
         } );
-        SVGCanvasActive = true;
+        svgCanvasActive = true;
     }
 
 
@@ -361,14 +361,12 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
                 if( selectedPlot == BaySeqAnalysisHandler.Plot.MACD ) {
                     saveToSVG( fileLocation );
-                }
-                else {
+                } else {
                     Path from = currentlyDisplayed.toPath();
                     try {
                         Path outputFile = Files.copy( from, to, StandardCopyOption.REPLACE_EXISTING );
                         NotificationDisplayer.getDefault().notify( Bundle.BaySeqSuccessHeader(), new ImageIcon(), Bundle.BaySeqSuccessMsg() + outputFile.toString(), null );
-                    }
-                    catch( IOException ex ) {
+                    } catch( IOException ex ) {
                         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                         LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                         JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
@@ -406,17 +404,14 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 int currentInteger = integerRep[i];
                 if( currentInteger == integerGroupA ) {
                     sampleA.add( i );
-                }
-                else {
+                } else {
                     if( integerGroupB == null ) {
                         integerGroupB = currentInteger;
                         sampleB.add( i );
-                    }
-                    else {
+                    } else {
                         if( integerGroupB == currentInteger ) {
                             sampleB.add( i );
-                        }
-                        else {
+                        } else {
                             messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
                             break;
                         }
@@ -425,14 +420,13 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
             if( sampleB.isEmpty() || (sampleA.size() + sampleB.size()) != integerRep.length ) {
                 messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
-            }
-            else {
+            } else {
                 chartPanel = CreatePlots.createInfPlot(
                         ConvertData.createMAvalues( result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray( new Integer[sampleA.size()] ),
                                                     sampleB.toArray( new Integer[sampleB.size()] ) ), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip() );
-                if( SVGCanvasActive ) {
+                if( svgCanvasActive ) {
                     jPanel1.remove( svgCanvas );
-                    SVGCanvasActive = false;
+                    svgCanvasActive = false;
                 }
                 jPanel1.add( chartPanel, BorderLayout.CENTER );
                 jPanel1.updateUI();
@@ -441,13 +435,12 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
             progressHandle.switchToDeterminate( 100 );
             progressHandle.finish();
-        }
-        else {
-            if( !SVGCanvasActive ) {
+        } else {
+            if( !svgCanvasActive ) {
                 jPanel1.remove( chartPanel );
                 jPanel1.add( svgCanvas, BorderLayout.CENTER );
                 jPanel1.updateUI();
-                SVGCanvasActive = true;
+                svgCanvasActive = true;
             }
             try {
                 messages.setText( "" );
@@ -457,26 +450,21 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 svgCanvas.setURI( currentlyDisplayed.toURI().toString() );
                 svgCanvas.setVisible( true );
                 svgCanvas.repaint();
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            }
-            catch( BaySeq.SamplesNotValidException ex ) {
+            } catch( BaySeq.SamplesNotValidException ex ) {
                 messages.setText( "Samples A and B must not be the same!" );
-            }
-            catch( GnuR.PackageNotLoadableException ex ) {
+            } catch( GnuR.PackageNotLoadableException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            }
-            catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
+            } catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
-            }
-            finally {
+            } finally {
                 progressHandle.switchToDeterminate( 100 );
                 progressHandle.finish();
                 plotButton.setEnabled( true );
@@ -547,8 +535,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     public void update( Object args ) {
         if( args instanceof ChartExporter.ChartExportStatus ) {
             DgeExportUtilities.updateExportStatus( svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton );
-        }
-        else {
+        } else {
             addResults();
         }
     }
@@ -557,8 +544,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     @Override
     public void itemStateChanged( ItemEvent e ) {
         BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
-        if( item == BaySeqAnalysisHandler.Plot.Priors
-            || item == BaySeqAnalysisHandler.Plot.MACD ) {
+        if( item == BaySeqAnalysisHandler.Plot.Priors ||
+                 item == BaySeqAnalysisHandler.Plot.MACD ) {
             samplesAList.setEnabled( false );
             samplesALabel.setEnabled( false );
             samplesBList.setEnabled( false );

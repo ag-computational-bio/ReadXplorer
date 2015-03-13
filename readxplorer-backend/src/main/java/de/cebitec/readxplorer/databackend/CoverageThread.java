@@ -31,7 +31,6 @@ import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -54,7 +53,7 @@ public class CoverageThread extends RequestThread {
     private long trackID;
     private long trackID2;
     private final List<PersistentTrack> tracks;
-    ConcurrentLinkedQueue<IntervalRequest> requestQueue;
+    protected final ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResult currentCov;
     private PersistentReference referenceGenome;
 
@@ -75,14 +74,11 @@ public class CoverageThread extends RequestThread {
         this.tracks = tracks;
         if( tracks.size() == 1 ) {
             singleCoverageThread( tracks.get( 0 ).getId() );
-        }
-        else if( tracks.size() == 2 && !combineTracks ) {
+        } else if( tracks.size() == 2 && !combineTracks ) {
             doubleCoverageThread( tracks.get( 0 ).getId(), tracks.get( 1 ).getId() );
-        }
-        else if( tracks.size() >= 2 ) {
+        } else if( tracks.size() >= 2 ) {
             multipleCoverageThread();
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException( "At least one track needs to be handed over to the CoverageThread." );
         }
     }
@@ -194,8 +190,7 @@ public class CoverageThread extends RequestThread {
             }
             result = new CoverageAndDiffResult( cov, null, null, request );
             result.setReadStarts( readStarts );
-        }
-        else {
+        } else {
             result = getCoverageAndReadStartsFromFile( request, tracks.get( 0 ) );
         }
 
@@ -224,7 +219,7 @@ public class CoverageThread extends RequestThread {
         CoverageManager cov2 = new CoverageManager( from, to );
         cov1.incArraysToIntervalSize();
         cov2.incArraysToIntervalSize();
-//        cov.setTwoTracks(true); //TODO: check if not needed
+//        cov.setTwoTracks(true); //TODO check if not needed
 
         IntervalRequest newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -283,8 +278,7 @@ public class CoverageThread extends RequestThread {
                 diffs.addAll( intermedRes.getDiffs() );
                 gaps.addAll( intermedRes.getGaps() );
             }
-        }
-        else {
+        } else {
             CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile( request, tracks.get( 0 ) );
             covManager = result.getCovManager();
             diffs = result.getDiffs();
@@ -313,8 +307,7 @@ public class CoverageThread extends RequestThread {
                                                || doesNotMatchLatestRequestBounds( request )) ) {
                         if( trackID2 != 0 ) {
                             currentCov = this.loadCoverageDouble( request );
-                        }
-                        else if( this.trackID != 0 || this.canQueryCoverage() ) {
+                        } else if( this.trackID != 0 || this.canQueryCoverage() ) {
                             currentCov = this.loadCoverageMultiple( request );
                         }
                         /*else {
@@ -327,17 +320,14 @@ public class CoverageThread extends RequestThread {
                         this.setLastRequest( request );
                         request.getSender().receiveData( currentCov );
 
-                    }
-                    else {
+                    } else {
                         request.getSender().notifySkipped();
                     }
-                }
-                else {
+                } else {
                     this.makeThreadSleep( 25 );
                 }
             }
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( JOptionPane.getRootFrame() );
             this.interrupt();
         }
@@ -389,8 +379,7 @@ public class CoverageThread extends RequestThread {
     private void makeThreadSleep( final int msToSleep ) {
         try {
             Thread.sleep( msToSleep );
-        }
-        catch( InterruptedException ex ) {
+        } catch( InterruptedException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
     }

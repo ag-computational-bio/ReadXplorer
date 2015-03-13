@@ -20,12 +20,10 @@ package de.cebitec.readxplorer.utils.classification;
 
 /**
  * Enumeration for all different features types used in readxplorer. This does
- * not only
- * include genetic features, but also features displayed in viewers.
- * Each type is created with an integer and a string representation and
- * it can return values for both.
- * It also allows to return the feature type represented by a given integer
- * or string.
+ * not only include genetic features, but also features displayed in viewers.
+ * Each type is created with an integer and a string representation and it can
+ * return values for both. It also allows to return the feature type represented
+ * by a given integer or string.
  * <p>
  * @author ddoppmeier, rhilker
  */
@@ -169,7 +167,6 @@ public enum FeatureType implements Classification {
     private static final int DISTORTED_PAIR_INT = 27;
     private static final int SINGLE_MAPPING_INT = 28;
 
-
     //feature types supported by ReadXplorer
     //Underscore Strings are needed to parse the official feature keys
     private static final String ANY_STRING = "any";
@@ -244,7 +241,7 @@ public enum FeatureType implements Classification {
     /**
      * FeatureTypes that are GUI selectable.
      */
-    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = { GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA, NC_RNA };
+    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA, NC_RNA};
 
 
     private FeatureType( int typeInt, String typeString ) {
@@ -273,10 +270,10 @@ public enum FeatureType implements Classification {
 
     /**
      * @return the desired FeatureType for a given integer of a genomic feature
-     *         type.
+     * type.
      * <p>
      * @param type the type of FeatureType to return. If the type does not match
-     *             a genomic feature type, FeatureType.UNDEFINED is returned.
+     * a genomic feature type, FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType( int type ) {
         switch( type ) {
@@ -324,68 +321,49 @@ public enum FeatureType implements Classification {
      * @return the desired FeatureType for a given genomic feature type string.
      * <p>
      * @param type the type of FeatureType to return. If the type is unknown
-     *             FeatureType.UNDEFINED is returned.
+     * FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType( String type ) {
         FeatureType featType;
         if( type.equalsIgnoreCase( UNDEFINED_STRING ) ) {
             featType = UNDEFINED;
-        }
-        else if( type.equalsIgnoreCase( MRNA_STRING ) ) {
+        } else if( type.equalsIgnoreCase( MRNA_STRING ) ) {
             featType = MRNA;
-        }
-        else if( type.equalsIgnoreCase( CDS_STRING ) ) {
+        } else if( type.equalsIgnoreCase( CDS_STRING ) ) {
             featType = CDS;
-        }
-        else if( type.equalsIgnoreCase( ORF_STRING ) ) {
+        } else if( type.equalsIgnoreCase( ORF_STRING ) ) {
             featType = CDS;
-        }
-        else if( type.equalsIgnoreCase( MISC_RNA_STRING ) || type.equalsIgnoreCase( MISC_RNA_STRING_USCORE ) ) {
+        } else if( type.equalsIgnoreCase( MISC_RNA_STRING ) || type.equalsIgnoreCase( MISC_RNA_STRING_USCORE ) ) {
             featType = MISC_RNA;
-        }
-        else if( type.equalsIgnoreCase( RRNA_STRING ) ) {
+        } else if( type.equalsIgnoreCase( RRNA_STRING ) ) {
             featType = RRNA;
-        }
-        else if( type.equalsIgnoreCase( REPEAT_UNIT_STRING ) || type.equalsIgnoreCase( REPEAT_UNIT_STRING_USCORE ) ) {
+        } else if( type.equalsIgnoreCase( REPEAT_UNIT_STRING ) || type.equalsIgnoreCase( REPEAT_UNIT_STRING_USCORE ) ) {
             featType = REPEAT_UNIT;
-        }
-        else if( type.equalsIgnoreCase( TRNA_STRING ) ) {
+        } else if( type.equalsIgnoreCase( TRNA_STRING ) ) {
             featType = TRNA;
-        }
-        else if( type.equalsIgnoreCase( GENE_STRING ) ) {
+        } else if( type.equalsIgnoreCase( GENE_STRING ) ) {
             featType = GENE;
-        }
-        else if( type.equalsIgnoreCase( MIRNA_STRING ) ) {
+        } else if( type.equalsIgnoreCase( MIRNA_STRING ) ) {
             featType = MIRNA;
-        }
-        else if( type.equalsIgnoreCase( EXON_STRING ) ) {
+        } else if( type.equalsIgnoreCase( EXON_STRING ) ) {
             featType = EXON;
-        }
-        else if( type.equalsIgnoreCase( SOURCE_STRING ) ) {
+        } else if( type.equalsIgnoreCase( SOURCE_STRING ) ) {
             featType = SOURCE;
-        }
-        else if( type.equalsIgnoreCase( ANY_STRING ) ) {
+        } else if( type.equalsIgnoreCase( ANY_STRING ) ) {
             featType = ANY;
-        }
-        else if( type.equalsIgnoreCase( FIVE_UTR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( FIVE_UTR_STRING ) ) {
             featType = FIVE_UTR;
-        }
-        else if( type.equalsIgnoreCase( THREE_UTR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( THREE_UTR_STRING ) ) {
             featType = THREE_UTR;
-        }
-        else if( type.equalsIgnoreCase( NC_RNA_STRING ) ) {
+        } else if( type.equalsIgnoreCase( NC_RNA_STRING ) ) {
             featType = NC_RNA;
-        }
-        else if( type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING ) || type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING ) || type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING_UNDERSCORE ) ) {
             featType = MINUS_THIRTYFIVE;
-        }
-        else if( type.equalsIgnoreCase( MINUS_TEN_STRING ) || type.equalsIgnoreCase( MINUS_TEN_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( MINUS_TEN_STRING ) || type.equalsIgnoreCase( MINUS_TEN_STRING_UNDERSCORE ) ) {
             featType = MINUS_TEN;
-        }
-        else if( type.equalsIgnoreCase( RBS_STRING ) ) {
+        } else if( type.equalsIgnoreCase( RBS_STRING ) ) {
             featType = RBS;
-        }
-        else {
+        } else {
             featType = UNDEFINED;
         }
 

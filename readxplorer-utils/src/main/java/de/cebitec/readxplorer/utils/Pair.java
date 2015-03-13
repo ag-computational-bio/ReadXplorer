@@ -90,7 +90,7 @@ public class Pair<T1, T2> {
      * @param o2 Second object
      * <p>
      * @return <code>true</code> if the first object equals the second one,
-     *         <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
     public static boolean same( Object o1, Object o2 ) {
         return o1 == null ? o2 == null : o1.equals( o2 );
@@ -103,7 +103,7 @@ public class Pair<T1, T2> {
      * @param obj The object to test if it is equal to this Pair.
      * <p>
      * @return <code>true</code> if both elements of both Pairs are the same,
-     *         <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
     @Override
     public boolean equals( Object obj ) {

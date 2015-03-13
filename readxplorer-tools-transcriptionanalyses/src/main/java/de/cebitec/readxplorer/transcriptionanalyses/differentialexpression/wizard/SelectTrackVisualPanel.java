@@ -169,8 +169,7 @@ public final class SelectTrackVisualPanel extends JPanel implements
     public boolean selectionFinished() {
         if( trackList.isSelectionEmpty() ) {
             return false;
-        }
-        else {
+        } else {
             List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
             return selectedTracks.size() >= 2;
         }

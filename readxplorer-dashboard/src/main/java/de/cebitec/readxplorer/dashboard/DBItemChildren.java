@@ -28,7 +28,7 @@ import org.openide.util.Exceptions;
 
 /**
  * Children container for DBItems.
- *
+ * <p>
  * @author jeff
  */
 public class DBItemChildren extends StandardItemChildren {
@@ -52,8 +52,7 @@ public class DBItemChildren extends StandardItemChildren {
         for( DBItem item : this.items ) {
             try {
                 childrenNodes.add( new DBItemNode( item ) );
-            }
-            catch( IntrospectionException ex ) {
+            } catch( IntrospectionException ex ) {
                 Exceptions.printStackTrace( ex );
             }
 

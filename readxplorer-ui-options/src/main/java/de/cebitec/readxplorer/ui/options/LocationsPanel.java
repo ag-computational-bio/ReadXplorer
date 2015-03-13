@@ -23,11 +23,13 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
+
 
 /**
  * A panel displaying options for important locations needed by ReadXplorer.
@@ -36,9 +38,11 @@ import org.openide.util.NbPreferences;
  */
 final class LocationsPanel extends OptionsPanel {
 
+    private static final Logger LOG = Logger.getLogger( LocationsPanel.class.getName() );
+
     private static final long serialVersionUID = 1L;
 
-    private final LocationsOptionsPanelController controller;
+//    private final LocationsOptionsPanelController controller;
     private final Preferences pref;
     private String selectedDbLink;
 
@@ -48,7 +52,7 @@ final class LocationsPanel extends OptionsPanel {
      * @param controller The controller
      */
     LocationsPanel( LocationsOptionsPanelController controller ) {
-        this.controller = controller;
+//        this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
         initComponents();
         initAdditionalComponents();
@@ -383,7 +387,7 @@ final class LocationsPanel extends OptionsPanel {
             URL url = new URL( selectedDbLink );
             isValid = true;
         } catch( MalformedURLException ex ) {
-//            selectedDbLink = Properties.DB_EXPASY;
+            LOG.info( "Encountered a malformed enzyme DB url." );
         }
         return isValid;
     }

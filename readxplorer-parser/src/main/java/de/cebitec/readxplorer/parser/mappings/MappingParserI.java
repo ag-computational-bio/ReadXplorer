@@ -36,7 +36,7 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
     /**
      * Parses the input determined by the track job.
      * <p>
-     * @param trackJob       the track job to parse
+     * @param trackJob the track job to parse
      * @param chromLengthMap the map of chromosome names to chromosome length
      * <p>
      * @return the parsed data object
@@ -44,31 +44,31 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
-    public Boolean parseInput( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError;
+    Boolean parseInput( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError;
 
 
     /**
      * Converts some data for the given track job and the given reference.
      * <p>
-     * @param trackJob       the track job whose data needs to be converted
+     * @param trackJob the track job whose data needs to be converted
      * @param chromLengthMap the mapping of chromosome name to chromosome length
-     *                       for this track
+     * for this track
      * <p>
      * @return Any object the specific implementation needs
      * <p>
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
-    public Boolean convert( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError;
+    Boolean convert( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError;
 
 
     /**
-     * Sets the given stats container to this parser. Then this parser can
-     * store statistics.
+     * Sets the given stats container to this parser. Then this parser can store
+     * statistics.
      * <p>
      * @param statsContainer the stats container to set
      */
-    public void setStatsContainer( StatsContainer statsContainer );
+    void setStatsContainer( StatsContainer statsContainer );
 
 
 }

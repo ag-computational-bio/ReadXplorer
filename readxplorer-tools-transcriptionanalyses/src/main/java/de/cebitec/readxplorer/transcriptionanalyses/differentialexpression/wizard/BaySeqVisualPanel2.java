@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 
 public final class BaySeqVisualPanel2 extends JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private int[] replicateStructure = new int[1];
@@ -165,8 +167,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
                 trackListModel.removeElement( persistentTrack );
                 if( it.hasNext() ) {
                     strBuilder.append( "," );
-                }
-                else {
+                } else {
                     strBuilder.append( "}" );
                 }
             }

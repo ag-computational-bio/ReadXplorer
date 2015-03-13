@@ -71,7 +71,7 @@ public class Difference extends BasicDiff implements Comparable<Difference>,
      */
     @Override
     public final int compareTo( Difference other ) {
-        return ( (Integer) this.getPosition()).compareTo(other.getPosition());
+        return ((Integer) this.getPosition()).compareTo( other.getPosition() );
     }
 
 

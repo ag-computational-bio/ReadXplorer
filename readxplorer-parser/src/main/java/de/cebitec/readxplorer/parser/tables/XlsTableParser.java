@@ -39,9 +39,9 @@ import org.openide.util.Exceptions;
  */
 public class XlsTableParser implements TableParserI {
 
-    private static final String name = "Xls Table Parser";
-    private static final String[] fileExtension = new String[]{ "xls", "XLS", "Xls" };
-    private static final String fileDescription = "Xls table";
+    private static final String NAME = "Xls Table Parser";
+    private static final String[] FILE_EXTENSIONS = new String[]{"xls", "XLS", "Xls"};
+    private static final String FILE_DESCRIPTION = "Xls table";
 
 
     /**
@@ -72,7 +72,7 @@ public class XlsTableParser implements TableParserI {
             workbook = Workbook.getWorkbook( fileToRead );
             boolean fstSheet = true;
             String headerStartFstSheet = "";
-            for( Sheet sheet : workbook.getSheets() ) { //TODO: filter stats and parametersheet
+            for( Sheet sheet : workbook.getSheets() ) { //TODO filter stats and parametersheet
                 for( int i = 0; i < sheet.getRows(); i++ ) {
                     if( fstSheet ) {
                         headerStartFstSheet = sheet.getCell( 0, 0 ).getContents();
@@ -94,8 +94,7 @@ public class XlsTableParser implements TableParserI {
                     }
                 }
             }
-        }
-        catch( IOException | BiffException ex ) {
+        } catch( IOException | BiffException ex ) {
             Exceptions.printStackTrace( ex );
         }
 
@@ -106,24 +105,24 @@ public class XlsTableParser implements TableParserI {
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSIONS;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     /**
-     * @return The name of the parser.
+     * @return The NAME of the parser.
      */
     @Override
     public String toString() {

@@ -31,6 +31,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.FINE;
 
 
 /**
@@ -40,6 +43,8 @@ import java.util.Set;
  * @author ddoppmeier, rhilker
  */
 public class PersistentFeature extends Node implements PersistentFeatureI {
+
+    private static final Logger LOG = Logger.getLogger( PersistentFeature.class.getName() );
 
     private final int id;
     private final int chromId;
@@ -109,8 +114,9 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
                 if( !Properties.NO_PARENT_STRING.equals( parentId ) ) {
                     parentIdList.add( Integer.parseInt( parentId ) );
                 }
-            }catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 //ignore and continue
+                LOG.log( FINE, e.getMessage(), e );
             }
         }
         return parentIdList;
@@ -282,14 +288,11 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
         String returnString;
         if( this.featureName != null && !this.featureName.isEmpty() ) {
             returnString = this.featureName;
-        }
-        else if( this.locus != null && !this.locus.isEmpty() ) {
+        } else if( this.locus != null && !this.locus.isEmpty() ) {
             returnString = this.locus;
-        }
-        else if( this.ecNumber != null && !this.ecNumber.isEmpty() ) {
+        } else if( this.ecNumber != null && !this.ecNumber.isEmpty() ) {
             returnString = this.ecNumber;
-        }
-        else {
+        } else {
             returnString = "Feature with start: " + this.start + ", stop: " + this.stop;
         }
 
@@ -346,8 +349,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
         int ret = 0;
         if( this.start < genomicRange.getStart() ) {
             ret = -1;
-        }
-        else if( this.start > genomicRange.getStart() ) {
+        } else if( this.start > genomicRange.getStart() ) {
             ret = 1;
         }
         return ret;
@@ -358,7 +360,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * Static inner class containig all utility methods for
      * <tt>PersistentFeatures</tt>.
      */
-    public static class Utils {
+    public static final class Utils {
 
         /**
          * Utility class, no instantiation allowed.

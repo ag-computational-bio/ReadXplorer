@@ -147,8 +147,9 @@ class LZWEncoder {
 
     void char_out( byte c, OutputStream outs ) throws IOException {
         accum[a_count++] = c;
-        if( a_count >= 254 )
+        if( a_count >= 254 ) {
             flush_char( outs );
+        }
     }
 
 	// Clear out the hash table
@@ -215,31 +216,31 @@ class LZWEncoder {
             if( htab[i] == fcode ) {
                 ent = codetab[i];
                 continue;
-            }
-            else if( htab[i] >= 0 ) // non-empty slot
+            } else if( htab[i] >= 0 ) // non-empty slot
             {
                 disp = hsize_reg - i; // secondary hash (after G. Knott)
-                if( i == 0 )
+                if( i == 0 ) {
                     disp = 1;
+                }
                 do {
-                    if( (i -= disp) < 0 )
+                    if( (i -= disp) < 0 ) {
                         i += hsize_reg;
+                    }
 
                     if( htab[i] == fcode ) {
                         ent = codetab[i];
                         continue outer_loop;
                     }
-                }
-                while( htab[i] >= 0 );
+                } while( htab[i] >= 0 );
             }
             output( ent, outs );
             ent = c;
             if( free_ent < maxmaxcode ) {
                 codetab[i] = free_ent++; // code -> hashtable
                 htab[i] = fcode;
-            }
-            else
+            } else {
                 cl_block( outs );
+            }
         }
         // Put out the final code.
         output( ent, outs );
@@ -279,8 +280,9 @@ class LZWEncoder {
     //----------------------------------------------------------------------------
 
     private int nextPixel() {
-        if( remaining == 0 )
+        if( remaining == 0 ) {
             return EOF;
+        }
 
         --remaining;
 
@@ -293,10 +295,11 @@ class LZWEncoder {
     void output( int code, OutputStream outs ) throws IOException {
         cur_accum &= masks[cur_bits];
 
-        if( cur_bits > 0 )
+        if( cur_bits > 0 ) {
             cur_accum |= (code << cur_bits);
-        else
+        } else {
             cur_accum = code;
+        }
 
         cur_bits += n_bits;
 
@@ -312,13 +315,13 @@ class LZWEncoder {
             if( clear_flg ) {
                 maxcode = MAXCODE( n_bits = g_init_bits );
                 clear_flg = false;
-            }
-            else {
+            } else {
                 ++n_bits;
-                if( n_bits == maxbits )
+                if( n_bits == maxbits ) {
                     maxcode = maxmaxcode;
-                else
+                } else {
                     maxcode = MAXCODE( n_bits );
+                }
             }
         }
 
