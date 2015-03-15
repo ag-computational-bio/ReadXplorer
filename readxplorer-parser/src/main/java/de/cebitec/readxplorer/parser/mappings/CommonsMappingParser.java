@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.parser.common.ParsedDiff;
 import de.cebitec.readxplorer.parser.common.ParsedReferenceGap;
 import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readxplorer.utils.MessageSenderI;
+import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
@@ -45,6 +46,10 @@ import static java.util.logging.Level.WARNING;
  * <p>
  * @author jstraube, Rolf Hilker
  */
+@NbBundle.Messages( { "# {0} - filename",
+                      "# {1} - lineNo",
+                      "# {2} - read string",
+                      "Parser.checkMapping.ErrorReadEmpty=Read sequence could not be parsed in {0} line {1}.Found: {2}" } )
 public final class CommonsMappingParser {
 
     private static final Logger LOG = Logger.getLogger( CommonsMappingParser.class.getName() );
@@ -77,12 +82,13 @@ public final class CommonsMappingParser {
      * in this case). Read and reference sequence are treated case
      * insensitively, so there is no need to transform the case beforehand.
      * <p>
-     * @param cigar the cigar string containing the alignment operations
-     * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence area belonging to the cigar and
-     * without gaps
+     * @param cigar       the cigar string containing the alignment operations
+     * @param readSeq     the read sequence belonging to the cigar and without
+     *                    gaps
+     * @param refSeq      the reference sequence area belonging to the cigar and
+     *                    without gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
-     * false if the read is on the fwd strand.
+     *                    false if the read is on the fwd strand.
      * <p>
      * @return diff and gap result for the read and reference seq pair
      * <p>
@@ -162,14 +168,15 @@ public final class CommonsMappingParser {
      * insensitively, so there is no need to transform the case beforehand. All
      * cigar operations need to be uppercase!
      * <p>
-     * @param cigar the cigar string containing the alignment operations
-     * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence area belonging to the cigar and
-     * without gaps
+     * @param cigar       the cigar string containing the alignment operations
+     * @param readSeq     the read sequence belonging to the cigar and without
+     *                    gaps
+     * @param refSeq      the reference sequence area belonging to the cigar and
+     *                    without gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
-     * false if the read is on the fwd strand.
-     * @param start start of the alignment of read and reference in the
-     * reference
+     *                    false if the read is on the fwd strand.
+     * @param start       start of the alignment of read and reference in the
+     *                    reference
      * <p>
      * @return diff and gap result for the read and reference seq pair
      * <p>
@@ -274,9 +281,10 @@ public final class CommonsMappingParser {
      * treated case insensitively, so there is no need to transform the case
      * beforehand.
      * <p>
-     * @param readSeq read whose diffs and gaps are calculated
-     * @param refSeq reference sequence aligned to the read sequence
-     * @param start start position on the whole chromosome (absolute position)
+     * @param readSeq   read whose diffs and gaps are calculated
+     * @param refSeq    reference sequence aligned to the read sequence
+     * @param start     start position on the whole chromosome (absolute
+     *                  position)
      * @param direction direction of the read
      * <p>
      * @return the diff and gap result for the read
@@ -323,9 +331,9 @@ public final class CommonsMappingParser {
      * a new position in the reference genome, but we store the number of gaps
      * for one position of the ref genome.
      * <p>
-     * @param gapPos position of the gap
+     * @param gapPos        position of the gap
      * @param gapOrderIndex the gap order index for the current gap (larger the
-     * more gaps in a row
+     *                      more gaps in a row
      * <p>
      * @return the new gap order index for the gap (starting with 0)
      */
@@ -346,14 +354,15 @@ public final class CommonsMappingParser {
      * This method tries to convert the cigar string to the mapping again
      * because SAM format has no other mapping information
      * <p>
-     * @param cigar contains mapping information of reference and read sequence
-     * M can be a Match or Mismatch, D is a deletion on the read, I insertion on
-     * the read, S softclipped read
-     * @param refSeq reference sequence corresponding to read seq
+     * @param cigar   contains mapping information of reference and read
+     *                sequence M can be a Match or Mismatch, D is a deletion on
+     *                the read, I insertion on the read, S softclipped read
+     * @param refSeq  reference sequence corresponding to read seq
      * @param readSeq read sequence
      * <p>
      * @return the refSeq with gaps in fact of insertions in the reads
      */
+    @NbBundle.Messages( { "# {0} - observed cigar operation", "CommonMethod.CIGAR=CIGAR character is unknown {0}" } )
     public static String[] createMappingOfRefAndRead( String cigar, String refSeq, String readSeq ) {
         // TODO: check this
         String newRefSeqwithGaps = null;
@@ -425,8 +434,8 @@ public final class CommonsMappingParser {
                         softclipped = Integer.parseInt( numOfBases );
                     }
                     break;
-                default:
-                    LOG.log( WARNING, NbBundle.getMessage( CommonsMappingParser.class, "CommonMethod.CIGAR ", op ) );
+                default: //shoud never happen as SAMRecord validates the cigar
+                    LOG.log( WARNING, Bundle.CommonMethod_CIGAR( op ) );
                     break;
             }
         }
@@ -439,84 +448,34 @@ public final class CommonsMappingParser {
 
 
     /**
-     * Checks a read for common properties: <br>1. Empty or null read sequence
-     * <br>2. mapping beyond the reference sequence length or to negative
-     * positions <br>3. a start position larger than the stop position
+     * Checks SAMRecord read properties necessary for ReadXplorer:
+     * <br/>'*' read sequence is not permitted.
      * <p>
-     * @param parent the parent observable to receive messages
-     * @param readSeq the read sequence
-     * @param refSeqLength the length of the reference sequence
-     * @param start the start of the mapping
-     * @param stop the stop of the mapping
+     * @param parent   the parent observable to receive messages
+     * @param readSeq  the read sequence
      * @param filename the file name of which the mapping originates
-     * @param lineNo the line number in the filelineNo<p>
+     * @param lineNo   the line number in the filelineNo<p>
      * @return true, if the read is consistent, false otherwise
      */
-    public static boolean checkRead( final MessageSenderI parent,
-            final String readSeq,
-            final int refSeqLength,
-            final int start,
-            final int stop,
-            final String filename,
-            final int lineNo ) {
+    public static boolean checkReadSam( final MessageSenderI parent,
+                                        final String readSeq,
+                                        final String filename,
+                                        final int lineNo ) {
+
 
         boolean isConsistent = true;
-        if( readSeq == null || readSeq.isEmpty() ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorReadEmpty", filename, lineNo, readSeq ) );
+        if( SAMRecord.NULL_SEQUENCE_STRING.equals( readSeq ) ) { //RX requires read strings
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadEmpty( filename, lineNo, readSeq ) );
             isConsistent = false;
         }
-        if( refSeqLength < start || refSeqLength < stop ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorReadPosition",
-                    filename, lineNo, start, stop, refSeqLength ) );
-            isConsistent = false;
-        }
-        if( start >= stop ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorStartStop", filename, lineNo, start, stop ) );
-            isConsistent = false;
-        }
-
-        return isConsistent;
-    }
-
-
-    /**
-     * Checks a read for common properties:
-     * <br>1. Empty or null read sequence
-     * <br>2. mapping beyond the reference sequence length or to negative
-     * positions
-     * <br>3. a start position larger than the stop position
-     * <br>4. an error in the cigar string
-     * <p>
-     * @param parent the parent observable to receive messages
-     * @param readSeq the read sequence
-     * @param refSeqLength the length of the reference sequence
-     * @param cigar the cigar of the mapping
-     * @param start the start of the mapping
-     * @param stop the stop of the mapping
-     * @param filename the file name of which the mapping originates
-     * @param lineno the line number in the file
-     * <p>
-     * @return true, if the read is consistent, false otherwise
-     */
-    public static boolean checkReadSam(
-            final MessageSenderI parent,
-            final String readSeq,
-            final int refSeqLength,
-            final String cigar,
-            final int start,
-            final int stop,
-            final String filename,
-            final int lineno ) {
-
-        boolean isConsistent = CommonsMappingParser.checkRead( parent, readSeq, refSeqLength, start, stop, filename, lineno );
-        if( !cigar.matches( "[MHISDPXN=\\d]+" ) ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorCigar", cigar, filename, lineno ) );
-            isConsistent = false;
-        }
+        /* Check if read maps beyond reference sequence not needed because we
+         * need the CIGAR and SamRecord automatically validates the
+         * AlignmentBlocks
+         */
+        /*
+         * Check if start > stop not necessary, because SAMRecord calculates the
+         * stop based on the start + length
+         */
 
         return isConsistent;
     }
@@ -532,20 +491,31 @@ public final class CommonsMappingParser {
      * <br>5. an empty refrence sequence
      * <br>6. an unknown mapping orientation
      * <p>
-     * @param parent the parent observable to receive messages
-     * @param readSeq the read sequence
-     * @param readname the name of the read
-     * @param refSeq reference sequence beloning to the mapping (not the
-     * complete reference genome)
+     * @param parent       the parent observable to receive messages
+     * @param readSeq      the read sequence
+     * @param readname     the name of the read
+     * @param refSeq       reference sequence beloning to the mapping (not the
+     *                     complete reference genome)
      * @param refSeqLength the length of the reference sequence
-     * @param start the start of the mapping
-     * @param stop the stop of the mapping
-     * @param direction direction of the mapping
-     * @param filename the file name of which the mapping originates
-     * @param lineno the line number in the file
+     * @param start        the start of the mapping
+     * @param stop         the stop of the mapping
+     * @param direction    direction of the mapping
+     * @param filename     the file name of which the mapping originates
+     * @param lineNo       the line number in the file
      * <p>
      * @return true, if the read is consistent, false otherwise
      */
+    @NbBundle.Messages( { "# {0} - filename",
+                          "# {1} - lineNo",
+                          "# {2} - read name",
+                          "Parser.checkMapping.ErrorReadname=Could not read readname in {0} line {1}. Found read name: {2}",
+                          "# {0} - filename",
+                          "# {1} - lineNo",
+                          "Parser.checkMapping.ErrorDirectionJok=Could not parse direction in {0}  line {1}. Must be >> oder <<",
+                          "# {0} - filename",
+                          "# {1} - lineNo",
+                          "# {2} - reference sequence",
+                          "Parser.checkMapping.ErrorRef=Reference sequence could not be parsed in {0} line {1}.Found: {2}" } )
     public static boolean checkReadJok(
             final MessageSenderI parent,
             final String readSeq,
@@ -556,23 +526,69 @@ public final class CommonsMappingParser {
             final int stop,
             final int direction,
             final String filename,
-            final int lineno ) {
+            final int lineNo ) {
 
-        boolean isConsistent = CommonsMappingParser.checkRead( parent, readSeq, refSeqLength, start, stop, filename, lineno );
+        boolean isConsistent = CommonsMappingParser.checkRead( parent, refSeqLength, start, stop, filename, lineNo );
 
+        if( readSeq == null || readSeq.isEmpty() ) {
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadEmpty( filename, lineNo, readSeq ) );
+            isConsistent = false;
+        }
         if( readname == null || readname.isEmpty() ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorReadname", filename, lineno, readname ) );
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadname( filename, lineNo, readname ) );
             isConsistent = false;
         }
         if( direction == 0 ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorDirectionJok", filename, lineno ) );
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorDirectionJok( filename, lineNo ) );
             isConsistent = false;
         }
         if( refSeq == null || refSeq.isEmpty() ) {
-            parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorRef", filename, lineno, refSeq ) );
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorRef( filename, lineNo, refSeq ) );
+            isConsistent = false;
+        }
+
+        return isConsistent;
+    }
+
+
+    /**
+     * Checks a read for common properties: <br>1. Empty or null read sequence
+     * <br>2. mapping beyond the reference sequence length or to negative
+     * positions <br>3. a start position larger than the stop position
+     * <p>
+     * @param parent       the parent observable to receive messages
+     * @param refSeqLength the length of the reference sequence
+     * @param start        the start of the mapping
+     * @param stop         the stop of the mapping
+     * @param filename     the file name of which the mapping originates
+     * @param lineNo       the line number in the filelineNo<p>
+     * @return true, if the read is consistent, false otherwise
+     */
+    @NbBundle.Messages( { "# {0} - filename",
+                          "# {1} - lineNo",
+                          "# {2} - start",
+                          "# {3} - stop",
+                          "# {4} - ref length",
+                          "Parser.checkMapping.ErrorReadPosition=Could not read readname in {0} line {1}. Reference is shorter than mapping! Start: {2} Stop: {3} Reference length: {4}",
+                          "# {0} - filename",
+                          "# {1} - lineNo",
+                          "# {2} - start",
+                          "# {3} - stop",
+                          "Parser.checkMapping.ErrorStartStop=Start bigger than stop in {0}  line {1}. Found start: {2}, stop:{3}" } )
+    public static boolean checkRead( final MessageSenderI parent,
+                                     final int refSeqLength,
+                                     final int start,
+                                     final int stop,
+                                     final String filename,
+                                     final int lineNo ) {
+
+        boolean isConsistent = true;
+        if( refSeqLength < start || refSeqLength < stop ) {
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadPosition( filename, lineNo, start, stop, refSeqLength ) );
+            isConsistent = false;
+        }
+        if( start >= stop ) {
+            parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorStartStop( filename, lineNo, start, stop ) );
             isConsistent = false;
         }
 
@@ -585,9 +601,9 @@ public final class CommonsMappingParser {
      * mapping, we need to count the number of deletions to calculate the stop
      * position of the read in the ref genome.
      * <p>
-     * @param cigar contains mapping information
+     * @param cigar         contains mapping information
      * @param startPosition of the mapping
-     * @param readLength the length of the read
+     * @param readLength    the length of the read
      * <p>
      * @return Corrected stop position of the read
      */
@@ -618,71 +634,91 @@ public final class CommonsMappingParser {
 
 
     /**
-     * Returns the read name without the pair tag.
+     * If the read name contains a pair tag, it returns the read name without
+     * the pair tag for both read names prior to Casava 1.8 and read names in
+     * Casava 1.8 format. If there is no pair tag, the read name remains
+     * unchanged.
      * <p>
-     * @param readNameFull The read name whose pair tag shall be removed
+     * @param readNameFull The read name whose pair tag shall be removed if it
+     *                     contains one
      * <p>
-     * @return The read name without its pair tag
+     * @return A pair: The First element is a boolean indicating whether the
+     *         read name has been modified (<code>true</code>) or not
+     *         (<code>false</code>). The second element is the read name without
+     *         its pair tag.
      */
-    public static String getReadNameWithoutPairTag( final String readNameFull ) {
-        String readName;
+    public static Pair<Boolean, String> getReadNameWithoutPairTag( final String readNameFull ) {
+        boolean changed = false;
+        String readName = readNameFull;
         String[] nameParts = readNameFull.split( " " );
         if( nameParts.length == 2 && (nameParts[1].startsWith( "1" ) || nameParts[1].startsWith( "2" )) ) {
             readName = nameParts[0];
+            changed = true;
         } else {
-            readName = readNameFull.substring( 0, readNameFull.length() - 2 );
+            final char lastChar = readName.charAt( readName.length() - 1 );
+            final char prevLastChar = readName.charAt( readName.length() - 2 );
+
+            if( prevLastChar == Properties.EXT_SEPARATOR &&
+                (lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_A2 ||
+                 lastChar == Properties.EXT_B1 || lastChar == Properties.EXT_B2) ) {
+
+                readName = readNameFull.substring( 0, readNameFull.length() - 2 );
+                changed = true;
+            }
         }
 
-        return readName;
+        return new Pair<>( changed, readName );
     }
 
 
     /**
-     * Calculates the pair tag for a given sam record. It checks the ending of
-     * the read name, the ReadPairedFlag of the sam record and the casava > 1.8
-     * format for an appropriate pair flag until it is found. If no paired read
-     * tag can be found, the pair tag returns a neutral pairTag for single end
-     * mapped reads.
+     * Calculates the pair tag for a given sam record. It checks the
+     * ReadPairedFlag of the sam record, the ending of the read name for read
+     * names prior to CASAVA 1.8 and CASAVA > 1.8 formatted read names for an
+     * appropriate pair flag until it is found. If no paired read tag can be
+     * deduced, the method returns a neutral pairTag for single end mapped
+     * reads.
      * <p>
      * @param record the record to check for a pair tag
      * <p>
      * @return Either '1' for first read of pair, '2' for second read of pair or
-     * '0' for a single end mapping
+     *         '0' for a single end mapping
      */
     public static char getReadPairTag( final SAMRecord record ) {
 
-        final String readName = record.getReadName();
         char pairTag = Properties.EXT_UNDEFINED;
 
-        if( readName.length() > 2 ) {
+        //if paired read flag is set, we can directly use it
+        if( record.getReadPairedFlag() ) {
+            pairTag = record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2;
 
-            final char lastChar = readName.charAt( readName.length() - 1 );
-            final char prevLastChar = readName.charAt( readName.length() - 2 );
+        } else {
+            final String readName = record.getReadName();
+            if( readName.length() > 2 ) {
 
-            if( prevLastChar == Properties.EXT_SEPARATOR ) {
-                if( lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1 ) {
-                    pairTag = Properties.EXT_A1;
+                final char lastChar = readName.charAt( readName.length() - 1 );
+                final char prevLastChar = readName.charAt( readName.length() - 2 );
 
-                } else if( lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2 ) {
-                    pairTag = Properties.EXT_A2;
-                }
-            } else {
-
-                //check for casava > 1.8 paired read
-                String[] nameParts = readName.split( " " );
-                if( nameParts.length == 2 ) {
-                    if( nameParts[1].startsWith( Properties.EXT_A1_STRING ) ) {
+                if( prevLastChar == Properties.EXT_SEPARATOR ) {
+                    if( lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1 ) {
                         pairTag = Properties.EXT_A1;
-                    } else if( nameParts[1].startsWith( Properties.EXT_A2_STRING ) ) {
+
+                    } else if( lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2 ) {
                         pairTag = Properties.EXT_A2;
+                    }
+                } else {
+
+                    //check for casava > 1.8 paired read
+                    String[] nameParts = readName.split( " " );
+                    if( nameParts.length == 2 ) {
+                        if( nameParts[1].startsWith( Properties.EXT_A1_STRING ) ) {
+                            pairTag = Properties.EXT_A1;
+                        } else if( nameParts[1].startsWith( Properties.EXT_A2_STRING ) ) {
+                            pairTag = Properties.EXT_A2;
+                        }
                     }
                 }
             }
-        }
-
-        //if tag is not set yet, but paired read flag is set, we can use it
-        if( pairTag == Properties.EXT_UNDEFINED && record.getReadPairedFlag() ) {
-            pairTag = record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2;
         }
         return pairTag;
     }
@@ -698,8 +734,8 @@ public final class CommonsMappingParser {
      */
     public static boolean isCasavaLarger1Dot8Format( final String readName ) {
         String[] nameParts = readName.split( " " );
-        return nameParts.length == 2 && (nameParts[1].startsWith( Properties.EXT_A1_STRING )
-                || nameParts[1].startsWith( Properties.EXT_A2_STRING ));
+        return nameParts.length == 2 && (nameParts[1].startsWith( Properties.EXT_A1_STRING ) ||
+                                         nameParts[1].startsWith( Properties.EXT_A2_STRING ));
     }
 
 
@@ -709,18 +745,18 @@ public final class CommonsMappingParser {
      * already contain a paired read ending.
      * <p>
      * @param record the record whose read name should be elongated, if it is a
-     * paired read
+     *               paired read
      * <p>
      * @return The elongated read name or the original one, if it already had a
-     * paired read ending
+     *         paired read ending
      */
     public static String elongatePairedReadName( final SAMRecord record ) {
 
         String readName = record.getReadName();
         final char pairTag = readName.charAt( readName.length() - 1 );
-        if( record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
-                && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2
-                && !isCasavaLarger1Dot8Format( readName ) ) {
+        if( record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1 &&
+            pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2 &&
+            !isCasavaLarger1Dot8Format( readName ) ) {
             readName += "/" + (record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2);
         }
         return readName;
@@ -734,14 +770,11 @@ public final class CommonsMappingParser {
      * <code>isFstFile</code>.
      * <p>
      * @param record The record to check and update
-     * @param isFstFile if true: "/1" is appended. If false: "/2" is appended to
-     * the read name.
      */
-    public static void checkOrAddPairTag( final SAMRecord record, final boolean isFstFile ) {
-        char pairTag = CommonsMappingParser.getReadPairTag( record );
-        if( pairTag == Properties.EXT_UNDEFINED ) {
-            String pairEnding = "/" + (isFstFile ? Properties.EXT_A1 : Properties.EXT_A2);
-            record.setReadName( record.getReadName().concat( pairEnding ) );
+    public static void checkOrRemovePairTag( final SAMRecord record ) {
+        Pair<Boolean, String> readNamePair = CommonsMappingParser.getReadNameWithoutPairTag( record.getReadName() );
+        if( readNamePair.getFirst() ) {
+            record.setReadName( readNamePair.getSecond() );
         }
     }
 
@@ -750,7 +783,7 @@ public final class CommonsMappingParser {
      * Converts the the decimal number (flag) into binary code and checks if 4
      * is 1 or 0
      * <p>
-     * @param flag The flag to check
+     * @param flag          The flag to check
      * @param startPosition start pos of mapping
      * <p>
      * @return true, if it is a mapped sequence, false otherwise
@@ -774,13 +807,14 @@ public final class CommonsMappingParser {
      * known.
      * <p>
      * @param recordToDiffMap map of sam records to their number of mismatches
-     * to update with classification data
-     * @param classification the classification for the current list of records
+     *                        to update with classification data
+     * @param classification  the classification data for the current list of
+     *                        records.
      * <p>
      * @throws AssertionError thrown if something could not be asserted
      */
     public static void addClassificationData( final Map<SAMRecord, Integer> recordToDiffMap,
-            final ParsedClassification classification ) throws AssertionError {
+                                              final ParsedClassification classification ) throws AssertionError {
 
         final int lowestDiffRate = classification.getMinMismatches();
         final Map<Integer, Integer> mismatchCountMap = classification.getMismatchCountMap();
@@ -831,14 +865,14 @@ public final class CommonsMappingParser {
      * written by the given writer. The diffMap is cleared after writing the
      * data.
      * <p>
-     * @param diffMap map of sam records to the number of differences to the
-     * reference
+     * @param diffMap            map of sam records to the number of differences
+     *                           to the reference
      * @param classificationData parsed classification data to add to the
-     * records
-     * @param samBamWriter writer to write the SAM records to
+     *                           records
+     * @param samBamWriter       writer to write the SAM records to
      */
     public static void writeSamRecord( final Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData,
-            final SAMFileWriter samBamWriter ) {
+                                       final SAMFileWriter samBamWriter ) {
 
         //store data and clear data structure, if new read name is reached - file needs to be sorted by read name
         CommonsMappingParser.addClassificationData( diffMap, classificationData );
@@ -856,44 +890,55 @@ public final class CommonsMappingParser {
      * the ReadXplorer classification data is created and stored in the given
      * classificationData.
      * <p>
-     * @param record record to classify
-     * @param messageSender Sender who should be updated, if errors occur
-     * @param chromLengthMap chromosome length map
-     * @param fileName mapping file name from which the record originates
-     * @param lineNo the line number of the current record in the file
-     * @param refSeqFetcher a fetcher for the reference sequence
-     * @param diffMap map of sam records to the number of differences to the
-     * reference, is updated by this method
+     * @param record             record to classify
+     * @param messageSender      Sender who should be updated, if errors occur
+     * @param chromLengthMap     chromosome length map
+     * @param fileName           mapping file name from which the record
+     *                           originates
+     * @param lineNo             the line number of the current record in the
+     *                           file
+     * @param refSeqFetcher      a fetcher for the reference sequence
+     * @param diffMap            map of sam records to the number of differences
+     *                           to the reference, is updated by this method
      * @param classificationData object in which the classification data is
-     * stored by this method
+     *                           stored by this method
      * <p>
      * @return <code>true</code>, if the mapping data is consistent,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
-    public static boolean classifyRead( final SAMRecord record, MessageSenderI messageSender, final Map<String, Integer> chromLengthMap, final String fileName, final int lineNo,
-            final RefSeqFetcher refSeqFetcher, final Map<SAMRecord, Integer> diffMap, final ParsedClassification classificationData ) {
-        final String cigar = record.getCigarString();
+    public static boolean classifyRead( final SAMRecord record, MessageSenderI messageSender,
+                                        final Map<String, Integer> chromLengthMap,
+                                        final String fileName,
+                                        final int lineNo,
+                                        final RefSeqFetcher refSeqFetcher,
+                                        final Map<SAMRecord, Integer> diffMap,
+                                        final ParsedClassification classificationData ) {
         final String readSeq = record.getReadString();
-        final int start = record.getAlignmentStart();
-        final int stop = record.getAlignmentEnd();
+        boolean isConsistent = CommonsMappingParser.checkReadSam( messageSender, readSeq, fileName, lineNo );
 
-        boolean isConsistent = CommonsMappingParser.checkReadSam( messageSender, readSeq, chromLengthMap.get( record.getReferenceName() ),
-                cigar, start, stop, fileName, lineNo );
 //            ++noSkippedReads;
 //            continue; //continue, and ignore read, if it contains inconsistent information
 
         if( isConsistent ) {
-            /*
-             * The cigar values are as follows: 0 (M) = alignment match
-             * (both, match or mismatch), 1 (I) = insertion, 2 (D) =
-             * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) =
-             * hard clipped, 6 (P) = padding, 7 (=) = sequene match, 8
-             * (X) = sequence mismatch. H not needed, because these
-             * bases are not present in the read sequence!
-             */
+
+//            The cigar values are as follows:
+//            0 (M) = alignment match (both, match or mismatch),
+//            1 (I) = insertion, 2 (D) = deletion,
+//            3 (N) = skipped,
+//            4 (S) = soft clipped,
+//            5 (H) = hard clipped,
+//            6 (P) = padding,
+//            7 (=) = sequene match,
+//            8 (X) = sequence mismatch.
+//            H not needed, because these bases are not present in the read
+//            sequence!
+
             //count differences to reference
+            final int start = record.getAlignmentStart();
+            final int stop = record.getAlignmentEnd();
             String refSeq = refSeqFetcher.getSubSequence( record.getReferenceName(), start, stop );
             boolean isRevStrand = record.getReadNegativeStrandFlag();
+            final String cigar = record.getCigarString();
             DiffAndGapResult diffGapResult = CommonsMappingParser.createDiffsAndGaps( cigar, readSeq, refSeq, isRevStrand, start );
             int mismatches = diffGapResult.getDifferences();
             diffMap.put( record, mismatches );

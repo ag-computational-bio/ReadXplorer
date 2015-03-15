@@ -25,8 +25,8 @@ import de.cebitec.readxplorer.utils.ErrorLimit;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SamUtils;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.sf.samtools.BAMFileWriter;
 import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMSequenceDictionary;
 import net.sf.samtools.SAMSequenceRecord;
@@ -156,7 +155,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                         final String[] tokens = line.split( "\\t+", 8 );
                         if( tokens.length == 7 ) { // if the length is not correct the read is not parsed
                             // cast tokens
-                            final String readName = tokens[0];
+                            final String readName = CommonsMappingParser.getReadNameWithoutPairTag( tokens[0] ).getSecond();
                             final int start;
                             final int stop;
                             try {
@@ -179,10 +178,10 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             final byte direction;
                             switch( tokens[3] ) {
                                 case ">>":
-                                    direction = 1;
+                                    direction = SequenceUtils.STRAND_FWD;
                                     break;
                                 case "<<":
-                                    direction = -1;
+                                    direction = SequenceUtils.STRAND_REV;
                                     break;
                                 default:
                                     direction = 0;
@@ -223,7 +222,6 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             //                    samRecord.setFlags(stop); //other fields which could be set
                             //                    samRecord.setAttribute(tag, value);
                             //                    samRecord.setReferenceIndex(lineno);
-                            //                    samRecord.setBaseQualityString(NAME);
 
                             bamFileWriter.addAlignment( samRecord );
                             //                    samFileWriter.addAlignment(samRecord);
@@ -241,12 +239,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                     }
                     bamFileWriter.close();
                 }
-                try( SAMFileReader samFileReader = new SAMFileReader( outputFile ) ) {
-                    samFileReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-                    SamUtils samUtils = new SamUtils();
-                    samUtils.registerObserver( this );
-                    success = samUtils.createIndex( samFileReader, new File( outputFile + Properties.BAM_INDEX_EXT ) );
-                }
+                success = SamUtils.createBamIndex( outputFile, this );
 
                 this.notifyObservers( "Converting track..." );
                 long finish = System.currentTimeMillis();

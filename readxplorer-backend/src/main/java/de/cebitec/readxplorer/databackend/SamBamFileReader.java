@@ -61,10 +61,10 @@ import org.openide.DialogDisplayer;
 
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
- *
+ * <p>
  * @author -Rolf Hilker- <rhilker@cebitec.uni-bielefeld.de>
  */
-public class SamBamFileReader implements Observable {
+public class SamBamFileReader implements Observable, Observer {
 
     private static final Logger LOG = Logger.getLogger( SamBamFileReader.class.getName() );
 
@@ -94,7 +94,7 @@ public class SamBamFileReader implements Observable {
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam
      * file.
-     *
+     * <p>
      * @param dataFile  the file to read from
      * @param trackId   the track id of the track whose data is stored in the
      *                  given file
@@ -128,7 +128,7 @@ public class SamBamFileReader implements Observable {
      * Checks if the index of the bam file is present or creates it. If it needs
      * to be created, the gui is blocked by a dialog, which waits for the finish
      * signal of the index creation.
-     *
+     * <p>
      * @return true, if the index already exists, false otherwise
      */
     private void checkIndex() {
@@ -144,7 +144,10 @@ public class SamBamFileReader implements Observable {
 
                 @Override
                 public void run() {
-                    samUtils.createIndex( samFileReader, new File( dataFile.getAbsolutePath().concat( Properties.BAM_INDEX_EXT ) ) );
+                    boolean success = SamUtils.createBamIndex( dataFile, SamBamFileReader.this );
+                    if( !success ) {
+                        dialogDescriptor.setMessage( "Bam index creation failed! You can close the dialog and check the file permissions in the folder of the bam file." );
+                    }
                     progressHandle.finish();
                     okButton.setEnabled( true );
                 }
@@ -253,15 +256,14 @@ public class SamBamFileReader implements Observable {
      * Checks if diffs and gaps are needed and if the mapping contains some.
      * <p>
      * @param request
-     * @param type
-     *                <p>
+     * @param type <p>
      * @return true, if diffs and gaps are needed and the mapping contains some,
      *         false otherwise
      */
     private boolean hasNeededDiffs( IntervalRequest request, MappingClass type ) {
-        return request.isDiffsAndGapsNeeded()
-               && type != MappingClass.SINGLE_PERFECT_MATCH
-               && type != MappingClass.PERFECT_MATCH;
+        return request.isDiffsAndGapsNeeded() &&
+                 type != MappingClass.SINGLE_PERFECT_MATCH &&
+                 type != MappingClass.PERFECT_MATCH;
     }
 
 
@@ -269,7 +271,7 @@ public class SamBamFileReader implements Observable {
      * Retrieves the reduced mappings from the given interval from the sam or
      * bam file set for this data reader and the reference sequence with the
      * given name. Diffs and gaps are never included.
-     *
+     * <p>
      * @param request the request to carry out
      * <p>
      * @return the reduced mappings for the given interval. Diffs and gaps are
@@ -320,7 +322,7 @@ public class SamBamFileReader implements Observable {
      * Retrieves the read pair mappings from the given interval from the sam or
      * bam file set for this data reader and the reference sequence with the
      * given name.
-     *
+     * <p>
      * @param request request to carry out
      * <p>
      * @return the coverage for the given interval
@@ -405,7 +407,7 @@ public class SamBamFileReader implements Observable {
 
     /**
      * Creates a mapping for the given classification and mapping data.
-     *
+     * <p>
      * @param classification the classification data
      * @param id             unique id of the mapping
      * @param startPos       start position of the mapping
@@ -687,9 +689,10 @@ public class SamBamFileReader implements Observable {
      * @param refSeq  the reference sequence belonging to the cigar and without
      *                gaps in upper case characters
      * @param mapping if a mapping is handed over to the method it adds the
-     *                diffs and gaps directly to the mapping and updates it's number of
-     *                differences to the reference. If null is passed, only the
-     *                DiffAndGapResult contains all the diff and gap data.
+     *                diffs and gaps directly to the mapping and updates it's
+     *                number of differences to the reference. If null is passed,
+     *                only the DiffAndGapResult contains all the diff and gap
+     *                data.
      * <p>
      * @return DiffAndGapResult containing all the diffs and gaps
      */
@@ -706,7 +709,7 @@ public class SamBamFileReader implements Observable {
         final int start = record.getAlignmentStart();
         final byte[] baseQualities = record.getBaseQualities();
         final Byte mappingQuality = (byte) (record.getMappingQuality() >= DEFAULT_MAP_QUAL ? UNKNOWN_CALCULATED_MAP_QUAL : record.getMappingQuality());
-        final String[] num = cigar.split(CIGAR_REGEX );
+        final String[] num = cigar.split( CIGAR_REGEX );
         final String[] charCigar = cigar.split( "\\d+" );
         int refPos = 0;
         int readPos = 0;
@@ -812,7 +815,7 @@ public class SamBamFileReader implements Observable {
 
     /**
      * Adds a diff either to the mapping, if it is not null, or to the diffs.
-     *
+     * <p>
      * @param mapping the mapping to which the diff shall be added or
      * <cc>null</cc>.
      * @param diffs   the diffs list to which the diff shall be added.
@@ -866,14 +869,23 @@ public class SamBamFileReader implements Observable {
      *         otherwise
      */
     private boolean isIncludedMapping( MappingClass mappingClass, Integer numMappingsForRead, int mappingQuality, ParametersReadClasses readClassParams ) {
-        boolean isIncludedMapping = (readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ )
-                                     || !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) && numMappingsForRead != null && numMappingsForRead == 1)
-                                    && (mappingQuality == UNKNOWN_MAP_QUAL
-                                        || mappingQuality >= readClassParams.getMinMappingQual());
+        boolean isIncludedMapping = (readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ||
+                 !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) && numMappingsForRead != null && numMappingsForRead == 1) &&
+                 (mappingQuality == UNKNOWN_MAP_QUAL ||
+                                     mappingQuality >= readClassParams.getMinMappingQual());
         if( isIncludedMapping ) {
             isIncludedMapping = readClassParams.isClassificationAllowed( mappingClass );
         }
         return isIncludedMapping;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void update( Object args ) {
+        this.notifyObservers( args );
     }
 
 

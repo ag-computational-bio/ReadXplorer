@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.utils;
 
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -102,13 +103,14 @@ public final class PositionUtils {
      * natural order.
      * <p>
      * @param isFwdOrder The sort order to use for the list
-     * @param codons The list of genomic ranges to sort
+     * @param genomicRanges The list of genomic ranges to sort
      */
-    public static void sortList( boolean isFwdOrder, List<? extends GenomicRange> codons ) {
+    public static void sortList( boolean isFwdOrder, List<? extends GenomicRange> genomicRanges ) {
         if( isFwdOrder ) {
-            Collections.sort( codons ); //start with first
+            Collections.sort( genomicRanges ); //start with first
         } else {
-            Collections.sort( codons, Collections.reverseOrder() ); //start with last
+            Comparator<GenomicRange> revComp = Collections.reverseOrder();
+            Collections.sort( genomicRanges, revComp ); //start with last
         }
     }
 

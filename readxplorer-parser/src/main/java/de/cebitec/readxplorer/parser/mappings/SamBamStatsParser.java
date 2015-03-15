@@ -49,7 +49,7 @@ import org.openide.util.NbBundle;
  * Creates and stores the statistics for a track, which needs to be sorted by
  * position. The data to store is directly forwarded to the observer, which
  * should then further process it (store it in the db).
- *
+ * <p>
  * @author -Rolf Hilker-
  */
 public class SamBamStatsParser implements Observable, MessageSenderI {
@@ -78,17 +78,17 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      * to be sorted by position. The data to store is directly forwarded to the
      * observer, which should then further process it (store it in the db).
      * <p>
-     * @param trackJob track job whose position table needs to be created
+     * @param trackJob       track job whose position table needs to be created
      * @param chromLengthMap mapping of chromosome name
      * <p>
      * @return
      */
-    @SuppressWarnings("fallthrough")
-    @NbBundle.Messages({
+    @SuppressWarnings( "fallthrough" )
+    @NbBundle.Messages( {
         "# {0} - track file path",
         "StatsParser.Finished=Finished creating track statistics for {0}. ",
         "# {0} - track file path",
-        "StatsParser.Start=Start creating track statistics for {0}"})
+        "StatsParser.Start=Start creating track statistics for {0}" } )
     public ParsedTrack createTrackStats( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) {
 
         final long startTime = System.currentTimeMillis();
@@ -105,16 +105,13 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         for( String chromName : chromLengthMap.keySet() ) {
             Map<Classification, List<Pair<Integer, Integer>>> mapClassMap = new HashMap<>();
             for( MappingClass mapClass : MappingClass.values() ) {
-                mapClassMap.put( mapClass, new ArrayList<Pair<Integer, Integer>>() );
+                mapClassMap.put( mapClass, new ArrayList<>() );
                 mapClassMap.get( mapClass ).add( new Pair<>( 0, 0 ) );
             }
-            mapClassMap.put( TotalCoverage.TOTAL_COVERAGE, new ArrayList<Pair<Integer, Integer>>() );
+            mapClassMap.put( TotalCoverage.TOTAL_COVERAGE, new ArrayList<>() );
             mapClassMap.get( TotalCoverage.TOTAL_COVERAGE ).add( new Pair<>( 0, 0 ) );
             classToCoveredIntervalsMap.put( chromName, mapClassMap );
         }
-//        Map<String, Object> readNameSet = new HashMap<>();
-//        String[] nameArray;
-//        String shortReadName;
 
         try( final SAMFileReader sam = new SAMFileReader( trackJob.getFile() ) ) {
 
@@ -127,16 +124,11 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                     ++lineNo;
 
                     final SAMRecord record = samItor.next();
-//                    String readName = record.getReadName();
                     final String refName = record.getReferenceName();
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( refName ) ) {
 
-                        String cigar = record.getCigarString();
-                        int start = record.getAlignmentStart();
-                        int stop = record.getAlignmentEnd();
                         String readSeq = record.getReadString();
-
-                        if( !CommonsMappingParser.checkReadSam( this, readSeq, chromLengthMap.get( refName ), cigar, start, stop, fileName, lineNo ) ) {
+                        if( !CommonsMappingParser.checkReadSam( this, readSeq, fileName, lineNo ) ) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
@@ -164,6 +156,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             }
                             readsDifferentPos.clear();
                         }
+
+                        int start = record.getAlignmentStart();
+                        int stop = record.getAlignmentEnd();
                         if( !readsDifferentPos.contains( start ) ) {
                             readsDifferentPos.add( start );
                             seqCount = 0;
@@ -188,7 +183,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                     if( nfe.getMessage() == null || !nfe.getMessage().contains( "MAPQ should be 0" ) ) {
                         //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                         this.sendMsgIfAllowed( NbBundle.getMessage( SamBamStatsParser.class,
-                                "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
+                                                                    "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
                         Exceptions.printStackTrace( nfe );
                     }
                 }
@@ -206,6 +201,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         } catch( RuntimeEOFException e ) {
             this.notifyObservers( "Last read in file is incomplete, ignoring it!" );
         } catch( Exception e ) {
+            this.notifyObservers( e.getMessage() );
             Exceptions.printStackTrace( e ); //TODO correct error handling or remove
         }
 
@@ -266,7 +262,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
     /**
      * @return The statistics parser for handling statistics for the extended
-     * track.
+     *         track.
      */
     public StatsContainer getStatsContainer() {
         return statsContainer;

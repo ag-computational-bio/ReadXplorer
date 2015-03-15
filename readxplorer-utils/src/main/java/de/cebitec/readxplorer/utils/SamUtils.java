@@ -55,8 +55,8 @@ import org.openide.util.NbPreferences;
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -122,9 +122,9 @@ public class SamUtils implements Observable {
             samItor.close();
             this.notifyObservers( "All " + totalRecords + " reads indexed!" );
         } catch( SAMException e ) {
-            this.notifyObservers( "If you tried to create an index on a sam "
-                    + "file this is the reason for the exception. Indexes"
-                    + "can only be created for bam files!" );
+            this.notifyObservers( "If you tried to create an index on a sam " +
+                                  "file this is the reason for the exception. Indexes" +
+                                  "can only be created for bam files!" );
             this.notifyObservers( e );
             success = false;
         }
@@ -152,25 +152,45 @@ public class SamUtils implements Observable {
         }
     }
 
-    /* Creates either a sam or a bam file writer depending on the ending of the
-     * oldFile.
+
+    /**
+     * Creates a bam index for a given bam file.
+     * <p>
+     * @param bamFile  The bam file to index.
+     * @param observer The observer to notify about the progress of indexing.
+     * <p>
+     * @return <code>true</code> if the index creation succeeded,
+     *         <code>false</code> otherwise.
      */
+    public static boolean createBamIndex( File bamFile, Observer observer ) {
+        boolean success = false;
+        try( SAMFileReader samReader = new SAMFileReader( bamFile ) ) { //close is performed by try statement
+            samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            SamUtils utils = new SamUtils();
+            utils.registerObserver( observer );
+            success = utils.createIndex( samReader, new File( bamFile + Properties.BAM_INDEX_EXT ) );
+            utils.removeObserver( observer );
+        }
+        return success;
+    }
+
 
     /**
      * Creates a bam file writer. The output file of the new writer is the old
      * file name + the new ending and the appropriate file extension (.sam or
      * .bam).
      * <p>
-     * @param oldFile the old file (if data is not stored in a file, just create
-     * a file with a name of your choice
-     * @param header the header of the new file
+     * @param oldFile   the old file (if data is not stored in a file, just
+     *                  create a file with a name of your choice
+     * @param header    the header of the new file
      * @param presorted if true, SAMRecords must be added to the SAMFileWriter
-     * in order that agrees with header.sortOrder.
+     *                  in order that agrees with header.sortOrder.
      * @param newEnding the ending is added to the end of the file name of the
-     * old file (this is not the file extension)
+     *                  old file (this is not the file extension)
      * <p>
      * @return a pair consisting of: the sam or bam file writer ready for
-     * writing as the first element and the new file as the second element
+     *         writing as the first element and the new file as the second
+     *         element
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter( File oldFile, SAMFileHeader header, boolean presorted, String newEnding ) {
 
@@ -198,10 +218,10 @@ public class SamUtils implements Observable {
      *
      * @param inputFile the input file whose extension should be changed
      * @param newEnding the ending is added to the end of the file name of the
-     * old file (this is not the file extension)
+     *                  old file (this is not the file extension)
      * <p>
      * @return a new bam file, which does not already exist with the given new
-     * ending
+     *         ending
      */
     public static File getFileWithBamExtension( File inputFile, String newEnding ) {
         String[] nameParts = inputFile.getAbsolutePath().split( "\\." );
@@ -231,7 +251,7 @@ public class SamUtils implements Observable {
      * Note: This is not the file extension!
      * <p>
      * @param fileEnding the file ending to remove
-     * @param filePath the file path to chech for the ending
+     * @param filePath   the file path to chech for the ending
      * <p>
      * @return the new file path without the given ending
      */
@@ -248,12 +268,13 @@ public class SamUtils implements Observable {
      * returns true, if the file is sorted according to the sort order handed
      * over as sortOrderToCheck
      * <p>
-     * @param fileToCheck the sam/bam file, whose sort order has to be checked
+     * @param fileToCheck      the sam/bam file, whose sort order has to be
+     *                         checked
      * @param sortOrderToCheck the sort order of the file, which is expected/
-     * needed
+     *                         needed
      * <p>
      * @return true, if the sort order of the file equals the given
-     * sortOrderToCheck
+     *         sortOrderToCheck
      */
     public static boolean isSortedBy( File fileToCheck, SAMFileHeader.SortOrder sortOrderToCheck ) {
         try( SAMFileReader samReader = new SAMFileReader( fileToCheck ) ) {
@@ -272,10 +293,10 @@ public class SamUtils implements Observable {
      * inserted and deleted bases (vs. the reference) are not represented in the
      * alignment blocks.
      * <p>
-     * @param cigar
-     * @param refStartPos
+     * @param cigar       The cigar of the read
+     * @param refStartPos Start position in the reference
      * <p>
-     * @return
+     * @return The list of alignment blocks for the given cigar
      */
     public List<SamAlignmentBlock> getAlignmentBlocks( Cigar cigar, int refStartPos ) {
 
