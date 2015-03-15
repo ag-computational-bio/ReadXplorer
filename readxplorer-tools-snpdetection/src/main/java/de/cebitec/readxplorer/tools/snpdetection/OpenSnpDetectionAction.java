@@ -58,8 +58,8 @@ import org.openide.windows.WindowManager;
 
 /**
  * Action for opening a new SNP and DIP detection. It opens a track list
- * containing all tracks of the selected reference and creates a new snp
- * detection setup top component when tracks were selected.
+ * containing all tracks of the selected reference and creates a new SNP and DIP
+ * detection setup wizard, runs the analysis and opens the result TopComponent.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -98,9 +98,12 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
 
     /**
-     * Action for opening a new snp detection. It opens a track list containing
-     * all tracks of the selected reference and creates a new snp detection
-     * setup top component when tracks were selected.
+     * Action for opening a new SNP and DIP detection. It opens a track list
+     * containing all tracks of the selected reference and creates a new SNP and
+     * DIP detection setup wizard, runs the analysis and opens the result
+     * TopComponent.
+     * <p>
+     * @param context The ReferenceViewer for which the analysis is carried out.
      */
     public OpenSnpDetectionAction( ReferenceViewer context ) {
         this.context = context;
@@ -278,7 +281,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             }
 
         } catch( ClassCastException e ) {
-            LOG.log(Level.INFO, "Passed wrong data container to {0}", getClass().getName());
+            LOG.log( Level.INFO, "Passed wrong data container to {0}", getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
     }

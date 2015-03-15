@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.TribbleException;
@@ -41,6 +40,8 @@ import org.broad.tribble.bed.BEDCodec;
 import org.broad.tribble.bed.BEDFeature;
 import org.broad.tribble.bed.FullBEDFeature.Exon;
 import org.broad.tribble.readers.LineIterator;
+
+import static java.util.logging.Level.INFO;
 
 
 /**

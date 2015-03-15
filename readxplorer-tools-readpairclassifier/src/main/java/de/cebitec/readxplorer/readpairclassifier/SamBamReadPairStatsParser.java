@@ -91,33 +91,26 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
             long start = System.currentTimeMillis();
             long finish;
             int lineNo = 0;
-            this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
+            notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
 
             samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
             SAMRecordIterator samItor = samBamReader.iterator();
 
-            String refName = trackJob.getRefGen().getName();
-
-            SAMRecord record;
-            char pairTag;
-            Object classobj;
-            ReadPairType pairClass;
-            int insertSize;
             while( samItor.hasNext() ) {
                 ++lineNo;
                 //separate all mappings of same pair by read pair tag and hand it over to classification then
-                record = samItor.next();
+                SAMRecord record = samItor.next();
                 if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
-                    pairTag = CommonsMappingParser.getReadPairTag( record );
+                    char pairTag = CommonsMappingParser.getReadPairTag( record );
 
                     if( pairTag == Properties.EXT_A1 ) {
 
-                        classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
+                        Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
                         if( classobj != null ) {
                             if( classobj instanceof Integer && ((int) classobj) >= -128 && ((int) classobj) <= 128 ) {
-                                pairClass = ReadPairType.getReadPairType( Integer.valueOf( classobj.toString() ) );
+                                ReadPairType pairClass = ReadPairType.getReadPairType( Integer.valueOf( classobj.toString() ) );
                                 this.statsContainer.incReadPairStats( pairClass, 1 );
-                                insertSize = Math.abs( record.getInferredInsertSize() );
+                                int insertSize = Math.abs( record.getInferredInsertSize() );
                                 if( insertSize != 0 ) { // 0 = unpaired/not available
                                     this.readPairSizeDistribution.increaseDistribution( insertSize );
                                 }
@@ -129,9 +122,9 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
                     } else if( pairTag == Properties.EXT_A2 ) {
 
-                        classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
+                        Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
                         if( classobj != null && classobj instanceof Integer ) {
-                            pairClass = ReadPairType.getReadPairType( Integer.valueOf( classobj.toString() ) );
+                            ReadPairType pairClass = ReadPairType.getReadPairType( Integer.valueOf( classobj.toString() ) );
                             if( pairClass == ReadPairType.UNPAIRED_PAIR ) {
                                 this.statsContainer.incReadPairStats( pairClass, 1 );
                             } //else we have already counted read 1 of the pair

@@ -31,8 +31,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.INFO;
 
 
 /**

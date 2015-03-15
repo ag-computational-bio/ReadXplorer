@@ -34,13 +34,13 @@ import java.util.Map;
  * A jok parser, which first reads the jok file, converts it into a bam file
  * sorted by mapping start position and then prepares the new bam file for
  * import into the DB as direct access track.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class JokToBamDirectParser implements MappingParserI, Observer {
 
     private static final String NAME = "Jok to Bam Direct Access Parser";
-    private static final String[] FILE_EXTENSION = new String[]{"out", "Jok", "jok", "JOK"};
+    private static final String[] FILE_EXTENSION = new String[]{ "out", "Jok", "jok", "JOK" };
     private static final String FILE_DESCRIPTION = "Jok Read Mappings converted to BAM";
     private final SamBamParser bamParser;
     private final List<Observer> observers;
@@ -97,10 +97,10 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * Converts a jok file into a bam file sorted by mapping start position.
      * Also updates the file in the track job to the new file.
      * <p>
-     * @param trackJob the track job containing the jok file
+     * @param trackJob       the track job containing the jok file
      * @param chromLengthMap the mapping of chromosome NAME to chromosome length
- for this track
- <p>
+     *                       for this track
+     * <p>
      * @return true, if the conversion was successful, false otherwise
      * <p>
      * @throws ParsingException
@@ -113,7 +113,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
         final Iterator<String> it = chromLengthMap.keySet().iterator();
         if( it.hasNext() ) {
             final String chromName = it.next(); //ok, since SARUMAN only supports mapping on a single reference sequence
-
+            //TODO: might still be used in conjunction with a later merged multiple fasta file -> make sure the correct ref is used!
             //Convert jok file to bam
             final JokToBamConverter jokConverter = new JokToBamConverter();
             List<File> jobs = new ArrayList<>();
