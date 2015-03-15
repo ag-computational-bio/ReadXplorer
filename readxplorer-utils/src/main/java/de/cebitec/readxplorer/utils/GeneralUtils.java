@@ -36,13 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import static java.util.logging.Level.SEVERE;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
