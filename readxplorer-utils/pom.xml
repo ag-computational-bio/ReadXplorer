@@ -56,6 +56,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-progress</artifactId>
             <version>${netbeans.version}</version>
@@ -154,6 +159,7 @@
                         <publicPackage>org.apache.commons.logging.*</publicPackage>
                         <publicPackage>org.apache.batik.*</publicPackage>
                         <publicPackage>org.apache.xerces.*</publicPackage>
+                        <publicPackage>org.supercsv.*</publicPackage>
                         <publicPackage>org.w3c.dom.*</publicPackage>
                         <publicPackage>org.xml.sax.*</publicPackage>
                         <publicPackage>javax.xml.parsers.*</publicPackage>
