@@ -73,20 +73,10 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
         maxRPKMValueLabel = new javax.swing.JLabel();
 
         minReadCountValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.minReadCountValueField.text")); // NOI18N
-        minReadCountValueField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                minReadCountValueFieldActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(minRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.minRPKMValueLabel.text")); // NOI18N
 
         maxReadCountValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.maxReadCountValueField.text")); // NOI18N
-        maxReadCountValueField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                maxReadCountValueFieldActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(maxRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.maxRPKMValueLabel.text")); // NOI18N
 
@@ -119,14 +109,6 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void minReadCountValueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minReadCountValueFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_minReadCountValueFieldActionPerformed
-
-    private void maxReadCountValueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxReadCountValueFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_maxReadCountValueFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel maxRPKMValueLabel;

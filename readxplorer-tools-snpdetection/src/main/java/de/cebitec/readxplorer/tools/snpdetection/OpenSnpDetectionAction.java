@@ -71,7 +71,7 @@ import org.openide.windows.WindowManager;
     @ActionReference( path = "Menu/Tools", position = 125 ),
     @ActionReference( path = "Toolbars/Tools", position = 100 )
 } )
-@Messages( "CTL_OpenSnpDetectionAction=OpenSnpDetectionAction" )
+@Messages( { "CTL_OpenSnpDetectionAction=OpenSnpDetectionAction", "CTL_OpenSNPDetection=SNP Detection" } )
 public final class OpenSnpDetectionAction implements ActionListener,
                                                      DataVisualisationI {
 
@@ -123,16 +123,12 @@ public final class OpenSnpDetectionAction implements ActionListener,
         this.finishedCovAnalyses = 0;
         this.trackToAnalysisMap = new HashMap<>();
 
-        //show track list
         this.runWizardAndSnpDetection();
     }
 
 
     /**
-     * Initializes the setup wizard for the snp detection
-     * <p>
-     * @param trackIds the list of track ids for which the snp detection has to
-     *                 be carried out
+     * Initializes the setup wizard for the snp detection.
      */
     @Messages( { "TTL_SNPWizardTitle=SNP Detection Parameter Wizard",
                  "TITLE_SNPDetectionTopComp=SNP Detection Window",
@@ -189,9 +185,9 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
         this.parametersSNPs = new ParameterSetSNPs( minVaryingBases, minPercentage, useMainBase, selFeatureTypes,
                                                     readClassParams, minBaseQuality, minAverageBaseQual, minAverageMapQual );
-        TrackConnector connector;
         if( !combineTracks ) {
             for( PersistentTrack track : tracks ) {
+                TrackConnector connector;
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
@@ -204,7 +200,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             }
         } else {
             try {
-                connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
+                TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassParams );
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {

@@ -460,7 +460,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 }
             }
         } catch( RuntimeIOException e ) {
-            LOG.log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackPath() );
+            LOG.log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackFile() );
         }
     }
 
