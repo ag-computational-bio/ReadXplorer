@@ -17,9 +17,12 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv;
 
+import bio.comp.jlu.readxplorer.tools.gasv.ParametersBamToGASV.FragmentBoundsMethod;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import gasv.bamtogasv.BAMToGASV;
+import gasv.main.GASVMain;
 import java.awt.HeadlessException;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,6 +36,7 @@ import javax.swing.JPanel;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 
@@ -42,29 +46,52 @@ import org.openide.util.NbBundle;
  * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class GASVCaller {
+public class GASVCaller implements Runnable {
+
+    private final File bamFile;
+    private final ParametersBamToGASV bamToGASVParams;
+
+    private final PersistentReference reference;
+    private String chromNamesFileName;
+    private ProgressHandle progressHandle;
 
 
     /**
      * Handles all steps necessary for calling GASV to predict genome
      * rearrangements.
+     * <p>
+     * @param reference The reference whose tracks are analyzed here.
+     * @param bamFile   The bam file to analyze
      */
-    public GASVCaller() {
+    @NbBundle.Messages( { "ProgressName=Storing chromosome names in file..." } )
+    public GASVCaller( PersistentReference reference, File bamFile, ParametersBamToGASV bamToGASVParams ) {
+        this.reference = reference;
+        this.bamFile = bamFile;
+        this.bamToGASVParams = bamToGASVParams;
+        progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
+    }
+
+
+    /**
+     * Calls GASV.
+     */
+    @Override
+    public void run() {
+        callGASV();
     }
 
 
     /**
      * Executes all necessary steps to prepare and run GASV for the detection of
      * genome rearrangements within read mapping data.
-     * <p>
-     * @param reference The reference whose tracks are analyzed here.
      */
-    public void callGASV( PersistentReference reference ) {
+    public void callGASV() {
 //        Algorithm:
 //        1. create chromosome naming file as references will most certainly contain other names than numbers
 //        2. Call GASV
         createChromosomeNamingFile( reference );
-
+        runBamToGASV( bamFile );
+        runGASVMain( bamFile.getAbsolutePath() + ".gasv.in" );
 
     }
 
@@ -78,38 +105,26 @@ public class GASVCaller {
      * @param reference The reference whose tracks are analyzed here.
      */
     @NbBundle.Messages( { "Error=An error occured during the file saving process.",
-                          "ProgressName=Storing chromosome names in file...",
                           "SuccessMsg=Chromosome names successfully stored in ",
                           "SuccessHeader=Success" } )
     private void createChromosomeNamingFile( PersistentReference reference ) {
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         String dbLocation = projectConnector.getDBLocation();
         String refName = reference.getName();
-        String chromNamesFileName = new File( dbLocation ).getParent().concat( "\\" + refName.concat( "-seqNames-gasv.txt" ) );
+        chromNamesFileName = new File( dbLocation ).getParent().concat( "\\" + refName.concat( "-seqNames-gasv.txt" ) );
 
-        ProgressHandle progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
         final String chromNamesString = createChromNamesString( reference );
         progressHandle.start();
 
-        Thread exportThread = new Thread( new Runnable() {
-
-            @Override
-            public void run() {
-
-                //Note that file is overwritten every time!
-                try( final BufferedWriter outputWriter = new BufferedWriter( new FileWriter( chromNamesFileName ) ); ) {
-                    outputWriter.write( chromNamesString );
-                    NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(),
-                                                               Bundle.SuccessMsg() + chromNamesFileName, null );
-                } catch( IOException | MissingResourceException | HeadlessException e ) {
-                    JOptionPane.showMessageDialog( new JPanel(), Bundle.Error() + e.getMessage() );
-                }
-                progressHandle.finish();
-            }
-
-
-        } );
-        exportThread.start();
+        //Note that file is overwritten every time!
+        try( final BufferedWriter outputWriter = new BufferedWriter( new FileWriter( chromNamesFileName ) ); ) {
+            outputWriter.write( chromNamesString );
+            NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(),
+                                                       Bundle.SuccessMsg() + chromNamesFileName, null );
+        } catch( IOException | MissingResourceException | HeadlessException e ) {
+            JOptionPane.showMessageDialog( new JPanel(), Bundle.Error() + e.getMessage() );
+        }
+        progressHandle.finish();
     }
 
 
@@ -121,7 +136,7 @@ public class GASVCaller {
      * <br/>plasmidX 2
      * <p>
      * @param reference The reference connector of the reference whose tracks
-     *                     are analyzed here.
+     *                  are analyzed here.
      * <p>
      * @return A String with one chromosome name and a unique id per line for
      *         all chromosomes of the given reference genome.
@@ -135,6 +150,93 @@ public class GASVCaller {
         }
 
         return chromNamesBuilder.toString();
+    }
+
+
+    /**
+     * Runs BamToGASV, the first step of the GASV pipeline.
+     * <p>
+     * @param bamFile The bam file to analyze
+     */
+    private void runBamToGASV( File bamFile ) {
+        String[] gasvArgs = { bamFile.getAbsolutePath(),
+                              "-LIBRARY_SEPARATED",
+                              bamToGASVParams.isLibrarySeparated() ? "sep" : "all",
+                              "-MAPPING_QUALITY",
+                              String.valueOf( bamToGASVParams.getMinMappingQuality() ),
+                              "-CUTOFF_LMINLMAX",
+                              calcFragmentBoundsMethod( bamToGASVParams.getFragmentBoundsMethod() ),
+                              "-CHROMOSOME_NAMING",
+                              chromNamesFileName,
+                              "-USE_NUMBER_READS",
+                              "1000000",
+                              "-PROPER_LENGTH",
+                              String.valueOf( bamToGASVParams.getMaxPairLength() ),
+                              "-PLATFORM",
+                              bamToGASVParams.getPlatform() ? "SOLiD" : "Illumina",
+                              "-WRITE_CONCORDANT",
+                              bamToGASVParams.isWriteConcordantPairs() ? "True" : "False",
+                              "-WRITE_LOWQ",
+                              bamToGASVParams.isWriteLowQualityPairs() ? "True" : "False",
+                              "-VALIDATION_STRINGENCY",
+                              bamToGASVParams.getSamValidationStringency().getTypeString() };
+        BAMToGASV.main( gasvArgs ); //TODO: sysos have to be redirected!
+    }
+
+
+    /**
+     * Constructs the correctly formatted input string for the fragment bounds
+     * method parameter of GASV.
+     * <p>
+     * @param fragmentBoundsMethod The fragment bounds method enumeration
+     *                             parameter
+     * <p>
+     * @return The correctly formatted input string for the fragment bounds
+     *         method parameter of GASV.
+     */
+    private String calcFragmentBoundsMethod( FragmentBoundsMethod fragmentBoundsMethod ) {
+        String methodString = fragmentBoundsMethod.getTypeString() + "=";
+        switch( fragmentBoundsMethod ) {
+            case SD:
+                methodString += String.valueOf( bamToGASVParams.getDistSDValue() );
+                break;
+            case EXACT:
+                methodString += bamToGASVParams.getDistExactValue();
+                break;
+            case FILE:
+                methodString += bamToGASVParams.getDistFile();
+                break;
+            case PCT: //fallthrough to default
+            default:
+                methodString += String.valueOf( bamToGASVParams.getDistPCTValue() ) + "%";
+        }
+
+        return methodString;
+    }
+
+
+    /**
+     * Runs GASVMain, the second and final step of the GASV pipeline.
+     * <p>
+     * @param gasvInputFileName The input file for GASVMain generated with
+     *                          BamToGASV.
+     */
+    private void runGASVMain( String gasvInputFileName ) {
+        String[] gasvArgs = { "--batch",
+                              "--minClusterSize",
+                              "50",
+                              "--numChrom",
+                              "1",
+                              gasvInputFileName };
+        try {
+            GASVMain.main( gasvArgs );
+        } catch( IOException ex ) { //TODO: Correct error handling
+            Exceptions.printStackTrace( ex );
+        } catch( CloneNotSupportedException ex ) {
+            Exceptions.printStackTrace( ex );
+        } catch( NullPointerException ex ) {
+            Exceptions.printStackTrace( ex );
+        }
     }
 
 

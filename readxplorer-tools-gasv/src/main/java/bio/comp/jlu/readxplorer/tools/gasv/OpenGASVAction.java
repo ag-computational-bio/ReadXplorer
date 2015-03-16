@@ -17,9 +17,29 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv;
 
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+import org.openide.DialogDisplayer;
+import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -48,9 +68,21 @@ import org.openide.util.NbBundle.Messages;
     @ActionReference( path = "Toolbars/Tools", position = 150 )
 } )
 @Messages( "CTL_OpenGASVAction=Run GASV" )
-public final class OpenGASVAction implements ActionListener {
+public final class OpenGASVAction implements ActionListener, DataVisualisationI {
+
+    private static final Logger LOG = Logger.getLogger( OpenGASVAction.class.getName() );
+    private static final String PROP_WIZARD_NAME = "GASV_Wizard";
 
     private final ReferenceViewer context;
+
+    private final PersistentReference reference;
+    private List<PersistentTrack> tracks;
+    private Map<Integer, PersistentTrack> trackMap;
+    private int finishedCovAnalyses = 0;
+
+    private Map<Integer, GASVCaller> trackToAnalysisMap;
+    private WizardDescriptor wiz;
+    private OpenTracksWizardPanel openTracksPanel;
 
 
     /**
@@ -63,18 +95,118 @@ public final class OpenGASVAction implements ActionListener {
      */
     public OpenGASVAction( ReferenceViewer context ) {
         this.context = context;
+        reference = context.getReference();
     }
 
 
     /**
-     * {@inheritdoc}
+     * Carries out the calculations for a complete genome rearrangement
+     * detection using GASV + opening the corresponding TopComponent.
+     * <p>
+     * @param ev the event itself, which is not used currently
      */
     @Override
     public void actionPerformed( ActionEvent ev ) {
+
+        trackToAnalysisMap = new HashMap<>();
+
+        boolean cancelled = runWizard();
+        if( !cancelled ) {
+            runAnalysis();
+        }
+    }
+
+
+    /**
+     * Initializes the setup wizard for the genome rearrangement detection using
+     * GASV.
+     * <p>
+     * @return <code>true</code>, if the wizard has been finished successfully,
+     *         <code>false</code> otherwise
+     */
+    @Messages( { "TTL_GASVWizardTitle=GASV Genome Rearrangement Parameter Wizard" } )
+    private boolean runWizard() {
         //Open track selection & option wizard.
-        //Afterwards run GASV with:
-        GASVCaller gasvCaller = new GASVCaller();
-        gasvCaller.callGASV( context.getReference() );
+        @SuppressWarnings( "unchecked" )
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        openTracksPanel = new OpenTracksWizardPanel( PROP_WIZARD_NAME, reference.getId() );
+
+        panels.add( openTracksPanel );
+        panels.add( new BamToGASVWizardPanel() );
+        panels.add( new GASVMainWizardPanel() );
+
+        wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
+
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( Bundle.TTL_GASVWizardTitle() );
+
+        //action to perform after successfully finishing the wizard
+        return DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
+    }
+
+
+    /**
+     * Starts the genome rearrangement detection using GASV.
+     */
+    @Messages( { "TITLE_GASVTopComp=GASV Genome Rearrangements Window",
+                 "HINT_GASVTopComp=This is a GASV Genome Rearrangements window" } )
+    private void runAnalysis() {
+
+        ParametersBamToGASV bamToGASVParams = (ParametersBamToGASV) wiz.getProperty( BamToGASVWizardPanel.PROP_BAM_TO_GASV_PARAMS );
+
+        List<PersistentTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
+        if( !selectedTracks.isEmpty() ) {
+            tracks = selectedTracks;
+            trackMap = ProjectConnector.getTrackMap( tracks );
+
+//            this.snpDetectionTopComp = (SnpDetectionTopComponent) WindowManager.getDefault().findTopComponent( "SnpDetectionTopComponent" );
+//            this.snpDetectionTopComp.setName( Bundle.TITLE_SNPDetectionTopComp() );
+//            this.snpDetectionTopComp.setToolTipText( Bundle.HINT_SNP_DetectionTopComp() );
+//            this.snpDetectionTopComp.open();
+//            this.startSNPDetection( wiz );
+
+            //Afterwards run GASV with:
+            for( PersistentTrack track : tracks ) {
+                TrackConnector connector;
+                try {
+                    connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+                    continue;
+                }
+
+                //every track has its own analysis handlers
+                List<Classification> excludedClasses = Arrays.asList(
+                        new MappingClass[]{
+                            MappingClass.COMMON_MATCH,
+                            MappingClass.BEST_MATCH,
+                            MappingClass.PERFECT_MATCH
+                        } );
+                this.createAnalysis( connector, bamToGASVParams );
+            }
+        }
+    }
+
+
+    /**
+     * Creates the actual analysis objects and runs them for a single track.
+     * <p>
+     * @param connector       The track connector for which the analysis shall
+     *                        be run
+     * @param readClassParams The read mapping class parameters to apply
+     */
+    private void createAnalysis( TrackConnector connector, ParametersBamToGASV bamToGASVParams ) {
+        File trackFile = connector.getTrackFile();
+        GASVCaller gasvCaller = new GASVCaller( reference, trackFile, bamToGASVParams );
+        Thread thread = new Thread( gasvCaller );
+        thread.start();
+    }
+
+
+    @Override
+    public void showData( Object data ) {
+
     }
 
 

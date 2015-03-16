@@ -22,6 +22,7 @@ package gasv.bamtogasv;
  *
  */
 
+import bio.comp.jlu.readxplorer.tools.gasv.GASVUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1260,9 +1261,11 @@ public class BAMToGASV {
 	 */
 	private void parseSAMRecord(SAMRecord s, Library lib){
 
-		// If this record is duplicated (according to flag) OR is NOT paired, then
-		// return immediately.
-		if(s.getDuplicateReadFlag() || !s.getReadPairedFlag())
+                // If this record is duplicated (according to flag) OR is NOT paired, then
+                // return immediately.
+                // Rolf Hilker added first condition (!isForbiddenMapping(s)) to generate
+                // useful results in conjunction with ReadXplorer
+		if(GASVUtils.isForbiddenMapping(s) || s.getDuplicateReadFlag() || !s.getReadPairedFlag())
 			return;
 
 		String readname = s.getReadName();

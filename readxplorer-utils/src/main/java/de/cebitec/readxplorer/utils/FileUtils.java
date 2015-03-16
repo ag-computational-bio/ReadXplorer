@@ -161,6 +161,18 @@ public final class FileUtils {
         return result;
     }
 
+    /**
+     * check that the given path exists and is readable.
+     * <p>
+     * @param filePathString <p>
+     * @return boolean true if the file exists, false otherwise
+     */
+    public static boolean fileExistsAndIsReadable( String filePathString ) {
+        File f = new File( filePathString );
+        boolean result = f.exists() && f.canRead();
+        return result;
+    }
+
 
     /**
      * check that the given path exists, is readable and can be executed
