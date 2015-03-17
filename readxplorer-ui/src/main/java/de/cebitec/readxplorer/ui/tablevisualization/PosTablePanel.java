@@ -55,7 +55,7 @@ public class PosTablePanel extends TablePanel {
         final int chromColumn;
         switch( tableType ) {
             case COVERAGE_ANALYSIS: //fallthrough
-            case RPKM_ANALYSIS: //fallthrough
+            case TPM_RPKM_ANALYSIS: //fallthrough
             case SNP_DETECTION: //fallthrough
             case OPERON_DETECTION:
                 trackColumn = 2;
@@ -84,14 +84,14 @@ public class PosTablePanel extends TablePanel {
      */
     private void initAdditionalComponents( final int posColumn, final int chromColumn ) {
         this.dataTable.setModel( this.tableData );
+        //TODO: feature position - map mit features im ram halten
+        //TODO: after closing of ref and reopening, it does not react anymore
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
         model.addListSelectionListener( new ListSelectionListener() {
 
             @Override
             public void valueChanged( ListSelectionEvent e ) {
-                //TODO: feature position - map mit features im ram halten
-                //TODO: after closing of ref and reopening, it does not react anymore
                 TableUtils.showPosition( dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference );
             }
 

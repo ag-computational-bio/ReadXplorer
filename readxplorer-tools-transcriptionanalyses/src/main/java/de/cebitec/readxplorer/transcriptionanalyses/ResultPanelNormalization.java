@@ -30,10 +30,7 @@ import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -76,17 +73,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
         this.normStatsMap.put( TOTAL_MAPPINGS, 0 );
         this.refComp = ReferenceFeatureTopComp.findInstance();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.normalizationTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( normalizationTable, posIdx, chromIdx, getBoundsInfoManager() );
-                refComp.showTableFeature( normalizationTable, 0 );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( normalizationTable, posIdx, chromIdx, getBoundsInfoManager() );
     }
 
 

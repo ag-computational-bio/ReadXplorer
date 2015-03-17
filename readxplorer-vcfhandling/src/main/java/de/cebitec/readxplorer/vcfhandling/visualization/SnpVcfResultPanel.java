@@ -26,9 +26,6 @@ import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import org.broadinstitute.variant.variantcontext.VariantContext;
 
@@ -68,19 +65,7 @@ public class SnpVcfResultPanel extends ResultTablePanel {
         this.vcfTable.getTableHeader().addMouseListener( tableFilter );
         //ensures number of lines will adapt to number of translations (features) for each snp
 
-
-        DefaultListSelectionModel model = (DefaultListSelectionModel) vcfTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-
-            @Override
-            public void valueChanged( ListSelectionEvent lse ) {
-                TableUtils.showPosition( vcfTable, sourColumn, chromColumn, getBoundsInfoManager() );
-
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( vcfTable, sourColumn, chromColumn, getBoundsInfoManager() );
     }
 
 

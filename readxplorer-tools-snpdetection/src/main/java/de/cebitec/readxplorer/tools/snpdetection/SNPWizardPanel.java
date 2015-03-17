@@ -45,8 +45,6 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
 
     /**
      * The SNP detection wizard main panel.
-     * <p>
-     * @param referenceId reference id
      */
     public SNPWizardPanel() {
         super( "Please enter valid parameters (Only number & percent values. Quality values need to be between 0 & 127)" );

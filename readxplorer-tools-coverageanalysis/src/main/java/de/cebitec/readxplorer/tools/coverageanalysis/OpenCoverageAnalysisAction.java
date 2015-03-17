@@ -242,7 +242,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                             coverageAnalysisResultPanel = new ResultPanelCoverageAnalysis();
                             coverageAnalysisResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
                         }
-                        coverageAnalysisResultPanel.addCoverageAnalysis( result );
+                        coverageAnalysisResultPanel.addResult( result );
 
                         if( finishedCovAnalyses >= tracks.size() || combineTracks ) {
 
@@ -265,7 +265,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                             } else {
                                 title = "Detected uncovered intervals for ";
                             }
-                            String panelName = title + trackNames + " (" + coverageAnalysisResultPanel.getResultSize() + " hits)";
+                            String panelName = title + trackNames + " (" + coverageAnalysisResultPanel.getDataSize() + " hits)";
                             coveredAnnoAnalysisTopComp.openAnalysisTab( panelName, coverageAnalysisResultPanel );
                         }
                     }

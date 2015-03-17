@@ -35,11 +35,8 @@ import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -74,16 +71,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         tableFilter = new TableRightClickFilter<>( UneditableTableModel.class, posColumnIdx, trackColumnIdx );
         this.tSSTable.getTableHeader().addMouseListener( tableFilter );
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager() );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager() );
     }
 
 

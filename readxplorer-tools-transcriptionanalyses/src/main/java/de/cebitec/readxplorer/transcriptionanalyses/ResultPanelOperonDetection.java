@@ -37,10 +37,7 @@ import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -80,16 +77,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         this.operonDetectionTable.getTableHeader().addMouseListener( tableFilter );
         this.initStatsMap();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
     }
 
 

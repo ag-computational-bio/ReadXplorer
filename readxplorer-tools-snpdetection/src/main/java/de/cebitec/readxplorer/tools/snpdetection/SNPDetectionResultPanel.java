@@ -40,10 +40,7 @@ import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -93,16 +90,7 @@ public class SNPDetectionResultPanel extends ResultTablePanel {
             this.snpTable.getColumnModel().getColumn( i ).setCellRenderer( lineWrapRenderer );
         }
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) snpTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( snpTable, posColumn, chromColumn, getBoundsInfoManager() );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( snpTable, posColumn, chromColumn, getBoundsInfoManager() );
     }
 
 

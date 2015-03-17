@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.utils;
 
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -109,8 +108,7 @@ public final class PositionUtils {
         if( isFwdOrder ) {
             Collections.sort( genomicRanges ); //start with first
         } else {
-            Comparator<GenomicRange> revComp = Collections.reverseOrder();
-            Collections.sort( genomicRanges, revComp ); //start with last
+            Collections.sort( genomicRanges, Collections.<GenomicRange>reverseOrder() ); //start with last
         }
     }
 

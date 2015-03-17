@@ -123,7 +123,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         tc.open();
         tc.requestActive();
         resultView = CorrelationResultTopComponent.findInstance().openResultTab( referenceViewer );
-        this.resultView.setAnalysisResult( this.analysisResult );
+        resultView.addResult( analysisResult );
         requestNextStep();
     }
 
