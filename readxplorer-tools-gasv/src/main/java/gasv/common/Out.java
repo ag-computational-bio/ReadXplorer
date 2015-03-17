@@ -2,28 +2,35 @@
  * Copyright 2010 Benjamin Raphael, Suzanne Sindi, Hsin-Ta Wu, Anna Ritz, Luke Peng
  *
  *  This file is part of gasv.
- * 
+ *
  *  gasv is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  gasv is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with gasv.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 package gasv.common;
 
+import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
+import org.openide.windows.InputOutput;
+
+
 /**
-  * This simple class is just a wrapper around System.out to facilitate printing at different
+  * This simple class is just a wrapper around io.getOut() to facilitate printing at different
   * debug levels
   */
 public class Out {
+
+        private static final InputOutput io = GASVCaller.io;
+
 	/**
 	 * If DEBUG_LEVEL is set to MAX_LVL then all possible messages will be output.
 	 * This includes print(), print1(), print2(), etc messages.
@@ -31,7 +38,7 @@ public class Out {
 	public static final int MAX_LVL = 10;
 
 	/**
-	 * If DEBUG_LEVEL is set to VERBOSE_LVL then only print() and print1() 
+	 * If DEBUG_LEVEL is set to VERBOSE_LVL then only print() and print1()
 	 * messages will be output.
 	 */
 	public static final int VERBOSE_LVL = 1;
@@ -55,19 +62,19 @@ public class Out {
 	  * Will always print no matter the DEBUG_LEVEL
 	  */
 	public static void print(String output) {
-		System.out.println(output);
+		io.getOut().println(output);
 	}
 
 	/**
 	  * Will always print as long as the DEBUG_LEVEL is greater than 0.
 	  * Use this for --verbose mode messages, i.e. those messages that are
-	  * important for a user to understand program execution in more detail 
+	  * important for a user to understand program execution in more detail
 	  */
 	public static void print1(String output) {
 		if (DEBUG_LEVEL > 0) {
-			System.out.println(output);
+			io.getOut().println(output);
 		}
-	}	
+	}
 
 	/**
 	  * Will only print if DEBUG_LEVEL is 2 or higher.
@@ -75,9 +82,9 @@ public class Out {
 	  */
 	public static void print2(String output) {
 		if (DEBUG_LEVEL > 1) {
-			System.out.println(output);
+			io.getOut().println(output);
 		}
-	}	
+	}
 
 	/**
 	  * Will only print if DEBUG_LEVEL is 3 or higher.
@@ -85,9 +92,9 @@ public class Out {
 	  */
 	public static void print3(String output) {
 		if (DEBUG_LEVEL > 1) {
-			System.out.println(output);
+			io.getOut().println(output);
 		}
-	}	
+	}
 
 
 }

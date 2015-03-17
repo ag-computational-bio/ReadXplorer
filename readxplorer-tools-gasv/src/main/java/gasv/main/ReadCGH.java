@@ -2,41 +2,45 @@
  * Copyright 2010 Benjamin Raphael, Suzanne Sindi, Hsin-Ta Wu, Anna Ritz, Luke Peng
  *
  *  This file is part of gasv.
- * 
+ *
  *  gasv is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  gasv is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with gasv.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 package gasv.main;
-import gasv.common.Out;
+import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
 import gasv.common.Constants;
+import gasv.common.Out;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import org.openide.windows.InputOutput;
 
 
 public class ReadCGH extends ReadFile {
-	
+
 	/* ReadCGH reads in file of CGH breakpoint region in form of one pair of genomic locations.
 	 *  input file should be of format:
 	 *  chr pos1 pos2
-	 *  
+	 *
 	 * Rectangles are created from CGH breakpoint locations as follows:
 	 *  Large rectangles are created using each given CGH genomic region and each entire chromosome.
 	 *  Those CGH pair that was used to create a rectangle that intersected with ESP data, is then paired with every other CGH pair
 	 *  	to create many small candidate rectangles.
 	 *  These rectangles are then put through the program once more.
 	 */
+
+        private static final InputOutput io = GASVCaller.io;
 
 	private String nextLine_;
 
@@ -57,12 +61,12 @@ public class ReadCGH extends ReadFile {
 		//b_ = new java.io.BufferedReader(f_);
 		curLeftChr_ = 0;
 		curRightChr_ = 0;
-		diffChrPairReached_ = false; 
+		diffChrPairReached_ = false;
 		nextLine_ = null;
 	}
 
-	private CGH parseCGHFromString(String nextLine, int targetChr, 
-			boolean useWindowSize, boolean matchChromosomes) 
+	private CGH parseCGHFromString(String nextLine, int targetChr,
+			boolean useWindowSize, boolean matchChromosomes)
 			throws NumberFormatException, Exception {
 		String[] line = nextLine.split("\\s+");
 		//if (line.length == Constants.NUM_COLS_IN_PAIR_CGH_FILE) {
@@ -70,10 +74,10 @@ public class ReadCGH extends ReadFile {
 		//}
 
 		if (line.length != Constants.NUM_COLS_IN_SING_CGH_FILE) {
-			System.out.println("Found a row with incorrect"
+			io.getOut().println("Found a row with incorrect"
 					+ " number of items. Expect "
 					+ Constants.NUM_COLS_IN_SING_CGH_FILE
-					+ " in an aCGH file, found: " 
+					+ " in an aCGH file, found: "
 					+ line.length + ", so skipping row.");
 			throw new Exception();
 		}
@@ -101,10 +105,10 @@ public class ReadCGH extends ReadFile {
 		} else {
 			return new CGH(line[0], line[1], chr, x, y);
 		}
-	}	
+	}
 
-	public boolean readNextBreakRegions(int leftChr, int rightChr, 
-			ArrayList<BreakRegion> br, int endWindowPos, 
+	public boolean readNextBreakRegions(int leftChr, int rightChr,
+			ArrayList<BreakRegion> br, int endWindowPos,
 			boolean startNewChr) throws IOException {
 		return false;
 	}
@@ -114,7 +118,7 @@ public class ReadCGH extends ReadFile {
 	}
 
 	/**
-	  * Returns a 2 element int array. 
+	  * Returns a 2 element int array.
 	  * First element is -1 if no CGH data matching this chromosome is found.
 	  * If data is found, the first element will be the starting position of the first line of matching data.
 	  * and the second element will be the end position (a.k.a. start pos of first line of non-matching data)
@@ -128,9 +132,9 @@ public class ReadCGH extends ReadFile {
 		ret[1] = -1;
 		cghFile_.seek(startPos);
 		long curPos = startPos;
-		
+
 		String nextLine = cghFile_.readLine();
-		//will break out of this loop when first CGH with non-matching chromosome is encountered 
+		//will break out of this loop when first CGH with non-matching chromosome is encountered
 		while(nextLine != null){
 
 			//Skip comment lines (those beginning with "#")
@@ -149,8 +153,8 @@ public class ReadCGH extends ReadFile {
 				// and true so that we match only CGH w/same chromosome
 				c = this.parseCGHFromString(nextLine, chr, false, true);
 			} catch (NumberFormatException ex) {
-				Out.print("Couldn't parse chromosome identifier: " 
-						+ " for line: " + nextLine 
+				Out.print("Couldn't parse chromosome identifier: "
+						+ " for line: " + nextLine
 						+ " so skipping current line");
 				//update position to beginning of next line
 				curPos = cghFile_.getFilePointer();
@@ -165,10 +169,10 @@ public class ReadCGH extends ReadFile {
 				continue;
 			}
 
-			// If c is null we reached a read on different chromosome so return the 
+			// If c is null we reached a read on different chromosome so return the
 			// value of curPos which is the beginning of the line we just read
 			if (c == null) {
-				ret[1] = curPos; 
+				ret[1] = curPos;
 				return ret;
 			}
 
@@ -203,8 +207,8 @@ public class ReadCGH extends ReadFile {
 	//CURRENTLY UNSUPPORTED!
 	private void readBreakRegions(int targetLeftChr, int targetRightChr,
 			ArrayList<BreakRegion>[][] breakRegionsArray) throws IOException{
-		
+
 	}
-	
+
 }
 

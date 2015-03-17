@@ -57,8 +57,9 @@ public class MappingProcessor {
     }
 
 
+    @NbBundle.Messages( "MappingProcessor.output.name=Mapper" )
     public MappingProcessor( final String referencePath, final String sourcePath, final String mappingParam ) {
-        this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( MappingProcessor.class, "MappingProcessor.output.name" ), true );
+        this.io = IOProvider.getDefault().getIO( Bundle.MappingProcessor_output_name(), true );
         this.io.setOutputVisible( true );
         this.io.getOut().println( "" );
 

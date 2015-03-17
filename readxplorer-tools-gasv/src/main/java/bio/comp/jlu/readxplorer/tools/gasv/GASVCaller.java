@@ -39,6 +39,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 
 /**
@@ -47,7 +49,10 @@ import org.openide.util.NbBundle;
  * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
+@NbBundle.Messages( "GASV.output.name=GASV output" )
 public class GASVCaller implements Runnable {
+
+    public static final InputOutput io = IOProvider.getDefault().getIO( Bundle.GASV_output_name(), false );
 
     private final File bamFile;
     private final ParametersBamToGASV bamToGASVParams;
@@ -94,6 +99,8 @@ public class GASVCaller implements Runnable {
 //        Algorithm:
 //        1. create chromosome naming file as references will most certainly contain other names than numbers
 //        2. Call GASV
+
+        io.select();
         createChromosomeNamingFile( reference );
         runBamToGASV( bamFile );
         runGASVMain( bamFile.getAbsolutePath() + ".gasv.in" );
@@ -111,8 +118,11 @@ public class GASVCaller implements Runnable {
      */
     @NbBundle.Messages( { "Error=An error occured during the file saving process.",
                           "SuccessMsg=Chromosome names successfully stored in ",
-                          "SuccessHeader=Success" } )
+                          "SuccessHeader=Success",
+                          "ChromFileWritingStart=Starting to write chromosome naming file for GASV...",
+                          "ChromFileWritingFinished=Finished writing chromosome naming file for GASV." } )
     private void createChromosomeNamingFile( PersistentReference reference ) {
+        io.getOut().println( Bundle.ChromFileWritingStart() );
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         String dbLocation = projectConnector.getDBLocation();
         String refName = reference.getName();
@@ -130,6 +140,7 @@ public class GASVCaller implements Runnable {
             JOptionPane.showMessageDialog( new JPanel(), Bundle.Error() + e.getMessage() );
         }
         progressHandle.finish();
+        io.getOut().println( Bundle.ChromFileWritingFinished() );
     }
 
 
@@ -185,7 +196,7 @@ public class GASVCaller implements Runnable {
                               bamToGASVParams.isWriteLowQualityPairs() ? "true" : "false",
                               "-VALIDATION_STRINGENCY",
                               bamToGASVParams.getSamValidationStringency() };
-        BAMToGASV.main( gasvArgs ); //TODO: sysos have to be redirected!
+        BAMToGASV.main( gasvArgs );
     }
 
 

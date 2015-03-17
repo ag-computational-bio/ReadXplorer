@@ -22,6 +22,7 @@ package gasv.bamtogasv;
  *
  */
 
+import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
 import bio.comp.jlu.readxplorer.tools.gasv.GASVUtils;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,6 +49,7 @@ import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMSequenceDictionary;
 import net.sf.samtools.util.RuntimeEOFException;
 import net.sf.samtools.util.RuntimeIOException;
+import org.openide.windows.InputOutput;
 
 /**
  * Bam to GASV Processor
@@ -64,6 +66,10 @@ import net.sf.samtools.util.RuntimeIOException;
  *
  */
 public class BAMToGASV {
+
+        //Rolf Hilker replaced all System.out.println calls in all GASV classes with io.getOut()
+        //to redirect messages to the ReadXplorer console.
+        private static final InputOutput io = GASVCaller.io;
 
 	/* Options and Default Values */
 	public String BAMFILE;
@@ -131,7 +137,7 @@ public class BAMToGASV {
 		try {
 			b2g = new BAMToGASV(args);
 		} catch (IOException e) {
-			System.out.println("ERROR: cannot open error log for writing. Make sure you can write to the BAM file's directory (or the OUTPUT_PREFIX's directory).");
+			io.getOut().println("ERROR: cannot open error log for writing. Make sure you can write to the BAM file's directory (or the OUTPUT_PREFIX's directory).");
 			System.exit(-1);
 		}
 
@@ -146,7 +152,7 @@ public class BAMToGASV {
 
 		// If BAM file read exited prematurely again, die with an error.
 		if(!b2g.someLibPassed)
-			System.out.println("After Running fixMates, reading the BAM file resulted in errors.  Consult the FAQ for troubleshooting solutions.");
+			io.getOut().println("After Running fixMates, reading the BAM file resulted in errors.  Consult the FAQ for troubleshooting solutions.");
 
 		// MERGE CONCORDANT FILES (Anna - new June 30,2012)
 		// Only when GASVPRO_FLAG is set AND LIBRARY_SEPARATED is not 'all'
@@ -162,7 +168,7 @@ public class BAMToGASV {
 		b2g.writeGASVPROInputFile();
 
 		// Report output files and any skipped records.
-		System.out.println("BAMToGASV complete.\n");
+		io.getOut().println("BAMToGASV complete.\n");
 		b2g.printSkipped();
 		b2g.printOutputFiles();
 	}
@@ -201,7 +207,7 @@ public class BAMToGASV {
 			int[] concordantSortOrder = {1,2,3};
 			concordantSorter = new ExternalSort(concordantSortOrder);
 		} catch (Exception e) {
-			System.out.println("ERROR while instantiating the ExternalSort object.");
+			io.getOut().println("ERROR while instantiating the ExternalSort object.");
 			System.exit(-1);
 		}
 
@@ -210,7 +216,7 @@ public class BAMToGASV {
 			try {
 				getChromosomeNames();
 			} catch (FileNotFoundException e) {
-				System.out.println("ERROR: " + CHROMOSOME_NAMING_FILE + " does not exist.");
+				io.getOut().println("ERROR: " + CHROMOSOME_NAMING_FILE + " does not exist.");
 				System.exit(-1);
 			}
 		} else { // to be safe, set CHR_NAMES to null.
@@ -228,7 +234,7 @@ public class BAMToGASV {
 
 		// Arguments come in pairs AND 1 bam file, so there should be an odd number of parameters.
 		if(args.length % 2 == 0) {
-			System.out.println("Error! Incorrect number of arguments (perhaps an option is missing a value).");
+			io.getOut().println("Error! Incorrect number of arguments (perhaps an option is missing a value).");
 			return false;
 		}
 
@@ -245,7 +251,7 @@ public class BAMToGASV {
 				URL url = new URL(BAMFILE);
 				IS_URL = true;
 			} catch (Exception e) {
-				System.out.println("Error! "+BAMFILE+" does not exist.");
+				io.getOut().println("Error! "+BAMFILE+" does not exist.");
 				return false;
 			}
 		}
@@ -256,7 +262,7 @@ public class BAMToGASV {
 				if(args[i+1].equalsIgnoreCase("sep") || args[i+1].equalsIgnoreCase("all"))
 					LIBRARY_SEPARATED = args[i+1].toLowerCase();
 				else {
-					System.out.println("Error! LIBRARY_SEPARATED option can only be 'sep' or 'all'.");
+					io.getOut().println("Error! LIBRARY_SEPARATED option can only be 'sep' or 'all'.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-OUTPUT_PREFIX")) {
@@ -267,7 +273,7 @@ public class BAMToGASV {
 					if(MAPPING_QUALITY < 0)
 						throw new Exception();
 				} catch (Exception e) {
-					System.out.println("Error! MAPPING_QUALITY must be a non-negative integer.");
+					io.getOut().println("Error! MAPPING_QUALITY must be a non-negative integer.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-CUTOFF_LMINLMAX")) {
@@ -276,7 +282,7 @@ public class BAMToGASV {
 						!std.matcher(CUTOFF_LMINLMAX).matches() &&
 						!exact.matcher(CUTOFF_LMINLMAX).matches() &&
 						!file.matcher(CUTOFF_LMINLMAX).matches()) {
-					System.out.println("Error! "+CUTOFF_LMINLMAX+" is not a valid CUTOFF_LMINLMAX option.");
+					io.getOut().println("Error! "+CUTOFF_LMINLMAX+" is not a valid CUTOFF_LMINLMAX option.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-USE_NUMBER_READS")) {
@@ -285,13 +291,13 @@ public class BAMToGASV {
 					if(USE_NUMBER_READS < 0)
 						throw new Exception();
 				} catch (Exception e) {
-					System.out.println("Error! USE_NUMBER_READS must be an non-negative integer.");
+					io.getOut().println("Error! USE_NUMBER_READS must be an non-negative integer.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-CHROMOSOME_NAMING")) { // 5/22 Update flag as CHROMOSOME_NAMING
 				CHROMOSOME_NAMING_FILE = args[i+1];
 				if(!(new File(CHROMOSOME_NAMING_FILE).exists())) {
-					System.out.println("Error! " + CHROMOSOME_NAMING_FILE + " does not exist.");
+					io.getOut().println("Error! " + CHROMOSOME_NAMING_FILE + " does not exist.");
 				}
 			} else if(args[i].equalsIgnoreCase("-PROPER_LENGTH")) {
 				try {
@@ -299,14 +305,14 @@ public class BAMToGASV {
 					if(PROPER_LENGTH < 0)
 						throw new Exception();
 				} catch (Exception e) {
-					System.out.println("Error! PROPER_LENGTH must be a non-negative integer.");
+					io.getOut().println("Error! PROPER_LENGTH must be a non-negative integer.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-PLATFORM")) {
 				if(args[i+1].equalsIgnoreCase("illumina") || args[i+1].equalsIgnoreCase("solid") || args[i+1].equalsIgnoreCase("matepair"))
 					PLATFORM = args[i+1].toLowerCase();
 				else {
-					System.out.println("Error! PLATFORM option can only be 'Illumina', 'SOLiD' or 'MatePair'.");
+					io.getOut().println("Error! PLATFORM option can only be 'Illumina', 'SOLiD' or 'MatePair'.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-WRITE_CONCORDANT")) {
@@ -315,7 +321,7 @@ public class BAMToGASV {
 				else if (args[i+1].equalsIgnoreCase("false"))
 					WRITE_CONCORDANT = false;
 				else {
-					System.out.println("Error! WRITE_CONCORDANT option can only be 'True' or 'False'.");
+					io.getOut().println("Error! WRITE_CONCORDANT option can only be 'True' or 'False'.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-WRITE_LOWQ")) {
@@ -324,7 +330,7 @@ public class BAMToGASV {
 				else if (args[i+1].equalsIgnoreCase("false"))
 					WRITE_LOWQ = false;
 				else {
-					System.out.println("Error! WRITE_LOWQ option can only be 'True' or 'False'.");
+					io.getOut().println("Error! WRITE_LOWQ option can only be 'True' or 'False'.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-VALIDATION_STRINGENCY")) {
@@ -335,7 +341,7 @@ public class BAMToGASV {
 				else if(args[i+1].equalsIgnoreCase("strict"))
 					STRINGENCY = ValidationStringency.STRICT;
 				else {
-					System.out.println("ERROR: VALIDATION_STRINGENCY option can only be 'Silent','Lenient', or 'Strict'.");
+					io.getOut().println("ERROR: VALIDATION_STRINGENCY option can only be 'Silent','Lenient', or 'Strict'.");
 					return false;
 				}
 			} else if(args[i].equalsIgnoreCase("-GASVPRO")) { // GASVPro
@@ -354,23 +360,23 @@ public class BAMToGASV {
 				else if (args[i+1].equalsIgnoreCase("false")){
 					NOSORT = false;
 				} else {
-					System.out.println("Error! Option " + args[i] + " does not exist.");
+					io.getOut().println("Error! Option " + args[i] + " does not exist.");
 					return false;
 				}
 			} else {
-				System.out.println("Error! Option " + args[i] + " does not exist.");
+				io.getOut().println("Error! Option " + args[i] + " does not exist.");
 				return false;
 			}
 		}
 
 		// if it's a  URL and the OUTPUT_PREFIX is the BAMFILE, die.
 		if(IS_URL && OUTPUT_PREFIX.equals(BAMFILE)) {
-			System.out.println("ERROR: OUTPUT_PREFIX must be specified if BAMFILE is a URL.");
+			io.getOut().println("ERROR: OUTPUT_PREFIX must be specified if BAMFILE is a URL.");
 			return false;
 		}
 
 		if(!WRITE_CONCORDANT && NOSORT) {
-			System.out.println("ERROR: NOSORT flag cannot be set if Concordant Pairs are not written.");
+			io.getOut().println("ERROR: NOSORT flag cannot be set if Concordant Pairs are not written.");
 		}
 
 		return true;
@@ -380,8 +386,8 @@ public class BAMToGASV {
 	 * Prints the usage information.
 	 **/
 	public void printUsage() {
-		System.out.println("\nProgram: BAMToGASV\nVersion: 2.0.1\n");
-		System.out.println("USAGE (src): java -Xms512m -Xmx2048m BAMToGASV <bam file or hyperlink> [Options]\n" +
+		io.getOut().println("\nProgram: BAMToGASV\nVersion: 2.0.1\n");
+		io.getOut().println("USAGE (src): java -Xms512m -Xmx2048m BAMToGASV <bam file or hyperlink> [Options]\n" +
 				"USAGE (jar): java -Xms512m -Xmx2048m -jar BAMToGASV.jar <bam file or hyperlink> [Options]\n\n" +
 				"Options are:\n" +
 				"-LIBRARY_SEPARATED [String] (Default: sep)\n" +
@@ -428,32 +434,32 @@ public class BAMToGASV {
 	 * flag is changed.
 	 **/
 	public void printArguments() {
-		System.out.println("\n===================================");
-		System.out.println("Arguments are:");
+		io.getOut().println("\n===================================");
+		io.getOut().println("Arguments are:");
 		if(IS_URL)
-			System.out.println("  BAM File URL = " + BAMFILE);
+			io.getOut().println("  BAM File URL = " + BAMFILE);
 		else
-			System.out.println("  BAM File = " + BAMFILE);
-		System.out.println("  Output Prefix = " + OUTPUT_PREFIX);
-		System.out.println("  Minimum Mapping Quality = " + MAPPING_QUALITY);
-		System.out.println("  Lmin/Lmax Cutoff = \"" + CUTOFF_LMINLMAX+"\"");
-		System.out.println("  # of Reads for Calculating Lmin/Lmax, Checking Pairs, and Checking Variant Types = " + USE_NUMBER_READS);
-		System.out.println("  Chromosome Naming File (null if none specified) = " + CHROMOSOME_NAMING_FILE);
-		System.out.println("  Maximum Length for a Proper Pair = " + PROPER_LENGTH);
-		System.out.println("  Platform = \"" + PLATFORM+"\"");
-		System.out.println("  Write Concordant File? " + WRITE_CONCORDANT);
-		System.out.print("  Separate Libraries? ");
+			io.getOut().println("  BAM File = " + BAMFILE);
+		io.getOut().println("  Output Prefix = " + OUTPUT_PREFIX);
+		io.getOut().println("  Minimum Mapping Quality = " + MAPPING_QUALITY);
+		io.getOut().println("  Lmin/Lmax Cutoff = \"" + CUTOFF_LMINLMAX+"\"");
+		io.getOut().println("  # of Reads for Calculating Lmin/Lmax, Checking Pairs, and Checking Variant Types = " + USE_NUMBER_READS);
+		io.getOut().println("  Chromosome Naming File (null if none specified) = " + CHROMOSOME_NAMING_FILE);
+		io.getOut().println("  Maximum Length for a Proper Pair = " + PROPER_LENGTH);
+		io.getOut().println("  Platform = \"" + PLATFORM+"\"");
+		io.getOut().println("  Write Concordant File? " + WRITE_CONCORDANT);
+		io.getOut().print("  Separate Libraries? ");
 		if(LIBRARY_SEPARATED.equals("all"))
-			System.out.println("false");
+			io.getOut().println("false");
 		else
-			System.out.println("true");
-		System.out.println("  Validation Stringency: " + STRINGENCY);
-		System.out.print("  Prepare GASVPro Output? ");
+			io.getOut().println("true");
+		io.getOut().println("  Validation Stringency: " + STRINGENCY);
+		io.getOut().print("  Prepare GASVPro Output? ");
 		if(GASVPRO_OUTPUT)
-			System.out.println("true");
+			io.getOut().println("true");
 		else
-			System.out.println("false");
-		System.out.println("===================================\n");
+			io.getOut().println("false");
+		io.getOut().println("===================================\n");
 	}
 
 	/**
@@ -471,7 +477,7 @@ public class BAMToGASV {
 				num = scan.nextInt();
 				CHR_NAMES.put(name,num);
 			} catch (NumberFormatException e) {
-				System.out.println("ERROR: some line in " + CHROMOSOME_NAMING_FILE + " is not of the form <name>\t<integer.");
+				io.getOut().println("ERROR: some line in " + CHROMOSOME_NAMING_FILE + " is not of the form <name>\t<integer.");
 				System.exit(-1);
 			}
 		}
@@ -482,7 +488,7 @@ public class BAMToGASV {
 	 * Does not require the file to be read.
 	 **/
 	public void getHeaderInformation() {
-		System.out.println("Processing Header Information...");
+		io.getOut().println("Processing Header Information...");
 		String platform,id,libname;
 		SAMReadGroupRecord record;
 
@@ -498,7 +504,7 @@ public class BAMToGASV {
 				URL url = new URL(BAMFILE);
 				reader = new SAMFileReader( url,null,false);
 			} catch (Exception e) {
-				System.out.println("ERROR: Error reading URL " + BAMFILE + ".");
+				io.getOut().println("ERROR: Error reading URL " + BAMFILE + ".");
 				System.exit(-1);
 			}
 		}
@@ -510,9 +516,9 @@ public class BAMToGASV {
 		if (GASVPRO_OUTPUT){
 			SAMSequenceDictionary SeqInfo = header.getSequenceDictionary();
 			if (SeqInfo.getReferenceLength() == 0)
-				System.out.println("  WARNING: Can't find genome length in Header, using default setting 3,000,000,000.");
+				io.getOut().println("  WARNING: Can't find genome length in Header, using default setting 3,000,000,000.");
 			else {
-				System.out.println("  Genome length: " + SeqInfo.getReferenceLength());
+				io.getOut().println("  Genome length: " + SeqInfo.getReferenceLength());
 				GL = SeqInfo.getReferenceLength();
 			}
 		}
@@ -528,37 +534,37 @@ public class BAMToGASV {
 			libname = record.getLibrary();
 
 			if(platform == null || platform.equals(""))
-				System.out.println("  WARNING: Platform not specified for library "+libname+". Proceeding with "+PLATFORM+". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM.");
+				io.getOut().println("  WARNING: Platform not specified for library "+libname+". Proceeding with "+PLATFORM+". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM.");
 
 			else if(!platform.toLowerCase().equals(PLATFORM))
-				System.out.println("  WARNING: Platform in library " + libname + " is " + platform+". Proceeding with "+PLATFORM+". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM.");
+				io.getOut().println("  WARNING: Platform in library " + libname + " is " + platform+". Proceeding with "+PLATFORM+". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM.");
 
 			else if(!platform.equals("")) // if platform is non an empty string, we've seen it.
 				viewedPlatforms.put(platform.toLowerCase(),platform);
 
 			if(LIBRARY_SEPARATED.equals("sep")) {
-				//System.out.println("  ID " + id+" associated with Library " + libname+".");
+				//io.getOut().println("  ID " + id+" associated with Library " + libname+".");
 				LIBRARY_IDS.put(id,libname);
 			} else { // "all"
-				//System.out.println("  ID " + id + " associated with Library " + libname + " with ID " + id + " considered in \"all\"");
+				//io.getOut().println("  ID " + id + " associated with Library " + libname + " with ID " + id + " considered in \"all\"");
 				LIBRARY_IDS.put(id,LIBRARY_SEPARATED);
 			}
 		}
 
 		// if there is more than one viewed platform, die with an error.
 		if(viewedPlatforms.size() > 1) {
-			System.out.println("  ERROR: Different libraries have different platforms.  The platforms found are:");
+			io.getOut().println("  ERROR: Different libraries have different platforms.  The platforms found are:");
 			Iterator<String> iter = viewedPlatforms.values().iterator();
 			while(iter.hasNext())
-				System.out.println("\t"+iter.next());
-			System.out.println("Check your BAM/SAM file.");
+				io.getOut().println("\t"+iter.next());
+			io.getOut().println("Check your BAM/SAM file.");
 			reader.close();
 			System.exit(-1);
 		}
 
 		if(LIBRARY_IDS.size() == 0) {
 			// 5/22 Show WARNING rather than ERROR
-			System.out.println("  WARNING: No library information found in the BAM.  Proceeding with -LIBRARY_SEPARATED \"all\" flag.");
+			io.getOut().println("  WARNING: No library information found in the BAM.  Proceeding with -LIBRARY_SEPARATED \"all\" flag.");
 			LIBRARY_SEPARATED = "all";
 			LIBRARY_IDS.put("all",LIBRARY_SEPARATED);
 		}
@@ -573,10 +579,10 @@ public class BAMToGASV {
 				LIBRARY_NAMES.add(libname);
 		}
 
-		System.out.println("  Proceeding with the following libraries:");
+		io.getOut().println("  Proceeding with the following libraries:");
 		for(int i=0;i<LIBRARY_NAMES.size();i++)
-			System.out.println("    \""+LIBRARY_NAMES.get(i)+"\"");
-		System.out.println();
+			io.getOut().println("    \""+LIBRARY_NAMES.get(i)+"\"");
+		io.getOut().println();
 	}
 
 	/**
@@ -584,17 +590,17 @@ public class BAMToGASV {
 	 * @param lib - Library object.
 	 **/
 	public void checkPairingInfo(Library lib) {
-		System.out.println("\nChecking pairing info for library \""+lib.name+"\"...");
+		io.getOut().println("\nChecking pairing info for library \""+lib.name+"\"...");
 		String libname = lib.name;
 
 		if(!lib.mateFound && lib.counter > 0){
-			System.out.println("WARNING: Library " + libname +
+			io.getOut().println("WARNING: Library " + libname +
 					" has no pairing info in the first " + USE_NUMBER_READS + " fragments.");
 		} else if(!lib.mateFound) {
-			System.out.println("WARNING: Library " + libname +
+			io.getOut().println("WARNING: Library " + libname +
 					" has no pairing info in the first " + USE_NUMBER_READS + " fragments.");
 		}else {
-			System.out.println("  Library \""+libname+"\" has mated pairs.");
+			io.getOut().println("  Library \""+libname+"\" has mated pairs.");
 			someLibPassed = true;
 		}
 	}
@@ -604,23 +610,23 @@ public class BAMToGASV {
 	 * Picard's function currently exits.
 	 **/
 	public void fixMates() {
-		System.out.println("Running Fixmate() to pair reads.  When this is done, re-run BAMToGASV.jar with the new BAM file.");
+		io.getOut().println("Running Fixmate() to pair reads.  When this is done, re-run BAMToGASV.jar with the new BAM file.");
 
 		// NEWBAMFILE is the name of the file that will be fixed if the program runs
 		// without error.
 		String NEWBAMFILE = OUTPUT_PREFIX+".fixmate.bam";
 
-		System.out.println("Writing fixed BAM/SAM file to "+NEWBAMFILE);
+		io.getOut().println("Writing fixed BAM/SAM file to "+NEWBAMFILE);
 		String[] fixmateargs = {"INPUT="+BAMFILE,"OUTPUT="+NEWBAMFILE};
 		try {
 			FixMateInformation.main(fixmateargs);
 		} catch (Exception e) {
-			System.out.println("Error while fixing mate information.  If the read names do not have a \"/1\" or a \"/2\" suffix, then fixmate won't work.");
+			io.getOut().println("Error while fixing mate information.  If the read names do not have a \"/1\" or a \"/2\" suffix, then fixmate won't work.");
 			System.exit(-1);
 		}
 
 		BAMFILE = NEWBAMFILE;
-		System.out.println("BAMFILE to be accessed is now "+BAMFILE);
+		io.getOut().println("BAMFILE to be accessed is now "+BAMFILE);
 	}
 
 	/**
@@ -629,7 +635,7 @@ public class BAMToGASV {
 	 * @param lib - Library object.
 	 **/
 	public void getLminLmax(Library lib) {
-		System.out.println("Getting Lmin and Lmax for library \"" + lib.name+"\"...");
+		io.getOut().println("Getting Lmin and Lmax for library \"" + lib.name+"\"...");
 
 		// Step 0: Calculate Mean and STD
 		getMeanAndSTDForNovoalign(lib);
@@ -644,7 +650,7 @@ public class BAMToGASV {
 			// If it matches exact Lmin/Lmax, then set this for each library.
 			lib.Lmin = tmpLmin;
 			lib.Lmax = tmpLmax;
-			System.out.println("  Setting Exact Lmin="+tmpLmin + " and Lmax="+tmpLmax+".");
+			io.getOut().println("  Setting Exact Lmin="+tmpLmin + " and Lmax="+tmpLmax+".");
 			return; // we're done.
 		}
 
@@ -654,7 +660,7 @@ public class BAMToGASV {
 			int standarddev = Integer.parseInt(match.group(1));
 			getLminLmaxSTD(lib,standarddev);
 			checkLmin(lib);
-			System.out.println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
+			io.getOut().println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
 					" and Lmax="+lib.Lmax + " using standard deviation method in first " +
 					lib.counter + " reads.");
 			return; // we're done
@@ -666,7 +672,7 @@ public class BAMToGASV {
 			int percent = Integer.parseInt(match.group(1));
 			getLminLmaxPCT(lib,percent);
 			checkLmin(lib);
-			System.out.println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
+			io.getOut().println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
 					" and Lmax="+lib.Lmax + " using percentile method in first " + lib.counter + " reads.");
 			return; // we're done
 		}
@@ -680,7 +686,7 @@ public class BAMToGASV {
 			try {
 				scan = new Scanner(new File(file));
 			} catch (FileNotFoundException e) {
-				System.out.println("ERROR: "+file+" does not exist.");
+				io.getOut().println("ERROR: "+file+" does not exist.");
 				System.exit(-1);
 			}
 			while(scan.hasNext()) {
@@ -695,7 +701,7 @@ public class BAMToGASV {
 				if(!pct.matcher(pattern).matches() &&
 						!std.matcher(pattern).matches() &&
 						!exact.matcher(pattern).matches()) {
-					System.out.println("ERROR: library " + lib.name + " does not have a valid CUTOFF_LMINLMAX option.");
+					io.getOut().println("ERROR: library " + lib.name + " does not have a valid CUTOFF_LMINLMAX option.");
 					System.exit(-1);
 				}
 
@@ -705,7 +711,7 @@ public class BAMToGASV {
 					// If it matches exact Lmin/Lmax, then set this for the library.
 					lib.Lmin = Integer.parseInt(match.group(1));
 					lib.Lmax = Integer.parseInt(match.group(2));
-					System.out.println("  Library \""+lib.name+"\" sets Lmin="+lib.Lmin +
+					io.getOut().println("  Library \""+lib.name+"\" sets Lmin="+lib.Lmin +
 							" and Lmax="+lib.Lmax + ".");
 					continue;
 				}
@@ -716,7 +722,7 @@ public class BAMToGASV {
 					int standarddev = Integer.parseInt(match.group(1));
 					getLminLmaxSTD(lib,standarddev);
 					checkLmin(lib);
-					System.out.println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
+					io.getOut().println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
 							" and Lmax="+lib.Lmax + " using standard deviation method in first " + lib.counter + " reads.");
 					continue;
 				}
@@ -727,7 +733,7 @@ public class BAMToGASV {
 					int percent = Integer.parseInt(match.group(1));
 					getLminLmaxPCT(lib,percent);
 					checkLmin(lib);
-					System.out.println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
+					io.getOut().println("  Library \""+lib.name+"\" has Lmin="+lib.Lmin +
 							" and Lmax="+lib.Lmax + " using percentile method in first " + lib.counter + " reads.");
 					continue;
 				}
@@ -747,22 +753,22 @@ public class BAMToGASV {
 				lib.Lmax == Integer.MIN_VALUE ||
 				lib.minRead_L == Integer.MAX_VALUE) {
 			if(LIBRARY_SEPARATED.equals("sep"))
-				System.out.println("  WARNING: No paired reads found for library \"" + lib.name +"\"");
+				io.getOut().println("  WARNING: No paired reads found for library \"" + lib.name +"\"");
 			else {
-				System.out.println("  WARNING: No paired reads found.");
+				io.getOut().println("  WARNING: No paired reads found.");
 			}
 			return;
 		}
 
 		if(lib.Lmin < 0 ) {
-			System.out.println("  WARNING: Lmin of " + lib.Lmin +
+			io.getOut().println("  WARNING: Lmin of " + lib.Lmin +
 					" is negative for library \"" + lib.name + "\".  Resetting to 0.");
 			lib.Lmin = 0;
 		}
 
 		// If Lmin > Lmax, then die with an error.
 		if(lib.Lmin >= lib.Lmax) {
-			System.out.println("ERROR: Lmin >= Lmax for library \"" + lib.name + "\" after ensuring that Lmin >= 2*minreadlen.");
+			io.getOut().println("ERROR: Lmin >= Lmax for library \"" + lib.name + "\" after ensuring that Lmin >= 2*minreadlen.");
 			System.exit(-1);
 		}
 	}
@@ -785,12 +791,12 @@ public class BAMToGASV {
 	 */
 	public void getLminLmaxPCT(Library lib, int percent) {
 		if(percent < 50){
-			System.out.println("WARNING: PCT=" + percent + "% would result in an Lmin LARGER than Lmax!!  Proceeding under assumption user meant to input PCT="+ (100-percent) + "% instead!");
+			io.getOut().println("WARNING: PCT=" + percent + "% would result in an Lmin LARGER than Lmax!!  Proceeding under assumption user meant to input PCT="+ (100-percent) + "% instead!");
 			percent=100-percent;
 		}
 		long Lmin_q = Math.round(((lib.total_C) * ((float)(100-percent)/100)) + 0.5);
 		long Lmax_q = Math.round(((lib.total_C) * ((float)percent/100)) + 0.5 );
-		//System.out.println("Lmin_q = " + Lmin_q + " and Lmax_q = " + Lmax_q);
+		//io.getOut().println("Lmin_q = " + Lmin_q + " and Lmax_q = " + Lmax_q);
 
 		int counting_q = 0;
 		int last_value = 0;
@@ -799,14 +805,14 @@ public class BAMToGASV {
 			Map.Entry<Integer,Integer> libtmp = libIter.next();
 			if(counting_q <= Lmin_q && counting_q+libtmp.getValue().intValue() >= Lmin_q){
 				lib.Lmin=libtmp.getKey().intValue();
-				//System.out.println("lib.Lmin = " + lib.Lmin + " and lib.Lmax = " + lib.Lmax);
+				//io.getOut().println("lib.Lmin = " + lib.Lmin + " and lib.Lmax = " + lib.Lmax);
 			}
 			if(counting_q <= Lmax_q && counting_q+libtmp.getValue().intValue() >= Lmax_q){
 				lib.Lmax=libtmp.getKey().intValue();
-				//System.out.println("lib.Lmin = " + lib.Lmin + " and lib.Lmax = " + lib.Lmax);
+				//io.getOut().println("lib.Lmin = " + lib.Lmin + " and lib.Lmax = " + lib.Lmax);
 			}
 			counting_q += libtmp.getValue().intValue();
-			//System.out.println(libtmp.getKey() + " --> " + libtmp.getValue() + " ---" + counting_q);
+			//io.getOut().println(libtmp.getKey() + " --> " + libtmp.getValue() + " ---" + counting_q);
 			last_value = libtmp.getKey().intValue();
 		}
 
@@ -819,7 +825,7 @@ public class BAMToGASV {
 		lib.mean = (int)((double)lib.total_L/lib.total_C+0.5);
 		double sd_up = 0;
 
-		//System.out.println(mean);
+		//io.getOut().println(mean);
 		Iterator<Map.Entry<Integer, Integer>> libIter = lib.lengthHist.entrySet().iterator();
 		while(libIter.hasNext()){
 			Map.Entry<Integer,Integer> libtmp = libIter.next();
@@ -834,7 +840,7 @@ public class BAMToGASV {
 	 * @param lib - Library to use.
 	 */
 	public void checkVariantTypes(Library lib) {
-		System.out.println("Checking discordant types for library " + lib.name+"...");
+		io.getOut().println("Checking discordant types for library " + lib.name+"...");
 		VariantType type;
 		String libname = lib.name;
 		boolean inv = false;
@@ -856,7 +862,7 @@ public class BAMToGASV {
 			else if(type == VariantType.TRANS)
 				tr = true;
 			else if(type != VariantType.CONC) {
-				System.out.println("ERROR! Variant Type " + type + " not recognized.");
+				io.getOut().println("ERROR! Variant Type " + type + " not recognized.");
 				System.exit(-1);
 			}
 
@@ -865,16 +871,16 @@ public class BAMToGASV {
 		}
 
 		if(!inv)
-			System.out.println("  WARNING: Library \""+libname+"\" has no inversions in first " + lib.counter + " reads.");
+			io.getOut().println("  WARNING: Library \""+libname+"\" has no inversions in first " + lib.counter + " reads.");
 		if(!del)
-			System.out.println("  WARNING: Library \""+libname+"\" has no deletions in first " + lib.counter + " reads.");
+			io.getOut().println("  WARNING: Library \""+libname+"\" has no deletions in first " + lib.counter + " reads.");
 		if(!div)
-			System.out.println("  WARNING: Library \""+libname+"\" has no divergents in first " + lib.counter + " reads.");
+			io.getOut().println("  WARNING: Library \""+libname+"\" has no divergents in first " + lib.counter + " reads.");
 		if(!tr)
-			System.out.println("  WARNING: Library \""+libname+"\" has no translocations in first " + lib.counter + " reads.");
+			io.getOut().println("  WARNING: Library \""+libname+"\" has no translocations in first " + lib.counter + " reads.");
 		if(!ins)
-			System.out.println("  WARNING: Library \""+libname+"\" has no insertions in first " + lib.counter + " reads.");
-		System.out.println();
+			io.getOut().println("  WARNING: Library \""+libname+"\" has no insertions in first " + lib.counter + " reads.");
+		io.getOut().println();
 
 	}
 
@@ -883,7 +889,7 @@ public class BAMToGASV {
 	 * @throws IOException
 	 */
 	public void readBAMfile() {
-		System.out.println("Reading BAM file.  Once "+ USE_NUMBER_READS + " lines have been acquired for each library, stats will be calculated.");
+		io.getOut().println("Reading BAM file.  Once "+ USE_NUMBER_READS + " lines have been acquired for each library, stats will be calculated.");
 		String id,libname = null;
 		Library lib;
 		VariantType type;
@@ -901,7 +907,7 @@ public class BAMToGASV {
 			try {
 				inputSam = new SAMFileReader(new URL(BAMFILE), null,false);
 			} catch (MalformedURLException e) {
-				System.out.println("ERROR: URL " + BAMFILE + " is malformed.");
+				io.getOut().println("ERROR: URL " + BAMFILE + " is malformed.");
 				System.exit(-1);
 			}
 		}
@@ -913,7 +919,7 @@ public class BAMToGASV {
 				String header = inputSam.getFileHeader().getTextHeader();
 				LOWQ_BAM_FILE.write(header);
 			} catch (IOException e) {
-				System.out.println("ERROR creating low quality SAM file.");
+				io.getOut().println("ERROR creating low quality SAM file.");
 				System.exit(-1);
 			}
 			else
@@ -934,7 +940,7 @@ public class BAMToGASV {
 				// print information every 500,000 lines.
 				recordCounter++;
 				if(recordCounter % 500000 == 0 || recordCounter == 1) {
-					System.out.println("  processing BAM line " + recordCounter + ": ");
+					io.getOut().println("  processing BAM line " + recordCounter + ": ");
 					for(int i=0;i<LIBRARY_NAMES.size();i++) {
 						int numinmem = 0;
 
@@ -945,10 +951,10 @@ public class BAMToGASV {
 						}
 
 						if(LIBRARY_INFO.get(LIBRARY_NAMES.get(i)).firstNreads != null)
-							System.out.println("\t\""+LIBRARY_NAMES.get(i)+"\" has " + numinmem + " lines in memory and " +
+							io.getOut().println("\t\""+LIBRARY_NAMES.get(i)+"\" has " + numinmem + " lines in memory and " +
 									LIBRARY_INFO.get(LIBRARY_NAMES.get(i)).firstNreads.size() + " records in the first N reads.");
 						else
-							System.out.println("\t\""+LIBRARY_NAMES.get(i)+"\" has " + numinmem + " lines in memory ("+tmp+")");
+							io.getOut().println("\t\""+LIBRARY_NAMES.get(i)+"\" has " + numinmem + " lines in memory ("+tmp+")");
 					}
 				}
 
@@ -962,7 +968,7 @@ public class BAMToGASV {
 				if (LIBRARY_IDS.containsKey(id)){
 					libname = LIBRARY_IDS.get(id);
 				} else{ // Reading group id does not exist in the header.
-					System.out.println("ERROR: Reading group id at read " + samRecord.getReadName()+ "does not exist in the header!!");
+					io.getOut().println("ERROR: Reading group id at read " + samRecord.getReadName()+ "does not exist in the header!!");
 					inputSam.close();
 					System.exit(-1);
 				}
@@ -998,17 +1004,17 @@ public class BAMToGASV {
 				} // END haven't computed stats yet && lib.counter >= USE_NUMBER_READS
 			} // end for (SAMRecord samRecord : inputSam)
 		} catch (RuntimeIOException e) {
-			System.out.println("WARNING: RuntimeIOException caught when iterating through records - closing BAM file and processing output. This might be due to a truncated file.");
+			io.getOut().println("WARNING: RuntimeIOException caught when iterating through records - closing BAM file and processing output. This might be due to a truncated file.");
 			System.err.println("WARNING: RuntimeIOException caught when iterating through records - closing BAM file and processing output. This might be due to a truncated file.");
 		}
 		// Layla 8/22/2012 - Add additional catches for truncated files.
 		catch (FileTruncatedException e) {
-			System.out.println("WARNING: FileTruncatedException caught when iterating through records - closing BAM file and processing output.");
+			io.getOut().println("WARNING: FileTruncatedException caught when iterating through records - closing BAM file and processing output.");
 			System.err.println("WARNING: FileTruncatedException caught when iterating through records - closing BAM file and processing output.");
 		}
 
 		catch (RuntimeEOFException e) {
-			System.out.println("WARNING: RuntimeEOFException caught when iterating through records - closing BAM file and processing output.");
+			io.getOut().println("WARNING: RuntimeEOFException caught when iterating through records - closing BAM file and processing output.");
 			System.err.println("WARNING: RuntimeEOFException caught when iterating through records - closing BAM file and processing output.");
 
 		}
@@ -1017,11 +1023,11 @@ public class BAMToGASV {
 			try {
 				LOWQ_BAM_FILE.close();
 			} catch (IOException e) {
-				System.out.println("WARNING: Cannot close low-quality sam file.");
+				io.getOut().println("WARNING: Cannot close low-quality sam file.");
 			}
 		}
 
-		System.out.println("Done reading BAM file.\n");
+		io.getOut().println("Done reading BAM file.\n");
 
 		// finish analysis with remaining records in libraries.
 		// FOR EACH LIBRARY:
@@ -1038,7 +1044,7 @@ public class BAMToGASV {
 			// might have fewer than USE_NUMBER_READS pairs.
 			// Calculate stats now if this is the case.
 			if (!lib.computedStats){
-				System.out.println("  WARNING: There are fewer than " +
+				io.getOut().println("  WARNING: There are fewer than " +
 						USE_NUMBER_READS + " for library \""+libname+"\". Computing statistics now...");
 
 				// check pairInfo
@@ -1090,7 +1096,7 @@ public class BAMToGASV {
 				for(int k=1;k<=lib.numTmpFilesForVariant.get(type);k++)
 					tmpFilenames.add(getTmpFileName(libname,type,k));
 
-				System.out.println("  Library \""+libname+"\" type "+type+": merging "+
+				io.getOut().println("  Library \""+libname+"\" type "+type+": merging "+
 						tmpFilenames.size() + " temporary files");
 
 				// Now, merge files. Concordants are written differently than all
@@ -1112,11 +1118,11 @@ public class BAMToGASV {
 					CONCORDANT_FILES.get(iter.next()).close();
 				}
 			} catch (IOException e) {
-				System.out.println("WARNING: Cannot close unsorted concordant files.");
+				io.getOut().println("WARNING: Cannot close unsorted concordant files.");
 			}
 		}
 
-		System.out.println();
+		io.getOut().println();
 	}
 
 	/**
@@ -1350,7 +1356,7 @@ public class BAMToGASV {
 		try {
 			LOWQ_BAM_FILE.write(record1+record2);
 		} catch (IOException e) {
-			System.out.println("ERROR: Cannot write low-quality sam file.");
+			io.getOut().println("ERROR: Cannot write low-quality sam file.");
 			System.exit(-1);
 		}
 	}
@@ -1399,7 +1405,7 @@ public class BAMToGASV {
 	 */
 	public void sortAndWriteTempFile(Library lib, VariantType type) {
 
-		System.out.println("  Library \""+lib.name+"\" type "+type+": writing "+lib.rowsForVariant.get(type).size()+" lines in temp file");
+		io.getOut().println("  Library \""+lib.name+"\" type "+type+": writing "+lib.rowsForVariant.get(type).size()+" lines in temp file");
 
 		// Increment temporary file number.
 		int curnum = lib.numTmpFilesForVariant.get(type);
@@ -1418,7 +1424,7 @@ public class BAMToGASV {
 					for(int i=0;i<towrite.size();i++)
 						writer.write(towrite.get(i)+"\n");
 				} catch (IOException e) {
-					System.out.println("ERROR WHILE OPENING AND WRITING TO " + filename);
+					io.getOut().println("ERROR WHILE OPENING AND WRITING TO " + filename);
 					System.exit(-1);
 				}
 			} else {
@@ -1427,7 +1433,7 @@ public class BAMToGASV {
 							lib.rowsForVariant.get(type),
 							getTmpFileName(lib.name,type,curnum));
 				} catch (IOException e) {
-					System.out.println("ERROR WHILE WRITING CONCORDANT TMP FILE " + getTmpFileName(lib.name,type,curnum) + ". Most likely, the tmp file cannot be created - check the output directory location.");
+					io.getOut().println("ERROR WHILE WRITING CONCORDANT TMP FILE " + getTmpFileName(lib.name,type,curnum) + ". Most likely, the tmp file cannot be created - check the output directory location.");
 					System.exit(-1);
 				}
 			}
@@ -1437,7 +1443,7 @@ public class BAMToGASV {
 						lib.rowsForVariant.get(type),
 						getTmpFileName(lib.name,type,curnum));
 			} catch (IOException e) {
-				System.out.println("ERROR WHILE WRITING DISCORDANT TMP FILE " + getTmpFileName(lib.name,type,curnum) + ". Most likely, the tmp file cannot be created - check the output directory location.");
+				io.getOut().println("ERROR WHILE WRITING DISCORDANT TMP FILE " + getTmpFileName(lib.name,type,curnum) + ". Most likely, the tmp file cannot be created - check the output directory location.");
 				System.exit(-1);
 			}
 		}
@@ -1478,7 +1484,7 @@ public class BAMToGASV {
 		if(type == VariantType.TRANS)
 			return OUTPUT_PREFIX+"_"+lib+".translocation";
 
-		System.out.println("ERROR: type "+type+" is not one of the recognized options.");
+		io.getOut().println("ERROR: type "+type+" is not one of the recognized options.");
 		System.exit(-1);
 		return "";
 	}
@@ -1499,21 +1505,21 @@ public class BAMToGASV {
 		}
 		// if there are no concordant files, print a warning.
 		if(concordantfiles.size()==0)
-			System.out.println("\nWARNING: " + concordantFile + " was not created because there are no concordant files for the libraries.\n");
+			io.getOut().println("\nWARNING: " + concordantFile + " was not created because there are no concordant files for the libraries.\n");
 
 		// if this list has only one file, we're done.
 		if(concordantfiles.size()==1) {
-			System.out.println("\nMoving single concordant file to one with the correct name.\n");
+			io.getOut().println("\nMoving single concordant file to one with the correct name.\n");
 			File old = new File(concordantfiles.get(0));
 			boolean success = old.renameTo(new File(concordantFile));
 			if(!success)
-				System.out.println("WARNING: " + concordantFile + " was not created by moving " + old.getName());
+				io.getOut().println("WARNING: " + concordantFile + " was not created by moving " + old.getName());
 		}
 
 		// Otherwise, merge the multiple concordant files.
 		if(concordantfiles.size() > 1) {
 			// (2) Merge all concordant files using Sorter.merge() function. Write to OUTPUT_PREFIX+"_all.concordant
-			System.out.println("\nMerging " +concordantfiles.size()+" concordant files for all libraries into a single one.  This might take a while...\n");
+			io.getOut().println("\nMerging " +concordantfiles.size()+" concordant files for all libraries into a single one.  This might take a while...\n");
 			concordantSorter.merge(concordantfiles,concordantFile);
 		}
 	}
@@ -1544,7 +1550,7 @@ public class BAMToGASV {
 
 			writer.close();
 		} catch (Exception e) {
-			System.out.println("Error writing .info file. Continuing.");
+			io.getOut().println("Error writing .info file. Continuing.");
 		}
 	}
 
@@ -1576,7 +1582,7 @@ public class BAMToGASV {
 			}
 			writer.close();
 		} catch (Exception e) {
-			System.out.println("Error writing .gasvInput file. Continuing.");
+			io.getOut().println("Error writing .gasvInput file. Continuing.");
 		}
 	}
 
@@ -1610,7 +1616,7 @@ public class BAMToGASV {
 			writerpro.write("Lambda: "+totalGAvgInsert/GL+"\n");
 			writerpro.close();
 		} catch (Exception e) {
-			System.out.println("Error writing .gasvproInput file. Continuing.");
+			io.getOut().println("Error writing .gasvproInput file. Continuing.");
 		}
 	}
 
@@ -1620,17 +1626,17 @@ public class BAMToGASV {
 	 */
 	public void printSkipped() {
 		if(CHROMOSOME_NAMING_FILE == null && BAMToGASV.NON_DEFAULT_REFS.size() > 0) {
-			System.out.println("The following non-default chromosome names were skipped:");
+			io.getOut().println("The following non-default chromosome names were skipped:");
 			Iterator<String> iter = BAMToGASV.NON_DEFAULT_REFS.keySet().iterator();
 			while(iter.hasNext())
-				System.out.println("  "+iter.next());
+				io.getOut().println("  "+iter.next());
 		} else if (CHROMOSOME_NAMING_FILE != null && BAMToGASV.NON_DEFAULT_REFS.size() > 0) {
-			System.out.println("The following non-default chromosome names were NOT in "+CHROMOSOME_NAMING_FILE+":");
+			io.getOut().println("The following non-default chromosome names were NOT in "+CHROMOSOME_NAMING_FILE+":");
 			Iterator<String> iter = BAMToGASV.NON_DEFAULT_REFS.keySet().iterator();
 			while(iter.hasNext())
-				System.out.println("  "+iter.next());
+				io.getOut().println("  "+iter.next());
 		}
-		System.out.println();
+		io.getOut().println();
 
 		String libname;
 		Library lib;
@@ -1640,7 +1646,7 @@ public class BAMToGASV {
 
 			// skip if there are no reads.
 			if(lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE)
-				System.out.println("\nWARNING: Library \""+libname+
+				io.getOut().println("\nWARNING: Library \""+libname+
 				"\" had zero reads present. Not including this library in output files.\n");
 		}
 	}
@@ -1649,15 +1655,15 @@ public class BAMToGASV {
 	 * Prints the output files that were written.
 	 */
 	public void printOutputFiles() {
-		System.out.println("Output files are:");
-		System.out.println("  "+OUTPUT_PREFIX+".info"); // always written
-		System.out.println("  "+OUTPUT_PREFIX+".gasv.in"); // always written
+		io.getOut().println("Output files are:");
+		io.getOut().println("  "+OUTPUT_PREFIX+".info"); // always written
+		io.getOut().println("  "+OUTPUT_PREFIX+".gasv.in"); // always written
 		if (GASVPRO_OUTPUT){
-			System.out.println("  "+OUTPUT_PREFIX+".gasvpro.in"); // GASVPro
-			System.out.println("  "+OUTPUT_PREFIX+"_all.concordant");// GASVPro
+			io.getOut().println("  "+OUTPUT_PREFIX+".gasvpro.in"); // GASVPro
+			io.getOut().println("  "+OUTPUT_PREFIX+"_all.concordant");// GASVPro
 		}
 		if(WRITE_LOWQ) {
-			System.out.println("  "+OUTPUT_PREFIX+"_lowqual.sam");
+			io.getOut().println("  "+OUTPUT_PREFIX+"_lowqual.sam");
 		}
 
 
@@ -1669,7 +1675,7 @@ public class BAMToGASV {
 				if(VARIANTS[j] == VariantType.CONC && GASVPRO_OUTPUT) // GASVPro
 					continue;
 
-				System.out.println("  "+getFinalFileName(LIBRARY_NAMES.get(i),VARIANTS[j]));
+				io.getOut().println("  "+getFinalFileName(LIBRARY_NAMES.get(i),VARIANTS[j]));
 
 			}
 		}

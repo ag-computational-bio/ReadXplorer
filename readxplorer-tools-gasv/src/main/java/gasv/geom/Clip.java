@@ -12,7 +12,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. The end-user documentation included with the redistribution,
  *    if any, must include the following acknowledgment:
@@ -41,14 +41,16 @@
  * ====================================================================
  */
 package gasv.geom;
+import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
 import java.awt.geom.Point2D ;
 import java.awt.geom.Rectangle2D ;
 import java.util.ArrayList ;
 import java.util.List ;
+import org.openide.windows.InputOutput;
 
 /**
  * <code>Clip</code> is a Java version of the <i>General Poly Clipper</i> algorithm
- * developed by Alan Murta (gpc@cs.man.ac.uk).  The home page for the original source can be 
+ * developed by Alan Murta (gpc@cs.man.ac.uk).  The home page for the original source can be
  * found at <a href="http://www.cs.man.ac.uk/aig/staff/alan/software/" target="_blank">
  * http://www.cs.man.ac.uk/aig/staff/alan/software/</a>.
  * <p>
@@ -69,20 +71,23 @@ public class Clip
    // -----------------
    // --- Constants ---
    // -----------------
+
+    private static final InputOutput io = GASVCaller.io;
+
    private static final boolean DEBUG = false ;
-   
+
    private static final double GPC_EPSILON = 2.2204460492503131e-016 ;
    private static final String GPC_VERSION = "2.31" ;
-   
+
    private static final int LEFT  = 0 ;
    private static final int RIGHT = 1 ;
-   
+
    private static final int ABOVE = 0 ;
    private static final int BELOW = 1 ;
-   
+
    private static final int CLIP = 0 ;
    private static final int SUBJ = 1 ;
-   
+
    // ------------------------
    // --- Member Variables ---
    // ------------------------
@@ -94,7 +99,7 @@ public class Clip
    private Clip()
    {
    }
-   
+
    // ----------------------
    // --- Static Methods ---
    // ----------------------
@@ -125,7 +130,7 @@ public class Clip
    {
       return clip( OperationType.GPC_UNION, p1, p2, polyClass );
    }
-   
+
    /**
     * Return the xor of <code>p1</code> and <code>p2</code> where the
     * return type is of <code>polyClass</code>.  See the note in the class description
@@ -139,10 +144,10 @@ public class Clip
    {
       return clip( OperationType.GPC_XOR, p1, p2, polyClass );
    }
-   
+
    /**
     * Return the intersection of <code>p1</code> and <code>p2</code> where the
-    * return type is of <code>PolyDefault</code>. 
+    * return type is of <code>PolyDefault</code>.
     *
     * @param p1 One of the polygons to performt he intersection with
     * @param p2 One of the polygons to performt he intersection with
@@ -154,7 +159,7 @@ public class Clip
 
    /**
     * Return the union of <code>p1</code> and <code>p2</code> where the
-    * return type is of <code>PolyDefault</code>. 
+    * return type is of <code>PolyDefault</code>.
     *
     * @param p1 One of the polygons to performt he union with
     * @param p2 One of the polygons to performt he union with
@@ -163,10 +168,10 @@ public class Clip
    {
       return clip( OperationType.GPC_UNION, p1, p2, PolyDefault.class );
    }
-   
+
    /**
     * Return the xor of <code>p1</code> and <code>p2</code> where the
-    * return type is of <code>PolyDefault</code>. 
+    * return type is of <code>PolyDefault</code>.
     *
     * @param p1 One of the polygons to performt he xor with
     * @param p2 One of the polygons to performt he xor with
@@ -175,7 +180,7 @@ public class Clip
    {
       return clip( OperationType.GPC_XOR, p1, p2, PolyDefault.class );
    }
-   
+
    // -----------------------
    // --- Private Methods ---
    // -----------------------
@@ -202,7 +207,7 @@ public class Clip
    private static Poly clip( OperationType op, Poly subj, Poly clip, Class polyClass )
    {
       Poly result = createNewPoly( polyClass ) ;
-      
+
       /* Test for trivial NULL result cases */
       if( (subj.isEmpty() && clip.isEmpty()) ||
           (subj.isEmpty() && ((op == OperationType.GPC_INT) || (op == OperationType.GPC_DIFF))) ||
@@ -210,14 +215,14 @@ public class Clip
       {
          return result ;
       }
-      
+
       /* Identify potentialy contributing contours */
-      if( ((op == OperationType.GPC_INT) || (op == OperationType.GPC_DIFF)) && 
+      if( ((op == OperationType.GPC_INT) || (op == OperationType.GPC_DIFF)) &&
           !subj.isEmpty() && !clip.isEmpty() )
       {
          minimax_test(subj, clip, op);
       }
-      
+
       /* Build LMT */
       LmtTable lmt_table = new LmtTable();
       ScanBeamTreeEntries sbte = new ScanBeamTreeEntries();
@@ -229,8 +234,8 @@ public class Clip
       }
       if( DEBUG )
       {
-         System.out.println("");
-         System.out.println(" ------------ After build_lmt for subj ---------");
+         io.getOut().println("");
+         io.getOut().println(" ------------ After build_lmt for subj ---------");
          lmt_table.print();
       }
       if (!clip.isEmpty())
@@ -239,8 +244,8 @@ public class Clip
       }
       if( DEBUG )
       {
-         System.out.println("");
-         System.out.println(" ------------ After build_lmt for clip ---------");
+         io.getOut().println("");
+         io.getOut().println(" ------------ After build_lmt for clip ---------");
          lmt_table.print();
       }
 
@@ -262,19 +267,19 @@ public class Clip
       {
          parity[CLIP]= RIGHT;
       }
-      
+
       if( DEBUG )
       {
          print_sbt(sbt);
       }
-      
+
       LmtNode local_min = lmt_table.top_node ;
 
       TopPolygonNode out_poly = new TopPolygonNode(); // used to create resulting Poly
-      
+
       AetTree aet = new AetTree();
       int scanbeam = 0 ;
-      
+
       /* Process each scanbeam */
       while( scanbeam < sbt.length )
       {
@@ -287,9 +292,9 @@ public class Clip
             yt = sbt[scanbeam];
             dy = yt - yb;
          }
-  
+
          /* === SCANBEAM BOUNDARY PROCESSING ================================ */
-         
+
          /* If LMT node corresponding to yb exists */
          if (local_min != null )
          {
@@ -300,22 +305,22 @@ public class Clip
                {
                   add_edge_to_aet( aet, edge );
                }
-               
+
                local_min = local_min.next;
             }
          }
-         
+
          if( DEBUG )
          {
             aet.print();
          }
          /* Set dummy previous x value */
          double px = -Double.MAX_VALUE ;
-         
+
          /* Create bundles within AET */
          EdgeNode e0 = aet.top_node ;
          EdgeNode e1 = aet.top_node ;
-         
+
          /* Set up bundle fields of first edge */
          aet.top_node.bundle[ABOVE][ aet.top_node.type ] = (aet.top_node.top.y != yb) ? 1 : 0;
          aet.top_node.bundle[ABOVE][ ((aet.top_node.type==0) ? 1 : 0) ] = 0;
@@ -325,12 +330,12 @@ public class Clip
          {
             int ne_type = next_edge.type ;
             int ne_type_opp = ((next_edge.type==0) ? 1 : 0); //next edge type opposite
-            
+
             /* Set up bundle fields of next edge */
             next_edge.bundle[ABOVE][ ne_type     ]= (next_edge.top.y != yb) ? 1 : 0;
             next_edge.bundle[ABOVE][ ne_type_opp ] = 0 ;
             next_edge.bstate[ABOVE] = BundleState.UNBUNDLED;
-            
+
             /* Bundle edges above the scanbeam boundary if they coincide */
             if ( next_edge.bundle[ABOVE][ne_type] == 1 )
             {
@@ -346,29 +351,29 @@ public class Clip
                e0 = next_edge;
             }
          }
-         
+
          int[] horiz = new int[2] ;
          horiz[CLIP]= HState.NH;
          horiz[SUBJ]= HState.NH;
-         
+
          int[] exists = new int[2] ;
          exists[CLIP] = 0 ;
          exists[SUBJ] = 0 ;
-         
+
          PolygonNode cf = null ;
-         
+
          /* Process each edge at this scanbeam boundary */
          for (EdgeNode edge= aet.top_node ; (edge != null); edge = edge.next )
          {
             exists[CLIP] = edge.bundle[ABOVE][CLIP] + (edge.bundle[BELOW][CLIP] << 1);
             exists[SUBJ] = edge.bundle[ABOVE][SUBJ] + (edge.bundle[BELOW][SUBJ] << 1);
-         
+
             if( (exists[CLIP] != 0) || (exists[SUBJ] != 0) )
             {
                /* Set bundle side */
                edge.bside[CLIP] = parity[CLIP];
                edge.bside[SUBJ] = parity[SUBJ];
-         
+
                boolean contributing = false ;
                int br=0, bl=0, tr=0, tl=0 ;
                /* Determine contributing status and quadrant occupancies */
@@ -380,7 +385,7 @@ public class Clip
                   br = ((parity[CLIP]!=0) && (parity[SUBJ]!=0)) ? 1 : 0;
                   bl = ( ((parity[CLIP] ^ edge.bundle[ABOVE][CLIP])!=0) &&
                          ((parity[SUBJ] ^ edge.bundle[ABOVE][SUBJ])!=0) ) ? 1 : 0;
-                  tr = ( ((parity[CLIP] ^ ((horiz[CLIP]!=HState.NH)?1:0)) !=0) && 
+                  tr = ( ((parity[CLIP] ^ ((horiz[CLIP]!=HState.NH)?1:0)) !=0) &&
                          ((parity[SUBJ] ^ ((horiz[SUBJ]!=HState.NH)?1:0)) !=0) ) ? 1 : 0;
                   tl = (((parity[CLIP] ^ ((horiz[CLIP]!=HState.NH)?1:0) ^ edge.bundle[BELOW][CLIP])!=0) &&
                         ((parity[SUBJ] ^ ((horiz[SUBJ]!=HState.NH)?1:0) ^ edge.bundle[BELOW][SUBJ])!=0))?1:0;
@@ -401,7 +406,7 @@ public class Clip
                                 ((exists[CLIP]!=0) && (exists[SUBJ]!=0) && (parity[CLIP] == parity[SUBJ]));
                   br= ((parity[CLIP]!=0) || (parity[SUBJ]!=0))?1:0;
                   bl= (((parity[CLIP] ^ edge.bundle[ABOVE][CLIP])!=0) || ((parity[SUBJ] ^ edge.bundle[ABOVE][SUBJ])!=0))?1:0;
-                  tr= ( ((parity[CLIP] ^ ((horiz[CLIP]!=HState.NH)?1:0))!=0) || 
+                  tr= ( ((parity[CLIP] ^ ((horiz[CLIP]!=HState.NH)?1:0))!=0) ||
                         ((parity[SUBJ] ^ ((horiz[SUBJ]!=HState.NH)?1:0))!=0) ) ?1:0;
                   tl= ( ((parity[CLIP] ^ ((horiz[CLIP]!=HState.NH)?1:0) ^ edge.bundle[BELOW][CLIP])!=0) ||
                         ((parity[SUBJ] ^ ((horiz[SUBJ]!=HState.NH)?1:0) ^ edge.bundle[BELOW][SUBJ])!=0) ) ? 1:0;
@@ -410,11 +415,11 @@ public class Clip
                {
                   throw new IllegalStateException("Unknown op");
                }
-               
+
                /* Update parity */
                parity[CLIP] ^= edge.bundle[ABOVE][CLIP];
                parity[SUBJ] ^= edge.bundle[ABOVE][SUBJ];
-               
+
                /* Update horizontal state */
                if (exists[CLIP]!=0)
                {
@@ -424,11 +429,11 @@ public class Clip
                {
                   horiz[SUBJ] = HState.next_h_state[horiz[SUBJ]][((exists[SUBJ] - 1) << 1) + parity[SUBJ]];
                }
-               
+
                if (contributing)
                {
                   double xb = edge.xb;
-                  
+
                   int vclass = VertexType.getType( tr, tl, br, bl );
                   switch (vclass)
                   {
@@ -530,7 +535,7 @@ public class Clip
                out_poly.print();
             }
          } /* End of AET loop */
-         
+
          /* Delete terminating edges from the AET, otherwise compute xt */
          for (EdgeNode edge = aet.top_node ; (edge != null); edge = edge.next)
          {
@@ -538,15 +543,15 @@ public class Clip
             {
                EdgeNode prev_edge = edge.prev;
                EdgeNode next_edge= edge.next;
-               
+
                if (prev_edge != null)
                   prev_edge.next = next_edge;
                else
                   aet.top_node = next_edge;
-               
+
                if (next_edge != null )
                   next_edge.prev = prev_edge;
-               
+
                /* Copy bundle head state to the adjacent tail edge if required */
                if ((edge.bstate[BELOW] == BundleState.BUNDLE_HEAD) && (prev_edge!=null))
                {
@@ -572,21 +577,21 @@ public class Clip
                   edge.xt= edge.bot.x + edge.dx * (yt - edge.bot.y);
             }
          }
-                  
+
          if (scanbeam < sbte.sbt_entries )
          {
             /* === SCANBEAM INTERIOR PROCESSING ============================== */
-            
+
             /* Build intersection table for the current scanbeam */
             ItNodeTable it_table = new ItNodeTable();
             it_table.build_intersection_table(aet, dy);
-         
+
             /* Process each node in the intersection table */
             for (ItNode intersect = it_table.top_node ; (intersect != null); intersect = intersect.next)
             {
                e0= intersect.ie[0];
                e1= intersect.ie[1];
-               
+
                /* Only generate output for contributing intersections */
                if ( ((e0.bundle[ABOVE][CLIP]!=0) || (e0.bundle[ABOVE][SUBJ]!=0)) &&
                     ((e1.bundle[ABOVE][CLIP]!=0) || (e1.bundle[ABOVE][SUBJ]!=0)))
@@ -595,17 +600,17 @@ public class Clip
                   PolygonNode q = e1.outp[ABOVE];
                   double ix = intersect.point.x;
                   double iy = intersect.point.y + yb;
-               
+
                   int in_clip = ( ( (e0.bundle[ABOVE][CLIP]!=0) && !(e0.bside[CLIP]!=0)) ||
                                   ( (e1.bundle[ABOVE][CLIP]!=0) &&  (e1.bside[CLIP]!=0)) ||
                                   (!(e0.bundle[ABOVE][CLIP]!=0) && !(e1.bundle[ABOVE][CLIP]!=0) &&
                                     (e0.bside[CLIP]!=0) && (e1.bside[CLIP]!=0) ) ) ? 1 : 0;
-                  
+
                   int in_subj = ( ( (e0.bundle[ABOVE][SUBJ]!=0) && !(e0.bside[SUBJ]!=0)) ||
                                   ( (e1.bundle[ABOVE][SUBJ]!=0) &&  (e1.bside[SUBJ]!=0)) ||
                                   (!(e0.bundle[ABOVE][SUBJ]!=0) && !(e1.bundle[ABOVE][SUBJ]!=0) &&
                                     (e0.bside[SUBJ]!=0) && (e1.bside[SUBJ]!=0) ) ) ? 1 : 0;
-        
+
                   int tr=0, tl=0, br=0, bl=0 ;
                   /* Determine quadrant occupancies */
                   if( (op == OperationType.GPC_DIFF) || (op == OperationType.GPC_INT) )
@@ -636,7 +641,7 @@ public class Clip
                   {
                      throw new IllegalStateException("Unknown op type, "+op);
                   }
-                  
+
                   int vclass = VertexType.getType( tr, tl, br, bl );
                   switch (vclass)
                   {
@@ -719,8 +724,8 @@ public class Clip
                      default:
                         break;
                   } /* End of switch */
-               } /* End of contributing intersection conditional */                  
-                  
+               } /* End of contributing intersection conditional */
+
                /* Swap bundle sides in response to edge crossing */
                if (e0.bundle[ABOVE][CLIP]!=0)
                   e1.bside[CLIP] = (e1.bside[CLIP]==0)?1:0;
@@ -738,7 +743,7 @@ public class Clip
                {
                   next_edge.prev = e0;
                }
-   
+
                if (e0.bstate[ABOVE] == BundleState.BUNDLE_HEAD)
                {
                   boolean search = true;
@@ -778,7 +783,7 @@ public class Clip
                   out_poly.print();
                }
             } /* End of IT loop*/
-               
+
             /* Prepare for next scanbeam */
             for ( EdgeNode edge = aet.top_node; (edge != null); edge = edge.next)
             {
@@ -814,13 +819,13 @@ public class Clip
             }
          }
       } /* === END OF SCANBEAM PROCESSING ================================== */
-      
+
       /* Generate result polygon from out_poly */
       result = out_poly.getResult(polyClass);
-            
+
       return result ;
    }
-   
+
    private static boolean EQ(double a, double b)
    {
       return (Math.abs(a - b) <= GPC_EPSILON);
@@ -830,7 +835,7 @@ public class Clip
    {
       return ((i - 1 + n) % n);
    }
-   
+
    private static int NEXT_INDEX(int i, int n)
    {
       return ((i + 1    ) % n);
@@ -838,10 +843,10 @@ public class Clip
 
    private static boolean OPTIMAL( Poly p, int i )
    {
-      return (p.getY(PREV_INDEX(i, p.getNumPoints())) != p.getY(i)) || 
+      return (p.getY(PREV_INDEX(i, p.getNumPoints())) != p.getY(i)) ||
              (p.getY(NEXT_INDEX(i, p.getNumPoints())) != p.getY(i)) ;
    }
-   
+
    private static Rectangle2D[] create_contour_bboxes( Poly p )
    {
       Rectangle2D[] box = new Rectangle2D[p.getNumInnerPoly()] ;
@@ -852,14 +857,14 @@ public class Clip
         Poly inner_poly = p.getInnerPoly(c);
         box[c] = inner_poly.getBounds();
      }
-     return box;  
+     return box;
    }
-   
+
    private static void minimax_test( Poly subj, Poly clip, OperationType op )
    {
       Rectangle2D[] s_bbox = create_contour_bboxes(subj);
       Rectangle2D[] c_bbox = create_contour_bboxes(clip);
-      
+
       int subj_num_poly = subj.getNumInnerPoly();
       int clip_num_poly = clip.getNumInnerPoly();
       boolean[][] o_table = new boolean[subj_num_poly][clip_num_poly] ;
@@ -889,10 +894,10 @@ public class Clip
          {
             clip.setContributing( c, false ); // Flag non contributing status
          }
-      }  
+      }
 
       if (op == OperationType.GPC_INT)
-      {  
+      {
          /* For each subject contour, search for any clip contour overlaps */
          for ( int s= 0; s < subj_num_poly; s++)
          {
@@ -905,7 +910,7 @@ public class Clip
             {
                subj.setContributing( s, false ); // Flag non contributing status
             }
-         }  
+         }
       }
    }
 
@@ -995,7 +1000,7 @@ public class Clip
                   prev_bound.next_bound = e ;
                }
                e.next_bound = current_bound ;
-               
+
 //               EdgeNode existing_bound = current_bound ;
 //               current_bound = e ;
 //               current_bound.next_bound = existing_bound ;
@@ -1061,7 +1066,7 @@ public class Clip
          }
       }
    }
-   
+
    private static void add_edge_to_aet( AetTree aet , EdgeNode edge )
    {
       if ( aet.top_node == null )
@@ -1206,10 +1211,10 @@ public class Clip
          }
       }
    }
-   
-   private static EdgeTable build_lmt( LmtTable lmt_table, 
+
+   private static EdgeTable build_lmt( LmtTable lmt_table,
                                       ScanBeamTreeEntries sbte,
-                                      Poly p, 
+                                      Poly p,
                                       int type, //poly type SUBJ/CLIP
                                       OperationType op)
    {
@@ -1244,7 +1249,7 @@ public class Clip
                   num_vertices++;
                }
             }
-           
+
             /* Do the contour forward pass */
             for ( int min= 0; min < num_vertices; min++)
             {
@@ -1266,19 +1271,19 @@ public class Clip
                   e.bstate[BELOW] = BundleState.UNBUNDLED;
                   e.bundle[BELOW][CLIP] = 0;
                   e.bundle[BELOW][SUBJ] = 0;
-                  
+
                   for ( int i= 0; i < num_edges; i++)
                   {
                      EdgeNode ei = edge_table.getNode( e_index+i );
                      EdgeNode ev = edge_table.getNode( v );
-                     
+
                      ei.xb    = ev.vertex.x;
                      ei.bot.x = ev.vertex.x;
                      ei.bot.y = ev.vertex.y;
 
                      v = NEXT_INDEX(v, num_vertices);
                      ev = edge_table.getNode( v );
-                     
+
                      ei.top.x= ev.vertex.x;
                      ei.top.y= ev.vertex.y;
                      ei.dx= (ev.vertex.x - ei.bot.x) / (ei.top.y - ei.bot.y);
@@ -1296,7 +1301,7 @@ public class Clip
                   insert_bound( bound_list(lmt_table, edge_table.getNode(min).vertex.y), e);
                   if( DEBUG )
                   {
-                     System.out.println("fwd");
+                     io.getOut().println("fwd");
                      lmt_table.print();
                   }
                   e_index += num_edges;
@@ -1324,12 +1329,12 @@ public class Clip
                   e.bstate[BELOW] = BundleState.UNBUNDLED;
                   e.bundle[BELOW][CLIP] = 0;
                   e.bundle[BELOW][SUBJ] = 0;
-                  
+
                   for (int i= 0; i < num_edges; i++)
                   {
                      EdgeNode ei = edge_table.getNode( e_index+i );
                      EdgeNode ev = edge_table.getNode( v );
-                     
+
                      ei.xb    = ev.vertex.x;
                      ei.bot.x = ev.vertex.x;
                      ei.bot.y = ev.vertex.y;
@@ -1354,7 +1359,7 @@ public class Clip
                   insert_bound( bound_list(lmt_table, edge_table.getNode(min).vertex.y), e);
                   if( DEBUG )
                   {
-                     System.out.println("rev");
+                     io.getOut().println("rev");
                      lmt_table.print();
                   }
                   e_index+= num_edges;
@@ -1375,7 +1380,7 @@ public class Clip
       else
       {
          double den= (st.xt - st.xb) - (edge.xt - edge.xb);
-         
+
          /* If new edge and ST edge don't cross */
          if( (edge.xt >= st.xt) || (edge.dx == st.dx) || (Math.abs(den) <= GPC_EPSILON))
          {
@@ -1389,21 +1394,21 @@ public class Clip
             double r= (edge.xb - st.xb) / den;
             double x= st.xb + r * (st.xt - st.xb);
             double y= r * dy;
-            
+
             /* Insert the edge pointers and the intersection point in the IT */
            it.top_node = add_intersection(it.top_node, st.edge, edge, x, y);
-            
+
             /* Head further into the ST */
             st.prev = add_st_edge(st.prev, it, edge, dy);
          }
       }
       return st ;
    }
-   
-   private static ItNode add_intersection( ItNode it_node, 
-                                           EdgeNode edge0, 
+
+   private static ItNode add_intersection( ItNode it_node,
+                                           EdgeNode edge0,
                                            EdgeNode  edge1,
-                                           double x, 
+                                           double x,
                                            double y)
    {
       if (it_node == null)
@@ -1427,7 +1432,7 @@ public class Clip
       }
       return it_node ;
    }
-   
+
    // ---------------------
    // --- Inner Classes ---
    // ---------------------
@@ -1435,12 +1440,12 @@ public class Clip
    {
       private String m_Type ;
       private OperationType( String type ) { m_Type = type; }
-      
+
       public static final OperationType GPC_DIFF  = new OperationType( "Difference" );
       public static final OperationType GPC_INT   = new OperationType( "Intersection" );
       public static final OperationType GPC_XOR   = new OperationType( "Exclusive or" );
       public static final OperationType GPC_UNION = new OperationType( "Union" );
-      
+
       public String toString() { return m_Type; }
    }
 
@@ -1465,15 +1470,15 @@ public class Clip
       public static final int IRI = 13 ; /* Internal right intermediate       */
       public static final int IMX = 14 ; /* Internal maximum                  */
       public static final int FUL = 15 ; /* Full non-intersection             */
-      
+
       public static int getType( int tr, int tl, int br, int bl )
       {
           return tr + (tl << 1) + (br << 2) + (bl << 3);
       }
    }
-   
+
    /**
-    * Horizontal edge states            
+    * Horizontal edge states
     */
    private static class HState
    {
@@ -1485,25 +1490,25 @@ public class Clip
       public static final int[][] next_h_state =
       {
       /*        ABOVE     BELOW     CROSS */
-      /*        L   R     L   R     L   R */  
+      /*        L   R     L   R     L   R */
       /* NH */ {BH, TH,   TH, BH,   NH, NH},
       /* BH */ {NH, NH,   NH, NH,   TH, TH},
       /* TH */ {NH, NH,   NH, NH,   BH, BH}
       };
    }
-   
+
    /**
-    * Edge bundle state                 
+    * Edge bundle state
     */
    private static class BundleState
    {
       private String m_State ;
       private BundleState( String state ) { m_State = state ; }
-      
+
       public static final BundleState UNBUNDLED   = new BundleState( "UNBUNDLED"   ); // Isolated edge not within a bundle
       public static final BundleState BUNDLE_HEAD = new BundleState( "BUNDLE_HEAD" ); // Bundle head node
       public static final BundleState BUNDLE_TAIL = new BundleState( "BUNDLE_TAIL" ); // Passive bundle tail node
-      
+
       public String toString() { return m_State; }
    }
 
@@ -1515,7 +1520,7 @@ public class Clip
       double     x;    // X coordinate component
       double     y;    // Y coordinate component
       VertexNode next; // Pointer to next vertex in list
-      
+
       public VertexNode( double x, double y )
       {
          this.x = x ;
@@ -1534,37 +1539,37 @@ public class Clip
       VertexNode[] v = new VertexNode[2] ; /* Left and right vertex list ptrs   */
       PolygonNode  next;                   /* Pointer to next polygon contour   */
       PolygonNode  proxy;                  /* Pointer to actual structure used  */
-      
+
       public PolygonNode( PolygonNode next, double x, double y )
       {
          /* Make v[LEFT] and v[RIGHT] point to new vertex */
          VertexNode vn = new VertexNode( x, y );
          this.v[LEFT ] = vn ;
          this.v[RIGHT] = vn ;
-         
+
          this.next = next ;
          this.proxy = this ; /* Initialise proxy to point to p itself */
          this.active = 1 ; //TRUE
       }
-      
+
       public void add_right( double x, double y )
       {
          VertexNode nv = new VertexNode( x, y );
-         
+
          /* Add vertex nv to the right end of the polygon's vertex list */
          proxy.v[RIGHT].next= nv;
-         
+
          /* Update proxy->v[RIGHT] to point to nv */
          proxy.v[RIGHT]= nv;
       }
-      
+
       public void add_left( double x, double y)
       {
          VertexNode nv = new VertexNode( x, y );
-         
+
          /* Add vertex nv to the left end of the polygon's vertex list */
          nv.next= proxy.v[LEFT];
-         
+
          /* Update proxy->[LEFT] to point to nv */
          proxy.v[LEFT]= nv;
       }
@@ -1574,27 +1579,27 @@ public class Clip
    private static class TopPolygonNode
    {
       PolygonNode top_node = null ;
-      
+
       public PolygonNode add_local_min( double x, double y )
       {
          PolygonNode existing_min = top_node;
-         
+
          top_node = new PolygonNode( existing_min, x, y );
-         
+
          return top_node ;
       }
-      
+
       public void merge_left( PolygonNode p, PolygonNode q )
       {
          /* Label contour as a hole */
          q.proxy.hole = true ;
-         
+
          if (p.proxy != q.proxy)
          {
             /* Assign p's vertex list to the left end of q's list */
             p.proxy.v[RIGHT].next= q.proxy.v[LEFT];
             q.proxy.v[LEFT]= p.proxy.v[LEFT];
-            
+
             /* Redirect any p.proxy references to q.proxy */
             PolygonNode target = p.proxy ;
             for(PolygonNode node = top_node; (node != null); node = node.next)
@@ -1612,13 +1617,13 @@ public class Clip
       {
          /* Label contour as external */
          q.proxy.hole = false ;
-         
+
          if (p.proxy != q.proxy)
          {
             /* Assign p's vertex list to the right end of q's list */
             q.proxy.v[RIGHT].next= p.proxy.v[LEFT];
             q.proxy.v[RIGHT]= p.proxy.v[RIGHT];
-            
+
             /* Redirect any p->proxy references to q->proxy */
             PolygonNode target = p.proxy ;
             for (PolygonNode node = top_node ; (node != null ); node = node.next)
@@ -1631,7 +1636,7 @@ public class Clip
             }
          }
       }
-      
+
       public int count_contours()
       {
          int nc = 0 ;
@@ -1645,7 +1650,7 @@ public class Clip
                {
                   nv++;
                }
-               
+
                /* Record valid vertex counts in the active field */
                if (nv > 2)
                {
@@ -1667,7 +1672,7 @@ public class Clip
          }
          return nc;
       }
-      
+
       public Poly getResult( Class polyClass )
       {
          Poly result = createNewPoly( polyClass );
@@ -1690,7 +1695,7 @@ public class Clip
                   {
                      poly.setIsHole( poly_node.proxy.hole );
                   }
-                  
+
                   // ------------------------------------------------------------------------
                   // --- This algorithm puts the verticies into the poly in reverse order ---
                   // ------------------------------------------------------------------------
@@ -1705,7 +1710,7 @@ public class Clip
                   c++;
                }
             }
-            
+
             // -----------------------------------------
             // --- Sort holes to the end of the list ---
             // -----------------------------------------
@@ -1730,29 +1735,29 @@ public class Clip
          }
          return result ;
       }
-      
+
       public void print()
       {
-         System.out.println("---- out_poly ----");
+         io.getOut().println("---- out_poly ----");
          int c= 0;
          PolygonNode npoly_node = null ;
          for (PolygonNode poly_node= top_node; (poly_node != null); poly_node = npoly_node)
          {
-            System.out.println("contour="+c+"  active="+poly_node.active+"  hole="+poly_node.proxy.hole);
+            io.getOut().println("contour="+c+"  active="+poly_node.active+"  hole="+poly_node.proxy.hole);
             npoly_node = poly_node.next;
             if (poly_node.active != 0)
             {
                int v=0 ;
                for (VertexNode vtx = poly_node.proxy.v[LEFT]; (vtx != null) ; vtx = vtx.next )
                {
-                  System.out.println("v="+v+"  vtx.x="+vtx.x+"  vtx.y="+vtx.y);
+                  io.getOut().println("v="+v+"  vtx.x="+vtx.x+"  vtx.y="+vtx.y);
                }
                c++;
             }
          }
-      }         
+      }
    }
-   
+
    private static class EdgeNode
    {
       Point2D.Double vertex = new Point2D.Double(); /* Piggy-backed contour vertex data  */
@@ -1776,22 +1781,22 @@ public class Clip
    private static class AetTree
    {
       EdgeNode top_node ;
-      
+
       public void print()
       {
-         System.out.println("");
-         System.out.println("aet");
+         io.getOut().println("");
+         io.getOut().println("aet");
          for( EdgeNode edge = top_node ; (edge != null) ; edge = edge.next )
          {
-            System.out.println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
+            io.getOut().println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
          }
       }
    }
-   
+
    private static class EdgeTable
    {
       private List m_List = new ArrayList();
-   
+
       public void addNode( double x, double y )
       {
          EdgeNode node = new EdgeNode();
@@ -1799,12 +1804,12 @@ public class Clip
          node.vertex.y = y ;
          m_List.add( node );
       }
-      
+
       public EdgeNode getNode( int index )
       {
          return (EdgeNode)m_List.get(index);
       }
-      
+
       public boolean FWD_MIN( int i )
       {
          EdgeNode prev = (EdgeNode)m_List.get(PREV_INDEX(i, m_List.size()));
@@ -1829,7 +1834,7 @@ public class Clip
          return ((prev.vertex.getY() >  ith.vertex.getY()) &&
                  (next.vertex.getY() >= ith.vertex.getY()));
       }
-      
+
       public boolean NOT_RMAX( int i )
       {
          EdgeNode prev = (EdgeNode)m_List.get(PREV_INDEX(i, m_List.size()));
@@ -1846,7 +1851,7 @@ public class Clip
       double   y;            /* Y coordinate at local minimum     */
       EdgeNode first_bound;  /* Pointer to bound list             */
       LmtNode  next;         /* Pointer to next local minimum     */
-      
+
       public LmtNode( double yvalue )
       {
          y = yvalue ;
@@ -1856,33 +1861,33 @@ public class Clip
    private static class LmtTable
    {
       LmtNode top_node ;
-      
+
       public void print()
       {
          int n = 0 ;
          LmtNode lmt = top_node ;
          while( lmt != null )
          {
-            System.out.println("lmt("+n+")");
+            io.getOut().println("lmt("+n+")");
             for( EdgeNode edge = lmt.first_bound ; (edge != null) ; edge = edge.next_bound )
             {
-               System.out.println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
+               io.getOut().println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
             }
             n++ ;
             lmt = lmt.next ;
          }
       }
    }
-   
+
    /**
-    * Scanbeam tree 
+    * Scanbeam tree
     */
    private static class ScanBeamTree
    {
       double       y;            /* Scanbeam node y value             */
       ScanBeamTree less;         /* Pointer to nodes with lower y     */
       ScanBeamTree more;         /* Pointer to nodes with higher y    */
-      
+
       public ScanBeamTree( double yvalue )
       {
          y = yvalue ;
@@ -1896,11 +1901,11 @@ public class Clip
    {
       int sbt_entries ;
       ScanBeamTree sb_tree ;
-      
+
       public double[] build_sbt()
       {
          double[] sbt = new double[sbt_entries] ;
-         
+
          int entries = 0 ;
          entries = inner_build_sbt( entries, sbt, sb_tree );
          if( entries != sbt_entries )
@@ -1909,7 +1914,7 @@ public class Clip
          }
          return sbt ;
       }
-      
+
       private int inner_build_sbt( int entries, double[] sbt, ScanBeamTree sbt_node )
       {
          if( sbt_node.less != null )
@@ -1925,7 +1930,7 @@ public class Clip
          return entries ;
       }
    }
-   
+
    /**
     * Intersection table
     */
@@ -1934,7 +1939,7 @@ public class Clip
       EdgeNode[]     ie    = new EdgeNode[2];      /* Intersecting edge (bundle) pair   */
       Point2D.Double point = new Point2D.Double(); /* Point of intersection             */
       ItNode         next;                         /* The next intersection table node  */
-      
+
       public ItNode( EdgeNode edge0, EdgeNode edge1, double x, double y, ItNode next )
       {
          this.ie[0] = edge0 ;
@@ -1944,7 +1949,7 @@ public class Clip
          this.next = next ;
       }
    }
-   
+
    private static class ItNodeTable
    {
       ItNode top_node ;
@@ -1952,7 +1957,7 @@ public class Clip
       public void build_intersection_table(AetTree aet, double dy)
       {
          StNode st = null ;
-         
+
          /* Process each AET edge */
          for (EdgeNode edge = aet.top_node ; (edge != null); edge = edge.next)
          {
@@ -1965,7 +1970,7 @@ public class Clip
          }
       }
    }
-   
+
    /**
     * Sorted edge table
     */
@@ -1976,7 +1981,7 @@ public class Clip
       double   xt;           /* Scanbeam top x coordinate         */
       double   dx;           /* Change in x for a unit y increase */
       StNode   prev;         /* Previous edge in sorted list      */
-      
+
       public StNode( EdgeNode edge, StNode prev )
       {
          this.edge = edge ;
@@ -1984,19 +1989,19 @@ public class Clip
          this.xt = edge.xt ;
          this.dx = edge.dx ;
          this.prev = prev ;
-      }      
+      }
    }
-   
+
    // -------------
    // --- DEBUG ---
    // -------------
    private static void print_sbt( double[] sbt )
    {
-      System.out.println("");
-      System.out.println("sbt.length="+sbt.length);
+      io.getOut().println("");
+      io.getOut().println("sbt.length="+sbt.length);
       for( int i = 0 ; i < sbt.length ; i++ )
       {
-         System.out.println("sbt["+i+"]="+sbt[i]);
+         io.getOut().println("sbt["+i+"]="+sbt[i]);
       }
    }
 }
