@@ -106,5 +106,10 @@
             <artifactId>readxplorer-api</artifactId>
             <version>1.1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-io</artifactId>
+            <version>RELEASE80</version>
+        </dependency>
     </dependencies>
 </project>
