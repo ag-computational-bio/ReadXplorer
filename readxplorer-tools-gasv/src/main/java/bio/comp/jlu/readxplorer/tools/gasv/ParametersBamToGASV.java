@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,22 @@ import de.cebitec.readxplorer.databackend.ParameterSetI;
  */
 public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
 
+    /** Fragment bounds calculation method PCT. */
+    public static final String FB_METHOD_PCT = "PCT";
+    /** Fragment bounds calculation method SD. */
+    public static final String FB_METHOD_SD = "SD";
+    /** Fragment bounds calculation method EXACT. */
+    public static final String FB_METHOD_EXACT = "EXACT";
+    /** Fragment bounds calculation method FILE. */
+    public static final String FB_METHOD_FILE = "FILE";
+
+    /** SAM validation stringency silent. */
+    public static final String STRINGENCY_SILENT = "silent";
+    /** SAM validation stringency lenient. */
+    public static final String STRINGENCY_LENIENT = "lenient";
+    /** SAM validation stringency strict. */
+    public static final String STRINGENCY_STRICT = "strict";
+
     private boolean isSeparateOutput;
     private boolean isSolid;
     private boolean isWriteConcordantPairs;
@@ -38,8 +54,8 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
     private int distSDValue;
     private String distExactValue;
     private String distFile;
-    private ParametersBamToGASV.SamValidationStringency samValidationStringency;
-    private FragmentBoundsMethod fragmentBoundsMethod;
+    private String samValidationStringency;
+    private String fragmentBoundsMethod;
 
 
     /**
@@ -77,7 +93,6 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
      *                                sequencing libraries.
      * @param samValidationStringency Validation stringency to use for reading
      *                                data from the bam file.
-     * <p>
      */
     public ParametersBamToGASV( boolean isSolid,
                                 boolean isSeparateOutput,
@@ -85,12 +100,12 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
                                 boolean isWriteLowQualityPairs,
                                 byte minMappingQuality,
                                 int maxPairLength,
-                                FragmentBoundsMethod fragmentBoundsMethod,
+                                String fragmentBoundsMethod,
                                 int distPCTValue,
                                 int distSDValue,
                                 String distExactValue,
                                 String distFile,
-                                ParametersBamToGASV.SamValidationStringency samValidationStringency ) {
+                                String samValidationStringency ) {
 
         this.isSolid = isSolid;
         this.isSeparateOutput = isSeparateOutput;
@@ -112,8 +127,8 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
      * Constructor for creating a default value parameter set.
      */
     public ParametersBamToGASV() {
-        this( false, false, false, false, new Byte( "20" ), 10000, FragmentBoundsMethod.PCT,
-              99, -1, "", "", SamValidationStringency.SILENT );
+        this( false, false, false, false, new Byte( "20" ), 10000, FB_METHOD_PCT,
+              99, -1, "", "", STRINGENCY_SILENT );
     }
 
 
@@ -232,7 +247,7 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
     /**
      * @return The method for specifying fragment distribution bounds.
      */
-    public FragmentBoundsMethod getFragmentBoundsMethod() {
+    public String getFragmentBoundsMethod() {
         return fragmentBoundsMethod;
     }
 
@@ -241,7 +256,7 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
      * @param fragmentBoundsMethod The method for specifying fragment
      *                             distribution bounds.
      */
-    public void setFragmentBoundsMethod( FragmentBoundsMethod fragmentBoundsMethod ) {
+    public void setFragmentBoundsMethod( String fragmentBoundsMethod ) {
         this.fragmentBoundsMethod = fragmentBoundsMethod;
     }
 
@@ -322,7 +337,7 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
     /**
      * @return Validation stringency to use for reading data from the bam file.
      */
-    public ParametersBamToGASV.SamValidationStringency getSamValidationStringency() {
+    public String getSamValidationStringency() {
         return samValidationStringency;
     }
 
@@ -331,131 +346,9 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
      * @param samValidationStringency Validation stringency to use for reading
      *                                data from the bam file.
      */
-    public void setSamValidationStringency( ParametersBamToGASV.SamValidationStringency samValidationStringency ) {
+    public void setSamValidationStringency( String samValidationStringency ) {
         this.samValidationStringency = samValidationStringency;
     }
 
-
-    /**
-     * Enumeration of fragment the methods for specifying fragment distribution
-     * bounds.
-     */
-    public enum FragmentBoundsMethod {
-
-        /** Percentage quantile method. */
-        PCT( FragmentBoundsMethod.PCT_STRING ),
-        /** Standard deviation above
-         * mean method. */
-        SD( FragmentBoundsMethod.SD_STRING ),
-        /** EXACT LMin and LMax value
-         * method. */
-        EXACT( FragmentBoundsMethod.EXACT_STRING ),
-        /** Use file with
-         * different cutoffs for each library. */
-        FILE( FragmentBoundsMethod.FILE_STRING );
-
-        private static final String PCT_STRING = "PCT";
-        private static final String SD_STRING = "SD";
-        private static final String EXACT_STRING = "EXACT";
-        private static final String FILE_STRING = "FILE";
-
-        private String typeString;
-
-
-        private FragmentBoundsMethod( String typeString ) {
-            this.typeString = typeString;
-        }
-
-
-        /**
-         * @return The String value of the type of the current fragment bounds
-         *         method.
-         */
-        public String getTypeString() {
-            return typeString;
-        }
-
-
-        /**
-         * @param type Type of FragmentBoundsMethod to return. If the type does
-         *             not match a method or is <code>null</code>, {@link #PCT}
-         *             is returned.
-         */
-        public static FragmentBoundsMethod getMethodType( String type ) {
-            if( type == null ) {
-                return PCT;
-            }
-            switch( type ) {
-                case SD_STRING:
-                    return SD;
-                case EXACT_STRING:
-                    return EXACT;
-                case FILE_STRING:
-                    return FILE;
-                case PCT_STRING: //fallthrough to default
-                default:
-                    return PCT;
-            }
-        }
-
-
-    }
-
-
-    /**
-     * Enumeration of SAM validation stringencies.
-     */
-    public enum SamValidationStringency {
-
-        /** Percentage quantile method. */
-        SILENT( SamValidationStringency.SILENT_STRING ),
-        /** Standard deviation above mean method. */
-        LENIENT( SamValidationStringency.LENIENT_STRING ),
-        /** EXACT LMin and LMax value method. */
-        STRICT( SamValidationStringency.STRICT_STRING );
-
-        private static final String SILENT_STRING = "silent";
-        private static final String LENIENT_STRING = "lenient";
-        private static final String STRICT_STRING = "strict";
-
-        private String typeString;
-
-
-        private SamValidationStringency( String typeString ) {
-            this.typeString = typeString;
-        }
-
-
-        /**
-         * @return The String representation of the type of the current Sam
-         *         validation stringency.
-         */
-        public String getTypeString() {
-            return typeString;
-        }
-
-
-        /**
-         * @param type Type of SamValidationStringency to return. If the type
-         *             does not match a stringency or is <code>null</code>,
-         *             {@link #SILENT} is returned.
-         */
-        public static SamValidationStringency getMethodType( String type ) {
-            if( type == null ) {
-                return SILENT;
-            }
-            switch( type ) {
-                case LENIENT_STRING:
-                    return LENIENT;
-                case STRICT_STRING:
-                    return STRICT;
-                case SILENT_STRING:  //fallthrough to default
-                default:
-                    return SILENT;
-            }
-        }
-
-
-    }
 
 }

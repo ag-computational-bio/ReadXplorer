@@ -19,9 +19,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -83,10 +81,9 @@ public class CoverageAnalysisWizardPanel extends ChangeListeningWizardPanel {
      * use, also after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( MIN_COVERAGE_COUNT, String.valueOf( this.component.getMinCoverageCount() ) );
-        pref.put( SUM_COVERAGE, this.component.isSumCoverageOfBothStrands() ? "1" : "0" );
-        pref.put( COVERED_INTERVALS, this.component.isDetectCoveredIntervals() ? "1" : "0" );
+        getPref().put( MIN_COVERAGE_COUNT, String.valueOf( this.component.getMinCoverageCount() ) );
+        getPref().put( SUM_COVERAGE, this.component.isSumCoverageOfBothStrands() ? "1" : "0" );
+        getPref().put( COVERED_INTERVALS, this.component.isDetectCoveredIntervals() ? "1" : "0" );
     }
 
 

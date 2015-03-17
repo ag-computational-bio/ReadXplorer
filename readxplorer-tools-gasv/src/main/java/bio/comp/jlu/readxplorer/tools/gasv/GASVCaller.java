@@ -17,7 +17,6 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv;
 
-import bio.comp.jlu.readxplorer.tools.gasv.ParametersBamToGASV.FragmentBoundsMethod;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -28,6 +27,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import javax.swing.ImageIcon;
@@ -50,6 +51,7 @@ public class GASVCaller implements Runnable {
 
     private final File bamFile;
     private final ParametersBamToGASV bamToGASVParams;
+    private final ParametersGASVMain gasvMainParams;
 
     private final PersistentReference reference;
     private String chromNamesFileName;
@@ -60,14 +62,17 @@ public class GASVCaller implements Runnable {
      * Handles all steps necessary for calling GASV to predict genome
      * rearrangements.
      * <p>
-     * @param reference The reference whose tracks are analyzed here.
-     * @param bamFile   The bam file to analyze
+     * @param reference       The reference whose tracks are analyzed here.
+     * @param bamFile         The bam file to analyze
+     * @param bamToGASVParams BamToGASV parameter set to apply.
+     * @param gasvMainParams  GASVMain parameter set to apply.
      */
     @NbBundle.Messages( { "ProgressName=Storing chromosome names in file..." } )
-    public GASVCaller( PersistentReference reference, File bamFile, ParametersBamToGASV bamToGASVParams ) {
+    public GASVCaller( PersistentReference reference, File bamFile, ParametersBamToGASV bamToGASVParams, ParametersGASVMain gasvMainParams ) {
         this.reference = reference;
         this.bamFile = bamFile;
         this.bamToGASVParams = bamToGASVParams;
+        this.gasvMainParams = gasvMainParams;
         progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
     }
 
@@ -175,11 +180,11 @@ public class GASVCaller implements Runnable {
                               "-PLATFORM",
                               bamToGASVParams.getPlatform() ? "SOLiD" : "Illumina",
                               "-WRITE_CONCORDANT",
-                              bamToGASVParams.isWriteConcordantPairs() ? "True" : "False",
+                              bamToGASVParams.isWriteConcordantPairs() ? "true" : "false",
                               "-WRITE_LOWQ",
-                              bamToGASVParams.isWriteLowQualityPairs() ? "True" : "False",
+                              bamToGASVParams.isWriteLowQualityPairs() ? "true" : "false",
                               "-VALIDATION_STRINGENCY",
-                              bamToGASVParams.getSamValidationStringency().getTypeString() };
+                              bamToGASVParams.getSamValidationStringency() };
         BAMToGASV.main( gasvArgs ); //TODO: sysos have to be redirected!
     }
 
@@ -194,19 +199,19 @@ public class GASVCaller implements Runnable {
      * @return The correctly formatted input string for the fragment bounds
      *         method parameter of GASV.
      */
-    private String calcFragmentBoundsMethod( FragmentBoundsMethod fragmentBoundsMethod ) {
-        String methodString = fragmentBoundsMethod.getTypeString() + "=";
+    private String calcFragmentBoundsMethod( String fragmentBoundsMethod ) {
+        String methodString = fragmentBoundsMethod + "=";
         switch( fragmentBoundsMethod ) {
-            case SD:
+            case ParametersBamToGASV.FB_METHOD_SD:
                 methodString += String.valueOf( bamToGASVParams.getDistSDValue() );
                 break;
-            case EXACT:
+            case ParametersBamToGASV.FB_METHOD_EXACT:
                 methodString += bamToGASVParams.getDistExactValue();
                 break;
-            case FILE:
+            case ParametersBamToGASV.FB_METHOD_FILE:
                 methodString += bamToGASVParams.getDistFile();
                 break;
-            case PCT: //fallthrough to default
+            case ParametersBamToGASV.FB_METHOD_PCT: //fallthrough to default
             default:
                 methodString += String.valueOf( bamToGASVParams.getDistPCTValue() ) + "%";
         }
@@ -222,14 +227,51 @@ public class GASVCaller implements Runnable {
      *                          BamToGASV.
      */
     private void runGASVMain( String gasvInputFileName ) {
-        String[] gasvArgs = { "--batch",
-                              "--minClusterSize",
-                              "50",
-                              "--numChrom",
-                              "1",
-                              gasvInputFileName };
+        List<String> gasvArgsList = new ArrayList<>();
+        gasvArgsList.add( "--batch" );
+        if( gasvMainParams.isHeaderless() ) {
+            gasvArgsList.add( "--nohead" );
+        }
+        if( gasvMainParams.isVerbose() ) {
+            gasvArgsList.add( "--verbose" );
+        }
+        if( gasvMainParams.isDebug() ) {
+            gasvArgsList.add( "--debug" );
+        }
+        if( gasvMainParams.isFast() ) {
+            gasvArgsList.add( "--fast" );
+        }
+        if( gasvMainParams.getMinClusterSize() > 0 ) {
+            gasvArgsList.add( "--minClusterSize" );
+            gasvArgsList.add( String.valueOf( gasvMainParams.getMinClusterSize() ) );
+        }
+        if( gasvMainParams.getMaxClusterSize() > 0 ) {
+            gasvArgsList.add( "--maxClusterSize" );
+            gasvArgsList.add( String.valueOf( gasvMainParams.getMaxClusterSize() ) );
+        }
+        if( gasvMainParams.getMaxCliqueSize() > 0 ) {
+            gasvArgsList.add( "--maxCliqueSize" );
+            gasvArgsList.add( String.valueOf( gasvMainParams.getMaxCliqueSize() ) );
+        }
+        if( gasvMainParams.getMaxReadPairs() > 0 ) {
+            gasvArgsList.add( "--maxPairedEndsPerWin" );
+            gasvArgsList.add( String.valueOf( gasvMainParams.getMaxReadPairs() ) );
+        }
+        if( gasvMainParams.isMaxSubClusters() ) {
+            gasvArgsList.add( "--maximal" );
+        }
+        gasvArgsList.add( "--numChrom" );
+        gasvArgsList.add( String.valueOf( reference.getNoChromosomes() ) );
+        gasvArgsList.add( "--output" );
+        gasvArgsList.add( gasvMainParams.getOutputType() );
+        if( gasvMainParams.isNonreciprocal() ) {
+            gasvArgsList.add( "--nonreciprocal" );
+        }
+        gasvArgsList.add( gasvInputFileName );
+
+        String[] gasvArgs = new String[0];
         try {
-            GASVMain.main( gasvArgs );
+            GASVMain.main( gasvArgsList.toArray( gasvArgs ) );
         } catch( IOException ex ) { //TODO: Correct error handling
             Exceptions.printStackTrace( ex );
         } catch( CloneNotSupportedException ex ) {

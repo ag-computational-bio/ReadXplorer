@@ -19,9 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS;
@@ -80,8 +78,7 @@ public class TransAnalysesOperonWizardPanel extends ChangeListeningWizardPanel {
      * use, also after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.putBoolean( PROP_WIZARD_NAME + PROP_AUTO_OPERON_PARAMS, component.isOperonAutomatic() );
-        pref.put( PROP_WIZARD_NAME + PROP_MIN_SPANNING_READS, String.valueOf( component.getMinSpanningReads() ) );
+        getPref().putBoolean( PROP_WIZARD_NAME + PROP_AUTO_OPERON_PARAMS, component.isOperonAutomatic() );
+        getPref().put( PROP_WIZARD_NAME + PROP_MIN_SPANNING_READS, String.valueOf( component.getMinSpanningReads() ) );
     }
 }

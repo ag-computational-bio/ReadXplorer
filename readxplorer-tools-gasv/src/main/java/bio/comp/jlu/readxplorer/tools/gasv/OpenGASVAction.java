@@ -17,6 +17,8 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv;
 
+import bio.comp.jlu.readxplorer.tools.gasv.wizard.BamToGASVWizardPanel;
+import bio.comp.jlu.readxplorer.tools.gasv.wizard.GASVMainWizardPanel;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -26,14 +28,11 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +153,7 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
     private void runAnalysis() {
 
         ParametersBamToGASV bamToGASVParams = (ParametersBamToGASV) wiz.getProperty( BamToGASVWizardPanel.PROP_BAM_TO_GASV_PARAMS );
+        ParametersGASVMain gasvMainParams = (ParametersGASVMain) wiz.getProperty( GASVMainWizardPanel.PROP_GASV_MAIN_PARAMS );
 
         List<PersistentTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if( !selectedTracks.isEmpty() ) {
@@ -176,14 +176,7 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
                     continue;
                 }
 
-                //every track has its own analysis handlers
-                List<Classification> excludedClasses = Arrays.asList(
-                        new MappingClass[]{
-                            MappingClass.COMMON_MATCH,
-                            MappingClass.BEST_MATCH,
-                            MappingClass.PERFECT_MATCH
-                        } );
-                this.createAnalysis( connector, bamToGASVParams );
+                this.createAnalysis( connector, bamToGASVParams, gasvMainParams );
             }
         }
     }
@@ -194,11 +187,12 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
      * <p>
      * @param connector       The track connector for which the analysis shall
      *                        be run
-     * @param readClassParams The read mapping class parameters to apply
+     * @param bamToGASVParams BamToGASV parameter set to apply
+     * @param gasvMainParams  GASVMain parameter set to apply
      */
-    private void createAnalysis( TrackConnector connector, ParametersBamToGASV bamToGASVParams ) {
+    private void createAnalysis( TrackConnector connector, ParametersBamToGASV bamToGASVParams, ParametersGASVMain gasvMainParams ) {
         File trackFile = connector.getTrackFile();
-        GASVCaller gasvCaller = new GASVCaller( reference, trackFile, bamToGASVParams );
+        GASVCaller gasvCaller = new GASVCaller( reference, trackFile, bamToGASVParams, gasvMainParams );
         Thread thread = new Thread( gasvCaller );
         thread.start();
     }
