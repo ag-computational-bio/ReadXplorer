@@ -32,8 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import static java.util.logging.Level.FINE;
+import static java.util.regex.Pattern.compile;
 
 
 /**
@@ -45,6 +47,7 @@ import static java.util.logging.Level.FINE;
 public class PersistentFeature extends Node implements PersistentFeatureI {
 
     private static final Logger LOG = Logger.getLogger( PersistentFeature.class.getName() );
+    private static final Pattern SEMICOLON_PATTERN = compile( ";" );
 
     private final int id;
     private final int chromId;
@@ -107,7 +110,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * @return A list of parent ids.
      */
     private List<Integer> separateParentIds( String parentIds ) {
-        String[] parentIdArray = parentIds.split( ";" );
+        String[] parentIdArray = SEMICOLON_PATTERN.split( parentIds );
         List<Integer> parentIdList = new ArrayList<>( parentIdArray.length );
         for( String parentId : parentIdArray ) {
             try {

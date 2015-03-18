@@ -33,12 +33,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
 
 import static java.util.logging.Level.WARNING;
+import static java.util.regex.Pattern.compile;
 
 
 /**
@@ -64,7 +66,9 @@ public final class CommonsMappingParser {
      * at that position), 7 (=) = sequene match, 8 (X) = sequence mismatch.
      */
     //option H-hard clipped not needed later, because it does not count into the alignment, but if not splitted, a number format exception is triggered
-    public static final String CIGAR_REGEX = "[MIDNSPXH=]+";
+    public static final Pattern CIGAR_PATTERN = compile( "[MIDNSPXH=]+" );
+    public static final Pattern DIGIT_PATTERN = compile( "\\d+" );
+    public static final Pattern SPACE_REGEX = compile( " " );
 
 
     /**
@@ -100,8 +104,8 @@ public final class CommonsMappingParser {
         int differences = 0;
         int refPos = 0;
         int readPos = 0;
-        final String[] num = cigar.split( CIGAR_REGEX );
-        final String[] charCigar = cigar.split( "\\d+" );
+        final String[] num = CIGAR_PATTERN.split( cigar );
+        final String[] charCigar = DIGIT_PATTERN.split( cigar );
 
         for( int i = 1; i < charCigar.length; ++i ) {
 
@@ -186,8 +190,8 @@ public final class CommonsMappingParser {
     public static DiffAndGapResult createDiffsAndGaps( final String cigar, final String readSeq, final String refSeq, final boolean isRevStrand, final int start ) throws NumberFormatException {
 
 
-        final String[] num = cigar.split( CIGAR_REGEX );
-        final String[] charCigar = cigar.split( "\\d+" );
+        final String[] num = CIGAR_PATTERN.split( cigar );
+        final String[] charCigar = DIGIT_PATTERN.split( cigar );
         final List<ParsedDiff> diffs = new ArrayList<>();
         final List<ParsedReferenceGap> gaps = new ArrayList<>();
         final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
@@ -372,8 +376,8 @@ public final class CommonsMappingParser {
         int readPos = 0;
         int softclipped = 0;
 
-        final String[] num = cigar.split( CIGAR_REGEX );
-        final String[] charCigar = cigar.split( "\\d+" );
+        final String[] num = CIGAR_PATTERN.split( cigar );
+        final String[] charCigar = DIGIT_PATTERN.split( cigar );
         for( int i = 1; i < charCigar.length; i++ ) {
             String op = charCigar[i];
             String numOfBases = num[i - 1];
@@ -612,8 +616,8 @@ public final class CommonsMappingParser {
         int numberofDeletion = 0;
         int numberofInsertion = 0;
         int numberofSoftclipped = 0;
-        final String[] num = cigar.split( CIGAR_REGEX );
-        final String[] charCigar = cigar.split( "\\d+" );
+        final String[] num = CIGAR_PATTERN.split( cigar );
+        final String[] charCigar = DIGIT_PATTERN.split( cigar );
         for( int i = 1; i < charCigar.length; i++ ) {
             String op = charCigar[i];
             int numOfBases = Integer.parseInt( num[i - 1] );
@@ -650,7 +654,7 @@ public final class CommonsMappingParser {
     public static Pair<Boolean, String> getReadNameWithoutPairTag( final String readNameFull ) {
         boolean changed = false;
         String readName = readNameFull;
-        String[] nameParts = readNameFull.split( " " );
+        String[] nameParts = SPACE_REGEX.split( readNameFull );
         if( nameParts.length == 2 && (nameParts[1].startsWith( "1" ) || nameParts[1].startsWith( "2" )) ) {
             readName = nameParts[0];
             changed = true;
@@ -709,7 +713,7 @@ public final class CommonsMappingParser {
                 } else {
 
                     //check for casava > 1.8 paired read
-                    String[] nameParts = readName.split( " " );
+                    String[] nameParts = SPACE_REGEX.split( readName );
                     if( nameParts.length == 2 ) {
                         if( nameParts[1].startsWith( Properties.EXT_A1_STRING ) ) {
                             pairTag = Properties.EXT_A1;
@@ -733,7 +737,7 @@ public final class CommonsMappingParser {
      * @return true, if the read is in the casava format > 1.8, false otherwise
      */
     public static boolean isCasavaLarger1Dot8Format( final String readName ) {
-        String[] nameParts = readName.split( " " );
+        String[] nameParts = SPACE_REGEX.split( readName );
         return nameParts.length == 2 && (nameParts[1].startsWith( Properties.EXT_A1_STRING ) ||
                                          nameParts[1].startsWith( Properties.EXT_A2_STRING ));
     }

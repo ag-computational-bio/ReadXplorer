@@ -38,12 +38,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.SEVERE;
+import static java.util.regex.Pattern.compile;
 
 
 /**
@@ -53,8 +55,12 @@ import static java.util.logging.Level.SEVERE;
  */
 public final class GeneralUtils {
 
-    private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
+    public static final Pattern COLON_PATTERN = compile( ":" );
+    public static final Pattern HASH_KEY_PATTERN = compile( "#" );
+    public static final Pattern SLASH_PATTERN = compile( "/" );
+    public static final Pattern COLON_HASH_PATTERN = compile( ":|#" );
 
+    private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
     private static final Preferences PREF = NbPreferences.forModule( Object.class );
 
 
@@ -476,12 +482,12 @@ public final class GeneralUtils {
         String shortReadName = readName;
         String[] nameArray;
         if( readName.startsWith( "@" ) ) {
-            nameArray = readName.split( ":" );
+            nameArray = COLON_PATTERN.split( readName );
             if( nameArray.length == 5 ) {
                 shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
                 if( shortReadName.contains( "#" ) ) {
-                    nameArray = shortReadName.split( "#" );
-                    shortReadName = nameArray[0] + nameArray[1].split( "/" )[1];
+                    nameArray = HASH_KEY_PATTERN.split( shortReadName );
+                    shortReadName = nameArray[0] + SLASH_PATTERN.split( nameArray[1] )[1];
                 }
             } else if( nameArray.length == 10 ) {
                 shortReadName = nameArray[4] + nameArray[5] + nameArray[6];
@@ -524,7 +530,7 @@ public final class GeneralUtils {
     public static String[] splitReadName( String readName, NameStyle specialStyle ) {
         String[] nameArray;
         if( specialStyle == NameStyle.STYLE_ILLUMINA ) {
-            nameArray = readName.split( ":|#" );
+            nameArray = COLON_HASH_PATTERN.split( readName );
         } else {
             int length = readName.length() / 5 + 1;
             nameArray = new String[length];

@@ -17,6 +17,7 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv.wizard;
 
+import bio.comp.jlu.readxplorer.tools.gasv.GASVUtils;
 import bio.comp.jlu.readxplorer.tools.gasv.ParametersBamToGASV;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
@@ -572,7 +573,7 @@ public final class BamToGASVVisualPanel extends JobPanel {
             isValidated = false;
         }
 
-        String[] lMinAndMax = distExactField.getText().split( "," );
+        String[] lMinAndMax = GASVUtils.COMMA_PATTERN.split( distExactField.getText() );
         if( lMinAndMax.length == 2 &&
             GeneralUtils.isValidIntegerInput( lMinAndMax[0] ) &&
             GeneralUtils.isValidIntegerInput( lMinAndMax[1] ) &&

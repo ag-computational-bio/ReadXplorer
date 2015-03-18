@@ -37,8 +37,9 @@ import static java.util.regex.Pattern.compile;
  */
 public final class GASVUtils {
 
+    public static final Pattern COMMA_PATTERN = compile( "," );
+
     private static final Logger LOG = Logger.getLogger( GASVUtils.class.getName() );
-    private static final Pattern COMMA_REGEX = compile( "," );
 
 
     /**
@@ -124,7 +125,7 @@ public final class GASVUtils {
         Pair<Integer, Integer> bpPosPair = new Pair<>( -1, -1 );
         if( breakPoint instanceof String ) {
             String bpString = (String) breakPoint;
-            String[] splittedBP = COMMA_REGEX.split( bpString );
+            String[] splittedBP = COMMA_PATTERN.split( bpString );
             if( splittedBP.length == 2 ) {
                 boolean isValidStart = GeneralUtils.isValidIntegerInput( splittedBP[0] );
                 boolean isValidEnd = GeneralUtils.isValidIntegerInput( splittedBP[1] );

@@ -82,7 +82,6 @@ public class SamBamFileReader implements Observable, Observer {
      */
     public static final int UNKNOWN_CALCULATED_MAP_QUAL = -1;
 
-    public static final String CIGAR_REGEX = "[MIDNSPXH=]+";
     private final File dataFile;
     private final int trackId;
     private final PersistentReference reference;
@@ -709,8 +708,8 @@ public class SamBamFileReader implements Observable, Observer {
         final int start = record.getAlignmentStart();
         final byte[] baseQualities = record.getBaseQualities();
         final Byte mappingQuality = (byte) (record.getMappingQuality() >= DEFAULT_MAP_QUAL ? UNKNOWN_CALCULATED_MAP_QUAL : record.getMappingQuality());
-        final String[] num = cigar.split( CIGAR_REGEX );
-        final String[] charCigar = cigar.split( "\\d+" );
+        final String[] num = CommonsMappingParser.CIGAR_PATTERN.split( cigar );
+        final String[] charCigar = CommonsMappingParser.DIGIT_PATTERN.split( cigar );
         int refPos = 0;
         int readPos = 0;
         for( int i = 1; i < charCigar.length; i++ ) {
