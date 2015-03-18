@@ -40,7 +40,7 @@ import org.openide.windows.InputOutput;
  */
 public class ExternalSort {
 
-        private static final InputOutput io = GASVCaller.io;
+        private static final InputOutput IO = GASVCaller.IO;
 
 	public final int NUM_LINES = 10000000;
 	//public final int NUM_LINES = 3; // testing purposes
@@ -72,14 +72,14 @@ public class ExternalSort {
 	}
 
 	public static void printUsage() {
-		io.getOut().println("USAGE: java ExternalSort <file_to_sort> <primaryCol> <secondaryCol>...\n" +
+		IO.getOut().println("USAGE: java ExternalSort <file_to_sort> <primaryCol> <secondaryCol>...\n" +
 				"\t<file_to_sort> is the file to sort. \n" +
 				"\t<primaryCol> <secondaryCol> ... is a list of signed integers indicating the sorting order.  " +
 				"Ties in the primary column are broken by the secondary column and so on.  Positive intgers indicate increasing " +
 				"order and negative integers indicate decreasing order.  All columns to sort on MUST be " +
 				"numbers (examples are 50,-0.234,1E-14). \n" +
 		"OUTPUT: <file_to_sort>.sorted");
-		io.getOut().println("ESP USAGE: Java ExternalSort <file_to_sort> ESP\n"+
+		IO.getOut().println("ESP USAGE: Java ExternalSort <file_to_sort> ESP\n"+
 				"Sorts the ESP file according to GASV specifications.\n" +
 		"OUTPUT: <file_to_sort>.sorted");
 	}
@@ -143,7 +143,7 @@ public class ExternalSort {
 	}
 
 	public void split() {
-		io.getOut().println("Reading file in chunks of " + NUM_LINES + ", sorting, and writing them to temp files.");
+		IO.getOut().println("Reading file in chunks of " + NUM_LINES + ", sorting, and writing them to temp files.");
 		try
 		{
 			BufferedReader in = new BufferedReader(new FileReader(infile));
@@ -151,7 +151,7 @@ public class ExternalSort {
 			String line = "";
 			while (line != null) {
 				rows.clear();
-				io.getOut().println("  file #" + numFiles);
+				IO.getOut().println("  file #" + numFiles);
 
 				// read next NUM_LINES lines.
 				for(int i=0; i<NUM_LINES; i++) {
@@ -187,10 +187,10 @@ public class ExternalSort {
 			}
 			in.close();
 
-			io.getOut().println("there are " + numFiles + " files.");
+			IO.getOut().println("there are " + numFiles + " files.");
 		}
 		catch (Exception ex) {
-			io.getOut().println("ERROR: Something went wrong when splitting & sorting the files.");
+			IO.getOut().println("ERROR: Something went wrong when splitting & sorting the files.");
 			ex.printStackTrace();
 			System.exit(-1);
 		}
@@ -225,7 +225,7 @@ public class ExternalSort {
 	}
 
 	public void merge() {
-		io.getOut().println("Merging files...");
+		IO.getOut().println("Merging files...");
 		try {
 			ArrayList<BufferedReader> mergefbr = new ArrayList<BufferedReader>();
 			ArrayList<SortElement> filerows = new ArrayList<SortElement>();
@@ -281,7 +281,7 @@ public class ExternalSort {
 			// at this point, all filerows should be null.
 			for(int i=0; i<filerows.size(); i++) {
 				if(filerows.get(i)!=null) {
-					io.getOut().println("ERROR: minIndex <= 0 and found row not null \"" + filerows.get(i).line+"\"");
+					IO.getOut().println("ERROR: minIndex <= 0 and found row not null \"" + filerows.get(i).line+"\"");
 					System.exit(-1);
 				}
 			}
@@ -296,10 +296,10 @@ public class ExternalSort {
 				for (int i=0; i<numFiles; i++)
 					new File(infile+"_tmp"+i+".txt").delete();
 			} catch (Exception e) {
-				io.getOut().println("WARNING: cannot delete temporary file");
+				IO.getOut().println("WARNING: cannot delete temporary file");
 			}
 		} catch (Exception ex) {
-			io.getOut().println("ERROR: Something wrong happened when merging the files.");
+			IO.getOut().println("ERROR: Something wrong happened when merging the files.");
 			ex.printStackTrace();
 			System.exit(-1);
 		}
@@ -358,7 +358,7 @@ public class ExternalSort {
 			// at this point, all filerows should be null.
 			for(int i=0; i<filerows.size(); i++) {
 				if(filerows.get(i)!=null) {
-					io.getOut().println("ERROR: minIndex <= 0 and found row not null \"" + filerows.get(i).line+"\"");
+					IO.getOut().println("ERROR: minIndex <= 0 and found row not null \"" + filerows.get(i).line+"\"");
 					System.exit(-1);
 				}
 			}
@@ -374,11 +374,11 @@ public class ExternalSort {
 					new File(files.get(i)).delete();
 				}
 			} catch (Exception e) {
-				io.getOut().println("WARNING: cannot delete temporary file.");
+				IO.getOut().println("WARNING: cannot delete temporary file.");
 			}
 		}
 		catch (Exception ex) {
-			io.getOut().println("ERROR: Something wrong happened when merging the files.");
+			IO.getOut().println("ERROR: Something wrong happened when merging the files.");
 			ex.printStackTrace();
 			System.exit(-1);
 		}
@@ -420,7 +420,7 @@ public class ExternalSort {
 				try {
 					Double.parseDouble(row[Math.abs(sortorder[0])-1]);
 				} catch (Exception e) {
-					io.getOut().println("  Header Line Detected: \"" + line + "\"");
+					IO.getOut().println("  Header Line Detected: \"" + line + "\"");
 					header = line;
 				}
 			}
@@ -448,9 +448,9 @@ public class ExternalSort {
 							return -1;
 					}
 				} catch (NumberFormatException e) {
-					io.getOut().println("ERROR: column " + index + " ("+ order +") did not parse as a double when comparing the following (1-based):");
-					io.getOut().println("\""+line+"\"");
-					io.getOut().println("\""+se.line+"\"");
+					IO.getOut().println("ERROR: column " + index + " ("+ order +") did not parse as a double when comparing the following (1-based):");
+					IO.getOut().println("\""+line+"\"");
+					IO.getOut().println("\""+se.line+"\"");
 					e.printStackTrace();
 					System.exit(-1);
 				}

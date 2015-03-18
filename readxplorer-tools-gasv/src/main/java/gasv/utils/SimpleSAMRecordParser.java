@@ -34,7 +34,7 @@ import org.openide.windows.InputOutput;
 
 public class SimpleSAMRecordParser {
 
-    private static final InputOutput io = GASVCaller.io;
+    private static final InputOutput IO = GASVCaller.IO;
 
 	public static void main(String[] args) throws IOException {
 
@@ -55,7 +55,7 @@ public class SimpleSAMRecordParser {
 			Iterator<SAMTagAndValue> iter = s.getAttributes().iterator();
 			while(iter.hasNext()) {
 				SAMTagAndValue val = iter.next();
-				io.getOut().println(val.tag+" " +val.value);
+				IO.getOut().println(val.tag+" " +val.value);
 			}
 			*/
 
@@ -64,7 +64,7 @@ public class SimpleSAMRecordParser {
 					s.getReadNegativeStrandFlag()+"\t"+s.getMappingQuality()+"\t"+
 					s.getCigarString()+"\t"+s.getAttribute("NM")+"\n");
 			if(count % 500000 == 0)
-				io.getOut().println("  record "+count+"...");
+				IO.getOut().println("  record "+count+"...");
 			count++;
 		}
 		in.close();
@@ -72,18 +72,18 @@ public class SimpleSAMRecordParser {
 	}
 
 	public static void printUsage() {
-		io.getOut().println("USAGE: java -jar SimpleSAMRecordParser.jar <input_bam_file> <output_file>");
-		io.getOut().println("\t<input_bam_file> is the input file");
-		io.getOut().println("\t<output_file> is a tab-delimited file with the following columns:");
-		io.getOut().println("\t\t<name>\tRecord name");
-		io.getOut().println("\t\t<flag>\tSAM Flag");
-		io.getOut().println("\t\t<chr>\tChomosome (or reference) name");
-		io.getOut().println("\t\t<start>\talignment start (softclipped, according to Picard)");
-		io.getOut().println("\t\t<end>\talignment end (softclipped, according to Picard)");
-		io.getOut().println("\t\t<neg>\ttrue if the alignment is on the negative strand, false otherwise");
-		io.getOut().println("\t\t<qual>\tmapping quality");
-		io.getOut().println("\t\t<cigar>\tCIGAR string");
-		io.getOut().println("\t\t<NM>\tEdit distance to the reference (excluding clipping)");
+		IO.getOut().println("USAGE: java -jar SimpleSAMRecordParser.jar <input_bam_file> <output_file>");
+		IO.getOut().println("\t<input_bam_file> is the input file");
+		IO.getOut().println("\t<output_file> is a tab-delimited file with the following columns:");
+		IO.getOut().println("\t\t<name>\tRecord name");
+		IO.getOut().println("\t\t<flag>\tSAM Flag");
+		IO.getOut().println("\t\t<chr>\tChomosome (or reference) name");
+		IO.getOut().println("\t\t<start>\talignment start (softclipped, according to Picard)");
+		IO.getOut().println("\t\t<end>\talignment end (softclipped, according to Picard)");
+		IO.getOut().println("\t\t<neg>\ttrue if the alignment is on the negative strand, false otherwise");
+		IO.getOut().println("\t\t<qual>\tmapping quality");
+		IO.getOut().println("\t\t<cigar>\tCIGAR string");
+		IO.getOut().println("\t\t<NM>\tEdit distance to the reference (excluding clipping)");
 
 	}
 }

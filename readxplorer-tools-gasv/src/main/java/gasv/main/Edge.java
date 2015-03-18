@@ -31,7 +31,7 @@ Contains two endpoints, in order from LEFT to RIGHT on the 2D plane.
 */
 public class Edge implements Cloneable{
 
-        private static final InputOutput io = GASVCaller.io;
+        private static final InputOutput IO = GASVCaller.IO;
 
 	EndPoint left;
 	EndPoint right;
@@ -72,7 +72,7 @@ public class Edge implements Cloneable{
 	//Return the Y-value of the edge intersecting a sweep line of the form: y = mx+b
 	// where b is the offset and slope is m
 	public double Value(double b, int slope){
-		if(slope!=-1 && slope!=1){ io.getOut().println("Invalid Assignment of Slope!"); System.exit(-1); }
+		if(slope!=-1 && slope!=1){ IO.getOut().println("Invalid Assignment of Slope!"); System.exit(-1); }
 		double answer;
 		//3 cases: horizontal, vertical or otherwise:
 		//Case 1: Horizontal:
@@ -140,7 +140,7 @@ public class Edge implements Cloneable{
 	//      sweep lines?) return the point of intersection or the point (-1,-1) if no intersection
 	public EndPoint getPoint(double b, int slope){
 		EndPoint answer = new EndPoint(-1,-1);
-		if(slope!=-1 && slope!=1){ io.getOut().println("Invalid Assignment of Slope!"); System.exit(-1); }
+		if(slope!=-1 && slope!=1){ IO.getOut().println("Invalid Assignment of Slope!"); System.exit(-1); }
 		//y = slope x + b OR x = (y - b)/slope;
 		//3 cases: horizontal, vertical or otherwise:
 		//Case 1: Horizontal:

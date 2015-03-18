@@ -50,8 +50,8 @@ public class PosTablePanel extends TablePanel {
      */
     public PosTablePanel( UneditableTableModel tableData, TableType tableType ) {
         this.tableData = tableData;
-        final int posColumn = 0;
-        final int trackColumn;
+        int posColumn = 0;
+        int trackColumn = 0;
         final int chromColumn;
         switch( tableType ) {
             case COVERAGE_ANALYSIS: //fallthrough
@@ -64,6 +64,10 @@ public class PosTablePanel extends TablePanel {
             case DIFF_GENE_EXPRESSION:
                 chromColumn = 1;
                 trackColumn = 2;
+                break;
+            case GASV_TABLE:
+                chromColumn = 1;
+                posColumn = 2;
                 break;
             case FEATURE_COVERAGE_ANALYSIS: //fallthrough
             case TSS_DETECTION: //fallthrough

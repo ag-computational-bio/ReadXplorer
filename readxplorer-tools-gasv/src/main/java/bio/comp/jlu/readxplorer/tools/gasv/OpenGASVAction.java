@@ -25,8 +25,14 @@ import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.parser.common.ParsingException;
+import de.cebitec.readxplorer.parser.tables.CsvTableParser;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
+import de.cebitec.readxplorer.ui.tablevisualization.PosTablePanel;
+import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.ui.visualisation.TableVisualizationHelper;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,14 +42,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.WindowManager;
+import org.supercsv.prefs.CsvPreference;
+
+import static de.cebitec.readxplorer.parser.tables.TableType.GASV_TABLE;
 
 
 /**
@@ -73,15 +89,17 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
     private static final String PROP_WIZARD_NAME = "GASV_Wizard";
 
     private final ReferenceViewer context;
+    private GASVTopComponent gasvTopComp;
+    private ProgressHandle progressHandle;
 
     private final PersistentReference reference;
     private List<PersistentTrack> tracks;
     private Map<Integer, PersistentTrack> trackMap;
-    private int finishedCovAnalyses = 0;
 
     private Map<Integer, GASVCaller> trackToAnalysisMap;
     private WizardDescriptor wiz;
     private OpenTracksWizardPanel openTracksPanel;
+    private File trackFile;
 
 
     /**
@@ -160,11 +178,10 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
             tracks = selectedTracks;
             trackMap = ProjectConnector.getTrackMap( tracks );
 
-//            this.snpDetectionTopComp = (SnpDetectionTopComponent) WindowManager.getDefault().findTopComponent( "SnpDetectionTopComponent" );
-//            this.snpDetectionTopComp.setName( Bundle.TITLE_SNPDetectionTopComp() );
-//            this.snpDetectionTopComp.setToolTipText( Bundle.HINT_SNP_DetectionTopComp() );
-//            this.snpDetectionTopComp.open();
-//            this.startSNPDetection( wiz );
+            if( gasvTopComp == null ) {
+                gasvTopComp = (GASVTopComponent) WindowManager.getDefault().findTopComponent( "GASVTopComponent" );
+            }
+            gasvTopComp.open();
 
             //Afterwards run GASV with:
             for( PersistentTrack track : tracks ) {
@@ -176,7 +193,7 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
                     continue;
                 }
 
-                this.createAnalysis( connector, bamToGASVParams, gasvMainParams );
+                createAnalysis( connector, bamToGASVParams, gasvMainParams );
             }
         }
     }
@@ -190,17 +207,64 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
      * @param bamToGASVParams BamToGASV parameter set to apply
      * @param gasvMainParams  GASVMain parameter set to apply
      */
+    @NbBundle.Messages( { "ActionProgressName=Genome Rearrangements are calculated with GASV..." } )
     private void createAnalysis( TrackConnector connector, ParametersBamToGASV bamToGASVParams, ParametersGASVMain gasvMainParams ) {
-        File trackFile = connector.getTrackFile();
-        GASVCaller gasvCaller = new GASVCaller( reference, trackFile, bamToGASVParams, gasvMainParams );
+        trackFile = connector.getTrackFile();
+        progressHandle = ProgressHandleFactory.createHandle( Bundle.ActionProgressName() );
+        progressHandle.start();
+        GASVCaller gasvCaller = new GASVCaller( reference, trackFile, bamToGASVParams, gasvMainParams, this, progressHandle );
         Thread thread = new Thread( gasvCaller );
         thread.start();
     }
 
 
+    /**
+     * Visualizes the result from GASV in a table.
+     * <p>
+     * @param data A message indicating that GASV has finished
+     */
     @Override
     public void showData( Object data ) {
 
+        File tableFile = new File( trackFile.getAbsolutePath() + ".gasv.in.clusters" );
+        if( tableFile.exists() && tableFile.canRead() ) {
+            CsvTableParser csvParser = new CsvTableParser();
+            csvParser.setAutoDelimiter( false );
+            csvParser.setCsvPref( CsvPreference.TAB_PREFERENCE );
+            csvParser.setTableModel( GASV_TABLE );
+            List<List<?>> tableData;
+            try {
+                tableData = csvParser.parseTable( tableFile );
+                if( tableData.size() > 1 ) { //there is more content than just the header
+                    tableData = GASVUtils.editGASVResultTable( tableData );
+                    final UneditableTableModel tableModel = TableUtils.transformDataToTableModel( tableData );
+
+                    //open table visualization panel with given reference for jumping to the position
+                    SwingUtilities.invokeLater( new Runnable() { //because it is not called from the swing dispatch thread
+                        @Override
+                        public void run() {
+                            PosTablePanel tablePanel = new PosTablePanel( tableModel, GASV_TABLE );
+                            tablePanel.setReferenceGenome( reference );
+                            TableVisualizationHelper.checkAndOpenRefViewer( reference, tablePanel );
+
+                            String panelName = "Imported table from: " + tableFile.getName();
+                            gasvTopComp.openAnalysisTab( panelName, tablePanel );
+                        }
+
+
+                    } );
+                } else {
+                    JOptionPane.showMessageDialog( gasvTopComp,
+                                                   "No rearrangements have been detected by GASV for this data set: " +
+                                                   trackFile.getAbsolutePath(), "No rearrangements detected", JOptionPane.INFORMATION_MESSAGE );
+                }
+            } catch( ParsingException ex ) {
+                GASVCaller.IO.getOut().println( "An error occurred during parsing of the mapping data:\\n" + ex.getMessage() );
+                LOG.log( Level.SEVERE, "An error occurred during parsing of the mapping data:\\n{0}", ex.getMessage() );
+            }
+
+        }
+        progressHandle.finish();
     }
 
 

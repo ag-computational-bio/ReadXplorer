@@ -27,7 +27,7 @@ import org.openide.windows.InputOutput;
 
 public class GASVMain{
 
-        private static final InputOutput io = GASVCaller.io;
+        private static final InputOutput IO = GASVCaller.IO;
 
 	public static boolean USE_HEADER = true;
 	public static boolean USE_PAIRED_CGH = false;
@@ -179,95 +179,95 @@ public class GASVMain{
 
 
 	private static void printShortUsage(){
-		io.getOut().println("");
-		io.getOut().println("Program: GASV (Geometric Analysis for Structural Variation)");
-		io.getOut().println("Version: " + Constants.GASV_VERSION + "\n");
-		io.getOut().println("Usage:   java -jar GASV.jar [options] <InputFile>" + "\n");
-		io.getOut().println("         InputFile: PR file");
-		io.getOut().println("           java -jar GASV.jar [options] <InputFile>\n");
-		io.getOut().println("         InputFile: Batch File");
-		io.getOut().println("           java -jar GASV.jar [options] --batch <InputFile>\n");
-		io.getOut().println("Output:    <InputFile>.clusters");
-		io.getOut().println("Default:   Reports all SVs supported by at least 4 mappings.\n");
+		IO.getOut().println("");
+		IO.getOut().println("Program: GASV (Geometric Analysis for Structural Variation)");
+		IO.getOut().println("Version: " + Constants.GASV_VERSION + "\n");
+		IO.getOut().println("Usage:   java -jar GASV.jar [options] <InputFile>" + "\n");
+		IO.getOut().println("         InputFile: PR file");
+		IO.getOut().println("           java -jar GASV.jar [options] <InputFile>\n");
+		IO.getOut().println("         InputFile: Batch File");
+		IO.getOut().println("           java -jar GASV.jar [options] --batch <InputFile>\n");
+		IO.getOut().println("Output:    <InputFile>.clusters");
+		IO.getOut().println("Default:   Reports all SVs supported by at least 4 mappings.\n");
 		return;
 	}
 
 	private static void printUsage() {
 
-		io.getOut().println("Program: GASV (Geometric Analysis for Structural Variation)");
-		io.getOut().println("Version: " + Constants.GASV_VERSION + "\n");
-		io.getOut().println("Usage:   java -jar GASV.jar [options] <InputFile>" + "\n");
-		io.getOut().println("         InputFile: PR file");
-		io.getOut().println("           java -jar GASV.jar [options] <InputFile>\n");
-		io.getOut().println("         InputFile: Batch File");
-		io.getOut().println("           java -jar GASV.jar [options] --batch <InputFile>\n");
-		io.getOut().println("Output:    <InputFile>.clusters");
-		io.getOut().println("Default:   Reports all SVs supported by at least 4 mappings.\n");
+		IO.getOut().println("Program: GASV (Geometric Analysis for Structural Variation)");
+		IO.getOut().println("Version: " + Constants.GASV_VERSION + "\n");
+		IO.getOut().println("Usage:   java -jar GASV.jar [options] <InputFile>" + "\n");
+		IO.getOut().println("         InputFile: PR file");
+		IO.getOut().println("           java -jar GASV.jar [options] <InputFile>\n");
+		IO.getOut().println("         InputFile: Batch File");
+		IO.getOut().println("           java -jar GASV.jar [options] --batch <InputFile>\n");
+		IO.getOut().println("Output:    <InputFile>.clusters");
+		IO.getOut().println("Default:   Reports all SVs supported by at least 4 mappings.\n");
 
-		io.getOut().println("\n****************************");
-		io.getOut().println("General GASV Options:");
-		io.getOut().println("****************************");
+		IO.getOut().println("\n****************************");
+		IO.getOut().println("General GASV Options:");
+		IO.getOut().println("****************************");
 
-		io.getOut().println("--outputdir      <dir>   Directory in which to place output files");
-		io.getOut().println("--lmin           <val>   Lmin value (integer) (Default: 100)");
-		io.getOut().println("--lmax           <val>   Lmax value (integer) (Default: 400)");
-		io.getOut().println("--nohead                 Output files will not have a header line");
-		io.getOut().println("--output         <mode>  Specify the GASV cluster output mode (Default: standard)\n"
+		IO.getOut().println("--outputdir      <dir>   Directory in which to place output files");
+		IO.getOut().println("--lmin           <val>   Lmin value (integer) (Default: 100)");
+		IO.getOut().println("--lmax           <val>   Lmax value (integer) (Default: 400)");
+		IO.getOut().println("--nohead                 Output files will not have a header line");
+		IO.getOut().println("--output         <mode>  Specify the GASV cluster output mode (Default: standard)\n"
 						   + "                           standard   Interval coordinates without read names\n"
 						   + "                           reads      Interval coordinates *with* read names\n"
 						   + "                           regions    Breakpoint Polygon with read names\n");
-		io.getOut().println("--minClusterSize <val>   Predictions with less than <val> fragments are ignored (integer) (Default: 4)");
-		io.getOut().println("--fast                   Increases the memory usage by GASV, for faster computing, but risks OutOfMemory errors");
-		io.getOut().println("--numChrom       <val>   Specify the number of chromosomes in this genome (integer) (Default: 24)");
-		io.getOut().println("--batch          <file>  Batch clustering of multiple files of PRs. Input file(s) are lists of PR file(s)");
+		IO.getOut().println("--minClusterSize <val>   Predictions with less than <val> fragments are ignored (integer) (Default: 4)");
+		IO.getOut().println("--fast                   Increases the memory usage by GASV, for faster computing, but risks OutOfMemory errors");
+		IO.getOut().println("--numChrom       <val>   Specify the number of chromosomes in this genome (integer) (Default: 24)");
+		IO.getOut().println("--batch          <file>  Batch clustering of multiple files of PRs. Input file(s) are lists of PR file(s)");
 
-		io.getOut().println("--nonreciprocal             Only PRs with the same orientations will be clustered together.");
-		io.getOut().println("                               E.g. +/+ and -/- inversion PRs will be segregated into separate clusters.");
-		io.getOut().println("--maxClusterSize <val>      Predictions with more than <val> fragments are ignored (integer)");
-		io.getOut().println("--maxCliqueSize  <val>      For predictions with more than <val> paired end sequences, no clique calculation");
-		io.getOut().println("                               or finding of maximal sub clusters will be done (integer).");
-		io.getOut().println("                               At most <val> PR names are output in regions model (numESP column is still accurate, locaization = -1).");
-		io.getOut().println("--maximal                   Maximal clusters will be output");
-		io.getOut().println("--maxPairedEndsPerWin <val> If more than <val> PRs are in a window, extra PRs are discarded. Ignored if --fast is set. (integer)");
-		io.getOut().println("--verbose                   Prints extra information to standard output");
-		io.getOut().println("--debug                     Run program in debug mode");
+		IO.getOut().println("--nonreciprocal             Only PRs with the same orientations will be clustered together.");
+		IO.getOut().println("                               E.g. +/+ and -/- inversion PRs will be segregated into separate clusters.");
+		IO.getOut().println("--maxClusterSize <val>      Predictions with more than <val> fragments are ignored (integer)");
+		IO.getOut().println("--maxCliqueSize  <val>      For predictions with more than <val> paired end sequences, no clique calculation");
+		IO.getOut().println("                               or finding of maximal sub clusters will be done (integer).");
+		IO.getOut().println("                               At most <val> PR names are output in regions model (numESP column is still accurate, locaization = -1).");
+		IO.getOut().println("--maximal                   Maximal clusters will be output");
+		IO.getOut().println("--maxPairedEndsPerWin <val> If more than <val> PRs are in a window, extra PRs are discarded. Ignored if --fast is set. (integer)");
+		IO.getOut().println("--verbose                   Prints extra information to standard output");
+		IO.getOut().println("--debug                     Run program in debug mode");
 
-		io.getOut().println("\n****************************");
-		io.getOut().println("Deprecated GASV Options:");
-		io.getOut().println("****************************");
+		IO.getOut().println("\n****************************");
+		IO.getOut().println("Deprecated GASV Options:");
+		IO.getOut().println("****************************");
 
-		io.getOut().println("\nCGH Mode (<mode> = --cgh or -c):");
-		io.getOut().println("\tUsage: java -jar GASV.jar --cgh [options] <PRFile> <CGHFile>");
-		io.getOut().println("\tOutput: <CGHFile>.clusters");
+		IO.getOut().println("\nCGH Mode (<mode> = --cgh or -c):");
+		IO.getOut().println("\tUsage: java -jar GASV.jar --cgh [options] <PRFile> <CGHFile>");
+		IO.getOut().println("\tOutput: <CGHFile>.clusters");
 
-		io.getOut().println("\nCGH Options:");
-		io.getOut().println("--paired                    Each line in the CGH file is paired with every other line, to form two dimensional data which can be represented as finite rectangles.");
-		io.getOut().println("--minClusterSize <val>      See Cluster Mode Options (integer)");
-		io.getOut().println("--maxClusterSize <val>      See Cluster Mode Options (integer)");
-		io.getOut().println("--maxCliqueSize  <val>      See Cluster Mode Options (integer)");
-		io.getOut().println("--maximal                   Maximal clusters will be output");
-		io.getOut().println("--maxPairedEndsPerWin <val> See Cluster Mode Options (integer)");
+		IO.getOut().println("\nCGH Options:");
+		IO.getOut().println("--paired                    Each line in the CGH file is paired with every other line, to form two dimensional data which can be represented as finite rectangles.");
+		IO.getOut().println("--minClusterSize <val>      See Cluster Mode Options (integer)");
+		IO.getOut().println("--maxClusterSize <val>      See Cluster Mode Options (integer)");
+		IO.getOut().println("--maxCliqueSize  <val>      See Cluster Mode Options (integer)");
+		IO.getOut().println("--maximal                   Maximal clusters will be output");
+		IO.getOut().println("--maxPairedEndsPerWin <val> See Cluster Mode Options (integer)");
 
-		io.getOut().println("\nFilter Mode (<mode> = --filter or -f):");
-		io.getOut().println("\tUsage: java -jar GASV.jar --filter [options] <ReferenceInputFile> <Target_Input_File>");
-		io.getOut().println("\tESPs listed in the Target File will be filtered against the Reference File.");
-		io.getOut().println("\tOutput:");
-		io.getOut().println("\t\t<Target_Input_File>.removed : PRs that overlap PRs in the Reference File.");
-		io.getOut().println("\t\t<Target_Input_File>.retained : PRs that represent unique variants relative to the Reference File.");
+		IO.getOut().println("\nFilter Mode (<mode> = --filter or -f):");
+		IO.getOut().println("\tUsage: java -jar GASV.jar --filter [options] <ReferenceInputFile> <Target_Input_File>");
+		IO.getOut().println("\tESPs listed in the Target File will be filtered against the Reference File.");
+		IO.getOut().println("\tOutput:");
+		IO.getOut().println("\t\t<Target_Input_File>.removed : PRs that overlap PRs in the Reference File.");
+		IO.getOut().println("\t\t<Target_Input_File>.retained : PRs that represent unique variants relative to the Reference File.");
 
-		io.getOut().println("\nFilter Mode Options:");
-		io.getOut().println("--lmin <val>       Lmin value for reference input file (integer)");
-		io.getOut().println("--lmax <val>       Lmax value for reference input file (integer)");
-		io.getOut().println("--lmin2 <val>      Lmin value for target input file (integer)");
-		io.getOut().println("--lmax2 <val>      Lmax value for target input file (integer)");
+		IO.getOut().println("\nFilter Mode Options:");
+		IO.getOut().println("--lmin <val>       Lmin value for reference input file (integer)");
+		IO.getOut().println("--lmax <val>       Lmax value for reference input file (integer)");
+		IO.getOut().println("--lmin2 <val>      Lmin value for target input file (integer)");
+		IO.getOut().println("--lmax2 <val>      Lmax value for target input file (integer)");
 
-		io.getOut().println("\nNocluster Mode (<mode> = --nocluster or -n):");
-		io.getOut().println("\tUsage: java -jar GASV.jar --nocluster [options] <InputFile>");
-		io.getOut().println("\tOutput: <InputFile>.noclusters");
+		IO.getOut().println("\nNocluster Mode (<mode> = --nocluster or -n):");
+		IO.getOut().println("\tUsage: java -jar GASV.jar --nocluster [options] <InputFile>");
+		IO.getOut().println("\tOutput: <InputFile>.noclusters");
 
-		io.getOut().println("\nOther Options:");
-		io.getOut().println("--split            Ignored unless in --cluster mode. This option specifies that candidate split reads are output for each cluster as an additional output column. The --readlength option must be specified.");
-		io.getOut().println("--readlength <val> The length of each read. Required for --split mode.");
+		IO.getOut().println("\nOther Options:");
+		IO.getOut().println("--split            Ignored unless in --cluster mode. This option specifies that candidate split reads are output for each cluster as an additional output column. The --readlength option must be specified.");
+		IO.getOut().println("--readlength <val> The length of each read. Required for --split mode.");
 
 		return;
 	}
@@ -591,11 +591,11 @@ public class GASVMain{
 
 		//Error Checking: Too few or too many arguments.
 		if(numArgsNoOpts < 2) {
-			io.getOut().println("Error: Missing arguments, check usage or get full help with --help");
+			IO.getOut().println("Error: Missing arguments, check usage or get full help with --help");
 			return;
 		}
 		if (numArgsNoOpts > 3) {
-			io.getOut().println("Error: Too many arguments, check usage or get full help with --help");
+			IO.getOut().println("Error: Too many arguments, check usage or get full help with --help");
 			return;
 		}
 
@@ -617,7 +617,7 @@ public class GASVMain{
 				}
 				FilterESP.filterESP(newArgs[0], newArgs[1]);
 			} else {
-				io.getOut().println("ERROR: Missing required arguments in --filter mode.");
+				IO.getOut().println("ERROR: Missing required arguments in --filter mode.");
 				printUsage();
 			}
 
@@ -636,7 +636,7 @@ public class GASVMain{
 					ClusterESP.clusterESP(newArgs[0]);
 				}
 			} else {
-				io.getOut().println("ERROR: Too many arguments provided in --cluster mode.");
+				IO.getOut().println("ERROR: Too many arguments provided in --cluster mode.");
 				printUsage();
 			}
 		} else if ((args[0].equals("--cgh") || args[0].equals("-g"))) {
@@ -650,7 +650,7 @@ public class GASVMain{
 				}
 				ClusterESP.clusterESPAndCGH(newArgs[0], newArgs[1]);
 			} else {
-				io.getOut().println("ERROR: Too many arguments provided in --cgh mode.");
+				IO.getOut().println("ERROR: Too many arguments provided in --cgh mode.");
 				printUsage();
 			}
 		} else if ((args[0].equals("--nocluster") || args[0].equals("-n"))) {
@@ -664,16 +664,16 @@ public class GASVMain{
 				}
 				ConvertFileToPolygons.convertFileToPolys(newArgs[0], GASVMain.LMIN, GASVMain.LMAX, GASVMain.USE_BATCH, GASVMain.USE_FAST);
 			} else {
-				io.getOut().println("ERROR: Too many arguments provided in --nocluster mode.");
+				IO.getOut().println("ERROR: Too many arguments provided in --nocluster mode.");
 				printUsage();
 			}
 		} else {
-			io.getOut().println("ERROR: Unrecognized <mode> argument: " + args[0]);
+			IO.getOut().println("ERROR: Unrecognized <mode> argument: " + args[0]);
 			printUsage();
 		}
 
 
 
-        io.getOut().println("GASV Program has Finished Successfully.");
+        IO.getOut().println("GASV Program has Finished Successfully.");
     }
 }

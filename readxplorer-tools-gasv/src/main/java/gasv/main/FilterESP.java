@@ -34,7 +34,7 @@ Testing commit
 */
 public class FilterESP{
 
-        private static final InputOutput io = GASVCaller.io;
+        private static final InputOutput IO = GASVCaller.IO;
 
 
 	public static void filterESP(String refFile, String targetFile) throws IOException, CloneNotSupportedException, NullPointerException{
@@ -43,7 +43,7 @@ public class FilterESP{
 
 		ReadInput Kidd = new ReadInput(refFile);
 
-		io.getOut().println("Reference ESP File: " + refFile);
+		IO.getOut().println("Reference ESP File: " + refFile);
 
 		ReadInput WashU = new ReadInput(targetFile);
 
@@ -104,10 +104,10 @@ public class FilterESP{
 			removedWriter.write(headerLine);
 		}
 
-		io.getOut().println("Target ESP File: " + targetFile);
-		io.getOut().println("Output Files:");
-		io.getOut().println("\tRetained: " + retainedFile);
-		io.getOut().println("\tRemoved: " + removedFile);
+		IO.getOut().println("Target ESP File: " + targetFile);
+		IO.getOut().println("Output Files:");
+		IO.getOut().println("\tRetained: " + retainedFile);
+		IO.getOut().println("\tRemoved: " + removedFile);
 
 
 		ArrayList<Clone>                  cloneList     = new ArrayList<Clone>();

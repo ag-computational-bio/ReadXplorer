@@ -40,12 +40,12 @@ public class ReadCGH extends ReadFile {
 	 *  These rectangles are then put through the program once more.
 	 */
 
-        private static final InputOutput io = GASVCaller.io;
+        private static final InputOutput IO = GASVCaller.IO;
 
 	private String nextLine_;
 
-	//private java.io.FileReader f_;
-	//private java.io.BufferedReader b_;
+	//private java.IO.FileReader f_;
+	//private java.IO.BufferedReader b_;
 	private boolean diffChrPairReached_;
 	private int curLeftChr_;
 	private int curRightChr_;
@@ -57,8 +57,8 @@ public class ReadCGH extends ReadFile {
 
 		//open in read-only mode
 		cghFile_ = new RandomAccessFile(file, "r");
-		//f_ = new java.io.FileReader(file_);
-		//b_ = new java.io.BufferedReader(f_);
+		//f_ = new java.IO.FileReader(file_);
+		//b_ = new java.IO.BufferedReader(f_);
 		curLeftChr_ = 0;
 		curRightChr_ = 0;
 		diffChrPairReached_ = false;
@@ -74,7 +74,7 @@ public class ReadCGH extends ReadFile {
 		//}
 
 		if (line.length != Constants.NUM_COLS_IN_SING_CGH_FILE) {
-			io.getOut().println("Found a row with incorrect"
+			IO.getOut().println("Found a row with incorrect"
 					+ " number of items. Expect "
 					+ Constants.NUM_COLS_IN_SING_CGH_FILE
 					+ " in an aCGH file, found: "

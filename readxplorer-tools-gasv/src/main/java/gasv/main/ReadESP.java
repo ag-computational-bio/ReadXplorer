@@ -35,7 +35,7 @@ public class ReadESP extends ReadFile {
 	 * clone_index chr1 pos1 orient1 chr2 pos2 orient2
 	 */
 
-         private static final InputOutput io = GASVCaller.io;
+         private static final InputOutput IO = GASVCaller.IO;
 
 	private int lmin_, lmax_;
 
@@ -118,7 +118,7 @@ public class ReadESP extends ReadFile {
 			throws NumberFormatException, Exception {
 
 		if (line.length != 3 && line.length != 5) {
-			io.getOut().println("Found a row with incorrect"
+			IO.getOut().println("Found a row with incorrect"
 					+ " number of items. Expect 3 or 5"
 					+ " in an PR (or interval) file, found: "
 					+ line.length + ", so skipping row.");
@@ -209,7 +209,7 @@ public class ReadESP extends ReadFile {
 			return parseIntervalCloneFromString(nextLine, targetLeftChr, targetRightChr,
 					useWindowSize, matchChromosomes, line);
 			//TMP change!!
-			/*io.getOut().println("Found a row with incorrect"
+			/*IO.getOut().println("Found a row with incorrect"
 					+ " number of items. Expect "
 					+ Constants.NUM_COLS_IN_ESP_FILE
 					+ " in an ESP file, found: "
@@ -405,7 +405,7 @@ public class ReadESP extends ReadFile {
 			try {
 				c = this.parseCloneFromString(nextLine_, targetLeftChr, targetRightChr, true, true);
 			} catch (NumberFormatException ex) {
-				io.getOut().println("Couldn't parse chromosome identifiers: "
+				IO.getOut().println("Couldn't parse chromosome identifiers: "
 						+ " for line: " + nextLine_
 						+ " so skipping current line");
 				nextLine_ = b_.readLine();
@@ -466,8 +466,8 @@ public class ReadESP extends ReadFile {
 	private void readBreakRegions(int targetLeftChr, int targetRightChr,
 			ArrayList<BreakRegion>[][] breakRegionsArray) throws IOException{
 
-		//f = new java.io.FileReader(file_);
-		//b = new java.io.BufferedReader(f);
+		//f = new java.IO.FileReader(file_);
+		//b = new java.IO.BufferedReader(f);
 		int counter = 0;
 		String nextLine = b_.readLine();
 		while(nextLine != null){
@@ -490,7 +490,7 @@ public class ReadESP extends ReadFile {
 				c = this.parseCloneFromString(nextLine, targetLeftChr, targetRightChr, false,
 						matchChromosomes);
 			} catch (NumberFormatException ex) {
-				io.getOut().println("Couldn't parse chromosome identifiers: "
+				IO.getOut().println("Couldn't parse chromosome identifiers: "
 						+ " for line: " + nextLine
 						+ " skipping current line");
 				nextLine = b_.readLine();

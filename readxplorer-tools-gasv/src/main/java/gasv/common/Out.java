@@ -24,12 +24,12 @@ import org.openide.windows.InputOutput;
 
 
 /**
-  * This simple class is just a wrapper around io.getOut() to facilitate printing at different
-  * debug levels
+  * This simple class is just a wrapper around IO.getOut() to facilitate printing at different
+ debug levels
   */
 public class Out {
 
-        private static final InputOutput io = GASVCaller.io;
+        private static final InputOutput IO = GASVCaller.IO;
 
 	/**
 	 * If DEBUG_LEVEL is set to MAX_LVL then all possible messages will be output.
@@ -62,7 +62,7 @@ public class Out {
 	  * Will always print no matter the DEBUG_LEVEL
 	  */
 	public static void print(String output) {
-		io.getOut().println(output);
+		IO.getOut().println(output);
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class Out {
 	  */
 	public static void print1(String output) {
 		if (DEBUG_LEVEL > 0) {
-			io.getOut().println(output);
+			IO.getOut().println(output);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class Out {
 	  */
 	public static void print2(String output) {
 		if (DEBUG_LEVEL > 1) {
-			io.getOut().println(output);
+			IO.getOut().println(output);
 		}
 	}
 
@@ -92,7 +92,7 @@ public class Out {
 	  */
 	public static void print3(String output) {
 		if (DEBUG_LEVEL > 1) {
-			io.getOut().println(output);
+			IO.getOut().println(output);
 		}
 	}
 

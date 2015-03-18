@@ -18,6 +18,7 @@
 package bio.comp.jlu.readxplorer.tools.gasv;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import gasv.bamtogasv.BAMToGASV;
@@ -37,7 +38,6 @@ import javax.swing.JPanel;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
@@ -52,15 +52,17 @@ import org.openide.windows.InputOutput;
 @NbBundle.Messages( "GASV.output.name=GASV output" )
 public class GASVCaller implements Runnable {
 
-    public static final InputOutput io = IOProvider.getDefault().getIO( Bundle.GASV_output_name(), false );
+    public static final InputOutput IO = IOProvider.getDefault().getIO( Bundle.GASV_output_name(), false );
 
+    private final PersistentReference reference;
     private final File bamFile;
     private final ParametersBamToGASV bamToGASVParams;
     private final ParametersGASVMain gasvMainParams;
+    private final DataVisualisationI parent;
+    private final ProgressHandle analysisProgressHandle;
+    private final ProgressHandle storeChromsProgressHandle;
 
-    private final PersistentReference reference;
     private String chromNamesFileName;
-    private ProgressHandle progressHandle;
 
 
     /**
@@ -71,14 +73,23 @@ public class GASVCaller implements Runnable {
      * @param bamFile         The bam file to analyze
      * @param bamToGASVParams BamToGASV parameter set to apply.
      * @param gasvMainParams  GASVMain parameter set to apply.
+     * @param parent          The parent to notify when the calculation has
+     *                        finished that it can visualize the results.
+     * @param progressHandle  The progress handle of the analysis to update when
+     *                        intermediate steps have finished.
      */
-    @NbBundle.Messages( { "ProgressName=Storing chromosome names in file..." } )
-    public GASVCaller( PersistentReference reference, File bamFile, ParametersBamToGASV bamToGASVParams, ParametersGASVMain gasvMainParams ) {
+    @NbBundle.Messages( { "CallerProgressName=Storing chromosome names in file..." } )
+    public GASVCaller( PersistentReference reference, File bamFile, ParametersBamToGASV bamToGASVParams,
+                       ParametersGASVMain gasvMainParams,
+                       DataVisualisationI parent,
+                       ProgressHandle progressHandle ) {
         this.reference = reference;
         this.bamFile = bamFile;
         this.bamToGASVParams = bamToGASVParams;
         this.gasvMainParams = gasvMainParams;
-        progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
+        this.parent = parent;
+        this.storeChromsProgressHandle = ProgressHandleFactory.createHandle( Bundle.CallerProgressName() );
+        this.analysisProgressHandle = progressHandle;
     }
 
 
@@ -96,11 +107,9 @@ public class GASVCaller implements Runnable {
      * genome rearrangements within read mapping data.
      */
     public void callGASV() {
-//        Algorithm:
-//        1. create chromosome naming file as references will most certainly contain other names than numbers
-//        2. Call GASV
 
-        io.select();
+        IO.getOut().flush(); //delete data from previous GASV runs
+        IO.select();
         createChromosomeNamingFile( reference );
         runBamToGASV( bamFile );
         runGASVMain( bamFile.getAbsolutePath() + ".gasv.in" );
@@ -122,14 +131,14 @@ public class GASVCaller implements Runnable {
                           "ChromFileWritingStart=Starting to write chromosome naming file for GASV...",
                           "ChromFileWritingFinished=Finished writing chromosome naming file for GASV." } )
     private void createChromosomeNamingFile( PersistentReference reference ) {
-        io.getOut().println( Bundle.ChromFileWritingStart() );
+        IO.getOut().println( Bundle.ChromFileWritingStart() );
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         String dbLocation = projectConnector.getDBLocation();
         String refName = reference.getName();
         chromNamesFileName = new File( dbLocation ).getParent().concat( "\\" + refName.concat( "-seqNames-gasv.txt" ) );
 
         final String chromNamesString = createChromNamesString( reference );
-        progressHandle.start();
+        storeChromsProgressHandle.start();
 
         //Note that file is overwritten every time!
         try( final BufferedWriter outputWriter = new BufferedWriter( new FileWriter( chromNamesFileName ) ); ) {
@@ -139,8 +148,8 @@ public class GASVCaller implements Runnable {
         } catch( IOException | MissingResourceException | HeadlessException e ) {
             JOptionPane.showMessageDialog( new JPanel(), Bundle.Error() + e.getMessage() );
         }
-        progressHandle.finish();
-        io.getOut().println( Bundle.ChromFileWritingFinished() );
+        storeChromsProgressHandle.finish();
+        IO.getOut().println( Bundle.ChromFileWritingFinished() );
     }
 
 
@@ -174,7 +183,9 @@ public class GASVCaller implements Runnable {
      * <p>
      * @param bamFile The bam file to analyze
      */
+    @NbBundle.Messages( { "ProgressBamToGASV=Running BamToGASV step (1. of 2 steps)" } )
     private void runBamToGASV( File bamFile ) {
+        analysisProgressHandle.progress( Bundle.ProgressBamToGASV() );
         String[] gasvArgs = { bamFile.getAbsolutePath(),
                               "-LIBRARY_SEPARATED",
                               bamToGASVParams.isLibrarySeparated() ? "sep" : "all",
@@ -237,7 +248,9 @@ public class GASVCaller implements Runnable {
      * @param gasvInputFileName The input file for GASVMain generated with
      *                          BamToGASV.
      */
+    @NbBundle.Messages( { "ProgressGASVMain=Running GASVMain step (2. of 2 steps)" } )
     private void runGASVMain( String gasvInputFileName ) {
+        analysisProgressHandle.progress( Bundle.ProgressGASVMain() );
         List<String> gasvArgsList = new ArrayList<>();
         gasvArgsList.add( "--batch" );
         if( gasvMainParams.isHeaderless() ) {
@@ -283,13 +296,11 @@ public class GASVCaller implements Runnable {
         String[] gasvArgs = new String[0];
         try {
             GASVMain.main( gasvArgsList.toArray( gasvArgs ) );
-        } catch( IOException ex ) { //TODO: Correct error handling
-            Exceptions.printStackTrace( ex );
-        } catch( CloneNotSupportedException ex ) {
-            Exceptions.printStackTrace( ex );
-        } catch( NullPointerException ex ) {
-            Exceptions.printStackTrace( ex );
+        } catch( IOException | CloneNotSupportedException | NullPointerException ex ) {
+            IO.getOut().println( ex.getMessage() );
         }
+
+        parent.showData( "done" );
     }
 
 

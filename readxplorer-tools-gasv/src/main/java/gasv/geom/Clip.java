@@ -72,7 +72,7 @@ public class Clip
    // --- Constants ---
    // -----------------
 
-    private static final InputOutput io = GASVCaller.io;
+    private static final InputOutput IO = GASVCaller.IO;
 
    private static final boolean DEBUG = false ;
 
@@ -234,8 +234,8 @@ public class Clip
       }
       if( DEBUG )
       {
-         io.getOut().println("");
-         io.getOut().println(" ------------ After build_lmt for subj ---------");
+         IO.getOut().println("");
+         IO.getOut().println(" ------------ After build_lmt for subj ---------");
          lmt_table.print();
       }
       if (!clip.isEmpty())
@@ -244,8 +244,8 @@ public class Clip
       }
       if( DEBUG )
       {
-         io.getOut().println("");
-         io.getOut().println(" ------------ After build_lmt for clip ---------");
+         IO.getOut().println("");
+         IO.getOut().println(" ------------ After build_lmt for clip ---------");
          lmt_table.print();
       }
 
@@ -1301,7 +1301,7 @@ public class Clip
                   insert_bound( bound_list(lmt_table, edge_table.getNode(min).vertex.y), e);
                   if( DEBUG )
                   {
-                     io.getOut().println("fwd");
+                     IO.getOut().println("fwd");
                      lmt_table.print();
                   }
                   e_index += num_edges;
@@ -1359,7 +1359,7 @@ public class Clip
                   insert_bound( bound_list(lmt_table, edge_table.getNode(min).vertex.y), e);
                   if( DEBUG )
                   {
-                     io.getOut().println("rev");
+                     IO.getOut().println("rev");
                      lmt_table.print();
                   }
                   e_index+= num_edges;
@@ -1738,19 +1738,19 @@ public class Clip
 
       public void print()
       {
-         io.getOut().println("---- out_poly ----");
+         IO.getOut().println("---- out_poly ----");
          int c= 0;
          PolygonNode npoly_node = null ;
          for (PolygonNode poly_node= top_node; (poly_node != null); poly_node = npoly_node)
          {
-            io.getOut().println("contour="+c+"  active="+poly_node.active+"  hole="+poly_node.proxy.hole);
+            IO.getOut().println("contour="+c+"  active="+poly_node.active+"  hole="+poly_node.proxy.hole);
             npoly_node = poly_node.next;
             if (poly_node.active != 0)
             {
                int v=0 ;
                for (VertexNode vtx = poly_node.proxy.v[LEFT]; (vtx != null) ; vtx = vtx.next )
                {
-                  io.getOut().println("v="+v+"  vtx.x="+vtx.x+"  vtx.y="+vtx.y);
+                  IO.getOut().println("v="+v+"  vtx.x="+vtx.x+"  vtx.y="+vtx.y);
                }
                c++;
             }
@@ -1784,11 +1784,11 @@ public class Clip
 
       public void print()
       {
-         io.getOut().println("");
-         io.getOut().println("aet");
+         IO.getOut().println("");
+         IO.getOut().println("aet");
          for( EdgeNode edge = top_node ; (edge != null) ; edge = edge.next )
          {
-            io.getOut().println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
+            IO.getOut().println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
          }
       }
    }
@@ -1868,10 +1868,10 @@ public class Clip
          LmtNode lmt = top_node ;
          while( lmt != null )
          {
-            io.getOut().println("lmt("+n+")");
+            IO.getOut().println("lmt("+n+")");
             for( EdgeNode edge = lmt.first_bound ; (edge != null) ; edge = edge.next_bound )
             {
-               io.getOut().println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
+               IO.getOut().println("edge.vertex.x="+edge.vertex.x+"  edge.vertex.y="+edge.vertex.y);
             }
             n++ ;
             lmt = lmt.next ;
@@ -1997,11 +1997,11 @@ public class Clip
    // -------------
    private static void print_sbt( double[] sbt )
    {
-      io.getOut().println("");
-      io.getOut().println("sbt.length="+sbt.length);
+      IO.getOut().println("");
+      IO.getOut().println("sbt.length="+sbt.length);
       for( int i = 0 ; i < sbt.length ; i++ )
       {
-         io.getOut().println("sbt["+i+"]="+sbt[i]);
+         IO.getOut().println("sbt["+i+"]="+sbt[i]);
       }
    }
 }
