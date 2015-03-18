@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.GeneralUtils;
@@ -44,9 +45,13 @@ public class CorrelationResultPanel extends ResultTablePanel {
 
 
     /**
-     * Creates new form CorrelationResultPanel
+     * Creates new form CorrelationResultPanel.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public CorrelationResultPanel() {
+    public CorrelationResultPanel( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumn = 2;
         final int trackColumn = 2;

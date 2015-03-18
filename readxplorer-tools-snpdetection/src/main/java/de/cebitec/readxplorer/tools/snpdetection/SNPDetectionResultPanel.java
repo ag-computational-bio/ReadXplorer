@@ -30,6 +30,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
@@ -74,9 +75,13 @@ public class SNPDetectionResultPanel extends ResultTablePanel {
 
 
     /**
-     * Creates new form SNPDetectionResultPanel
+     * Creates new form SNPDetectionResultPanel.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public SNPDetectionResultPanel() {
+    public SNPDetectionResultPanel( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumn = 0;
         final int trackColumn = 2;

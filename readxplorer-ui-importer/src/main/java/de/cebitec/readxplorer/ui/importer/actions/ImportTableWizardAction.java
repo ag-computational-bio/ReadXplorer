@@ -150,7 +150,6 @@ public final class ImportTableWizardAction implements ActionListener {
                         public void run() {
                             PosTablePanel tablePanel = new PosTablePanel( tableModel, tableType );
                             tablePanel.setReferenceGenome( ref );
-//                            tablePanel.setTableType(tableType);
                             TableVisualizationHelper.checkAndOpenRefViewer( ref, tablePanel );
 
                             String panelName = "Imported table from: " + tableFile.getName();

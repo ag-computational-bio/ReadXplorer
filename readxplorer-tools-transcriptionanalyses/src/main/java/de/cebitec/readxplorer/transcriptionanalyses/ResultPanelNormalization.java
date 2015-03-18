@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -60,8 +61,12 @@ public class ResultPanelNormalization extends ResultTablePanel {
     /**
      * Panel showing a result of an analysis filtering for features with a min
      * and max certain readcount.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public ResultPanelNormalization() {
+    public ResultPanelNormalization( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posIdx = 0;
         final int trackIdx = 2;

@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.tablevisualization;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.TableType;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import javax.swing.DefaultListSelectionModel;
@@ -39,6 +40,8 @@ public class PosTablePanel extends TablePanel {
     private final UneditableTableModel tableData;
     private PersistentReference reference;
     private final TableRightClickFilter<UneditableTableModel> filterListener;
+    private int posColumn;
+    private final int chromColumn;
 
 
     /**
@@ -50,9 +53,8 @@ public class PosTablePanel extends TablePanel {
      */
     public PosTablePanel( UneditableTableModel tableData, TableType tableType ) {
         this.tableData = tableData;
-        int posColumn = 0;
+        posColumn = 0;
         int trackColumn = 0;
-        final int chromColumn;
         switch( tableType ) {
             case COVERAGE_ANALYSIS: //fallthrough
             case TPM_RPKM_ANALYSIS: //fallthrough
@@ -77,7 +79,7 @@ public class PosTablePanel extends TablePanel {
                 break; //for all other tables
         }
         this.initComponents();
-        this.initAdditionalComponents( posColumn, chromColumn );
+        this.initAdditionalComponents();
         filterListener = new TableRightClickFilter<>( UneditableTableModel.class, posColumn, trackColumn );
         this.dataTable.getTableHeader().addMouseListener( filterListener );
     }
@@ -86,21 +88,10 @@ public class PosTablePanel extends TablePanel {
     /**
      * Initializes additionals stuff for this panel.
      */
-    private void initAdditionalComponents( final int posColumn, final int chromColumn ) {
+    private void initAdditionalComponents() {
         this.dataTable.setModel( this.tableData );
         //TODO: feature position - map mit features im ram halten
         //TODO: after closing of ref and reopening, it does not react anymore
-
-        DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference );
-            }
-
-
-        } );
     }
 
 
@@ -174,6 +165,35 @@ public class PosTablePanel extends TablePanel {
      */
     public PersistentReference getReferenceGenome() {
         return this.reference;
+    }
+
+
+    /**
+     * After setting the BoundsInfoManager,
+     * <p>
+     * @param bim
+     */
+    @Override
+    public void setBoundsInfoManager( BoundsInfoManager bim ) {
+        super.setBoundsInfoManager( bim );
+        this.createListSelectionListener();
+    }
+
+
+    /**
+     * Creates the ListSelectionListener for jumping to a position in the
+     * reference genome.
+     */
+    private void createListSelectionListener() {
+        DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
+        model.addListSelectionListener( new ListSelectionListener() {
+            @Override
+            public void valueChanged( ListSelectionEvent e ) {
+                TableUtils.showPosition( dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference );
+            }
+
+
+        } );
     }
 
 

@@ -346,8 +346,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         AnalysisTranscriptionStart analysisTSS = trackToAnalysisMap.get( trackId ).getAnalysisTSS();
                         parametersTss = analysisTSS.getParametersTSS(); //if automatic is on, the parameters are different now
                         if( transcriptionStartResultPanel == null ) {
-                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-                            transcriptionStartResultPanel.setReferenceViewer( refViewer );
+                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart( refViewer );
                         }
 
                         TssDetectionResult tssResult = new TssDetectionResult( analysisTSS.getResults(), parametersTss, trackMap, reference, combineTracks, 1, 0 );
@@ -365,8 +364,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         if( parametersOperonDet.isPerformOperonAnalysis() ) {
 
                             if( operonResultPanel == null ) {
-                                operonResultPanel = new ResultPanelOperonDetection( parametersOperonDet );
-                                operonResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
+                                operonResultPanel = new ResultPanelOperonDetection( parametersOperonDet, refViewer.getBoundsInformationManager() );
                             }
                             OperonDetectionResult operonDetectionResult = new OperonDetectionResult( trackMap,
                                                                                                      trackToAnalysisMap.get( trackId ).getAnalysisOperon().getResults(), reference, combineTracks, 2, 0 );
@@ -383,8 +381,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         if( parametersNormalization.isPerformNormAnalysis() ) {
                             AnalysisNormalization normalizationAnalysis = trackToAnalysisMap.get( trackId ).getAnalysisNorm();
                             if( normalizationResultPanel == null ) {
-                                normalizationResultPanel = new ResultPanelNormalization();
-                                normalizationResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
+                                normalizationResultPanel = new ResultPanelNormalization( refViewer.getBoundsInformationManager() );
                             }
                             NormalizationAnalysisResult normAnalysisResult = new NormalizationAnalysisResult( trackMap,
                                                                                                               trackToAnalysisMap.get( trackId ).getAnalysisNorm().getResults(),
@@ -406,7 +403,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
             } );
         } catch( ClassCastException e ) {
-            LOG.log(Level.INFO, "Unknown data passed to {0}", getClass().getName());
+            LOG.log( Level.INFO, "Unknown data passed to {0}", getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
 

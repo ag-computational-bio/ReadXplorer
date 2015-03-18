@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readxplorer.vcfhandling.importer;
 
 
@@ -81,7 +82,7 @@ public final class VcfImportAction implements ActionListener {
     private AppPanelTopComponent appPanelTopComp;
     private SnpVcfViewer snpVcfViewer;
     private SnpVcfResultTopComponent vcfResultTopComp;
-    private final SnpVcfResultPanel resultPanel = new SnpVcfResultPanel();
+    private SnpVcfResultPanel resultPanel = null;
     private WizardDescriptor wiz;
 
     //private WizardDescriptor.Panel<WizardDescriptor>[] panel;
@@ -93,8 +94,7 @@ public final class VcfImportAction implements ActionListener {
 
 
     /**
-     * Reads in the given VCF-file.
-     * The data of the VCF-file is saved in a list
+     * Reads in the given VCF-file. The data of the VCF-file is saved in a list
      * of VariantContexts, then the dashboard, SNP-Viewer, Reference-Viewer and
      * Result table are opened.
      * <p>
@@ -125,31 +125,9 @@ public final class VcfImportAction implements ActionListener {
             VcfParser vcfP = new VcfParser( vcfFile );
             variantCList = vcfP.getVariantContextList();
 
-            openResultWindow();
             openView( variantCList );
 
         }
-    }
-
-
-    /**
-     * Opens the Result table.
-     */
-    private void openResultWindow() {
-
-        // Saves required information for generating a SnpVcfResult Object
-        reference = (PersistentReference) wiz.getProperty( VcfImportWizardPanel.PROP_SELECTED_REF );
-        combineTracks = false;
-
-        // Opens VcfResultPanel
-        if( vcfResultTopComp == null ) {
-            vcfResultTopComp = (SnpVcfResultTopComponent) WindowManager.getDefault().findTopComponent( "Snp_VcfResultTopComponent" );
-        }
-        vcfResultTopComp.open();
-
-        SnpVcfResult vcfResult = new SnpVcfResult( variantCList, trackMap, reference, combineTracks );
-        resultPanel.addResult( vcfResult );
-        vcfResultTopComp.openAnalysisTab( "Result Panel", resultPanel );
     }
 
 
@@ -160,9 +138,26 @@ public final class VcfImportAction implements ActionListener {
      */
     private void openView( List<VariantContext> variantList ) {
 
-        // Saves required information for generating a VcfViewer-Object
+        // Saves required information for generating a SnpVcfResult Object
+        reference = (PersistentReference) wiz.getProperty( VcfImportWizardPanel.PROP_SELECTED_REF );
+        combineTracks = false;
         ViewController viewController = this.checkAndOpenRefViewer( reference );
-        resultPanel.setBoundsInfoManager( viewController.getBoundsManager() );
+
+        // Opens VcfResultPanel
+        if( vcfResultTopComp == null ) {
+            vcfResultTopComp = (SnpVcfResultTopComponent) WindowManager.getDefault().findTopComponent( "Snp_VcfResultTopComponent" );
+        }
+        vcfResultTopComp.open();
+
+        if( resultPanel == null ) {
+            resultPanel = new SnpVcfResultPanel( viewController.getBoundsManager() );
+        }
+
+        SnpVcfResult vcfResult = new SnpVcfResult( variantCList, trackMap, reference, combineTracks );
+        resultPanel.addResult( vcfResult );
+        vcfResultTopComp.openAnalysisTab( "Result Panel", resultPanel );
+
+        // Saves required information for generating a VcfViewer-Object
         BasePanelFactory basePanelFac = viewController.getBasePanelFac();
         BasePanel basePanel = basePanelFac.getGenericBasePanel( false, false, false, null );
         viewController.addMousePositionListener( basePanel );
@@ -192,8 +187,7 @@ public final class VcfImportAction implements ActionListener {
     /**
      * Opens the dashboard and Reference-Viewer.
      * <p>
-     * @param ref
-     *            <p>
+     * @param ref <p>
      * @return
      */
     private ViewController checkAndOpenRefViewer( PersistentReference ref ) {

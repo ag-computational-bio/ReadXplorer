@@ -257,8 +257,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
                     @Override
                     public void run() {
                         if( snpDetectionResultPanel == null ) {
-                            snpDetectionResultPanel = new SNPDetectionResultPanel();
-                            snpDetectionResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
+                            snpDetectionResultPanel = new SNPDetectionResultPanel( context.getBoundsInformationManager() );
                         }
                         snpDetectionResultPanel.setReferenceGenome( context.getReference() );
                         snpDetectionResultPanel.addResult( result );

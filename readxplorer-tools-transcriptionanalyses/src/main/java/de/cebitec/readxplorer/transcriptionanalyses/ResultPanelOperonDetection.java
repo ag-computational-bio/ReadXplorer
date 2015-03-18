@@ -29,6 +29,7 @@ import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
@@ -67,8 +68,11 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      * contains an export button, which exports the data into an excel file.
      * <p>
      * @param operonDetParameters parameters used for this operon detection
+     * @param bim                 BoundsInfoManager of the reference on which
+     *                            this analysis was performed.
      */
-    public ResultPanelOperonDetection( ParameterSetOperonDet operonDetParameters ) {
+    public ResultPanelOperonDetection( ParameterSetOperonDet operonDetParameters, BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumnIdx = 5;
         final int trackColumnIdx = 2;

@@ -62,8 +62,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     /**
      * This panel is capable of showing a table with transcription start sites
      * and contains an export button, which exports the data into an excel file.
+     * <p>
+     * @param referenceViewer The reference viewer belonging to this analysis
+     *                        and needed for updating the currently shown
+     *                        position and extracting the reference sequence.
      */
-    public ResultPanelTranscriptionStart() {
+    public ResultPanelTranscriptionStart( ReferenceViewer referenceViewer ) {
+        setBoundsInfoManager( referenceViewer.getBoundsInformationManager() );
+        this.referenceViewer = referenceViewer;
         this.initComponents();
         final int posColumnIdx = 0;
         final int trackColumnIdx = 1;
@@ -339,19 +345,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             } );
         }
-    }
-
-
-    /**
-     * Set the reference viewer needed for updating the currently shown position
-     * and extracting the reference sequence.
-     * <p>
-     * @param referenceViewer the reference viewer belonging to this analysis
-     *                        result
-     */
-    public void setReferenceViewer( ReferenceViewer referenceViewer ) {
-        this.setBoundsInfoManager( referenceViewer.getBoundsInformationManager() );
-        this.referenceViewer = referenceViewer;
     }
 
 

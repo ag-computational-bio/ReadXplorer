@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.vcfhandling.visualization;
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
@@ -54,9 +55,13 @@ public class SnpVcfResultPanel extends ResultTablePanel {
 
 
     /**
-     * Creates new form Snp_VcfResultPanel
+     * Creates new form Snp_VcfResultPanel.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public SnpVcfResultPanel() {
+    public SnpVcfResultPanel( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int sourColumn = 3;
         final int trackColumn = 2;
