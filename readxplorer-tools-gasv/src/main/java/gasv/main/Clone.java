@@ -21,7 +21,8 @@
 package gasv.main;
 
 import gasv.common.Out;
-import gasv.geom.*;
+import gasv.geom.Poly;
+import gasv.geom.PolyDefault;
 
 
 public class Clone extends BreakRegion {
@@ -277,11 +278,13 @@ public class Clone extends BreakRegion {
     }
 
 
+    @Override
     public double getX() {
         return x;
     }
 
 
+    @Override
     public double getY() {
         return y;
     }
@@ -504,6 +507,7 @@ public class Clone extends BreakRegion {
 
     //Task: Outputs the clone type to a string.
 
+    @Override
     public String toString() {
         return name + " " + number + " " + chrx + " " + x + " " + chry + " " + y + " " + bmin + " " + bmax + "\n" + top.toString() + " " + bottom.toString();
     }

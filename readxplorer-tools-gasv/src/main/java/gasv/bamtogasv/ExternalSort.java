@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import org.openide.windows.InputOutput;
 
 
@@ -155,9 +156,8 @@ public class ExternalSort {
 
     public void split() {
         IO.getOut().println( "Reading file in chunks of " + NUM_LINES + ", sorting, and writing them to temp files." );
-        try {
-            BufferedReader in = new BufferedReader( new FileReader( infile ) );
-            ArrayList<SortElement> rows = new ArrayList<SortElement>();
+        try( BufferedReader in = new BufferedReader( new FileReader( infile ) ) ) {
+            List<SortElement> rows = new ArrayList<>();
             String line = "";
             while( line != null ) {
                 rows.clear();
@@ -176,7 +176,7 @@ public class ExternalSort {
                     // It has a header if the value is NOT parsed as a double.
                     if( firstLine ) {
                         SortElement e = new SortElement( line );
-                        if( header.equals( "" ) ) {
+                        if( header.isEmpty( ) ) {
                             rows.add( e );
                         }
                         firstLine = false;
@@ -189,15 +189,14 @@ public class ExternalSort {
                 Collections.sort( rows );
 
                 // write to disk
-                BufferedWriter bw = new BufferedWriter( new FileWriter( infile + "_tmp" + numFiles + ".txt" ) );
-                for( int i = 0; i < rows.size(); i++ ) {
-                    bw.append( rows.get( i ).line + "\n" );
+                try ( BufferedWriter bw = new BufferedWriter( new FileWriter( infile + "_tmp" + numFiles + ".txt" ) )) {
+                    for( SortElement row : rows ) {
+                        bw.append( row.line + "\n" );
+                    }
                 }
-                bw.close();
 
                 numFiles++;
             }
-            in.close();
 
             IO.getOut().println( "there are " + numFiles + " files." );
         } catch( Exception ex ) {
@@ -208,44 +207,40 @@ public class ExternalSort {
     }
 
 
-    public void sort( ArrayList<String> lines, String outputname ) throws IOException {
-        ArrayList<SortElement> rows = new ArrayList<SortElement>();
-        SortElement e;
+    public void sort( List<String> lines, String outputname ) throws IOException {
 
+        List<SortElement> rows = new ArrayList<>();
         for( int i = 0; i < lines.size(); i++ ) {
 
             // First, create SortElement from lines.get(i)
-            e = new SortElement( lines.get( i ) );
-            if( !e.line.equals( "" ) && !e.line.contains( "null" ) ) {
+            SortElement e = new SortElement( lines.get( i ) );
+            if( !e.line.isEmpty( ) && !e.line.contains( "null" ) ) {
                 rows.add( e );
             }
 
             // then, set lines.get(i) to null.
             lines.set( i, null );
         }
-        // finally, set lines arraylist to null.
-        lines = null;
 
         // sort the ArrayList of SortElements.
         Collections.sort( rows );
 
         // write to disk
-        BufferedWriter bw = new BufferedWriter( new FileWriter( outputname ) );
-        for( int i = 0; i < rows.size(); i++ ) {
-            bw.write( rows.get( i ).line + "\n" );
+        try( BufferedWriter bw = new BufferedWriter( new FileWriter( outputname ) )) {
+            for( SortElement row : rows ) {
+                bw.write( row.line + "\n" );
+            }
         }
-        bw.close();
     }
 
 
     public void merge() {
         IO.getOut().println( "Merging files..." );
-        try {
-            ArrayList<BufferedReader> mergefbr = new ArrayList<BufferedReader>();
-            ArrayList<SortElement> filerows = new ArrayList<SortElement>();
-            BufferedWriter out = new BufferedWriter( new FileWriter( outfile ) );
+        try( BufferedWriter out = new BufferedWriter( new FileWriter( outfile ) ) ) {
+            List<BufferedReader> mergefbr = new ArrayList<>();
+            List<SortElement> filerows = new ArrayList<>();
 
-            if( !header.equals( "" ) ) {
+            if( !header.isEmpty( ) ) {
                 out.write( header + "\n" );
             }
 
@@ -263,16 +258,13 @@ public class ExternalSort {
                 }
             }
 
-            SortElement row;
-            SortElement min;
-            int minIndex;
             while( someFileStillHasRows ) {
-                min = null;
-                minIndex = -1;
+                SortElement min = null;
+                int minIndex = -1;
 
                 // check which one is min
                 for( int i = 0; i < filerows.size(); i++ ) {
-                    row = filerows.get( i );
+                    SortElement row = filerows.get( i );
                     if( row != null && (min == null || row.compareTo( min ) < 0) ) {
                         min = row;
                         minIndex = i;
@@ -297,17 +289,16 @@ public class ExternalSort {
             }
 
             // at this point, all filerows should be null.
-            for( int i = 0; i < filerows.size(); i++ ) {
-                if( filerows.get( i ) != null ) {
-                    IO.getOut().println( "ERROR: minIndex <= 0 and found row not null \"" + filerows.get( i ).line + "\"" );
+            for( SortElement filerow : filerows ) {
+                if( filerow != null ) {
+                    IO.getOut().println( "ERROR: minIndex <= 0 and found row not null \"" + filerow.line + "\"" );
                     System.exit( -1 );
                 }
             }
 
             // close all the files
-            out.close();
-            for( int i = 0; i < mergefbr.size(); i++ ) {
-                mergefbr.get( i ).close();
+            for( BufferedReader mergefbr1 : mergefbr ) {
+                mergefbr1.close();
             }
 
             // delete all intermediate files.
@@ -326,11 +317,10 @@ public class ExternalSort {
     }
 
 
-    public void merge( ArrayList<String> files, String outputfile ) {
-        try {
-            ArrayList<BufferedReader> mergefbr = new ArrayList<BufferedReader>();
-            ArrayList<SortElement> filerows = new ArrayList<SortElement>();
-            BufferedWriter out = new BufferedWriter( new FileWriter( outputfile ) );
+    public void merge( List<String> files, String outputfile ) {
+        try( BufferedWriter out = new BufferedWriter( new FileWriter( outputfile ) ) ) {
+            List<BufferedReader> mergefbr = new ArrayList<>();
+            List<SortElement> filerows = new ArrayList<>();
 
             boolean someFileStillHasRows = false;
             for( int i = 0; i < files.size(); i++ ) {
@@ -346,16 +336,13 @@ public class ExternalSort {
                 }
             }
 
-            SortElement row;
-            SortElement min;
-            int minIndex;
             while( someFileStillHasRows ) {
-                min = null;
-                minIndex = -1;
+                SortElement min = null;
+                int minIndex = -1;
 
                 // check which one is min
                 for( int i = 0; i < filerows.size(); i++ ) {
-                    row = filerows.get( i );
+                    SortElement row = filerows.get( i );
                     if( row != null && (min == null || row.compareTo( min ) < 0) ) {
                         min = row;
                         minIndex = i;
@@ -380,23 +367,22 @@ public class ExternalSort {
             }
 
             // at this point, all filerows should be null.
-            for( int i = 0; i < filerows.size(); i++ ) {
-                if( filerows.get( i ) != null ) {
-                    IO.getOut().println( "ERROR: minIndex <= 0 and found row not null \"" + filerows.get( i ).line + "\"" );
+            for( SortElement filerow : filerows ) {
+                if( filerow != null ) {
+                    IO.getOut().println( "ERROR: minIndex <= 0 and found row not null \"" + filerow.line + "\"" );
                     System.exit( -1 );
                 }
             }
 
             // close all the files
-            out.close();
-            for( int i = 0; i < mergefbr.size(); i++ ) {
-                mergefbr.get( i ).close();
+            for( BufferedReader mergefbr1 : mergefbr ) {
+                mergefbr1.close();
             }
 
             // delete all intermediate files.
             try {
-                for( int i = 0; i < files.size(); i++ ) {
-                    new File( files.get( i ) ).delete();
+                for( String file : files ) {
+                    new File( file ).delete();
                 }
             } catch( Exception e ) {
                 IO.getOut().println( "WARNING: cannot delete temporary file." );
@@ -460,30 +446,29 @@ public class ExternalSort {
         @Override
         public int compareTo( SortElement se ) {
             int index = -1;
-            String order = "";
             for( int i = 0; i < sortorder.length; i++ ) {
                 try {
                     index = sortorder[i];
+                    double d1 = Double.parseDouble( row[index - 1] );
+                    double d2 = Double.parseDouble( se.row[index - 1] );
                     if( index > 0 ) { // sort increasing
-                        order = "increasing";
-                        if( Double.parseDouble( row[index - 1] ) < Double.parseDouble( se.row[index - 1] ) ) {
+                        if( d1 < d2 ) {
                             return -1;
                         }
-                        if( Double.parseDouble( row[index - 1] ) > Double.parseDouble( se.row[index - 1] ) ) {
+                        if( d1 > d2 ) {
                             return 1;
                         }
                     } else { // sort decreasing
-                        order = "decreasing";
-                        index = index * -1;
-                        if( Double.parseDouble( row[index - 1] ) < Double.parseDouble( se.row[index - 1] ) ) {
+                        index *= -1;
+                        if( d1 < d2 ) {
                             return 1;
                         }
-                        if( Double.parseDouble( row[index - 1] ) > Double.parseDouble( se.row[index - 1] ) ) {
+                        if( d1 > d2 ) {
                             return -1;
                         }
                     }
                 } catch( NumberFormatException e ) {
-                    IO.getOut().println( "ERROR: column " + index + " (" + order + ") did not parse as a double when comparing the following (1-based):" );
+                    IO.getOut().println( "ERROR: column " + index + " did not parse as a double when comparing the following (1-based):" );
                     IO.getOut().println( "\"" + line + "\"" );
                     IO.getOut().println( "\"" + se.line + "\"" );
                     e.printStackTrace();

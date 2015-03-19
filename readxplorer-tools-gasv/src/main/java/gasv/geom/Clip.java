@@ -117,7 +117,7 @@ public class Clip {
      * @param p2        One of the polygons to performt he intersection with
      * @param polyClass The type of <code>Poly</code> to return
      */
-    public static Poly intersection( Poly p1, Poly p2, Class polyClass ) {
+    public static Poly intersection( Poly p1, Poly p2, Class<?> polyClass ) {
         return clip( OperationType.GPC_INT, p1, p2, polyClass );
     }
 
@@ -131,7 +131,7 @@ public class Clip {
      * @param p2        One of the polygons to performt he union with
      * @param polyClass The type of <code>Poly</code> to return
      */
-    public static Poly union( Poly p1, Poly p2, Class polyClass ) {
+    public static Poly union( Poly p1, Poly p2, Class<?> polyClass ) {
         return clip( OperationType.GPC_UNION, p1, p2, polyClass );
     }
 
@@ -145,7 +145,7 @@ public class Clip {
      * @param p2        One of the polygons to performt he xor with
      * @param polyClass The type of <code>Poly</code> to return
      */
-    public static Poly xor( Poly p1, Poly p2, Class polyClass ) {
+    public static Poly xor( Poly p1, Poly p2, Class<?> polyClass ) {
         return clip( OperationType.GPC_XOR, p1, p2, polyClass );
     }
 
@@ -192,7 +192,7 @@ public class Clip {
     /**
      * Create a new <code>Poly</code> type object using <code>polyClass</code>.
      */
-    private static Poly createNewPoly( Class polyClass ) {
+    private static Poly createNewPoly( Class<?> polyClass ) {
         try {
             return (Poly) polyClass.newInstance();
         } catch( Exception e ) {
@@ -205,7 +205,7 @@ public class Clip {
      * <code>clip()</code> is the main method of the clipper algorithm. This is
      * where the conversion from really begins.
      */
-    private static Poly clip( OperationType op, Poly subj, Poly clip, Class polyClass ) {
+    private static Poly clip( OperationType op, Poly subj, Poly clip, Class<?> polyClass ) {
         Poly result = createNewPoly( polyClass );
 
         /* Test for trivial NULL result cases */
@@ -224,8 +224,8 @@ public class Clip {
         /* Build LMT */
         LmtTable lmt_table = new LmtTable();
         ScanBeamTreeEntries sbte = new ScanBeamTreeEntries();
-        EdgeTable s_heap = null;
-        EdgeTable c_heap = null;
+        EdgeTable s_heap;
+        EdgeTable c_heap;
         if( !subj.isEmpty() ) {
             s_heap = build_lmt( lmt_table, sbte, subj, SUBJ, op );
         }
@@ -1544,7 +1544,7 @@ public class Clip {
         }
 
 
-        public Poly getResult( Class polyClass ) {
+        public Poly getResult( Class<?> polyClass ) {
             Poly result = createNewPoly( polyClass );
             int num_contours = count_contours();
             if( num_contours > 0 ) {
@@ -1679,7 +1679,7 @@ public class Clip {
 
     private static class EdgeTable {
 
-        private List m_List = new ArrayList();
+        private List<EdgeNode> m_List = new ArrayList<>();
 
 
         public void addNode( double x, double y ) {
@@ -1691,38 +1691,38 @@ public class Clip {
 
 
         public EdgeNode getNode( int index ) {
-            return (EdgeNode) m_List.get( index );
+            return m_List.get( index );
         }
 
 
         public boolean FWD_MIN( int i ) {
-            EdgeNode prev = (EdgeNode) m_List.get( PREV_INDEX( i, m_List.size() ) );
-            EdgeNode next = (EdgeNode) m_List.get( NEXT_INDEX( i, m_List.size() ) );
-            EdgeNode ith = (EdgeNode) m_List.get( i );
+            EdgeNode prev = m_List.get( PREV_INDEX( i, m_List.size() ) );
+            EdgeNode next = m_List.get( NEXT_INDEX( i, m_List.size() ) );
+            EdgeNode ith =  m_List.get( i );
             return ((prev.vertex.getY() >= ith.vertex.getY()) &&
                     (next.vertex.getY() > ith.vertex.getY()));
         }
 
 
         public boolean NOT_FMAX( int i ) {
-            EdgeNode next = (EdgeNode) m_List.get( NEXT_INDEX( i, m_List.size() ) );
-            EdgeNode ith = (EdgeNode) m_List.get( i );
+            EdgeNode next =  m_List.get( NEXT_INDEX( i, m_List.size() ) );
+            EdgeNode ith =  m_List.get( i );
             return (next.vertex.getY() > ith.vertex.getY());
         }
 
 
         public boolean REV_MIN( int i ) {
-            EdgeNode prev = (EdgeNode) m_List.get( PREV_INDEX( i, m_List.size() ) );
-            EdgeNode next = (EdgeNode) m_List.get( NEXT_INDEX( i, m_List.size() ) );
-            EdgeNode ith = (EdgeNode) m_List.get( i );
+            EdgeNode prev =  m_List.get( PREV_INDEX( i, m_List.size() ) );
+            EdgeNode next =  m_List.get( NEXT_INDEX( i, m_List.size() ) );
+            EdgeNode ith =  m_List.get( i );
             return ((prev.vertex.getY() > ith.vertex.getY()) &&
                     (next.vertex.getY() >= ith.vertex.getY()));
         }
 
 
         public boolean NOT_RMAX( int i ) {
-            EdgeNode prev = (EdgeNode) m_List.get( PREV_INDEX( i, m_List.size() ) );
-            EdgeNode ith = (EdgeNode) m_List.get( i );
+            EdgeNode prev =  m_List.get( PREV_INDEX( i, m_List.size() ) );
+            EdgeNode ith =  m_List.get( i );
             return (prev.vertex.getY() > ith.vertex.getY());
         }
 

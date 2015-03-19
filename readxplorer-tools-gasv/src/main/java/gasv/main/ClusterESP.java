@@ -22,10 +22,24 @@ package gasv.main;
 
 import gasv.common.Constants;
 import gasv.common.Out;
-import java.util.*;
-import java.io.*;
-import java.text.*;
-import gasv.geom.*;
+import gasv.geom.Poly;
+import gasv.geom.PolyDefault;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 
 /**
@@ -39,12 +53,12 @@ public class ClusterESP {
     private static final String ESP_HEAD_READS = "#Cluster_ID:\tLeftChr:\tLeftBreakPoint:\tRightChr:\tRightBreakPoint:\tNum PRS:\tLocalization:\tType:\tList of PRS:";
     private static final String ESP_HEAD_REGIONS = "#Cluster_ID:\tNum PRS:\tLocalization:\tType:\tList of PRS:\t LeftChr:\tRightChr:\tBoundary Points:";
     private static RandomAccessFile tmpFile = null;
-    private static ArrayList<BreakRegion> cLocal = new ArrayList<BreakRegion>();
+    private static List<BreakRegion> cLocal = new ArrayList<>();
 
     //Printing at most one decimal point.
     private static DecimalFormat df_ = new DecimalFormat( "#.#" );
 
-    private static ArrayList<Clone> cloneList_ = new ArrayList<Clone>();
+    private static List<Clone> cloneList_ = new ArrayList<>();
     private static int CLUSTER_NUMBER = 1;
     private static int CGH_NUMBER = 1;
     private static BufferedWriter clusterWriter_ = null;
@@ -67,14 +81,14 @@ public class ClusterESP {
     private static final CloneComparator COMPARATOR = new CloneComparator();
 
     // values used for saving previous window state
-    private static ArrayList<Cluster> sameClusterList = null;
-    private static ArrayList<Cluster> diffClusterList = null;
+    private static List<Cluster> sameClusterList = null;
+    private static List<Cluster> diffClusterList = null;
 
 
-    public static LinkedList polyToList( Poly p ) {
-        LinkedList poly = new LinkedList();
+    public static LinkedList<int[]> polyToList( Poly p ) {
+        LinkedList<int[]> poly = new LinkedList<>();
         for( int i = 0; i < p.getNumPoints(); i++ ) {
-            int coord[] = { (int) p.getX( i ), (int) p.getY( i ) };
+            int[] coord = { (int) p.getX( i ), (int) p.getY( i ) };
             poly.add( coord );
         }
         return poly;
@@ -82,17 +96,17 @@ public class ClusterESP {
 
 
     public static String printPoly( Poly p ) {
-        LinkedList coords = polyToList( p );
-        String toReturn = "";
-        Iterator iter = coords.iterator();
-        while( iter.hasNext() ) {
-            int[] pair = (int[]) iter.next();
-            toReturn = toReturn + pair[0] + ", " + pair[1];
+        LinkedList<int[]> coords = polyToList( p );
+        StringBuilder sb = new StringBuilder();
+        Iterator<int[]> iter = coords.iterator();
+        for( int[] pair : polyToList( p ) ) {
+
+            sb.append( pair[0] ).append( ", " ).append( pair[1] );
             if( iter.hasNext() ) {
-                toReturn = toReturn + ", ";
+                sb.append( ", " );
             }
         }
-        return toReturn;
+        return sb.toString();
     }
 
 
@@ -103,12 +117,11 @@ public class ClusterESP {
         boolean pluPlu = false;
         boolean minMin = false;
 
-        ArrayList<Clone> clones = cluster.getClones();
+        List<Clone> clones = cluster.getClones();
         if( clones.get( 0 ).getChrX() != clones.get( 0 ).getChrY() ) {
             diffChrom = true;
         }
-        for( int i = 0; i < clones.size(); ++i ) {
-            Clone clone = clones.get( i );
+        for( Clone clone : clones ) {
             if( clone.getX() < 0 ) {
                 if( clone.getY() < 0 ) {
                     minMin = true;
@@ -181,9 +194,7 @@ public class ClusterESP {
         double maxY = 0;
         double minY = Double.MAX_VALUE;
 
-        ArrayList<Clone> clones = cluster.getClones();
-        for( int i = 0; i < clones.size(); ++i ) {
-            Clone clone = clones.get( i );
+        for( Clone clone : cluster.getClones() ) {
             double x = clone.getX();
             double y = clone.getY();
             if( x < 0 ) {
@@ -254,9 +265,7 @@ public class ClusterESP {
         double minNegY = Double.MAX_VALUE;
         double outX, outY;
 
-        ArrayList<Clone> clones = cluster.getClones();
-        for( int i = 0; i < clones.size(); ++i ) {
-            Clone clone = clones.get( i );
+        for( Clone clone : cluster.getClones() ) {
             double x = clone.getX();
             double y = clone.getY();
             if( x < 0 ) {
@@ -296,14 +305,14 @@ public class ClusterESP {
 
 
     private static String printPolyNoSpaces( Poly p ) {
-        LinkedList coords = polyToList( p );
+        LinkedList<int[]> coords = polyToList( p );
         String toReturn = "";
-        Iterator iter = coords.iterator();
+        Iterator<int[]> iter = coords.iterator();
         while( iter.hasNext() ) {
-            int[] pair = (int[]) iter.next();
+            int[] pair = iter.next();
             toReturn = toReturn + pair[0] + "," + pair[1];
             if( iter.hasNext() ) {
-                toReturn = toReturn + ",";
+                toReturn += ",";
             }
         }
         return toReturn;
@@ -328,7 +337,8 @@ public class ClusterESP {
 
 
     public static boolean clique( Cluster cluster ) {
-        ArrayList<Clone> clusterClones = cluster.getClones();
+
+        List<Clone> clusterClones = cluster.getClones();
         int size = clusterClones.size();
 		//java initializes boolean arrays to all false
         //boolean[][] visited = new boolean[size][size];
@@ -368,7 +378,7 @@ public class ClusterESP {
     public static void clusterESP( String fileName ) throws IOException, CloneNotSupportedException, NullPointerException {
 
         String fileNameMinusPath = fileName;
-        int idxOfSlash = fileName.lastIndexOf( "/" );
+        int idxOfSlash = fileName.lastIndexOf( '/' );
         if( idxOfSlash != -1 ) {
             fileNameMinusPath = fileName.substring( idxOfSlash + 1 );
         }
@@ -423,7 +433,7 @@ public class ClusterESP {
                 chrx = i + 1;
                 chry = j + 1;
 
-                ArrayList<BreakRegion> c = null;
+                List<BreakRegion> c = null;
                 Out.print1( "ClusterESP: processing chr " + chrx + ", chr" + chry );
 				//if (fileDone) {
                 //	Out.print1("ClusterESP: fileDone, shouldn't keep going...");
@@ -434,7 +444,7 @@ public class ClusterESP {
                     } else {
                         if( saveMemory ) {
                             if( c == null ) {
-                                c = new ArrayList<BreakRegion>();
+                                c = new ArrayList<>();
                             }
                         }
                         if( useBatch ) {
@@ -516,7 +526,7 @@ public class ClusterESP {
      * This is the version of clusterHelper to use if just want to do clustering
      * of ESP's (no CGH data) This version will write out the clusters to file
      */
-    private static void clusterHelper( ArrayList<BreakRegion> c, String directionString, boolean findSplitReads )
+    private static void clusterHelper( List<BreakRegion> c, String directionString, boolean findSplitReads )
             throws IOException {
         clusterHelper( c, directionString, null, null, null, findSplitReads );
     }
@@ -527,10 +537,10 @@ public class ClusterESP {
      * of ESP's along with CGH data. This version won't write anything to file,
      * just store the cgh and cluster overlaps in the appropriate HashMap's.
      */
-    private static void clusterHelper( ArrayList<BreakRegion> c, String directionString,
-                                       HashMap<BreakRegion, ArrayList<Cluster>> cghxMap,
-                                       HashMap<BreakRegion, ArrayList<Cluster>> cghyMap,
-                                       HashMap<BreakRegion, ArrayList<Cluster>> cghPairMap,
+    private static void clusterHelper( List<BreakRegion> c, String directionString,
+                                       Map<BreakRegion, List<Cluster>> cghxMap,
+                                       Map<BreakRegion, List<Cluster>> cghyMap,
+                                       Map<BreakRegion, List<Cluster>> cghPairMap,
                                        boolean findSplitReads )
             throws IOException {
 
@@ -571,7 +581,7 @@ public class ClusterESP {
                 if( rightMostX < 0 ) {
                     rightMostX = -rightMostX;
                 } else {
-                    rightMostX = rightMostX + GASVMain.MAX_LMAX;
+                    rightMostX += GASVMain.MAX_LMAX;
                 }
                 if( directionString.equals( SAME ) &&
                          (rightMostX > sameRightMostTrapEnd_) ) {
@@ -602,17 +612,17 @@ public class ClusterESP {
 
 		//this will be the list of clones completely unlabeled
         //this will first be large, then shrink in size as more clones labeled
-        ArrayList<Clone> unlabeledClones = new ArrayList<Clone>( cloneList_ );
+        List<Clone> unlabeledClones = new ArrayList<>( cloneList_ );
 
         //sort cloneList_ by bmin
 
-        java.util.Collections.sort( unlabeledClones, COMPARATOR );
+        Collections.sort( unlabeledClones, COMPARATOR );
         /* Out.print2("clusterHelper() benchmarking for " + numClones + " clones
          * in direction " + directionString + ": after sorting unlabeledClones,
          * time: " + System.currentTimeMillis());
          */
         //Explore Clusters;
-        ArrayList<Cluster> curClusterList = new ArrayList<Cluster>();
+        List<Cluster> curClusterList = new ArrayList<>();
         LABEL = -1;
         while( unlabeledClones.size() > 0 ) {
             Clone cloneN = unlabeledClones.remove( 0 );
@@ -632,7 +642,7 @@ public class ClusterESP {
 
 			//for every Clone, if it belongs to the current LABEL cluster (at first, cluster
             // will contain only the initial Clone) and it hasn't yet been visited...
-            ArrayList<Clone> tmpClusterClones = tmpCluster.getClones();
+            List<Clone> tmpClusterClones = tmpCluster.getClones();
             for( int m = 0; m < tmpClusterClones.size(); m++ ) {
                 Clone cloneM = tmpClusterClones.get( m );
 				//count up the number of overlapping clones
@@ -743,9 +753,9 @@ public class ClusterESP {
 	//if any of the current Clones in c overlap with previous clusters, remove those previous
     //clusters (before they get written out), and add the associated clones instead to the current list, c.
 
-    private static void checkForOverlapsWithPrevClusters( ArrayList<BreakRegion> c, String direction ) {
+    private static void checkForOverlapsWithPrevClusters( List<BreakRegion> c, String direction ) {
 
-        ArrayList<Cluster> oldClusterList = null;
+        List<Cluster> oldClusterList = null;
         double bound = -1;
         if( direction.equals( SAME ) ) {
 			//if the prev structures are null, we must've started a new chromosome pair, so no need to
@@ -791,7 +801,7 @@ public class ClusterESP {
                         // only consider those clusters within overlap distance of c1
                         if( curCluster != null &&
                                  curCluster.getRightMostX() >= c1LeftMostX ) {
-                            ArrayList<Clone> curClones = curCluster.getClones();
+                            List<Clone> curClones = curCluster.getClones();
                             for( int j = 0; j < curClones.size(); ++j ) {
                                 Clone oldClone = curClones.get( j );
                                 if( oldClone != null && GASVMain.overlap( c1, oldClone ) > 0 ) {
@@ -820,11 +830,11 @@ public class ClusterESP {
     //Find overlaps between CGH and ESP data, and fill out the appropriate (non-null) HashMap(s)
 
     private static void findCGHAndESPOverlaps( String direction,
-                                               HashMap<BreakRegion, ArrayList<Cluster>> cghxMap,
-                                               HashMap<BreakRegion, ArrayList<Cluster>> cghyMap,
-                                               HashMap<BreakRegion, ArrayList<Cluster>> cghPairMap ) throws IOException {
+                                               Map<BreakRegion, List<Cluster>> cghxMap,
+                                               Map<BreakRegion, List<Cluster>> cghyMap,
+                                               Map<BreakRegion, List<Cluster>> cghPairMap ) throws IOException {
 
-        ArrayList<Cluster> curClusterList = null;
+        List<Cluster> curClusterList = null;
         if( direction.equals( SAME ) ) {
             curClusterList = sameClusterList;
         } else if( direction.equals( DIFFERENT ) ) {
@@ -914,26 +924,26 @@ public class ClusterESP {
 
 
     private static void clearCGHClusterMap(
-            HashMap<BreakRegion, ArrayList<Cluster>> map )
+            Map<BreakRegion, List<Cluster>> map )
             throws IOException {
-        Iterator<Map.Entry<BreakRegion, ArrayList<Cluster>>> iter = map.entrySet().iterator();
+        Iterator<Map.Entry<BreakRegion, List<Cluster>>> iter = map.entrySet().iterator();
         while( iter.hasNext() ) {
-            Map.Entry<BreakRegion, ArrayList<Cluster>> entry = iter.next();
+            Map.Entry<BreakRegion, List<Cluster>> entry = iter.next();
             entry.getValue().clear();
         }
     }
 
 
     private static void printCGHClusterEntries(
-            HashMap<BreakRegion, ArrayList<Cluster>> map )
+            Map<BreakRegion, List<Cluster>> map )
             throws IOException {
 		//for (int k=0; k<maps.length;++k) {
         //Set<Map.Entry< BreakRegion, ArrayList<Cluster> > > entries = maps[i].entrySet();
         //Iterator<Map.Entry<BreakRegion, ArrayList<Cluster>>> iter = entries.iterator();
-        Iterator<Map.Entry<BreakRegion, ArrayList<Cluster>>> iter = map.entrySet().iterator();
+        Iterator<Map.Entry<BreakRegion, List<Cluster>>> iter = map.entrySet().iterator();
         while( iter.hasNext() ) {
-            Map.Entry<BreakRegion, ArrayList<Cluster>> entry = iter.next();
-            ArrayList<Cluster> curClusterList = entry.getValue();
+            Map.Entry<BreakRegion, List<Cluster>> entry = iter.next();
+            List<Cluster> curClusterList = entry.getValue();
             CGH cgh = (CGH) entry.getKey();
 
             //ignore entries where no overlap occurred
@@ -1024,7 +1034,7 @@ public class ClusterESP {
                     return true;
                 }
             } else {
-                ArrayList<Clone> list = cluster.getClones();
+                List<Clone> list = cluster.getClones();
                 for( int i = 0; i < list.size(); ++i ) {
                     PolyDefault clonePoly = (PolyDefault) list.get( i ).getPoly();
                     PolyDefault res = (PolyDefault) cghPoly.intersection( clonePoly );
@@ -1092,7 +1102,7 @@ public class ClusterESP {
     private static void writeClusters( String direction ) //, ArrayList<Cluster> curClusterList)
             throws IOException {
         //OUTPUT THE DIFFERENT CLUSTERS
-        ArrayList<Cluster> curClusterList = null;
+        List<Cluster> curClusterList = null;
         if( direction.equals( SAME ) ) {
             curClusterList = sameClusterList;
         } else if( direction.equals( DIFFERENT ) ) {
@@ -1110,7 +1120,7 @@ public class ClusterESP {
             if( myCluster == null ) {
                 continue;
             }
-            ArrayList<Cluster> clustersToWrite = new ArrayList<Cluster>();
+            List<Cluster> clustersToWrite = new ArrayList<>();
             //if (myCluster.isClique() && myCluster.getPoly().getArea() > 0) {
             clustersToWrite.add( myCluster );
             //else if
@@ -1160,7 +1170,7 @@ public class ClusterESP {
     private static void writeClustersAndSplitReads( String direction )
             throws IOException {
 
-        ArrayList<Cluster> curClusterList = null;
+        List<Cluster> curClusterList = null;
         if( direction.equals( SAME ) ) {
             curClusterList = sameClusterList;
         } else if( direction.equals( DIFFERENT ) ) {
@@ -1178,7 +1188,7 @@ public class ClusterESP {
             if( myCluster == null ) {
                 continue;
             }
-            ArrayList<Cluster> clustersToWrite = new ArrayList<Cluster>();
+            List<Cluster> clustersToWrite = new ArrayList<>();
             clustersToWrite.add( myCluster );
 
             if( (GASVMain.USE_MAXIMAL || GASVMain.USE_ALL) && (!myCluster.isClique() || !(myCluster.getPoly().getArea() > 0)) ) {
@@ -1214,25 +1224,25 @@ public class ClusterESP {
 	//creates PairedCGH objects for all possible pairings of the two lists of CGH data and inserts them
     // as keys to the map
 
-    private static void genPairsAndPutInMap( ArrayList<BreakRegion> list1, ArrayList<BreakRegion> list2,
-                                             HashMap<BreakRegion, ArrayList<Cluster>> map ) {
+    private static void genPairsAndPutInMap( List<BreakRegion> list1, List<BreakRegion> list2,
+                                             Map<BreakRegion, List<Cluster>> map ) {
         for( int i = 0; i < list1.size(); ++i ) {
             for( int j = 0; j < list2.size(); ++j ) {
                 CGH cghi = (CGH) list1.get( i );
                 CGH cghj = (CGH) list2.get( j );
                 PairedCGH cghPair = new PairedCGH( CGH_NUMBER, cghi, cghj );
                 CGH_NUMBER++;
-                map.put( cghPair, new ArrayList<Cluster>() );
+                map.put( cghPair, new ArrayList<>() );
             }
         }
 
     }
 
 
-    private static void convertArrayListToMap( ArrayList<BreakRegion> list,
-                                               HashMap<BreakRegion, ArrayList<Cluster>> map ) {
+    private static void convertArrayListToMap( List<BreakRegion> list,
+                                               Map<BreakRegion, List<Cluster>> map ) {
         for( int i = 0; i < list.size(); ++i ) {
-            map.put( list.get( i ), new ArrayList<Cluster>() );
+            map.put( list.get( i ), new ArrayList<>() );
         }
     }
 
@@ -1240,7 +1250,7 @@ public class ClusterESP {
     public static void clusterESPAndCGH( String espFilename, String cghFilename )
             throws IOException {
         String fileNameMinusPath = cghFilename;
-        int idxOfSlash = cghFilename.lastIndexOf( "/" );
+        int idxOfSlash = cghFilename.lastIndexOf( '/' );
         if( idxOfSlash != -1 ) {
             fileNameMinusPath = cghFilename.substring( idxOfSlash + 1 );
         }
@@ -1277,7 +1287,7 @@ public class ClusterESP {
         ReadInput readInput = new ReadInput( espFilename );
         ReadInput cghReadInput = new ReadInput( cghFilename );
 
-        ArrayList<BreakRegion>[][] breakRegions = null;
+        List<BreakRegion>[][] breakRegions = null;
         int lmin = GASVMain.LMIN;
         int lmax = GASVMain.LMAX;
 
@@ -1286,7 +1296,7 @@ public class ClusterESP {
 
         //in fast mode, read PES from all chromosomes into memory at once
         if( useFast ) {
-            breakRegions = new ArrayList[GASVMain.NUM_CHROM][GASVMain.NUM_CHROM];
+            breakRegions = new List[GASVMain.NUM_CHROM][GASVMain.NUM_CHROM];
             if( useBatch ) {
                 readInput.readFiles( breakRegions );
             } else {
@@ -1310,7 +1320,7 @@ public class ClusterESP {
 		//int CLUSTER_NUMBER = 1;
         for( int i = 0; i < GASVMain.NUM_CHROM; i++ ) {
             chrx = i + 1;
-            ArrayList<BreakRegion> cghx = new ArrayList<BreakRegion>();
+            List<BreakRegion> cghx = new ArrayList<BreakRegion>();
             if( useBatch ) {
                 cghReadInput.readCGHFilesByChr( chrx, cghx );
             } else {
@@ -1331,17 +1341,17 @@ public class ClusterESP {
                 // with either chrx crossed with x or x crossed with y (in the case of translocations).
                 // if in single CGH mode, will have a single cghxMap for non-translocation ESPs, or
                 // both cghxMap and cghyMap for translocation ESP's.
-                HashMap<BreakRegion, ArrayList<Cluster>> cghPairMap = null;
-                HashMap<BreakRegion, ArrayList<Cluster>> cghxMap = null;
-                HashMap<BreakRegion, ArrayList<Cluster>> cghyMap = null;
+                Map<BreakRegion, List<Cluster>> cghPairMap = null;
+                Map<BreakRegion, List<Cluster>> cghxMap = null;
+                Map<BreakRegion, List<Cluster>> cghyMap = null;
 
                 if( usePairedCGH ) {
-                    if( cghx.size() == 0 ) {
+                    if( cghx.isEmpty() ) {
                         Out.print1( "ClusterESP: no CGH data for chr" + chrx +
                                  " so no pairs can be generated. Will skip clustering." );
                         skipClustering = true;
                     }
-                    cghPairMap = new HashMap<BreakRegion, ArrayList<Cluster>>(
+                    cghPairMap = new HashMap<>(
                             Constants.EXPECTED_NUM_CGH_PER_CHR );
 					//if same chr, only need to generate the paired data based on one chr's CGH data
                     //if diffChr, will populate the map after reading in chry CGH data too
@@ -1352,7 +1362,7 @@ public class ClusterESP {
                     }
                 } else {
                     //for non-paired, we know we have to at least make the chrxMap
-                    cghxMap = new HashMap<BreakRegion, ArrayList<Cluster>>(
+                    cghxMap = new HashMap<>(
                             Constants.EXPECTED_NUM_CGH_PER_CHR );
                     //convertArrayListToMap(cghDataByChr[i], cghxMap);
                     convertArrayListToMap( cghx, cghxMap );
@@ -1360,7 +1370,7 @@ public class ClusterESP {
 
                 //for translocations will also have to read the CGH data for chry
                 if( chrx != chry ) {
-                    ArrayList<BreakRegion> cghy = new ArrayList<BreakRegion>();
+                    List<BreakRegion> cghy = new ArrayList<>();
                     if( useBatch ) {
                         cghReadInput.readCGHFilesByChr( chry, cghy );
                     } else {
@@ -1369,7 +1379,7 @@ public class ClusterESP {
                     Out.print1( "ClusterESP: considering " + cghy.size() + " cgh regions for chr " + chry );
                     // for paired data, generate the map based on both x and y
                     if( usePairedCGH ) {
-                        if( cghy.size() == 0 ) {
+                        if( cghy.isEmpty() ) {
                             Out.print1( "ClusterESP: no CGH data for chr" + chry +
                                      " so no pairs can be generated. " +
                                      "Will skip clustering." );
@@ -1379,26 +1389,26 @@ public class ClusterESP {
                     } else {
 						//for non-paired data, make CGH y data into a separate map
                         //if both cghx and cghy are empty, no need to do clustering
-                        if( (cghx.size() == 0) && (cghy.size() == 0) ) {
+                        if( (cghx.isEmpty()) && (cghy.isEmpty()) ) {
                             Out.print1( "ClusterESP: no CGH data for chr" + chrx +
                                      " or for chr" + chry +
                                      " so will skip clustering." );
                             skipClustering = true;
                         }
-                        cghyMap = new HashMap<BreakRegion, ArrayList<Cluster>>( Constants.EXPECTED_NUM_CGH_PER_CHR );
+                        cghyMap = new HashMap<>( Constants.EXPECTED_NUM_CGH_PER_CHR );
                         convertArrayListToMap( cghy, cghyMap );
                     }
                 } else if( !usePairedCGH ) {
 					//if in single CGH mode and it is NOT a translocation, can skip clustering
                     //for chromsoome if no CGH data exists for this chromosome
-                    if( cghx.size() == 0 ) {
+                    if( cghx.isEmpty() ) {
                         Out.print1( "ClusterESP: no CGH data for chr" + chrx +
                                  " so will skip clustering." );
                         skipClustering = true;
                     }
                 }
 
-                ArrayList<BreakRegion> c = null;
+                List<BreakRegion> c = null;
                 do {
                     // will be either fast mode or window (saveMemory mode)
                     if( useFast ) {
@@ -1519,8 +1529,8 @@ public class ClusterESP {
 		//pos always represents the position at the start of the current line
         //long pos = 0;
 
-        HashMap<String, Object> visitedCGH
-                = new HashMap<String, Object>( Constants.EXPECTED_NUM_CGH_PER_CHR );
+        Map<String, Object> visitedCGH
+                = new HashMap<>( Constants.EXPECTED_NUM_CGH_PER_CHR );
         String cghName;
         String nextLine = f.readLine();
         while( nextLine != null ) {
@@ -1542,7 +1552,7 @@ public class ClusterESP {
             String chr1 = line[1];
             String chr2 = line[2];
             String clusters = line[4];
-            ArrayList<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             addClustersToList( clusters, list );
 
 			//now save place so can seek() back to it after searching thru the rest
@@ -1587,7 +1597,7 @@ public class ClusterESP {
 
 
     //adds a string representing clusters to an ArrayList
-    private static void addClustersToList( String str, ArrayList<String> list ) {
+    private static void addClustersToList( String str, List<String> list ) {
         String[] parts = str.split( "\\(" );
         for( int i = 0; i < parts.length; ++i ) {
             int end = parts[i].indexOf( ")" );
@@ -1671,14 +1681,14 @@ public class ClusterESP {
 
                 Out.print1( "ClusterESP: processing chr " + chrx + ", chr" + chry );
 
-                ArrayList<BreakRegion> c = null;
+                List<BreakRegion> c = null;
                 do {
                     // will be either fast mode or window (saveMemory mode)
                     if( useFast ) {
                         c = breakRegions[i][j];
                     } else {
                         if( c == null ) {
-                            c = new ArrayList<BreakRegion>();
+                            c = new ArrayList<>();
                         }
                         if( useBatch ) {
                             fileDone = readInput.readWindowFromFiles( chrx,

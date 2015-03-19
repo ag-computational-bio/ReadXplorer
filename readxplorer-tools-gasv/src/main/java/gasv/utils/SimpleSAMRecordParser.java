@@ -46,28 +46,29 @@ public class SimpleSAMRecordParser {
         String outfile = args[1];
 
         int count = 0;
-        BufferedWriter writer = new BufferedWriter( new FileWriter( outfile ) );
-        SAMFileReader in = new SAMFileReader( new File( bamfile ) );
+        try( BufferedWriter writer = new BufferedWriter( new FileWriter( outfile ) );
+             SAMFileReader in = new SAMFileReader( new File( bamfile ) ) ) {
 
-        writer.write( "Name\tSAMFlag\tChr\tStart\tEnd\tNegativeStrand?\tQuality\tCIGAR\tNM\n" );
-        for( SAMRecord s : in ) {
-            /*
-             * Iterator<SAMTagAndValue> iter = s.getAttributes().iterator();
-             * while(iter.hasNext()) { SAMTagAndValue val = iter.next();
-             * IO.getOut().println(val.tag+" " +val.value); }
-             */
+            writer.write( "Name\tSAMFlag\tChr\tStart\tEnd\tNegativeStrand?\tQuality\tCIGAR\tNM\n" );
+            for( SAMRecord s : in ) {
+                /*
+                 * Iterator<SAMTagAndValue> iter = s.getAttributes().iterator();
+                 * while(iter.hasNext()) { SAMTagAndValue val = iter.next();
+                 * IO.getOut().println(val.tag+" " +val.value); }
+                 */
 
-            writer.write( s.getReadName() + "\t" + s.getFlags() + "\t" + s.getReferenceName() + "\t" +
+                writer.write( s.getReadName() + "\t" + s.getFlags() + "\t" + s.getReferenceName() + "\t" +
                           s.getAlignmentStart() + "\t" + s.getAlignmentEnd() + "\t" +
                           s.getReadNegativeStrandFlag() + "\t" + s.getMappingQuality() + "\t" +
                           s.getCigarString() + "\t" + s.getAttribute( "NM" ) + "\n" );
-            if( count % 500000 == 0 ) {
-                IO.getOut().println( "  record " + count + "..." );
+                if( count % 500000 == 0 ) {
+                    IO.getOut().println( "  record " + count + "..." );
+                }
+                count++;
             }
-            count++;
+
         }
-        in.close();
-        writer.close();
+        
     }
 
 

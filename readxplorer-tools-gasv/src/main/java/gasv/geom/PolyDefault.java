@@ -43,10 +43,10 @@
 
 package gasv.geom;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -78,7 +78,7 @@ public class PolyDefault implements Poly {
      * contains one poly
      */
     private boolean m_IsHole = false;
-    protected List m_List = new ArrayList();
+    protected List<Poly> m_List = new ArrayList<>();
 
    // --------------------
     // --- Constructors ---
@@ -124,6 +124,7 @@ public class PolyDefault implements Poly {
      * @return an integer value that is the same for two objects whenever their
      *         internal representation is the same (equals() is true)
     * */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + m_List.hashCode();
@@ -134,6 +135,7 @@ public class PolyDefault implements Poly {
     /**
      *
      */
+    @Override
     public String toString() {
         return super.toString();
     }
@@ -145,6 +147,7 @@ public class PolyDefault implements Poly {
     /**
      * Remove all of the points. Creates an empty polygon.
      */
+    @Override
     public void clear() {
         m_List.clear();
     }
@@ -156,6 +159,7 @@ public class PolyDefault implements Poly {
      * <b>Implementation Note:</b> If a point is added to an empty PolyDefault
      * object, it will create an inner polygon of type <code>PolySimple</code>.
      */
+    @Override
     public void add( double x, double y ) {
         add( new Point2D.Double( x, y ) );
     }
@@ -167,11 +171,12 @@ public class PolyDefault implements Poly {
      * <b>Implementation Note:</b> If a point is added to an empty PolyDefault
      * object, it will create an inner polygon of type <code>PolySimple</code>.
      */
+    @Override
     public void add( Point2D p ) {
-        if( m_List.size() == 0 ) {
+        if( m_List.isEmpty() ) {
             m_List.add( new PolySimple() );
         }
-        ((Poly) m_List.get( 0 )).add( p );
+        m_List.get( 0 ).add( p );
     }
 
 
@@ -184,6 +189,7 @@ public class PolyDefault implements Poly {
      *                               hole. This would break the assumption that
      *                               only simple polygons can be holes.
      */
+    @Override
     public void add( Poly p ) {
         if( (m_List.size() > 0) && m_IsHole ) {
             throw new IllegalStateException( "Cannot add polys to something designated as a hole." );
@@ -195,6 +201,7 @@ public class PolyDefault implements Poly {
     /**
      * Return true if the polygon is empty
      */
+    @Override
     public boolean isEmpty() {
         return m_List.isEmpty();
     }
@@ -204,8 +211,9 @@ public class PolyDefault implements Poly {
      * Returns the bounding rectangle of this polygon.
      * <strong>WARNING</strong> Not supported on complex polygons.
      */
+    @Override
     public Rectangle2D getBounds() {
-        if( m_List.size() == 0 ) {
+        if( m_List.isEmpty() ) {
             return new Rectangle2D.Double();
         } else if( m_List.size() == 1 ) {
             Poly ip = getInnerPoly( 0 );
@@ -219,8 +227,9 @@ public class PolyDefault implements Poly {
     /**
      * Returns the polygon at this index.
      */
+    @Override
     public Poly getInnerPoly( int polyIndex ) {
-        return (Poly) m_List.get( polyIndex );
+        return m_List.get( polyIndex );
     }
 
 
@@ -228,6 +237,7 @@ public class PolyDefault implements Poly {
      * Returns the number of inner polygons - inner polygons are assumed to
      * return one here.
      */
+    @Override
     public int getNumInnerPoly() {
         return m_List.size();
     }
@@ -236,24 +246,27 @@ public class PolyDefault implements Poly {
     /**
      * Return the number points of the first inner polygon
      */
+    @Override
     public int getNumPoints() {
-        return ((Poly) m_List.get( 0 )).getNumPoints();
+        return m_List.get( 0 ).getNumPoints();
     }
 
 
     /**
      * Return the X value of the point at the index in the first inner polygon
      */
+    @Override
     public double getX( int index ) {
-        return ((Poly) m_List.get( 0 )).getX( index );
+        return m_List.get( 0 ).getX( index );
     }
 
 
     /**
      * Return the Y value of the point at the index in the first inner polygon
      */
+    @Override
     public double getY( int index ) {
-        return ((Poly) m_List.get( 0 )).getY( index );
+        return m_List.get( 0 ).getY( index );
     }
 
 
@@ -263,6 +276,7 @@ public class PolyDefault implements Poly {
      * <p>
      * @throws IllegalStateException if called on a complex polygon.
      */
+    @Override
     public boolean isHole() {
         if( m_List.size() > 1 ) {
             throw new IllegalStateException( "Cannot call on a poly made up of more than one poly." );
@@ -277,6 +291,7 @@ public class PolyDefault implements Poly {
      * <p>
      * @throws IllegalStateException if called on a complex polygon.
      */
+    @Override
     public void setIsHole( boolean isHole ) {
         if( m_List.size() > 1 ) {
             throw new IllegalStateException( "Cannot call on a poly made up of more than one poly." );
@@ -289,8 +304,9 @@ public class PolyDefault implements Poly {
      * Return true if the given inner polygon is contributing to the set
      * operation. This method should NOT be used outside the Clip algorithm.
      */
+    @Override
     public boolean isContributing( int polyIndex ) {
-        return ((Poly) m_List.get( polyIndex )).isContributing( 0 );
+        return m_List.get( polyIndex ).isContributing( 0 );
     }
 
 
@@ -300,11 +316,12 @@ public class PolyDefault implements Poly {
      * <p>
      * @throws IllegalStateException if called on a complex polygon
      */
+    @Override
     public void setContributing( int polyIndex, boolean contributes ) {
         if( m_List.size() != 1 ) {
             throw new IllegalStateException( "Only applies to polys of size 1" );
         }
-        ((Poly) m_List.get( polyIndex )).setContributing( 0, contributes );
+        m_List.get( polyIndex ).setContributing( 0, contributes );
     }
 
 
@@ -314,6 +331,7 @@ public class PolyDefault implements Poly {
      * <p>
      * @return the returned Poly will be an instance of PolyDefault.
      */
+    @Override
     public Poly intersection( Poly p ) {
         return Clip.intersection( p, this, this.getClass() );
     }
@@ -325,6 +343,7 @@ public class PolyDefault implements Poly {
      * <p>
      * @return the returned Poly will be an instance of PolyDefault.
      */
+    @Override
     public Poly union( Poly p ) {
         return Clip.union( p, this, this.getClass() );
     }
@@ -336,6 +355,7 @@ public class PolyDefault implements Poly {
      * <p>
      * @return the returned Poly will be an instance of PolyDefault.
      */
+    @Override
     public Poly xor( Poly p ) {
         return Clip.xor( p, this, this.getClass() );
     }
@@ -344,6 +364,7 @@ public class PolyDefault implements Poly {
     /**
      * Return the area of the polygon in square units.
      */
+    @Override
     public double getArea() {
         double area = 0.0;
         for( int i = 0; i < getNumInnerPoly(); i++ ) {

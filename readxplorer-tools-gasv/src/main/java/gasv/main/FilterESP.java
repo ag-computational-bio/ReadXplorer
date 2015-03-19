@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.openide.windows.InputOutput;
@@ -42,7 +43,7 @@ public class FilterESP {
 
     public static void filterESP( String refFile, String targetFile ) throws IOException, CloneNotSupportedException, NullPointerException {
 
-        ArrayList<BreakRegion> cLocal = new ArrayList<BreakRegion>();
+        List<BreakRegion> cLocal = new ArrayList<>();
 
         ReadInput Kidd = new ReadInput( refFile );
 
@@ -50,8 +51,8 @@ public class FilterESP {
 
         ReadInput WashU = new ReadInput( targetFile );
 
-        ArrayList<BreakRegion>[][] breakRegionsK = null;
-        ArrayList<BreakRegion>[][] breakRegionsW = null;
+        List<BreakRegion>[][] breakRegionsK = null;
+        List<BreakRegion>[][] breakRegionsW = null;
         int lminKidd = GASVMain.LMIN;
         int lmaxKidd = GASVMain.LMAX;
         int lminWashU = GASVMain.LMIN2;
@@ -81,7 +82,7 @@ public class FilterESP {
         }
 
         String washUNameMinusPath = targetFile;
-        int idxOfSlash = targetFile.lastIndexOf( "/" );
+        int idxOfSlash = targetFile.lastIndexOf( '/' );
         if( idxOfSlash != -1 ) {
             washUNameMinusPath = targetFile.substring( idxOfSlash + 1 );
         }
@@ -113,19 +114,19 @@ public class FilterESP {
         IO.getOut().println( "\tRemoved: " + removedFile );
 
 
-        ArrayList<Clone> cloneList = new ArrayList<Clone>();
-        ArrayList<Clone> borderClones = new ArrayList<Clone>();
-        ArrayList<Clone> cloneListKidd = new ArrayList<Clone>();
-        ArrayList<Clone> borderKiddClones = new ArrayList<Clone>();
+        List<Clone> cloneList = new ArrayList<>();
+        List<Clone> borderClones = new ArrayList<>();
+        List<Clone> cloneListKidd = new ArrayList<>();
+        List<Clone> borderKiddClones = new ArrayList<>();
 
 		// cloneOverlaps should just hold a list of booleans.
         // It doesn't seem like the list of integers is ever used, just
         // testing to see whether any integers were ever added to the list.
         //ArrayList<ArrayList<Integer>>     cloneOverlaps = new ArrayList<ArrayList<Integer>>();
-        ArrayList<AtomicBoolean> cloneOverlaps = new ArrayList<AtomicBoolean>();
-        ArrayList<PriorityQueue<Integer>> clusters = new ArrayList<PriorityQueue<Integer>>();
-        ArrayList<Integer> clusterLabel = new ArrayList<Integer>();
-        ArrayList<Integer> visited = new ArrayList<Integer>();
+        List<AtomicBoolean> cloneOverlaps = new ArrayList<>();
+        List<PriorityQueue<Integer>> clusters = new ArrayList<>();
+        List<Integer> clusterLabel = new ArrayList<>();
+        List<Integer> visited = new ArrayList<>();
 
 		//Step 2: Add all the Add/Remove Events for all clones!
         //(***) Need a way to add more clones (different sizes/etc) to the clone array!(***)
@@ -141,8 +142,8 @@ public class FilterESP {
                 //ArrayList<BreakRegion> c = WashU_CS[i][j];
                 Out.print1( "FilterESP: processing chr " + chrx + ", chr" + chry );
 
-                ArrayList<BreakRegion> c = null;
-                ArrayList<BreakRegion> d = null;
+                List<BreakRegion> c = null;
+                List<BreakRegion> d = null;
                 do {
                     int endWindowPos = 0;
                     if( useFast ) {
@@ -151,10 +152,10 @@ public class FilterESP {
                     } else {
                         //if (saveMemory) {
                         if( c == null ) {
-                            c = new ArrayList<BreakRegion>();
+                            c = new ArrayList<>();
                         }
                         if( d == null ) {
-                            d = new ArrayList<BreakRegion>();
+                            d = new ArrayList<>();
                         }
                         Out.print2( "BEFORE READING: Reference end window pos = " + endWindowPos + " chrs " + chrx + " and " + chry );
                         if( useBatch ) {

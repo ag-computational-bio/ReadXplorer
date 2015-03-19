@@ -31,8 +31,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.picard.sam.FixMateInformation;
@@ -92,18 +94,18 @@ public class BAMToGASV_AMBIG {
     public Pattern file = Pattern.compile( "FILE=(.*)" );
 
     /* Data Structures */
-    public HashMap<String, String> LIBRARY_IDS; // <library_id,full_library_name>
-    public HashMap<String, Library> LIBRARY_INFO; // <full_library_name,Library Object>
-    public ArrayList<String> LIBRARY_NAMES; // list of <full_library_name>
-    public HashMap<String, Integer> HIGHQ_INDICATOR; // <full_library_name,#of reads>
-    public HashSet<String> LOWQ_INDICATOR; // <full_library_name,#of reads>
+    public Map<String, String> LIBRARY_IDS; // <library_id,full_library_name>
+    public Map<String, Library> LIBRARY_INFO; // <full_library_name,Library Object>
+    public List<String> LIBRARY_NAMES; // list of <full_library_name>
+    public Map<String, Integer> HIGHQ_INDICATOR; // <full_library_name,#of reads>
+    public Set<String> LOWQ_INDICATOR; // <full_library_name,#of reads>
 
     /* Sorters for ESPs and for Concordants */
     public ExternalSort discordantSorter, concordantSorter;
 
     /* Static Variables */
-    public static HashMap<String, Boolean> NON_DEFAULT_REFS; // <refname,true>
-    public static HashMap<String, Integer> CHR_NAMES; // <non-default chr naming, #>
+    public static Map<String, Boolean> NON_DEFAULT_REFS; // <refname,true>
+    public static Map<String, Integer> CHR_NAMES; // <non-default chr naming, #>
     public static VariantType[] VARIANTS = VariantType.values(); // list of variant types
 
 
@@ -178,12 +180,12 @@ public class BAMToGASV_AMBIG {
         printArguments();
 
         // initialize variables.
-        LIBRARY_IDS = new HashMap<String, String>();
-        LIBRARY_NAMES = new ArrayList<String>();
-        LIBRARY_INFO = new HashMap<String, Library>();
-        HIGHQ_INDICATOR = new HashMap<String, Integer>();
-        LOWQ_INDICATOR = new HashSet<String>();
-        NON_DEFAULT_REFS = new HashMap<String, Boolean>();
+        LIBRARY_IDS = new HashMap<>();
+        LIBRARY_NAMES = new ArrayList<>();
+        LIBRARY_INFO = new HashMap<>();
+        HIGHQ_INDICATOR = new HashMap<>();
+        LOWQ_INDICATOR = new HashSet<>();
+        NON_DEFAULT_REFS = new HashMap<>();
         BAD_RECORD_COUNTER = 0;
 
         // Try opening sorters and catch errors.
@@ -372,14 +374,12 @@ public class BAMToGASV_AMBIG {
      * the CHR_NAMES variable.
 	 * */
     public void getChromosomeNames() throws FileNotFoundException {
-        CHR_NAMES = new HashMap<String, Integer>();
+        CHR_NAMES = new HashMap<>();
         Scanner scan = new Scanner( new File( CHROMOSOME_NAMING_FILE ) );
-        String name;
-        int num;
         while( scan.hasNext() ) { // lines are of the form <name> <num>
             try {
-                name = scan.next();
-                num = scan.nextInt();
+                String name = scan.next();
+                int num = scan.nextInt();
                 CHR_NAMES.put( name, num );
             } catch( NumberFormatException e ) {
                 System.out.println( "ERROR: some line in " + CHROMOSOME_NAMING_FILE + " is not of the form <name>\t<integer." );
@@ -395,11 +395,9 @@ public class BAMToGASV_AMBIG {
 	 * */
     public void getHeaderInformation() {
         System.out.println( "Processing Header Information..." );
-        String platform, id, libname;
-        SAMReadGroupRecord record;
 
         // keep track of the platforms we've seen in this BAM file.
-        HashMap<String, String> viewedPlatforms = new HashMap<String, String>();
+        HashMap<String, String> viewedPlatforms = new HashMap<>();
 
         // open the file and read it.
         SAMFileReader reader = null;
@@ -428,22 +426,20 @@ public class BAMToGASV_AMBIG {
                 GL = SeqInfo.getReferenceLength();
             }
         }
-        // getReadGroups() returns a list of SAMReadGroupRecords.
-        Iterator<SAMReadGroupRecord> groups = header.getReadGroups().iterator();
 
-        while( groups.hasNext() ) {
+        // getReadGroups() returns a list of SAMReadGroupRecords.
+        for ( SAMReadGroupRecord record : header.getReadGroups() ) {
 
             // get platform, library ID, and library name.
-            record = groups.next();
-            platform = record.getPlatform();
-            id = record.getId();
-            libname = record.getLibrary();
+            String platform = record.getPlatform();
+            String id = record.getId();
+            String libname = record.getLibrary();
 
-            if( platform == null || platform.equals( "" ) ) {
+            if( platform == null || platform.isEmpty( ) ) {
                 System.out.println( "  WARNING: Platform not specified for library " + libname + ". Proceeding with " + PLATFORM + ". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM." );
             } else if( !platform.toLowerCase().equals( PLATFORM ) ) {
                 System.out.println( "  WARNING: Platform in library " + libname + " is " + platform + ". Proceeding with " + PLATFORM + ". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM." );
-            } else if( !platform.equals( "" ) ) // if platform is non an empty string, we've seen it.
+            } else if( !platform.isEmpty( ) ) // if platform is non an empty string, we've seen it.
             {
                 viewedPlatforms.put( platform.toLowerCase(), platform );
             }
@@ -469,7 +465,7 @@ public class BAMToGASV_AMBIG {
             System.exit( -1 );
         }
 
-        if( LIBRARY_IDS.size() == 0 ) {
+        if( LIBRARY_IDS.isEmpty() ) {
             // 5/22 Show WARNING rather than ERROR
             System.out.println( "  WARNING: No library information found in the BAM.  Proceeding with -LIBRARY_SEPARATED \"all\" flag." );
             LIBRARY_SEPARATED = "all";
@@ -479,17 +475,15 @@ public class BAMToGASV_AMBIG {
         reader.close();
 
         // Finally, make list of library information
-        Iterator<String> iter = LIBRARY_IDS.values().iterator();
-        while( iter.hasNext() ) {
-            libname = iter.next();
-            if( !LIBRARY_NAMES.contains( libname ) ) {
-                LIBRARY_NAMES.add( libname );
+        for ( String libName : LIBRARY_IDS.values() ) {
+            if( !LIBRARY_NAMES.contains( libName ) ) {
+                LIBRARY_NAMES.add( libName );
             }
         }
 
         System.out.println( "  Proceeding with the following libraries:" );
-        for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-            System.out.println( "    \"" + LIBRARY_NAMES.get( i ) + "\"" );
+        for( String libName : LIBRARY_NAMES ) {
+            System.out.println( "    \"" + libName + "\"" );
         }
         System.out.println();
     }
@@ -566,7 +560,6 @@ public class BAMToGASV_AMBIG {
         lib.Lmin = tmpLmin;
         lib.Lmax = tmpLmax;
         System.out.println( "  Setting Lmin=" + tmpLmin + " and Lmax=" + tmpLmax + "." );
-        return; // we're done.
     }
 
 
@@ -620,7 +613,6 @@ public class BAMToGASV_AMBIG {
         match = file.matcher( CUTOFF_LMINLMAX );
         if( match.matches() ) {
             String file = match.group( 1 );
-            String pattern;
             Scanner scan = null;
             try {
                 scan = new Scanner( new File( file ) );
@@ -630,7 +622,7 @@ public class BAMToGASV_AMBIG {
             }
             while( scan.hasNext() ) {
                 String libname = scan.next();
-                pattern = scan.next();
+                String pattern = scan.next();
 
                 // we're only looking for the name of this library.
                 if( !libname.equals( lib.name ) ) {
@@ -731,7 +723,7 @@ public class BAMToGASV_AMBIG {
         Iterator<Map.Entry<Integer, Integer>> libIter = lib.lengthHist.entrySet().iterator();
         while( libIter.hasNext() ) {
             Map.Entry<Integer, Integer> libtmp = libIter.next();
-            sd_up += libtmp.getValue().intValue() * Math.pow( libtmp.getKey().intValue() - mean, 2 );
+            sd_up += libtmp.getValue() * Math.pow( libtmp.getKey() - mean, 2 );
         }
         //double sd = Math.sqrt(sd_up/lib.counter);
         double sd = Math.sqrt( sd_up / lib.total_C );
@@ -760,17 +752,17 @@ public class BAMToGASV_AMBIG {
         Iterator<Map.Entry<Integer, Integer>> libIter = lib.lengthHist.entrySet().iterator();
         while( libIter.hasNext() ) {
             Map.Entry<Integer, Integer> libtmp = libIter.next();
-            if( counting_q <= Lmin_q && counting_q + libtmp.getValue().intValue() >= Lmin_q ) {
-                lib.Lmin = libtmp.getKey().intValue();
+            if( counting_q <= Lmin_q && counting_q + libtmp.getValue() >= Lmin_q ) {
+                lib.Lmin = libtmp.getKey();
                 //System.out.println("lib.Lmin = " + lib.Lmin + " and lib.Lmax = " + lib.Lmax);
             }
-            if( counting_q <= Lmax_q && counting_q + libtmp.getValue().intValue() >= Lmax_q ) {
-                lib.Lmax = libtmp.getKey().intValue();
+            if( counting_q <= Lmax_q && counting_q + libtmp.getValue() >= Lmax_q ) {
+                lib.Lmax = libtmp.getKey();
                 //System.out.println("lib.Lmin = " + lib.Lmin + " and lib.Lmax = " + lib.Lmax);
             }
-            counting_q += libtmp.getValue().intValue();
+            counting_q += libtmp.getValue();
             //System.out.println(libtmp.getKey() + " --> " + libtmp.getValue() + " ---" + counting_q);
-            last_value = libtmp.getKey().intValue();
+            last_value = libtmp.getKey();
         }
 
         if( lib.Lmax == Integer.MIN_VALUE ) {
@@ -843,11 +835,7 @@ public class BAMToGASV_AMBIG {
      */
     public void readBAMfile() {
         System.out.println( "Reading BAM file. Using Lmin/Lmax from GASV.in file" );
-        String id, libname = null;
-        Library lib;
-        VariantType type;
-        int recordCounter = 0; // for printing lines
-        ArrayList<String> tmpFilenames = new ArrayList<String>();
+        List<String> tmpFilenames = new ArrayList<>();
 
         // set validation stringency for SAMFileReader.
         SAMFileReader.setDefaultValidationStringency( STRINGENCY );
@@ -856,25 +844,22 @@ public class BAMToGASV_AMBIG {
         SAMFileReader inputSam = null;
         inputSam = new SAMFileReader( new File( BAMFILE ) );
 
-        for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-            libname = LIBRARY_NAMES.get( i );
+        String libname = null;
+        for( String libName : LIBRARY_NAMES ) {
+            libname = libName;
             LIBRARY_INFO.put( libname, new Library( libname ) );
         }
-        lib = LIBRARY_INFO.get( libname );
+        Library lib = LIBRARY_INFO.get( libname );
         getLminLmaxFromGASVIn( lib, GASVINPUT );
 
-        Iterator<SAMRecord> itr = inputSam.iterator();
         String currentname = "";
 
-        /*
-         *
-         */
-
-        ArrayList<SAMRecord> read1Records = new ArrayList<SAMRecord>();
-        ArrayList<SAMRecord> read2Records = new ArrayList<SAMRecord>();
+        List<SAMRecord> read1Records = new ArrayList<>();
+        List<SAMRecord> read2Records = new ArrayList<>();
         Integer read1Count = 0;
         Integer read2Count = 0;
 
+        Iterator<SAMRecord> itr = inputSam.iterator();
         while( itr.hasNext() ) {
             SAMRecord samRecord = itr.next();
             if( !samRecord.getReadName().equals( currentname ) ) {
@@ -936,24 +921,20 @@ public class BAMToGASV_AMBIG {
         inputSam.close();
         System.out.println( "Done reading BAM file.\n" );
 
-        for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-            libname = LIBRARY_NAMES.get( i );
+        for( String libName : LIBRARY_NAMES ) {
+            libname = libName;
             lib = LIBRARY_INFO.get( libname );
-            // Go through each Variant Type.
-            for( int j = 0; j < VARIANTS.length; j++ ) {
-                type = VARIANTS[j];
-
+            // Go through each Variant Tyepe.
+            for( VariantType type : VARIANTS ) {
                 // skip variant types that aren't flagged as "to-write"
                 if( type == VariantType.CONC ) {
                     continue;
                 }
-
                 // (2) Write last temporary files for variants
                 if( lib.rowsForVariant.get( type ).size() > 0 ) {
                     sortAndWriteTempFile( lib, type );
                 }
-
-				// (3) For each variant, merge temporary files into one sorted file.
+                // (3) For each variant, merge temporary files into one sorted file.
                 // Files are deleted in the merge() function.
 
                 // First, get a list of the temporary file names.
@@ -961,16 +942,12 @@ public class BAMToGASV_AMBIG {
                 for( int k = 1; k <= lib.numTmpFilesForVariant.get( type ); k++ ) {
                     tmpFilenames.add( getTmpFileName( libname, type, k ) );
                 }
-
                 System.out.println( "  Library \"" + libname + "\" type " + type + ": merging " +
                                     tmpFilenames.size() + " temporary files" );
-
-				// Now, merge files. Concordants are written differently than all
+                // Now, merge files. Concordants are written differently than all
                 // other ESP files.
                 discordantSorter.merge( tmpFilenames, getFinalFileName( libname, type ) );
-
             } // END for each variant
-
         } // END for each library
 
 		// finish analysis with remaining records in libraries.
@@ -1066,8 +1043,8 @@ public class BAMToGASV_AMBIG {
                         lib.total_RL += s.getReadLength();
                         lib.total_C += 1;
                         if( lib.lengthHist.containsKey( insertL ) ) {
-                            int tmp = lib.lengthHist.get( insertL ).intValue();
-                            lib.lengthHist.put( insertL, new Integer( tmp + 1 ) );
+                            int tmp = lib.lengthHist.get( insertL );
+                            lib.lengthHist.put( insertL, tmp + 1 );
                         } else {
                             lib.lengthHist.put( insertL, 1 );
                         }
@@ -1076,8 +1053,8 @@ public class BAMToGASV_AMBIG {
                         lib.total_C += 1;
                         lib.total_RL += s.getReadLength();
                         if( lib.lengthHist.containsKey( insertL ) ) {
-                            int tmp = lib.lengthHist.get( insertL ).intValue();
-                            lib.lengthHist.put( insertL, new Integer( tmp + 1 ) );
+                            int tmp = lib.lengthHist.get( insertL );
+                            lib.lengthHist.put(insertL, tmp + 1);
                         } else {
                             lib.lengthHist.put( insertL, 1 );
                         }
@@ -1107,23 +1084,17 @@ public class BAMToGASV_AMBIG {
 		// Check to see if we should sort and write tmp file here.
         // Now, sort and write ALL tmp files (all libraries, all types)
         if( lib.rowsForVariant.get( type ).size() >= NUM_LINES_FOR_EXTERNAL_SORT ) {
-            String libname;
-            for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-                libname = LIBRARY_NAMES.get( i );
+            for( String libname : LIBRARY_NAMES ) {
                 lib = LIBRARY_INFO.get( libname );
-
-                for( int j = 0; j < VARIANTS.length; j++ ) {
-                    if( VARIANTS[j] == VariantType.CONC ) {
+                for( VariantType varType : VARIANTS ) {
+                    if( varType == VariantType.CONC ) {
                         continue;
                     }
-
                     // if there are fewer than 1/10th of the number of reads, don't do this yet.
-                    if( lib.rowsForVariant.get( VARIANTS[j] ).size() < USE_NUMBER_READS / 10 ) {
+                    if( lib.rowsForVariant.get( varType ).size() < USE_NUMBER_READS / 10 ) {
                         continue;
                     }
-
-                    sortAndWriteTempFile( lib, VARIANTS[j] );
-
+                    sortAndWriteTempFile( lib, varType );
                 } // END for each variant
             } // END for each Library
         } // END if(lib.rowsForVariant.get(type).size() >= NUM_LINES_FOR_EXTERNAL_SORT)
@@ -1145,10 +1116,10 @@ public class BAMToGASV_AMBIG {
         }
 
         if( type == VariantType.CONC && GASVPRO_OUTPUT ) { // GASVPro calculating avg length (insert, read) for GASVPro parameters file
-            int conc_chrom = pobj.getChromosome().intValue();
+            int conc_chrom = pobj.getChromosome();
             if( lib.numConcord.containsKey( conc_chrom ) ) {
-                int tmp = lib.numConcord.get( conc_chrom ).intValue();
-                lib.numConcord.put( conc_chrom, new Integer( tmp + 1 ) );
+                int tmp = lib.numConcord.get( conc_chrom );
+                lib.numConcord.put( conc_chrom, tmp + 1 );
             } else {
                 lib.numConcord.put( conc_chrom, 1 );
             }
@@ -1160,23 +1131,17 @@ public class BAMToGASV_AMBIG {
 		// Check to see if we should sort and write tmp file here.
         // Now, sort and write ALL tmp files (all libraries, all types)
         if( lib.rowsForVariant.get( type ).size() >= NUM_LINES_FOR_EXTERNAL_SORT ) {
-            String libname;
-            for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-                libname = LIBRARY_NAMES.get( i );
+            for( String libname : LIBRARY_NAMES ) {
                 lib = LIBRARY_INFO.get( libname );
-
-                for( int j = 0; j < VARIANTS.length; j++ ) {
-                    if( VARIANTS[j] == VariantType.CONC && !WRITE_CONCORDANT ) {
+                for( VariantType varType : VARIANTS ) {
+                    if( varType == VariantType.CONC && !WRITE_CONCORDANT ) {
                         continue;
                     }
-
                     // if there are fewer than 1/10th of the number of reads, don't do this yet.
-                    if( lib.rowsForVariant.get( VARIANTS[j] ).size() < USE_NUMBER_READS / 10 ) {
+                    if( lib.rowsForVariant.get( varType ).size() < USE_NUMBER_READS / 10 ) {
                         continue;
                     }
-
-                    sortAndWriteTempFile( lib, VARIANTS[j] );
-
+                    sortAndWriteTempFile( lib, varType );
                 } // END for each variant
             } // END for each Library
         } // END if(lib.rowsForVariant.get(type).size() >= NUM_LINES_FOR_EXTERNAL_SORT)
@@ -1456,17 +1421,15 @@ public class BAMToGASV_AMBIG {
 		// MERGE CONCORDANT FILES (Anna - new June 30,2012)
         // Only when GASVPRO_FLAG is set AND LIBRARY_SEPARATED is not 'all'
         // (1) Get list of all concordant files.
-        ArrayList<String> concordantfiles = new ArrayList<String>();
-        String libname;
-        for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-            libname = LIBRARY_NAMES.get( i );
+        ArrayList<String> concordantfiles = new ArrayList<>();
+        for( String libname : LIBRARY_NAMES ) {
             String fname = getFinalFileName( libname, VariantType.CONC );
             if( new File( fname ).exists() ) {
                 concordantfiles.add( fname );
             }
         }
         // if there are no concordant files, print a warning.
-        if( concordantfiles.size() == 0 ) {
+        if( concordantfiles.isEmpty() ) {
             System.out.println( "\nWARNING: " + concordantFile + " was not created because there are no concordant files for the libraries.\n" );
         }
 
@@ -1494,14 +1457,11 @@ public class BAMToGASV_AMBIG {
      * library.
      */
     public void writeInfoFile() {
-        try {
-            BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".info" ) );
+        try( BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".info" ) ) ) {
+
             writer.write( "LibraryName\tLmin\tLmax\n" );
-            String libname;
-            Library lib;
-            for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-                libname = LIBRARY_NAMES.get( i );
-                lib = LIBRARY_INFO.get( libname );
+            for( String libname : LIBRARY_NAMES ) {
+                Library lib = LIBRARY_INFO.get( libname );
 
                 // skip if there are no reads.
                 if( lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE ) {
@@ -1512,7 +1472,6 @@ public class BAMToGASV_AMBIG {
                 //writerpro.write(libname+"\t"+LIBRARY_INFO.get(libname).getAverageInsertLength()+"\t"+LIBRARY_INFO.get(libname).getAverageReadLength()+"\t"+LIBRARY_INFO.get(libname).getConcordDist()+"\n");
             }
 
-            writer.close();
         } catch( Exception e ) {
             System.out.println( "Error writing .info file. Continuing." );
         }
@@ -1524,28 +1483,21 @@ public class BAMToGASV_AMBIG {
      * for insertions.
      */
     public void writeGASVInputFile() {
-        try {
+        try( BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasv.combined.in" ) ) ) {
             // append gasv.in to the GASVINPUT and write to .gasv.combined.in
-            BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasv.combined.in" ) );
-            String libname;
-            Library lib;
-            VariantType type;
-
             Scanner scan = new Scanner( new File( GASVINPUT ) );
             while( scan.hasNext() ) {
                 writer.write( scan.nextLine() + "\n" );
             }
             scan.close();
 
-            for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-                libname = LIBRARY_NAMES.get( i );
-                lib = LIBRARY_INFO.get( libname );
+            for( String libname : LIBRARY_NAMES ) {
+                Library lib = LIBRARY_INFO.get( libname );
                 // skip if there are no reads.
                 if( lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE ) {
                     continue;
                 }
-                for( int j = 0; j < VARIANTS.length; j++ ) {
-                    type = VARIANTS[j];
+                for( VariantType type : VARIANTS ) {
                     if( type == VariantType.CONC ||
                         type == VariantType.INS ) {
                         continue;
@@ -1569,20 +1521,18 @@ public class BAMToGASV_AMBIG {
      * Writes the .gasvpro.in file. // GASVPro - Output GASVPro parameters file
      */
     public void writeGASVPROInputFile() {
-        try {
-            if( !GASVPRO_OUTPUT ) {
-                return;
-            }
-            BufferedWriter writerpro = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasvpro.in" ) );
-            String libname;
-            Library lib;
+
+        if( !GASVPRO_OUTPUT ) {
+            return;
+        }
+
+        try( BufferedWriter writerpro = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasvpro.in" ) ) ) {
 
             int totalNC = 0;
             float totalGAvgRead = 0;
             float totalGAvgInsert = 0;
-            for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-                libname = LIBRARY_NAMES.get( i );
-                lib = LIBRARY_INFO.get( libname );
+            for( String libname : LIBRARY_NAMES ) {
+                Library lib = LIBRARY_INFO.get( libname );
                 if( lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE ) {
                     continue;
                 }
@@ -1595,7 +1545,7 @@ public class BAMToGASV_AMBIG {
             writerpro.write( "Lavg: " + totalGAvgInsert / totalNC + "\n" );
             writerpro.write( "ReadLen: " + totalGAvgRead / totalNC + "\n" );
             writerpro.write( "Lambda: " + totalGAvgInsert / GL + "\n" );
-            writerpro.close();
+
         } catch( Exception e ) {
             System.out.println( "Error writing .gasvproInput file. Continuing." );
         }
@@ -1622,11 +1572,8 @@ public class BAMToGASV_AMBIG {
         }
         System.out.println();
 
-        String libname;
-        Library lib;
-        for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-            libname = LIBRARY_NAMES.get( i );
-            lib = LIBRARY_INFO.get( libname );
+        for( String libname : LIBRARY_NAMES ) {
+            Library lib = LIBRARY_INFO.get( libname );
 
             // skip if there are no reads.
             if( lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE ) {
@@ -1649,19 +1596,15 @@ public class BAMToGASV_AMBIG {
             System.out.println( "  " + OUTPUT_PREFIX + "_all.concordant" );// GASVPro
         }
 
-        for( int i = 0; i < LIBRARY_NAMES.size(); i++ ) {
-            for( int j = 0; j < VARIANTS.length; j++ ) {
-
-                if( VARIANTS[j] == VariantType.CONC && !WRITE_CONCORDANT ) {
+        for( String libName : LIBRARY_NAMES ) {
+            for( VariantType variant : VARIANTS ) {
+                if( variant == VariantType.CONC && !WRITE_CONCORDANT ) {
                     continue;
                 }
-                if( VARIANTS[j] == VariantType.CONC && GASVPRO_OUTPUT ) // GASVPro
-                {
+                if( variant == VariantType.CONC && GASVPRO_OUTPUT ) {
                     continue;
                 }
-
-                System.out.println( "  " + getFinalFileName( LIBRARY_NAMES.get( i ), VARIANTS[j] ) );
-
+                System.out.println( "  " + getFinalFileName( libName, variant ) );
             }
         }
     }

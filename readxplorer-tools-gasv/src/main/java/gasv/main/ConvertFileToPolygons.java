@@ -21,9 +21,12 @@
 package gasv.main;
 
 import gasv.common.Out;
-import java.util.*;
-import java.io.*;
-import java.text.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ConvertFileToPolygons {
@@ -37,7 +40,7 @@ public class ConvertFileToPolygons {
             throws java.io.IOException, NullPointerException {
 
         String inFileNameMinusPath = inputFile;
-        int idxOfSlash = inputFile.lastIndexOf( "/" );
+        int idxOfSlash = inputFile.lastIndexOf( '/' );
         if( idxOfSlash != -1 ) {
             inFileNameMinusPath = inputFile.substring( idxOfSlash + 1 );
         }
@@ -63,7 +66,7 @@ public class ConvertFileToPolygons {
 
 
         ReadInput readInput = new ReadInput( inputFile );
-        ArrayList<BreakRegion>[][] breakRegions = null;
+        List<BreakRegion>[][] breakRegions = null;
         boolean fileDone = false;
 
         //in fast mode, read PES from all chromosomes into memory at once
@@ -90,13 +93,13 @@ public class ConvertFileToPolygons {
                 int chrx = i + 1;
                 int chry = j + 1;
                 Out.print1( "ConvertFileToPolygons: processing chr " + chrx + ", chr" + chry );
-                ArrayList<BreakRegion> c = null;
+                List<BreakRegion> c = null;
                 do {
                     if( useFast ) {
                         c = breakRegions[i][j];
                     } else {
                         if( c == null ) {
-                            c = new ArrayList<BreakRegion>();
+                            c = new ArrayList<>();
                         }
                         if( useBatch ) {
                             //c = readInput.readFiles(chrx, chry);

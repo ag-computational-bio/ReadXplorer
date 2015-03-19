@@ -35,6 +35,7 @@ public class Rectangle extends PolyDefault {
     }
 
 
+    @Override
     public Poly intersection( Poly p ) {
         return Clip.intersection( p, this, this.getClass().getSuperclass() );
     }

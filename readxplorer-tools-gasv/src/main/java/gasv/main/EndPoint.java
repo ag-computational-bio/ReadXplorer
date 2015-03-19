@@ -20,8 +20,6 @@
  */
 package gasv.main;
 
-import java.lang.*;
-
 
 public class EndPoint implements Cloneable {
 
@@ -67,6 +65,7 @@ public class EndPoint implements Cloneable {
     }
 
 
+    @Override
     public String toString() {
         //return "(" + x + "," + y + ")";
         return "{" + Math.round( x ) + "," + Math.round( y ) + "}";

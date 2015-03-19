@@ -41,6 +41,7 @@ public class IntervalClone extends Clone {
     }
 
 
+    @Override
     public Poly getPoly() {
         if( p == null ) {
             p = new PolyDefault();
@@ -60,6 +61,7 @@ public class IntervalClone extends Clone {
     }
 
 
+    @Override
     public String getType() {
         if( isSame_ ) {
             return "same";

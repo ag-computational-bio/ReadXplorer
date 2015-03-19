@@ -25,6 +25,7 @@ package gasv.bamtogasv;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import net.sf.samtools.SAMRecord;
@@ -33,13 +34,13 @@ import net.sf.samtools.SAMRecord;
 public class Library {
 
     public String name;
-    public ArrayList<GASVPair> firstNreads;
+    public List<GASVPair> firstNreads;
     public boolean pairedTag, mateFound, computedStats;
     public int Lmin, Lmax, counter, total_L, minRead_L, total_C, total_RL, mean, std;
-    public TreeMap<Integer, Integer> numConcord;
-    public TreeMap<Integer, Integer> lengthHist; /// TreeMap is sorted
-    public HashMap<VariantType, Integer> numTmpFilesForVariant; // <variant_type, # of tmp files written>
-    public HashMap<VariantType, ArrayList<String>> rowsForVariant; // <variant_type,lines to sort>
+    public Map<Integer, Integer> numConcord;
+    public Map<Integer, Integer> lengthHist; /// TreeMap is sorted
+    public Map<VariantType, Integer> numTmpFilesForVariant; // <variant_type, # of tmp files written>
+    public Map<VariantType, List<String>> rowsForVariant; // <variant_type,lines to sort>
 
 
     public Library( String n ) {
@@ -51,19 +52,19 @@ public class Library {
         Lmin = Integer.MIN_VALUE;
         Lmax = Integer.MIN_VALUE;
         minRead_L = Integer.MAX_VALUE;
-        lengthHist = new TreeMap<Integer, Integer>();
-        numConcord = new TreeMap<Integer, Integer>();
+        lengthHist = new TreeMap<>();
+        numConcord = new TreeMap<>();
         counter = 0;
-        firstNreads = new ArrayList<GASVPair>();
+        firstNreads = new ArrayList<>();
         pairedTag = false;
         computedStats = false;
 
-        rowsForVariant = new HashMap<VariantType, ArrayList<String>>();
-        numTmpFilesForVariant = new HashMap<VariantType, Integer>();
+        rowsForVariant = new HashMap<>();
+        numTmpFilesForVariant = new HashMap<>();
         VariantType[] varList = VariantType.values();
-        for( int v = 0; v < varList.length; v++ ) {
-            numTmpFilesForVariant.put( varList[v], 0 );
-            clearVariantBuffer( varList[v] );
+        for( VariantType varType : varList ) {
+            numTmpFilesForVariant.put( varType, 0 );
+            clearVariantBuffer( varType );
         }
     }
 
@@ -71,7 +72,7 @@ public class Library {
     // resets numLinesForVariant and rowsForVariant.
 
     public void clearVariantBuffer( VariantType t ) {
-        rowsForVariant.put( t, new ArrayList<String>() );
+        rowsForVariant.put( t, new ArrayList<>() );
     }
 
 
@@ -115,23 +116,23 @@ public class Library {
         Iterator<Map.Entry<Integer, Integer>> iter = numConcord.entrySet().iterator();
         while( iter.hasNext() ) {
             Map.Entry<Integer, Integer> libtmp = iter.next();
-            total_genome += libtmp.getValue().intValue();
+            total_genome += libtmp.getValue();
         }
         return total_genome;
     }
 
 
     public String getConcordDist() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator<Map.Entry<Integer, Integer>> iter = numConcord.entrySet().iterator();
         while( iter.hasNext() ) {
             Map.Entry<Integer, Integer> libtmp = iter.next();
-            buffer.append( libtmp.getKey().toString() + "-" + libtmp.getValue().toString() );
+            sb.append( libtmp.getKey().toString() ).append( '-' ).append(libtmp.getValue().toString());
             if( iter.hasNext() ) {
-                buffer.append( "\t" );
+                sb.append( "\t" );
             }
         }
-        return buffer.toString();
+        return sb.toString();
     }
 
 

@@ -23,7 +23,8 @@ package gasv.main;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 
 public abstract class ReadFile {
@@ -37,13 +38,13 @@ public abstract class ReadFile {
     protected int numChrom;
 	//protected ArrayList<BreakRegion> breakRegions_;
     //TODO: change name from clones to breakRegions_
-    protected ArrayList<BreakRegion> clones;
+    protected List<BreakRegion> clones;
     //protected ArrayList<Cluster>[][] shapes;
     protected GenomicPos genomicPosComparator_;
     protected String file_;
 
 
-    public ReadFile( String file, ArrayList<BreakRegion> breakRegions ) throws IOException {
+    public ReadFile( String file, List<BreakRegion> breakRegions ) throws IOException {
 		//TODO: change name from clones to breakRegions_
         //breakRegions_ = breakRegions;
         clones = breakRegions;
@@ -55,7 +56,7 @@ public abstract class ReadFile {
     }
 
 
-    public ArrayList<BreakRegion> getBreakRegions() {
+    public List<BreakRegion> getBreakRegions() {
         return clones;
     }
 
@@ -98,7 +99,7 @@ public abstract class ReadFile {
     }
 
 
-    protected void sortByFirstPos( ArrayList[][] toSort ) {
+    protected void sortByFirstPos( List[][] toSort ) {
         for( int i = 0; i < numChrom; i++ ) {
             for( int j = 0; j < numChrom; j++ ) {
                 if( toSort[i][j] != null ) {
@@ -125,7 +126,7 @@ public abstract class ReadFile {
      * BreakRegion. The BreakRegion is then placed in the provided 2D array of
      * BreakRegion ArrayList's.
      */
-    public abstract void readBreakRegions( ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException;
+    public abstract void readBreakRegions( List<BreakRegion>[][] breakRegionsArray ) throws IOException;
 
 
     /**
@@ -143,7 +144,7 @@ public abstract class ReadFile {
      * Return true if end of file reached, otherwise returns false.
      */
     public abstract boolean readNextBreakRegions( int leftChr, int rightChr,
-                                                  ArrayList<BreakRegion> br, int endWindowPos, boolean startNewChr ) throws IOException;
+                                                  List<BreakRegion> br, int endWindowPos, boolean startNewChr ) throws IOException;
 
 
     public abstract boolean getDiffChrPairReached();

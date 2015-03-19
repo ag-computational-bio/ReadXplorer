@@ -23,11 +23,10 @@ package gasv.main;
 import java.util.Comparator;
 
 
-public class GenomicPos implements Comparator {
+public class GenomicPos implements Comparator<BreakRegion> {
 
-    public int compare( Object c1, Object c2 ) {
-        BreakRegion clone1 = (BreakRegion) c1;
-        BreakRegion clone2 = (BreakRegion) c2;
+    @Override
+    public int compare( BreakRegion clone1, BreakRegion clone2 ) {
         if( Math.abs( clone1.getX() ) > Math.abs( clone2.getX() ) ) {
             return 1;
         } else if( Math.abs( clone1.getX() ) == Math.abs( clone2.getX() ) ) {

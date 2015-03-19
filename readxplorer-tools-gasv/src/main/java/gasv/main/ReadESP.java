@@ -25,7 +25,8 @@ import gasv.common.Constants;
 import gasv.common.Out;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.openide.windows.InputOutput;
 
 
@@ -54,11 +55,11 @@ public class ReadESP extends ReadFile {
     private int numConcordant_ = 0;
     private int numOverlapping_ = 0;
     private int intervalID_ = 1;
-    private HashMap<String, Integer> transcriptToIntMap = null;
+    private Map<String, Integer> transcriptToIntMap = null;
 
 
     public ReadESP( String file, int min, int max,
-                    ArrayList<BreakRegion> breakRegions, int windowSize ) throws IOException {
+                    List<BreakRegion> breakRegions, int windowSize ) throws IOException {
         super( file, breakRegions );
         lmin_ = min;
         lmax_ = max;
@@ -84,7 +85,8 @@ public class ReadESP extends ReadFile {
      * In this version of readBreakRegions(), all clones are read into memory in
      * one pass and stored in the provided 2D Array of ArrayList<breakRegions>
      */
-    public void readBreakRegions( ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException {
+    @Override
+    public void readBreakRegions( List<BreakRegion>[][] breakRegionsArray ) throws IOException {
         readBreakRegions( -1, -1, breakRegionsArray );
     }
 
@@ -93,6 +95,7 @@ public class ReadESP extends ReadFile {
      * Read in clones from the file into an ArrayList. Only read in those clones
      * that match the specified targetLeftChr and targetRightChr
      */
+    @Override
     public void readBreakRegions( int targetLeftChr, int targetRightChr ) throws IOException {
         readBreakRegions( targetLeftChr, targetRightChr, null );
     }
@@ -383,7 +386,7 @@ public class ReadESP extends ReadFile {
      * <p>
      */
     public boolean readNextBreakRegions( int targetLeftChr, int targetRightChr,
-                                         ArrayList<BreakRegion> br, int endWindowPos, boolean startNewChr ) throws IOException {
+                                         List<BreakRegion> br, int endWindowPos, boolean startNewChr ) throws IOException {
 
         //if starting on a new left, right chr pair, then need to clear the following flag
         if( startNewChr ) {
@@ -459,6 +462,7 @@ public class ReadESP extends ReadFile {
      * Returns true if a read with a chromosome pair other than the target
      * chromosome pair is encountered in the "window" reading mode.
      */
+    @Override
     public boolean getDiffChrPairReached() {
         return diffChrPairReached_;
     }
@@ -472,7 +476,7 @@ public class ReadESP extends ReadFile {
      * array.
      */
     private void readBreakRegions( int targetLeftChr, int targetRightChr,
-                                   ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException {
+                                   List<BreakRegion>[][] breakRegionsArray ) throws IOException {
 
 		//f = new java.IO.FileReader(file_);
         //b = new java.IO.BufferedReader(f);
@@ -525,7 +529,7 @@ public class ReadESP extends ReadFile {
                 int y = c.getChrY() - 1;
 
                 if( breakRegionsArray[x][y] == null ) {
-                    breakRegionsArray[x][y] = new ArrayList<BreakRegion>();
+                    breakRegionsArray[x][y] = new ArrayList<>();
                 }
 
                 breakRegionsArray[x][y].add( c );

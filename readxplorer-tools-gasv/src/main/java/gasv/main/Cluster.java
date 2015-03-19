@@ -20,16 +20,21 @@
  */
 package gasv.main;
 
-import java.util.*;
-import gasv.geom.*;
-import gasv.common.Out;
 import gasv.common.Constants;
+import gasv.common.Out;
+import gasv.geom.Poly;
+import gasv.geom.PolyDefault;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 public class Cluster {
 
     // note that clones previously just held clone names - this is what was used in ClusterAlgorithm.java
-    private ArrayList<Clone> clones_;
+    private List<Clone> clones_;
     private PolyDefault intersect_;
     private boolean mixed_;
     private boolean isClique_ = false;
@@ -42,7 +47,7 @@ public class Cluster {
 
 
     public Cluster( int chrx, int chry ) {
-        clones_ = new ArrayList<Clone>();
+        clones_ = new ArrayList<>();
         //intersect = inter;
         intersect_ = null;
         mixed_ = false;
@@ -57,7 +62,7 @@ public class Cluster {
     }
 
 
-    public ArrayList<Clone> getClones() {
+    public List<Clone> getClones() {
         return clones_;
     }
 
@@ -99,10 +104,10 @@ public class Cluster {
 
     public boolean partOf( Cluster c ) {
         boolean toReturn = false;
-        ArrayList clonesOfC = c.getClones();
-        for( int i = 0; i < clones_.size(); i++ ) {
-            for( int j = 0; j < clonesOfC.size(); j++ ) {
-                if( clones_.get( i ).equals( clonesOfC.get( j ) ) ) {
+        List<Clone> clonesOfC = c.getClones();
+        for( Clone clone_ : clones_ ) {
+            for( Clone cloneOfC : clonesOfC ) {
+                if( clone_.equals( cloneOfC ) ) {
                     toReturn = true;
                 }
             }
@@ -121,6 +126,7 @@ public class Cluster {
     }
 
 
+    @Override
     public String toString() {
 
 		//return clones + " " + intersect.print();
@@ -137,10 +143,6 @@ public class Cluster {
      */
     private void updateBoundaries( Clone clone ) {
         //update rightMostX_ and leftMostX_ if necessary
-        double rightx, leftx, topy, bottomy;
-        double x = clone.getX();
-        double y = clone.getY();
-        double lmax = clone.getLmax();
         Poly p = clone.getPoly();
         int numPts = p.getNumPoints();
         for( int i = 0; i < numPts; ++i ) {
@@ -179,7 +181,7 @@ public class Cluster {
         for( int i = 0; i < size; ++i ) {
             toReturn += clones_.get( i ).getName();
             if( i < (size - 1) ) {
-                toReturn = toReturn + ", ";
+                toReturn += ", ";
             }
         }
         return toReturn;
@@ -197,7 +199,7 @@ public class Cluster {
         for( int i = 0; i < size; ++i ) {
             toReturn += clones_.get( i ).getName();
             if( i < (size - 1) ) {
-                toReturn = toReturn + ",";
+                toReturn += ",";
             }
         }
         return toReturn;
@@ -264,7 +266,7 @@ public class Cluster {
             }
         }
 
-        ArrayList<String> splitReads = new ArrayList<String>();
+        ArrayList<String> splitReads = new ArrayList<>();
         for( int i = 0; i < clones_.size(); ++i ) {
             Clone curClone = clones_.get( i );
 			//two options:
@@ -324,7 +326,7 @@ public class Cluster {
     }
 
 
-    public void findMaximalClusters( ArrayList<Cluster> maximalList ) {
+    public void findMaximalClusters( List<Cluster> maximalList ) {
 
         if( clones_.size() > GASVMain.MAX_CLIQUE_SIZE ) {
             Out.print2( "Cluster of size " + clones_.size() + " exceeds --maxCliqueSize " +
@@ -347,8 +349,8 @@ public class Cluster {
 			//pass true to indicate this is the first top level call, and can split into rectangles
             //immediately without checking the termination condition
             //try {
-            ArrayList<Cluster> tmpMaximalList = new ArrayList<Cluster>();
-            LinkedList<ClusterNode> bfsQueue = new LinkedList<ClusterNode>();
+            List<Cluster> tmpMaximalList = new ArrayList<>();
+            LinkedList<ClusterNode> bfsQueue = new LinkedList<>();
             ClusterNode firstNode = new ClusterNode( this, true, //maxClusterSize,
                                                      tmpMaximalList,
                                                      leftMostX_, rightMostX_, topMostY_, bottomMostY_, visitedMaximalClusters, 0 );
@@ -394,19 +396,19 @@ public class Cluster {
         //				and just concatenate all clones together to get unique id of cluster.
         //				This will allow us to skip the step of evaluating whether a clique is
         //				large enough and avoid adding duplicate maximal clusters.
-        ArrayList<Clone> clones = node.cluster.getClones();
+        List<Clone> clones = node.cluster.getClones();
         boolean isTopLevel = node.isTopLevel;
         //int[] maxClusterSize = node.maxClusterSize;
-        ArrayList<Cluster> maximalList = node.maximalList;
+        List<Cluster> maximalList = node.maximalList;
         double leftMostX = node.leftMostX;
         double rightMostX = node.rightMostX;
         double topMostY = node.topMostY;
         double bottomMostY = node.bottomMostY;
-        HashMap<String, Object> visitedMaximalClusters = node.visitedMaximalClusters;
+        Map<String, Object> visitedMaximalClusters = node.visitedMaximalClusters;
         int recursionLvl = node.recursionLvl;
 
         if( !isTopLevel ) {
-            String clusterID = "";
+
 			//if fewer clones in this cluster than the current maximal cluster size, then there's no way we can
             //discover any maximal clusters here.  Just return
             // BUT, realized that I was misinterpreting maximal mode, so we need to return ALL non-dominated subclusters,
@@ -416,17 +418,17 @@ public class Cluster {
             //+ ", ignoring it since max size is " + maxClusterSize[0]);
             //return;
             //}
-
-            for( int i = 0; i < clones.size(); ++i ) {
-                Clone curClone = clones.get( i );
-                clusterID += curClone.getName();
-                clusterID += curClone.getX();
-                clusterID += curClone.getY();
+            StringBuilder sb = new StringBuilder();
+            for( Clone curClone : clones ) {
+                sb.append( curClone.getName() );
+                sb.append( curClone.getX() );
+                sb.append( curClone.getY() );
 				//lengths shouldn't add to uniqueness since almost always the same length
                 //clusterID += curClone.getXLen();
                 //clusterID += curClone.getYLen();
-                clusterID += " ";
+                sb.append( ' ' );
             }
+            String clusterID = sb.toString();
             Out.print2( "Recursion level: " + recursionLvl + "... Considering cluster: " + clusterID +
                      " with BFS QUEUE size " + bfsQueue.size() );
             if( recursionLvl > 1000 ) {
@@ -647,8 +649,8 @@ public class Cluster {
      */
     private static boolean dominates( Cluster cluster1, Cluster cluster2 ) {
         boolean c1Dominates = true;
-        ArrayList<Clone> c1 = cluster1.getClones();
-        ArrayList<Clone> c2 = cluster2.getClones();
+        List<Clone> c1 = cluster1.getClones();
+        List<Clone> c2 = cluster2.getClones();
         for( int i = 0; i < c2.size(); ++i ) {
             if( !c1.contains( c2.get( i ) ) ) {
                 c1Dominates = false;
@@ -692,18 +694,18 @@ class ClusterNode {
 
     Cluster cluster;
     boolean isTopLevel;
-    ArrayList<Cluster> maximalList;
+    List<Cluster> maximalList;
     double leftMostX;
     double rightMostX;
     double topMostY;
     double bottomMostY;
-    HashMap<String, Object> visitedMaximalClusters;
+    Map<String, Object> visitedMaximalClusters;
     int recursionLvl;
 
 
-    public ClusterNode( Cluster clusterP, boolean isTopLevelP, ArrayList<Cluster> maximalListP,
+    public ClusterNode( Cluster clusterP, boolean isTopLevelP, List<Cluster> maximalListP,
                         double leftMostXP, double rightMostXP, double topMostYP, double bottomMostYP,
-                        HashMap<String, Object> visitedMaximalClustersP, int recursionLvlP ) {
+                        Map<String, Object> visitedMaximalClustersP, int recursionLvlP ) {
 
         cluster = clusterP;
         isTopLevel = isTopLevelP;

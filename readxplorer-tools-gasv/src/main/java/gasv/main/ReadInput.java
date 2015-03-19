@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ReadInput {
@@ -36,11 +37,11 @@ public class ReadInput {
      */
     FileReader f;
     BufferedReader b;
-    ArrayList<String> CGHfiles;
+    List<String> CGHfiles;
     private String filename_;
     boolean setFiles;
     private ReadFile singleReadFile_;
-    private ArrayList<ReadFile> readFiles_;
+    private List<ReadFile> readFiles_;
     private ReadFile[] arrayOfReadFiles_ = null;
     private int[] curPosArray_ = null;
     private int[] endWindowPosArray_ = null;
@@ -93,7 +94,7 @@ public class ReadInput {
      * store results in the provided 2D array.
      */
     public void readSingleFile( int lmin, int lmax,
-                                ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException {
+                                List<BreakRegion>[][] breakRegionsArray ) throws IOException {
 
         readSingleFile( -1, -1, lmin, lmax, breakRegionsArray );
     }
@@ -104,7 +105,7 @@ public class ReadInput {
      * store results in the ArrayList that is returned. Only those results
      * matching the specified chr numbers are returned.
      */
-    public ArrayList<BreakRegion> readSingleFile( int leftChr, int rightChr, int lmin,
+    public List<BreakRegion> readSingleFile( int leftChr, int rightChr, int lmin,
                                                   int lmax ) throws IOException {
 
         return readSingleFile( leftChr, rightChr, lmin, lmax, null );
@@ -116,16 +117,16 @@ public class ReadInput {
      * store results either in the provided 2D array, or if the 2D array is
      * null, then in the returned ArrayList. Returns null if error occurs.
      */
-    private ArrayList<BreakRegion> readSingleFile( int leftChr, int rightChr, int lmin, int lmax,
-                                                   ArrayList<BreakRegion>[][] breakRegionsArray )
+    private List<BreakRegion> readSingleFile( int leftChr, int rightChr, int lmin, int lmax,
+                                                   List<BreakRegion>[][] breakRegionsArray )
             throws IOException {
 
-        ArrayList<BreakRegion> breakRegions = null;
+        List<BreakRegion> breakRegions = null;
 
 		//if 2D array is null, need to provide an ArrayList for ReadFile constructors
         // in which BreakRegion's can be placed
         if( breakRegionsArray == null ) {
-            breakRegions = new ArrayList<BreakRegion>();
+            breakRegions = new ArrayList<>();
         }
         ReadFile r = this.createReadFile( lmin, lmax, breakRegions );
 
@@ -144,7 +145,7 @@ public class ReadInput {
 
 
     private ReadFile createReadFile( int lmin, int lmax,
-                                     ArrayList<BreakRegion> breakRegions ) throws java.io.IOException {
+                                     List<BreakRegion> breakRegions ) throws java.io.IOException {
         f = new FileReader( filename_ );
         b = new BufferedReader( f );
 
@@ -208,7 +209,7 @@ public class ReadInput {
      * left and right chr.
      */
     public boolean readWindowFromSingleFile( int targetChr,
-                                             ArrayList<BreakRegion> br ) throws IOException {
+                                             List<BreakRegion> br ) throws IOException {
         return readWindowFromSingleFile( targetChr, targetChr, -1, -1, br );
     }
 
@@ -223,7 +224,7 @@ public class ReadInput {
      * @return true if end of file reached, false otherwise
      */
     public boolean readWindowFromSingleFile( int leftChr, int rightChr, int lmin,
-                                             int lmax, ArrayList<BreakRegion> br ) throws IOException {
+                                             int lmax, List<BreakRegion> br ) throws IOException {
 
         if( singleReadFile_ == null ) {
             singleReadFile_ = this.createReadFile( lmin, lmax, br );
@@ -266,9 +267,9 @@ public class ReadInput {
      * within it into a ReadFile object and returning these objects in an
      * ArrayList.
      */
-    private ArrayList<ReadFile> createReadFiles( ArrayList<BreakRegion> breakRegions ) throws IOException {
+    private List<ReadFile> createReadFiles( List<BreakRegion> breakRegions ) throws IOException {
 
-        ArrayList<ReadFile> readFiles = new ArrayList<ReadFile>();
+        List<ReadFile> readFiles = new ArrayList<>();
         //singleReadFile_ = this.createReadFile(lmin, lmax, br);
         f = new FileReader( filename_ );
         b = new BufferedReader( f );
@@ -287,7 +288,7 @@ public class ReadInput {
             ReadFile r;
 
             //also ignore blank lines
-            if( line != null && line.length == 1 && line[0].equals( "" ) ) {
+            if( line != null && line.length == 1 && line[0].isEmpty( ) ) {
                 nextLine = b.readLine();
                 continue;
             }
@@ -344,7 +345,7 @@ public class ReadInput {
      * @return true if end of all files reached, false otherwise
      */
     public boolean readWindowFromFiles( int leftChr, int rightChr,
-                                        ArrayList<BreakRegion> br ) throws IOException {
+                                        List<BreakRegion> br ) throws IOException {
 
         int numFiles = 0;
         //only need to initialize readFiles_ variable first time through
@@ -420,7 +421,7 @@ public class ReadInput {
      * Parses the files for break regions and returns them in the provided
      * breakRegionsArray list
      */
-    public void readFiles( ArrayList<BreakRegion>[][] breakRegionsArray )
+    public void readFiles( List<BreakRegion>[][] breakRegionsArray )
             throws IOException {
         readFiles( -1, -1, breakRegionsArray );
     }
@@ -430,7 +431,7 @@ public class ReadInput {
      * Parses the files for break regions with left chromosome in "leftChr" and
      * right chromosome in "rightChr" and returns these regions in an ArrayList.
      */
-    public ArrayList<BreakRegion> readFiles( int leftChr, int rightChr ) throws IOException {
+    public List<BreakRegion> readFiles( int leftChr, int rightChr ) throws IOException {
         return readFiles( leftChr, rightChr, null );
     }
 
@@ -442,20 +443,20 @@ public class ReadInput {
      * breakRegions argument is not null, leftChr and rightChr are ignored and
      * all break regions will be read into the breakRegions 2D array.
      */
-    private ArrayList<BreakRegion> readFiles( int leftChr, int rightChr,
-                                              ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException {
+    private List<BreakRegion> readFiles( int leftChr, int rightChr,
+                                              List<BreakRegion>[][] breakRegionsArray ) throws IOException {
 		//ArrayList<BreakRegion>[][] breakRegions
         ////	= new ArrayList[GASVMain.NUM_CHROM][GASVMain.NUM_CHROM];
 
-        ArrayList<BreakRegion> breakRegions = null;
+        List<BreakRegion> breakRegions = null;
 
 		//if 2D array is null, need to provide an ArrayList for ReadFile constructors
         // in which BreakRegion's can be placed
         if( breakRegionsArray == null ) {
-            breakRegions = new ArrayList<BreakRegion>();
+            breakRegions = new ArrayList<>();
         }
 
-        ArrayList<ReadFile> readFiles = this.createReadFiles( breakRegions );
+        List<ReadFile> readFiles = this.createReadFiles( breakRegions );
 
         for( int i = 0; i < readFiles.size(); ++i ) {
             ReadFile r = readFiles.get( i );
@@ -596,7 +597,7 @@ public class ReadInput {
      * Assumes file is sorted so can always seek to the proper position after at
      * least one pass through
      */
-    public void readSingleCGHFileByChr( int chr, ArrayList<BreakRegion> cgh ) throws IOException {
+    public void readSingleCGHFileByChr( int chr, List<BreakRegion> cgh ) throws IOException {
 
         //lmin and lmax don't matter for CGH, just pass -1
         if( singleReadFile_ == null ) {
@@ -653,7 +654,7 @@ public class ReadInput {
      * Assumes files are sorted so can always seek to the proper position after
      * at least one pass through
      */
-    public void readCGHFilesByChr( int chr, ArrayList<BreakRegion> cgh ) throws IOException {
+    public void readCGHFilesByChr( int chr, List<BreakRegion> cgh ) throws IOException {
 
         //only need to initialize readFiles_ variable first time through
         if( readFiles_ == null ) {

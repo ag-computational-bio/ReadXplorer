@@ -151,7 +151,7 @@ public class GASVMain {
 
         //io.getOut().println("Clone 1: " + Clone1.getName() + "\tClone 2:" + Clone2.getName());
 
-        int slope = 0;
+        int slope;
         if( Clone1.getType().equals( "same" ) ) {
             slope = -1;
         } else {
@@ -295,7 +295,7 @@ public class GASVMain {
         IO.getOut().println( "--split            Ignored unless in --cluster mode. This option specifies that candidate split reads are output for each cluster as an additional output column. The --readlength option must be specified." );
         IO.getOut().println( "--readlength <val> The length of each read. Required for --split mode." );
 
-        return;
+        
     }
 
 

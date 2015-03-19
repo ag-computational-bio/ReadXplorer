@@ -25,7 +25,7 @@ import gasv.common.Constants;
 import gasv.common.Out;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
+import java.util.List;
 import org.openide.windows.InputOutput;
 
 
@@ -55,7 +55,7 @@ public class ReadCGH extends ReadFile {
     private RandomAccessFile cghFile_;
 
 
-    public ReadCGH( String file, ArrayList<BreakRegion> breakRegions ) throws IOException {
+    public ReadCGH( String file, List<BreakRegion> breakRegions ) throws IOException {
         super( file, breakRegions );
 
         //open in read-only mode
@@ -113,12 +113,13 @@ public class ReadCGH extends ReadFile {
 
 
     public boolean readNextBreakRegions( int leftChr, int rightChr,
-                                         ArrayList<BreakRegion> br, int endWindowPos,
+                                         List<BreakRegion> br, int endWindowPos,
                                          boolean startNewChr ) throws IOException {
         return false;
     }
 
 
+    @Override
     public boolean getDiffChrPairReached() {
         return diffChrPairReached_;
     }
@@ -133,7 +134,7 @@ public class ReadCGH extends ReadFile {
      * still be the end position... unless end of file reached without hitting a
      * different chromosome, then 2nd element will be -1.
      */
-    public long[] readBreakRegions( int chr, ArrayList<BreakRegion> cgh, long startPos ) throws IOException {
+    public long[] readBreakRegions( int chr, List<BreakRegion> cgh, long startPos ) throws IOException {
 
         long[] ret = new long[2];
         ret[0] = -1;
@@ -206,13 +207,15 @@ public class ReadCGH extends ReadFile {
 
     //CURRENTLY UNSUPPORTED!
 
-    public void readBreakRegions( ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException {
+    @Override
+    public void readBreakRegions( List<BreakRegion>[][] breakRegionsArray ) throws IOException {
         readBreakRegions( -1, -1, breakRegionsArray );
     }
 
 
     //CURRENTLY UNSUPPORTED!
 
+    @Override
     public void readBreakRegions( int targetLeftChr, int targetRightChr ) throws IOException {
         readBreakRegions( targetLeftChr, targetRightChr, null );
     }
@@ -222,7 +225,7 @@ public class ReadCGH extends ReadFile {
 
 
     private void readBreakRegions( int targetLeftChr, int targetRightChr,
-                                   ArrayList<BreakRegion>[][] breakRegionsArray ) throws IOException {
+                                   List<BreakRegion>[][] breakRegionsArray ) throws IOException {
 
     }
 

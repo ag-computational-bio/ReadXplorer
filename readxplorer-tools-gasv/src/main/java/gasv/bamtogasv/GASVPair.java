@@ -29,7 +29,7 @@ public class GASVPair {
 
     private int first_start, first_end, second_start, second_end;
     private char first_ori, second_ori;
-    private Integer first_chrom, second_chrom;
+    private int first_chrom, second_chrom;
     private String readname;
     boolean badChrParse = false;
 
@@ -114,17 +114,17 @@ public class GASVPair {
 
 
     public boolean equalConvPair() {
-        return first_ori == '+' && second_ori == '-' ? true : false;
+        return first_ori == '+' && second_ori == '-';
     }
 
 
     public boolean equalChromosome() {
-        return first_chrom == second_chrom ? true : false;
+        return first_chrom == second_chrom;
     }
 
 
     public boolean equalStrand() {
-        return first_ori == second_ori ? true : false;
+        return first_ori == second_ori;
     }
 
 
@@ -133,7 +133,7 @@ public class GASVPair {
     }
 
 
-    public int parseChr( String str ) {
+    public final int parseChr( String str ) {
         if( BAMToGASV.CHR_NAMES == null ) {
             try {
                 return Integer.parseInt( str );

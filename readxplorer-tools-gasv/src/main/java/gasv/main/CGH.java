@@ -48,11 +48,13 @@ public class CGH extends BreakRegion {
     }
 
 
+    @Override
     public double getX() {
         return x_;
     }
 
 
+    @Override
     public double getY() {
         return y_;
     }
@@ -63,6 +65,7 @@ public class CGH extends BreakRegion {
     }
 
 
+    @Override
     public String getName() {
         return probe1_ + "_" + probe2_;
     }

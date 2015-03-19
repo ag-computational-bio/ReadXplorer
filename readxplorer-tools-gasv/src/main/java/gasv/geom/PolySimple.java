@@ -43,10 +43,10 @@
 
 package gasv.geom;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -69,7 +69,7 @@ public class PolySimple implements Poly {
     /**
      * The list of Point2D objects in the polygon.
      */
-    protected List m_List = new ArrayList();
+    protected List<Point2D> m_List = new ArrayList<>();
 
     /** Flag used by the Clip algorithm */
     private boolean m_Contributes = true;
@@ -92,6 +92,7 @@ public class PolySimple implements Poly {
      * <strong>WARNING:</strong> This method failse if the first point appears
      * more than once in the list.
      */
+    @Override
     public boolean equals( Object obj ) {
         if( !(obj instanceof PolySimple) ) {
             return false;
@@ -151,6 +152,7 @@ public class PolySimple implements Poly {
      * @return an integer value that is the same for two objects whenever their
      *         internal representation is the same (equals() is true)
      */
+    @Override
     public int hashCode() {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // !!! WARNING:  This hash and equals break the contract. !!!
@@ -164,6 +166,7 @@ public class PolySimple implements Poly {
     /**
      * Return a string briefly describing the polygon.
      */
+    @Override
     public String toString() {
         return "PolySimple: num_points=" + getNumPoints();
     }
@@ -175,6 +178,7 @@ public class PolySimple implements Poly {
     /**
      * Remove all of the points. Creates an empty polygon.
      */
+    @Override
     public void clear() {
         m_List.clear();
     }
@@ -183,6 +187,7 @@ public class PolySimple implements Poly {
     /**
      * Add a point to the first inner polygon.
      */
+    @Override
     public void add( double x, double y ) {
         add( new Point2D.Double( x, y ) );
     }
@@ -191,6 +196,7 @@ public class PolySimple implements Poly {
     /**
      * Add a point to the first inner polygon.
      */
+    @Override
     public void add( Point2D p ) {
         m_List.add( p );
     }
@@ -199,6 +205,7 @@ public class PolySimple implements Poly {
     /**
      * Throws IllegalStateexception if called
      */
+    @Override
     public void add( Poly p ) {
         throw new IllegalStateException( "Cannot add poly to a simple poly." );
     }
@@ -207,6 +214,7 @@ public class PolySimple implements Poly {
     /**
      * Return true if the polygon is empty
      */
+    @Override
     public boolean isEmpty() {
         return m_List.isEmpty();
     }
@@ -215,6 +223,7 @@ public class PolySimple implements Poly {
     /**
      * Returns the bounding rectangle of this polygon.
      */
+    @Override
     public Rectangle2D getBounds() {
         double xmin = Double.MAX_VALUE;
         double ymin = Double.MAX_VALUE;
@@ -246,6 +255,7 @@ public class PolySimple implements Poly {
      * Returns <code>this</code> if <code>polyIndex = 0</code>, else it throws
      * IllegalStateException.
      */
+    @Override
     public Poly getInnerPoly( int polyIndex ) {
         if( polyIndex != 0 ) {
             throw new IllegalStateException( "PolySimple only has one poly" );
@@ -257,6 +267,7 @@ public class PolySimple implements Poly {
     /**
      * Always returns 1.
      */
+    @Override
     public int getNumInnerPoly() {
         return 1;
     }
@@ -265,6 +276,7 @@ public class PolySimple implements Poly {
     /**
      * Return the number points of the first inner polygon
      */
+    @Override
     public int getNumPoints() {
         return m_List.size();
     }
@@ -273,22 +285,25 @@ public class PolySimple implements Poly {
     /**
      * Return the X value of the point at the index in the first inner polygon
      */
+    @Override
     public double getX( int index ) {
-        return ((Point2D) m_List.get( index )).getX();
+        return m_List.get( index ).getX();
     }
 
 
     /**
      * Return the Y value of the point at the index in the first inner polygon
      */
+    @Override
     public double getY( int index ) {
-        return ((Point2D) m_List.get( index )).getY();
+        return m_List.get( index ).getY();
     }
 
 
     /**
      * Always returns false since PolySimples cannot be holes.
      */
+    @Override
     public boolean isHole() {
         return false;
     }
@@ -297,6 +312,7 @@ public class PolySimple implements Poly {
     /**
      * Throws IllegalStateException if called.
      */
+    @Override
     public void setIsHole( boolean isHole ) {
         throw new IllegalStateException( "PolySimple cannot be a hole" );
     }
@@ -308,6 +324,7 @@ public class PolySimple implements Poly {
      * <p>
      * @throws IllegalStateException if <code>polyIndex != 0</code>
      */
+    @Override
     public boolean isContributing( int polyIndex ) {
         if( polyIndex != 0 ) {
             throw new IllegalStateException( "PolySimple only has one poly" );
@@ -322,6 +339,7 @@ public class PolySimple implements Poly {
      * <p>
      * @throws IllegalStateException if <code>polyIndex != 0</code>
      */
+    @Override
     public void setContributing( int polyIndex, boolean contributes ) {
         if( polyIndex != 0 ) {
             throw new IllegalStateException( "PolySimple only has one poly" );
@@ -336,6 +354,7 @@ public class PolySimple implements Poly {
      * <p>
      * @return The returned Poly is of type PolySimple
      */
+    @Override
     public Poly intersection( Poly p ) {
         return Clip.intersection( this, p, this.getClass() );
     }
@@ -347,6 +366,7 @@ public class PolySimple implements Poly {
      * <p>
      * @return The returned Poly is of type PolySimple
      */
+    @Override
     public Poly union( Poly p ) {
         return Clip.union( this, p, this.getClass() );
     }
@@ -358,6 +378,7 @@ public class PolySimple implements Poly {
      * <p>
      * @return The returned Poly is of type PolySimple
      */
+    @Override
     public Poly xor( Poly p ) {
         return Clip.xor( p, this, this.getClass() );
     }
@@ -369,6 +390,7 @@ public class PolySimple implements Poly {
      * The algorithm for the area of a complex polygon was take from code by
      * Joseph O'Rourke author of " Computational Geometry in C".
      */
+    @Override
     public double getArea() {
         if( getNumPoints() < 3 ) {
             return 0.0;

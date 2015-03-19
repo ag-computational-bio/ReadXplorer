@@ -119,6 +119,7 @@ public class PairedCGH extends CGH {
     // smaller y value) - then when x's and y's are switched, coord2_ becomes the upper bound of the rectangle
     // (the greater y value) and it is higher than the y=x dividing line at x=coord3_.
 
+    @Override
     public String getName() {
         return probe1_ + "_" + probe2_ + "_" + probe3_ + "_" + probe4_;
     }

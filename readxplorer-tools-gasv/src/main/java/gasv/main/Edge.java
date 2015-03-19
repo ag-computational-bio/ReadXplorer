@@ -83,6 +83,7 @@ public class Edge implements Cloneable {
     //public String toString(){ return "{"+left.toString() +"," + right.toString() + "}"; }
 
 
+    @Override
     public String toString() {
         return "{LEFT:" + left.toString() + ", RIGHT:" + right.toString() + "}";
     }
