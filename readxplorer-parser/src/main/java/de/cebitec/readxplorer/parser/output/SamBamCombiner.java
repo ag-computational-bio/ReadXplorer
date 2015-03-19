@@ -24,7 +24,6 @@ import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SamUtils;
 import java.io.File;
 import java.util.ArrayList;
@@ -42,9 +41,9 @@ import org.openide.util.NbBundle;
 /**
  * Combines two mapping files (e.g. read 1 and read2 of the same pairs) in one
  * file. The first trackjob contains the new file name afterwards, while the
- * second trackjob contains an empty file name to prevent reuse of it after
- * the combination.
- *
+ * second trackjob contains an empty file name to prevent reuse of it after the
+ * combination.
+ * <p>
  * @author -Rolf Hilker-
  */
 public class SamBamCombiner implements CombinerI {
@@ -63,11 +62,10 @@ public class SamBamCombiner implements CombinerI {
      * by calling "combineData".
      * <p>
      * @param trackJob1      containing the first file before the merge and the
-     *                       new
-     *                       file name after the merge process
+     *                       new file name after the merge process
      * @param trackJob2      containing the second file, which is merged with
-     *                       the first
-     *                       an its file path is reset to an empty string afterwards
+     *                       the first an its file path is reset to an empty
+     *                       string afterwards
      * @param sortCoordinate true, if the combined file should be sorted by
      *                       coordinate and false otherwise
      */
@@ -108,8 +106,7 @@ public class SamBamCombiner implements CombinerI {
             SAMFileHeader header = samBamReader.getFileHeader();
             if( sortCoordinate ) {
                 header.setSortOrder( SAMFileHeader.SortOrder.coordinate );
-            }
-            else {
+            } else {
                 header.setSortOrder( SAMFileHeader.SortOrder.unsorted );
             }
 
@@ -134,13 +131,7 @@ public class SamBamCombiner implements CombinerI {
             samBamFileWriter.close();
 
             if( sortCoordinate ) {
-                try( SAMFileReader samReaderNew = new SAMFileReader( outputFile ) ) { //close is performed by try statement
-                    samReaderNew.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-                    SamUtils utils = new SamUtils();
-                    utils.registerObserver( this );
-                    success = utils.createIndex( samReaderNew, new File( outputFile + Properties.BAM_INDEX_EXT ) );
-                    utils.removeObserver( this );
-                }
+                success = SamUtils.createBamIndex( outputFile, this );
             }
 
             long finish = System.currentTimeMillis();
@@ -153,14 +144,13 @@ public class SamBamCombiner implements CombinerI {
 
 
     /**
-     * Carries out the actual I/O stuff. Observers are noticed in case a read
-     * cannot be processed.
+     * Carries out the actual I/O stuff. Also sets the proper read pair flags in
+     * the {@link SAMRecord}. Observers are noticed in case a read cannot be processed.
      * <p>
      * @param samBamItor       the iterator to read sam records from
      * @param samBamFileWriter the writer to write to
      * @param isFstFile        true, if this is the file containing read1, false
-     *                         if
-     *                         this is the file containing read2 of the pairs
+     *                         if this is the file containing read2 of the pairs
      */
     private void readAndWrite( final SAMRecordIterator samBamItor, final SAMFileWriter samBamFileWriter, final boolean isFstFile ) {
 
@@ -170,19 +160,20 @@ public class SamBamCombiner implements CombinerI {
         while( samBamItor.hasNext() ) {
             try {
                 record = samBamItor.next();
-                CommonsMappingParser.checkOrAddPairTag( record, isFstFile );
+                record.setReadPairedFlag( true );
+                record.setFirstOfPairFlag( isFstFile );
+                record.setSecondOfPairFlag( !isFstFile );
+                record.setMateUnmappedFlag( true ); //we do not know whether mate from other file is mapped or not
+                CommonsMappingParser.checkOrRemovePairTag( record );
                 samBamFileWriter.addAlignment( record );
-            }
-            catch( RuntimeEOFException e ) {
+            } catch( RuntimeEOFException e ) {
                 this.notifyObservers( "Read could not be added to new file: " + record.getReadName() );
-            }
-            catch( SAMFormatException e ) {
+            } catch( SAMFormatException e ) {
                 if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
                     this.notifyObservers( e.getMessage() );
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
             }
-            noReads++;
-            if( noReads % 500000 == 0 ) {
+            if( ++noReads % 500000 == 0 ) {
                 long finish = System.currentTimeMillis();
                 this.notifyObservers( Benchmark.calculateDuration( startTime, finish, noReads + " reads converted..." ) );
             }

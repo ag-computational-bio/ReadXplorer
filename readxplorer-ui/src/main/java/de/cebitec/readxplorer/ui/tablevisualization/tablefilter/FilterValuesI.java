@@ -38,7 +38,7 @@ public interface FilterValuesI {
      * @param cutoff             the cutoff value
      * @param currentEntryValue  the current entry value from the row
      */
-    public void filterTable( DefaultTableModel filteredTableModel, Vector row, double cutoff, double currentEntryValue );
+    void filterTable( DefaultTableModel filteredTableModel, Vector row, double cutoff, double currentEntryValue );
 
 
 }

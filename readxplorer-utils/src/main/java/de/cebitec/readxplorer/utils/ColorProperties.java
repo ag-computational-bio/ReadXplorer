@@ -26,7 +26,7 @@ import java.awt.Color;
  *
  * @author ddoppmeier, rhilker
  */
-public class ColorProperties {
+public final class ColorProperties {
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -63,7 +63,7 @@ public class ColorProperties {
     /**
      * Standard color for single best match reads = light yellow.
      */
-    public static Color BEST_MATCH_SINGLE = new Color( 238, 216, 13 );
+    public static final Color BEST_MATCH_SINGLE = new Color( 238, 216, 13 );
     /**
      * Standard color for perfect match reads = green.
      */
@@ -71,7 +71,7 @@ public class ColorProperties {
     /**
      * Standard color for single perfect match reads = light green.
      */
-    public static Color PERFECT_MATCH_SINGLE = new Color( 38, 180, 36 );
+    public static final Color PERFECT_MATCH_SINGLE = new Color( 38, 180, 36 );
     // double track panel specific colors
     /**
      * Standard color for coverage difference of two tracks = blue.

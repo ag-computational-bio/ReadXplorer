@@ -19,12 +19,14 @@ package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,14 +51,13 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * <p>
      * @param results      the results of the covered feature detection
      * @param trackMap     the map of track ids to the tracks, for which the
-     *                     covered
-     *                     feature detection was carried out
+     *                     covered feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
     public CoveredFeatureResult( List<CoveredFeature> results, Map<Integer, PersistentTrack> trackMap, PersistentReference reference,
                                  boolean combineTracks, int trackColumn, int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
-        this.results = results;
+        this.results = new ArrayList<>( results );
 
     }
 
@@ -65,7 +66,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * @return The current content of the result list.
      */
     public List<CoveredFeature> getResults() {
-        return results;
+        return Collections.unmodifiableList( results );
     }
 
 
@@ -74,7 +75,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * synchronizes the list and prevents making changes during the adding
      * process.
      * <p>
-     * @param coveredFeatures
+     * @param coveredFeatures The new list of covered features to add
      */
     public void addAllToResult( List<CoveredFeature> coveredFeatures ) {
         this.results.addAll( coveredFeatures );
@@ -136,7 +137,8 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add( coveredFeature.getPercentCovered() );
             coveredFeatureRow.add( coveredFeature.getNoCoveredBases() );
             coveredFeatureRow.add( feature.getLocus() );
-            coveredFeatureRow.add( feature.getEcNumber() );
+            UrlWithTitle url = GeneralUtils.createEcUrl( feature.getEcNumber() );
+            coveredFeatureRow.add( url != null ? url : "" );
             coveredFeatureRow.add( feature.getProduct() );
 
             coveredFeaturesResultList.add( coveredFeatureRow );
@@ -184,8 +186,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         String tableHeader;
         if( parameters.isGetCoveredFeatures() ) {
             tableHeader = "Covered Features Table";
-        }
-        else {
+        } else {
             tableHeader = "Uncovered Features Table";
         }
         sheetNames.add( tableHeader );

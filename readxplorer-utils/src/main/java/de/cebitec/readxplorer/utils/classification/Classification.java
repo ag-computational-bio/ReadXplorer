@@ -29,13 +29,13 @@ public interface Classification {
     /**
      * @return The string representation associated with this Classification.
      */
-    public String getTypeString();
+    String getTypeString();
 
 
     /**
      * @return The integer value associated with this Classification.
      */
-    public int getTypeByte();
+    int getTypeByte();
 
 
 }

@@ -28,13 +28,16 @@ import java.util.Set;
  *
  * @author kstaderm
  */
-public class ProcessingLog {
+public final class ProcessingLog {
 
     private static ProcessingLog instance;
     private StringBuilder gnuRprocessing = new StringBuilder();
     private Map<String, Object> properties = null;
 
 
+    /**
+     * Instantiation not allowed.
+     */
     private ProcessingLog() {
     }
 
@@ -48,7 +51,12 @@ public class ProcessingLog {
 
 
     public synchronized void logGNURoutput( String output ) {
-        gnuRprocessing.append( output );
+        gnuRprocessing.append( output ).append( "\n" );
+    }
+
+
+    public synchronized void logGNURinput( String input ) {
+        gnuRprocessing.append( "> " ).append( input ).append( "\n" );
     }
 
 
@@ -81,8 +89,7 @@ public class ProcessingLog {
                 if( currentProperty instanceof Map ) {
                     Map currentPropertyMap = (Map) currentProperty;
                     log.append( key ).append( " = " ).append( Arrays.deepToString( currentPropertyMap.values().toArray() ) ).append( System.getProperty( "line.separator" ) );
-                }
-                else {
+                } else {
                     log.append( key ).append( " = " ).append( currentProperty.toString() ).append( System.getProperty( "line.separator" ) );
                 }
             }

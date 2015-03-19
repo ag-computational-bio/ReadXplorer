@@ -20,12 +20,12 @@ package de.cebitec.readxplorer.databackend;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairResultPersistent;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairResultPersistent;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.sql.Timestamp;
@@ -39,6 +39,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.INFO;
+
 
 /**
  * This mapping thread should be used for analyses, but not for visualizing
@@ -49,12 +51,15 @@ import java.util.logging.Logger;
  */
 public class MappingThread extends RequestThread {
 
-    public static int FIXED_INTERVAL_LENGTH = 1000;
+    private static final Logger LOG = Logger.getLogger( MappingThread.class.getName() );
+
+
+    private static final int FIXED_INTERVAL_LENGTH = 1000;
     private final List<PersistentTrack> tracks;
-    ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private List<Mapping> currentMappings;
     private Collection<ReadPairGroup> currentReadPairs;
     private PersistentReference refGenome;
+    protected ConcurrentLinkedQueue<IntervalRequest> requestQueue;
 
 
     /**
@@ -96,10 +101,10 @@ public class MappingThread extends RequestThread {
      */
     List<Mapping> loadMappings( final IntervalRequest request ) {
         ArrayList<Mapping> mappingList = new ArrayList<>();
-        if( request.getFrom() < request.getTo()  &&  request.getFrom() > 0  &&  request.getTo() > 0 ) {
+        if( request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0 ) {
 
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp );
+            LOG.log( INFO, "{0}: Reading mapping data from file...", currentTimestamp );
 
             mappingList.ensureCapacity( tracks.size() );
             for( final PersistentTrack track : tracks ) {
@@ -113,7 +118,7 @@ public class MappingThread extends RequestThread {
             }
 
             currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
+            LOG.log( INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
 
         }
         return mappingList;
@@ -132,7 +137,7 @@ public class MappingThread extends RequestThread {
     public List<Mapping> loadReducedMappings( final IntervalRequest request ) {
 
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp );
+        LOG.log( INFO, "{0}: Reading mapping data from file...", currentTimestamp );
 
         List<Mapping> mappings = new ArrayList<>( tracks.size() );
         for( final PersistentTrack track : tracks ) {
@@ -146,7 +151,7 @@ public class MappingThread extends RequestThread {
         }
 
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
+        LOG.log( INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
 
         return mappings;
     }
@@ -190,29 +195,24 @@ public class MappingThread extends RequestThread {
                 if( doesNotMatchLatestRequestBounds( request ) ) {
                     if( request.getDesiredData() == Properties.READ_PAIRS ) {
                         this.currentReadPairs = this.getReadPairMappings( request );
-                    }
-                    else if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
+                    } else if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
                         currentMappings = this.loadReducedMappings( request );
-                    }
-                    else {
+                    } else {
                         currentMappings = this.loadMappings( request );
                     }
                     //switch between ordinary mappings and read pairs
                     if( request.getDesiredData() != Properties.READ_PAIRS ) {
                         request.getSender().receiveData( new MappingResult( currentMappings, request ) );
-                    }
-                    else {
+                    } else {
                         request.getSender().receiveData( new ReadPairResultPersistent( currentReadPairs, request ) );
                     }
                 }
 
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep( 10 );
-                }
-                catch( InterruptedException ex ) {
-                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
+                } catch( InterruptedException ex ) {
+                    LOG.log( Level.SEVERE, null, ex );
                 }
             }
 

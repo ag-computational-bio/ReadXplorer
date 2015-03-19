@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.biojava.bio.BioException;
 import org.biojava.bio.program.gff3.GFF3DocumentHandler;
@@ -42,7 +43,7 @@ import org.biojava.utils.ParserException;
 public class BioJavaGff3IdParser implements IdParserI {
 
     private final ArrayList<Observer> observers = new ArrayList<>();
-    private List<String> seqIds;
+    private final List<String> seqIds = new ArrayList<>();
 
 
     /**
@@ -56,7 +57,8 @@ public class BioJavaGff3IdParser implements IdParserI {
      */
     @Override
     public List<String> getSequenceIds( final File gff3File ) throws ParsingException {
-        seqIds = new ArrayList<>();
+
+        seqIds.clear();
 
         try( BufferedReader br = new BufferedReader( new FileReader( gff3File ) ) ) {
 
@@ -64,12 +66,12 @@ public class BioJavaGff3IdParser implements IdParserI {
             GFF3Handler handler = new GFF3Handler();
             gff3Parser.parse( br, handler, new Ontology.Impl( "Ontologyname", "name of ontology" ) );
 
-        }
-        catch( IOException | BioException | ParserException ex ) {
+        } catch( IOException | BioException | ParserException ex ) {
             this.notifyObservers( ex );
         }
 
-        return seqIds;
+        return Collections.unmodifiableList( seqIds );
+
     }
 
 

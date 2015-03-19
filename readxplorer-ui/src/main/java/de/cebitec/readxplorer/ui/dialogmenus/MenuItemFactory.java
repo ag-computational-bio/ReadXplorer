@@ -19,12 +19,12 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.parser.output.OutputWriter;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
-import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Region;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -45,7 +45,7 @@ import org.openide.util.NbBundle;
 
 /**
  * Factory for different JMenuItems with predefined functionality.
- *
+ * <p>
  * @author Rolf Hilker
  */
 public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
@@ -63,8 +63,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
 
     /**
-     * Returns a JMenuItem for copying a sequence.
-     * The text to copy has to be known, when the method is called.
+     * Returns a JMenuItem for copying a sequence. The text to copy has to be
+     * known, when the method is called.
      * <p>
      * @param sequenceToCopy the sequence to copy
      * <p>
@@ -135,13 +135,13 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
 
     /**
-     * Returns a JMenuItem for storing a sequence in fasta format.
-     * The sequence to store has to be known, when the method is called.
+     * Returns a JMenuItem for storing a sequence in fasta format. The sequence
+     * to store has to be known, when the method is called.
      * <p>
      * @param sequence the sequence to store as fasta
      * @param refName  name of the reference sequence
-     * @param feature  the feature whose sequence is to be converted to fasta
-     *                 it contains the header information, but not the sequence
+     * @param feature  the feature whose sequence is to be converted to fasta it
+     *                 contains the header information, but not the sequence
      * <p>
      * @return The JMenuItem for storing a sequence in fasta format
      */
@@ -200,8 +200,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for storing a sequence in fasta format. The sequence
      * to store has to be known, when the method is called.
      * <p>
-     * @param sequence the sequence to translate and store as
-     *                 fasta
+     * @param sequence the sequence to translate and store as fasta
      * @param refName  name of the reference sequence
      * @param seqStart the startpoint of the sequence
      * @param seqStop  the endpoint of the sequence
@@ -240,9 +239,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             public void actionPerformed( ActionEvent e ) {
                 String output;
                 if( feature != null ) {
-                    output = this.generateFastaFromFeature();
-                }
-                else {
+                    output = this.generateFastaFromFeature( "Genome_" + refName );
+                } else {
                     String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
                     output = OutputWriter.generateFasta( sequence, header );
                 }
@@ -253,12 +251,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             /**
              * Generates a string ready for output in a fasta file.
              */
-            private String generateFastaFromFeature() {
+            private String generateFastaFromFeature( String refName ) {
                 String ecNumber = feature.getEcNumber() != null ? feature.getEcNumber() : "no EC number";
                 String locus = feature.getLocus() != null ? feature.getLocus() : "no locus";
                 String product = feature.getProduct() != null ? feature.getProduct() : "no product";
 
-                return OutputWriter.generateFasta( sequence, ecNumber, locus, product );
+                return OutputWriter.generateFasta( sequence, refName, ecNumber, locus, product );
             }
 
 
@@ -269,8 +267,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
 
     /**
-     * Returns a JMenuItem for copying one or more CDS sequences.
-     * The text to copy has to be known, when the method is called.
+     * Returns a JMenuItem for copying one or more CDS sequences. The text to
+     * copy has to be known, when the method is called.
      * <p>
      * @param sequencesToStore the CDS sequence(s) to store
      * @param regions          the regions to store
@@ -289,12 +287,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                 String output = "";
                 for( int i = 0; i < sequencesToStore.size(); ++i ) {
                     int length = regions.get( i ).getStop() + 1 - regions.get( i ).getStart();
-                    String header = "Copied CDS sequence from: "
-                                    + referenceName
-                                    + ", Positions: " + regions.get( i ).getStart()
-                                    + " to " + regions.get( i ).getStop()
-                                    + ", Length: " + length
-                                    + "bp, Amino Acids: " + length / 3;
+                    String header = "Copied CDS sequence from: " +
+                             referenceName +
+                             ", Positions: " + regions.get( i ).getStart() +
+                             " to " + regions.get( i ).getStop() +
+                             ", Length: " + length +
+                             "bp, Amino Acids: " + length / 3;
                     output += OutputWriter.generateFasta( sequencesToStore.get( i ), header );
                 }
                 new StoreStringFileChooser( new String[]{ "fasta" }, "fasta", output );
@@ -308,9 +306,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
     /**
      * Returns a JMenuItem for calculating a possible folding of the selected
-     * DNA
-     * sequence with RNAFold.
-     * The sequence to fold has to be known already!
+     * DNA sequence with RNAFold. The sequence to fold has to be known already!
      * <p>
      * @param rnaFolderControl instance of an rnafoldercontroller
      * @param sequenceToFold   the DNA/RNA sequence to fold with RNAFold
@@ -383,8 +379,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
     /**
      * Creates a JMenuItem which updates the navigator bar associated with the
-     * given
-     * BoundsInfoManager to the stop of the first cdsRegion, when it is pressed.
+     * given BoundsInfoManager to the stop of the first cdsRegion, when it is
+     * pressed.
      * <p>
      * @param boundsManager the bounds info manager, whose navigator bar is to
      *                      be updated
@@ -402,10 +398,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 if( !cdsRegions.isEmpty() ) {
-                    if( cdsRegions.get( 0 ).isForwardStrand() ) {
+                    if( cdsRegions.get( 0 ).isFwdStrand() ) {
                         boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStop() );
-                    }
-                    else {
+                    } else {
                         boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStart() );
                     }
                 }
@@ -490,22 +485,20 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
 
     /**
-     * @return Any text found in the clipboard. If none is found,
-     *         an empty String is returned.
+     * @return Any text found in the clipboard. If none is found, an empty
+     *         String is returned.
      */
     public String getClipboardContents() {
         String result = "";
         Transferable contents = clipboard.getContents( null );
-        final boolean hasTransferableText = (contents != null)
-                                            && contents.isDataFlavorSupported( DataFlavor.stringFlavor );
+        final boolean hasTransferableText = (contents != null) &&
+                 contents.isDataFlavorSupported( DataFlavor.stringFlavor );
         if( hasTransferableText ) {
             try {
                 result = (String) contents.getTransferData( DataFlavor.stringFlavor );
-            }
-            catch( UnsupportedFlavorException ex ) {
+            } catch( UnsupportedFlavorException ex ) {
                 JOptionPane.showMessageDialog( this, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE );
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 JOptionPane.showMessageDialog( this, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             }
         }

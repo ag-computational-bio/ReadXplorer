@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
@@ -29,8 +29,8 @@ import java.util.List;
 
 /**
  * A JPanel offering various methods useful for track import panels. E.g. it
- * allows to get the list of references present in the currently
- * opened ReadXplorer DB.
+ * allows to get the list of references present in the currently opened
+ * ReadXplorer DB.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -45,8 +45,7 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
     /**
      * A JPanel offering various methods useful for track import panels. E.g. it
      * allows to get the list of references present in the currently opened
-     * ReadXplorer
-     * DB.
+     * ReadXplorer DB.
      */
     public ImportTrackBasePanel() {
     }
@@ -89,8 +88,7 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
             for( PersistentReference r : refs ) {
                 refJobList.add( new ReferenceJob( r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp() ) );
             }
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( this );
         }
         return refJobList;
@@ -99,8 +97,8 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
 
     /**
      * @return true, if this track was already imported in another readxplorer
-     *         db. In that case the sam/bam file does not have to be extended anymore,
-     *         because all needed data is already stored in the file.
+     *         db. In that case the sam/bam file does not have to be extended
+     *         anymore, because all needed data is already stored in the file.
      */
     public boolean isAlreadyImported() {
         return isAlreadyImported;
@@ -109,8 +107,10 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
 
     /**
      * @param isAlreadyImported true, if this track was already imported in
-     *                          another readxplorer db. In that case the sam/bam file does not have to be
-     *                          extended anymore, because all needed data is already stored in the file.
+     *                          another readxplorer db. In that case the sam/bam
+     *                          file does not have to be extended anymore,
+     *                          because all needed data is already stored in the
+     *                          file.
      */
     protected void setIsAlreadyImported( boolean isAlreadyImported ) {
         this.isAlreadyImported = isAlreadyImported;

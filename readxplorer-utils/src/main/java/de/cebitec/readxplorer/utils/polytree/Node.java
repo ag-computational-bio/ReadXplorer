@@ -20,29 +20,24 @@ package de.cebitec.readxplorer.utils.polytree;
 
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
 /**
  * *************************************************************************
- * Copyright (C) 2010 by Rolf Hilker *
- * rhilker a t cebitec.uni-bielefeld.de *
- *                                                                         *
- * This program is free software; you can redistribute it and/or modify *
- * it under the terms of the GNU General Public License as published by *
- * the Free Software Foundation; either version 2 of the License, or *
- * (at your option) any later version. *
- *                                                                         *
- * This program is distributed in the hope that it will be useful, *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the *
- * GNU General Public License for more details. *
- *                                                                         *
- * You should have received a copy of the GNU General Public License *
- * along with this program; if not, write to the *
- * Free Software Foundation, Inc., *
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. *
- **************************************************************************
+ * Copyright (C) 2010 by Rolf Hilker * rhilker a t cebitec.uni-bielefeld.de * *
+ * This program is free software; you can redistribute it and/or modify * it
+ * under the terms of the GNU General Public License as published by * the Free
+ * Software Foundation; either version 2 of the License, or * (at your option)
+ * any later version. * * This program is distributed in the hope that it will
+ * be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU General
+ * Public License for more details. * * You should have received a copy of the
+ * GNU General Public License * along with this program; if not, write to the *
+ * Free Software Foundation, Inc., * 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA. *
+ * *************************************************************************
  */
 /**
  * Defines a <tt>node</tt> constructor to create a new <tt>node</tt> and has
@@ -55,7 +50,7 @@ public class Node implements Traversable {//, Cloneable {
     /**
      * Vector with the children of a node.
      */
-    private List<Node> nodeChildren;
+    private final List<Node> nodeChildren;
     /**
      * Parents of the Node.
      */
@@ -69,9 +64,8 @@ public class Node implements Traversable {//, Cloneable {
      * length and a key-object to be stored in the <tt>node</tt> .
      * <p>
      * @param nodeType The node type to store within the current <tt>node</tt>
-     * @param parents  A list of <tt>nodes</tt> which are the parents of the
-     * <tt>node</tt> to be
-     * created.
+     * @param parents A list of <tt>nodes</tt> which are the parents of the
+     * <tt>node</tt> to be created.
      */
     public Node( final FeatureType nodeType, final List<Node> parents ) {
         this.nodeType = nodeType;
@@ -79,48 +73,13 @@ public class Node implements Traversable {//, Cloneable {
             for( Node parent : parents ) {
                 parent.addChild( this );
             }
-        }
-        else {
+        } else {
             this.parents = new ArrayList<>();
         }
         this.nodeChildren = new ArrayList<>();
     }
 
-//    /**
-//     * Returns the depth of the Node.
-//     * @return depth the depth of the Node
-//     */
-//    public Integer getDepth() {
-//        Node node = this;
-//        Integer depth = 0;
-//        while (!node.isRoot()) {
-//            node = node.getParents();
-//            depth++;
-//        }
-//        return depth;
-//    }
 
-//    /**
-//     * Clones the node.
-//     * @return newNode the copy of the original node.
-//     */
-//    @Override
-//    public Node clone() {
-//
-//        Node newNode;
-//        if (this.nodeType == null) {
-//            newNode = new Node(null, null);
-//        } else {
-//            newNode = new Node(this.nodeType, null);
-//        }
-//        if (!this.isLeaf()) {
-//            for (Node n : this.getNodeChildren()) {
-//                newNode.getNodeChildren().add(n.clone());
-//                newNode.getNodeChildren().get(newNode.getNodeChildren().size() - 1).parents.add(newNode);
-//            }
-//        }
-//        return newNode;
-//    }
     /**
      * Bottom up through the tree. Does not set the visited flag for any nodes!
      * The node visitor has to take care of this behaviour. But nodes and their
@@ -154,10 +113,9 @@ public class Node implements Traversable {//, Cloneable {
      * Traverses a <tt>node</tt> with different visitors in top down fashion.
      * <p>
      * @param nodeVisitor Visitor-type with which the <tt>node</tt> should be
-     *                    traversed. Does not set the visited flag for any nodes! The node visitor
-     *                    has to take care of this behaviour. But nodes and their corresponding
-     *                    subtree,
-     *                    whose visited flag is set are not visited anymore.
+     * traversed. Does not set the visited flag for any nodes! The node visitor
+     * has to take care of this behaviour. But nodes and their corresponding
+     * subtree, whose visited flag is set are not visited anymore.
      */
     @Override
     public void traverse( final NodeVisitor nodeVisitor ) {
@@ -180,8 +138,8 @@ public class Node implements Traversable {//, Cloneable {
      * @param newChild The <tt>node</tt> to be set as a new child
      */
     public void addChild( final Node newChild ) {
-        this.nodeChildren.add( newChild );
-        newChild.getParents().add( this );
+        nodeChildren.add( newChild );
+        newChild.addParent( this );
     }
 
 
@@ -189,7 +147,7 @@ public class Node implements Traversable {//, Cloneable {
      * Deletes all children (<tt>nodes</tt>) of a <tt>node</tt>.
      */
     public void clearChildren() {
-        this.nodeChildren.clear();
+        nodeChildren.clear();
     }
 
 
@@ -200,16 +158,26 @@ public class Node implements Traversable {//, Cloneable {
      */
     @Override
     public String toString() {
-        final StringBuilder out = new StringBuilder();
-        if( !this.isLeaf() ) {
-            out.append( '(' );
-            for( Node nodeChild : this.nodeChildren ) {
-                out.append( nodeChild.toString() ).append( "," );
+        final StringBuilder sb = new StringBuilder();
+        if( !isLeaf() ) {
+            sb.append( '(' );
+            for( Node nodeChild : nodeChildren ) {
+                sb.append( nodeChild.toString() ).append( ',' );
             }
-            out.deleteCharAt( out.length() - 1 );
-            out.append( ")" );
+            sb.deleteCharAt( sb.length() - 1 );
+            sb.append( ')' );
         }
-        return out.toString();
+        return sb.toString();
+    }
+
+
+    /**
+     * Add a parent <tt>node</tt>.
+     *
+     * @param parentNode A new parent node of this instance.
+     */
+    public void addParent( Node parentNode ) {
+        parents.add( parentNode );
     }
 
 
@@ -219,7 +187,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return The parents <tt>node</tt> of a <tt>node</tt>
      */
     public List<Node> getParents() {
-        return this.parents;
+        return Collections.unmodifiableList( parents );
     }
 
 
@@ -230,7 +198,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return true if the <tt>node</tt> is a leaf
      */
     public boolean isLeaf() {
-        return (this.nodeChildren.isEmpty());
+        return nodeChildren.isEmpty();
     }
 
 
@@ -241,7 +209,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return true if the <tt>node</tt> is the <tt>root</tt>
      */
     public boolean isRoot() {
-        return this.parents.isEmpty();
+        return parents.isEmpty();
     }
 
 
@@ -261,7 +229,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return key A key object which is stored in the <tt>node</tt>
      */
     public FeatureType getNodeType() {
-        return this.nodeType;
+        return nodeType;
     }
 
 
@@ -271,7 +239,7 @@ public class Node implements Traversable {//, Cloneable {
      * @return nodeChildren The vector of children of a <tt>node</tt>
      */
     public List<Node> getNodeChildren() {
-        return this.nodeChildren;
+        return Collections.unmodifiableList( nodeChildren );
     }
 
 
@@ -281,13 +249,14 @@ public class Node implements Traversable {//, Cloneable {
      * @param children A vector of children-nodes
      */
     public void setNodeChildren( final List<Node> children ) {
-        this.nodeChildren = children;
+        nodeChildren.clear();
+        nodeChildren.addAll( children );
     }
 
 
     /**
      * @return <code>true</code>, if this node was already visited in the
-     *         current traversal.
+     * current traversal.
      */
     public boolean isVisited() {
         return visited;
@@ -298,7 +267,7 @@ public class Node implements Traversable {//, Cloneable {
      * Sets whether this node was already visited in the current traversal.
      * <p>
      * @param visited <code>true</code>, if this node was already visited in the
-     *                current traversal
+     * current traversal
      */
     public void setVisited( boolean visited ) {
         this.visited = visited;

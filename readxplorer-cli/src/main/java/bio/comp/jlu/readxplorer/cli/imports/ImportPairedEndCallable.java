@@ -21,7 +21,7 @@ package bio.comp.jlu.readxplorer.cli.imports;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable.ImportPairedEndResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
@@ -47,7 +47,7 @@ import static java.util.logging.Level.SEVERE;
 
 
 /**
- * 
+ *
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */

@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.converter;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.output.ConverterI;
 import de.cebitec.readxplorer.parser.output.JokToBamConverter;
 import de.cebitec.readxplorer.ui.dialogmenus.FileSelectionPanel;
@@ -37,7 +37,7 @@ import org.openide.util.NbBundle;
 /**
  * Visual wizard panel for selection of files to convert and selection of a
  * converter.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ConverterSetupCard extends FileSelectionPanel {
@@ -285,19 +285,18 @@ public class ConverterSetupCard extends FileSelectionPanel {
                 updateGuiForMultipleFiles( this.getSelectedFiles().length > 1, multiTrackScrollPane, multiTrackList, multiTrackListLabel, fileTextField );
                 if( useMultipleImport() ) {
                     File[] files = this.getSelectedFiles();
-                    getMappingFiles().clear();
+                    mappingFiles.clear();
 
                     for( int i = 0; i < files.length; ++i ) {
                         addFile( files[i], fileTextField );
                         fileTextField.setText( files[i].getName() );
                     }
 
-                    fileTextField.setText( getMappingFiles().size() + " tracks to import" );
+                    fileTextField.setText( mappingFiles.size() + " tracks to import" );
                     DefaultListModel<String> model = new DefaultListModel<>();
-                    fillMultipleImportTable( model, getMappingFiles(), "Mapping file list:" );
+                    fillMultipleImportTable( model, mappingFiles, "Mapping file list:" );
                     multiTrackList.setModel( model );
-                }
-                else {
+                } else {
                     File file = this.getSelectedFile();
                     addFile( file, fileTextField );
                 }
@@ -320,8 +319,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
         char input = evt.getKeyChar();
         if( input != '\b' ) {
             this.refChromName = this.referenceNameField.getText() + evt.getKeyChar();
-        }
-        else {
+        } else {
             this.refChromName = this.referenceNameField.getText();
         }
         this.isRequiredInfoSet();
@@ -332,17 +330,14 @@ public class ConverterSetupCard extends FileSelectionPanel {
         String value = this.referenceLengthField.getText();
         String wholeInput = value.concat( input );
         if( input.equals( "\b" ) ) {
-            if( GeneralUtils.isValidPositiveNumberInput( value ) ) {
+            if( GeneralUtils.isValidPositiveIntegerInput( value ) ) {
                 this.chromLength = Integer.valueOf( value );
-            }
-            else {
+            } else {
                 this.chromLength = -1;
             }
-        }
-        else if( GeneralUtils.isValidPositiveNumberInput( wholeInput ) ) {
+        } else if( GeneralUtils.isValidPositiveIntegerInput( wholeInput ) ) {
             this.chromLength = Integer.valueOf( wholeInput );
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( this, "Please enter a numerical reference length larger than 0!", "Invalid Length", JOptionPane.ERROR_MESSAGE );
             this.chromLength = -1;
         }
@@ -365,7 +360,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     }//GEN-LAST:event_chromComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome> chromComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome> chromComboBox;
     private javax.swing.JLabel chromComboLabel;
     private javax.swing.JComboBox<ConverterI> converterComboBox;
     private javax.swing.JLabel converterLabel;
@@ -377,7 +372,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private javax.swing.JScrollPane multiTrackScrollPane;
     private javax.swing.JButton openFileButton;
     private javax.swing.JCheckBox refCheckBox;
-    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> refComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataobjects.PersistentReference> refComboBox;
     private javax.swing.JLabel refComboLabel;
     private javax.swing.JLabel refSelectionLabel;
     private javax.swing.JTextField referenceLengthField;
@@ -407,8 +402,8 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * conversion can be started or not.
      */
     public void isRequiredInfoSet() {
-        canConvert = !getMappingFiles().isEmpty() && currentConverter != null
-                     && (refChromName != null && !refChromName.isEmpty() && chromLength >= 0 || refCheckBox.isSelected());
+        canConvert = !mappingFiles.isEmpty() && currentConverter != null &&
+                 (refChromName != null && !refChromName.isEmpty() && chromLength >= 0 || refCheckBox.isSelected());
         firePropertyChange( ConverterAction.PROP_CAN_CONVERT, null, canConvert );
     }
 
@@ -424,8 +419,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     public int getChromosomeLength() {
         if( this.refCheckBox.isSelected() && selectedChrom != null ) {
             return selectedChrom.getLength();
-        }
-        else {
+        } else {
             return chromLength;
         }
     }
@@ -438,8 +432,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     public String getRefChromosomeName() {
         if( this.refCheckBox.isSelected() && selectedChrom != null ) {
             return selectedChrom.getName();
-        }
-        else {
+        } else {
             return refChromName;
         }
     }
@@ -455,8 +448,9 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * Set the reference genome components to their correct visibility state.
      * <p>
      * @param useRefFromDb true, if the options for a reference sequence from
-     *                     the DB should be visible, false, if the options for manually entering
-     *                     the reference data should be visible.
+     *                     the DB should be visible, false, if the options for
+     *                     manually entering the reference data should be
+     *                     visible.
      */
     private void setVisibleComponents( boolean useRefFromDb ) {
         this.refCheckBox.setSelected( useRefFromDb );

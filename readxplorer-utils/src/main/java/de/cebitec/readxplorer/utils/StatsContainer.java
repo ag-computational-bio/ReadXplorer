@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.utils.classification.TotalCoverage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class StatsContainer {
     public static final String NO_LARGE_ORIENT_WRONG_PAIRS = "Wrong Orient. Larger Pairs";
     public static final String NO_SMALL_ORIENT_WRONG_PAIRS = "Wrong Orient. Smaller Pairs";
     public static final String NO_SINGLE_MAPPIGNS = "Single Mappings";
-    public static final String NO_UNIQUE_PAIRS = "Unique Read Pairs"; //TODO: can we calculate these?
+    public static final String NO_UNIQUE_PAIRS = "Unique Read Pairs"; //TODO can we calculate these?
     public static final String NO_UNIQ_PERF_PAIRS = "Unique Perfect Read Pairs";
     public static final String NO_UNIQ_SMALL_PAIRS = "Unique Small Pairs";
     public static final String NO_UNIQ_LARGE_PAIRS = "Unique Larger Pairs";
@@ -121,10 +122,23 @@ public class StatsContainer {
 
     /**
      * @return The map containing all initialized statistics of the associated
-     *         track or read pair track.
+     * track or read pair track.
      */
     public Map<String, Integer> getStatsMap() {
-        return statsMap;
+        return Collections.unmodifiableMap( statsMap );
+    }
+
+
+    /**
+     * Add a new key-value pair to the statistics map of this StatsContainer. It
+     * does not check if the key already existed, so the value to an existing
+     * key is overwritten.
+     *
+     * @param key The key to add
+     * @param value The value to add
+     */
+    public void addStatsValue( String key, int value ) {
+        statsMap.put( key, value );
     }
 
 
@@ -134,7 +148,7 @@ public class StatsContainer {
      * coverage has to be put into the statsMap!
      * <p>
      * @param classToCoveredIntervalsMap Map of Chromosomes to mapping classes
-     *                                   to the intervals covered by mappings of that classification
+     * to the intervals covered by mappings of that classification
      */
     public void setCoveredPositionsImport( Map<String, Map<Classification, List<Pair<Integer, Integer>>>> classToCoveredIntervalsMap ) {
         for( Map<Classification, List<Pair<Integer, Integer>>> chromMap : classToCoveredIntervalsMap.values() ) {
@@ -167,7 +181,7 @@ public class StatsContainer {
      * Fills the stats map with all available entries for a track.
      */
     public void prepareForTrack() {
-        prepareForStats(getListOfTrackStatistics());
+        prepareForStats( getListOfTrackStatistics() );
     }
 
 
@@ -175,15 +189,17 @@ public class StatsContainer {
      * Fills the stats map with all available entries for a read pair track.
      */
     public void prepareForReadPairTrack() {
-        prepareForStats(getListOfReadPairStatistics());
+        prepareForStats( getListOfReadPairStatistics() );
     }
+
 
     /**
      * Prepares the container for a predefined list of statistics identifiers.
+     *
      * @param statsIdList The list of statistics identifiers to store in this
      * container
      */
-    private void prepareForStats(List<String> statsIdList) {
+    private void prepareForStats( List<String> statsIdList ) {
         for( String statsId : statsIdList ) {
             statsMap.put( statsId, 0 );
         }
@@ -193,7 +209,7 @@ public class StatsContainer {
     /**
      * Increases the value of the given key by the given value.
      * <p>
-     * @param key           the key to increase
+     * @param key the key to increase
      * @param increaseValue the value to add to the old value of the key
      */
     public void increaseValue( String key, int increaseValue ) {
@@ -202,10 +218,10 @@ public class StatsContainer {
 
 
     /**
-     * Increases the read pair stats for the given read pair type by
-     * the given value.
+     * Increases the read pair stats for the given read pair type by the given
+     * value.
      * <p>
-     * @param type  the read pair type of the stats to increase
+     * @param type the read pair type of the stats to increase
      * @param value the value to add to the corresponding stats
      */
     public void incReadPairStats( final ReadPairType type, final int value ) {
@@ -217,58 +233,53 @@ public class StatsContainer {
                 increaseValue( NO_UNIQUE_PAIRS, value );
                 increaseValue( NO_UNIQ_PERF_PAIRS, value );
             }
-        }
-        else if( type == ReadPairType.DIST_SMALL_PAIR || type == ReadPairType.DIST_SMALL_UNQ_PAIR ) {
+        } else if( type == ReadPairType.DIST_SMALL_PAIR || type == ReadPairType.DIST_SMALL_UNQ_PAIR ) {
             increaseValue( NO_READ_PAIRS, value );
             increaseValue( NO_SMALL_DIST_PAIRS, value );
             if( type == ReadPairType.DIST_SMALL_UNQ_PAIR ) {
                 increaseValue( NO_UNIQUE_PAIRS, value );
                 increaseValue( NO_UNIQ_SMALL_PAIRS, value );
             }
-        }
-        else if( type == ReadPairType.DIST_LARGE_PAIR || type == ReadPairType.DIST_LARGE_UNQ_PAIR ) {
+        } else if( type == ReadPairType.DIST_LARGE_PAIR || type == ReadPairType.DIST_LARGE_UNQ_PAIR ) {
             increaseValue( NO_READ_PAIRS, value );
             increaseValue( NO_LARGE_DIST_PAIRS, value );
             if( type == ReadPairType.DIST_LARGE_UNQ_PAIR ) {
                 increaseValue( NO_UNIQUE_PAIRS, value );
                 increaseValue( NO_UNIQ_LARGE_PAIRS, value );
             }
-        }
-        else if( type == ReadPairType.ORIENT_WRONG_PAIR || type == ReadPairType.ORIENT_WRONG_UNQ_PAIR ) {
+        } else if( type == ReadPairType.ORIENT_WRONG_PAIR || type == ReadPairType.ORIENT_WRONG_UNQ_PAIR ) {
             increaseValue( NO_READ_PAIRS, value );
             increaseValue( NO_ORIENT_WRONG_PAIRS, value );
             if( type == ReadPairType.ORIENT_WRONG_UNQ_PAIR ) {
                 increaseValue( NO_UNIQUE_PAIRS, value );
                 increaseValue( NO_UNIQ_ORIENT_WRONG_PAIRS, value );
             }
-        }
-        else if( type == ReadPairType.OR_DIST_SMALL_PAIR || type == ReadPairType.OR_DIST_SMALL_UNQ_PAIR ) {
+        } else if( type == ReadPairType.OR_DIST_SMALL_PAIR || type == ReadPairType.OR_DIST_SMALL_UNQ_PAIR ) {
             increaseValue( NO_READ_PAIRS, value );
             increaseValue( NO_SMALL_ORIENT_WRONG_PAIRS, value );
             if( type == ReadPairType.OR_DIST_SMALL_PAIR ) {
                 increaseValue( NO_UNIQUE_PAIRS, value );
                 increaseValue( NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, value );
             }
-        }
-        else if( type == ReadPairType.OR_DIST_LARGE_PAIR || type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR ) {
+        } else if( type == ReadPairType.OR_DIST_LARGE_PAIR || type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR ) {
             increaseValue( NO_READ_PAIRS, value );
             increaseValue( NO_LARGE_ORIENT_WRONG_PAIRS, value );
             if( type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR ) {
                 increaseValue( NO_UNIQUE_PAIRS, value );
                 increaseValue( NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, value );
             }
-        }
-        else { //if (type == Properties.TYPE_UNPAIRED_PAIR) {
+        } else { //if (type == Properties.TYPE_UNPAIRED_PAIR) {
             increaseValue( NO_SINGLE_MAPPIGNS, value );
         }
     }
+
 
     /**
      * @return The list of track statistics identifiers stored in this
      * container.
      */
     public static List<String> getListOfTrackStatistics() {
-        List<String> statsList = new ArrayList<>( MappingClass.values().length + 7 );
+        List<String> statsList = new ArrayList<>();
 
         for( MappingClass mappingClass : MappingClass.values() ) {
             statsList.add( mappingClass.getTypeString() );
@@ -285,12 +296,13 @@ public class StatsContainer {
         return statsList;
     }
 
+
     /**
      * @return The list of additional read pair track statistics identifiers
      * stored in this container.
      */
     public static List<String> getListOfReadPairStatistics() {
-        List<String> statsList = new ArrayList<>( 20 );
+        List<String> statsList = new ArrayList<>();
 
         statsList.add( NO_READ_PAIRS );
         statsList.add( NO_PERF_PAIRS );
@@ -311,5 +323,6 @@ public class StatsContainer {
 
         return statsList;
     }
+
 
 }

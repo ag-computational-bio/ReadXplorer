@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.AdjustmentPanelListenerI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.AdjustmentPanelListenerI;
 import de.cebitec.readxplorer.utils.Observer;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Manages the bounds information for a reference sequence.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class BoundsInfoManager implements AdjustmentPanelListenerI {
@@ -133,8 +133,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
 
     /**
-     * @param d
-     *          <p>
+     * @param d <p>
      * @return The current horizontal bounds in connection to the reference
      *         sequence.
      */

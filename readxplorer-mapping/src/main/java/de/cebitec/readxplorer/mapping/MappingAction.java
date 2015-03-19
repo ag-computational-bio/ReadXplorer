@@ -44,16 +44,17 @@ import org.openide.util.NbBundle;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ActionID(
-    category = "Tools",
-    id = "de.cebitec.readxplorer.mapping.MappingAction" )
+         category = "Tools",
+         id = "de.cebitec.readxplorer.mapping.MappingAction" )
 @ActionRegistration(
-    displayName = "#CTL_MappingAction" )
+         displayName = "#CTL_MappingAction" )
 @ActionReference( path = "Menu/Tools", position = 154 )
+@NbBundle.Messages( "CTL_MappingAction=Map reads" )
 public final class MappingAction implements ActionListener {
 
-    static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
-    static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
-    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
+    static final String PROP_SOURCEPATH = "PROP_SOURCEPATH";
+    static final String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
+    static final String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
 
 
 //    private final LoginCookie context;
@@ -72,9 +73,10 @@ public final class MappingAction implements ActionListener {
 
 
     @Override
+    @NbBundle.Messages( "MSG_BackgroundActivity=There is currently other background activity!" )
     public void actionPerformed( ActionEvent ev ) {
         if( CentralLookup.getDefault().lookup( SwingWorker.class ) != null ) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( MappingAction.class, "MSG_BackgroundActivity" ), NotifyDescriptor.WARNING_MESSAGE );
+            NotifyDescriptor nd = new NotifyDescriptor.Message( Bundle.MSG_BackgroundActivity(), NotifyDescriptor.WARNING_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
             return;
         }

@@ -49,7 +49,7 @@ import org.openide.util.NbBundle;
  * Creates and stores the statistics for a track, which needs to be sorted by
  * position. The data to store is directly forwarded to the observer, which
  * should then further process it (store it in the db).
- *
+ * <p>
  * @author -Rolf Hilker-
  */
 public class SamBamStatsParser implements Observable, MessageSenderI {
@@ -61,9 +61,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
 
     /**
-     * Creates and stores the statistics for a track, which needs
-     * to be sorted by position. The data to store is directly forwarded to the
-     * observer, which should then further process it (store it in the db).
+     * Creates and stores the statistics for a track, which needs to be sorted
+     * by position. The data to store is directly forwarded to the observer,
+     * which should then further process it (store it in the db).
      */
     public SamBamStatsParser() {
         this.observers = new ArrayList<>();
@@ -93,7 +93,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
         final long startTime = System.currentTimeMillis();
         final String fileName = trackJob.getFile().getName();
-        notifyObservers( Bundle.StatsParser_Start( fileName ) );
+        this.notifyObservers( Bundle.StatsParser_Start( fileName ) );
+//        int noMappings = 0;
+//        long starti = System.currentTimeMillis();
 
         String lastReadSeq = "";
         List<Integer> readsDifferentPos = new ArrayList<>();
@@ -103,10 +105,10 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         for( String chromName : chromLengthMap.keySet() ) {
             Map<Classification, List<Pair<Integer, Integer>>> mapClassMap = new HashMap<>();
             for( MappingClass mapClass : MappingClass.values() ) {
-                mapClassMap.put( mapClass, new ArrayList<Pair<Integer, Integer>>() );
+                mapClassMap.put( mapClass, new ArrayList<>() );
                 mapClassMap.get( mapClass ).add( new Pair<>( 0, 0 ) );
             }
-            mapClassMap.put( TotalCoverage.TOTAL_COVERAGE, new ArrayList<Pair<Integer, Integer>>() );
+            mapClassMap.put( TotalCoverage.TOTAL_COVERAGE, new ArrayList<>() );
             mapClassMap.get( TotalCoverage.TOTAL_COVERAGE ).add( new Pair<>( 0, 0 ) );
             classToCoveredIntervalsMap.put( chromName, mapClassMap );
         }
@@ -119,19 +121,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             int lineNo = 0;
             while( samItor.hasNext() ) {
                 try {
-                    lineNo++;
+                    ++lineNo;
 
                     final SAMRecord record = samItor.next();
-//                    String readName = record.getReadName();
                     final String refName = record.getReferenceName();
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( refName ) ) {
 
-                        String cigar = record.getCigarString();
-                        int start = record.getAlignmentStart();
-                        int stop = record.getAlignmentEnd();
                         String readSeq = record.getReadString();
-
-                        if( !CommonsMappingParser.checkReadSam( this, readSeq, chromLengthMap.get( refName ), cigar, start, stop, fileName, lineNo ) ) {
+                        if( !CommonsMappingParser.checkReadSam( this, readSeq, fileName, lineNo ) ) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
@@ -152,62 +149,73 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             if( readsDifferentPos.size() == 1 ) { //1 means all reads since last clean started at same pos
                                 if( seqCount == 1 ) { // only one sequence found at same position
                                     statsContainer.increaseValue( StatsContainer.NO_UNIQUE_SEQS, seqCount );
-                                }
-                                else {
+                                } else {
                                     statsContainer.increaseValue( StatsContainer.NO_REPEATED_SEQ, 1 );
                                     //counting the repeated seq and not in how many reads they are contained
                                 }
                             }
                             readsDifferentPos.clear();
                         }
+
+                        int start = record.getAlignmentStart();
+                        int stop = record.getAlignmentEnd();
                         if( !readsDifferentPos.contains( start ) ) {
                             readsDifferentPos.add( start );
                             seqCount = 0;
                         }
-                        seqCount++;
+                        ++seqCount;
                         lastReadSeq = readSeq;
 
-                        statsContainer.increaseValue( mappingClass.getTypeString(), mapCount );
+                        statsContainer.increaseValue( mappingClass.getTypeString(), 1 );
                         PositionUtils.updateIntervals( classToCoveredIntervalsMap.get( refName ).get( mappingClass ), start, stop );
                         PositionUtils.updateIntervals( classToCoveredIntervalsMap.get( refName ).get( TotalCoverage.TOTAL_COVERAGE ), start, stop );
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
+
+//                        //can be used for debugging performance
+//                        if (++noMappings % 10000 == 0) {
+//                            long finish = System.currentTimeMillis();
+//                            this.notifyObservers(Benchmark.calculateDuration(starti, finish, noMappings + " mappings processed. "));
+//                            starti = System.currentTimeMillis();
+//                        }
                     }
-                }
-                catch( NumberFormatException nfe ) {
+                } catch( NumberFormatException nfe ) {
                     //skip error messages, if too many occur to prevent bug in the output panel
                     if( nfe.getMessage() == null || !nfe.getMessage().contains( "MAPQ should be 0" ) ) {
                         //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
-                        sendMsgIfAllowed( NbBundle.getMessage( SamBamStatsParser.class, "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
+                        this.sendMsgIfAllowed( NbBundle.getMessage( SamBamStatsParser.class,
+                                                                    "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
                         Exceptions.printStackTrace( nfe );
                     }
                 }
                 if( (lineNo % 500000) == 0 ) {//output process info only on every XX line
-                    notifyObservers( Benchmark.calculateDuration( startTime, System.currentTimeMillis(), lineNo + " mappings processed in " ) );
+                    long finish = System.currentTimeMillis();
+                    this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " mappings processed in " ) );
                 }
                 System.err.flush();
             }
             if( errorLimit.getSkippedCount() > 0 ) {
-                notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occurred" );
+                this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occurred" );
             }
             samItor.close();
 
-        }
-        catch( RuntimeEOFException e ) {
-            notifyObservers( "Last read in file is incomplete, ignoring it!" );
-        }
-        catch( Exception e ) {
-            Exceptions.printStackTrace( e ); //TODO: correct error handling or remove
+        } catch( RuntimeEOFException e ) {
+            this.notifyObservers( "Last read in file is incomplete, ignoring it!" );
+        } catch( Exception e ) {
+            this.notifyObservers( e.getMessage() );
+            Exceptions.printStackTrace( e ); //TODO correct error handling or remove
         }
 
         //finish statistics and return the track with the statistics data in the end
-        //TODO: claculate separately for all chromosomes for extended stats panel
+        //TODO claculate separately for all chromosomes for extended stats panel
         statsContainer.setCoveredPositionsImport( classToCoveredIntervalsMap );
 
         ParsedTrack track = new ParsedTrack( trackJob );
         statsContainer.setReadLengthDistribution( readLengthDistribution );
         track.setStatsContainer( statsContainer );
 
-        notifyObservers( Benchmark.calculateDuration( startTime, System.currentTimeMillis(), Bundle.StatsParser_Finished( fileName ) ) );
+        long finish = System.currentTimeMillis();
+        String msg = Bundle.StatsParser_Finished( fileName );
+        this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
         return track;
     }

@@ -18,23 +18,22 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.JRegion;
-import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PatternFilter;
-import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Region;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
+import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
-import de.cebitec.readxplorer.utils.CodonUtilities;
-import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 
@@ -42,13 +41,13 @@ import org.openide.util.Lookup;
 /**
  * Listener for highlighting areas on a sequence bar. Note that classes with a
  * HighlightAreaListener have to implement IHighlightable
- *
+ * <p>
  * @author Rolf Hilker
  */
 public class HighlightAreaListener extends MouseAdapter {
 
     private static final int HEIGHT = 12;
-    private final HashMap<Integer, List<JRegion>> specialRegionList;
+    private final Map<Integer, List<JRegion>> specialRegionList;
     private final SequenceBar parentComponent;
     private final int baseLineY;
     private final int offsetY;
@@ -66,8 +65,7 @@ public class HighlightAreaListener extends MouseAdapter {
      * @param parentComponent the component the listener is associated to
      * @param baseLineY       the baseline of the vie
      * @param offsetY         the y offset from the middle, which determines
-     *                        where to
-     *                        start painting the highlighting rectangle
+     *                        where to start painting the highlighting rectangle
      */
     public HighlightAreaListener( final SequenceBar parentComponent, final int baseLineY, final int offsetY ) {
         this.parentComponent = parentComponent;
@@ -97,8 +95,7 @@ public class HighlightAreaListener extends MouseAdapter {
             this.keepPainted = false;
             this.freezeRect = false;
             this.setHighlightRectangle( null );
-        }
-        else if( inRect ) {
+        } else if( inRect ) {
             this.showPopUp( e );
         }
         //highlight interval from current start to next stop codon in frame
@@ -277,7 +274,7 @@ public class HighlightAreaListener extends MouseAdapter {
     /**
      * Allows to add special regions within this sequence bar. These regions
      * receive additional treatment, when the mouse was clicked in one of them.
-     *
+     * <p>
      * @param jreg a JRegion, which has to be treated in a special way
      */
     public void addSpecialRegion( JRegion jreg ) {
@@ -293,8 +290,7 @@ public class HighlightAreaListener extends MouseAdapter {
 
     /**
      * Shows the complete menu for any position on the sequence bar. This is
-     * context
-     * sensitive, depending on special regions (start, stop codons and
+     * context sensitive, depending on special regions (start, stop codons and
      * patterns).
      * <p>
      * @param e the mouse event which triggered the call of this method
@@ -358,20 +354,20 @@ public class HighlightAreaListener extends MouseAdapter {
      * @return the CDS regions for a pixel in a start codon (given by xPos).
      */
     private List<Region> calcCdsRegions( int xPos ) {
-        List<JRegion> specialRegions = this.specialRegionList.get( xPos );
+        List<JRegion> specialRegions = specialRegionList.get( xPos );
 
         List<Region> cdsRegions = new ArrayList<>();
         for( JRegion specialRegion : specialRegions ) {
 
             if( specialRegion.getType() == Properties.START ) {
-                if( isFwdStrand && specialRegion.getY() < this.baseLineY ) {
+                if( isFwdStrand && specialRegion.getY() < baseLineY ) {
                     //detect stop pos of special region for fwd strand
-                    Region cdsToHighlight = this.findNextStopPos( specialRegion.getStart(), parentComponent.getPersistentReference() );
+                    Region cdsToHighlight = findCdsRegion( specialRegion.getStart(), parentComponent.getPersistentReference() );
                     cdsRegions.add( cdsToHighlight );
-                }
-                else if( !isFwdStrand && specialRegion.getY() > this.baseLineY ) {
+
+                } else if( !isFwdStrand && specialRegion.getY() > baseLineY ) {
                     //detect stop pos (which is the start pos in pixels) of special region for rev strand
-                    Region cdsToHighlight = this.findNextStopPos( specialRegion.getStop(), parentComponent.getPersistentReference() );
+                    Region cdsToHighlight = findCdsRegion( specialRegion.getStop(), parentComponent.getPersistentReference() );
                     cdsRegions.add( cdsToHighlight );
                 }
             }
@@ -381,39 +377,34 @@ public class HighlightAreaListener extends MouseAdapter {
 
 
     /**
-     * @param start     the first position in the correct reading frame, on
-     *                  which
-     *                  stop codons should be detected.
-     * @param reference
-     *                  <p>
-     * @return The next stop position in the reference from the given start
+     * Identifies the CDS belonging to the given
+     * <p>
+     * @param cdsStart  The first position in the correct reading frame, on
+     *                  which stop codons should be detected.
+     * @param reference The reference to analyze for the next stop position
+     * <p>
+     * @return The CDS identified for the given start in the current reference
      */
-    private Region findNextStopPos( int start, PersistentReference reference ) {
-        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
-        String[] stopCodons = geneticCode.getSecond();
-        List<Integer> results = new ArrayList<>();
+    private Region findCdsRegion( int cdsStart, PersistentReference reference ) {
 
-        PatternFilter patternFilter = new PatternFilter( start, reference.getActiveChromLength(), reference );
-        for( String stop : stopCodons ) {
-            patternFilter.setPattern( stop.toUpperCase() );
-            int stopPos = patternFilter.findNextOccurrenceOnStrand( isFwdStrand );
-            results.add( stopPos );
-        }
+        StartCodonFilter codonFilter = new StartCodonFilter( cdsStart, cdsStart, reference );
+        codonFilter.setAllStopCodonsSelected( true );
+        codonFilter.setMaxNoResults( 1 );
+        codonFilter.setRequireSameFrame( true );
 
-        //find closest stop codon in correct frame on correct strand
-        int closestStop = isFwdStrand ? Integer.MAX_VALUE : -1;
-        for( Integer stop : results ) {
-            if( isFwdStrand && stop < closestStop || !isFwdStrand && stop > closestStop ) {
-                closestStop = stop;
+        Region stopCodon = codonFilter.findNextCodon( cdsStart, isFwdStrand );
+
+        int cdsStop = -1;
+        if( stopCodon != null ) {
+            if( !isFwdStrand ) {
+                cdsStop = cdsStart;
+                cdsStart = stopCodon.getStart();
+            } else {
+                cdsStop = stopCodon.getStop();
             }
         }
 
-        if( isFwdStrand ) {
-            return new Region( start, closestStop, isFwdStrand, Properties.CDS );
-        }
-        else {
-            return new Region( closestStop, start, isFwdStrand, Properties.CDS );
-        }
+        return new Region( cdsStart, cdsStop, isFwdStrand, Properties.CDS );
     }
 
 
@@ -430,6 +421,9 @@ public class HighlightAreaListener extends MouseAdapter {
     }
 
 
+    /**
+     * Clears the list of special regions in this listener.
+     */
     public void clearSpecialRegions() {
         this.specialRegionList.clear();
     }

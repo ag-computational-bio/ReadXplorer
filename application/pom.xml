@@ -90,6 +90,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-tools-gasv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-tools-readpairclassifier</artifactId>
         </dependency>
         <dependency>

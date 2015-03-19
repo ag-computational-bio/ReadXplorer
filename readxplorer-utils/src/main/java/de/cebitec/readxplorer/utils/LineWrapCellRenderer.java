@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.utils;
 
 
 import java.awt.Component;
+import java.util.regex.Pattern;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.TableCellRenderer;
@@ -32,6 +33,8 @@ import javax.swing.table.TableCellRenderer;
 public class LineWrapCellRenderer extends JTextArea implements TableCellRenderer {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Pattern LINE_BREAK_PATTERN = Pattern.compile( "\n" );
 
 
     @Override
@@ -47,8 +50,8 @@ public class LineWrapCellRenderer extends JTextArea implements TableCellRenderer
 //                }
         // ========================
 
-        int fontHeight = this.getFontMetrics( this.getFont() ).getHeight();
-        String[] splittedText = this.getText().split( "\n" );
+        int fontHeight = getFontMetrics( getFont() ).getHeight();
+        String[] splittedText = LINE_BREAK_PATTERN.split( getText() );
 //                int textLength = this.getText().length();
 //                int lines = textLength / this.getColumns() +1;//+1, cause we need at least 1 row.
 

@@ -93,8 +93,7 @@ public class GeneralSettingsWizardPanel implements
         tool = (Tool) wiz.getProperty( "tool" );
         if( tool == Tool.ExpressTest ) {
             getComponent().enableSaveOptions( false );
-        }
-        else {
+        } else {
             getComponent().enableSaveOptions( true );
         }
     }
@@ -132,8 +131,7 @@ public class GeneralSettingsWizardPanel implements
         List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         if( usedFeatures.isEmpty() ) {
             throw new WizardValidationException( null, "Please select at least one type of annotation.", null );
-        }
-        else {
+        } else {
             if( usedFeatures.size() < FeatureType.SELECTABLE_FEATURE_TYPES.length ) {
                 ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( genomeID );
                 if( !referenceConnector.hasFeatures( usedFeatures ) ) {

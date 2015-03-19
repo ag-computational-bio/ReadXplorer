@@ -18,32 +18,34 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.List;
 
 
 /**
+ * Interface for classes identifying regions.
  *
  * @author ddoppmeier
  */
 public interface RegionFilterI {
 
     /**
-     * Identifies regions. Remember to set setFrameCurrFeature in
-     * StartCodonFilter
-     * first, if only regions of a specified frame should be identified.
+     * Identifies regions.
      * <p>
      * @return a list of the identified regions
      */
-    public List<Region> findRegions();
+    List<Region> findRegions();
 
 
     /**
      * Sets the interval to use.
      * <p>
-     * @param start the leftmost position of the interval
-     * @param stop  the rightmost position of the interval
+     * @param start the leftmost position of the interval, alway smaller than
+     *              <code>stop</code>
+     * @param stop  the rightmost position of the interval, alway larger than
+     *              <code>start</code>
      */
-    public void setInterval( int start, int stop );
+    void setInterval( int start, int stop );
 
 
 }

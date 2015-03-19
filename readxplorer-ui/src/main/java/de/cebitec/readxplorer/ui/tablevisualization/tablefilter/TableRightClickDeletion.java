@@ -35,9 +35,9 @@ import javax.swing.table.DefaultTableModel;
  * of this class must be added as a listener to the Table that should have the
  * possibility of deletion of rows. Only tables using a model extending
  * DefaultTableModel can be used!
- *
+ * <p>
  * @param <E> the table model, which has to extend the DefaultTableModel.
- *
+ * <p>
  * @author jritter
  */
 public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseAdapter {
@@ -57,7 +57,7 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
      * instance of this class must be added as a listener to the Table that
      * should have the possibility of deletion of rows. Only tables using a
      * model extending DefaultTableModel can be used!
-     *
+     * <p>
      * @param <E> the table model, which has to extend the DefaultTableModel.
      */
     public TableRightClickDeletion() {
@@ -80,8 +80,7 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
                     if( lastTable.isRowSelected( lastSelectedRow ) ) {
                         model.removeRow( lastSelectedRow );
                     }
-                }
-                catch( Exception ex ) {
+                } catch( Exception ex ) {
                     JOptionPane.showMessageDialog( null, "Please select a row." );
                 }
             }

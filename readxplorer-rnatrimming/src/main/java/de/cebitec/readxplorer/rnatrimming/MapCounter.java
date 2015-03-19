@@ -33,8 +33,9 @@ public class MapCounter<T> extends HashMap<T, Integer> {
 
     public Integer incrementCount( T key ) {
         Integer counter = this.get( key );
-        if( counter == null )
+        if( counter == null ) {
             counter = 0;
+        }
         counter++;
         this.put( key, counter );
         return counter;

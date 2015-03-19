@@ -102,8 +102,7 @@ public class SelectTrackWizardPanel implements
     public void validate() throws WizardValidationException {
         if( !getComponent().selectionFinished() && tool != Tool.ExportCountTable ) {
             throw new WizardValidationException( null, "Please select a reference genome and at least two tracks.", null );
-        }
-        else {
+        } else {
             ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( getComponent().getSelectedReferenceGenomeID() );
             if( !referenceConnector.hasFeatures( FeatureType.ANY ) ) {
                 throw new WizardValidationException( null, "The selected reference genome does not contain any annotations.", null );

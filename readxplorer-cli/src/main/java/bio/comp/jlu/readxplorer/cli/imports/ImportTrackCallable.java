@@ -21,7 +21,7 @@ package bio.comp.jlu.readxplorer.cli.imports;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable.ImportTrackResults;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.parser.common.ParsingException;
@@ -43,7 +43,7 @@ import org.netbeans.api.sendopts.CommandException;
 
 
 /**
- * 
+ *
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */

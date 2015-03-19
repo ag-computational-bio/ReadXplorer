@@ -152,14 +152,14 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         snpEffectTable.setModel( new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    { SNP_DetectionResultPanel.SNPS_TOTAL, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_TOTAL ) ) },
-                    { SNP_DetectionResultPanel.SNPS_INTERGENEIC, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_INTERGENEIC ) ) },
-                    { SNP_DetectionResultPanel.SNPS_SYNONYMOUS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_SYNONYMOUS ) ) },
-                    { SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL ) ) },
-                    { SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF ) ) },
-                    { SNP_DetectionResultPanel.SNPS_STOPS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_STOPS ) ) },
-                    { SNP_DetectionResultPanel.SNPS_AA_INSERTIONS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_AA_INSERTIONS ) ) },
-                    { SNP_DetectionResultPanel.SNPS_AA_DELETIONS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_AA_DELETIONS ) ) }
+                    { SNPDetectionResultPanel.SNPS_TOTAL, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_TOTAL ) ) },
+                    { SNPDetectionResultPanel.SNPS_INTERGENEIC, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_INTERGENEIC ) ) },
+                    { SNPDetectionResultPanel.SNPS_SYNONYMOUS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_SYNONYMOUS ) ) },
+                    { SNPDetectionResultPanel.SNPS_CHEMIC_NEUTRAL, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_CHEMIC_NEUTRAL ) ) },
+                    { SNPDetectionResultPanel.SNPS_CHEMIC_DIFF, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_CHEMIC_DIFF ) ) },
+                    { SNPDetectionResultPanel.SNPS_STOPS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_STOPS ) ) },
+                    { SNPDetectionResultPanel.SNPS_AA_INSERTIONS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_AA_INSERTIONS ) ) },
+                    { SNPDetectionResultPanel.SNPS_AA_DELETIONS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_AA_DELETIONS ) ) }
                 },
                 new String[]{
                     NbBundle.getMessage( SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0" ),
@@ -192,9 +192,9 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
 
         snpTypeTable.setModel( new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    { SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS ) ) },
-                    { SNP_DetectionResultPanel.SNPS_INSERTIONS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_INSERTIONS ) ) },
-                    { SNP_DetectionResultPanel.SNPS_DELETIONS, String.valueOf( this.snpStatsMap.get( SNP_DetectionResultPanel.SNPS_DELETIONS ) ) }
+                    { SNPDetectionResultPanel.SNPS_SUBSTITUTIONS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_SUBSTITUTIONS ) ) },
+                    { SNPDetectionResultPanel.SNPS_INSERTIONS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_INSERTIONS ) ) },
+                    { SNPDetectionResultPanel.SNPS_DELETIONS, String.valueOf( this.snpStatsMap.get( SNPDetectionResultPanel.SNPS_DELETIONS ) ) }
                 },
                 new String[]{
                     NbBundle.getMessage( SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0" ),

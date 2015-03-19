@@ -36,13 +36,8 @@ public final class ChooseVisualPanel extends JPanel {
      */
     public ChooseVisualPanel() {
         initComponents();
-        if( !GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() ) {
-            jriErrorText.setText( "GNU R is not installed.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed." );
-        }
-        else {
-            if( !GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
-                jriErrorText.setText( "GNU R instance is already in use.\nOnly the ExpressTest and the count table export can be used\nas long as an other GNU R based test is opened." );
-            }
+        if(!GnuR.gnuRSetupCorrect()) {
+            jriErrorText.setText( "GNU R is not installed.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration." );
         }
     }
 

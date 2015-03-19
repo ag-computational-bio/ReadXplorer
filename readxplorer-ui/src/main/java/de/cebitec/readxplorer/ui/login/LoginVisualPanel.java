@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -34,11 +33,16 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * @author ddopmeier?, jstraube?, rhilker
  */
 public final class LoginVisualPanel extends JPanel {
+
+    private static final Logger LOG = Logger.getLogger( LoginVisualPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -87,8 +91,7 @@ public final class LoginVisualPanel extends JPanel {
             database = databaseField.getText();
             user = userField.getText();
             password = new String( passwordField.getPassword() );
-        }
-        else if( adapter.equalsIgnoreCase( "h2" ) ) {
+        } else if( adapter.equalsIgnoreCase( "h2" ) ) {
             hostname = null;
             database = databaseField.getText();
             if( database.endsWith( ".h2.db" ) ) {
@@ -99,8 +102,8 @@ public final class LoginVisualPanel extends JPanel {
             }
             user = null;
             password = null;
-        }
-        else /* <editor-fold defaultstate="collapsed" desc="should not reach here">*/ {
+        } else /* <editor-fold
+         * defaultstate="collapsed" desc="should not reach here"> */ {
             hostname = null;
             database = null;
             user = null;
@@ -129,33 +132,23 @@ public final class LoginVisualPanel extends JPanel {
                 prefs.put( LoginProperties.LOGIN_HOSTNAME, loginData.get( LoginWizardPanel.PROP_HOST ) );
                 prefs.put( LoginProperties.LOGIN_USER, loginData.get( LoginWizardPanel.PROP_USER ) );
                 prefs.put( LoginProperties.LOGIN_DATABASE_MYSQL, loginData.get( LoginWizardPanel.PROP_DATABASE ) );
-            }
-            else if( adapter.equalsIgnoreCase( "h2" ) ) {
+            } else if( adapter.equalsIgnoreCase( "h2" ) ) {
                 prefs.put( LoginProperties.LOGIN_DATABASE_H2, loginData.get( LoginWizardPanel.PROP_DATABASE ) );
             }
-            else {
-                // should not reach here
-            }
-        }
-        else {
+        } else {
             if( adapter.equalsIgnoreCase( "mysql" ) ) {
                 prefs.put( LoginProperties.LOGIN_HOSTNAME, "" );
                 prefs.put( LoginProperties.LOGIN_DATABASE_MYSQL, "" );
                 prefs.put( LoginProperties.LOGIN_USER, "" );
-            }
-            else if( adapter.equalsIgnoreCase( "h2" ) ) {
+            } else if( adapter.equalsIgnoreCase( "h2" ) ) {
                 prefs.put( LoginProperties.LOGIN_DATABASE_H2, "" );
-            }
-            else {
-                // should not reach here
             }
         }
 
         try {
             prefs.flush();
-        }
-        catch( BackingStoreException ex ) {
-            Logger.getLogger( LoginVisualPanel.class.getName() ).log( Level.SEVERE, null, ex );
+        } catch( BackingStoreException ex ) {
+            LOG.log( SEVERE, null, ex );
         }
     }
 
@@ -279,8 +272,7 @@ public final class LoginVisualPanel extends JPanel {
         String db = dbTypeBox.getSelectedItem().toString();
         if( db.equalsIgnoreCase( "h2" ) ) {
             this.updateUIForH2();
-        }
-        else {
+        } else {
             userField.setVisible( true );
             urlField.setVisible( true );
             passwordField.setVisible( true );
@@ -308,17 +300,16 @@ public final class LoginVisualPanel extends JPanel {
             @Override
             public void open( String fileLocation ) {
                 try { //store current directory
-                    NbPreferences.forModule( Object.class ).put( Properties.ReadXplorer_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
-                }
-                catch( IOException ex ) {
-                    // do nothing, path is not stored in properties...
+                    NbPreferences.forModule( Object.class ).put( Properties.READXPLORER_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
+                } catch( IOException ex ) {
+                    LOG.log( WARNING, Properties.READXPLORER_DATABASE_DIRECTORY + " could not be stored" );
                 }
                 databaseField.setText( fileLocation );
             }
 
 
         };
-        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Properties.ReadXplorer_DATABASE_DIRECTORY, null ) );
+        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Properties.READXPLORER_DATABASE_DIRECTORY, null ) );
 
         Preferences prefs2 = Preferences.userNodeForPackage( LoginVisualPanel.class );
         String db = dbTypeBox.getSelectedItem().toString();
@@ -327,8 +318,7 @@ public final class LoginVisualPanel extends JPanel {
             if( path != null ) {
                 fileChooser.setCurrentDirectory( new File( path ) );
             }
-        }
-        else {
+        } else {
             String path = prefs2.get( LoginProperties.LOGIN_DATABASE_MYSQL, null );
             if( path != null ) {
                 fileChooser.setCurrentDirectory( new File( path ) );
@@ -376,7 +366,7 @@ public final class LoginVisualPanel extends JPanel {
 
     /**
      * Updates the choose button text.
-     *
+     * <p>
      * @param chooseButtonText
      */
     public void setChooseButtonText( String chooseButtonText ) {

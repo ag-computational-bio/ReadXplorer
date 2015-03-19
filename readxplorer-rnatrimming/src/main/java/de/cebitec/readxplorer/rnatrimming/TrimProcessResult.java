@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.rnatrimming;
 
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 
@@ -32,15 +34,16 @@ import java.util.Observable;
  */
 class TrimProcessResult extends Observable {
 
-    private Integer allReads = 0;
-    private Integer mappedReads = 0;
-    private Integer trimmedReads = 0;
-    private Integer trimmedMappedReads = 0;
-    private Map<String, Object> params;
-    private Boolean ready = false;
+    private int allReads = 0;
+    private int mappedReads = 0;
+    private int trimmedReads = 0;
+    private int trimmedMappedReads = 0;
+    private final Map<String, Object> params;
 
 
     TrimProcessResult() {
+
+        params = new HashMap<>();
 
     }
 
@@ -48,7 +51,7 @@ class TrimProcessResult extends Observable {
     /**
      * @return the allReads
      */
-    public Integer getAllReads() {
+    public int getAllReads() {
         return allReads;
     }
 
@@ -64,7 +67,7 @@ class TrimProcessResult extends Observable {
     /**
      * @return the mappedReads
      */
-    public Integer getMappedReads() {
+    public int getMappedReads() {
         return mappedReads;
     }
 
@@ -80,7 +83,7 @@ class TrimProcessResult extends Observable {
     /**
      * @return the trimmedReads
      */
-    public Integer getTrimmedReads() {
+    public int getTrimmedReads() {
         return trimmedReads;
     }
 
@@ -96,7 +99,7 @@ class TrimProcessResult extends Observable {
     /**
      * @return the trimmedMappedReads
      */
-    public Integer getTrimmedMappedReads() {
+    public int getTrimmedMappedReads() {
         return trimmedMappedReads;
     }
 
@@ -104,7 +107,7 @@ class TrimProcessResult extends Observable {
     /**
      * @param trimmedMappedReads the trimmedMappedReads to set
      */
-    public void setTrimmedMappedReads( Integer trimmedMappedReads ) {
+    public void setTrimmedMappedReads( int trimmedMappedReads ) {
         this.trimmedMappedReads = trimmedMappedReads;
     }
 
@@ -116,7 +119,8 @@ class TrimProcessResult extends Observable {
      * @param params
      */
     public void setAnalysisParameters( Map<String, Object> params ) {
-        this.params = params;
+        this.params.clear();
+        this.params.putAll( params );
     }
 
 
@@ -126,12 +130,11 @@ class TrimProcessResult extends Observable {
      * @return
      */
     public Map<String, Object> getAnalysisParameters() {
-        return this.params;
+        return Collections.unmodifiableMap( params );
     }
 
 
     public void ready() {
-        this.ready = true;
         this.setChanged();
         this.notifyObservers();
     }

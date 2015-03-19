@@ -67,16 +67,18 @@ import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
  * This is where everything happens. First of all this class is a JComponent,
  * but it also has the capability of running itself as a thread and doing the
  * animation.
- *
- * @author Alexander Kaiser <akaiser@techfak.uni-bielefeld.de>,
- * Jan Krueger <jkrueger@techfak.uni-bielefeld.de>
+ * <p>
+ * @author Alexander Kaiser <akaiser@techfak.uni-bielefeld.de>, Jan Krueger
+ * <jkrueger@techfak.uni-bielefeld.de>
  *
  * Some warnings fixed and "zoomFit" method (setting of "ws" and "hs") adapted
  * by Rolf Hilker.
- *
+ * <p>
  */
 public class MoviePane extends JComponent implements Runnable, Movie,
                                                      ConfigListener {
+
+    private static final Logger LOG = Logger.getLogger( MoviePane.class.getName() );
 
     private Color background = Color.WHITE;
     private Color textColor = Color.BLACK;
@@ -88,7 +90,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     private final Lock buffRLock = rwl.readLock();
     private final Lock buffWLock = rwl.writeLock();
 
-    /*Mutex lock for protecting the current state */
+    /* Mutex lock for protecting the current state */
     private final Lock stateLock = new ReentrantLock();
 
     private boolean start_stop = false;
@@ -116,13 +118,10 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     private List<Point2D[]> frames = null;
     private List<PairTable> pairs = null;
 
-    private static final Logger log = Logger.getLogger( "MoviePane" );
-
 
     /**
-     * Constructs a new MoviePane; this constructor should only
-     * used if only the export facilities would be used, e.g.
-     * for commandline interface.
+     * Constructs a new MoviePane; this constructor should only used if only the
+     * export facilities would be used, e.g. for commandline interface.
      */
     protected MoviePane() {
         setRenderingHints();
@@ -154,9 +153,8 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             in = getClass().getResource( "fonts/cour.pfa" ).openStream();
             f = Font.createFont( Font.TYPE1_FONT, in );
             f = f.deriveFont( Font.BOLD, 12f );
-        }
-        catch( IOException | FontFormatException e ) {
-            log.severe( e.getMessage() );
+        } catch( IOException | FontFormatException e ) {
+            LOG.severe( e.getMessage() );
         }
     }
 
@@ -215,9 +213,10 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                           String chars,
                           int maxWidth, int maxHeight, boolean gui ) {
 
-        if( frames.size() != pairs.size() )
-            throw new IllegalArgumentException( "Illegal argument(s) passed "
-                                                + "to setMovie" );
+        if( frames.size() != pairs.size() ) {
+            throw new IllegalArgumentException( "Illegal argument(s) passed " +
+                     "to setMovie" );
+        }
         if( gui ) {
             stop();
 
@@ -226,15 +225,13 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             try {
                 setMovieData( frames, pairs, title, chars, maxWidth, maxHeight );
                 title_width = getFontMetrics( getFont() ).stringWidth( title );
-            }
-            finally {
+            } finally {
                 buffWLock.unlock();
                 stateLock.unlock();
                 drawIt();
                 repaint();
             }
-        }
-        else {
+        } else {
             setMovieData( frames, pairs, title, chars, maxWidth, maxHeight );
         }
     }
@@ -275,8 +272,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                     start_stop = (i != size - 2 || loop);
                     i = ++i >= size ? 0 : i;
                 }
-            }
-            finally {
+            } finally {
                 stateLock.unlock();
             }
 
@@ -288,13 +284,11 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             if( frame > tot ) {
                 try {
                     t.sleep( frame - tot );
-                }
-                catch( InterruptedException e ) {
-                    log.severe( e.getMessage() );
+                } catch( InterruptedException e ) {
+                    LOG.severe( e.getMessage() );
                 }
             }
-        }
-        while( this.start_stop );
+        } while( this.start_stop );
     }
 
 
@@ -304,9 +298,9 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     @Override
     public synchronized void paintComponent( Graphics g ) {
 
-        if( backbuffer == null
-            || backbuffer.getWidth( this ) != getWidth()
-            || backbuffer.getHeight( this ) != getHeight() ) {
+        if( backbuffer == null ||
+                 backbuffer.getWidth( this ) != getWidth() ||
+                 backbuffer.getHeight( this ) != getHeight() ) {
             backbuffer = createImage( getWidth(), getHeight() );
             drawIt();
         }
@@ -314,8 +308,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
         buffRLock.lock();
         try {
             g.drawImage( backbuffer, 0, 0, this );
-        }
-        finally {
+        } finally {
             buffRLock.unlock();
         }
     }
@@ -335,14 +328,14 @@ public class MoviePane extends JComponent implements Runnable, Movie,
      */
     @Override
     public void setZoom( int zoom ) {
-        if( zoom <= 0 )
+        if( zoom <= 0 ) {
             return;
+        }
 
         buffWLock.lock();
         try {
             this.zoom = zoom;
-        }
-        finally {
+        } finally {
             buffWLock.unlock();
             drawIt();
             repaint();
@@ -365,17 +358,18 @@ public class MoviePane extends JComponent implements Runnable, Movie,
         int hs = this.getHeight() - this.getHeight() / borderFactor;
         if( width < height ) {
             float zoomf = ws / ((float) width);
-            if( hs > zoomf * height )
+            if( hs > zoomf * height ) {
                 zoom = Math.round( zoomf * 100 );
-            else
+            } else {
                 zoom = Math.round( 100 * hs / ((float) height) );
-        }
-        else {
+            }
+        } else {
             float zoomf = hs / ((float) height);
-            if( ws > zoomf * width )
+            if( ws > zoomf * width ) {
                 zoom = Math.round( zoomf * 100 );
-            else
+            } else {
                 zoom = Math.round( 100 * ws / ((float) width) );
+            }
         }
 
         zoom = zoom > MAX_ZOOM ? MAX_ZOOM : (zoom < MIN_ZOOM ? MIN_ZOOM : zoom);
@@ -437,22 +431,21 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     public void drawFrame( Graphics2D gc, int idx, int numSteps, int step ) {
         int j, n;
 
-        if( size == 0 || idx < 0 || idx >= size )
+        if( size == 0 || idx < 0 || idx >= size ) {
             throw new IllegalArgumentException( "No such frame: " + idx + "." );
-        if( step > numSteps || step < 0 || numSteps < 0 )
+        }
+        if( step > numSteps || step < 0 || numSteps < 0 ) {
             throw new IllegalArgumentException( "Invalid interpolation options: " + numSteps + ", " + step + "." );
+        }
 
         gc.setFont( f );
         if( numSteps == 0 ) {
             so.draw( gc, chars, frames.get( idx ), center, pairs.get( idx ) );
-        }
-        else {
+        } else {
             j = idx == size - 1 ? size - 1 : idx + 1;
             n = step <= interpolations / 2 ? idx : (i == size - 1 ? size - 1 : idx + 1);
-            /* so.drawInterpolate(gc, chars,
-             frames.get(idx), frames.get(j),
-             center, pairs.get(n),
-             step, interpolations);*/
+            /* so.drawInterpolate(gc, chars, frames.get(idx), frames.get(j),
+             * center, pairs.get(n), step, interpolations); */
             so.drawInterpolate( gc, chars,
                                 frames.get( idx ), frames.get( j ),
                                 center, pairs.get( n ),
@@ -492,10 +485,11 @@ public class MoviePane extends JComponent implements Runnable, Movie,
         final BufferedImage image;
         final Graphics2D gc;
 
-        if( size == 0 || idx < 0 || idx >= size )
+        if( size == 0 || idx < 0 || idx >= size ) {
             throw new IllegalArgumentException( "No such frame: " + idx + "." );
+        }
 
-        /*zoomf = 0.01 * scale; */
+        /* zoomf = 0.01 * scale; */
         /* JK : calculate zoomF */
         final double zoomf = (double) x / (double) getMaxWidth() * zoom * 0.01;
 
@@ -504,23 +498,21 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             d = new Dimension();
             Point2D origin = new Point2D.Double();
             so.getBounds( frames.get( idx ), center, d, origin );
-        }
-        else {
+        } else {
             d = new Dimension( x, y );
         }
 
         if( transparent ) {
-            /*image = new BufferedImage((int)(zoomf*d.getWidth()),
-             (int)(zoomf*d.getHeight()),
-             BufferedImage.TYPE_4BYTE_ABGR);*/
+            /* image = new BufferedImage((int)(zoomf*d.getWidth()),
+             * (int)(zoomf*d.getHeight()),
+             BufferedImage.TYPE_4BYTE_ABGR); */
             image = new BufferedImage( x, y, BufferedImage.TYPE_4BYTE_ABGR );
             gc = (Graphics2D) image.getGraphics();
             gc.setBackground( new Color( 255, 255, 255, 255 ) );
-        }
-        else {
+        } else {
             /* image = new BufferedImage((int)(zoomf*d.getWidth()),
-             (int)(zoomf*d.getHeight()),
-             BufferedImage.TYPE_3BYTE_BGR);*/
+             * (int)(zoomf*d.getHeight()),
+             BufferedImage.TYPE_3BYTE_BGR); */
             image = new BufferedImage( x, y, BufferedImage.TYPE_3BYTE_BGR );
             gc = (Graphics2D) image.getGraphics();
             gc.setBackground( background );
@@ -528,17 +520,16 @@ public class MoviePane extends JComponent implements Runnable, Movie,
 
         gc.setRenderingHints( rh );
         gc.setFont( f );
-        /* gc.clearRect(0, 0, (int)(zoomf*d.getWidth()), (int)(zoomf*d.getHeight()));*/
+        /* gc.clearRect(0, 0, (int)(zoomf*d.getWidth()), (int)(zoomf*d.getHeight())); */
         /* JK : clear complete graphics context */
         gc.clearRect( 0, 0, x, y );
-        /*gc.translate(-zoomf*origin.getX(), -zoomf*origin.getY());*/
+        /* gc.translate(-zoomf*origin.getX(), -zoomf*origin.getY()); */
         /* JK : center structure */
         gc.translate( (d.getWidth() - getMaxWidth() * zoomf) / 2, (d.getHeight() - getMaxHeight() * zoomf) / 2 );
         gc.scale( zoomf, zoomf );
         if( numSteps == 0 ) {
             so.draw( gc, chars, frames.get( idx ), center, pairs.get( idx ) );
-        }
-        else {
+        } else {
             int j = idx == size - 1 ? size - 1 : idx + 1;
             int n = step <= interpolations / 2 ? idx : (i == size - 1 ? size - 1 : idx + 1);
             so.drawInterpolate( gc, chars,
@@ -563,21 +554,22 @@ public class MoviePane extends JComponent implements Runnable, Movie,
      */
     @Override
     public void start() {
-        if( this.start_stop || size <= 1 || (!loop && i == size - 1) )
+        if( this.start_stop || size <= 1 || (!loop && i == size - 1) ) {
             return;
+        }
 
         try {
-            if( t != null )
+            if( t != null ) {
                 t.join();
+            }
 
             this.start_stop = true;
 
             t = new Thread( this );
             t.setPriority( Thread.MAX_PRIORITY );
             t.start();
-        }
-        catch( InterruptedException e ) {
-            log.severe( e.getMessage() );
+        } catch( InterruptedException e ) {
+            LOG.severe( e.getMessage() );
         }
     }
 
@@ -588,19 +580,20 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     @Override
     public void stop() {
         if( !this.start_stop ) {
-            if( size > 0 )
+            if( size > 0 ) {
                 gotoFrame( 0 );
+            }
             return;
         }
 
         this.start_stop = false;
 
         try {
-            if( t != null )
+            if( t != null ) {
                 t.join();
-        }
-        catch( InterruptedException e ) {
-            log.severe( e.getMessage() );
+            }
+        } catch( InterruptedException e ) {
+            LOG.severe( e.getMessage() );
         }
     }
 
@@ -625,15 +618,15 @@ public class MoviePane extends JComponent implements Runnable, Movie,
      */
     @Override
     public void gotoFrame( int idx ) {
-        if( size == 0 || idx < 0 || idx >= size )
+        if( size == 0 || idx < 0 || idx >= size ) {
             throw new IllegalArgumentException( "No such frame: " + idx + "." );
+        }
 
         stateLock.lock();
         try {
             step = 0;
             i = idx;
-        }
-        finally {
+        } finally {
             stateLock.unlock();
             drawIt();
             repaint();
@@ -646,17 +639,18 @@ public class MoviePane extends JComponent implements Runnable, Movie,
      */
     @Override
     public void bskip() {
-        if( size <= 1 )
+        if( size <= 1 ) {
             return;
+        }
 
         stateLock.lock();
         try {
-            if( step == 0 || i == size - 1 )
+            if( step == 0 || i == size - 1 ) {
                 i = --i < 0 ? (loop ? size - 1 : 0) : i;
-            else
+            } else {
                 step = 0;
-        }
-        finally {
+            }
+        } finally {
             stateLock.unlock();
             drawIt();
             repaint();
@@ -669,15 +663,15 @@ public class MoviePane extends JComponent implements Runnable, Movie,
      */
     @Override
     public void fskip() {
-        if( size <= 1 )
+        if( size <= 1 ) {
             return;
+        }
 
         stateLock.lock();
         try {
             step = 0;
             i = ++i >= size ? (loop ? 1 : size - 1) : i;
-        }
-        finally {
+        } finally {
             stateLock.unlock();
             drawIt();
             repaint();
@@ -692,8 +686,9 @@ public class MoviePane extends JComponent implements Runnable, Movie,
 
         final Graphics2D gc;
 
-        if( backbuffer == null )
+        if( backbuffer == null ) {
             return;
+        }
 
         if( size < 1 ) {
             gc = (Graphics2D) backbuffer.getGraphics();
@@ -730,8 +725,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                                 center, pairs.get( n ),
                                 step, interpolations );
             gc.dispose();
-        }
-        finally {
+        } finally {
             buffWLock.unlock();
             stateLock.unlock();
         }
@@ -779,8 +773,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                         i = ++i >= size ? 0 : i;
                     }
                     frame = speed / interpolations;
-                }
-                finally {
+                } finally {
                     stateLock.unlock();
                 }
                 break;
@@ -794,8 +787,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                         start_stop = (i != size - 1 || loop);
                     }
                     frame = speed / interpolations;
-                }
-                finally {
+                } finally {
                     stateLock.unlock();
                 }
                 break;
@@ -803,8 +795,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                 stateLock.lock();
                 try {
                     loop = ((Boolean) e.getValue());
-                }
-                finally {
+                } finally {
                     stateLock.unlock();
                 }
                 break;
@@ -822,10 +813,12 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             int newZoom;
 
             newZoom = zoom - e.getWheelRotation();
-            if( -e.getWheelRotation() > 0 && newZoom <= MAX_ZOOM )
+            if( -e.getWheelRotation() > 0 && newZoom <= MAX_ZOOM ) {
                 setZoom( newZoom );
-            if( -e.getWheelRotation() < 0 && newZoom >= MIN_ZOOM )
+            }
+            if( -e.getWheelRotation() < 0 && newZoom >= MIN_ZOOM ) {
                 setZoom( newZoom );
+            }
         }
 
 
@@ -878,8 +871,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
 
                 xprev = e.getX();
                 yprev = e.getY();
-            }
-            else if( rotate ) {
+            } else if( rotate ) {
                 double zoomf = 0.01 * zoom;
                 double cx = zoomf * center.getX();
                 double cy = zoomf * center.getY();
@@ -900,8 +892,9 @@ public class MoviePane extends JComponent implements Runnable, Movie,
         public void mouseReleased( MouseEvent e ) {
             switch( e.getButton() ) {
                 case MouseEvent.BUTTON1:
-                    if( old != null )
+                    if( old != null ) {
                         setCursor( old );
+                    }
                     translate = false;
                     break;
                 case MouseEvent.BUTTON3:

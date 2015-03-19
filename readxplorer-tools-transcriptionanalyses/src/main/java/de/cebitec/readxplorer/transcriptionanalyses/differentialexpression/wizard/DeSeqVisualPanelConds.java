@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
@@ -87,12 +88,12 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
 
     public List<Integer> getGroupA() {
-        return groupA;
+        return Collections.unmodifiableList( groupA );
     }
 
 
     public List<Integer> getGroupB() {
-        return groupB;
+        return Collections.unmodifiableList( groupB );
     }
 
 
@@ -106,15 +107,15 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        trackList = new javax.swing.JList();
+        trackList = new javax.swing.JList<PersistentTrack>();
         addToConditionOne = new javax.swing.JButton();
         addToConditionTwo = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        conditionOneList = new javax.swing.JList();
+        conditionOneList = new javax.swing.JList<PersistentTrack>();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        conditionTwoList = new javax.swing.JList();
+        conditionTwoList = new javax.swing.JList<PersistentTrack>();
         removeFromConditionOne = new javax.swing.JButton();
         removeFromConditionTwo = new javax.swing.JButton();
 
@@ -224,7 +225,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.add( (Integer) (selectedTracks.indexOf( persistentTrack ) + 1) );
+            groupA.add( selectedTracks.indexOf( persistentTrack ) + 1 );
         }
     }//GEN-LAST:event_addToConditionOneActionPerformed
 
@@ -237,7 +238,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.add( (Integer) (selectedTracks.indexOf( persistentTrack ) + 1) );
+            groupB.add( selectedTracks.indexOf( persistentTrack ) + 1 );
         }
     }//GEN-LAST:event_addToConditionTwoActionPerformed
 
@@ -269,8 +270,8 @@ public final class DeSeqVisualPanelConds extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addToConditionOne;
     private javax.swing.JButton addToConditionTwo;
-    private javax.swing.JList conditionOneList;
-    private javax.swing.JList conditionTwoList;
+    private javax.swing.JList<PersistentTrack> conditionOneList;
+    private javax.swing.JList<PersistentTrack> conditionTwoList;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -279,6 +280,6 @@ public final class DeSeqVisualPanelConds extends JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JButton removeFromConditionOne;
     private javax.swing.JButton removeFromConditionTwo;
-    private javax.swing.JList trackList;
+    private javax.swing.JList<PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 }

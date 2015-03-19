@@ -37,13 +37,18 @@ import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * Thread for the deletion of tracks and references from the ReadXplorer DB.
- *
+ * <p>
  * @author ddoppmeier
  */
 public class DeletionThread extends SwingWorker<Object, Object> {
+
+    private static final Logger LOG = Logger.getLogger( DeletionThread.class.getName() );
 
     private final List<ReferenceJob> references;
     private final List<TrackJob> tracks;
@@ -63,23 +68,20 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         super();
         this.references = references;
         this.tracks = tracks;
-
         invalidGens = new HashSet<>();
-        io = IOProvider.getDefault().getIO( NbBundle.getMessage( DeletionThread.class, "DeletionThread.ouptut.name" ), false );
-        ph = ProgressHandleFactory.createHandle( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.name" ) );
-        workunits = references.size() + tracks.size();
 
+        this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( DeletionThread.class, "DeletionThread.ouptut.name" ), false );
+        this.ph = ProgressHandleFactory.createHandle( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.name" ) );
+        this.workunits = this.references.size() + this.tracks.size();
     }
 
 
     @Override
     protected Object doInBackground() {
-
         CentralLookup.getDefault().add( this );
         try {
             io.getOut().reset();
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             Exceptions.printStackTrace( ex );
         }
         io.select();
@@ -88,7 +90,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         ph.start( workunits == 1 ? 2 : workunits );
         workunits = 0;
 
-        Logger.getLogger( DeletionThread.class.getName() ).log( Level.INFO, "Starting deletion of data" );
+        LOG.log( INFO, "Starting deletion of data" );
 
         if( !tracks.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.track" ) + ":" );
@@ -99,13 +101,12 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     ProjectConnector.getInstance().deleteTrack( t.getID() );
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
 
-                }
-                catch( StorageException ex ) {
+                } catch( StorageException ex ) {
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                     //  invalidRuns.add(t.getRunJob());
                     invalidGens.add( t.getRefGen() );
-                    Logger.getLogger( DeletionThread.class.getName() ).log( Level.SEVERE, null, ex );
+                    LOG.log( SEVERE, null, ex );
                 }
             }
             io.getOut().println( "" );
@@ -114,19 +115,17 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         if( !references.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.ref" ) + ":" );
             ph.progress( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.ref" ), workunits );
-            for( ReferenceJob referenceJob : references ) {
+            for( ReferenceJob r : references ) {
                 ph.progress( ++workunits );
-                if( invalidGens.contains( referenceJob ) ) {
-                    io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.before" ) + " \"" + referenceJob.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.after" ) );
-                }
-                else {
+                if( invalidGens.contains( r ) ) {
+                    io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.after" ) );
+                } else {
                     try {
-                        ProjectConnector.getInstance().deleteGenome( referenceJob.getID() );
-                        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + referenceJob.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
-                    }
-                    catch( StorageException ex ) {
-                        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + referenceJob.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
-                        Logger.getLogger( DeletionThread.class.getName() ).log( Level.SEVERE, null, ex );
+                        ProjectConnector.getInstance().deleteGenome( r.getID() );
+                        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
+                    } catch( StorageException ex ) {
+                        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
+                        LOG.log( SEVERE, null, ex );
                     }
                 }
             }

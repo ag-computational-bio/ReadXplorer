@@ -19,12 +19,12 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.LogicalBoundsListener;
 import de.cebitec.readxplorer.ui.datavisualisation.MousePositionListener;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.classification.Classification;
@@ -46,7 +46,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -57,20 +59,25 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.openide.util.Exceptions;
 
+import static java.util.logging.Level.WARNING;
+
 
 /**
- * AbstractViewer ist a superclass for displaying genome related information.
- * It provides methods to compute the physical position (meaning pixel) for any
+ * AbstractViewer ist a superclass for displaying genome related information. It
+ * provides methods to compute the physical position (meaning pixel) for any
  * logical position (base position in genome) and otherwise. Depending on it's
  * own size and settings in the ViewerController AbstractViewer knows, which
  * interval from the genome should currently be displayed and provides getter
- * methods for these values. Tooltips in this viewer are initially shown for
- * 20 seconds.
+ * methods for these values. Tooltips in this viewer are initially shown for 20
+ * seconds.
  * <p>
  * @author ddoppmeier, rhilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class AbstractViewer extends JPanel implements
         LogicalBoundsListener, MousePositionListener {
+
+    private static final Logger LOG = Logger.getLogger( AbstractViewer.class.getName() );
+
 
     private static final long serialVersionUID = 1L;
     /**
@@ -124,12 +131,11 @@ public abstract class AbstractViewer extends JPanel implements
     private boolean hasOptions;
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
-    private final List<Classification> excludedClassifications;
     private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
-    public static final Color backgroundColor = new Color( 240, 240, 240 ); //to prevent wrong color on mac
+    public static final Color BACKGROUND_COLOR = new Color( 240, 240, 240 ); //to prevent wrong color on mac
     /**
      * Scrollpane, which should adapt, when component is repainted.
      */
@@ -137,6 +143,8 @@ public abstract class AbstractViewer extends JPanel implements
     private boolean centerScrollBar = false;
     private BufferedImage loadingIndicator;
     private boolean newDataRequestNeeded = false;
+
+    protected final List<Classification> excludedClassifications;
 
 
     /**
@@ -159,14 +167,13 @@ public abstract class AbstractViewer extends JPanel implements
         try {
             InputStream stream = AbstractViewer.class.getResourceAsStream( "loading.png" );
             this.loadingIndicator = ImageIO.read( stream );
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             Exceptions.printStackTrace( ex );
         }
 
         this.excludedClassifications = new ArrayList<>();
         this.setLayout( null );
-        this.setBackground( AbstractViewer.backgroundColor );
+        this.setBackground( AbstractViewer.BACKGROUND_COLOR );
         this.boundsManager = boundsManager;
         this.basePanel = basePanel;
         this.reference = reference;
@@ -285,15 +292,14 @@ public abstract class AbstractViewer extends JPanel implements
      * <p>
      * @param showSeqBar   true, if the sequence bar shall be visible, false
      *                     otherwise
-     * @param centerSeqBar true, if the sequence bar shall be centered, false
-     *                     if it shall be shown at the top
+     * @param centerSeqBar true, if the sequence bar shall be centered, false if
+     *                     it shall be shown at the top
      */
     public void showSequenceBar( boolean showSeqBar, boolean centerSeqBar ) {
         if( showSeqBar ) {
             this.seqBar = new SequenceBar( this );
             this.centerSeqBar = centerSeqBar;
-        }
-        else {
+        } else {
             seqBar = null;
         }
         // this.updatePhysicalBounds();
@@ -338,20 +344,17 @@ public abstract class AbstractViewer extends JPanel implements
                     seqBar.setBounds( 0, y1, paintingAreaInfo.getPhyRight(), seqBar.getSize().height );
                     paintingAreaInfo.setForwardLow( y1 - 1 );
                     paintingAreaInfo.setReverseLow( y2 + 1 );
-                }
-                else {
+                } else {
                     seqBar.setBounds( 0, 20, this.getSize().width, seqBar.getSize().height );
                     paintingAreaInfo.setForwardLow( 20 - 1 );
                     paintingAreaInfo.setReverseLow( seqBar.getSize().height + 21 );
                 }
 
-            }
-            else {
+            } else {
                 paintingAreaInfo.setForwardLow( height / 2 - 1 );
                 paintingAreaInfo.setReverseLow( height / 2 + 1 );
             }
-        }
-        else {
+        } else {
             pAInfoIsAvailable = false;
         }
     }
@@ -399,8 +402,8 @@ public abstract class AbstractViewer extends JPanel implements
             @Override
             public void mouseWheelMoved( MouseWheelEvent e ) {
 
-                if( canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0)
-                                || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
+                if( canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) ||
+                     (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
                     int oldZoom = zoom;
                     zoom += e.getUnitsToScroll();
                     if( zoom > 500 ) {
@@ -436,8 +439,7 @@ public abstract class AbstractViewer extends JPanel implements
                 if( tmpPos >= getBoundsInfo().getLogLeft() && tmpPos <= getBoundsInfo().getLogRight() && isInDrawingMode() ) {
                     basePanel.reportMouseOverPaintingStatus( true );
                     basePanel.reportCurrentMousePos( tmpPos );
-                }
-                else {
+                } else {
                     basePanel.reportMouseOverPaintingStatus( false );
                     AbstractViewer.this.repaintMousePosition( AbstractViewer.this.getCurrentMousePos(), AbstractViewer.this.getCurrentMousePos() );
                 }
@@ -573,8 +575,7 @@ public abstract class AbstractViewer extends JPanel implements
      * @param logPos position in the reference genome
      * <p>
      * @return the physical boundaries (left, right) of a single base of the
-     *         sequence
-     *         in the viewer.
+     *         sequence in the viewer.
      */
     public PhysicalBaseBounds getPhysBoundariesForLogPos( int logPos ) {
         double left = this.transformToPhysicalCoord( logPos );
@@ -645,15 +646,13 @@ public abstract class AbstractViewer extends JPanel implements
             lastPhysPos = physPos;
             //mouse on the right side of currentLog
             pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + lb);
-        }
-        else {
+        } else {
             lastPhysPos = physPos;
             //mouse on the right side of currentLog
             if( currentLog < pos ) {
                 pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + leftbound);
                 // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "rightside plus "+pos);
-            }
-            else {
+            } else {
                 pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + rightBound);
                 //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "leftside plus "+pos);
             }
@@ -681,8 +680,7 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * Update the physical coordinates of this panel, available width for
-     * painting.
-     * Method is called automatically, when this panel resizes
+     * painting. Method is called automatically, when this panel resizes
      */
     public void updatePhysicalBounds() {
         this.setSizes();
@@ -708,8 +706,7 @@ public abstract class AbstractViewer extends JPanel implements
 
             if( this.basewidth > 7 ) {
                 this.setIsInMaxZoomLevel( true );
-            }
-            else {
+            } else {
                 this.setIsInMaxZoomLevel( false );
             }
             if( this.seqBar != null ) {
@@ -722,9 +719,9 @@ public abstract class AbstractViewer extends JPanel implements
         if( this.scrollPane != null && this.centerScrollBar ) {
             try {
                 JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
-                verticalBar.setValue( verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2 );
-            }
-            catch( ArrayIndexOutOfBoundsException e ) {
+                verticalBar.setValue( verticalBar.getMaximum() / 2 - getParent().getHeight() / 2 );
+            } catch( ArrayIndexOutOfBoundsException e ) {
+                LOG.log( WARNING, "AbstractViewer: Parent height cannot be resolved." );
                 //ignore this problem, TODO: identify source of ArrayIndexOutOfBoundsException
             }
         }
@@ -777,8 +774,7 @@ public abstract class AbstractViewer extends JPanel implements
 
         if( newPos >= this.getBoundsInfo().getLogLeft() && newPos <= this.getBoundsInfo().getLogRight() ) {
             this.changeToolTipText( newPos );
-        }
-        else {
+        } else {
             this.setToolTipText( null );
         }
     }
@@ -800,8 +796,7 @@ public abstract class AbstractViewer extends JPanel implements
             if( oldPos >= newPos ) {
                 min = (int) mouseAreaNew.getLeftPhysBound();
                 max = (int) mouseAreaOld.getLeftPhysBound() + getWidthOfMouseOverlay( oldPos );
-            }
-            else {
+            } else {
                 min = (int) mouseAreaOld.getLeftPhysBound();
                 max = (int) mouseAreaNew.getLeftPhysBound() + getWidthOfMouseOverlay( newPos );
             }
@@ -983,8 +978,8 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @return true, if this viewer is currently active (in the foreground)
-     *         and false, if it is inactive
+     * @return true, if this viewer is currently active (in the foreground) and
+     *         false, if it is inactive
      */
     public boolean isActive() {
         return this.isActive;
@@ -1054,17 +1049,38 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @return The list of classification types, which are currently
-     *         excluded from the view/calculations by the user.
+     * Add a classification type to currently excluded views/calculations.
+     * <p>
+     * @param excludedClassification
+     */
+    public void addExcludedClassifications( Classification excludedClassification ) {
+        excludedClassifications.add( excludedClassification );
+    }
+
+
+    /**
+     * @return The list of classification types, which are currently excluded
+     *         from the view/calculations by the user.
      */
     public List<Classification> getExcludedClassifications() {
-        return this.excludedClassifications;
+        return Collections.unmodifiableList( excludedClassifications );
+    }
+
+
+    /**
+     * Remove a classification type from currently excluded views/calculations.
+     * <p>
+     * @param excludedClassification
+     */
+    public void removeExcludedClassifications( Classification excludedClassification ) {
+        excludedClassifications.remove( excludedClassification );
     }
 
 
     /**
      * @return The minimum mapping quality for data queries. If at least one
-     *         mapping does not contain a mapping quality, this filter is not used!
+     *         mapping does not contain a mapping quality, this filter is not
+     *         used!
      */
     public byte getMinMappingQuality() {
         return this.minMappingQuality;
@@ -1073,8 +1089,9 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * @param minMappingQuality Sets this value as the minimum mapping quality
-     *                          to use for data queries. If at least one mapping does not contain a
-     *                          mapping quality, this filter is not used!
+     *                          to use for data queries. If at least one mapping
+     *                          does not contain a mapping quality, this filter
+     *                          is not used!
      */
     public void setMinMappingQuality( byte minMappingQuality ) {
         this.minMappingQuality = minMappingQuality;
@@ -1083,7 +1100,8 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * @return Queries the excluded feature type list for the read class
-     *         parameter selection and converts them to a ParametersReadClasses object.
+     *         parameter selection and converts them to a ParametersReadClasses
+     *         object.
      */
     public ParametersReadClasses getReadClassParams() {
         return new ParametersReadClasses( this.getExcludedClassifications(), this.getMinMappingQuality() );

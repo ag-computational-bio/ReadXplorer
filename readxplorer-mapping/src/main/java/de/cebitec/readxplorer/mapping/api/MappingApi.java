@@ -38,7 +38,7 @@ import org.openide.util.NbPreferences;
  * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-public class MappingApi {
+public final class MappingApi {
 
     /**
      * Utility class.
@@ -48,10 +48,9 @@ public class MappingApi {
 
 
     /**
-     * Load the path to the mapper script from Netbeans preferences.
-     * If there is no preference available, try to use the Mapper-Script from
-     * the release-Directory, which will be available in the installation
-     * directory
+     * Load the path to the mapper script from Netbeans preferences. If there is
+     * no preference available, try to use the Mapper-Script from the
+     * release-Directory, which will be available in the installation directory
      * <p>
      * @return the full path to the mapping script
      */
@@ -59,7 +58,7 @@ public class MappingApi {
         String path = NbPreferences.forModule( Object.class ).get( Properties.MAPPER_PATH, "" );
 
         //try to locate bwa_mapper.sh, if we are not on windows (bwa_mapper.sh works only on unix systems)
-        if( (path.isEmpty())  &&  (!System.getProperty( "os.name" ).toLowerCase().contains( "win" )) ) {
+        if( (path.isEmpty()) && (!System.getProperty( "os.name" ).toLowerCase().contains( "win" )) ) {
             File result = InstalledFileLocator.getDefault().locate( "mappers/bwa_mapper.sh", "de.cebitec.readxplorer.mapping", false );
             if( result != null ) {
                 //try to set executable permission, if we are the owner
@@ -102,8 +101,7 @@ public class MappingApi {
      * @param fasta             the reads in fasta format
      * @param mappingParameters additional mapping paramters
      * <p>
-     * @return
-     *         <p>
+     * @return <p>
      * @throws IOException
      */
     @Messages( { "MSG_MappingApi.mapFastaFile.Start=Map sequencing reads with external mapper" } )
@@ -122,8 +120,7 @@ public class MappingApi {
 
             ph.finish();
             return fastafile.getAbsolutePath() + ".sam";
-        }
-        else {
+        } else {
             throw new RuntimeException( "Can not continue due to previous errors!" );
         }
     }
@@ -140,19 +137,17 @@ public class MappingApi {
         if( !FileUtils.fileExistsAndIsExecutable( MappingApi.getMapperPath() ) ) {
             if( !FileUtils.fileExists( MappingApi.getMapperPath() ) ) {
                 JOptionPane.showMessageDialog( null,
-                   "Please check your mapper configuration and provide a correct path to a mapping script!",
-                   "Warning", JOptionPane.INFORMATION_MESSAGE );
+                                               "Please check your mapper configuration and provide a correct path to a mapping script!",
+                                               "Warning", JOptionPane.INFORMATION_MESSAGE );
                 return false;
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog( null,
-                   "Please check your mapper configuration and permissions on the mapping script!\n"
-                   + "For Unix systems: try executing chmod u+rx,g+rx,a+rx bwa_mapper.sh to set execution permissions!",
-                   "Warning", JOptionPane.INFORMATION_MESSAGE );
+                                               "Please check your mapper configuration and permissions on the mapping script!\n" +
+                                                "For Unix systems: try executing chmod u+rx,g+rx,a+rx bwa_mapper.sh to set execution permissions!",
+                                               "Warning", JOptionPane.INFORMATION_MESSAGE );
                 return false;
             }
-        }
-        else {
+        } else {
             return true;
         }
 

@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * Provides some methods for basic database queries.
@@ -32,6 +34,13 @@ import java.util.logging.Logger;
  * @author Rolf Hilker
  */
 public final class GenericSQLQueries {
+
+    private static final Logger LOG = getLogger( GenericSQLQueries.class.getName() );
+
+
+    private GenericSQLQueries() {
+        //not for instantiation
+    }
 
 
     /**
@@ -48,23 +57,20 @@ public final class GenericSQLQueries {
      * @return the value calculated for the given sqlStatement
      */
     public static int getIntegerFromDB( String sqlStatement, String identifier, Connection con, long trackID ) {
-
         int num = -1;
         try( PreparedStatement fetch = con.prepareStatement( sqlStatement ) ) {
             fetch.setLong( 1, trackID );
 
-            try( ResultSet rs = fetch.executeQuery() ) {
-                if( rs.next() ) {
-                    num = rs.getInt( identifier );
-                }
+            ResultSet rs = fetch.executeQuery();
+            if( rs.next() ) {
+                num = rs.getInt( identifier );
             }
-        }
-        catch( SQLException ex ) {
-            Logger.getLogger( GenericSQLQueries.class.getName() ).log( Level.SEVERE, null, ex );
+            rs.close();
+        } catch( SQLException ex ) {
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return num;
-
     }
 
 
@@ -77,7 +83,6 @@ public final class GenericSQLQueries {
      * @return the latest id of the querried table increased by one
      */
     public static long getLatestIDFromDB( String sqlStatement, Connection con ) {
-
         long id = 0;
         try( PreparedStatement latestID = con.prepareStatement( sqlStatement );
              ResultSet rs = latestID.executeQuery() ) {
@@ -85,18 +90,14 @@ public final class GenericSQLQueries {
             if( rs.next() ) {
                 id = rs.getLong( "LATEST_ID" );
             }
-
+        } catch( SQLException ex ) {
+            LOG.log( Level.SEVERE, null, ex );
         }
-        catch( SQLException ex ) {
-            Logger.getLogger( GenericSQLQueries.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        return id + 1;
-
+        return ++id;
     }
 
 
     public static String generateAddColumnString( String table, String column ) {
-
         return "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
                + table
                + " AND COLUMN_NAME =" + column + ")"
@@ -106,7 +107,6 @@ public final class GenericSQLQueries {
                + " ADD COLUMN "
                + column + " BIGINT UNSIGNED "
                + " END";
-
     }
 
 
@@ -120,12 +120,10 @@ public final class GenericSQLQueries {
      * @return SQL command
      */
     public static String genAddColumnString( String table, String column, String type ) {
-
         return "ALTER TABLE "
                + table
                + " ADD COLUMN IF NOT EXISTS "
                + column + " " + type;
-
     }
 
 
@@ -138,12 +136,10 @@ public final class GenericSQLQueries {
      * @return SQL command
      */
     public static String genRemoveColumnString( String table, String column ) {
-
         return "ALTER TABLE "
                + table
                + " DROP COLUMN IF EXISTS "
                + column;
-
     }
 
 

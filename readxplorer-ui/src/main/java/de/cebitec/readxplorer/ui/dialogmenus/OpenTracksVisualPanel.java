@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
@@ -30,6 +30,7 @@ import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.OutlineView;
@@ -41,7 +42,7 @@ import org.openide.util.Exceptions;
 
 /**
  * A panel for the selection of tracks for a given reference.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTracksVisualPanel extends JobPanel implements
@@ -52,7 +53,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
     private final ExplorerManager explorerManager;
     private final OutlineView outlineView;
     private final ReferenceConnector refGenConnector;
-    private List<PersistentTrack> selectedTracks;
+    private final List<PersistentTrack> selectedTracks;
 
 
     /**
@@ -227,7 +228,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
      * @return The list of selected tracks from this panel.
      */
     public List<PersistentTrack> getSelectedTracks() {
-        return this.selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 
@@ -235,13 +236,14 @@ public class OpenTracksVisualPanel extends JobPanel implements
      * Stores all seleceted tracks in the internal selectedTracks list.
      */
     public void storeSelectedTracks() {
-        List<PersistentTrack> trackList = new ArrayList<>();
-        List<Node> markedNodes = this.getAllMarkedNodes();
+
+        selectedTracks.clear();
+        List<Node> markedNodes = getAllMarkedNodes();
         for( Node node : markedNodes ) {
             StandardNode markedNode = (StandardNode) node;
-            trackList.add( ((TrackItem) markedNode.getData()).getTrack() );
+            selectedTracks.add( ((TrackItem) markedNode.getData()).getTrack() );
         }
-        this.selectedTracks = trackList;
+
     }
 
 
@@ -264,8 +266,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
         boolean requiredInfoSet = this.getAllMarkedNodes().size() > 0;
         if( requiredInfoSet ) {
             this.storeSelectedTracks();
-        }
-        else {
+        } else {
             this.selectedTracks.clear();
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, requiredInfoSet );
@@ -342,8 +343,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
                 try {
                     PersistentTrack track = trackList.get( i );
                     trackNodes[i] = new TrackNode( new TrackItem( track ) );
-                }
-                catch( IntrospectionException ex ) {
+                } catch( IntrospectionException ex ) {
                     Exceptions.printStackTrace( ex );
                 }
             }

@@ -154,16 +154,14 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if( GeneralUtils.isValidNumberInput( minCoveragePercentField.getText() ) ) {
+        if( GeneralUtils.isValidIntegerInput( minCoveragePercentField.getText() ) ) {
             this.minCoveragePercent = Integer.parseInt( minCoveragePercentField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
-        if( GeneralUtils.isValidPositiveNumberInput( minCoverageCountField.getText() ) ) {
+        if( GeneralUtils.isValidPositiveIntegerInput( minCoverageCountField.getText() ) ) {
             this.minCoverageCount = Integer.parseInt( minCoverageCountField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
 

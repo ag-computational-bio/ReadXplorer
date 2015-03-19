@@ -123,8 +123,7 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
 
     /**
      * This method needs to be called in order to open a new tab for
-     * transcription analyses. Make sure to call {@link setAnalysisContext()}
-     * first in order to display the correct context for the analysis result.
+     * transcription analyses.
      * <p>
      * @param panelName   title of the new tab to create
      * @param resultPanel the panel to place in the new tab

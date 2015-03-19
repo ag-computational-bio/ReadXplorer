@@ -18,20 +18,22 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -42,11 +44,13 @@ public class BaySeq {
 
     private GnuR gnuR;
     /*
-     * The maximum number baySeq will use. This should prevent the programm
-     * from using insanely mutch cores on big machines in the CeBiTec Grid
+     * The maximum number baySeq will use. This should prevent the programm from
+     * using insanely mutch cores on big machines in the CeBiTec Grid
      * infrastructure.
      */
     private static final int MAX_PROCESSORS = 6;
+
+    private static final Logger LOG = Logger.getLogger( BaySeq.class.getName() );
 
 
     public BaySeq() {
@@ -56,51 +60,55 @@ public class BaySeq {
     /**
      * Processes data from a differential expression analysis experiment using
      * the baySeq package.
-     *
+     * <p>
      * @param bseqData         The prepared experiment data set.
      * @param numberOfFeatures The number of underlying features.
      * @param numberOfTracks   The number of underlying tracks.
      * @param saveFile         The Gnu R dataset will be saved to this file. If
-     *                         no
-     *                         saving should be done just pass null here.
+     *                         no saving should be done just pass null here.
      * <p>
      * @return a List of RVector. Each RVector represents the results for one
-     *         Group. The number of RVectors is always two times the number of committed
-     *         groups because there is always one normalised and one not normalised
-     *         result. Example: If you commited two groups. You will get four RVectors
-     *         as an result. The first RVector will represent the not normalised result
-     *         for the first committed group. The secound will represent the not
-     *         normalised result for the secound group. The third result will then
-     *         represent the normalised result for group one and the fourth result will
-     *         represent the normalised result for group two. So you will first get all
-     *         not normalised results and then all the normalised ones.
+     *         Group. The number of RVectors is always two times the number of
+     *         committed groups because there is always one normalised and one
+     *         not normalised result. Example: If you commited two groups. You
+     *         will get four RVectors as an result. The first RVector will
+     *         represent the not normalised result for the first committed
+     *         group. The secound will represent the not normalised result for
+     *         the secound group. The third result will then represent the
+     *         normalised result for group one and the fourth result will
+     *         represent the normalised result for group two. So you will first
+     *         get all not normalised results and then all the normalised ones.
      */
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile, UUID key )
-            throws JRILibraryNotInPathException, PackageNotLoadableException,
-                   IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
+                                           int numberOfFeatures, int numberOfTracks, File saveFile )
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
+        gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );
-        gnuR.loadPackage( "snow" );
         //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
         //computation will speed up a little bit but still leave you at least one core
         //for your other work.
-        int processors = Runtime.getRuntime().availableProcessors();
-        if( processors > MAX_PROCESSORS ) {
-            processors = MAX_PROCESSORS;
-        }
-        if( processors > 1 ) {
-            processors--;
+        if( gnuR.runningLocal ) {
+            gnuR.loadPackage( "snow" );
+            gnuR.loadPackage( "parallel" );
+            int processors = Runtime.getRuntime().availableProcessors();
+            if( processors > MAX_PROCESSORS ) {
+                processors = MAX_PROCESSORS;
+            }
+            if( processors > 1 ) {
+                processors--;
+            }
+            currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            LOG.log( Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
+            gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
+        } else {
+            gnuR.eval( "cl <- NULL" );
         }
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
-            currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
-            gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
             while( bseqData.hasCountData() ) {
@@ -117,7 +125,7 @@ public class BaySeq {
             gnuR.eval( "colnames(features) <- c(\"locus\", \"start\", \"stop\")" );
             gnuR.eval( "seglens <- features$stop - features$start + 1" );
             gnuR.eval( "cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)" );
-            gnuR.eval( "cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")" );
+            gnuR.eval( "libsizes(cD) <- getLibsizes(cD)" );
             gnuR.assign( "replicates", bseqData.getReplicateStructure() );
             gnuR.eval( "replicates(cD) <- as.factor(c(replicates))" );
             concatenate = new StringBuilder( 1000 );
@@ -136,7 +144,7 @@ public class BaySeq {
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ')' );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
-                RVector rvec = result.asVector();
+                List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
                 REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
@@ -145,7 +153,7 @@ public class BaySeq {
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
-                RVector rvec = result.asVector();
+                List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
                 REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
@@ -154,13 +162,14 @@ public class BaySeq {
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );
             }
-        } //We don't know what errors Gnu R might cause, so we have to catch all.
-        //The new generated exception can than be caught an handelt by the DeAnalysisHandler
-        catch( Exception e ) {
+        } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
+            //The new generated exception can than be caught an handelt by the DeAnalysisHandler
+            //If something goes wrong try to shutdown Rserve so that no instance keeps running
+            this.shutdown();
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
@@ -171,17 +180,20 @@ public class BaySeq {
      * memory which can be plotted. So this method will also not work after
      * calling clearGnuR() at least not until you have called process(...)
      * again.
-     *
+     * <p>
      * @param file     a File the created SVG image should be saved to.
      * @param samplesA an int array representing the first sample group that
      *                 should be plotted.
      * @param samplesB an int array representing the secound sample group that
-     *                 should be plotted. SamplesA and samplesB must not be the same!
+     *                 should be plotted. SamplesA and samplesB must not be the
+     *                 same!
      * <p>
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotMACD( File file, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                             IllegalStateException, PackageNotLoadableException {
+                                                                             IllegalStateException, PackageNotLoadableException,
+                                                                             RserveException, REngineException, REXPMismatchException,
+                                                                             IOException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -189,8 +201,8 @@ public class BaySeq {
         samplesABuilder.append( (samplesA[0] + 1) ).append( ':' ).append( (samplesA[samplesA.length - 1] + 1) );
         StringBuilder samplesBBuilder = new StringBuilder( 1000 );
         samplesBBuilder.append( (samplesB[0] + 1) ).append( ':' ).append( (samplesB[samplesB.length - 1] + 1) );
-        gnuR.storePlot( file, "plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
-                              + "samplesB = " + samplesBBuilder.toString() + ')' );
+        gnuR.storePlot( file, "plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", " +
+                              "samplesB = " + samplesBBuilder.toString() + ')' );
     }
 
 
@@ -200,18 +212,21 @@ public class BaySeq {
      * Gnu R memory which can be plotted. So this method will also not work
      * after calling clearGnuR() at least not until you have called process(...)
      * again.
-     *
+     * <p>
      * @param file     a File the created SVG image should be saved to.
      * @param group    the underlying group for the plot.
      * @param samplesA an int array representing the first sample group that
      *                 should be plotted.
      * @param samplesB an int array representing the secound sample group that
-     *                 should be plotted. SamplesA and samplesB must not be the same!
+     *                 should be plotted. SamplesA and samplesB must not be the
+     *                 same!
      * <p>
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotPosteriors( File file, Group group, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                                                IllegalStateException, PackageNotLoadableException {
+                                                                                                IllegalStateException, PackageNotLoadableException,
+                                                                                                RserveException, REngineException, REXPMismatchException,
+                                                                                                IOException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -219,11 +234,11 @@ public class BaySeq {
         samplesABuilder.append( (samplesA[0] + 1) ).append( ':' ).append( (samplesA[samplesA.length - 1] + 1) );
         StringBuilder samplesBBuilder = new StringBuilder( 1000 );
         samplesBBuilder.append( (samplesB[0] + 1) ).append( ':' ).append( (samplesB[samplesB.length - 1] + 1) );
-        gnuR.storePlot( file, "plotPosteriors(cD, group = " + group.getGnuRID()
-                              + ", samplesA = " + samplesABuilder.toString()
-                              + ", samplesB = " + samplesBBuilder.toString()
-                              + ", col = c(rep(\"blue\", 100), rep(\"black\", 900))"
-                              + ')' );
+        gnuR.storePlot( file, "plotPosteriors(cD, group = " + group.getGnuRID() +
+                              ", samplesA = " + samplesABuilder.toString() +
+                              ", samplesB = " + samplesBBuilder.toString() +
+                              ", col = c(rep(\"blue\", 100), rep(\"black\", 900))" +
+                              ')' );
     }
 
 
@@ -233,16 +248,18 @@ public class BaySeq {
      * memory which can be plotted. So this method will also not work after
      * calling clearGnuR() at least not until you have called process(...)
      * again.
-     *
+     * <p>
      * @param file  a File the created SVG image should be saved to.
      * @param group the underlying group for the plot.
      */
-    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException,
+                                                            RserveException, REngineException, REXPMismatchException,
+                                                            IOException {
         gnuR.storePlot( file, "plotPriors(cD, group = " + group.getGnuRID() + ')' );
     }
 
 
-    public void saveResultsAsCSV( int index, File saveFile ) {
+    public void saveResultsAsCSV( int index, File saveFile ) throws RserveException {
         String path = saveFile.getAbsolutePath();
         path = path.replace( "\\", "/" );
         gnuR.eval( "write.csv(tCounts" + index + ",file=\"" + path + "\")" );
@@ -252,7 +269,7 @@ public class BaySeq {
     /**
      * Validates if the samples A and B are not the same. For the MACD and
      * Posteriors plot samplesA and samplesB must not be the same.
-     *
+     * <p>
      * @param samplA int array representing samplesA.
      * @param samplB int array representing samplesB.
      * <p>
@@ -262,8 +279,7 @@ public class BaySeq {
         boolean inputValid = false;
         if( samplA.length != samplB.length ) {
             inputValid = true;
-        }
-        else {
+        } else {
             for( int i = 0; i < samplA.length; i++ ) {
                 if( samplA[i] != samplB[i] ) {
                     inputValid = true;
@@ -278,10 +294,11 @@ public class BaySeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown( UUID key ) {
+    public void shutdown() throws RserveException {
+        //Might happen that gnuR is null if something went wrong during Rserve
+        //startup or connection process.
         if( gnuR != null ) {
-            gnuR.releaseGnuRInstance( key );
-            gnuR = null;
+            gnuR.shutdown();
         }
     }
 

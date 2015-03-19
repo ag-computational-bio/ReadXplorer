@@ -38,19 +38,20 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 /*
- * In this version for ReadXplorer all unused code is commented out, but the original
- * version can easily be restored.
+ * In this version for ReadXplorer all unused code is commented out, but the
+ * original version can easily be restored.
  */
 
 /**
- * Export (extending the MovieAction class is the ExportFilter
- * class of RNAMovies2. Currently for different formats are supported :
- * SVG, JPG, PNG (and (animated) GIF, not here in ReadXplorer).
- *  *
- * @author Alexander Kaiser <akaiser@techfak.uni-bielefeld.de>,
- * Jan Krueger <jkrueger@techfak.uni-bielefeld.de> (JavaDoc and (animated) Gif);
+ * Export (extending the MovieAction class is the ExportFilter class of
+ * RNAMovies2. Currently for different formats are supported : SVG, JPG, PNG
+ * (and (animated) GIF, not here in ReadXplorer). * @author Alexander Kaiser
+ * <akaiser@techfak.uni-bielefeld.de>, Jan Krueger
+ * <jkrueger@techfak.uni-bielefeld.de> (JavaDoc and (animated) Gif);
  */
 public class Export extends MovieAction {
+
+    private static final Logger LOG = Logger.getLogger( Export.class.getName() );
 
     private File lastDir = null;
     private final String header;
@@ -59,9 +60,6 @@ public class Export extends MovieAction {
 //    private double xTrans = 0.0;
 //    private double yTrans = 0.0;
 //    private double zoomf = 0.0;
-
-    private static final Logger log = Logger.getLogger( Export.class.toString() );
-
 
     public Export( MoviePane moviePane, String header ) {//    public Export(RNAMovies movies) {
         super( "Export...", "" );
@@ -92,8 +90,7 @@ public class Export extends MovieAction {
 
         if( lastDir == null ) {
             chooser = new JFileChooser();
-        }
-        else {
+        } else {
             chooser = new JFileChooser( lastDir );
         }
         idx = 1; //since in ReadXplorer we only want the fst frame //idx = movies.isRunning() ? 1 : movies.getFrameIdx() + 1;
@@ -127,13 +124,12 @@ public class Export extends MovieAction {
             f = chooser.getSelectedFile();
             lastDir = chooser.getCurrentDirectory();
 //            if(to == from) {
-            log.info( "write a single image" );
+            LOG.info( "write a single image" );
 
             trans = ((ExportAccessory) chooser.getAccessory()).getTransparent();
             if( chooser.getFileFilter() instanceof JPGFilter ) {
                 writeJPG( movie, f, 1, zoom, false, imageW, imageH );//from, zoom, false, imageW, imageH);
-            }
-            else if( chooser.getFileFilter() instanceof PNGFilter ) {
+            } else if( chooser.getFileFilter() instanceof PNGFilter ) {
                 writePNG( movie, f, 1, zoom, false, trans, imageW, imageH );//from, zoom, false, trans,imageW,imageH);
 //                } else if(chooser.getFileFilter() instanceof SVGFilter) {
 //                    writeSVG(movie, f, 1, false);//from, false);
@@ -150,25 +146,22 @@ public class Export extends MovieAction {
 //                pm.show(movies);
 //                movies.setCursor(oldCursor);
 //            }
-        }
-        catch( java.io.FileNotFoundException ex ) {
+        } catch( java.io.FileNotFoundException ex ) {
             JOptionPane.showMessageDialog( movies,
-                                           "Error writing file:\n"
-                                           + ex.getMessage(),
+                                           "Error writing file:\n" +
+                                            ex.getMessage(),
                                            ex.getClass().getName(),
                                            JOptionPane.ERROR_MESSAGE );
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             JOptionPane.showMessageDialog( movies,
-                                           "Error writing file:\n"
-                                           + ex.getMessage(),
+                                           "Error writing file:\n" +
+                                            ex.getMessage(),
                                            ex.getClass().getName(),
                                            JOptionPane.ERROR_MESSAGE );
-        }
-        catch( Exception ex ) {
+        } catch( Exception ex ) {
             JOptionPane.showMessageDialog( movies,
-                                           "Error writing file:\n"
-                                           + ex.getMessage(),
+                                           "Error writing file:\n" +
+                                            ex.getMessage(),
                                            ex.getClass().getName(),
                                            JOptionPane.ERROR_MESSAGE );
         }
@@ -339,8 +332,7 @@ public class Export extends MovieAction {
 
         if( extension.charAt( 0 ) == '.' ) {
             extexp = extexp == null ? extension.substring( 1, extension.length() ) : extexp;
-        }
-        else {
+        } else {
             extexp = extexp == null ? extension : extexp;
             extension = "." + extension;
         }
@@ -351,16 +343,13 @@ public class Export extends MovieAction {
         if( addNumber ) {
             if( m.find() ) {
                 return filename.substring( 0, m.start() ).concat( "-" + String.valueOf( number ) ).concat( extension );
-            }
-            else {
+            } else {
                 return filename.concat( "-" + String.valueOf( number ) ).concat( extension );
             }
-        }
-        else {
+        } else {
             if( !m.find() ) {
                 return filename.concat( extension );
-            }
-            else {
+            } else {
                 return filename;
             }
         }
@@ -471,8 +460,7 @@ public class Export extends MovieAction {
     private String prepareHeader( String header ) {
         if( header.contains( ">>" ) ) {
             header = header.replace( ">>", "fwd" );
-        }
-        else if( header.contains( "<<" ) ) {
+        } else if( header.contains( "<<" ) ) {
             header = header.replace( "<<", "rev" );
         }
         return header;
@@ -510,9 +498,9 @@ public class Export extends MovieAction {
 
         @Override
         public boolean accept( File f ) {
-            return f.getName().endsWith( ".jpg" )
-                   || f.getName().endsWith( ".jpeg" )
-                   || f.isDirectory();
+            return f.getName().endsWith( ".jpg" ) ||
+                     f.getName().endsWith( ".jpeg" ) ||
+                     f.isDirectory();
         }
 
 

@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.RowSorter;
@@ -93,19 +94,20 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
-    private static final int posIdx = 0;
-    private static final int trackIdx = 2;
-    private static final int chromIdx = 1;
+    private static final Logger LOG = Logger.getLogger( DiffExpResultViewerTopComponent.class.getName() );
+    private static final int POS_IDX = 0;
+    private static final int TRACK_IDX = 2;
+    private static final int CHROM_IDX = 1;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
     private final List<DefaultTableModel> tableModels = new ArrayList<>();
     private TopComponent graphicsTopComponent;
     private ExpressTestGraphicsTopComponent ptc;
-    private TopComponent LogTopComponent;
+    private TopComponent logTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
     private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Differential Gene Expression Analysis" );
-    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>( UneditableTableModel.class, posIdx, trackIdx );
+    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>( UneditableTableModel.class, POS_IDX, TRACK_IDX );
     private ReferenceFeatureTopComp refComp;
 
 
@@ -146,7 +148,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
             BoundsInfoManager bm = tmpVCon.getBoundsManager();
             if( bm != null && analysisHandler.getRefGenomeID() == tmpVCon.getCurrentRefGen().getId() ) {
 
-                TableUtils.showPosition( topCountsTable, posIdx, chromIdx, bm );
+                TableUtils.showPosition( topCountsTable, POS_IDX, CHROM_IDX, bm );
             }
         }
         refComp.showTableFeature( topCountsTable, 0 );
@@ -346,6 +348,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                 graphicsTopComponent.open();
                 graphicsTopComponent.requestActive();
                 break;
+            default:
+                LOG.severe( "Encountered unknown differential gene expression tool" );
         }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
@@ -355,10 +359,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
     }//GEN-LAST:event_saveTableButtonActionPerformed
 
     private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed
-        LogTopComponent = new DiffExpLogTopComponent( analysisHandler );
-        analysisHandler.registerObserver( (Observer) LogTopComponent );
-        LogTopComponent.open();
-        LogTopComponent.requestActive();
+        logTopComponent = new DiffExpLogTopComponent( analysisHandler );
+        analysisHandler.registerObserver( (Observer) logTopComponent );
+        logTopComponent.open();
+        logTopComponent.requestActive();
     }//GEN-LAST:event_showLogButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createGraphicsButton;
@@ -418,11 +422,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                     case ERROR:
                         progressHandle.switchToDeterminate( 0 );
                         progressHandle.finish();
-                        LogTopComponent = new DiffExpLogTopComponent();
-                        LogTopComponent.open();
-                        LogTopComponent.requestActive();
+                        logTopComponent = new DiffExpLogTopComponent();
+                        logTopComponent.open();
+                        logTopComponent.requestActive();
                         cmp.close();
                         break;
+                    default:
+                        LOG.info( "Encountered unknown analysis status" );
                 }
             }
 

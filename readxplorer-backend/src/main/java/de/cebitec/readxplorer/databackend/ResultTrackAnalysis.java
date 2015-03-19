@@ -18,12 +18,13 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +39,14 @@ import java.util.Map;
  */
 public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
-    private Map<Integer, PersistentTrack> trackMap;
+    private final Map<Integer, PersistentTrack> trackMap;
     private final PersistentReference reference;
-    private List<String> trackNameList;
-    private ParameterSetI<T> parameters;
-    private Map<String, Integer> statsMap;
+    private final Map<String, Integer> statsMap;
     private final boolean combineTracks;
     private final int trackColumn;
     private final int filterColumn;
+    private List<String> trackNameList;
+    private ParameterSetI<T> parameters;
 
 
     /**
@@ -68,8 +69,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
                                 int trackColumn, int filterColumn ) {
         this.reference = reference;
         this.trackMap = trackMap;
-        this.trackNameList = PersistentTrack.generateTrackDescriptionList( trackMap.values() );
-        this.statsMap = new HashMap<>();
+        trackNameList = PersistentTrack.generateTrackDescriptionList( trackMap.values() );
+        statsMap = new HashMap<>();
         this.combineTracks = combineTracks;
         this.trackColumn = trackColumn;
         this.filterColumn = filterColumn;
@@ -118,8 +119,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         for( PersistentTrack track : trackMap.values() ) {
             if( fullLength || track.getDescription().length() <= 20 ) {
                 description = track.getDescription();
-            }
-            else {
+            } else {
                 description = track.getDescription().substring( 0, 20 ) + "...";
             }
             concatTrackNames += description + ", ";
@@ -153,11 +153,10 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      */
     public Object getTrackEntry( int trackId, boolean getFullengthName ) {
         Object trackEntry;
-        if( this.isCombineTracks() ) {
-            trackEntry = this.getCombinedTrackNames( getFullengthName );
-        }
-        else {
-            trackEntry = this.getTrackMap().get( trackId );
+        if( isCombineTracks() ) {
+            trackEntry = getCombinedTrackNames( getFullengthName );
+        } else {
+            trackEntry = getTrackMap().get( trackId );
         }
         return trackEntry;
     }
@@ -170,8 +169,9 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @param trackMap the map of tracks for which the analysis was carried out
      */
     public void setTrackMap( Map<Integer, PersistentTrack> trackMap ) {
-        this.trackMap = trackMap;
-        this.trackNameList = PersistentTrack.generateTrackDescriptionList( trackMap.values() );
+        this.trackMap.clear();
+        this.trackMap.putAll( trackMap );
+        trackNameList = PersistentTrack.generateTrackDescriptionList( trackMap.values() );
     }
 
 
@@ -180,7 +180,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      *         to their respective track id
      */
     public Map<Integer, PersistentTrack> getTrackMap() {
-        return trackMap;
+        return Collections.unmodifiableMap( trackMap );
     }
 
 
@@ -205,7 +205,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @return the parameter set which was used for the analysis
      */
     public ParameterSetI<T> getParameters() {
-        return this.parameters;
+        return parameters;
     }
 
 
@@ -224,15 +224,15 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      *         which this analysis result is one part
      */
     public List<String> getTrackNameList() {
-        return this.trackNameList;
+        return Collections.unmodifiableList( trackNameList );
     }
 
 
     /**
-     * @return The statistics map associated with this analysis
+     * @return The statistics map associated with this analysis.
      */
     public Map<String, Integer> getStatsMap() {
-        return this.statsMap;
+        return Collections.unmodifiableMap( statsMap );
     }
 
 
@@ -242,7 +242,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @param statsMap the statistics map associated with this analysis
      */
     public void setStatsMap( Map<String, Integer> statsMap ) {
-        this.statsMap = statsMap;
+        this.statsMap.clear();
+        this.statsMap.putAll( statsMap );
     }
 
 
@@ -253,7 +254,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @param value the value of the pair
      */
     public void addStatsToMap( String key, int value ) {
-        this.statsMap.put( key, value );
+        statsMap.put( key, value );
     }
 
 
@@ -261,18 +262,17 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * Update the stats map of this track analysis result with the given data.
      * <p>
      * @param newStatsMap A new stats map, whose content shall be merged /
-     *                    summed with the content of the stats map contained in this result object.
+     *                    summed with the content of the stats map contained in
+     *                    this result object.
      */
     public void updateStatsMap( Map<String, Integer> newStatsMap ) {
-        Map<String, Integer> internalStatsMap = this.getStatsMap();
         for( Map.Entry<String, Integer> entrySet : newStatsMap.entrySet() ) {
             String key = entrySet.getKey();
             Integer value = entrySet.getValue();
-            if( internalStatsMap.containsKey( key ) ) {
-                internalStatsMap.put( key, internalStatsMap.get( key ) + value );
-            }
-            else {
-                internalStatsMap.put( key, value );
+            if( statsMap.containsKey( key ) ) {
+                statsMap.put( key, statsMap.get( key ) + value );
+            } else {
+                statsMap.put( key, value );
             }
         }
     }
@@ -289,7 +289,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         List<Object> row = new ArrayList<>();
         if( statsMap.containsKey( identifier ) ) {
             row.add( identifier );
-            row.add( this.getStatsMap().get( identifier ) );
+            row.add( statsMap.get( identifier ) );
         }
         return row;
     }
@@ -304,7 +304,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      */
     public void createStatisticTableRows( List<List<Object>> statisticsExportData ) {
         for( String id : statsMap.keySet() ) {
-            statisticsExportData.add( this.createStatisticTableRow( id ) );
+            statisticsExportData.add( createStatisticTableRow( id ) );
         }
     }
 

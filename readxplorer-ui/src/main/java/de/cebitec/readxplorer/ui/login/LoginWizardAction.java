@@ -44,7 +44,7 @@ import org.openide.windows.WindowManager;
 
 /**
  * Action for opening the login wizard.
- *
+ * <p>
  * @author ddoppmeier, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @Messages( {
@@ -111,8 +111,7 @@ public final class LoginWizardAction implements ActionListener {
 
 
                             } );
-                        }
-                        catch( SQLException ex ) {
+                        } catch( SQLException ex ) {
                             NotifyDescriptor nd = new NotifyDescriptor.Message( ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE );
                             nd.setTitle( NbBundle.getMessage( LoginWizardAction.class, "MSG_LoginWizardAction.sqlError" ) );
                             DialogDisplayer.getDefault().notify( nd );
@@ -123,8 +122,7 @@ public final class LoginWizardAction implements ActionListener {
 
                 } );
                 connectThread.start();
-            }
-            catch( Exception ex ) {
+            } catch( Exception ex ) {
                 SwingUtilities.invokeLater( new LoadingRunnable() );
                 JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.LoginWizardAction_ErrorMsg( ex.toString() ),
                                                Bundle.LoginWizardAction_ErrorHeader(), JOptionPane.ERROR_MESSAGE );

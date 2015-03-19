@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.rnatrimming;
 
 
-import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationResultTopComponent;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.TabWithCloseX;
 import java.awt.event.ContainerEvent;
@@ -57,6 +56,8 @@ import org.openide.windows.WindowManager;
     "HINT_TrimResultTopComponent="
 } )
 public final class TrimResultTopComponent extends TopComponentExtended {
+
+    private static final Logger LOG = Logger.getLogger( TrimResultTopComponent.class.getName() );
 
     private static TrimResultTopComponent instance;
     private static final String PREFERRED_ID = "TrimResultTopComponent";
@@ -136,15 +137,13 @@ public final class TrimResultTopComponent extends TopComponentExtended {
     public static synchronized TrimResultTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            Logger.getLogger( CorrelationResultTopComponent.class.getName() ).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof TrimResultTopComponent ) {
             return (TrimResultTopComponent) win;
         }
-        Logger.getLogger( TrimResultTopComponent.class.getName() ).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
+        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }

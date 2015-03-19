@@ -19,12 +19,12 @@ package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
@@ -35,9 +35,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -46,6 +47,9 @@ import java.util.prefs.Preferences;
  * @author ddoppmeier
  */
 public class DoubleTrackViewer extends TrackViewer {
+
+    private static final Logger LOG = Logger.getLogger( DoubleTrackViewer.class.getName() );
+
 
     private static final long serialVersionUID = 572406471;
 
@@ -142,8 +146,7 @@ public class DoubleTrackViewer extends TrackViewer {
                     }
                     covPixel = max;
 
-                }
-                else {
+                } else {
                     covPixel = this.getCoverageValue( isFwdStrand, classType, left );
                 }
 
@@ -172,8 +175,7 @@ public class DoubleTrackViewer extends TrackViewer {
      * @param classType   the mapping classification type of the coverage path
      *                    handled here
      * @param absPos      the reference position for which the coverage should
-     *                    be
-     *                    obtained
+     *                    be obtained
      * <p>
      * @return the coverage value for the given strand, coverage type and
      *         position.
@@ -188,18 +190,14 @@ public class DoubleTrackViewer extends TrackViewer {
                 int value1 = (int) this.getNormalizedValue( id1, cov1.getCoverage( absPos, isFwdStrand ) );
                 int value2 = (int) this.getNormalizedValue( id2, cov2.getCoverage( absPos, isFwdStrand ) );
                 value = Math.abs( value2 - value1 );
-            }
-            else if( classType == ComparisonClass.TRACK2_COVERAGE ) {
+            } else if( classType == ComparisonClass.TRACK2_COVERAGE ) {
                 value = this.getNormalizedValue( id2, cov2.getCoverage( absPos, isFwdStrand ) );
-            }
-            else if( classType == ComparisonClass.TRACK1_COVERAGE ) {
+            } else if( classType == ComparisonClass.TRACK1_COVERAGE ) {
                 value = this.getNormalizedValue( id1, cov1.getCoverage( absPos, isFwdStrand ) );
+            } else {
+                LOG.log( SEVERE, "found unknown coverage type!" );
             }
-            else {
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown coverage type!" );
-            }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException( "The size of the coverage manager list is not equal to 2." );
         }
         return value;
@@ -273,8 +271,7 @@ public class DoubleTrackViewer extends TrackViewer {
         String classType = classification.getTypeString() + " " + strandString;
         if( this.hasNormalizationFactor() ) {
             sb.append( createTableRow( classType, coverage, coverageNorm ) );
-        }
-        else {
+        } else {
             sb.append( createTableRow( classType, coverage ) );
         }
     }

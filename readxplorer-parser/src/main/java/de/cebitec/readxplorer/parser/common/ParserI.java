@@ -28,19 +28,19 @@ public interface ParserI {
     /**
      * @return name of the parser.
      */
-    public String getName();
+    String getName();
 
 
     /**
      * @return file extensions supported by this parser.
      */
-    public String[] getFileExtensions();
+    String[] getFileExtensions();
 
 
     /**
      * @return input file description string.
      */
-    public String getInputFileDescription();
+    String getInputFileDescription();
 
 
 }

@@ -23,21 +23,21 @@ import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
  * Carries out the logic behind the covered features analysis.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class AnalysisCoveredFeatures implements Observer,
@@ -46,9 +46,11 @@ public class AnalysisCoveredFeatures implements Observer,
     private final TrackConnector trackConnector;
     private final ParameterSetCoveredFeatures analysisParams;
     private final List<PersistentFeature> genomeFeatures;
-    private final Map<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
+    private final HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
     private final List<CoveredFeature> detectedFeatures;
     private int summedCov = 0;
+
+    private final int lastFeatureIdx;
 
 
     /**
@@ -58,17 +60,17 @@ public class AnalysisCoveredFeatures implements Observer,
      * @param trackViewer        the track viewer for which the analyses should
      *                           be carried out
      * @param getCoveredFeatures <code>true</code> if the covered features
-     *                           should be
-     *                           returned, <code>false</code> if the uncovered features should be returned
-     * @param minCoveragePercent minimum percentage of an feature which has
-     *                           to be classified as covered, in order to detect it as 'present' in the
-     *                           analysis
+     *                           should be returned, <code>false</code> if the
+     *                           uncovered features should be returned
+     * @param minCoveragePercent minimum percentage of an feature which has to
+     *                           be classified as covered, in order to detect it
+     *                           as 'present' in the analysis
      * @param minCountedCoverage minimum coverage at a certain position to be
      *                           taken into account for the analysis
      * @param whateverStrand     <tt>true</tt>, if the strand does not matter
-     *                           for
-     *                           this analysis, false, if only mappings on the strand of the
-     *                           respective feature should be considered.
+     *                           for this analysis, false, if only mappings on
+     *                           the strand of the respective feature should be
+     *                           considered.
      */
     public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters ) {
         this.trackConnector = trackConnector;
@@ -76,6 +78,7 @@ public class AnalysisCoveredFeatures implements Observer,
         this.detectedFeatures = new ArrayList<>();
         this.coveredFeatureCount = new HashMap<>();
         this.genomeFeatures = new ArrayList<>();
+        this.lastFeatureIdx = 0;
 
         this.initDatastructures();
     }
@@ -93,7 +96,7 @@ public class AnalysisCoveredFeatures implements Observer,
         }
 
         PersistentFeature feature;
-        for( int i = 0; i < this.genomeFeatures.size(); i++ ) {
+        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
             feature = this.genomeFeatures.get( i );
             this.coveredFeatureCount.put( feature.getId(), new CoveredFeature( feature, trackConnector.getTrackID() ) );
         }
@@ -114,8 +117,7 @@ public class AnalysisCoveredFeatures implements Observer,
         if( data.getClass() == coverageAndDiffResult.getClass() ) {
             coverageAndDiffResult = (CoverageAndDiffResult) data;
             this.updateCoverageCountForFeatures( coverageAndDiffResult );
-        }
-        else if( data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED ) { //1 means coverage analysis is finished
+        } else if( data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED ) { //1 means coverage analysis is finished
             this.findCoveredFeatures();
         }
     }
@@ -132,13 +134,13 @@ public class AnalysisCoveredFeatures implements Observer,
         int rightBound = covManager.getRightBound();
         boolean isStrandBothOption = analysisParams.getReadClassParams().isStrandBothOption();
         boolean isFeatureStrand = analysisParams.getReadClassParams().isStrandFeatureOption();
-        boolean analysisStrand;
 
         //coverage identified within an feature
-        for( PersistentFeature genomeFeature : this.genomeFeatures ) {
+        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
             int noCoveredBases = 0;
-            PersistentFeature feature = genomeFeature;
+            PersistentFeature feature = this.genomeFeatures.get( i );
             summedCov = 0;
+
             if( feature.getChromId() == coverageAndDiffResult.getRequest().getChromId() ) {
                 int featureStart = feature.getStart();
                 int featureStop = feature.getStop();
@@ -149,14 +151,13 @@ public class AnalysisCoveredFeatures implements Observer,
 //                    }
 
                     if( isStrandBothOption ) {
-                        for( int j = featureStart; j <= featureStop; j++ ) {
+                        for( int j = featureStart; j <= featureStop; ++j ) {
                             if( this.checkCanIncreaseAndSumBothStrands( covManager, j ) ) {
                                 ++noCoveredBases;
                             }
                         }
-                    }
-                    else {
-                        analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                    } else {
+                        boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                         for( int j = featureStart; j <= featureStop; ++j ) {
                             if( this.checkCanIncreaseAndSumOneStrand( covManager, j, analysisStrand ) ) {
                                 ++noCoveredBases;
@@ -175,8 +176,7 @@ public class AnalysisCoveredFeatures implements Observer,
                         coveredFeature.setMeanCoverage( meanCov );
                     }
                     coveredFeature.setNoCoveredBases( coveredBases + noCoveredBases );
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -185,39 +185,37 @@ public class AnalysisCoveredFeatures implements Observer,
 
 
     /**
-     * Detects all features, which satisfy the given minimum coverage value
-     * at at least the given minimum percentage of bases of the feature.
+     * Detects all features, which satisfy the given minimum coverage value at
+     * at least the given minimum percentage of bases of the feature.
      */
     private void findCoveredFeatures() {
-
+        int percentCovered;
         if( analysisParams.isGetCoveredFeatures() ) {
             for( Integer id : this.coveredFeatureCount.keySet() ) {
-                int percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
+                percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered > analysisParams.getMinCoveredPercent() ) {
                     this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
                 }
             }
-        }
-        else {
-            for( Integer id : this.coveredFeatureCount.keySet() ) {
-                int percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
+        } else {
+            for( Integer id : coveredFeatureCount.keySet() ) {
+                percentCovered = coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered <= analysisParams.getMinCoveredPercent() ) {
-                    this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
+                    detectedFeatures.add( coveredFeatureCount.get( id ) );
                 }
             }
         }
-        
     }
 
 
     @Override
     public List<CoveredFeature> getResults() {
-        return this.detectedFeatures;
+        return Collections.unmodifiableList( detectedFeatures );
     }
 
 
     public int getNoGenomeFeatures() {
-        return this.genomeFeatures.size();
+        return genomeFeatures.size();
     }
 
 
@@ -231,8 +229,8 @@ public class AnalysisCoveredFeatures implements Observer,
      */
     private boolean checkCanIncreaseAndSumBothStrands( CoverageManager coverage, int j ) {
         List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
-        int cov = coverage.getTotalCoverage( excludedClasses, j, true )
-                  + coverage.getTotalCoverage( excludedClasses, j, false );
+        int cov = coverage.getTotalCoverage( excludedClasses, j, true ) +
+                 coverage.getTotalCoverage( excludedClasses, j, false );
         return this.increaseSumIfCanIncrease( cov );
     }
 

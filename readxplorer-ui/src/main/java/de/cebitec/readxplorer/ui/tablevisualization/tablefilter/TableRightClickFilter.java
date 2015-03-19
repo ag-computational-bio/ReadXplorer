@@ -18,13 +18,15 @@
 package de.cebitec.readxplorer.ui.tablevisualization.tablefilter;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.GenerateRowSorter;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
@@ -44,9 +46,9 @@ import org.openide.util.NbBundle;
 
 
 /**
- * A MouseAdapter, which offers a filter for the columns of a table. An
- * instance of this class must be added as a listener to the TableHeader of the
- * table that should be filtered. Only tables using a model extending
+ * A MouseAdapter, which offers a filter for the columns of a table. An instance
+ * of this class must be added as a listener to the TableHeader of the table
+ * that should be filtered. Only tables using a model extending
  * DefaultTableModel can be used!
  * <p>
  * @param <E> the table model, which has to extend the DefaultTableModel.
@@ -68,7 +70,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     private JMenuItem resetItem;
     private JMenuItem occurrenceFilter;
     private final Class<E> classType;
-    private Map<Integer, PersistentTrack> trackMap;
+    private final Map<Integer, PersistentTrack> trackMap;
     private final int posColumn;
     private final int trackColumn;
 
@@ -78,7 +80,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
      * instance of this class must be added as a listener to the TableHeader of
      * the table that should be filtered. Only tables using a model extending
      * DefaultTableModel can be used!
-     *
+     * <p>
      * @param classType   the type of the table model, which has to extend the
      *                    DefaultTableModel.
      * @param posColumn   column containing the position information
@@ -88,6 +90,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         this.classType = classType;
         this.posColumn = posColumn;
         this.trackColumn = trackColumn;
+        trackMap = new HashMap<>();
         init();
     }
 
@@ -104,7 +107,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
 
     /**
      * Getter for lastTable. needed in FilterOccurrence class.
-     *
+     * <p>
      * @return lastTable
      */
     public JTable getLastTable() {
@@ -192,8 +195,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Double cutoff = Double.parseDouble( input );
                         setNewTableModel( filterValuesSmallerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
-                    }
-                    catch( NumberFormatException nfe ) {
+                    } catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid number value." );
                     }
                 }
@@ -213,8 +215,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Double cutoff = Double.parseDouble( input );
                         setNewTableModel( filterValuesLargerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
-                    }
-                    catch( NumberFormatException nfe ) {
+                    } catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid value." );
                     }
                 }
@@ -233,8 +234,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     try {
                         Pattern.compile( input );
                         setNewTableModel( filterRegExp( (E) lastTable.getModel(), input, lastSelectedColumn ) );
-                    }
-                    catch( PatternSyntaxException pse ) {
+                    } catch( PatternSyntaxException pse ) {
                         JOptionPane.showMessageDialog( null, "Please enter a valid pattern." );
                     }
                 }
@@ -290,8 +290,8 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
 
 
     /**
-     * Sets the model of the lastTable. Also sets the original table model,
-     * if this is the first call of the method.
+     * Sets the model of the lastTable. Also sets the original table model, if
+     * this is the first call of the method.
      * <p>
      * @param newTableModel the new table model to set
      */
@@ -342,12 +342,13 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
 
 
     public void setTrackMap( Map<Integer, PersistentTrack> trackMap ) {
-        this.trackMap = trackMap;
+        this.trackMap.clear();
+        this.trackMap.putAll( trackMap );
     }
 
 
     public Map<Integer, PersistentTrack> getTrackMap() {
-        return trackMap;
+        return Collections.unmodifiableMap( trackMap );
     }
 
 

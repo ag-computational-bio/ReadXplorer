@@ -31,6 +31,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private final Map<String, Integer> tssStatisticsMap;
+    private final ParameterSetTSS tssParameters;
 
 
     /**
@@ -38,8 +39,9 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
      * <p>
      * @param tssStatisticsMap the snp results statistics to display
      */
-    public TssDetectionStatsPanel( Map<String, Integer> tssStatisticsMap ) {
+    public TssDetectionStatsPanel( Map<String, Integer> tssStatisticsMap, ParameterSetTSS tssParameters ) {
         this.tssStatisticsMap = tssStatisticsMap;
+        this.tssParameters = tssParameters;
         initComponents();
         this.initAdditionalComponents();
     }
@@ -59,6 +61,9 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
 
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
                 {null, null},
                 {null, null},
                 {null, null},
@@ -101,7 +106,9 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -111,9 +118,6 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
 
 
     private void initAdditionalComponents() {
-        int noUnannotatedTrans = this.tssStatisticsMap.get( TssDetectionResult.TSS_NOVEL );
-        String unannotatedTransValue = noUnannotatedTrans
-                                       == TssDetectionResult.UNUSED_STATISTICS_VALUE ? "-" : String.valueOf( noUnannotatedTrans );
         tssDetectionStatsTable.setModel( new javax.swing.table.DefaultTableModel(
                 new Object[][]{
                     { TssDetectionResult.TSS_TOTAL, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_TOTAL ) ) },
@@ -121,9 +125,14 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                     { TssDetectionResult.TSS_UPSTREAM, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_UPSTREAM ) ) },
                     { TssDetectionResult.TSS_DOWNSTREAM, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_DOWNSTREAM ) ) },
                     { TssDetectionResult.TSS_LEADERLESS, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_LEADERLESS ) ) },
+                    { TssDetectionResult.TSS_PRIMARY, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_PRIMARY ) ) },
+                    { TssDetectionResult.TSS_SECONDARY, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_SECONDARY ) ) },
                     { TssDetectionResult.TSS_FWD, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_FWD ) ) },
                     { TssDetectionResult.TSS_REV, String.valueOf( this.tssStatisticsMap.get( TssDetectionResult.TSS_REV ) ) },
-                    { TssDetectionResult.TSS_NOVEL, unannotatedTransValue }
+                    { TssDetectionResult.TSS_NOVEL, tssParameters.isPerformUnannotatedTranscriptDet() 
+                            ? tssStatisticsMap.get( TssDetectionResult.TSS_NOVEL ) : "-" },
+                    { TssDetectionResult.TSS_ASSOCIATED, tssParameters.isAssociateTss()
+                            ? tssStatisticsMap.get(TssDetectionResult.TSS_ASSOCIATED ) : "-" }
                 },
                 new String[]{
                     NbBundle.getMessage( TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1" ),

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.visualisation;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.tablevisualization.TablePanel;
 import java.util.Collection;
@@ -30,8 +30,11 @@ import java.util.Collection;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class TableVisualizationHelper {
+public final class TableVisualizationHelper {
 
+    /**
+     * Do not instantiate.
+     */
     private TableVisualizationHelper() {
     }
 

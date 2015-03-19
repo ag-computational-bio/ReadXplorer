@@ -21,8 +21,8 @@ package de.cebitec.readxplorer.dashboard;
 import de.cebitec.readxplorer.databackend.TrackStatisticsGenerator;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
@@ -60,6 +59,8 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -89,6 +90,9 @@ import org.openide.windows.TopComponent;
     "DashboardWindowTopComponent_openDBButton_loggedIn=Close this and open another database", } )
 public final class DashboardWindowTopComponent extends TopComponentExtended
         implements ExplorerManager.Provider {
+
+    private static final Logger LOG = Logger.getLogger( DashboardWindowTopComponent.class.getName() );
+
 
     private static final long serialVersionUID = 1L;
 
@@ -125,8 +129,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                     public synchronized void run() {
                         try {
                             this.wait( 200 );
-                        }
-                        catch( InterruptedException ex ) {
+                        } catch( InterruptedException ex ) {
                             Exceptions.printStackTrace( ex );
                         }
                         try {
@@ -139,10 +142,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
 
                             } );
-                        }
-                        catch( Exception e ) {
-                            Logger.getLogger( this.getClass().getName() ).log( Level.WARNING,
-                                                                               e.getMessage() );
+                        } catch( Exception e ) {
+                            LOG.log( WARNING, e.getMessage() );
                         }
                     }
 
@@ -167,8 +168,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             explorerSplitPane.setVisible( false );
             openButton.setVisible( false );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedOut() );
-        }
-        else {
+        } else {
             quickstartLabel.setVisible( false );
             explorerSplitPane.setVisible( true );
             openButton.setVisible( true );
@@ -189,12 +189,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                                     trackItems.add( new DBItem( track ) );
                                 }
                                 return new Node[]{ new DBItemNode( new DBItem( genome ), new DBItemChildren( trackItems ) ) };
-                            }
-                            else {
+                            } else {
                                 return new Node[]{ new DBItemNode( new DBItem( genome ) ) };
                             }
-                        }
-                        catch( IntrospectionException ex ) {
+                        } catch( IntrospectionException ex ) {
                             Exceptions.printStackTrace( ex );
                             return new Node[]{};
                         }
@@ -219,8 +217,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 //or like this for one special node:
                 //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
 
-            }
-            catch( OutOfMemoryError e ) {
+            } catch( OutOfMemoryError e ) {
                 VisualisationUtils.displayOutOfMemoryError( this );
             }
         }
@@ -247,8 +244,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                     if( !genomesAndTracksToOpen.containsKey( item.getID() ) ) {
                         genomesAndTracksToOpen.put( item.getID(), new HashSet<Long>() );
                     }
-                }
-                else {
+                } else {
                     if( !genomesAndTracksToOpen.containsKey( item.getRefID() ) ) {
                         genomesAndTracksToOpen.put( item.getRefID(), new HashSet<Long>() );
                         DBItem parentItem = this.getItemForNode( n.getParentNode() );
@@ -310,13 +306,16 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
         org.openide.awt.Mnemonics.setLocalizedText(quickstartLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.quickstartLabel.text")); // NOI18N
 
-        explorerSplitPane.setDividerLocation(200);
         explorerSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        explorerSplitPane.setResizeWeight(1.0);
+        explorerSplitPane.setToolTipText(org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.explorerSplitPane.toolTipText")); // NOI18N
 
+        explorerPanel.setPreferredSize(new java.awt.Dimension(500, 400));
         explorerPanel.setLayout(new java.awt.BorderLayout());
         explorerSplitPane.setLeftComponent(explorerPanel);
 
         buttonPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        buttonPanel.setPreferredSize(new java.awt.Dimension(1053, 51));
 
         org.openide.awt.Mnemonics.setLocalizedText(openButton, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.openButton.text")); // NOI18N
         openButton.setMargin(new java.awt.Insets(15, 50, 15, 50));
@@ -377,12 +376,13 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         storeButtonPanel.setLayout(storeButtonPanelLayout);
         storeButtonPanelLayout.setHorizontalGroup(
             storeButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, storeButtonPanelLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(storeStatsLabel))
             .addGroup(storeButtonPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(storeStatsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(storeButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(storeStatsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(storeButtonPanelLayout.createSequentialGroup()
+                        .addComponent(storeStatsLabel)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         storeButtonPanelLayout.setVerticalGroup(
@@ -400,9 +400,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(buttonPanelLayout.createSequentialGroup()
                 .addComponent(storeButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 231, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 215, Short.MAX_VALUE)
                 .addComponent(openButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 241, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 217, Short.MAX_VALUE)
                 .addComponent(selectButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         buttonPanelLayout.setVerticalGroup(
@@ -470,7 +470,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addGap(1, 1, 1)
                 .addComponent(quickstartLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -481,11 +481,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
      */
     private void initAdditionalComponents() {
 
-        String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - "
-                       + "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> "
-                       + "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore "
-                       + "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via "
-                       + "toolbar buttons or \"Tools\" menu)</p></html>";
+        String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - " +
+                 "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
+                 "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
+                 "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
+                 "toolbar buttons or \"Tools\" menu)</p></html>";
         quickstartLabel.setText( sText );
 
         Border paddingBorder = BorderFactory.createEmptyBorder( 50, 100, 100, 100 );
@@ -523,12 +523,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
-                        }
-                        else {
+                        } else {
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
                                 dbItem.setSelected( true );
-                            }
-                            else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
+                            } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
                         }
@@ -663,13 +661,15 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         loginAction.actionPerformed( evt );
     }
 
+
     /**
-     * Opens a TableFileChooser and fetches the track statistics for all tracks 
+     * Opens a TableFileChooser and fetches the track statistics for all tracks
      * stored in the DB to store their statistics in a table file.
      */
     private void storeTrackStatistics() {
-        TableExportFileChooser fileChooser = new TableExportFileChooser( 
+        TableExportFileChooser fileChooser = new TableExportFileChooser(
                 TableExportFileChooser.getTableFileExtensions(), new TrackStatisticsGenerator() );
     }
+
 
 }

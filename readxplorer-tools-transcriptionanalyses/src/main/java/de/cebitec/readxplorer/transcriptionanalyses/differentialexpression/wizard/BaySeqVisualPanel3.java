@@ -18,9 +18,10 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -32,6 +33,8 @@ import javax.swing.event.ListSelectionListener;
 
 public final class BaySeqVisualPanel3 extends JPanel implements
         ListSelectionListener {
+
+    private static final long serialVersionUID = 1L;
 
     private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private final DefaultListModel<String> groupListModel = new DefaultListModel<>();
@@ -52,7 +55,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
 
     public void updateTrackList( List<PersistentTrack> selectedTracks ) {
         if( !this.selectedTracks.equals( selectedTracks ) ) {
-            this.selectedTracks = new ArrayList<>(selectedTracks );
+            this.selectedTracks = new ArrayList<>( selectedTracks );
             currentGroupNumber = 1;
             selectedIndex = -1;
             currentGroupBeingCreated = null;
@@ -66,8 +69,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
                 strBuilder.append( persistentTrack.getDescription() );
                 if( it.hasNext() ) {
                     strBuilder.append( "," );
-                }
-                else {
+                } else {
                     strBuilder.append( "}" );
                 }
             }
@@ -142,6 +144,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
             }
         });
 
+        jScrollPane4.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         infoText.setEditable(false);
@@ -232,8 +235,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
                 trackListModel.removeElement( persistentTrack );
                 if( it.hasNext() ) {
                     strBuilder.append( "," );
-                }
-                else {
+                } else {
                     strBuilder.append( "}" );
                 }
             }
@@ -268,7 +270,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton addModelButton;
-    private javax.swing.JList createdGroupsList;
+    private javax.swing.JList<String> createdGroupsList;
     private javax.swing.JTextField groupCreationField;
     private javax.swing.JTextField infoText;
     private javax.swing.JLabel jLabel1;
@@ -278,7 +280,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JButton removeModelButton;
-    private javax.swing.JList trackList;
+    private javax.swing.JList<PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
 
@@ -292,7 +294,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
 
 
     public List<Group> getCreatedGroups() {
-        return createdGroups;
+        return Collections.unmodifiableList( createdGroups );
     }
 
 

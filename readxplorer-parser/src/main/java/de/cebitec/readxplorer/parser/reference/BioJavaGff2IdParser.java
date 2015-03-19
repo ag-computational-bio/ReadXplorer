@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.biojava.bio.BioException;
 import org.biojava.bio.program.gff.GFFDocumentHandler;
@@ -42,7 +43,7 @@ public class BioJavaGff2IdParser implements IdParserI {
 
 
     private final List<Observer> observers = new ArrayList<>();
-    private List<String> seqIds;
+    private final List<String> seqIds = new ArrayList<>();
 
 
     /**
@@ -56,7 +57,7 @@ public class BioJavaGff2IdParser implements IdParserI {
      */
     @Override
     public List<String> getSequenceIds( final File gff2File ) throws ParsingException {
-        seqIds = new ArrayList<>();
+        seqIds.clear();
         try( BufferedReader br = new BufferedReader( new FileReader( gff2File ) ) ) {
 
             GFFParser gff2Parser = new GFFParser();
@@ -64,11 +65,10 @@ public class BioJavaGff2IdParser implements IdParserI {
 
             gff2Parser.parse( br, handler );
 
-        }
-        catch( IOException | BioException | ParserException ex ) {
+        } catch( IOException | BioException | ParserException ex ) {
             this.notifyObservers( ex );
         }
-        return seqIds;
+        return Collections.unmodifiableList( seqIds );
     }
 
 

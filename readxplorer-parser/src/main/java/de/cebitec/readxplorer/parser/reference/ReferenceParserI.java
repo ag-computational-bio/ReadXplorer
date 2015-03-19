@@ -22,17 +22,25 @@ import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParserI;
 import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observable;
 
 
 /**
+ * An interface for parsing references.
  *
  * @author ddoppmeier
  */
 public interface ReferenceParserI extends ParserI, Observable {
 
-    public ParsedReference parseReference( ReferenceJob referenceJob, FeatureFilter filter ) throws ParsingException;
+    /**
+     * Parses a reference.
+     * @param referenceJob The reference job to parse the reference from
+     * @param filter The feature filter to use during parsing
+     * @return The parsed reference ready for storing
+     * @throws ParsingException
+     */
+    ParsedReference parseReference( ReferenceJob referenceJob, FeatureFilter filter ) throws ParsingException;
 
 
 }

@@ -23,7 +23,7 @@ package de.cebitec.readxplorer.parser.output;
  *
  * @author Rolf Hilker
  */
-public class OutputWriter {
+public final class OutputWriter {
 
     private OutputWriter() {
     }
@@ -32,37 +32,34 @@ public class OutputWriter {
     /**
      * Generates a string formatted in fasta format.
      * <p>
-     * @param sequence         the sequence to be stored
+     * @param sequence the sequence to be stored
      * @param headerParameters the strings to be contained in the header line of
-     *                         the fasta
+     * the fasta
      * <p>
      * @return the sequence string formatted in fasta format
      */
     public static String generateFasta( String sequence, String... headerParameters ) {
 
-        StringBuilder sb = new StringBuilder( sequence.length() + (sequence.length()/80)*4 + headerParameters.length*50 );
-
-        sb.append( '>' );
+        String header = ">";
         for( int i = 0; i < headerParameters.length; ++i ) {
-            sb.append( headerParameters[i] ).append( ' ' );
+            header = header.concat( headerParameters[i] ).concat( " " );
         }
-        sb.append( "\r\n" );
 
         final int lineLength = 80;
         final int seqLength = sequence.length();
+        String formattedSeq = "";
         int i = 0;
+        int end = 0;
         while( i < seqLength ) {
-            int end = i + lineLength;
+            end = i + lineLength;
 
             if( end > seqLength ) {
                 end = i + (seqLength - i);
             }
-            sb.append( sequence.substring( i, end ) ).append( "\r\n" );
+            formattedSeq = formattedSeq.concat( sequence.substring( i, end ).concat( "\r\n" ) );
             i += lineLength;
         }
-
-        return sb.toString();
-
+        return header.concat( "\r\n" ).concat( formattedSeq );
     }
 
 

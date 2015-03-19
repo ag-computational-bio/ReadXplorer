@@ -23,7 +23,7 @@ import de.cebitec.readxplorer.parser.common.ParsedChromosome;
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.TribbleException;
@@ -41,6 +40,8 @@ import org.broad.tribble.bed.BEDCodec;
 import org.broad.tribble.bed.BEDFeature;
 import org.broad.tribble.bed.FullBEDFeature.Exon;
 import org.broad.tribble.readers.LineIterator;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -51,11 +52,13 @@ import org.broad.tribble.readers.LineIterator;
  */
 public class TribbleBEDParser implements ReferenceParserI {
 
+    private static final Logger LOG = Logger.getLogger( TribbleBEDParser.class.getName() );
+
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtension = new String[]{ "bed", "BED" };
+    private static final String[] FILE_EXTENSION = new String[]{"bed", "BED"};
     // name of this parser for use in ComboBoxes
-    private static final String parserName = "BED file";
-    private static final String fileDescription = "BED file";
+    private static final String PARSER_NAME = "BED file";
+    private static final String FILE_DESCRIPTION = "BED file";
     private final List<Observer> observers = new ArrayList<>();
 
 
@@ -64,8 +67,7 @@ public class TribbleBEDParser implements ReferenceParserI {
      * the BED annotations from the BED file contained in the ReferenceJob.
      * <p>
      * @param referenceJob the reference job containing the files
-     * @param filter       the feature filter to use (removes undesired
-     *                     features)
+     * @param filter the feature filter to use (removes undesired features)
      * <p>
      * @return the parsed reference object with all parsed features
      * <p>
@@ -81,14 +83,14 @@ public class TribbleBEDParser implements ReferenceParserI {
         //at first store all eonxs in one data structure and add them to the ref genome at the end
 //        Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
+        LOG.log( INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
 
             final BEDCodec bedCodec = new BEDCodec( BEDCodec.StartOffset.ZERO );
             final AbstractFeatureReader<BEDFeature, LineIterator> reader = AbstractFeatureReader.getFeatureReader( referenceJob.getFile().getAbsolutePath(), bedCodec, false );
             if( bedCodec.canDecode( referenceJob.getFile().getAbsolutePath() ) ) {
 
-                Object header = reader.getHeader(); //TODO: something to do with the header?
+                Object header = reader.getHeader(); //TODO something to do with the header?
 
                 final Iterator<BEDFeature> featIt = reader.iterator();
                 while( reader.hasIndex() ) {
@@ -101,7 +103,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                         final int strand = feat.getStrand().equals( Strand.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         final String geneName = feat.getName();
                         final String locusTag = feat.getDescription();
-                        final String ecNumber = feat.getDescription(); //TODO: check this and test it
+                        final String ecNumber = feat.getDescription(); //TODO check this and test it
                         final String product = feat.getDescription();
                         final String parsedType = feat.getType();
 
@@ -112,7 +114,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                         final FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             this.notifyObservers( referenceJob.getFile().getName()
-                                                  + ": Using unknown feature type for " + parsedType );
+                                    + ": Using unknown feature type for " + parsedType );
                         }
 
                         final List<ParsedFeature> subFeatures = new ArrayList<>();
@@ -136,8 +138,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                 }
             }
 
-        }
-        catch( IOException | TribbleException ex ) {
+        } catch( IOException | TribbleException ex ) {
             throw new ParsingException( ex );
         }
 
@@ -147,19 +148,19 @@ public class TribbleBEDParser implements ReferenceParserI {
 
     @Override
     public String getName() {
-        return parserName;
+        return PARSER_NAME;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSION;
     }
 
 

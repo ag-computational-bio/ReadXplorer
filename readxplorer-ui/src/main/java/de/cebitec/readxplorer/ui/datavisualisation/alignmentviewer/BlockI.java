@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.ObjectWithId;
+import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
 import java.util.Iterator;
 
 
@@ -28,19 +28,19 @@ import java.util.Iterator;
  */
 public interface BlockI {
 
-    public int getAbsStart();
+    int getAbsStart();
 
 
-    public int getAbsStop();
+    int getAbsStop();
 
 
-    public Iterator<Brick> getBrickIterator();
+    Iterator<Brick> getBrickIterator();
 
 
-    public ObjectWithId getObjectWithId();
+    ObjectWithId getObjectWithId();
 
 
-    public int getNumOfBricks();
+    int getNumOfBricks();
 
 
 }

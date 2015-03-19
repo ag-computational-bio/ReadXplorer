@@ -29,7 +29,7 @@ import org.openide.util.NbPreferences;
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CodonUtilities {
+public final class CodonUtilities {
 
     private CodonUtilities() {
     }
@@ -39,28 +39,31 @@ public class CodonUtilities {
      * Parses custom codons of a line defined by the "wantedIndex" into an array
      * of Strings. Each codon is one entry in the resulting array.
      * <p>
-     * @param wantedIndex       index of the line containing the wanted codons
+     * @param wantedIndex index of the line containing the wanted codons
      * @param customCodonString string containing the codons inbetween '(' & ')'
-     *                          and seperated by a ',', e.g. (AGT, AGG)
+     * and seperated by a ',', e.g. (AGT, AGG)
      * <p>
      * @return A pair containing two arrays with the wanted codons. The first
-     *         array contains the start codons, the second the stop codons.
+     * array contains the start codons, the second the stop codons.
      */
     public static Pair<String[], String[]> parseCustomCodons( int wantedIndex, String customCodonString ) {
+
         GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
         int index = genCodeFactory.getGeneticCodes().size() + 1;
-        while( index++ <= wantedIndex ) {
+        while( index <= wantedIndex ) {
+            index++;
             customCodonString = customCodonString.substring( customCodonString.indexOf( '\n' ) + 1, customCodonString.length() );
         }
         int startIndex = customCodonString.startsWith( "\n" ) ? 2 : 1;
         String codons = customCodonString.substring( startIndex, customCodonString.indexOf( ')' ) );
         String[] startsAndStops = codons.split( ";" );
-        String[] starts = splitCodons( startsAndStops[0] );
         String[] stops = {};
         if( startsAndStops.length > 1 ) {
             stops = splitCodons( startsAndStops[1] );
         }
+        String[] starts = splitCodons( startsAndStops[0] );
         return new Pair<>( starts, stops );
+
     }
 
 
@@ -69,8 +72,8 @@ public class CodonUtilities {
      * and stop codons.
      * <p>
      * @return A pair containing two arrays with the codons of the selected
-     *         genetic code. The first array contains the start codons, the second the
-     *         stop codons.
+     * genetic code. The first array contains the start codons, the second the
+     * stop codons.
      */
     public static Pair<String[], String[]> getGeneticCodeArrays() {
         String[] startCodons = new String[0];
@@ -86,10 +89,9 @@ public class CodonUtilities {
                     pref.get( Properties.SEL_GENETIC_CODE, Properties.STANDARD_CODE_INDEX ) ) );
             startCodons = code.getStartCodons().toArray( startCodons );
             stopCodons = code.getStopCodons().toArray( stopCodons );
-        }
-        else {
+        } else {
             Pair<String[], String[]> codonPair = CodonUtilities.parseCustomCodons( codeIndex,
-                                                                                   pref.get( Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD_CODE_INDEX ) );
+                    pref.get( Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD_CODE_INDEX ) );
             startCodons = codonPair.getFirst();
             stopCodons = codonPair.getSecond();
         }
@@ -99,23 +101,23 @@ public class CodonUtilities {
 
     /**
      * @return Ensures that always a valid genetic code is returned. If a custom
-     *         genetic code is selected (which does not include a translation table),
-     *         the standard genetic code is used instead. Use this method, if not only
-     *         the start and stop codons of a genetic code are needed, but the other
-     *         codons and translations as well.
+     * genetic code is selected (which does not include a translation table),
+     * the standard genetic code is used instead. Use this method, if not only
+     * the start and stop codons of a genetic code are needed, but the other
+     * codons and translations as well.
      */
     public static GeneticCode getGeneticCode() {
-        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+
         Preferences pref = NbPreferences.forModule( Object.class );
         Integer codeIdx;
         try {
             codeIdx = Integer.valueOf( pref.get( Properties.SEL_GENETIC_CODE, Properties.STANDARD_CODE_INDEX ) );
-        }
-        catch( NumberFormatException e ) {
+        } catch( NumberFormatException e ) {
             codeIdx = Integer.valueOf( Properties.STANDARD_CODE_INDEX );
         }
 
-        return genCodeFactory.getGeneticCodeById( codeIdx );
+        return GeneticCodeFactory.getDefault().getGeneticCodeById( codeIdx );
+
     }
 
 

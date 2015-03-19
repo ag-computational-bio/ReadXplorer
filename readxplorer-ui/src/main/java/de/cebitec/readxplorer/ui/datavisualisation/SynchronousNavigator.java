@@ -24,10 +24,10 @@ package de.cebitec.readxplorer.ui.datavisualisation;
  */
 public interface SynchronousNavigator {
 
-    public void setCurrentScrollValue( int value );
+    void setCurrentScrollValue( int value );
 
 
-    public void setCurrentZoomValue( int value );
+    void setCurrentZoomValue( int value );
 
 
 }

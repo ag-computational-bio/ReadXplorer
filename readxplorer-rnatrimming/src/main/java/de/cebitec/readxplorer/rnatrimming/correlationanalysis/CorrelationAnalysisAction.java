@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
@@ -52,6 +52,8 @@ import org.openide.util.NbBundle.Messages;
 @Messages( "CTL_CorrelationAnalysisAction=Correlation analysis" )
 public final class CorrelationAnalysisAction implements ActionListener {
 
+    private static final Logger LOG = Logger.getLogger( CorrelationAnalysisAction.class.getName() );
+
     public static final String PROP_SELECTED_TRACKS = "PROP_SELECTED_TRACKS";
     public static final String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";
     public static final String PROP_MINCORRELATION = "PROP_MINCORRELATION";
@@ -68,7 +70,6 @@ public final class CorrelationAnalysisAction implements ActionListener {
 
 
     private SelectReadClassWizardPanel readClassWizPanel;
-    private final static Logger LOG = Logger.getLogger( CorrelationAnalysisAction.class.getName() );
     private final ReferenceViewer context;
 
 
@@ -112,9 +113,6 @@ public final class CorrelationAnalysisAction implements ActionListener {
                     readClassesParams, coefficient, intervalLength, minCorrelation, minPeakCoverage, tracks );
 
             new CorrelationAnalysisProcessor( context, parametersCorrelationAnalysis );
-        }
-        else {
-            //do nothing
         }
     }
 

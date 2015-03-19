@@ -38,9 +38,13 @@ public final class SQLStatements {
      */
     public static final String GET_NUM = "NUM";
 
-
     //////////////////  statements for table creation  /////////////////////////
 
+//    public static final String SETUP_PROJECT_FOLDER =
+//            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_PROJECT_FOLDER
+//            + " ("
+//            + FieldNames.PROJECT_FOLDER_PATH + " VARCHAR(400) NOT NULL "
+//            + ") ";
     public static final String SETUP_STATISTICS
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
               + "( "
@@ -69,9 +73,14 @@ public final class SQLStatements {
      */
     public static final String DROP_INDEX = "DROP INDEX IF EXISTS ";
 
-
     //////////////////  statements for data insertion  ////////////////////////
 
+//    public static final String INSERT_PROJECT_FOLDER =
+//            "INSERT INTO " + FieldNames.TABLE_PROJECT_FOLDER
+//            + "("
+//            + FieldNames.PROJECT_FOLDER_PATH
+//            + ") "
+//            + " VALUES (?); ";
     public static final String INSERT_REFGENOME
             = "INSERT INTO " + FieldNames.TABLE_REFERENCE + " "
               + "("
@@ -506,6 +515,13 @@ public final class SQLStatements {
               + FieldNames.TABLE_STATISTICS;
 
 
+//    public static final String FETCH_GENOMEID_FOR_TRACK =
+//            "SELECT "
+//            + FieldNames.TRACK_REFERENCE_ID + " "
+//            + "FROM "
+//            + FieldNames.TABLE_TRACK + " "
+//            + "WHERE "
+//            + FieldNames.TRACK_ID + " = ?";
     /**
      * @param trackId track id of one track of a read pair
      */
@@ -516,7 +532,6 @@ public final class SQLStatements {
               + FieldNames.TABLE_TRACK + " "
               + "WHERE "
               + FieldNames.TRACK_ID + " = ? ";
-
 
     /**
      * Fetches second track id for read pair tracks.
@@ -565,7 +580,7 @@ public final class SQLStatements {
               + FieldNames.COUNT_DISTRIBUTION_DISTRIBUTION_TYPE + " = ? ";
 
 
-    public static String INIT_FEATURE_PARENT_ID
+    public static final String INIT_FEATURE_PARENT_ID
             = "UPDATE "
               + FieldNames.TABLE_FEATURES
               + " SET "
@@ -607,5 +622,45 @@ public final class SQLStatements {
               + " ALTER COLUMN "
               + FieldNames.FEATURE_CHROMOSOME_ID
               + " SET NOT NULL";
-    
+
+//             public static final String COPY_TO_FEATURE_DETAILS_TABLE =
+//                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("
+//                    + FieldNames.FEATURE_ID + ", "
+//                    + FieldNames.FEATURE_EC_NUM + ", "
+//                    + FieldNames.FEATURE_LOCUS_TAG + ", "
+//                    + FieldNames.FEATURE_PRODUCT + ", "
+//                    + FieldNames.FEATURE_STRAND + ", "
+//                    + FieldNames.FEATURE_GENE + ") "
+//                + " SELECT "
+//                    + FieldNames.FEATURE_ID + ", "
+//                    + FieldNames.FEATURE_EC_NUM + ", "
+//                    + FieldNames.FEATURE_LOCUS_TAG + ", "
+//                    + FieldNames.FEATURE_PRODUCT + ", "
+//                    + FieldNames.FEATURE_STRAND + ", "
+//                    + FieldNames.FEATURE_GENE
+//                + " FROM "
+//                    + FieldNames.TABLE_FEATURES +
+//                " WHERE EXISTS ("
+//                    + "SELECT * "
+//                    + "FROM INFORMATION_SCHEMA.COLUMNS "
+//                    + "WHERE TABLE_NAME = '" + FieldNames.TABLE_FEATURES + "' "
+//                    + " AND COLUMN_NAME = '" + FieldNames.FEATURE_PRODUCT + "' ) ";
+//
+//
+//
+//
+//             public static final String CHECK_FEATURE_TABLE =
+//                "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"
+//                    + FieldNames.TABLE_FEATURES + "' AND COLUMN_NAME = '"
+//                    + FieldNames.FEATURE_PRODUCT + "' ";
+//
+//
+//
+//
+//             public static final String ALTER_FEATURE_TABLE =
+//                "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_EC_NUM + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_GENE + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_LOCUS_TAG + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_PRODUCT + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_STRAND + "; ";
 }

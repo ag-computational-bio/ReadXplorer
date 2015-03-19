@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
 import org.openide.WizardDescriptor;
 

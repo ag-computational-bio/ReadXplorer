@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -34,7 +35,7 @@ import org.openide.util.NbBundle;
 /**
  * A standard JPanel with functionality to handle multiple files, a list of
  * mapping files and manage a used directory.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class FileSelectionPanel extends JPanel {
@@ -42,12 +43,12 @@ public class FileSelectionPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private boolean useMultipleImport = false;
-    private List<File> mappingFiles = new ArrayList<>();
+    protected final List<File> mappingFiles = new ArrayList<>();
 
 
     /**
-     * A standard JPanel with functionality to handle multiple files
-     * and manage a used directory.
+     * A standard JPanel with functionality to handle multiple files and manage
+     * a used directory.
      */
     public FileSelectionPanel() {
     }
@@ -64,17 +65,16 @@ public class FileSelectionPanel extends JPanel {
     public void addFile( File file, JTextField mappingFileField ) {
         if( file.canRead() ) {
             addMappingFile( file );
-            /*TODO: Read sam header & check against reference, show a mapping of references up to 100? entries. Show button to list more/all
-             //try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
-             //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
-             //SAMFileHeader header = samReader.getFileHeader();
-             //} } catch (Exception e) {
-             this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
-             Exceptions.printStackTrace(e);
-             } */
+            /* TODO: Read sam header & check against reference, show a mapping of
+             * references up to 100? entries. Show button to list more/all //try
+             * (SAMFileReader samReader = new SAMFileReader(trackJob.getFile()))
+             * {
+             * //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+             * //SAMFileHeader header = samReader.getFileHeader(); //} } catch
+             * (Exception e) { this.notifyObservers(e.getMessage() != null ?
+             * e.getMessage() : e); Exceptions.printStackTrace(e); } */
             mappingFileField.setText( file.getAbsolutePath() );
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog( this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE );
         }
     }
@@ -103,11 +103,10 @@ public class FileSelectionPanel extends JPanel {
      * @return The single mapping file to import
      */
     public File getMappingFile() {
-        if( getMappingFiles().isEmpty() ) {
+        if( mappingFiles.isEmpty() ) {
             return null;
-        }
-        else {
-            return getMappingFiles().get( 0 );
+        } else {
+            return mappingFiles.get( 0 );
         }
     }
 
@@ -117,17 +116,7 @@ public class FileSelectionPanel extends JPanel {
      *         set import with the same parameters at once.
      */
     public List<File> getMappingFiles() {
-        return mappingFiles;
-    }
-
-
-    /**
-     * Sets the mapping files for multiple track import at once.
-     * <p>
-     * @param mappingFiles The list of mapping files to import at once
-     */
-    protected void setMappingFiles( List<File> mappingFiles ) {
-        this.mappingFiles = mappingFiles;
+        return Collections.unmodifiableList( mappingFiles );
     }
 
 
@@ -167,13 +156,12 @@ public class FileSelectionPanel extends JPanel {
      *                               once, false otherwise
      * @param multiTrackScrollPane   scrollpane to display multiple files
      * @param multiTrackList         list which actually displays the multiple
-     *                               files on
-     *                               the scrollpane
+     *                               files on the scrollpane
      * @param multiTrackListLabel    the label which should only be visible for
      *                               multiple file handling
      * @param fileTextField          text field displaying either the file path
-     *                               for
-     *                               single files or the count of files to handle for multiple file handling
+     *                               for single files or the count of files to
+     *                               handle for multiple file handling
      */
     public void updateGuiForMultipleFiles( boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
                                            JLabel multiTrackListLabel, JTextField fileTextField ) {
@@ -182,13 +170,12 @@ public class FileSelectionPanel extends JPanel {
         multiTrackList.setVisible( this.useMultipleImport() );
         multiTrackListLabel.setVisible( this.useMultipleImport() );
         if( this.useMultipleImport() ) {
-            fileTextField.setText( getMappingFiles().size() + " tracks to import" );
+            fileTextField.setText( mappingFiles.size() + " tracks to import" );
             DefaultListModel<String> model = new DefaultListModel<>();
-            fillMultipleImportTable( model, getMappingFiles(), "Mapping file list:" );
+            fillMultipleImportTable( model, mappingFiles, "Mapping file list:" );
             multiTrackList.setModel( model );
             this.setSize( this.getPreferredSize() );
-        }
-        else {
+        } else {
             fileTextField.setText( getMappingFile() != null ? getMappingFile().getAbsolutePath() : "" );
             multiTrackList.setModel( new DefaultListModel<String>() );
         }

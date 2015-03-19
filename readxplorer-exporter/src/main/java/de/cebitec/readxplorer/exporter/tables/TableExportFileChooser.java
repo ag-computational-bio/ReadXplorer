@@ -110,8 +110,7 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
                     TableExporterI exporter;
                     if( getFileFilter().getDescription().contains( "xls" ) ) {
                         exporter = new ExcelExporter( progressHandle );
-                    }
-                    else { //file filter contains csv
+                    } else { //file filter contains csv
                         exporter = new CsvExporter( progressHandle );
                     }
                     exporter.setHeaders( exportData.dataColumnDescriptions() );
@@ -122,18 +121,14 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
 
                             exporter.writeFile( new File( fileLocation ) );
 
-                        }
-                        catch( FileNotFoundException ex ) {
+                        } catch( FileNotFoundException ex ) {
                             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE );
-                        }
-                        catch( IOException ex ) {
+                        } catch( IOException ex ) {
                             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE );
-                        }
-                        catch( WriteException ex ) {
+                        } catch( WriteException ex ) {
                             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.FailMsg(),
                                                            Bundle.FailHeader(), JOptionPane.ERROR_MESSAGE );
-                        }
-                        catch( OutOfMemoryError e ) {
+                        } catch( OutOfMemoryError e ) {
                             JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.OomMsg(),
                                                            Bundle.FailHeader(), JOptionPane.INFORMATION_MESSAGE );
                         }

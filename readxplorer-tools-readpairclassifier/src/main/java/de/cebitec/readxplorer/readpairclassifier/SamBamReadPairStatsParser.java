@@ -30,22 +30,25 @@ import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
 
+import static java.util.logging.Level.INFO;
+
 
 /**
- * A parser only responsible for parsing read pair statistics for a track.
- * This parser is mainly used for track, which have already been imported into
+ * A parser only responsible for parsing read pair statistics for a track. This
+ * parser is mainly used for track, which have already been imported into
  * another ReadXplorer DB and are now reimported.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
+
+    private static final Logger LOG = Logger.getLogger( SamBamReadPairStatsParser.class.getName() );
 
     //TODO: identify when pair goes across end of genome but only if circular reference genome
     private final TrackJob trackJob;
@@ -54,15 +57,14 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
 
     /**
-     * A parser only responsible for parsing read pair statistics for a
-     * track. This parser is mainly used for track, which have already been
-     * imported into another ReadXplorer DB and are now reimported.
+     * A parser only responsible for parsing read pair statistics for a track.
+     * This parser is mainly used for track, which have already been imported
+     * into another ReadXplorer DB and are now reimported.
      * <p>
      * @param readPairJobContainer container with both track jobs of this pair
      * @param chromLengthMap       mapping of chromosome names to their length
      * @param classificationMap    the classification map of the track - not
-     *                             needed
-     *                             in this parser until now
+     *                             needed in this parser until now
      */
     public SamBamReadPairStatsParser( ReadPairJobContainer readPairJobContainer, Map<String, Integer> chromLengthMap, Map<String, ParsedClassification> classificationMap ) {
         super( readPairJobContainer, chromLengthMap );
@@ -86,19 +88,19 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
     public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
 
         try( SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() ) ) {
-            final long start = System.currentTimeMillis();
-            this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
+            long start = System.currentTimeMillis();
+            long finish;
+            int lineNo = 0;
+            notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
 
             samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-            final SAMRecordIterator samItor = samBamReader.iterator();
+            SAMRecordIterator samItor = samBamReader.iterator();
 
-            final String refName = trackJob.getRefGen().getName();
-            int lineNo = 0;
             while( samItor.hasNext() ) {
-                lineNo++;
+                ++lineNo;
                 //separate all mappings of same pair by read pair tag and hand it over to classification then
                 SAMRecord record = samItor.next();
-                if( !record.getReadUnmappedFlag() && record.getReferenceName().equals( refName ) ) {
+                if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
                     char pairTag = CommonsMappingParser.getReadPairTag( record );
 
                     if( pairTag == Properties.EXT_A1 ) {
@@ -114,13 +116,11 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                                 }
                             }
 
-                        }
-                        else {
+                        } else {
                             this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
                         }
 
-                    }
-                    else if( pairTag == Properties.EXT_A2 ) {
+                    } else if( pairTag == Properties.EXT_A2 ) {
 
                         Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
                         if( classobj != null && classobj instanceof Integer ) {
@@ -128,15 +128,14 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                             if( pairClass == ReadPairType.UNPAIRED_PAIR ) {
                                 this.statsContainer.incReadPairStats( pairClass, 1 );
                             } //else we have already counted read 1 of the pair
-                        }
-                        else {
+                        } else {
                             this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
                         }
                     }
                 }
 
                 if( lineNo % 500000 == 0 ) {
-                    long finish = System.currentTimeMillis();
+                    finish = System.currentTimeMillis();
                     this.notifyObservers( Benchmark.calculateDuration( start, finish, lineNo + " mappings processed in " ) );
                 }
                 System.err.flush();
@@ -144,16 +143,15 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
             samItor.close();
 
-            long finish = System.currentTimeMillis();
+            finish = System.currentTimeMillis();
             String msg = NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Finish" );
             this.notifyObservers( Benchmark.calculateDuration( start, finish, msg ) );
 
             this.statsContainer.setReadPairDistribution( this.readPairSizeDistribution );
 
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Error", e.getMessage() ) );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, e.getMessage() );
+            LOG.log( INFO, e.getMessage() );
         }
 
         return new ParsedReadPairContainer();

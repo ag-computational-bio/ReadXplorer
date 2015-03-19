@@ -75,8 +75,7 @@ public class Layer implements LayerI {
                     sb.append( "-" );
                 }
                 sb.append( "." );
-            }
-            else {
+            } else {
                 sb.append( "." );
             }
         }

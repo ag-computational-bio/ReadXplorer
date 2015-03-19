@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +27,8 @@ import javax.swing.JPanel;
 
 
 public final class BaySeqVisualPanel2 extends JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
@@ -165,8 +167,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
                 trackListModel.removeElement( persistentTrack );
                 if( it.hasNext() ) {
                     strBuilder.append( "," );
-                }
-                else {
+                } else {
                     strBuilder.append( "}" );
                 }
             }

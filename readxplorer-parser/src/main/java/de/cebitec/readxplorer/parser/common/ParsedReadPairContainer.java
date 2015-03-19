@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +56,8 @@ public class ParsedReadPairContainer {
 
 
     /**
-     * Adds all mappings to a MappingGroup with same pair id,
-     * but different mapping positions
-     * Mapping = is unique to a sequence and position
+     * Adds all mappings to a MappingGroup with same pair id, but different
+     * mapping positions Mapping = is unique to a sequence and position
      * <p>
      * @param mappingIDs
      * @param parsedReadPair
@@ -65,19 +65,18 @@ public class ParsedReadPairContainer {
     public void addParsedReadPair( Pair<Long, Long> mappingIDs, ParsedReadPairMapping parsedReadPair ) {
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
         if( !this.parsedReadPairs.containsKey( mappingIDs ) ) {
-            this.parsedReadPairs.put( mappingIDs, parsedReadPair ); //TODO: mappingIDs can be vice versa
+            this.parsedReadPairs.put( mappingIDs, parsedReadPair ); //TODO mappingIDs can be vice versa
 
             if( parsedReadPair.getType() == ReadPairType.PERFECT_PAIR || parsedReadPair.getType() == ReadPairType.PERFECT_UNQ_PAIR ) {
-                statsMap.put( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) + 1 );
+                statsContainer.addStatsValue( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) + 1 );
             }
-            statsMap.put( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) + 1 );
-        }
-        else {
+            statsContainer.addStatsValue( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) + 1 );
+        } else {
             this.parsedReadPairs.get( mappingIDs ).addReplicate();
             if( parsedReadPair.getType() == ReadPairType.PERFECT_PAIR || parsedReadPair.getType() == ReadPairType.PERFECT_UNQ_PAIR ) {
-                statsMap.put( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) - 1 );
+                statsContainer.addStatsValue( StatsContainer.NO_UNIQ_PERF_PAIRS, statsMap.get( StatsContainer.NO_UNIQ_PERF_PAIRS ) - 1 );
             }
-            statsMap.put( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) - 1 );
+            statsContainer.addStatsValue( StatsContainer.NO_UNIQUE_PAIRS, statsMap.get( StatsContainer.NO_UNIQUE_PAIRS ) - 1 );
         }
         statsContainer.incReadPairStats( parsedReadPair.getType(), 1 );
     }
@@ -99,19 +98,18 @@ public class ParsedReadPairContainer {
 
 
     public Map<Pair<Long, Long>, ParsedReadPairMapping> getParsedReadPairs() {
-        return parsedReadPairs;
+        return Collections.unmodifiableMap( parsedReadPairs );
     }
 
 
     /**
      * @return The mapping list of all mapping ids to their corresponding
-     *         sequence pair ids. Only contains the mappings which don't form a proper
-     *         pair.
-     *         To get this mapping for paired sequences use
-     *         <code>getParsedReadPairs()</code>.
+     * sequence pair ids. Only contains the mappings which don't form a proper
+     * pair. To get this mapping for paired sequences use
+     * <code>getParsedReadPairs()</code>.
      */
     public List<Pair<Long, Long>> getMappingToPairIdList() {
-        return this.mappingToPairIDList;
+        return Collections.unmodifiableList( mappingToPairIDList );
     }
 
 

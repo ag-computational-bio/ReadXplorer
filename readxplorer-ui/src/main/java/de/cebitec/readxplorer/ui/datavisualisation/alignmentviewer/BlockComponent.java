@@ -20,10 +20,10 @@ package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 import de.cebitec.readxplorer.databackend.SamBamFileReader;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Difference;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.ObjectWithId;
-import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataobjects.Difference;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
+import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.ui.datavisualisation.PaintUtilities;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
@@ -35,6 +35,7 @@ import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -48,22 +49,25 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 
 import static de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer.PROP_MOUSEPOSITION_CHANGED;
+import static java.util.logging.Level.SEVERE;
 
 
 /**
  * A <code>BlockComponent</code> represents a read alignment as a colored
  * rectangle and has knowledge of all important information of the alignment.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class BlockComponent extends JComponent {
+
+    private static final Logger LOG = Logger.getLogger( BlockComponent.class.getName() );
+
 
     private static final long serialVersionUID = 1324672345;
     private final BlockI block;
@@ -221,8 +225,8 @@ public class BlockComponent extends JComponent {
      * @return The reference sequence
      */
     public String getSequence() {
-        int start = ((Mapping) block.getObjectWithId()).getStart();
-        int stop = ((Mapping) block.getObjectWithId()).getStop();
+        int start = ((GenomicRange) block.getObjectWithId()).getStart();
+        int stop = ((GenomicRange) block.getObjectWithId()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getActiveChromSequence( start - 1, stop );
         return readSequence;
@@ -266,8 +270,7 @@ public class BlockComponent extends JComponent {
 
         if( mapping.isUnique() ) {
             sb.append( createTableRow( "Unique", "yes" ) );
-        }
-        else {
+        } else {
             sb.append( createTableRow( "Unique", "no" ) );
         }
         sb.append( createTableRow( "Number of mappings for read", mapping.getNumMappingsForRead() + "" ) );
@@ -311,8 +314,8 @@ public class BlockComponent extends JComponent {
     /**
      * @param baseQualities The array of phred scaled base qualities to convert
      * <p>
-     * @return A String representation of the phred scaled base qualities in
-     *         the array.
+     * @return A String representation of the phred scaled base qualities in the
+     *         array.
      */
     private String generateBaseQualString( byte[] baseQualities ) {
         String baseQualString = "[";
@@ -327,11 +330,9 @@ public class BlockComponent extends JComponent {
         }
         if( baseQualString.endsWith( "," ) ) {
             baseQualString = baseQualString.substring( 0, baseQualString.length() - 1 ) + "]";
-        }
-        else if( baseQualString.endsWith( "<br>" ) ) {
+        } else if( baseQualString.endsWith( "<br>" ) ) {
             baseQualString = baseQualString.substring( 0, baseQualString.length() - 5 ) + "]";
-        }
-        else if( baseQualString.length() == 1 ) {
+        } else if( baseQualString.length() == 1 ) {
             baseQualString = "";
         }
         return baseQualString;
@@ -420,9 +421,8 @@ public class BlockComponent extends JComponent {
         //Used for determining location of brick in viewer
         int brickCount = 0;
         int gapCount = 0;
-        Brick brick;
         for( Iterator<Brick> it = block.getBrickIterator(); it.hasNext(); ) {
-            brick = it.next();
+            Brick brick = it.next();
 
             if( brick != Brick.MATCH || showBaseQualities ) {
                 // get start of brick
@@ -459,8 +459,7 @@ public class BlockComponent extends JComponent {
                             gapCount = 0;
                     }
 
-                }
-                else {
+                } else {
                     if( mapping.getBaseQualities().length > brickCount ) {
                         brickColor = ColorUtils.getAdaptedColor( mapping.getBaseQualities()[brickCount], SequenceUtils.MAX_PHRED, blockColor );
                     }
@@ -470,8 +469,7 @@ public class BlockComponent extends JComponent {
                 if( brickColor != null ) {
                     this.brickDataList.add( new BrickData( brick, rectangle, brickColor, labelCenter ) );
                 }
-            }
-            else {
+            } else {
                 gapCount = 0;
             }
 
@@ -483,10 +481,10 @@ public class BlockComponent extends JComponent {
     /**
      * Calculates the alignment blocks to paint for the given mapping.
      * <p>
-     * @param ObjectWithId The ObjectWithId, which should be a Mapping
+     * @param objectWithId The ObjectWithId, which should be a Mapping
      */
-    private void calcAlignmentBlocks( ObjectWithId ObjectWithId ) {
-        ObjectWithId persObj = ObjectWithId;
+    private void calcAlignmentBlocks( ObjectWithId objectWithId ) {
+        ObjectWithId persObj = objectWithId;
         if( persObj instanceof Mapping ) {
             this.blockColor = this.determineBlockColor();
             Mapping mapping = (Mapping) persObj;
@@ -495,8 +493,7 @@ public class BlockComponent extends JComponent {
                 Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
                         mapping.getStart(), mapping.getStop(), parentViewer, phyLeft, height );
                 this.rectList.add( blockRect );
-            }
-            else {
+            } else {
                 for( SamAlignmentBlock aBlock : mapping.getAlignmentBlocks() ) {
                     Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
                             aBlock.getRefStart(), aBlock.getRefStop(), parentViewer, phyLeft, height );
@@ -553,11 +550,11 @@ public class BlockComponent extends JComponent {
                 break;
             case UNDEF:
                 c = ColorProperties.MISMATCH_BACKGROUND;
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown brick type {0}", brick );
+                LOG.log( SEVERE, "found unknown brick type {0}", brick );
                 break;
             default:
                 c = ColorProperties.MISMATCH_BACKGROUND;
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown brick type {0}", brick );
+                LOG.log( SEVERE, "found unknown brick type {0}", brick );
         }
 
         return c;

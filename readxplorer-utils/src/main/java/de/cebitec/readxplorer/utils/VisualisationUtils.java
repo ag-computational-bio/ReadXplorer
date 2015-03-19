@@ -29,11 +29,15 @@ import org.openide.util.NbBundle;
 
 /**
  * Class containing general visualization related methods.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class VisualisationUtils {
+public final class VisualisationUtils {
 
+    
+    /**
+     * Instantiation not allowed!
+     */
     private VisualisationUtils() {
     }
 
@@ -53,8 +57,7 @@ public class VisualisationUtils {
             if( c instanceof JButton ) {
                 buttons.add( (JButton) c );
 
-            }
-            else if( c instanceof JComponent ) {
+            } else if( c instanceof JComponent ) {
                 VisualisationUtils.getButtons( (JComponent) c, buttons );
             }
         }
@@ -62,9 +65,8 @@ public class VisualisationUtils {
 
 
     /**
-     * Initialize panels representing individual wizard's steps and sets
-     * various properties for them influencing wizard appearance for static
-     * wizards.
+     * Initialize panels representing individual wizard's steps and sets various
+     * properties for them influencing wizard appearance for static wizards.
      * <p>
      * @param wizardPanels the panels belonging to the wizard
      * <p>
@@ -92,6 +94,11 @@ public class VisualisationUtils {
     }
 
 
+    /**
+     * Displays an out of memory error in a JOptionPane.
+     * <p>
+     * @param parentPanel The parent panel causing the error.
+     */
     public static void displayOutOfMemoryError( Component parentPanel ) {
         String msg = NbBundle.getMessage( VisualisationUtils.class, "OOM_Message",
                                           "An out of memory error occured during fetching the references. Please restart the software with more memory." );

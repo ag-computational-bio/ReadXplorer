@@ -25,7 +25,7 @@ package de.cebitec.readxplorer.databackend;
  *
  * @author jstraube, rhilker
  */
-public class H2SQLStatements {
+public final class H2SQLStatements {
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -35,7 +35,7 @@ public class H2SQLStatements {
 
     //////////////////  statements for table creation  /////////////////////////
 
-    public final static String SETUP_REFERENCE_GENOME
+    public static final String SETUP_REFERENCE_GENOME
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REFERENCE
               + " ("
               + FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, "
@@ -46,7 +46,7 @@ public class H2SQLStatements {
               + ") ";
 
 
-    public final static String SETUP_CHROMOSOME
+    public static final String SETUP_CHROMOSOME
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_CHROMOSOME
               + " ("
               + FieldNames.CHROM_ID + " BIGINT PRIMARY KEY, "
@@ -57,12 +57,12 @@ public class H2SQLStatements {
               + ") ";
 
 
-    public final static String INDEX_CHROMOSOME
+    public static final String INDEX_CHROMOSOME
             = "CREATE INDEX IF NOT EXISTS INDEXCHROMOSOM ON " + FieldNames.TABLE_CHROMOSOME
               + " (" + FieldNames.CHROM_REFERENCE_ID + ") ";
 
 
-    public final static String SETUP_FEATURES
+    public static final String SETUP_FEATURES
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
               + " ("
               + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
@@ -79,12 +79,12 @@ public class H2SQLStatements {
               + ") ";
 
 
-    public final static String INDEX_FEATURES
+    public static final String INDEX_FEATURES
             = "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES
               + " (" + FieldNames.FEATURE_CHROMOSOME_ID + ") ";
 
 
-    public final static String SETUP_TRACKS
+    public static final String SETUP_TRACKS
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_TRACK
               + " ( "
               + FieldNames.TRACK_ID + " BIGINT UNSIGNED PRIMARY KEY, "
@@ -96,11 +96,11 @@ public class H2SQLStatements {
               + ") ";
 
 
-    public final static String INDEX_TRACK_REFID
+    public static final String INDEX_TRACK_REFID
             = "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK
               + " (" + FieldNames.TRACK_REFERENCE_ID + ") ";
 
-    public final static String INDEX_TRACK_READ_PAIR_ID
+    public static final String INDEX_TRACK_READ_PAIR_ID
             = "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK
               + " (" + FieldNames.TRACK_READ_PAIR_ID + ") ";
 

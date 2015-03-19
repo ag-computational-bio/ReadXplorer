@@ -20,10 +20,10 @@ package de.cebitec.readxplorer.databackend.connector;
 
 import de.cebitec.readxplorer.databackend.FieldNames;
 import de.cebitec.readxplorer.databackend.SQLStatements;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
@@ -33,6 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,8 +98,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -129,8 +129,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -162,8 +161,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -194,8 +192,7 @@ public class ReferenceConnector {
                 fetch.setLong( 1, chromId );
                 fetch.setInt( 2, from );
                 fetch.setInt( 3, to );
-            }
-            else {
+            } else {
                 fetch = con.prepareStatement( SQLStatements.FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL );
                 fetch.setLong( 1, chromId );
                 fetch.setInt( 2, from );
@@ -222,8 +219,7 @@ public class ReferenceConnector {
             }
             fetch.close();
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -258,6 +254,10 @@ public class ReferenceConnector {
      * Fetches all features which at least partly overlap a given region of the
      * reference including all parent-children relationships between the
      * features.
+     * <br>An Example:
+     * <br>Gene is included, CDS is excluded:
+     * <br>All CDS belonging to a gene are preserved in the feature hierarchy of
+     * that gene, while all CDS from the result list level are discarded
      * <p>
      * @param from        start position of the region of interest
      * @param to          end position of the region of interest
@@ -281,6 +281,10 @@ public class ReferenceConnector {
      * Fetches all features which at least partly overlap a given region of the
      * reference including all parent-children relationships between the
      * features.
+     * <br>An Example:
+     * <br>Gene is included, CDS is excluded:
+     * <br>All CDS belonging to a gene are preserved in the feature hierarchy of
+     * that gene, while all CDS from the result list level are discarded
      * <p>
      * @param from         start position of the region of interest
      * @param to           end position of the region of interest
@@ -339,8 +343,7 @@ public class ReferenceConnector {
                 }
             }
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -369,12 +372,11 @@ public class ReferenceConnector {
                     associatedTracks.add( new PersistentTrack( id, filePath, description, date, refGenomeID, readPairId ) );
                 }
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
-        return associatedTracks;
+        return Collections.unmodifiableList( associatedTracks );
 
     }
 
@@ -438,8 +440,7 @@ public class ReferenceConnector {
                 if( type == FeatureType.ANY ) {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_EXIST );
                     fetch.setLong( 1, currentID );
-                }
-                else {
+                } else {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
                     fetch.setLong( 1, currentID );
                     fetch.setLong( 2, type.getTypeByte() );
@@ -450,8 +451,7 @@ public class ReferenceConnector {
                     rs.close();
                     return true;
                 }
-            }
-            catch( SQLException ex ) {
+            } catch( SQLException ex ) {
                 LOG.log( Level.SEVERE, null, ex );
                 return false;
             }

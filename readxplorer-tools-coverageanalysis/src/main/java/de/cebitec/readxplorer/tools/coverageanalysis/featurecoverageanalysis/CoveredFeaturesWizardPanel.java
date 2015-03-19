@@ -19,9 +19,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -81,10 +79,9 @@ public class CoveredFeaturesWizardPanel extends ChangeListeningWizardPanel {
      * use, also after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( PROP_GET_COVERED_FEATURES, this.component.isGetCoveredFeatures() ? "1" : "0" );
-        pref.put( PROP_MIN_COVERED_PERCENT, String.valueOf( this.component.getMinCoveredPercent() ) );
-        pref.put( PROP_MIN_COVERAGE_COUNT, String.valueOf( this.component.getMinCoverageCount() ) );
+        getPref().put( PROP_GET_COVERED_FEATURES, this.component.isGetCoveredFeatures() ? "1" : "0" );
+        getPref().put( PROP_MIN_COVERED_PERCENT, String.valueOf( this.component.getMinCoveredPercent() ) );
+        getPref().put( PROP_MIN_COVERAGE_COUNT, String.valueOf( this.component.getMinCoverageCount() ) );
     }
 
 

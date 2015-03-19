@@ -54,11 +54,40 @@
             <artifactId>org-openide-dialogs</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
     <build>
+
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <configuration>
+                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
@@ -67,18 +96,13 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.databackend</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.databackend.connector</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.databackend.dataObjects</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.databackend.dataobjects</publicPackage>
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <useDefaultManifestFile>true</useDefaultManifestFile>
-                </configuration>
-            </plugin>
+
         </plugins>
+
     </build>
 </project>

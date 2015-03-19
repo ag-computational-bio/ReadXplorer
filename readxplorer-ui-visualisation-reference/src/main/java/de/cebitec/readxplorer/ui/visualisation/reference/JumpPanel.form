@@ -52,7 +52,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="filterProperties" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+              <Component id="filterProperties" alignment="0" min="0" pref="174" max="32767" attributes="1"/>
               <Component id="tableScrollPane" alignment="0" pref="0" max="32767" attributes="1"/>
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -147,7 +147,7 @@
                           <Component id="jumpFilterLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="filterTextfield" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="6" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="filterForLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioProduct" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -290,7 +290,7 @@
         <Component class="javax.swing.JComboBox" name="chromComboBox">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;()"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>

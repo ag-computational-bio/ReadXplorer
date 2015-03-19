@@ -29,6 +29,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMFileWriterFactory;
@@ -43,18 +45,22 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.regex.Pattern.compile;
+
 
 /**
- * SamTrimmer allows to filter unmapped entries in SAM file
- * and trim them using a trim method.
- * The user will see a progress info.
+ * SamTrimmer allows to filter unmapped entries in SAM file and trim them using
+ * a trim method. The user will see a progress info.
  * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class RNATrimProcessor {
 
-    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
-    private final static Logger LOG = Logger.getLogger( RNATrimProcessor.class.getName() );
+    private static final Logger LOG = Logger.getLogger( RNATrimProcessor.class.getName() );
+    private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
+    private static final Pattern OS_PATTERN = compile( ":os:" );
+
     private RequestProcessor.Task theTask = null;
     private String sourcePath;
     private boolean canceled = false;
@@ -69,12 +75,10 @@ public class RNATrimProcessor {
                 SAMRecord record = samItor.next();
                 if( record.getReadUnmappedFlag() ) {
                     histogram.put( record.getReadName(), 0 );
-                }
-                else {
+                } else {
                     histogram.incrementCount( record.getReadName() );
                 }
-            }
-            catch( SAMFormatException e ) {
+            } catch( SAMFormatException e ) {
                 this.showMsg( "Cought SAMFormatException for a record in your SAM file: " + e.getMessage() );
             }
         }
@@ -128,12 +132,14 @@ public class RNATrimProcessor {
                 //in this case we would get lots of INFO messages on the console
                 //workaround: do not output the progress, if the current value is bigger
                 // than the whole lines count (stays at 100%)
-                if( lines >= currentline )
+                if( lines >= currentline ) {
                     ph.progress( currentline );
+                }
 
                 //update chart after every 1000 lines
-                if( currentline % 1000 == 1 )
+                if( currentline % 1000 == 1 ) {
                     this.updateChartData();
+                }
 
                 try {
                     SAMRecord record = samItor.next();
@@ -143,18 +149,16 @@ public class RNATrimProcessor {
 
                     if( record.getReadUnmappedFlag() ) {
                         TrimMethodResult trimResult = method.trim( record.getReadString() );
-                        fasta.write( ">" + record.getReadName() + separator + trimResult.getOsField()
-                                     + separator + trimResult.getTrimmedCharsFromLeft()
-                                     + separator + trimResult.getTrimmedCharsFromRight() + "\n" );
+                        fasta.write( ">" + record.getReadName() + separator + trimResult.getOsField() +
+                                 separator + trimResult.getTrimmedCharsFromLeft() +
+                                 separator + trimResult.getTrimmedCharsFromRight() + "\n" );
                         fasta.write( trimResult.getSequence() + "\n" );
                         this.trimProcessResult.incrementTrimmedReads();
-                    }
-                    else {
+                    } else {
                         this.trimProcessResult.incrementMappedReads();
                     }
 
-                }
-                catch( SAMFormatException e ) {
+                } catch( SAMFormatException e ) {
                     this.showMsg( "Cought SAMFormatException for a record in your SAM file: " + e.getMessage() );
                 }
             }
@@ -163,8 +167,7 @@ public class RNATrimProcessor {
             fileWriter.close();
             samItor.close();
             this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Finish", samfile.getAbsolutePath() ) );
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             Exceptions.printStackTrace( e );
             this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Failed", samfile.getAbsolutePath() ) );
         }
@@ -208,23 +211,26 @@ public class RNATrimProcessor {
         try( SAMFileReader samBamReader = new SAMFileReader( samfile ) ) {
             SAMRecordIterator samItor = samBamReader.iterator();
 
+            SAMFileHeader header = samBamReader.getFileHeader();
             SAMFileWriterFactory factory = new SAMFileWriterFactory();
-            SAMFileWriter writer = factory.makeSAMWriter( samBamReader.getFileHeader(), false, new File( newPath ) );
+            File outputFile = new File( newPath );
+            SAMFileWriter writer = factory.makeSAMWriter( header, false, outputFile );
             this.trimProcessResult.setTrimmedMappedReads( 0 );
             while( samItor.hasNext() && (!this.canceled) ) {
                 currentline++;
                 ph.progress( currentline );
 
                 //update chart after every 1000 lines
-                if( currentline % 1000 == 1 )
+                if( currentline % 1000 == 1 ) {
                     this.updateChartData();
+                }
 
                 try {
                     SAMRecord record = samItor.next();
                     // the readname field will have the form
                     // name:original:fullsequence
                     // so try to split it into two parts
-                    String[] parts = record.getReadName().split( ":os:" );
+                    String[] parts = OS_PATTERN.split( record.getReadName() );
                     if( parts.length == 4 ) {
                         record.setReadName( parts[0] );
                         record.setAttribute( "os", parts[1] ); // os = original sequence
@@ -233,8 +239,9 @@ public class RNATrimProcessor {
                             int tr = Integer.parseInt( parts[3] );
                             record.setAttribute( "tl", tl ); // tl = trimmed from left
                             record.setAttribute( "tr", tr ); // tr = trimmed from right
-                        }
-                        catch( Exception ex ) {
+                        } catch( NumberFormatException e ) {
+                            LOG.log( SEVERE, "RNATrimProcessor: Readname parts have wrong format - integer expected, but found: {0} and {1}",
+                                             new Object[]{ parts[2], parts[3] });
                         }
 
                     }
@@ -243,11 +250,10 @@ public class RNATrimProcessor {
                     }
 
                     if( !record.getReadUnmappedFlag() ) {
-                        this.trimProcessResult.incrementTrimmedMappedReads();
+                        trimProcessResult.incrementTrimmedMappedReads();
                     }
 
-                }
-                catch( SAMFormatException e ) {
+                } catch( SAMFormatException e ) {
                     this.showMsg( "Cought SAMFormatException for a record in your SAM file: " + e.getMessage() );
                 }
             }
@@ -255,8 +261,7 @@ public class RNATrimProcessor {
             samItor.close();
 
             this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Finish", samfile.getAbsolutePath() ) );
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             Exceptions.printStackTrace( e );
             this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Failed", samfile.getAbsolutePath() ) );
         }
@@ -267,9 +272,8 @@ public class RNATrimProcessor {
 
 
     /**
-     * If any message should be printed to the console, this method is used.
-     * If an error occured during the run of the parser, which does not
-     * interrupt
+     * If any message should be printed to the console, this method is used. If
+     * an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print
@@ -292,7 +296,7 @@ public class RNATrimProcessor {
         tc.requestActive();
         final TrimResultPanel resultView = tc.openResultTab( shortFileName );
         this.trimProcessResult = new TrimProcessResult();
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put( "referencePath", referencePath );
         params.put( "sourcePath", sourcePath );
         params.put( "maximumTrim", maximumTrim );
@@ -333,9 +337,9 @@ public class RNATrimProcessor {
                 showMsg( "Extract unmapped reads to a file..." );
                 String fasta = extractUnmappedReadsAndTrim( new File( sourcePath ), method );
                 String sam = null;
-//                String extractedSam = null;
+                String extractedSam = null;
                 try {
-                    if( !canceled )
+                    if( !canceled ) {
                         sam = MappingApi.mapFastaFile( new SimpleOutput() {
 
                             @Override
@@ -351,16 +355,20 @@ public class RNATrimProcessor {
 
 
                         }, referencePath, fasta, mappingParam );
-//                    if( !canceled )
-//                        extractedSam = extractOriginalSequencesInSamFile( sam, true );
-                    if( !canceled )
+                    }
+                    if( !canceled ) {
+                        extractedSam = extractOriginalSequencesInSamFile( sam, true );
+                    }
+                    if( !canceled ) {
                         FileUtils.delete( sam );
-                    if( !canceled )
+                    }
+                    if( !canceled ) {
                         FileUtils.delete( fasta );
-                    if( !canceled )
+                    }
+                    if( !canceled ) {
                         showMsg( "Extraction ready!" );
-                }
-                catch( IOException ex ) {
+                    }
+                } catch( IOException ex ) {
                     Exceptions.printStackTrace( ex );
                 }
                 trimProcessResult.ready();

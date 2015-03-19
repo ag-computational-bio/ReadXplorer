@@ -21,8 +21,8 @@ package de.cebitec.readxplorer.tools.detailedviewer;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanelFactory;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanelFactory;
 import de.cebitec.readxplorer.ui.datavisualisation.histogramviewer.HistogramViewer;
 import java.awt.CardLayout;
 import java.util.logging.Logger;
@@ -50,7 +50,7 @@ import org.openide.windows.WindowManager;
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.detailedviewer.DetailedViewerTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_DetailedViewerAction",
          preferredID = "DetailedViewerTopComponent"
@@ -61,6 +61,8 @@ import org.openide.windows.WindowManager;
     "HINT_DetailedViewerTopComponent=This is a DetailedViewer window"
 } )
 public final class DetailedViewerTopComponent extends TopComponentExtended {
+
+    private static final Logger LOG = Logger.getLogger( DetailedViewerTopComponent.class.getName() );
 
     private static final long serialVersionUID = 1L;
     private static final String PREFERRED_ID = "DetailedViewerTopComponent";
@@ -73,9 +75,9 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     private BasePanel readPairBasePanel;
     private CardLayout cards;
 
-    private static String HISTOGRAMCARD = "histo";
-    private static String ALIGNMENTCARD = "alignment";
-    private static String READPAIRCARD = "readPair";
+    private static final String HISTOGRAMCARD = "histo";
+    private static final String ALIGNMENTCARD = "alignment";
+    private static final String READPAIRCARD = "readPair";
 
     private String selectedViewer;
     private final ViewController viewCon;
@@ -256,16 +258,14 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     public static synchronized DetailedViewerTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            Logger.getLogger( DetailedViewerTopComponent.class.getName() ).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof DetailedViewerTopComponent ) {
             return (DetailedViewerTopComponent) win;
         }
-        Logger.getLogger( DetailedViewerTopComponent.class.getName() ).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior." );
+        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID +
+                 "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
 
@@ -284,8 +284,7 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
             this.readPairBasePanel = factory.getReadPairBasePanel( this.trackConnector );
             this.changeViewerStatus( READPAIRCARD, false );
             this.cardPanel.add( this.readPairBasePanel, READPAIRCARD );
-        }
-        else {
+        } else {
             this.readPairButton.setEnabled( false );
         }
 
@@ -359,8 +358,8 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     }
 
     /*
-     * Overriding these two methods ensures that only displayed components are updated
-     * and thus increases performance of the viewers.
+     * Overriding these two methods ensures that only displayed components are
+     * updated and thus increases performance of the viewers.
      */
 
     @Override

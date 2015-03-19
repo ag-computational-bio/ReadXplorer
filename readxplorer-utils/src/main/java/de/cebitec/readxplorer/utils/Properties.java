@@ -26,10 +26,23 @@ package de.cebitec.readxplorer.utils;
 public final class Properties {
 
 
+    private Properties() {
+    }
+
+
     // different adapter types for a project and or database
     public static final String ADAPTER_MYSQL = "mysql";
     public static final String ADAPTER_H2 = "h2";
     public static final String ADAPTER_DIRECT_ACCESS = "direct";
+
+    // protein DB properties
+    public static final String DB_BRENDA = "http://www.brenda-enzymes.org/enzyme.php?ecno=";
+    public static final String DB_EC2PDB = "http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/enzymes/GetPage.pl?ec_number=";
+    public static final String DB_EXPASY = "http://enzyme.expasy.org/EC/";
+    public static final String DB_INTENZ = "http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec=";
+    public static final String DB_KEGG = "http://www.genome.jp/dbget-bin/www_bget?ec:";
+    public static final String DB_METACYC = "http://biocyc.org/META/substring-search?type=REACTION&object=";
+    public static final String DB_PRIAM = "http://priam.prabi.fr/cgi-bin/PRIAM_profiles_CurrentRelease.pl?EC=";
 
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
@@ -43,7 +56,7 @@ public final class Properties {
 
     // ReadXplorer file chooser properties
     public static final String READXPLORER_FILECHOOSER_DIRECTORY = "readXplorerFileChooser.Directory";
-    public static final String ReadXplorer_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
+    public static final String READXPLORER_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
 
     //Properties to set different viewers active
     public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
@@ -82,10 +95,9 @@ public final class Properties {
      */
     public static final byte READ_STARTS = 9;
     /**
-     * Value for viewing all mappings as if they came from the fwd. strand
-     * (10). This should only be used in combination with {@link STRAND_BOTH}
-     * to infer, if all mappings shall be treated as if the came from the fwd.
-     * or
+     * Value for viewing all mappings as if they came from the fwd. strand (10).
+     * This should only be used in combination with {@link STRAND_BOTH} to
+     * infer, if all mappings shall be treated as if the came from the fwd. or
      * the rev. strand ()
      */
     public static final byte STRAND_FWD_ANALYSIS = 10;
@@ -182,9 +194,54 @@ public final class Properties {
     public static final String EXT_A2_STRING = String.valueOf( EXT_A2 );
 
     /**
-     * The CRAN Mirror used by Gnu R to load missing packages
+     * Temporary directory used for import of data (SAM/BAM/JOK).
+     */
+    public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
+
+    /**
+     * Protein database prefix used for creating EC-number links.
+     */
+    public static final String ENZYME_DB_LINK = "PROTEIN_DB_LINK";
+
+    /**
+     * The CRAN Mirror used by Gnu R to load missing packages.
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
+
+    /**
+     * The RServe host we will connect to for GNU R computations.
+     */
+    public static final String RSERVE_HOST = "RSERVE_HOST";
+    /**
+     * The RServe port we will connect to for GNU R computations.
+     */
+    public static final String RSERVE_PORT = "RSERVE_PORT";
+    /**
+     * Use username and password for authentication.
+     */
+    public static final String RSERVE_USE_AUTH = "RSERVE_USE_AUTH";
+    /**
+     * The RServe user we will use for the connection.
+     */
+    public static final String RSERVE_USER = "RSERVE_USER";
+    /**
+     * The RServe password we will use for the connection.
+     */
+    public static final String RSERVE_PASSWORD = "RSERVE_PASSWORD";
+    /**
+     * Holds the full path to the Rserve startup script if manual local setup is
+     * used.
+     */
+    public static final String RSERVE_STARTUP_SCRIPT = "RSERVE_STARTUP_SCRIPT";
+    /**
+     * Is Rserve manually configured to connect to a remote server.
+     */
+    public static final String RSERVE_MANUAL_REMOTE_SETUP = "RSERVE_MANUAL_REMOTE_SETUP";
+    /**
+     * Is Rserve manually configured to connect to a local server with custom
+     * startup script.
+     */
+    public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
 
     public static final String MAPPER_PATH = "MAPPER_PATH";
 

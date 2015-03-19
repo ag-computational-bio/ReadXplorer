@@ -24,11 +24,10 @@ import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
+import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.Observable;
@@ -37,17 +36,24 @@ import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.openide.util.Exceptions;
+import org.rosuda.REngine.Rserve.RserveException;
+
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -55,26 +61,29 @@ import javax.swing.JOptionPane;
  * collecting all count data from each single AnalysisHandler of each track,
  * starting the processing by the chosen tool and displaying the results after
  * the calculations.
- *
+ * <p>
  * @author kstaderm
  */
 public abstract class DeAnalysisHandler extends Thread implements Observable,
                                                                   DataVisualisationI {
 
-    private ReferenceConnector referenceConnector;
-    private List<PersistentFeature> genomeAnnos;
-    private final List<PersistentTrack> selectedTracks;
-    private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
+    private static final Logger LOG = Logger.getLogger( DeAnalysisHandler.class.getName() );
+
     private final int refGenomeID;
-    private List<ResultDeAnalysis> results;
-    private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
-    private File saveFile = null;
-    private final Set<FeatureType> selectedFeatureTypes;
-    private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
-    private int resultsReceivedBack = 0;
     private final int startOffset;
     private final int stopOffset;
     private final ParametersReadClasses readClassParams;
+    private final List<PersistentTrack> selectedTracks;
+    private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
+    private final Set<FeatureType> selectedFeatureTypes;
+    private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
+
+    private int resultsReceivedBack = 0;
+    private ReferenceConnector referenceConnector;
+    private File saveFile = null;
+    private final List<PersistentFeature> genomeAnnos;
+    private final List<ResultDeAnalysis> results;
+    private final Map<Integer, CollectCoverageData> collectCoverageDataInstances;
 
 
     public static enum Tool {
@@ -97,13 +106,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
         public static Tool[] usableTools() {
-            if( GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
+            if( GnuR.gnuRSetupCorrect() ) {
                 return Tool.values();
                 //If one Tool should not be available to the user return something like :
                 //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
-
-            }
-            else {
+            } else {
                 Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
                 return ret;
             }
@@ -125,7 +132,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * care of collecting all count data from each single AnalysisHandler of
      * each track, starting the processing by the chosen tool and displaying the
      * results after the calculations.
-     *
+     * <p>
      * @param selectedTracks       list of selected tracks for the analysis
      * @param refGenomeID          id of the selected reference genome
      * @param saveFile             file, in which some data for this analysis
@@ -135,8 +142,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * @param startOffset          offset in bases left of each feature start
      * @param stopOffset           offset in bases right of each feature stop
      * @param readClassParams      Parameter set of the selected read classes
-     *                             for
-     *                             this analysis
+     *                             for this analysis
      */
     public DeAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID,
                               File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
@@ -149,6 +155,10 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
+        genomeAnnos = new ArrayList<>();
+        results = new ArrayList<>();
+        collectCoverageDataInstances = new HashMap<>();
+
     }
 
 
@@ -156,12 +166,12 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * Acutally starts the differential gene expression analysis.
      */
     private void startAnalysis() {
-        collectCoverageDataInstances = new HashMap<>();
+        collectCoverageDataInstances.clear();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
+        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
-        genomeAnnos = new ArrayList<>();
+        genomeAnnos.clear();
 
         for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
             genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
@@ -173,14 +183,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
                 CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
                 collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
-                AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track "
-                                                                         + currentTrack.getDescription() + ".", readClassParams );
+                AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
+                                                                currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
                 handler.setDesiredData( Properties.REDUCED_MAPPINGS );
                 handler.registerObserver( collCovData );
                 allHandler.add( handler );
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 ProcessingLog.getInstance().addProperty( "Unresolved track", currentTrack );
                 notifyObservers( AnalysisStatus.ERROR );
@@ -220,11 +229,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     /**
      * When all countData is collected this method is called and the processing
      * with the tool corresponding to the implementing class should start.
-     *
+     * <p>
      * @return
      */
     protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
-                                                                       JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
+                                                                       IllegalStateException,
+                                                                       UnknownGnuRException,
+                                                                       RserveException,
+                                                                       IOException;
 
 
     /**
@@ -232,16 +244,17 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * the analysis are closed. So you should clean up everything and release
      * the Gnu R instance at this point.
      */
-    public abstract void endAnalysis();
+    public abstract void endAnalysis() throws RserveException;
 
 
     public void setResults( List<ResultDeAnalysis> results ) {
-        this.results = results;
+        this.results.clear();
+        this.results.addAll( results );
     }
 
 
     public Map<Integer, Map<PersistentFeature, Integer>> getAllCountData() {
-        return allCountData;
+        return Collections.unmodifiableMap( allCountData );
     }
 
 
@@ -251,17 +264,17 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     public List<PersistentFeature> getPersAnno() {
-        return genomeAnnos;
+        return Collections.unmodifiableList( genomeAnnos );
     }
 
 
     public List<PersistentTrack> getSelectedTracks() {
-        return selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 
     public List<ResultDeAnalysis> getResults() {
-        return results;
+        return Collections.unmodifiableList( results );
     }
 
 
@@ -274,7 +287,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     public Map<Integer, CollectCoverageData> getCollectCoverageDataInstances() {
-        return collectCoverageDataInstances;
+        return Collections.unmodifiableMap( collectCoverageDataInstances );
     }
 
 
@@ -295,7 +308,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     public void removeObserver( Observer observer ) {
         this.observerList.remove( observer );
         if( this.observerList.isEmpty() ) {
-            endAnalysis();
+            try {
+                endAnalysis();
+            } catch( RserveException ex ) {
+                Exceptions.printStackTrace( ex );
+            }
             this.interrupt();
         }
     }
@@ -318,26 +335,31 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
         if( ++resultsReceivedBack == getCollectCoverageDataInstances().size() ) {
             try {
-                results = processWithTool();
-            }
-            catch( PackageNotLoadableException | UnknownGnuRException ex ) {
+                results.clear();
+                results.addAll( processWithTool() );
+                notifyObservers( AnalysisStatus.FINISHED );
+            } catch( PackageNotLoadableException | UnknownGnuRException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 notifyObservers( AnalysisStatus.ERROR );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
                 this.interrupt();
-            }
-            catch( IllegalStateException ex ) {
+            } catch( IllegalStateException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            }
-            catch( JRILibraryNotInPathException ex ) {
+            } catch( RserveException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
-                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
+                notifyObservers( AnalysisStatus.ERROR );
+                this.interrupt();
+            } catch( IOException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
+                notifyObservers( AnalysisStatus.ERROR );
             }
-            notifyObservers( AnalysisStatus.FINISHED );
         }
     }
 

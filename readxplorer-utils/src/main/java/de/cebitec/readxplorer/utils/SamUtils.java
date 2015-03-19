@@ -33,6 +33,7 @@ import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
+import org.openide.util.NbPreferences;
 
 /*
  * The MIT License
@@ -54,8 +55,8 @@ import net.sf.samtools.util.RuntimeEOFException;
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 /**
@@ -110,11 +111,9 @@ public class SamUtils implements Observable {
                         this.notifyObservers( totalRecords + " reads indexed ..." );
                     }
                     indexer.processAlignment( record );
-                }
-                catch( RuntimeEOFException e ) {
+                } catch( RuntimeEOFException e ) {
                     this.notifyObservers( e );
-                }
-                catch( SAMFormatException e ) {
+                } catch( SAMFormatException e ) {
                     if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
                         this.notifyObservers( e.getMessage() );
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
@@ -122,11 +121,10 @@ public class SamUtils implements Observable {
             }
             samItor.close();
             this.notifyObservers( "All " + totalRecords + " reads indexed!" );
-        }
-        catch( SAMException e ) {
-            this.notifyObservers( "If you tried to create an index on a sam "
-                                  + "file this is the reason for the exception. Indexes"
-                                  + "can only be created for bam files!" );
+        } catch( SAMException e ) {
+            this.notifyObservers( "If you tried to create an index on a sam " +
+                                  "file this is the reason for the exception. Indexes" +
+                                  "can only be created for bam files!" );
             this.notifyObservers( e );
             success = false;
         }
@@ -154,18 +152,36 @@ public class SamUtils implements Observable {
         }
     }
 
-    /* Creates either a sam or a bam file writer depending on the ending of the
-     * oldFile.
+
+    /**
+     * Creates a bam index for a given bam file.
+     * <p>
+     * @param bamFile  The bam file to index.
+     * @param observer The observer to notify about the progress of indexing.
+     * <p>
+     * @return <code>true</code> if the index creation succeeded,
+     *         <code>false</code> otherwise.
      */
+    public static boolean createBamIndex( File bamFile, Observer observer ) {
+        boolean success = false;
+        try( SAMFileReader samReader = new SAMFileReader( bamFile ) ) { //close is performed by try statement
+            samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            SamUtils utils = new SamUtils();
+            utils.registerObserver( observer );
+            success = utils.createIndex( samReader, new File( bamFile + Properties.BAM_INDEX_EXT ) );
+            utils.removeObserver( observer );
+        }
+        return success;
+    }
+
 
     /**
      * Creates a bam file writer. The output file of the new writer is the old
-     * file name + the new
-     * ending and the appropriate file extension (.sam or .bam).
+     * file name + the new ending and the appropriate file extension (.sam or
+     * .bam).
      * <p>
      * @param oldFile   the old file (if data is not stored in a file, just
-     *                  create
-     *                  a file with a name of your choice
+     *                  create a file with a name of your choice
      * @param header    the header of the new file
      * @param presorted if true, SAMRecords must be added to the SAMFileWriter
      *                  in order that agrees with header.sortOrder.
@@ -173,7 +189,8 @@ public class SamUtils implements Observable {
      *                  old file (this is not the file extension)
      * <p>
      * @return a pair consisting of: the sam or bam file writer ready for
-     *         writing as the first element and the new file as the second element
+     *         writing as the first element and the new file as the second
+     *         element
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter( File oldFile, SAMFileHeader header, boolean presorted, String newEnding ) {
 
@@ -184,8 +201,9 @@ public class SamUtils implements Observable {
 //        } catch (ArrayIndexOutOfBoundsException e) {
 //            extension = "bam";
 //        }
-        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
+//        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Properties.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
 //        if (extension.toLowerCase().contains("sam")) {
 //            outputFile = new File(newFileName + newEnding + ".sam");
 //            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
@@ -216,8 +234,7 @@ public class SamUtils implements Observable {
             newFilePath = SamUtils.removeReadXplorerFileEndings( SORT_READNAME_STRING, newFilePath );
             newFilePath = SamUtils.removeReadXplorerFileEndings( SORT_READSEQ_STRING, newFilePath );
             newFilePath = SamUtils.removeReadXplorerFileEndings( EXTENDED_STRING, newFilePath );
-        }
-        else {
+        } else {
             newFilePath = inputFile.getAbsolutePath();
         }
         File newFile = new File( newFilePath + newEnding + ".bam" );
@@ -231,8 +248,7 @@ public class SamUtils implements Observable {
 
     /**
      * Removes a file ending used by ReadXplorer from the end of a file name.
-     * Note:
-     * This is not the file extension!
+     * Note: This is not the file extension!
      * <p>
      * @param fileEnding the file ending to remove
      * @param filePath   the file path to chech for the ending
@@ -264,8 +280,7 @@ public class SamUtils implements Observable {
         try( SAMFileReader samReader = new SAMFileReader( fileToCheck ) ) {
             try {
                 return samReader.getFileHeader().getSortOrder().equals( sortOrderToCheck );
-            }
-            catch( IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
+            } catch( IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
                 return false;
             }
         }
@@ -274,16 +289,14 @@ public class SamUtils implements Observable {
 
     /**
      * Returns blocks of the read sequence that have been aligned directly to
-     * the
-     * reference sequence. Note that clipped portions of the read and inserted
-     * and
-     * deleted bases (vs. the reference) are not represented in the alignment
-     * blocks.
+     * the reference sequence. Note that clipped portions of the read and
+     * inserted and deleted bases (vs. the reference) are not represented in the
+     * alignment blocks.
      * <p>
-     * @param cigar
-     * @param refStartPos
-     *                    <p>
-     * @return
+     * @param cigar       The cigar of the read
+     * @param refStartPos Start position in the reference
+     * <p>
+     * @return The list of alignment blocks for the given cigar
      */
     public List<SamAlignmentBlock> getAlignmentBlocks( Cigar cigar, int refStartPos ) {
 

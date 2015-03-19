@@ -19,40 +19,49 @@ package de.cebitec.readxplorer.ui.tablevisualization;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
  * Provides some basic table utils for ReadXplorer.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class TableUtils {
+public final class TableUtils {
 
+    private static final Logger LOG = Logger.getLogger( TableUtils.class.getName() );
+
+
+    /**
+     * Do not instantiate.
+     */
     private TableUtils() {
-        //do not instantiate
     }
 
 
     /**
-     * Transforms the selected row index in the table view to the selected
-     * index of the underlying table model (in case the results are sorted,
-     * they can be different). If the transformation is not possible, it returns
-     * -1
+     * Transforms the selected row index in the table view to the selected index
+     * of the underlying table model (in case the results are sorted, they can
+     * be different). If the transformation is not possible, it returns -1
      * <p>
      * @param table the table for which the selected model row is needed
      * <p>
-     * @return The selected model row index or -1, if the index is out of
-     *         bounds or cannot be calculated
+     * @return The selected model row index or -1, if the index is out of bounds
+     *         or cannot be calculated
      */
     public static int getSelectedModelRow( JTable table ) {
         int wantedModelIdx = -1;
@@ -66,8 +75,8 @@ public class TableUtils {
                 if( table.getModel().getRowCount() > selectedModelIdx ) {
                     wantedModelIdx = selectedModelIdx;
                 }
-            }
-            catch( ArrayIndexOutOfBoundsException e ) {
+            } catch( ArrayIndexOutOfBoundsException e ) {
+                LOG.log( INFO, "Selected row transformation not possible due to ArrayIndexOutOfBoundsException" );
                 //do nothing, just return -1 since the transformation was not possible
             }
         }
@@ -80,19 +89,17 @@ public class TableUtils {
      * chromosome, which might be in String or Integer format or updates the
      * viewers to the start position of a selected PersistentFeature with
      * respect to the strand on which the feature is located.
-     *
+     * <p>
      * @param table          the table whose selected element's position is to
      *                       be shown
      * @param posColumnIndex the index of the table model column holding the
      *                       position
      * @param chromColumnIdx The index of the table model column holding the
      *                       chromosome on which the position to show is
-     *                       located. If the position
-     *                       column contains PersistentFeatures, the
-     *                       chromColumnIdx can be set to -1
-     *                       and the chromosome information is obtained from the
-     *                       selected
-     *                       PersistentFeature.
+     *                       located. If the position column contains
+     *                       PersistentFeatures, the chromColumnIdx can be set
+     *                       to -1 and the chromosome information is obtained
+     *                       from the selected PersistentFeature.
      * @param bim            the bounds information manager which should be
      *                       updated
      */
@@ -114,18 +121,16 @@ public class TableUtils {
      *                       position
      * @param chromColumnIdx The index of the table model column holding the
      *                       chromosome on which the position to show is
-     *                       located. If the position
-     *                       column contains PersistentFeatures, the
-     *                       chromColumnIdx can be set to -1
-     *                       and the chromosome information is obtained from the
-     *                       selected
-     *                       PersistentFeature.
+     *                       located. If the position column contains
+     *                       PersistentFeatures, the chromColumnIdx can be set
+     *                       to -1 and the chromosome information is obtained
+     *                       from the selected PersistentFeature.
      * @param bim            the bounds information manager which should be
      *                       updated
      * @param reference      The reference belonging to this data table. NOTE:
-     *                       It is
-     *                       only needed, if the chromosome column does not contain the chromosome,
-     *                       but only its name! Otherwise the reference can be <code>null</code>
+     *                       It is only needed, if the chromosome column does
+     *                       not contain the chromosome, but only its name!
+     *                       Otherwise the reference can be <code>null</code>
      */
     public static void showPosition( JTable table, int posColumnIndex, int chromColumnIdx,
                                      BoundsInfoManager bim, PersistentReference reference ) {
@@ -143,14 +148,12 @@ public class TableUtils {
                 int pos = feature.getStartOnStrand();
                 bim.navigatorBarUpdated( pos );
 
-            }
-            else {
+            } else {
                 Object chromValue = table.getModel().getValueAt( selectedModelRow, chromColumnIdx );
                 PersistentChromosome chrom = null;
                 if( chromValue instanceof PersistentChromosome ) {
                     bim.chromosomeChanged( ((PersistentChromosome) chromValue).getId() );
-                }
-                else if( chromValue instanceof String && reference != null ) {
+                } else if( chromValue instanceof String && reference != null ) {
                     Map<String, PersistentChromosome> chromMap = PersistentChromosome.getChromNameMap( reference.getChromosomes().values() );
                     String chromName = (String) chromValue;
                     if( chromMap.containsKey( chromName ) ) {
@@ -162,15 +165,13 @@ public class TableUtils {
                 if( posValue instanceof Integer ) {
                     bim.navigatorBarUpdated( (Integer) posValue );
 
-                }
-                else if( posValue instanceof String ) {
+                } else if( posValue instanceof String ) {
                     String[] posArray = ((String) posValue).split( "\n" );
                     try {
                         // Get first position in the array
                         bim.navigatorBarUpdated( PositionUtils.convertPosition( posArray[0] ) );
 
-                    }
-                    catch( NumberFormatException e ) {
+                    } catch( NumberFormatException e ) {
                         //could be a feature locus then for imported tables
                         if( reference != null && chrom != null ) {
                             List<PersistentFeature> features = ProjectConnector.getInstance().getRefGenomeConnector( reference.getId() )
@@ -196,8 +197,7 @@ public class TableUtils {
      * strand on which the feature is located.
      * <p>
      * @param table           the table whose selected PersistentFeature
-     *                        position is to be
-     *                        shown
+     *                        position is to be shown
      * @param featColumnIndex the index of the table model column holding the
      *                        PersistentFeature
      * @param bim             the bounds information manager which should be
@@ -232,6 +232,44 @@ public class TableUtils {
             newModel = new UneditableTableModel( newDataArray, headers );
         }
         return newModel;
+    }
+
+
+    /**
+     * Adds empty columns to a table row. They contain the empty string.
+     * <p>
+     * @param noColumns The number of empty columns to add
+     * @param tableRow  The table row to update with empty rows
+     */
+    public static void addEmptyColumns( int noColumns, List<Object> tableRow ) {
+        for( int i = 0; i < noColumns; i++ ) {
+            tableRow.add( "" );
+        }
+    }
+
+
+    /**
+     * Adds a {@link ListSelectionListener} to the given table which enables
+     * showing the genomic position of the currently selected table row via the
+     * given {@link BoundsInfoManager}.
+     * <p>
+     * @param table       Add the listener to this table
+     * @param posColumn   Table column containing the genomic position
+     * @param chromColumn Table column containing the chromosome
+     * @param bim         BoundsInfoManager whose position has to be updated by
+     *                    the listener
+     */
+    public static void addTableListSelectionListener( JTable table, int posColumn, int chromColumn, BoundsInfoManager bim ) {
+        DefaultListSelectionModel model = (DefaultListSelectionModel) table.getSelectionModel();
+        model.addListSelectionListener( new ListSelectionListener() {
+
+            @Override
+            public void valueChanged( ListSelectionEvent e ) {
+                TableUtils.showPosition( table, posColumn, chromColumn, bim );
+            }
+
+
+        } );
     }
 
 

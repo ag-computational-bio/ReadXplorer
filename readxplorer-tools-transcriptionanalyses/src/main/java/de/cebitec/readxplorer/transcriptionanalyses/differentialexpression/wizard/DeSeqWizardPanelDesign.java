@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -94,8 +94,7 @@ public class DeSeqWizardPanelDesign implements
         boolean newTracks = false;
         if( tracks == null ) {
             newTracks = true;
-        }
-        else {
+        } else {
             for( PersistentTrack persistentTrack : tmpTracks ) {
                 if( !tracks.contains( persistentTrack ) ) {
                     newTracks = true;
@@ -153,8 +152,7 @@ public class DeSeqWizardPanelDesign implements
             }
             if( differentCondsUsed ) {
                 design.put( key, rowAsStringArray );
-            }
-            else {
+            } else {
                 throw new WizardValidationException( null, "Each row must have at least two different identifier in it.", null );
             }
 

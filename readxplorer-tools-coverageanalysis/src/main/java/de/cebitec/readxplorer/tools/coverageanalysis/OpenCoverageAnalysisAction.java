@@ -23,9 +23,9 @@ import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -49,11 +50,13 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * Action for opening the coverage analysis. It opens the wizard and runs the
  * analysis after successfully finishing the wizard.
- *
+ * <p>
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -71,6 +74,7 @@ import org.openide.windows.WindowManager;
 public final class OpenCoverageAnalysisAction implements ActionListener,
                                                          DataVisualisationI {
 
+    private static final Logger LOG = Logger.getLogger( OpenCoverageAnalysisAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "CoverageAnalysisWiz";
     private final ReferenceViewer context;
     private final PersistentReference reference;
@@ -168,22 +172,19 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
             for( PersistentTrack track : this.tracks ) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
-                }
-                catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
 
                 this.createAnalysis( connector, readClassesParams );
             }
-        }
-        else {
+        } else {
             try {
                 connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassesParams );
 
-            }
-            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
@@ -212,8 +213,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
      * Shows the results in the corresponding top component.
      * <p>
      * @param dataTypeObject the pair describing the result data. It has to
-     *                       consist of the track id as the first element and the data type string as
-     *                       the second element.
+     *                       consist of the track id as the first element and
+     *                       the data type string as the second element.
      */
     @Override
     public void showData( Object dataTypeObject ) {
@@ -241,7 +242,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                             coverageAnalysisResultPanel = new ResultPanelCoverageAnalysis();
                             coverageAnalysisResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
                         }
-                        coverageAnalysisResultPanel.addCoverageAnalysis( result );
+                        coverageAnalysisResultPanel.addResult( result );
 
                         if( finishedCovAnalyses >= tracks.size() || combineTracks ) {
 
@@ -261,11 +262,10 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                             String title;
                             if( parameters.isDetectCoveredIntervals() ) {
                                 title = "Detected covered intervals for ";
-                            }
-                            else {
+                            } else {
                                 title = "Detected uncovered intervals for ";
                             }
-                            String panelName = title + trackNames + " (" + coverageAnalysisResultPanel.getResultSize() + " hits)";
+                            String panelName = title + trackNames + " (" + coverageAnalysisResultPanel.getDataSize() + " hits)";
                             coveredAnnoAnalysisTopComp.openAnalysisTab( panelName, coverageAnalysisResultPanel );
                         }
                     }
@@ -274,9 +274,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                 } );
             }
 
-        }
-        catch( ClassCastException e ) {
-            //do nothing, we dont handle other data in this class
+        } catch( ClassCastException e ) {
+            LOG.log( SEVERE, "Unknown data received in " + this.getClass().getName() );
         }
 
     }

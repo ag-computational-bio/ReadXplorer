@@ -18,7 +18,10 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -30,17 +33,60 @@ import java.util.Set;
  */
 public class ParametersFeatureTypes {
 
-    private Set<FeatureType> selFeatureTypes;
+    private final Set<FeatureType> selFeatureTypes;
+    private int featureStartOffset;
+    private int featureStopOffset;
 
 
     /**
      * Creates a parameters set which contains all parameters concerning the
      * usage of ReadXplorer's feature types.
      * <p>
-     * @param selFeatureTypes the set of selected feature types
+     * @param selFeatureTypes    The set of selected feature types
+     * @param featureStartOffset The start offset making genomic features start
+     *                           further upstream
+     * @param featureStopOffset  The stop offset making genomic features end
+     *                           further downstream
      */
-    public ParametersFeatureTypes( Set<FeatureType> selFeatureTypes ) {
-        this.selFeatureTypes = selFeatureTypes;
+    public ParametersFeatureTypes( Set<FeatureType> selFeatureTypes, int featureStartOffset,
+                                                                     int featureStopOffset ) {
+        this.selFeatureTypes = new HashSet<>( selFeatureTypes );
+        this.featureStartOffset = featureStartOffset;
+        this.featureStopOffset = featureStopOffset;
+    }
+
+
+    /**
+     * @return The start offset making genomic features start further upstream.
+     */
+    public int getFeatureStartOffset() {
+        return featureStartOffset;
+    }
+
+
+    /**
+     * @param featureStartOffset The start offset making genomic features start
+     *                           further upstream.
+     */
+    public void setFeatureStartOffset( int featureStartOffset ) {
+        this.featureStartOffset = featureStartOffset;
+    }
+
+
+    /**
+     * @return The stop offset making genomic features end further downstream.
+     */
+    public int getFeatureStopOffset() {
+        return featureStopOffset;
+    }
+
+
+    /**
+     * @param featureStopOffset The stop offset making genomic features end
+     *                          further downstream.
+     */
+    public void setFeatureStopOffset( int featureStopOffset ) {
+        this.featureStopOffset = featureStopOffset;
     }
 
 
@@ -48,7 +94,7 @@ public class ParametersFeatureTypes {
      * @return the set of selected feature types
      */
     public Set<FeatureType> getSelFeatureTypes() {
-        return selFeatureTypes;
+        return Collections.unmodifiableSet( selFeatureTypes );
     }
 
 
@@ -56,8 +102,48 @@ public class ParametersFeatureTypes {
      * @param selFeatureTypes the set of selected feature types
      */
     public void setSelFeatureTypes( Set<FeatureType> selFeatureTypes ) {
-        this.selFeatureTypes = selFeatureTypes;
+        this.selFeatureTypes.clear();
+        this.selFeatureTypes.addAll( selFeatureTypes );
     }
 
+
+    /**
+     * Calculates the offset of the feature start position (the smaller genomic
+     * position) according to the offset parameters stored in this instance.
+     * <p>
+     * @param feature The feature whose start including the offset is needed
+     * <p>
+     * @return The feature start corrected by the offset parameters stored in
+     *         this instance.
+     */
+    public int calcFeatureStartOffset( PersistentFeature feature ) {
+        int newStart = feature.getStart();
+        if ( feature.isFwdStrand() ) {
+            newStart -= featureStartOffset;
+        } else {
+            newStart -= featureStopOffset;
+        }
+        return newStart;
+    }
+
+
+    /**
+     * Calculates the offset of the feature start position (the smaller genomic
+     * position) according to the offset parameters stored in this instance.
+     * <p>
+     * @param feature The feature whose start including the offset is needed
+     * <p>
+     * @return The feature start corrected by the offset parameters stored in
+     *         this instance.
+     */
+    public int calcFeatureStopOffset( PersistentFeature feature ) {
+        int newStop = feature.getStop();
+        if( feature.isFwdStrand() ) {
+            newStop += featureStopOffset;
+        } else {
+            newStop += featureStartOffset;
+        }
+        return newStop;
+    }
 
 }

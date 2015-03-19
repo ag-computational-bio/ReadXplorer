@@ -105,34 +105,22 @@
 
 
     <build>
+
         <plugins>
+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>nbm-maven-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <publicPackages>
-                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus.explorer</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.histogramviewer</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.basePanel</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.login</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.referenceviewer</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.abstractviewer</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus.screenshot</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.tablevisualization.tablefilter</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.analysis</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.tablevisualization</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.trackviewer</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.controller</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.readpairviewer</publicPackage>
-                    </publicPackages>
-                    <licenseFile>../License-GPLv3.txt</licenseFile>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <configuration>
+                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -140,7 +128,37 @@
                     <useDefaultManifestFile>true</useDefaultManifestFile>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>de.cebitec.readxplorer.ui</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.analysis</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.controller</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.abstractviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.basepanel</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.histogramviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.readpairviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.referenceviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.trackviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus.screenshot</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus.explorer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.login</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.tablevisualization</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.tablevisualization.tablefilter</publicPackage>
+                    </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
+                </configuration>
+            </plugin>
+
         </plugins>
+
     </build>
 
 </project>

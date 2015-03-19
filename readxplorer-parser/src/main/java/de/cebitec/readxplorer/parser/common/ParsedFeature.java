@@ -22,11 +22,12 @@ import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
 /**
- * Contains all available information about a persistent feature.
+ * Contains all available information about a parsed feature.
  * <p>
  * @author ddoppmeier, rhilker
  */
@@ -46,27 +47,25 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
 
     /**
-     * Contains all available information about a persistent feature.
+     * Contains all available information about a parsed feature.
      * <p>
-     * @param type        FeatureType.CDS, FeatureType.REPEAT_UNIT,
-     *                    FeatureType.R_RNA, FeatureType.SOURCE,
-     *                    FeatureType.T_RNA, FeatureType.MISC_RNA,
-     *                    FeatureType.MI_RNA, FeatureType.GENE,
-     *                    FeatureType.M_RNA (mandatory)
-     * @param start       start position (mandatory)
-     * @param stop        stop position (mandatory)
-     * @param strand      SequenceUtils.STRAND_FWD for featues on forward and
-     *                    SequenceUtils.STRAND_REV on reverse strand
-     * @param locusTag    locus information
-     * @param product     description of the protein product
-     * @param ecNumber    ec number
-     * @param geneName    name of the gene, if it exists (e.g. "dnaA")
+     * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA,
+     * FeatureType.SOURCE, FeatureType.T_RNA, FeatureType.MISC_RNA,
+     * FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA (mandatory)
+     * @param start start position (mandatory)
+     * @param stop stop position (mandatory)
+     * @param strand SequenceUtils.STRAND_FWD for featues on forward and
+     * SequenceUtils.STRAND_REV on reverse strand
+     * @param locusTag locus information
+     * @param product description of the protein product
+     * @param ecNumber The EC number, if it exists, empty string otherwise
+     * @param geneName name of the gene, if it exists (e.g. "dnaA")
      * @param subFeatures the list of sub features belonging to this feature
-     * @param parentIds   the ids of the features to which the current feature
-     *                    belongs
+     * @param parentIds the ids of the features to which the current feature
+     * belongs
      */
     public ParsedFeature( FeatureType type, int start, int stop, int strand, String locusTag, String product,
-                          String ecNumber, String geneName, List<ParsedFeature> subFeatures, List<String> parentIds ) {
+            String ecNumber, String geneName, List<ParsedFeature> subFeatures, List<String> parentIds ) {
         super( type, null ); // if type is null, 0 is assumed, which is equal to FeatureType.UNDEFINED
         this.start = start;
         this.stop = stop;
@@ -83,25 +82,24 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     /**
      * Contains all available information about a persistent feature.
      * <p>
-     * @param type        FeatureType.CDS, FeatureType.REPEAT_UNIT,
-     *                    FeatureType.R_RNA,
-     *                    FeatureType.SOURCE, FeatureType.T_RNA, FeatureType.MISC_RNA,
-     *                    FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA (mandatory)
-     * @param start       start position (mandatory)
-     * @param stop        stop position (mandatory)
-     * @param strand      SequenceUtils.STRAND_FWD for featues on forward and
-     *                    SequenceUtils.STRAND_REV on reverse strand
-     * @param locusTag    locus information
-     * @param product     description of the protein product
-     * @param ecNumber    ec number
-     * @param geneName    name of the gene, if it exists (e.g. "dnaA")
+     * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA,
+     * FeatureType.SOURCE, FeatureType.T_RNA, FeatureType.MISC_RNA,
+     * FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA (mandatory)
+     * @param start start position (mandatory)
+     * @param stop stop position (mandatory)
+     * @param strand SequenceUtils.STRAND_FWD for featues on forward and
+     * SequenceUtils.STRAND_REV on reverse strand
+     * @param locusTag locus information
+     * @param product description of the protein product
+     * @param ecNumber The EC number, if it exists, empty string otherwise
+     * @param geneName name of the gene, if it exists (e.g. "dnaA")
      * @param subFeatures the list of sub features belonging to this feature
-     * @param parentIds   the ids of the features to which the current feature
-     *                    belongs
-     * @param identifier  unique identifier of this feature in this data set
+     * @param parentIds the ids of the features to which the current feature
+     * belongs
+     * @param identifier unique identifier of this feature in this data set
      */
     public ParsedFeature( FeatureType type, int start, int stop, int strand, String locusTag, String product,
-                          String ecNumber, String geneName, List<ParsedFeature> subFeatures, List<String> parentIds, String identifier ) {
+            String ecNumber, String geneName, List<ParsedFeature> subFeatures, List<String> parentIds, String identifier ) {
         this( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, parentIds );
         this.identifier = identifier;
     }
@@ -119,41 +117,67 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     }
 
 
+    /**
+     * @return true, if it has an EC number, false otherwise
+     */
     public boolean hasEcNumber() {
-        return ecNumber != null;
+        return ecNumber != null && !ecNumber.isEmpty();
     }
 
 
+    /**
+     * @return The EC number, if it exists, empty string otherwise
+     */
     public String getEcNumber() {
         return ecNumber;
     }
 
 
+    /**
+     * @return true, if it has a gene name, false otherwise
+     */
     public boolean hasGeneName() {
-        return this.geneName != null;
+        return geneName != null && !geneName.isEmpty();
     }
 
 
+    /**
+     * @return name of the gene, if it exists (e.g. "dnaA"), empty string
+     *         otherwise
+     */
     public String getGeneName() {
         return this.geneName;
     }
 
 
+    /**
+     * @return true, if it has locus information, false otherwise
+     */
     public boolean hasLocusTag() {
-        return locusTag != null;
+        return locusTag != null && !locusTag.isEmpty();
     }
 
 
+    /**
+     * @return locus information if it exists, empty string otherwise
+     */
     public String getLocusTag() {
         return locusTag;
     }
 
 
+    /**
+     * @return true, if it has protein product information, false otherwise
+     */
     public boolean hasProduct() {
         return product != null;
     }
 
 
+    /**
+     * @return description of the protein product if it exists, empty string
+     *         otherwise
+     */
     public String getProduct() {
         return product;
     }
@@ -161,7 +185,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @return start of the feature. Always the smaller value among start and
-     *         stop.
+     * stop.
      */
     public int getStart() {
         return start;
@@ -170,34 +194,46 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @return stop of the feature. Always the larger value among start and
-     *         stop.
+     * stop.
      */
     public int getStop() {
         return stop;
     }
 
 
+    /**
+     * @return true, if it has strand information, false otherwise
+     */
     public boolean hasStrand() {
         return strand != null && strand != 0;
     }
 
 
+    /**
+     * @return SequenceUtils.STRAND_FWD for featues on forward and
+     *         SequenceUtils.STRAND_REV on reverse strand
+     */
     public int getStrand() {
         return strand;
     }
 
 
+    /**
+     * Convenience method for getting the {@link FeatureType} of this feature
+     * instead of calling {@link #getNodeType()}.
+     * @return The {@link FeatureType} of this feature
+     */
     public FeatureType getType() {
-        return this.getNodeType(); //TODO: remove this method, if everything works
+        return this.getNodeType();
     }
 
 
     /**
      * @return the list of exons of this feature or an empty list if there are
-     *         no exons
+     * no exons
      */
     public List<ParsedFeature> getSubFeatures() {
-        return subFeatures;
+        return Collections.unmodifiableList( subFeatures );
     }
 
 
@@ -207,7 +243,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @param parsedSubFeature the sub feature to add.
      */
     public void addSubFeature( ParsedFeature parsedSubFeature ) {
-        this.subFeatures.add( parsedSubFeature );
+        subFeatures.add( parsedSubFeature );
     }
 
 
@@ -224,10 +260,10 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @return The list of parent identifiers/names of this feature, if it has
-     *         parent features. Otherwise the list is empty.
+     * parent features. Otherwise the list is empty.
      */
     public List<String> getParentIds() {
-        return parentIds;
+        return Collections.unmodifiableList( parentIds );
     }
 
 
@@ -245,7 +281,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     public String getParentIdsConcat() {
         StringBuilder builder = new StringBuilder( 20 );
         for( String parentId : parentIds ) {
-            builder.append( parentId ).append( ';' );
+            builder.append( parentId ).append( ";" );
         }
         return builder.length() > 0 ? builder.substring( 0, builder.length() - 1 ) : Properties.NO_PARENT_STRING;
     }
@@ -253,7 +289,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @return The identifier of this gene. <code>null</code> if the feature has
-     *         no identifier.
+     * no identifier.
      */
     public String getIdentifier() {
         return identifier;
@@ -262,7 +298,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @return True, if this feature has an identifier unique for this data set,
-     *         false otherwise.
+     * false otherwise.
      */
     public boolean hasIdentifier() {
         return this.identifier != null;
@@ -275,8 +311,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @param o feature to compare to this feature
      * <p>
      * @return 1, if this feature is larger than the other feature, -1 if vice
-     *         versa
-     *         and 0 if both positions are equal
+     * versa and 0 if both positions are equal
      */
     @Override
     public int compareTo( ParsedFeature o ) {
@@ -284,24 +319,19 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
             if( this.getStart() > o.getStart() ) {
                 return 1;
-            }
-            else if( this.getStart() < o.getStart() ) {
+            } else if( this.getStart() < o.getStart() ) {
                 return -1;
 
-            }
-            else {
+            } else {
                 if( this.getStop() > o.getStop() ) {
                     return 1;
-                }
-                else if( this.getStop() < o.getStop() ) {
+                } else if( this.getStop() < o.getStop() ) {
                     return -1;
-                }
-                else {
+                } else {
                     return 0;
                 }
             }
-        }
-        else {
+        } else {
             throw new NullPointerException();
         }
     }
@@ -309,7 +339,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @param id Unique id for this feature, which will be used in the DB as
-     *           primary key
+     * primary key
      */
     public void setId( long id ) {
         this.id = id;
@@ -318,7 +348,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
     /**
      * @return Unique id for this feature, which will be used in the DB as
-     *         primary key
+     * primary key
      */
     public long getId() {
         return this.id;

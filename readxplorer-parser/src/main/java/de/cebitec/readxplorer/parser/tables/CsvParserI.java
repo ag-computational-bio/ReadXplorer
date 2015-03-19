@@ -30,23 +30,24 @@ import org.supercsv.prefs.CsvPreference;
 public interface CsvParserI extends TableParserI {
 
     /**
-     * @param autoDelimiter <cc>true</cc>, if the delimiter shall be detected
-     *                      automatically, <cc>false</cc>, if the delimiter was selected by the user.
+     * @param autoDelimiter <code>true</code>, if the delimiter shall be
+     *                      detected automatically, <code>false</code>, if the
+     *                      delimiter was selected by the user.
      */
-    public void setAutoDelimiter( boolean autoDelimiter );
+    void setAutoDelimiter( boolean autoDelimiter );
 
 
     /**
      * @param csvPref The currently selected CsvPreference.
      */
-    public void setCsvPref( CsvPreference csvPref );
+    void setCsvPref( CsvPreference csvPref );
 
 
     /**
      *
      * @param cellProcessors The currently CellProcessor for selected CSV table
      */
-    public void setCellProscessors( CellProcessor[] cellProcessors );
+    void setCellProscessors( CellProcessor[] cellProcessors );
 
 
 }

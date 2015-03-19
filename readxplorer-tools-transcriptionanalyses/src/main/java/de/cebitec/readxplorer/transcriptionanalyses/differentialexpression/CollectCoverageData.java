@@ -18,12 +18,16 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.databackend.ParametersFeatureTypes;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +35,7 @@ import java.util.Map;
 
 /**
  * Collect the coverage data for a given track.
- *
+ * <p>
  * @author kstaderm
  */
 public class CollectCoverageData implements Observer {
@@ -49,17 +53,14 @@ public class CollectCoverageData implements Observer {
     /**
      * Adjusts how many bases downstream from the start position of a feature a
      * mapping should still be considered a hit. The features in the database
-     * are
-     * sometimes CDS positions. So it is normal that a lot of mappings will
-     * start in
-     * an are downstream of the start position of the feature.
+     * are sometimes CDS positions. So it is normal that a lot of mappings will
+     * start in an are downstream of the start position of the feature.
      */
     private final int startOffset;
     /**
      * Adjusts how many bases upstream from the stop position of a feature a
      * mapping should still be considered a hit. The features in the database
-     * are
-     * sometimes CDS positions. So it is normales that some mappings are not
+     * are sometimes CDS positions. So it is normales that some mappings are not
      * located exactly indside the feature positions.
      */
     private final int stopOffset;
@@ -68,7 +69,7 @@ public class CollectCoverageData implements Observer {
 
     /**
      * Constructor of the class.
-     *
+     * <p>
      * @param trackID      The ID of the track the instance of this class should
      *                     collect the coverage data for
      * @param perfAnalysis Instance of the calling instance of
@@ -85,37 +86,35 @@ public class CollectCoverageData implements Observer {
 
     /**
      * Updates the read count for the features with the given mappings.
-     *
+     * <p>
      * @param mappings the mappings
      */
     private void updateReadCountForFeatures( MappingResult result ) {
-        List<Mapping> mappings = result.getMappings();
+        List<Mapping> mappings = new ArrayList<>( result.getMappings() );
         Collections.sort( mappings );
         int lastMappingIdx = 0;
-        PersistentFeature feature;
-        boolean fstFittingMapping;
         boolean isStrandBothOption = readClassParams.isStrandBothOption();
         boolean isFeatureStrand = readClassParams.isStrandFeatureOption();
-        boolean analysisStrand;
 
-        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
-            feature = this.genomeFeatures.get( i );
+        for( PersistentFeature feature : genomeFeatures ) {
+
             if( feature.getChromId() == result.getRequest().getChromId() ) {
 
-                int featStart = feature.getStart() - startOffset;
-                int featStop = feature.getStop() + stopOffset;
-                analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
-                fstFittingMapping = true;
+                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, stopOffset );
+                int featStart = featTypeParams.calcFeatureStartOffset( feature );
+                int featStop = featTypeParams.calcFeatureStopOffset( feature );
+                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
                 if( !countData.containsKey( feature ) ) {
                     countData.put( feature, 0 );
                 }
-                for( int j = lastMappingIdx; j < mappings.size(); ++j ) {
+                for( int j = lastMappingIdx; j < mappings.size(); j++ ) {
                     Mapping mapping = mappings.get( j );
                     //If the orientation of the read does not matter this one is always true.
                     //mappings identified within a feature
-                    if( mapping.getStop() > featStart && mapping.getStart() < featStop ) {
+                    if( mapping.getStop() >= featStart && mapping.getStart() <= featStop ) {
 
                         if( fstFittingMapping ) {
                             lastMappingIdx = j;
@@ -126,8 +125,7 @@ public class CollectCoverageData implements Observer {
                         }
 
                         //still mappings left, but need next feature
-                    }
-                    else if( mapping.getStart() > featStop ) {
+                    } else if( mapping.getStart() > featStop ) {
                         break;
                     }
                 }
@@ -146,7 +144,7 @@ public class CollectCoverageData implements Observer {
 
 
     public Map<PersistentFeature, Integer> getCountData() {
-        return countData;
+        return Collections.unmodifiableMap( countData );
     }
 
 

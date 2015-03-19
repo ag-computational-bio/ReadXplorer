@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.plotting;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Pair;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.jfree.chart.ChartPanel;
@@ -48,20 +48,20 @@ import org.jfree.ui.TextAnchor;
  *
  * @author kstaderm
  */
-public class CreatePlots {
+public final class CreatePlots {
 
     private CreatePlots() {
     }
 
 
-    public synchronized static ChartPanel createPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
+    public static synchronized ChartPanel createPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
         XYSeriesCollection normal = new XYSeriesCollection();
         XYSeries nor = new XYSeries( "Normal" );
         for( PersistentFeature key : data.keySet() ) {
             Pair<Double, Double> pair = data.get( key );
-            Double X = pair.getFirst();
-            Double Y = pair.getSecond();
-            nor.add( new PlotDataItem( key, X, Y ) );
+            Double x = pair.getFirst();
+            Double y = pair.getSecond();
+            nor.add( new PlotDataItem( key, x, y ) );
         }
         normal.addSeries( nor );
         // create subplot 1...
@@ -86,7 +86,7 @@ public class CreatePlots {
     }
 
 
-    public synchronized static ChartPanel createInfPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
+    public static synchronized ChartPanel createInfPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
         XYSeriesCollection normal = new XYSeriesCollection();
         XYSeriesCollection posInf = new XYSeriesCollection();
         XYSeriesCollection negInf = new XYSeriesCollection();
@@ -95,19 +95,19 @@ public class CreatePlots {
         XYSeries neg = new XYSeries( "Negative Infinite" );
         for( PersistentFeature key : data.keySet() ) {
             Pair<Double, Double> pair = data.get( key );
-            Double X = pair.getFirst();
-            Double Y = pair.getSecond();
+            Double x = pair.getFirst();
+            Double y = pair.getSecond();
 
-            if( Y == Double.POSITIVE_INFINITY ) {
-                Y = 0d;
-                pos.add( new PlotDataItem( key, X, Y ) );
+            if( y == Double.POSITIVE_INFINITY ) {
+                y = 0d;
+                pos.add( new PlotDataItem( key, x, y ) );
             }
-            if( Y == Double.NEGATIVE_INFINITY ) {
-                Y = 0d;
-                neg.add( new PlotDataItem( key, X, Y ) );
+            if( y == Double.NEGATIVE_INFINITY ) {
+                y = 0d;
+                neg.add( new PlotDataItem( key, x, y ) );
             }
-            if( !Y.isInfinite() && !X.isInfinite() ) {
-                nor.add( new PlotDataItem( key, X, Y ) );
+            if( !y.isInfinite() && !x.isInfinite() ) {
+                nor.add( new PlotDataItem( key, x, y ) );
             }
         }
         normal.addSeries( nor );
@@ -129,7 +129,7 @@ public class CreatePlots {
     }
 
 
-    private synchronized static JFreeChart createCombinedChart( XYSeriesCollection normal,
+    private static synchronized JFreeChart createCombinedChart( XYSeriesCollection normal,
                                                                 XYSeriesCollection posInf, XYSeriesCollection negInf, String xName, String yName, XYToolTipGenerator toolTip ) {
 
         final NumberAxis domainAxis = new NumberAxis( xName );
@@ -148,11 +148,9 @@ public class CreatePlots {
         renderer2.setBaseToolTipGenerator( toolTip );
         final NumberAxis rangeAxis2 = new NumberAxis() {
             @Override
-            public List refreshTicks( Graphics2D g2, AxisState state,
+            public List<NumberTick> refreshTicks( Graphics2D g2, AxisState state,
                                       Rectangle2D dataArea, RectangleEdge edge ) {
-                List myTicks = new ArrayList();
-                myTicks.add( new NumberTick( 0, "-Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
-                return myTicks;
+                return Collections.singletonList( new NumberTick( 0, "-Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
             }
 
 
@@ -167,11 +165,9 @@ public class CreatePlots {
         renderer3.setBaseToolTipGenerator( toolTip );
         final NumberAxis rangeAxis3 = new NumberAxis() {
             @Override
-            public List refreshTicks( Graphics2D g2, AxisState state,
+            public List<NumberTick> refreshTicks( Graphics2D g2, AxisState state,
                                       Rectangle2D dataArea, RectangleEdge edge ) {
-                List myTicks = new ArrayList();
-                myTicks.add( new NumberTick( 0, "Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
-                return myTicks;
+                return Collections.singletonList( new NumberTick( 0, "Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
             }
 
 

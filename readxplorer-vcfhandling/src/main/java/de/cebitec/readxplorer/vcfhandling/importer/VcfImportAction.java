@@ -1,20 +1,36 @@
+/*
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package de.cebitec.readxplorer.vcfhandling.importer;
 
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.controller.ViewController;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanelFactory;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanelFactory;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.vcfhandling.visualization.Snp_VcfResult;
-import de.cebitec.readxplorer.vcfhandling.visualization.Snp_VcfResultPanel;
-import de.cebitec.readxplorer.vcfhandling.visualization.Snp_VcfResultTopComponent;
-import de.cebitec.readxplorer.vcfhandling.visualization.Snp_VcfViewer;
+import de.cebitec.readxplorer.vcfhandling.visualization.SnpVcfResult;
+import de.cebitec.readxplorer.vcfhandling.visualization.SnpVcfResultPanel;
+import de.cebitec.readxplorer.vcfhandling.visualization.SnpVcfResultTopComponent;
+import de.cebitec.readxplorer.vcfhandling.visualization.SnpVcfViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -64,9 +80,9 @@ public final class VcfImportAction implements ActionListener {
     private boolean combineTracks;
 
     private AppPanelTopComponent appPanelTopComp;
-    private Snp_VcfViewer snpVcfViewer;
-    private Snp_VcfResultTopComponent vcfResultTopComp;
-    private final Snp_VcfResultPanel resultPanel = new Snp_VcfResultPanel();
+    private SnpVcfViewer snpVcfViewer;
+    private SnpVcfResultTopComponent vcfResultTopComp;
+    private SnpVcfResultPanel resultPanel = null;
     private WizardDescriptor wiz;
 
     //private WizardDescriptor.Panel<WizardDescriptor>[] panel;
@@ -78,8 +94,7 @@ public final class VcfImportAction implements ActionListener {
 
 
     /**
-     * Reads in the given VCF-file.
-     * The data of the VCF-file is saved in a list
+     * Reads in the given VCF-file. The data of the VCF-file is saved in a list
      * of VariantContexts, then the dashboard, SNP-Viewer, Reference-Viewer and
      * Result table are opened.
      * <p>
@@ -110,31 +125,9 @@ public final class VcfImportAction implements ActionListener {
             VcfParser vcfP = new VcfParser( vcfFile );
             variantCList = vcfP.getVariantContextList();
 
-            openResultWindow();
             openView( variantCList );
 
         }
-    }
-
-
-    /**
-     * Opens the Result table.
-     */
-    private void openResultWindow() {
-
-        // Saves required information for generating a Snp_VcfResult Object
-        reference = (PersistentReference) wiz.getProperty( VcfImportWizardPanel.PROP_SELECTED_REF );
-        combineTracks = false;
-
-        // Opens VcfResultPanel
-        if( vcfResultTopComp == null ) {
-            vcfResultTopComp = (Snp_VcfResultTopComponent) WindowManager.getDefault().findTopComponent( "Snp_VcfResultTopComponent" );
-        }
-        vcfResultTopComp.open();
-
-        Snp_VcfResult vcfResult = new Snp_VcfResult( variantCList, trackMap, reference, combineTracks );
-        resultPanel.addResult( vcfResult );
-        vcfResultTopComp.openAnalysisTab( "Result Panel", resultPanel );
     }
 
 
@@ -145,9 +138,26 @@ public final class VcfImportAction implements ActionListener {
      */
     private void openView( List<VariantContext> variantList ) {
 
-        // Saves required information for generating a VcfViewer-Object
+        // Saves required information for generating a SnpVcfResult Object
+        reference = (PersistentReference) wiz.getProperty( VcfImportWizardPanel.PROP_SELECTED_REF );
+        combineTracks = false;
         ViewController viewController = this.checkAndOpenRefViewer( reference );
-        resultPanel.setBoundsInfoManager( viewController.getBoundsManager() );
+
+        // Opens VcfResultPanel
+        if( vcfResultTopComp == null ) {
+            vcfResultTopComp = (SnpVcfResultTopComponent) WindowManager.getDefault().findTopComponent( "Snp_VcfResultTopComponent" );
+        }
+        vcfResultTopComp.open();
+
+        if( resultPanel == null ) {
+            resultPanel = new SnpVcfResultPanel( viewController.getBoundsManager() );
+        }
+
+        SnpVcfResult vcfResult = new SnpVcfResult( variantCList, trackMap, reference, combineTracks );
+        resultPanel.addResult( vcfResult );
+        vcfResultTopComp.openAnalysisTab( "Result Panel", resultPanel );
+
+        // Saves required information for generating a VcfViewer-Object
         BasePanelFactory basePanelFac = viewController.getBasePanelFac();
         BasePanel basePanel = basePanelFac.getGenericBasePanel( false, false, false, null );
         viewController.addMousePositionListener( basePanel );
@@ -166,7 +176,7 @@ public final class VcfImportAction implements ActionListener {
             }
         }
 
-        snpVcfViewer = new Snp_VcfViewer( viewController.getBoundsManager(), basePanel, reference );
+        snpVcfViewer = new SnpVcfViewer( viewController.getBoundsManager(), basePanel, reference );
         snpVcfViewer.setVariants( variantList );
         basePanel.setViewer( snpVcfViewer );
         appPanelTopComp.showBasePanel( basePanel );
@@ -177,8 +187,7 @@ public final class VcfImportAction implements ActionListener {
     /**
      * Opens the dashboard and Reference-Viewer.
      * <p>
-     * @param ref
-     *            <p>
+     * @param ref <p>
      * @return
      */
     private ViewController checkAndOpenRefViewer( PersistentReference ref ) {

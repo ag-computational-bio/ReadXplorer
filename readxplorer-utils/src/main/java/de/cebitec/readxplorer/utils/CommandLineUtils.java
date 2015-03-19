@@ -36,9 +36,8 @@ public class CommandLineUtils {
 
 
     /**
-     * If any message should be printed to the console, this method is used.
-     * If an error occured during the run of the parser, which does not
-     * interrupt
+     * If any message should be printed to the console, this method is used. If
+     * an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print
@@ -57,7 +56,7 @@ public class CommandLineUtils {
      * run a command line tool and write the output to the console
      * <p>
      * @param command
-     *                <p>
+     * <p>
      * @throws java.io.IOException
      */
     public void runCommandAndWaitUntilEnded( String... command ) throws IOException {
@@ -79,8 +78,7 @@ public class CommandLineUtils {
         try {
             int exitValue = process.waitFor();
             this.showMsg( "\n\nExit Value is " + exitValue );
-        }
-        catch( InterruptedException e ) {
+        } catch( InterruptedException e ) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

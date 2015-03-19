@@ -18,16 +18,16 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import java.util.HashMap;
 
 
 /**
- * This class keeps track of created BoundsInfoManager-Instances and
- * ensures that there is only one BoundsInfoManager per genome
+ * This class keeps track of created BoundsInfoManager-Instances and ensures
+ * that there is only one BoundsInfoManager per genome
  * <p>
- * This is to ensure, that the panel navigation (i.e. "Jump to") still
- * works even if there are multiple genome object instances in use
+ * This is to ensure, that the panel navigation (i.e. "Jump to") still works
+ * even if there are multiple genome object instances in use
  * <p>
  * @author Evgeny Anisiforov
  */
@@ -44,8 +44,7 @@ public class BoundsInfoManagerFactory {
     public BoundsInfoManager get( PersistentReference genome ) {
         if( data.containsKey( genome.getId() ) ) {
             return data.get( genome.getId() );
-        }
-        else {
+        } else {
             BoundsInfoManager boundsManager = new BoundsInfoManager( genome );
             data.put( genome.getId(), boundsManager );
             return boundsManager;

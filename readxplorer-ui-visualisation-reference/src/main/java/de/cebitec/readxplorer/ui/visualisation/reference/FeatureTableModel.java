@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import javax.swing.table.AbstractTableModel;
 
 
@@ -30,7 +30,7 @@ public class FeatureTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
 
-    PersistentFeature[] featureData;
+    private PersistentFeature[] featureData;
     private final String[] columnNames = { "Feature", "Type", "Gene", "Product", "EC-Number" };
     private Object[][] data;
 
@@ -90,8 +90,7 @@ public class FeatureTableModel extends AbstractTableModel {
                 return PersistentFeature.class;
             }
             return getValueAt( 0, c ).getClass();
-        }
-        else {
+        } else {
             return Object.class;
         }
     }

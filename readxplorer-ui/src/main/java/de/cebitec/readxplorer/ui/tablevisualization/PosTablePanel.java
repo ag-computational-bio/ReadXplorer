@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.ui.tablevisualization;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.TableType;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import javax.swing.DefaultListSelectionModel;
@@ -39,6 +40,8 @@ public class PosTablePanel extends TablePanel {
     private final UneditableTableModel tableData;
     private PersistentReference reference;
     private final TableRightClickFilter<UneditableTableModel> filterListener;
+    private int posColumn;
+    private final int chromColumn;
 
 
     /**
@@ -50,12 +53,11 @@ public class PosTablePanel extends TablePanel {
      */
     public PosTablePanel( UneditableTableModel tableData, TableType tableType ) {
         this.tableData = tableData;
-        final int posColumn = 0;
-        final int trackColumn;
-        final int chromColumn;
+        posColumn = 0;
+        int trackColumn = 0;
         switch( tableType ) {
             case COVERAGE_ANALYSIS: //fallthrough
-            case RPKM_ANALYSIS: //fallthrough
+            case TPM_RPKM_ANALYSIS: //fallthrough
             case SNP_DETECTION: //fallthrough
             case OPERON_DETECTION:
                 trackColumn = 2;
@@ -65,6 +67,10 @@ public class PosTablePanel extends TablePanel {
                 chromColumn = 1;
                 trackColumn = 2;
                 break;
+            case GASV_TABLE:
+                chromColumn = 1;
+                posColumn = 2;
+                break;
             case FEATURE_COVERAGE_ANALYSIS: //fallthrough
             case TSS_DETECTION: //fallthrough
             default:
@@ -73,7 +79,7 @@ public class PosTablePanel extends TablePanel {
                 break; //for all other tables
         }
         this.initComponents();
-        this.initAdditionalComponents( posColumn, chromColumn );
+        this.initAdditionalComponents();
         filterListener = new TableRightClickFilter<>( UneditableTableModel.class, posColumn, trackColumn );
         this.dataTable.getTableHeader().addMouseListener( filterListener );
     }
@@ -82,21 +88,10 @@ public class PosTablePanel extends TablePanel {
     /**
      * Initializes additionals stuff for this panel.
      */
-    private void initAdditionalComponents( final int posColumn, final int chromColumn ) {
+    private void initAdditionalComponents() {
         this.dataTable.setModel( this.tableData );
-
-        DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                //TODO: feature position - map mit features im ram halten
-                //TODO: after closing of ref and reopening, it does not react anymore
-                TableUtils.showPosition( dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference );
-            }
-
-
-        } );
+        //TODO: feature position - map mit features im ram halten
+        //TODO: after closing of ref and reopening, it does not react anymore
     }
 
 
@@ -151,8 +146,7 @@ public class PosTablePanel extends TablePanel {
     public int getDataSize() {
         if( tableData != null ) {
             return tableData.getRowCount();
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -171,6 +165,35 @@ public class PosTablePanel extends TablePanel {
      */
     public PersistentReference getReferenceGenome() {
         return this.reference;
+    }
+
+
+    /**
+     * After setting the BoundsInfoManager,
+     * <p>
+     * @param bim
+     */
+    @Override
+    public void setBoundsInfoManager( BoundsInfoManager bim ) {
+        super.setBoundsInfoManager( bim );
+        this.createListSelectionListener();
+    }
+
+
+    /**
+     * Creates the ListSelectionListener for jumping to a position in the
+     * reference genome.
+     */
+    private void createListSelectionListener() {
+        DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
+        model.addListSelectionListener( new ListSelectionListener() {
+            @Override
+            public void valueChanged( ListSelectionEvent e ) {
+                TableUtils.showPosition( dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference );
+            }
+
+
+        } );
     }
 
 

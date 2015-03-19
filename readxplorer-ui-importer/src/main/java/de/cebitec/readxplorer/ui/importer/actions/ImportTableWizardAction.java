@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.importer.actions;
 
 
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.tables.CsvTableParser;
 import de.cebitec.readxplorer.parser.tables.TableParserI;
@@ -72,7 +72,7 @@ public final class ImportTableWizardAction implements ActionListener {
     /**
      * Action to import an arbitrary table into ReadXplorer and display it in a
      * new TopComonent.
-     *
+     * <p>
      * @param context A LoginCookie to assure, that a DB has already been
      *                opened.
      */
@@ -115,10 +115,10 @@ public final class ImportTableWizardAction implements ActionListener {
             try {
 //                List<List<?>> tableData = parser.parseTable(tableFile);
 
-                if( tableView != null && (tableType.equals( TableType.OPERON_DETECTION_JR )
-                                          || tableType.equals( TableType.RPKM_ANALYSIS_JR )
-                                          || tableType.equals( TableType.NOVEL_TRANSCRIPT_DETECTION_JR )
-                                          || tableType.equals( TableType.TSS_DETECTION_JR )) ) {
+                if( tableView != null && (tableType.equals( TableType.OPERON_DETECTION_JR ) ||
+                     tableType.equals( TableType.RPKM_ANALYSIS_JR ) ||
+                     tableType.equals( TableType.NOVEL_TRANSCRIPT_DETECTION_JR ) ||
+                     tableType.equals( TableType.TSS_DETECTION_JR )) ) {
 
                     //xls handling of transcriptome tables
                     if( parser instanceof XlsTranscriptomeTableParser ) {
@@ -130,8 +130,7 @@ public final class ImportTableWizardAction implements ActionListener {
                         Map<String, String> secondSheetMapThirdCol = xlsParser.getSecondSheetMapThirdCol();
                         tableView.processXlsInput( ref, model, secondSheetMap, secondSheetMapThirdCol );
 
-                    }
-                    else if( parser instanceof CsvTableParser ) {
+                    } else if( parser instanceof CsvTableParser ) {
                         CsvTableParser csvParser = (CsvTableParser) parser;
                         final File parametersFile = new File( statsFileLocation );
                         List<List<?>> tableData = csvParser.parseTable( tableFile );
@@ -140,8 +139,7 @@ public final class ImportTableWizardAction implements ActionListener {
                         tableView.processCsvInput( tableData, tableData2, tableType, ref );
 
                     }
-                }
-                else {
+                } else {
                     List<List<?>> tableData = parser.parseTable( tableFile );
 
                     final UneditableTableModel tableModel = TableUtils.transformDataToTableModel( tableData );
@@ -152,7 +150,6 @@ public final class ImportTableWizardAction implements ActionListener {
                         public void run() {
                             PosTablePanel tablePanel = new PosTablePanel( tableModel, tableType );
                             tablePanel.setReferenceGenome( ref );
-//                            tablePanel.setTableType(tableType);
                             TableVisualizationHelper.checkAndOpenRefViewer( ref, tablePanel );
 
                             String panelName = "Imported table from: " + tableFile.getName();
@@ -165,8 +162,7 @@ public final class ImportTableWizardAction implements ActionListener {
                     } );
                 }
 
-            }
-            catch( ParsingException ex ) {
+            } catch( ParsingException ex ) {
                 JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), ex.getMessage() + "\nFile: " + fileLocation,
                                                Bundle.ErrorHeader(), JOptionPane.INFORMATION_MESSAGE );
             }

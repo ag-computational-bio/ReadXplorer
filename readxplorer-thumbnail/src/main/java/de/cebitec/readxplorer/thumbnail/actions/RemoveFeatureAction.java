@@ -20,13 +20,32 @@ package de.cebitec.readxplorer.thumbnail.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.NbBundle;
 
-
+/**
+ * Action for removing features from the thumbnail view.
+ * 
+ * @author denis, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
+@ActionID(
+        category = "Tools",
+        id = "de.cebitec.readxplorer.thumbnail.actions.RemoveFeatureAction"
+)
+@ActionRegistration(displayName = "#CTL_RemoveTracksAction", iconInMenu = false)
+@ActionReference(path = "Menu/Tools/Thumbnail", position = 700, separatorBefore = 600)
+@NbBundle.Messages("CTL_RemoveTracksAction=Remove features")
 public final class RemoveFeatureAction implements ActionListener {
 
     private final RemoveCookie context;
 
-
+    /**
+     * Action for removing features from the thumbnail view.
+     * 
+     * @param context 
+     */
     public RemoveFeatureAction( RemoveCookie context ) {
         this.context = context;
     }

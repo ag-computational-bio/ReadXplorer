@@ -22,8 +22,8 @@ import de.cebitec.readxplorer.parser.common.ParsingException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.table.DefaultTableModel;
 import org.openide.util.Exceptions;
 
@@ -36,8 +36,8 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
 
     private TableType tableType;
     private DefaultTableModel model;
-    private Map<String, String> secondSheetMap;
-    private Map<String, String> secondSheetMapThirdCol;
+    private HashMap<String, String> secondSheetMap;
+    private HashMap<String, String> secondSheetMapThirdCol;
 
 
     /**
@@ -72,23 +72,22 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
         List<List<?>> parseTable = new ArrayList<>();
 
         if( tableType == TableType.TSS_DETECTION_JR
-            || tableType == TableType.OPERON_DETECTION_JR
-            || tableType == TableType.RPKM_ANALYSIS_JR
-            || tableType == TableType.NOVEL_TRANSCRIPT_DETECTION_JR ) {
+                || tableType == TableType.OPERON_DETECTION_JR
+                || tableType == TableType.RPKM_ANALYSIS_JR
+                || tableType == TableType.NOVEL_TRANSCRIPT_DETECTION_JR ) {
 
             ExcelToTable exlToTable = null;
             try {
                 exlToTable = new ExcelToTable( fileToRead );
-                this.model = exlToTable.dataToDataTableImport();
-                this.secondSheetMap = exlToTable.getSecondSheetData();
-                this.secondSheetMapThirdCol = exlToTable.getSecondSheetDataThirdColumn();
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 Exceptions.printStackTrace( ex );
             }
 
-        }
-        else {
+            this.model = exlToTable.dataToDataTableImport();
+            this.secondSheetMap = exlToTable.getSecondSheetData();
+            this.secondSheetMapThirdCol = exlToTable.getSecondSheetDataThirdColumn();
+
+        } else {
             parseTable = super.parseTable( fileToRead );
         }
 
@@ -101,12 +100,12 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
     }
 
 
-    public Map<String, String> getSecondSheetMap() {
+    public HashMap<String, String> getSecondSheetMap() {
         return secondSheetMap;
     }
 
 
-    public Map<String, String> getSecondSheetMapThirdCol() {
+    public HashMap<String, String> getSecondSheetMapThirdCol() {
         return secondSheetMapThirdCol;
     }
 

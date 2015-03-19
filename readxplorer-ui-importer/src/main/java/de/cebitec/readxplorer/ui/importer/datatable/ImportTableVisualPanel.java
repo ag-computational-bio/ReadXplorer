@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.ui.importer.datatable;
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.CsvPreferenceForUsers;
 import de.cebitec.readxplorer.parser.tables.CsvTableParser;
 import de.cebitec.readxplorer.parser.tables.TableParserI;
@@ -38,7 +38,7 @@ import org.supercsv.prefs.CsvPreference;
 /**
  * Creates a panel for displaying the selection of different table parsers and
  * their options.
- *
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ImportTableVisualPanel extends JobPanel {
@@ -82,7 +82,7 @@ public final class ImportTableVisualPanel extends JobPanel {
         tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readxplorer.parser.tables.TableType.values()));
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
-        de.cebitec.readxplorer.databackend.dataObjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataObjects.PersistentReference[0];
+        de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[0];
         refArray = ProjectConnector.getInstance().getGenomes().toArray(refArray);
         refComboBox = new javax.swing.JComboBox<>(new DefaultComboBoxModel<>(refArray));
         tableLabel = new javax.swing.JLabel();
@@ -267,15 +267,14 @@ public final class ImportTableVisualPanel extends JobPanel {
     private void tableComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tableComboBoxActionPerformed
 
         boolean isCsvParser = (this.parserComboBox.getSelectedItem() instanceof CsvTableParser);
-        if( isCsvParser
-            && ((TableType) tableComboBox.getSelectedItem() == TableType.OPERON_DETECTION_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.NOVEL_TRANSCRIPT_DETECTION_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.RPKM_ANALYSIS_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.TSS_DETECTION_JR) ) {
+        if( isCsvParser &&
+                 ((TableType) tableComboBox.getSelectedItem() == TableType.OPERON_DETECTION_JR ||
+             (TableType) tableComboBox.getSelectedItem() == TableType.NOVEL_TRANSCRIPT_DETECTION_JR ||
+             (TableType) tableComboBox.getSelectedItem() == TableType.RPKM_ANALYSIS_JR ||
+             (TableType) tableComboBox.getSelectedItem() == TableType.TSS_DETECTION_JR) ) {
             statsAndParamsButton.setEnabled( true );
             statsAndParamsFileTextField.setEnabled( true );
-        }
-        else {
+        } else {
             statsAndParamsButton.setEnabled( false );
             statsAndParamsFileTextField.setEnabled( false );
         }
@@ -316,7 +315,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JTextField fileTextField;
     private javax.swing.JComboBox<TableParserI> parserComboBox;
     private javax.swing.JLabel parserLabel;
-    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> refComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataobjects.PersistentReference> refComboBox;
     private javax.swing.JLabel refLabel;
     private javax.swing.JButton statsAndParamsButton;
     private javax.swing.JTextField statsAndParamsFileTextField;
@@ -327,8 +326,8 @@ public final class ImportTableVisualPanel extends JobPanel {
 
     @Override
     public boolean isRequiredInfoSet() {
-        boolean isValidated = tableComboBox.getSelectedIndex() > -1 && refComboBox.getSelectedIndex() > -1
-                              && fileLocation != null && !fileLocation.isEmpty();
+        boolean isValidated = tableComboBox.getSelectedIndex() > -1 && refComboBox.getSelectedIndex() > -1 &&
+                 fileLocation != null && !fileLocation.isEmpty();
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
@@ -376,8 +375,8 @@ public final class ImportTableVisualPanel extends JobPanel {
 
     /**
      * @return <code>true</code>, if the delimiter shall be detected
-     *         automatically, <code>false</code>, if the delimiter was selected by the
-     *         user.
+     *         automatically, <code>false</code>, if the delimiter was selected
+     *         by the user.
      */
     public boolean isAutodetectDelimiter() {
         return this.delimiterCheckBox.isSelected();

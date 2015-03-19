@@ -24,11 +24,12 @@ package de.cebitec.readxplorer.transcriptionanalyses;
  */
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.Operon;
-import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.OperonAdjacency;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Operon;
+import de.cebitec.readxplorer.transcriptionanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
@@ -37,19 +38,16 @@ import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 
 /**
- * This panel is capable of showing a table with detected operons and
- * contains an export button, which exports the data into an excel file.
- *
+ * This panel is capable of showing a table with detected operons and contains
+ * an export button, which exports the data into an excel file.
+ * <p>
  * @author -Rolf Hilker-
  */
 public class ResultPanelOperonDetection extends ResultTablePanel {
@@ -70,8 +68,11 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      * contains an export button, which exports the data into an excel file.
      * <p>
      * @param operonDetParameters parameters used for this operon detection
+     * @param bim                 BoundsInfoManager of the reference on which
+     *                            this analysis was performed.
      */
-    public ResultPanelOperonDetection( ParameterSetOperonDet operonDetParameters ) {
+    public ResultPanelOperonDetection( ParameterSetOperonDet operonDetParameters, BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumnIdx = 5;
         final int trackColumnIdx = 2;
@@ -80,16 +81,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         this.operonDetectionTable.getTableHeader().addMouseListener( tableFilter );
         this.initStatsMap();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
     }
 
 
@@ -217,8 +209,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
     /**
      * Adds the data from this OperonDetectionResult to the data already
-     * available
-     * in this result panel. All statistics etc. are also updated.
+     * available in this result panel. All statistics etc. are also updated.
      * <p>
      * @param newResult the result to add
      */
@@ -234,9 +225,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             if( this.operonResult == null ) {
                 this.operonResult = operonResultNew;
-            }
-            else {
-                this.operonResult.getResults().addAll( operonResultNew.getResults() );
+            } else {
+                this.operonResult.addAllToResult( operonResultNew.getResults() );
             }
 
             DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();

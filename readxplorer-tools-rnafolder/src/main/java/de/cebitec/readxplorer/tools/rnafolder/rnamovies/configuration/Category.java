@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.tools.rnafolder.rnamovies.configuration;
 
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -26,49 +28,45 @@ import javax.swing.event.EventListenerList;
 
 public class Category {
 
-    private Map<String, TypeWrapper> values;
+    private final Map<String, TypeWrapper> values;
 
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
-    private String name;
+    private final String name;
 
-    private int id = -1;
+    private final int id;
 
 
     protected Category( String name, Map<String, TypeWrapper> values ) {
-        this.name = name;
-        this.values = values;
+        this( -1, name, values );
     }
 
 
     protected Category( int id, String name, Map<String, TypeWrapper> values ) {
         this.id = id;
         this.name = name;
-        this.values = values;
+        this.values = new HashMap<>( values );
     }
 
 
     public Map<String, TypeWrapper> getValues() {
-        return values;
+        return Collections.unmodifiableMap( values );
     }
 
 
     public void init() {
         int localId = -1;
-        String key;
         Iterator<String> keys;
-        TypeWrapper tw;
 
         for( keys = values.keySet().iterator(); keys.hasNext(); ) {
-            key = keys.next();
-            tw = values.get( key );
+            String key = keys.next();
+            TypeWrapper tw = values.get( key );
 
             if( tw.contains( "id" ) ) {
                 try {
                     localId = Integer.parseInt( tw.getAttribute( "id" ) );
                     localId = localId < -1 ? -1 : localId;
-                }
-                catch( NumberFormatException e ) {
+                } catch( NumberFormatException e ) {
                     localId = -1;
                 }
             }
@@ -79,25 +77,25 @@ public class Category {
 
     public void set( String key, Object value ) {
         int localId = -1;
-        TypeWrapper tw;
 
-        if( !values.containsKey( key ) )
+        if( !values.containsKey( key ) ) {
             throw new NoSuchElementException( "Key " + key + " does not exsist in Configuration." );
+        }
 
-        tw = values.get( key );
+        TypeWrapper tw = values.get( key );
 
         if( tw.contains( "id" ) ) {
             try {
                 localId = Integer.parseInt( tw.getAttribute( "id" ) );
                 localId = localId < -1 ? -1 : localId;
-            }
-            catch( NumberFormatException e ) {
+            } catch( NumberFormatException e ) {
                 localId = -1;
             }
         }
 
-        if( value.getClass() != tw.getObject().getClass() )
+        if( value.getClass() != tw.getObject().getClass() ) {
             throw new IllegalArgumentException( "Invalid argument: " + value.getClass().getName() + " where " + values.get( key ).getObject().getClass().getName() + " is expected." );
+        }
 
         tw.setObject( value );
         fire( new ConfigChangedEvent( this, localId, key, value ) );
@@ -110,13 +108,14 @@ public class Category {
 
 
     public void set( String key, boolean value ) {
-        set( key, value );
+        set( key, Boolean.valueOf( value ) );
     }
 
 
     public Object get( String key ) {
-        if( !values.containsKey( key ) )
+        if( !values.containsKey( key ) ) {
             throw new NoSuchElementException( "Key " + key + " does not exsist in Configuration." );
+        }
 
         return values.get( key ).getObject();
     }
@@ -126,10 +125,11 @@ public class Category {
         Object value;
 
         value = get( key );
-        if( value instanceof Integer )
+        if( value instanceof Integer ) {
             return ((Integer) value);
-        else
+        } else {
             throw new IllegalArgumentException( "Invalid argument: " + key + ": " + value.getClass().getName() + " where java.lang.Integer is expected." );
+        }
 
     }
 
@@ -138,10 +138,11 @@ public class Category {
         Object value;
 
         value = get( key );
-        if( value instanceof Boolean )
+        if( value instanceof Boolean ) {
             return ((Boolean) value);
-        else
+        } else {
             throw new IllegalArgumentException( "Invalid argument: " + key + ": " + value.getClass().getName() + " where java.lang.Boolean is expected." );
+        }
 
     }
 
@@ -172,8 +173,9 @@ public class Category {
 
         listeners = listenerList.getListenerList();
         for( i = 0; i < listeners.length; i += 2 ) {
-            if( listeners[i] == ConfigListener.class )
+            if( listeners[i] == ConfigListener.class ) {
                 ((ConfigListener) listeners[i + 1]).configurationChanged( e );
+            }
         }
     }
 

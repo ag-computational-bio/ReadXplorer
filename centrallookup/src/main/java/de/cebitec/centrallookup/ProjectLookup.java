@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import org.openide.util.Lookup;
 import org.openide.util.LookupListener;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.windows.TopComponent;
@@ -27,6 +28,17 @@ import org.openide.windows.TopComponent;
 public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
     private static final long serialVersionUID = 8835898;
+
+    /**
+     * A ProjectLookup implementation that is empty and does not take
+     * objects.
+     * <p>
+     * @see Lookup.EMPTY
+     */
+    private static final EmptyProjectLookup EMPTY = new EmptyProjectLookup();
+
+    private static ProjectLookup pl;
+
     private InstanceContent content;
     /**
      * registry to work with
@@ -35,8 +47,10 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
 
     public ProjectLookup() {
+
         this( new InstanceContent() );
-        this.registry = TopComponent.getRegistry();
+
+        registry = TopComponent.getRegistry();
         registry.addPropertyChangeListener(new PropertyChangeListener() {
 
             /**
@@ -44,21 +58,24 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
              */
             @Override
             public void propertyChange( java.beans.PropertyChangeEvent evt ) {
+
                 if( TopComponent.Registry.PROP_ACTIVATED.equals( evt.getPropertyName() ) ) {
 
                     TopComponent tc = registry.getActivated();
                     if( tc instanceof ProjectLookup.Provider ) {
                         pl = ((ProjectLookup.Provider) registry.getActivated()).getProjectLookup();
                     }
-                    org.openide.util.Utilities.actionsGlobalContext().lookup( javax.swing.ActionMap.class );
+                    Utilities.actionsGlobalContext().lookup( javax.swing.ActionMap.class );
                 }
+
                 if( TopComponent.Registry.PROP_TC_CLOSED.equals( evt.getPropertyName() ) ) {
                     TopComponent tc = (TopComponent) evt.getNewValue();
                     if( tc instanceof ProjectLookup.Provider ) {
                         pl = null;
                     }
-                    org.openide.util.Utilities.actionsGlobalContext().lookup( javax.swing.ActionMap.class );
+                    Utilities.actionsGlobalContext().lookup( javax.swing.ActionMap.class );
                 }
+
             }
 
 
@@ -121,15 +138,14 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
     }
 
 
-    private static ProjectLookup pl;
-
-
     @Override
     public Lookup getLookup() {
         return getCurrent();
     }
 
 
+
+    
     /**
      * TopComponents that implement Provider share their ProjectLookup with the
      * global lookup.
@@ -138,47 +154,10 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
         ProjectLookup getProjectLookup();
 
-
     }
-    /**
-     * A ProjectLookup implementation that is empty and does not take
-     * objects.
-     * <p>
-     * @see Lookup.EMPTY
-     */
-    private static final Empty EMPTY = new Empty();
 
 
-    private static class Empty extends ProjectLookup {
-
-
-        private static final Result NO_RESULT = new Result() {
-
-            private static final long serialVersionUID = 8835899;
-
-
-            @Override
-            public void addLookupListener( LookupListener l ) {
-            }
-
-
-            @Override
-            public void removeLookupListener( LookupListener l ) {
-            }
-
-
-            @Override
-            public Collection allInstances() {
-                return Collections.EMPTY_SET;
-            }
-
-
-        };
-
-
-        Empty() {
-        }
-
+    private static class EmptyProjectLookup extends ProjectLookup {
 
         @Override
         public void add( Object instance ) {
@@ -191,11 +170,28 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
 
         @Override
-        @SuppressWarnings( "unchecked" )
         public <T> Result<T> lookupResult( Class<T> clazz ) {
-            return NO_RESULT;
-        }
 
+            return new Result<T>() {
+
+                private static final long serialVersionUID = 8835899;
+
+                @Override
+                public void addLookupListener( LookupListener l ) {
+                }
+
+                @Override
+                public void removeLookupListener( LookupListener l ) {
+                }
+
+                @Override
+                public Collection<? extends T> allInstances() {
+                    return Collections.emptyList();
+                }
+
+            };
+
+        }
 
     }
 

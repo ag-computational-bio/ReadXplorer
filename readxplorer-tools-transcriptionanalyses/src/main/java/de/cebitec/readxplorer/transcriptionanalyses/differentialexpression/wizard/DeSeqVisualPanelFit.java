@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,9 +49,9 @@ public final class DeSeqVisualPanelFit extends JPanel {
     public void updateConditionGroupsList( Set<String> conditionGroups ) {
         boolean newDataSet = false;
         for( String currentGroup : conditionGroups ) {
-            if( !allConditionGroupsModel.contains( currentGroup )
-                && !fittingOneModel.contains( currentGroup )
-                && !fittingTwoModel.contains( currentGroup ) ) {
+            if( !allConditionGroupsModel.contains( currentGroup ) &&
+                     !fittingOneModel.contains( currentGroup ) &&
+                     !fittingTwoModel.contains( currentGroup ) ) {
                 newDataSet = true;
                 break;
             }
@@ -67,12 +68,12 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
 
     public List<String> getFittingGroupOne() {
-        return fittingGroupOne;
+        return Collections.unmodifiableList( fittingGroupOne );
     }
 
 
     public List<String> getFittingGroupTwo() {
-        return fittingGroupTwo;
+        return Collections.unmodifiableList( fittingGroupTwo );
     }
 
 
@@ -96,15 +97,15 @@ public final class DeSeqVisualPanelFit extends JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        conditionGroupsList = new javax.swing.JList();
+        conditionGroupsList = new javax.swing.JList<String>();
         addToFittingOne = new javax.swing.JButton();
         removeFromFittingOne = new javax.swing.JButton();
         addToFittingTwo = new javax.swing.JButton();
         removeFromFittingTwo = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        fittingTwoList = new javax.swing.JList();
+        fittingTwoList = new javax.swing.JList<String>();
         jScrollPane2 = new javax.swing.JScrollPane();
-        fittingOneList = new javax.swing.JList();
+        fittingOneList = new javax.swing.JList<String>();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -223,8 +224,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 fittingGroupOne.add( currentGroup );
                 assignedGroups.add( currentGroup );
                 infoLabel.setText( "" );
-            }
-            else {
+            } else {
                 infoLabel.setText( "Each group can just be added once to a fitting group." );
             }
         }
@@ -248,8 +248,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 fittingGroupTwo.add( currentGroup );
                 assignedGroups.add( currentGroup );
                 infoLabel.setText( "" );
-            }
-            else {
+            } else {
                 infoLabel.setText( "Each group can just be added once to a fitting group." );
             }
         }
@@ -267,9 +266,9 @@ public final class DeSeqVisualPanelFit extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addToFittingOne;
     private javax.swing.JButton addToFittingTwo;
-    private javax.swing.JList conditionGroupsList;
-    private javax.swing.JList fittingOneList;
-    private javax.swing.JList fittingTwoList;
+    private javax.swing.JList<String> conditionGroupsList;
+    private javax.swing.JList<String> fittingOneList;
+    private javax.swing.JList<String> fittingTwoList;
     private javax.swing.JLabel infoLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

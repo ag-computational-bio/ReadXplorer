@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.exporter.tables;
 
 
+import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import jxl.Workbook;
@@ -33,6 +33,7 @@ import jxl.write.Number;
 import jxl.write.NumberFormats;
 import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
+import jxl.write.WritableHyperlink;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
@@ -41,6 +42,9 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * General excel exporter. It supports even multiple sheets in one document.
@@ -48,6 +52,16 @@ import org.openide.util.NbBundle;
  * @author -Rolf Hilker-
  */
 public class ExcelExporter implements TableExporterI {
+
+    private static final Logger LOG = getLogger( ExcelExporter.class.getName() );
+
+    private static final String TABLE_DOUBLE = "DOUBLE";
+    private static final String TABLE_FLOAT = "FLOAT";
+    private static final String TABLE_INTEGER = "INTEGER";
+    private static final String TABLE_LABEL = "LABEL";
+    private static final String TABLE_URL_W_TITLE = "LINK";
+    private static final String TABLE_STRING = "STRING";
+    private static final String UNKNOWN = "UNKNOWN";
 
 
     private final ProgressHandle progressHandle;
@@ -121,7 +135,7 @@ public class ExcelExporter implements TableExporterI {
     @Override
     public File writeFile( File file ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting to write Excel file...{0}", file.getAbsolutePath() );
+        LOG.log( INFO, "Starting to write Excel file...{0}", file.getAbsolutePath() );
 
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale( new Locale( "en", "EN" ) );
@@ -159,7 +173,7 @@ public class ExcelExporter implements TableExporterI {
 
         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get( 0 ), null );
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished writing Excel file!" );
+        LOG.log( INFO, "Finished writing Excel file!" );
 
         return file;
     }
@@ -188,9 +202,9 @@ public class ExcelExporter implements TableExporterI {
         int column = 0;
 
         for( String header : headerRow ) {
-            this.addColumn( sheet, "LABEL", header, column++, row );
+            this.addColumn( sheet, TABLE_LABEL, header, column++, row );
         }
-        ++row;
+        row++;
         this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
 
         String objectType;
@@ -201,8 +215,7 @@ public class ExcelExporter implements TableExporterI {
                 objectType = this.getObjectType( entry );
                 try {
                     this.addColumn( sheet, objectType, entry, column++, row );
-                }
-                catch( RowsExceededException e ) {
+                } catch( RowsExceededException e ) {
                     dataLeft = true;
                     break;
                 }
@@ -229,25 +242,22 @@ public class ExcelExporter implements TableExporterI {
     /**
      * @param entry the entry whose object type needs to be checked
      * <p>
-     * @return The string representing the object type of the entry. Currently
-     *         only "INTEGER", "STRING, or "UNKNOWN".
+     * @return The string representing the object type of the entry. Among
+     *         {@link #TABLE_STRING} and all other constants defined above.
      */
     private String getObjectType( Object entry ) {
         if( entry instanceof Integer || entry instanceof Byte || entry instanceof Long ) {
-            return "INTEGER";
-        }
-        else if( entry instanceof String || entry instanceof Character
-                 || entry instanceof CharSequence ) {
-            return "STRING";
-        }
-        else if( entry instanceof Double ) {
-            return "DOUBLE";
-        }
-        else if( entry instanceof Float ) {
-            return "FLOAT";
-        }
-        else {
-            return "UNKNOWN";
+            return TABLE_INTEGER;
+        } else if( entry instanceof String || entry instanceof Character || entry instanceof CharSequence ) {
+            return TABLE_STRING;
+        } else if( entry instanceof Double ) {
+            return TABLE_DOUBLE;
+        } else if( entry instanceof Float ) {
+            return TABLE_FLOAT;
+        } else if( entry instanceof UrlWithTitle ) {
+            return TABLE_URL_W_TITLE;
+        } else {
+            return UNKNOWN;
         }
     }
 
@@ -270,38 +280,44 @@ public class ExcelExporter implements TableExporterI {
         if( cellvalue == null ) {
             Label label = new Label( column, row, "n/a" );
             sheet.addCell( label );
-        }
-        else if( celltype.equals( "LABEL" ) ) {
+
+        } else if( celltype.equals( TABLE_LABEL ) ) {
             WritableCellFormat header = new WritableCellFormat( arialbold );
             Label label = new Label( column, row, (String) cellvalue, header );
             sheet.addCell( label );
-        }
-        else if( celltype.equals( "STRING" ) ) {
+
+        } else if( celltype.equals( TABLE_STRING ) ) {
             cellvalue = cellvalue instanceof Character ? String.valueOf( cellvalue ) : cellvalue;
             cellvalue = cellvalue instanceof CharSequence ? String.valueOf( cellvalue ) : cellvalue;
             cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
             WritableCellFormat string = new WritableCellFormat( arial );
             Label label = new Label( column, row, (String) cellvalue, string );
             sheet.addCell( label );
-        }
-        else if( celltype.equals( "INTEGER" ) ) {
+
+        } else if( celltype.equals( TABLE_INTEGER ) ) {
             WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.INTEGER );
             Integer value = Integer.parseInt( cellvalue.toString() );
             Number number = new Number( column, row, value, integerFormat );
             sheet.addCell( number );
-        }
-        else if( celltype.equals( "DOUBLE" ) ) {
+
+        } else if( celltype.equals( TABLE_DOUBLE ) ) {
             Double value = Double.parseDouble( cellvalue.toString() );
             Number number = new Number( column, row, value );
             sheet.addCell( number );
-        }
-        else if( celltype.equals( "FLOAT" ) ) {
+
+        } else if( celltype.equals( TABLE_FLOAT ) ) {
             WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.FLOAT );
             Float value = Float.parseFloat( cellvalue.toString() );
             Number number = new Number( column, row, value, integerFormat );
             sheet.addCell( number );
-        }
-        else if( celltype.equals( "UNKNOWN" ) ) {
+
+        } else if( celltype.equals( TABLE_URL_W_TITLE ) ) {
+            UrlWithTitle titleUrl = (UrlWithTitle) cellvalue;
+            WritableHyperlink link = new WritableHyperlink( column, row, titleUrl.getUrl() );
+            link.setDescription( titleUrl.getTitle() );
+            sheet.addHyperlink( link );
+
+        } else if( celltype.equals( UNKNOWN ) ) {
             WritableCellFormat string = new WritableCellFormat( arial );
             Label label = new Label( column, row, cellvalue.toString(), string );
             sheet.addCell( label );

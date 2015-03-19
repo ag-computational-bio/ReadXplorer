@@ -19,17 +19,19 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeq.SamplesNotValidException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -41,7 +43,6 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     private final List<Group> groups;
     private BaySeq baySeq;
     private final BaySeqAnalysisData baySeqAnalysisData;
-    private final UUID key;
 
 
     public static enum Plot {
@@ -67,33 +68,33 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
 
     public BaySeqAnalysisHandler( List<PersistentTrack> selectedTracks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
-                                  File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, UUID key ) {
+                                  File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
         baySeq = new BaySeq();
         baySeqAnalysisData = new BaySeqAnalysisData( getSelectedTracks().size(), groups, replicateStructure );
         this.groups = groups;
-        this.key = key;
     }
 
 
     @Override
-    public void endAnalysis() {
-        baySeq.shutdown( key );
+    public void endAnalysis() throws RserveException {
+        baySeq.shutdown();
         baySeq = null;
     }
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         prepareFeatures( baySeqAnalysisData );
         prepareCountData( baySeqAnalysisData, getAllCountData() );
-        List<ResultDeAnalysis> results = baySeq.process( baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key );
+        List<ResultDeAnalysis> results = baySeq.process( baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
         return results;
     }
 
 
     public File plot( Plot plot, Group group, int[] samplesA, int[] samplesB ) throws IOException, SamplesNotValidException,
-                                                                                      IllegalStateException, PackageNotLoadableException {
+                                                                                      IllegalStateException, PackageNotLoadableException, 
+                                                                                      RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.MACD ) {
@@ -110,7 +111,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
 
     public List<Group> getGroups() {
-        return groups;
+        return Collections.unmodifiableList( groups );
     }
 
 

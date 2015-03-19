@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.visualisation.reference.FeatureTableModel;
 import java.util.List;
 import javax.swing.ButtonGroup;
@@ -93,8 +93,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         //If current expression doesn't parse, don't update.
         try {
             rf = RowFilter.regexFilter( searchField.getText(), 0 );
-        }
-        catch( java.util.regex.PatternSyntaxException e ) {
+        } catch( java.util.regex.PatternSyntaxException e ) {
             return;
         }
         trs.setRowFilter( rf );

@@ -20,24 +20,25 @@ package de.cebitec.readxplorer.databackend;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.Difference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.Difference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+
+import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -47,13 +48,13 @@ import javax.swing.JOptionPane;
  */
 public class CoverageThread extends RequestThread {
 
+    private static final Logger LOG = getLogger( CoverageThread.class.getName() );
+
     private long trackID;
     private long trackID2;
     private final List<PersistentTrack> tracks;
-    ConcurrentLinkedQueue<IntervalRequest> requestQueue;
+    protected final ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResult currentCov;
-//    private double requestCounter = 0;
-//    private double skippedCounter = 0;
     private PersistentReference referenceGenome;
 
 
@@ -72,15 +73,12 @@ public class CoverageThread extends RequestThread {
         // do id specific stuff
         this.tracks = tracks;
         if( tracks.size() == 1 ) {
-            this.singleCoverageThread( tracks.get( 0 ).getId() );
-        }
-        else if( tracks.size() == 2 && !combineTracks ) {
-            this.doubleCoverageThread( tracks.get( 0 ).getId(), tracks.get( 1 ).getId() );
-        }
-        else if( tracks.size() >= 2 ) {
-            this.multipleCoverageThread();
-        }
-        else {
+            singleCoverageThread( tracks.get( 0 ).getId() );
+        } else if( tracks.size() == 2 && !combineTracks ) {
+            doubleCoverageThread( tracks.get( 0 ).getId(), tracks.get( 1 ).getId() );
+        } else if( tracks.size() >= 2 ) {
+            multipleCoverageThread();
+        } else {
             throw new UnsupportedOperationException( "At least one track needs to be handed over to the CoverageThread." );
         }
     }
@@ -88,8 +86,8 @@ public class CoverageThread extends RequestThread {
 
     private void singleCoverageThread( long trackID ) {
         this.trackID = trackID;
-        this.trackID2 = 0;
-        this.currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, null );
+        trackID2 = 0;
+        currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, null );
     }
 
 
@@ -101,15 +99,15 @@ public class CoverageThread extends RequestThread {
 
 
     private void multipleCoverageThread() {
-        this.trackID = 0;
-        this.trackID2 = 0;
+        trackID = 0;
+        trackID2 = 0;
         currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, null );
     }
 
 
     @Override
     public void addRequest( IntervalRequest request ) {
-        this.setLatestRequest( request );
+        setLatestRequest( request );
         requestQueue.add( request );
     }
 
@@ -125,9 +123,9 @@ public class CoverageThread extends RequestThread {
      */
     CoverageAndDiffResult getCoverageAndDiffsFromFile( IntervalRequest request, PersistentTrack track ) {
         File file = new File( track.getFilePath() );
-        if( this.referenceGenome == null ) {
+        if( referenceGenome == null ) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( track.getRefGenID() );
-            this.referenceGenome = refConnector.getRefGenome();
+            referenceGenome = refConnector.getRefGenome();
         }
         SamBamFileReader externalDataReader = new SamBamFileReader( file, track.getId(), referenceGenome );
         CoverageAndDiffResult result = externalDataReader.getCoverageFromBam( request );
@@ -149,9 +147,9 @@ public class CoverageThread extends RequestThread {
     CoverageAndDiffResult getCoverageAndReadStartsFromFile( IntervalRequest request, PersistentTrack track ) {
         CoverageAndDiffResult result;
         File file = new File( track.getFilePath() );
-        if( this.referenceGenome == null ) {
+        if( referenceGenome == null ) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( track.getRefGenID() );
-            this.referenceGenome = refConnector.getRefGenome();
+            referenceGenome = refConnector.getRefGenome();
         }
 
         SamBamFileReader externalDataReader = new SamBamFileReader( file, track.getId(), referenceGenome );
@@ -187,14 +185,13 @@ public class CoverageThread extends RequestThread {
         if( tracks.size() > 1 ) {
             for( int i = 0; i < this.tracks.size(); ++i ) {
                 CoverageAndDiffResult intermedRes = this.getCoverageAndReadStartsFromFile( request, tracks.get( i ) );
-                cov = this.mergeMultCoverages( cov, intermedRes.getCovManager() );
-                readStarts = this.mergeMultCoverages( readStarts, intermedRes.getReadStarts() );
+                cov = mergeMultCoverages( cov, intermedRes.getCovManager() );
+                readStarts = mergeMultCoverages( readStarts, intermedRes.getReadStarts() );
             }
             result = new CoverageAndDiffResult( cov, null, null, request );
             result.setReadStarts( readStarts );
-        }
-        else {
-            result = this.getCoverageAndReadStartsFromFile( request, tracks.get( 0 ) );
+        } else {
+            result = getCoverageAndReadStartsFromFile( request, tracks.get( 0 ) );
         }
 
         return result;
@@ -222,7 +219,7 @@ public class CoverageThread extends RequestThread {
         CoverageManager cov2 = new CoverageManager( from, to );
         cov1.incArraysToIntervalSize();
         cov2.incArraysToIntervalSize();
-//        cov.setTwoTracks(true); //TODO: check if not needed
+//        cov.setTwoTracks(true); //TODO check if not needed
 
         IntervalRequest newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -235,7 +232,7 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL,
                 CoverageManager.TRACK2,
                 request.getReadClassParams() );
-        CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile( newRequest, tracks.get( 0 ) );
+        CoverageAndDiffResult result = getCoverageAndDiffsFromFile( newRequest, tracks.get( 0 ) );
 
         newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -248,7 +245,7 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL,
                 CoverageManager.TRACK1,
                 request.getReadClassParams() );
-        result.addCoverageManager( this.getCoverageAndDiffsFromFile( newRequest, tracks.get( 1 ) ).getCovManager() );
+        result.addCoverageManager( getCoverageAndDiffsFromFile( newRequest, tracks.get( 1 ) ).getCovManager() );
 
         return result;
     }
@@ -281,8 +278,7 @@ public class CoverageThread extends RequestThread {
                 diffs.addAll( intermedRes.getDiffs() );
                 gaps.addAll( intermedRes.getGaps() );
             }
-        }
-        else {
+        } else {
             CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile( request, tracks.get( 0 ) );
             covManager = result.getCovManager();
             diffs = result.getDiffs();
@@ -311,8 +307,7 @@ public class CoverageThread extends RequestThread {
                                                || doesNotMatchLatestRequestBounds( request )) ) {
                         if( trackID2 != 0 ) {
                             currentCov = this.loadCoverageDouble( request );
-                        }
-                        else if( this.trackID != 0 || this.canQueryCoverage() ) {
+                        } else if( this.trackID != 0 || this.canQueryCoverage() ) {
                             currentCov = this.loadCoverageMultiple( request );
                         }
                         /*else {
@@ -325,17 +320,14 @@ public class CoverageThread extends RequestThread {
                         this.setLastRequest( request );
                         request.getSender().receiveData( currentCov );
 
-                    }
-                    else {
+                    } else {
                         request.getSender().notifySkipped();
                     }
-                }
-                else {
+                } else {
                     this.makeThreadSleep( 25 );
                 }
             }
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( JOptionPane.getRootFrame() );
             this.interrupt();
         }
@@ -387,9 +379,8 @@ public class CoverageThread extends RequestThread {
     private void makeThreadSleep( final int msToSleep ) {
         try {
             Thread.sleep( msToSleep );
-        }
-        catch( InterruptedException ex ) {
-            Logger.getLogger( CoverageThread.class.getName() ).log( Level.SEVERE, null, ex );
+        } catch( InterruptedException ex ) {
+            LOG.log( Level.SEVERE, null, ex );
         }
     }
 

@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
@@ -129,8 +129,8 @@ public final class SelectTrackVisualPanel extends JPanel implements
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> referenceList;
-    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack> trackList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataobjects.PersistentReference> referenceList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
 
@@ -169,8 +169,7 @@ public final class SelectTrackVisualPanel extends JPanel implements
     public boolean selectionFinished() {
         if( trackList.isSelectionEmpty() ) {
             return false;
-        }
-        else {
+        } else {
             List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
             return selectedTracks.size() >= 2;
         }

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.LegendAndOptionsProvider;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
@@ -46,8 +46,8 @@ import org.openide.util.NbPreferences;
 
 
 /**
- * Panel containing the display options for a track viewer like
- * automatic sclaing and normalizing the coverage.
+ * Panel containing the display options for a track viewer like automatic
+ * sclaing and normalizing the coverage.
  * <p>
  * @author jstraube, rhilker
  */
@@ -61,8 +61,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     /**
      * Creates a new Panel containing the display options for a track viewer
-     * like
-     * automatic sclaing and normalizing the coverage.
+     * like automatic sclaing and normalizing the coverage.
      * <p>
      * @param parentTrackViewer parent track viewer
      */
@@ -174,11 +173,9 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             for( String name : trackViewer.getTrackCon().getAssociatedTrackNames() ) {
                 this.createNormalizationEntry( name, k++ );
             }
-        }
-        else if( trackViewer.isTwoTracks() ) {
+        } else if( trackViewer.isTwoTracks() ) {
             this.createNormalizationEntry( "All tracks: ", 0 );
-        }
-        else {
+        } else {
             this.createNormalizationEntry( "", 0 );
         }
     }
@@ -217,8 +214,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         if( trackViewer.getNormalizationSettings() == null ) {
             ns = setNewNormalizationSettings();
             trackViewer.setNormalizationSettings( ns );
-        }
-        else {
+        } else {
             ns = trackViewer.getNormalizationSettings();
             boolean isLogNorm = ns.getIsLogNorm( trackID );
             boolean hasNorm = ns.getHasNormFac( trackID );

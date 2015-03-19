@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import jxl.write.WriteException;
@@ -32,6 +31,9 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
+
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -42,6 +44,8 @@ import org.supercsv.prefs.CsvPreference;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvExporter implements TableExporterI {
+
+    private static final Logger LOG = getLogger( CsvExporter.class.getName() );
 
     private List<List<List<Object>>> exportData;
     private List<List<String>> headers;
@@ -113,7 +117,7 @@ public class CsvExporter implements TableExporterI {
     @Override
     public File writeFile( File file ) throws FileNotFoundException, IOException, OutOfMemoryError, WriteException {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting to write csv file...{0}", file.getAbsolutePath() );
+        LOG.log( INFO, "Starting to write csv file...{0}", file.getAbsolutePath() );
 
         String[] header = new String[0];
 
@@ -134,7 +138,7 @@ public class CsvExporter implements TableExporterI {
 
         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get( 0 ), null );
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished writing csv file!" );
+        LOG.log( INFO, "Finished writing csv file!" );
 
 //        int currentPage = 0;
 //        int totalPage = 0;

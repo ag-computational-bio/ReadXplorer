@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.parser.common;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +38,12 @@ public class ParsedClassification {
     private final List<Integer> readStarts;
     private final Map<Integer, Integer> mismatchCountMap = new HashMap<>();
 
-    //    private List<String> refNames; //TODO: use this when multiple import is enabled
+    //    private List<String> refNames; //TODO use this when multiple import is enabled
 
     /**
      * Class for the classification data of a read.
      * <p>
-     * @param sortOrder
+     * @param sortOrder Sort order
      */
     public ParsedClassification( SAMFileHeader.SortOrder sortOrder ) {
         this.sortOrder = sortOrder;
@@ -52,8 +53,8 @@ public class ParsedClassification {
 
 
     /**
-     * @return The smallest number of mismatches for the associated read in
-     *         the current data set.
+     * @return The smallest number of mismatches for the associated read in the
+     * current data set.
      */
     public int getMinMismatches() {
         return minMismatches;
@@ -65,12 +66,12 @@ public class ParsedClassification {
      * value. The value is only set, if it is smaller than the value already
      * stored here.
      * <p>
-     * @param mismatches The number of mismatches for the associated read
-     *                   at the current mapping position.
+     * @param mismatches The number of mismatches for the associated read at the
+     * current mapping position.
      */
     public void updateMinMismatches( int mismatches ) {
-        if( mismatches < this.minMismatches ) {
-            this.minMismatches = mismatches;
+        if( mismatches < minMismatches ) {
+            minMismatches = mismatches;
         }
     }
 
@@ -79,7 +80,7 @@ public class ParsedClassification {
      * @return The array of read start positions for this read.
      */
     public List<Integer> getReadStarts() {
-        return readStarts;
+        return Collections.unmodifiableList( readStarts );
     }
 
 
@@ -92,18 +93,16 @@ public class ParsedClassification {
      * @param start the start of the current read
      * <p>
      * @return The start position of the next mapping or the smallest mapping
-     *         position, if this is the largest mapping position in the array. If only
-     *         one position is stored in the array, 0 is returned.
+     * position, if this is the largest mapping position in the array. If only
+     * one position is stored in the array, 0 is returned.
      */
     public int getNextMappingStart( int start ) {
         if( readStarts.size() <= 1 ) {
             return 0;
-        }
-        else if( this.sortOrder == SAMFileHeader.SortOrder.coordinate ) {
-            return this.getSortedMappingStart( start );
-        }
-        else {
-            return this.calcNextMappingStart( start );
+        } else if( sortOrder == SAMFileHeader.SortOrder.coordinate ) {
+            return getSortedMappingStart( start );
+        } else {
+            return calcNextMappingStart( start );
         }
     }
 
@@ -112,15 +111,14 @@ public class ParsedClassification {
      * @param start The start to which the next start should be returned
      * <p>
      * @return The next larger start position of the same read or the smallest
-     *         mapping position, if this is the largest mapping position for the read
+     * mapping position, if this is the largest mapping position for the read
      */
     private int getSortedMappingStart( int start ) {
-        int index = this.readStarts.indexOf( start ) + 1;
-        if( index < this.readStarts.size() ) {
-            return this.readStarts.get( index );
-        }
-        else {
-            return this.readStarts.get( 0 );
+        int index = readStarts.indexOf( start ) + 1;
+        if( index < readStarts.size() ) {
+            return readStarts.get( index );
+        } else {
+            return readStarts.get( 0 );
         }
     }
 
@@ -134,8 +132,8 @@ public class ParsedClassification {
      * @param start the start of the current read
      * <p>
      * @return The start position of the next mapping or the smallest mapping
-     *         position, if this is the largest mapping position in the array. If no
-     *         fitting position is found, 0 is returned.
+     * position, if this is the largest mapping position in the array. If no
+     * fitting position is found, 0 is returned.
      */
     private int calcNextMappingStart( int start ) {
 
@@ -145,8 +143,7 @@ public class ParsedClassification {
             if( mapStart > start && mapStart < nextStart ) {
                 nextStart = mapStart;
 
-            }
-            else if( mapStart < smallestStart ) {
+            } else if( mapStart < smallestStart ) {
                 smallestStart = mapStart;
             }
         }
@@ -160,11 +157,11 @@ public class ParsedClassification {
      * Adds a mapping start position to the start positions of this read in the
      * current data set.
      * <p>
-     * @param mappingStart The mapping start position of this read to add to
-     *                     the list
+     * @param mappingStart The mapping start position of this read to add to the
+     * list
      */
     public void addReadStart( int mappingStart ) {
-        this.readStarts.add( mappingStart );
+        readStarts.add( mappingStart );
     }
 
 
@@ -172,16 +169,16 @@ public class ParsedClassification {
      * @return The number of occurrences of this read in the data set.
      */
     public int getNumberOccurrences() {
-        return this.readStarts.size();
+        return readStarts.size();
     }
 
 
     /**
-     * @return The map of a number of mismatches to their count = how often
-     *         has this number of mismatches been observed in total.
+     * @return The map of a number of mismatches to their count = how often has
+     * this number of mismatches been observed in total.
      */
     public Map<Integer, Integer> getMismatchCountMap() {
-        return mismatchCountMap;
+        return Collections.unmodifiableMap( mismatchCountMap );
     }
 
 

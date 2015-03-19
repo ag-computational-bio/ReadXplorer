@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.thumbnail;
 
 
 import de.cebitec.readxplorer.databackend.ThreadListener;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 

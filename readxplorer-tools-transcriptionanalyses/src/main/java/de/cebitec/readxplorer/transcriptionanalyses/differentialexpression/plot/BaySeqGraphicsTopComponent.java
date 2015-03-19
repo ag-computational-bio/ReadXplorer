@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readxplorer.plotting.CreatePlots;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeq;
@@ -64,29 +64,32 @@ import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 
 
 /**
  * TopComponent, which displays all graphics available for a baySeq analysis.
  */
 @ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//BaySeqGraphics//EN",
-    autostore = false )
+                      autostore = false )
 @TopComponent.Description( preferredID = "BaySeqGraphicsTopComponent",
-    persistenceType = TopComponent.PERSISTENCE_NEVER )
+                           persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeqGraphicsTopComponent" )
 @ActionReference( path = "Menu/Window" )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_BaySeqGraphicsAction",
-    preferredID = "BaySeqGraphicsTopComponent" )
+                                      preferredID = "BaySeqGraphicsTopComponent" )
 @Messages( {
     "CTL_BaySeqGraphicsAction=BaySeqGraphics",
     "CTL_BaySeqGraphicsTopComponent=BaySeq Graphics",
-"HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
+    "HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
 } )
 public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger( BaySeqGraphicsTopComponent.class.getName() );
 
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
@@ -94,11 +97,11 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     private final DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
     private final DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
-    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private ProgressHandle progressHandle;
     private ResultDeAnalysis result;
     private List<Group> groups;
     private ChartPanel chartPanel;
-    private boolean SVGCanvasActive;
+    private boolean svgCanvasActive;
     private ProgressHandle svgExportProgressHandle;
 
 
@@ -132,17 +135,11 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         svgCanvas.addSVGDocumentLoaderListener( new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted( SVGDocumentLoaderEvent e ) {
-                progressHandle.start();
-                progressHandle.switchToIndeterminate();
             }
 
 
             @Override
             public void documentLoadingCompleted( SVGDocumentLoaderEvent e ) {
-                progressHandle.switchToDeterminate( 100 );
-                progressHandle.finish();
-                saveButton.setEnabled( true );
-                plotButton.setEnabled( true );
             }
 
 
@@ -158,7 +155,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
 
 
         } );
-        SVGCanvasActive = true;
+        svgCanvasActive = true;
     }
 
 
@@ -195,23 +192,23 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         samplesBLabel = new javax.swing.JLabel();
         plotButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
-        iSymbol = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         messages = new javax.swing.JTextArea();
+        iSymbol = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.jLabel2.text_1")); // NOI18N
 
         jSplitPane1.setDividerLocation(240);
 
         jPanel2.setMinimumSize(new java.awt.Dimension(0, 0));
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.jLabel1.text_1")); // NOI18N
 
         plotTypeComboBox.addItemListener(this);
 
-        org.openide.awt.Mnemonics.setLocalizedText(samplesALabel, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.samplesALabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(samplesALabel, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.samplesALabel.text_1")); // NOI18N
         samplesALabel.setEnabled(false);
 
         samplesAList.setEnabled(false);
@@ -220,17 +217,17 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         samplesBList.setEnabled(false);
         jScrollPane2.setViewportView(samplesBList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(samplesBLabel, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.samplesBLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(samplesBLabel, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.samplesBLabel.text_1")); // NOI18N
         samplesBLabel.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.plotButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.plotButton.text_1")); // NOI18N
         plotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.saveButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.saveButton.text_1")); // NOI18N
         saveButton.setEnabled(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -238,20 +235,21 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
         });
 
-        iSymbol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        iSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/vamp/differentialExpression/plot/i.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.iSymbol.text")); // NOI18N
-
         jScrollPane3.setBorder(null);
 
         messages.setEditable(false);
-        messages.setBackground(new java.awt.Color(240, 240, 240));
+        messages.setBackground(new java.awt.Color(238, 238, 238));
         messages.setColumns(20);
         messages.setLineWrap(true);
         messages.setRows(5);
         messages.setWrapStyleWord(true);
         messages.setBorder(null);
+        messages.setDisabledTextColor(new java.awt.Color(238, 238, 238));
         jScrollPane3.setViewportView(messages);
+
+        iSymbol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        iSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/plot/i.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "BaySeqGraphicsTopComponent.iSymbol.text")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -260,22 +258,23 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(iSymbol)
-                        .addContainerGap())
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(plotTypeComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(plotButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(samplesALabel, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(samplesBLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(plotButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(plotTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(samplesBLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(samplesALabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)))
+                        .addGap(0, 25, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(iSymbol)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -298,8 +297,9 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 .addComponent(saveButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(iSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(iSymbol)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel2);
@@ -311,7 +311,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -361,16 +361,14 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
                 if( selectedPlot == BaySeqAnalysisHandler.Plot.MACD ) {
                     saveToSVG( fileLocation );
-                }
-                else {
+                } else {
                     Path from = currentlyDisplayed.toPath();
                     try {
                         Path outputFile = Files.copy( from, to, StandardCopyOption.REPLACE_EXISTING );
                         NotificationDisplayer.getDefault().notify( Bundle.BaySeqSuccessHeader(), new ImageIcon(), Bundle.BaySeqSuccessMsg() + outputFile.toString(), null );
-                    }
-                    catch( IOException ex ) {
+                    } catch( IOException ex ) {
                         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                        Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                        LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                         JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                     }
                 }
@@ -387,13 +385,14 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
+        progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+        progressHandle.start();
+        progressHandle.switchToIndeterminate();
         BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
         messages.setText( "" );
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
         if( selectedPlot == BaySeqAnalysisHandler.Plot.MACD ) {
-            progressHandle.start();
-            progressHandle.switchToIndeterminate();
             Group selectedGroup = groups.get( groupComboBox.getSelectedIndex() );
             final int[] integerRep = selectedGroup.getIntegerRepresentation();
             final int integerGroupA = integerRep[0];
@@ -405,17 +404,14 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 int currentInteger = integerRep[i];
                 if( currentInteger == integerGroupA ) {
                     sampleA.add( i );
-                }
-                else {
+                } else {
                     if( integerGroupB == null ) {
                         integerGroupB = currentInteger;
                         sampleB.add( i );
-                    }
-                    else {
+                    } else {
                         if( integerGroupB == currentInteger ) {
                             sampleB.add( i );
-                        }
-                        else {
+                        } else {
                             messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
                             break;
                         }
@@ -424,14 +420,13 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
             if( sampleB.isEmpty() || (sampleA.size() + sampleB.size()) != integerRep.length ) {
                 messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
-            }
-            else {
+            } else {
                 chartPanel = CreatePlots.createInfPlot(
                         ConvertData.createMAvalues( result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray( new Integer[sampleA.size()] ),
                                                     sampleB.toArray( new Integer[sampleB.size()] ) ), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip() );
-                if( SVGCanvasActive ) {
+                if( svgCanvasActive ) {
                     jPanel1.remove( svgCanvas );
-                    SVGCanvasActive = false;
+                    svgCanvasActive = false;
                 }
                 jPanel1.add( chartPanel, BorderLayout.CENTER );
                 jPanel1.updateUI();
@@ -440,13 +435,12 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
             }
             progressHandle.switchToDeterminate( 100 );
             progressHandle.finish();
-        }
-        else {
-            if( !SVGCanvasActive ) {
+        } else {
+            if( !svgCanvasActive ) {
                 jPanel1.remove( chartPanel );
                 jPanel1.add( svgCanvas, BorderLayout.CENTER );
                 jPanel1.updateUI();
-                SVGCanvasActive = true;
+                svgCanvasActive = true;
             }
             try {
                 messages.setText( "" );
@@ -456,21 +450,26 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 svgCanvas.setURI( currentlyDisplayed.toURI().toString() );
                 svgCanvas.setVisible( true );
                 svgCanvas.repaint();
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            }
-            catch( BaySeq.SamplesNotValidException ex ) {
+            } catch( BaySeq.SamplesNotValidException ex ) {
                 messages.setText( "Samples A and B must not be the same!" );
+            } catch( GnuR.PackageNotLoadableException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            } catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
+            } finally {
+                progressHandle.switchToDeterminate( 100 );
+                progressHandle.finish();
                 plotButton.setEnabled( true );
             }
-            catch( GnuR.PackageNotLoadableException ex ) {
-                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
-                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            }
+
         }
     }//GEN-LAST:event_plotButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -536,8 +535,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     public void update( Object args ) {
         if( args instanceof ChartExporter.ChartExportStatus ) {
             DgeExportUtilities.updateExportStatus( svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton );
-        }
-        else {
+        } else {
             addResults();
         }
     }
@@ -546,8 +544,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     @Override
     public void itemStateChanged( ItemEvent e ) {
         BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
-        if( item == BaySeqAnalysisHandler.Plot.Priors
-            || item == BaySeqAnalysisHandler.Plot.MACD ) {
+        if( item == BaySeqAnalysisHandler.Plot.Priors ||
+                 item == BaySeqAnalysisHandler.Plot.MACD ) {
             samplesAList.setEnabled( false );
             samplesALabel.setEnabled( false );
             samplesBList.setEnabled( false );

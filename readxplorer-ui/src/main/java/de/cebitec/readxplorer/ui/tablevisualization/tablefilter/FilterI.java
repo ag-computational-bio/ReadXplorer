@@ -39,7 +39,7 @@ public interface FilterI<E extends DefaultTableModel> {
      * <p>
      * @return the filtered table model
      */
-    public E filterTable( E tableModel, int column, Object filterValue );
+    E filterTable( E tableModel, int column, Object filterValue );
 
 
 }

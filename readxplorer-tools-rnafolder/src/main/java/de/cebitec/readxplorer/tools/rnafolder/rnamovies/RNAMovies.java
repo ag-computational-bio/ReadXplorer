@@ -58,38 +58,37 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * RNA Movies
- *
+ * <p>
  * @author Alexander Kaiser <akaiser@TechFak.Uni-Bielefeld.DE>
  *
- * RNAStructML,Commandline interface support added by
- * Jan krueger <jkrueger@techfak.uni-bielefeld.de>
+ * RNAStructML,Commandline interface support added by Jan krueger
+ * <jkrueger@techfak.uni-bielefeld.de>
  *
  * Functionality limited for ReadXplorer (commented out main method, export and
- * RNAStructML parts)
- * by Rolf Hilker. Also fixed some warnings.
- *
+ * RNAStructML parts) by Rolf Hilker. Also fixed some warnings.
+ * <p>
  */
 public class RNAMovies extends JPanel implements ActionContainer {
 
+    private static final Logger LOG = Logger.getLogger( RNAMovies.class.getName() );
+
     public static final String TITLE = "RNAMovies";
     public static final String VERSION = "2.04";
-    public static final String USAGE = TITLE + VERSION + "\n"
-                                       + "usage java " + TITLE + VERSION + ".jar [<arguments>] :\n\n"
-                                       + "ATTENTION : cmdlineoptions in early beta state!\n\n"
-                                       + "-nogui                         :: run RNAMovies without starting the GUI\n"
-                                       + "-input <String>                :: set the input filename\n"
-                                       + "-output <String>               :: set the output filename\n"
-                                       + "[-xml]                         :: determines that the input file is in RNAStructML format\n"
-                                       + "-[structure <int>|steps <int>] :: creates ONLY the given structure (single frame)\n"
-                                       + "[-size <int>]                  :: set the size of the generated frame (in pixel)\n"
-                                       + "[-zoom <int>]                  :: zoom factor inside"
-                                       + "-(gif|png|svg|jpg)             :: set the image format\n"
-                                       + "[-h[elp]]                      :: print out a usage message\n";
+    public static final String USAGE = TITLE + VERSION + "\n" +
+             "usage java " + TITLE + VERSION + ".jar [<arguments>] :\n\n" +
+             "ATTENTION : cmdlineoptions in early beta state!\n\n" +
+             "-nogui                         :: run RNAMovies without starting the GUI\n" +
+             "-input <String>                :: set the input filename\n" +
+             "-output <String>               :: set the output filename\n" +
+             "[-xml]                         :: determines that the input file is in RNAStructML format\n" +
+             "-[structure <int>|steps <int>] :: creates ONLY the given structure (single frame)\n" +
+             "[-size <int>]                  :: set the size of the generated frame (in pixel)\n" +
+             "[-zoom <int>]                  :: zoom factor inside" +
+             "-(gif|png|svg|jpg)             :: set the image format\n" +
+             "[-h[elp]]                      :: print out a usage message\n";
 
 
     private static final int SCALE = 15;
-
-    private static final Logger log = Logger.getLogger( "RNAMovies" );
 
     private Configuration config;
 
@@ -115,13 +114,11 @@ public class RNAMovies extends JPanel implements ActionContainer {
         // load configuration
         try {
             config = new Configuration( configStream );
-        }
-        catch( IOException e ) {
-            log.severe( e.getMessage() );
+        } catch( IOException e ) {
+            LOG.severe( e.getMessage() );
             System.exit( 1 );
-        }
-        catch( SAXException e ) {
-            log.severe( "Error while parsing config: ".concat( e.getMessage() ) );
+        } catch( SAXException e ) {
+            LOG.severe( "Error while parsing config: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
@@ -132,13 +129,11 @@ public class RNAMovies extends JPanel implements ActionContainer {
                                                             new Class<?>[]{ this.getClass() },
                                                             new Object[]{ this } ) );
             parser.parse( new InputSource( actionStream ) );
-        }
-        catch( IOException e ) {
-            log.severe( e.getMessage() );
+        } catch( IOException e ) {
+            LOG.severe( e.getMessage() );
             System.exit( 1 );
-        }
-        catch( SAXException e ) {
-            log.severe( "Error while parsing action file: ".concat( e.getMessage() ) );
+        } catch( SAXException e ) {
+            LOG.severe( "Error while parsing action file: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
@@ -168,7 +163,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
     /**
      * Set the movie data from a String.
-     *
+     * <p>
      * @param data A String containing a valid script.
      */
     public void setData( String data ) {
@@ -188,7 +183,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
     /**
      * Set the movie data from a String.
-     *
+     * <p>
      * @param data   A String containing a valid script.
      * @param center Center structures to the maximal area of the whole script.
      */
@@ -210,7 +205,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
     /**
      * Set the movie data from an InputStream.
-     *
+     * <p>
      * @param in An InputStream (e.g. FileInputStream) containing a valid
      *           script.
      */
@@ -221,7 +216,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
     /**
      * Set the movie data from an InputStream.
-     *
+     * <p>
      * @param in     An InputStream (i.e. FileInputStream) containing a valid
      *               script.
      * @param center Center structures to the maximal area of the whole script.
@@ -250,8 +245,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
         if( !enumer.hasMoreElements() ) {
             throw new IllegalArgumentException( "No Movie Data found!" );
-        }
-        else {
+        } else {
             name = ((String) enumer.nextElement()).trim();
         }
 
@@ -261,18 +255,15 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
         if( name.charAt( 0 ) == '>' ) {
             dcse = false;
-        }
-        else if( name.charAt( 0 ) == '<' ) {
+        } else if( name.charAt( 0 ) == '<' ) {
             dcse = true;
-        }
-        else {
+        } else {
             throw new IllegalArgumentException( "Data Format Error: Missing '>' or '<' character!" );
         }
 
         if( !enumer.hasMoreElements() ) {
             throw new IllegalArgumentException( "No Movie Data found!" );
-        }
-        else {
+        } else {
             sequence = ((String) enumer.nextElement()).trim();
         }
 
@@ -295,8 +286,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
                 }
                 helices = ((String) enumer.nextElement());
                 struc = new Structure( sequence, structure, helices );
-            }
-            else {
+            } else {
                 structure = ((String) enumer.nextElement()).trim();
                 struc = new Structure( sequence, structure );
             }
@@ -329,7 +319,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
         title_end = name.indexOf( ' ' );
         mp.setMovie( frames, pairs, name.substring( 1, title_end == -1 ? name.length() : title_end ), sequence, w, h, gui );
-        log.log( Level.INFO, "{0} Structures loaded.", frames.size() );
+        LOG.log( Level.INFO, "{0} Structures loaded.", frames.size() );
     }
 
 //    /**
@@ -426,7 +416,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
     /**
      * Accessor method for the Movie
-     *
+     * <p>
      * @return an instance of the Movie
      */
     public Movie getMovie() {
@@ -436,7 +426,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
     /**
      * Get an instance of the Configuration
-     *
+     * <p>
      * @return the current configuration
      */
     public Configuration getConfiguration() {

@@ -51,7 +51,7 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
         bioProspectorLocationButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         seqLogoLocationTF = new javax.swing.JTextField();
-        SeqLogoLocationButton = new javax.swing.JButton();
+        seqLogoLocationButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ExternalProgramsPanel.class, "ExternalProgramsPanel.jLabel1.text")); // NOI18N
@@ -74,10 +74,10 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
 
         seqLogoLocationTF.setText(org.openide.util.NbBundle.getMessage(ExternalProgramsPanel.class, "ExternalProgramsPanel.seqLogoLocationTF.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(SeqLogoLocationButton, org.openide.util.NbBundle.getMessage(ExternalProgramsPanel.class, "ExternalProgramsPanel.SeqLogoLocationButton.text")); // NOI18N
-        SeqLogoLocationButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(seqLogoLocationButton, org.openide.util.NbBundle.getMessage(ExternalProgramsPanel.class, "ExternalProgramsPanel.seqLogoLocationButton.text")); // NOI18N
+        seqLogoLocationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SeqLogoLocationButtonActionPerformed(evt);
+                seqLogoLocationButtonActionPerformed(evt);
             }
         });
 
@@ -100,7 +100,7 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
                             .addComponent(seqLogoLocationTF))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(SeqLogoLocationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(seqLogoLocationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(bioProspectorLocationButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(jLabel3))
                 .addContainerGap())
@@ -119,7 +119,7 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(seqLogoLocationTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SeqLogoLocationButton))
+                    .addComponent(seqLogoLocationButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -137,7 +137,7 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_bioProspectorLocationButtonActionPerformed
 
-    private void SeqLogoLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeqLogoLocationButtonActionPerformed
+    private void seqLogoLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seqLogoLocationButtonActionPerformed
         fc = new JFileChooser();
 
         int returnVal = fc.showOpenDialog( this );
@@ -147,7 +147,7 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
                 this.seqLogoLocationTF.setText( fc.getSelectedFile().getAbsolutePath() );
             }
         }
-    }//GEN-LAST:event_SeqLogoLocationButtonActionPerformed
+    }//GEN-LAST:event_seqLogoLocationButtonActionPerformed
 
     private void bioProspectorLocationTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bioProspectorLocationTFActionPerformed
         // TODO add your handling code here:
@@ -178,27 +178,16 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
         if( seqlogo.exists() && seqlogo.isFile() && seqlogo.canExecute() ) {
             seqLogoCheck = true;
         }
-        if( bioProsCheck && seqLogoCheck ) {
-            return true;
-        }
-        else if( bioProsCheck ) {
-            return false;
-        }
-        else if( seqLogoCheck ) {
-            return false;
-        }
-        else {
-            return false;
-        }
+        return bioProsCheck && seqLogoCheck;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton SeqLogoLocationButton;
     private javax.swing.JButton bioProspectorLocationButton;
     private javax.swing.JTextField bioProspectorLocationTF;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JButton seqLogoLocationButton;
     private javax.swing.JTextField seqLogoLocationTF;
     // End of variables declaration//GEN-END:variables
 }

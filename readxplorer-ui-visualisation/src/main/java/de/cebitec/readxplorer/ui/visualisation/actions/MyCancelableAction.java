@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.visualisation.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -35,14 +36,17 @@ import org.openide.util.TaskListener;
  */
 public final class MyCancelableAction implements ActionListener {
 
-    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
-    private final static Logger LOG = Logger.getLogger( MyCancelableAction.class.getName() );
+    private static final Logger LOG = Logger.getLogger( MyCancelableAction.class.getName() );
+
+    private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private RequestProcessor.Task theTask = null;
 
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle( "task thats shows progress", new Cancellable() {
 
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }
@@ -52,9 +56,10 @@ public final class MyCancelableAction implements ActionListener {
 
         Runnable runnable = new Runnable() {
 
-            private final int NUM = 60000;
+            private static final int NUM = 60000;
 
 
+            @Override
             public void run() {
                 try {
                     ph.start(); //we must start the PH before we swith to determinate
@@ -65,8 +70,7 @@ public final class MyCancelableAction implements ActionListener {
                         Thread.sleep( 0 ); //throws InterruptedException is the task was cancelled
                     }
 
-                }
-                catch( InterruptedException ex ) {
+                } catch( InterruptedException ex ) {
                     LOG.info( "the task was CANCELLED" );
                 }
 
@@ -74,7 +78,7 @@ public final class MyCancelableAction implements ActionListener {
 
 
             private void doSomething( int i ) {
-                LOG.info( "doSomething with " + i );
+                LOG.log( Level.INFO, "doSomething with {0}", i );
             }
 
 
@@ -83,6 +87,7 @@ public final class MyCancelableAction implements ActionListener {
         theTask = RP.create( runnable ); //the task is not started yet
 
         theTask.addTaskListener( new TaskListener() {
+            @Override
             public void taskFinished( Task task ) {
                 ph.finish();
             }

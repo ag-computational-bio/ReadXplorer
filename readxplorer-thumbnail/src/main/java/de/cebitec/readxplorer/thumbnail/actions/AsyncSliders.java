@@ -20,14 +20,33 @@ package de.cebitec.readxplorer.thumbnail.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.NbBundle;
 
-
+/**
+ * Action to disable synchronization of sliders in the thumbnail viewer.
+ * 
+ * @author denis, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
+@ActionID(
+         category = "Tools",
+         id = "de.cebitec.readxplorer.thumbnail.actions.AsyncSliders"
+)
+@ActionRegistration(displayName = "#CTL_AsyncSliders", iconInMenu = false)
+@ActionReference( path = "Menu/Tools/Thumbnail", position = 350 )
+@NbBundle.Messages( "CTL_AsyncSliders=Don't sync sliders" )
 public final class AsyncSliders implements ActionListener {
 
-    private final ASyncSliderCookie context;
+    private final AsyncSliderCookie context;
 
-
-    public AsyncSliders( ASyncSliderCookie context ) {
+    /**
+     * Action to disable synchronization of sliders in the thumbnail viewer.
+     *
+     * @param context
+     */
+    public AsyncSliders( AsyncSliderCookie context ) {
         this.context = context;
     }
 

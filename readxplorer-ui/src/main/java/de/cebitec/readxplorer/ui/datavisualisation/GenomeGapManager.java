@@ -18,13 +18,12 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 
 /**
@@ -36,7 +35,7 @@ public class GenomeGapManager {
 
     private final int lowerBound;
     private final int upperBound;
-    private TreeMap<Integer, Integer> maxNumGapsPerOriginalPosition;
+    private Map<Integer, Integer> maxNumGapsPerOriginalPosition;
     private TreeMap<Integer, Integer> addedGapsOriginalPosition;
     private TreeMap<Integer, Integer> addedGapsAccumulatedPositions;
     private boolean accCalced;
@@ -59,7 +58,7 @@ public class GenomeGapManager {
     }
 
 
-    private void fillMap( TreeMap<Integer, Integer> map ) {
+    private void fillMap( Map<Integer, Integer> map ) {
         for( int i = lowerBound; i <= upperBound; i++ ) {
             map.put( i, 0 );
         }
@@ -67,14 +66,14 @@ public class GenomeGapManager {
 
 
     /**
-     * Add GenomeGaps from a PersistentMapping to this GenomeGapManager.
-     * Each TreeSet of this Collection contains gaps for one position. Mulitple
-     * values in the TreeSet indicate multiple genome gaps at one position
-     * in the reference genome.
+     * Add GenomeGaps from a PersistentMapping to this GenomeGapManager. Each
+     * TreeSet of this Collection contains gaps for one position. Mulitple
+     * values in the TreeSet indicate multiple genome gaps at one position in
+     * the reference genome.
      * <p>
      * @param values
      */
-    public void addGapsFromMapping( TreeMap<Integer, TreeSet<ReferenceGap>> values ) {
+    public void addGapsFromMapping( Map<Integer, Set<ReferenceGap>> values ) {
         Iterator<Integer> positionIt = values.keySet().iterator();
         while( positionIt.hasNext() ) {
             Integer pos = positionIt.next();
@@ -84,7 +83,7 @@ public class GenomeGapManager {
                 // of gap introduced shifts
                 continue;
             }
-            TreeSet<ReferenceGap> gapsPerPosition = values.get( pos );
+            Set<ReferenceGap> gapsPerPosition = values.get( pos );
             int numOfGapsPerPosition = gapsPerPosition.size();
             int oldValue = getNumOfGapsAt( pos );
             // if the current mapping has more gaps at current position,
@@ -103,9 +102,7 @@ public class GenomeGapManager {
 
 
     public void addNumOfGapsAtPosition( int position, int numOfGaps ) {
-        if( !fitsIntoBounds( position ) ) {
-        }
-        else {
+        if( fitsIntoBounds( position ) ) {
             int oldValue = getNumOfGapsAt( position );
             if( oldValue < numOfGaps ) {
                 accCalced = false;
@@ -152,19 +149,16 @@ public class GenomeGapManager {
     public int getNumOfGapsSmaller( int absPos ) {
         if( fitsIntoBounds( absPos ) ) {
             return addedGapsOriginalPosition.get( absPos );
-        }
-        else {
+        } else {
             // return gaps smaller than upperBound
             if( absPos > upperBound ) {
                 Set<Integer> gaps = addedGapsOriginalPosition.keySet();
                 if( gaps.isEmpty() ) {
                     return 0;
-                }
-                else {
+                } else {
                     return addedGapsOriginalPosition.get( Collections.max( gaps ) );
                 }
-            }
-            else {
+            } else {
                 return 0;
             }
         }
@@ -181,12 +175,10 @@ public class GenomeGapManager {
             Map.Entry<Integer, Integer> entry = addedGapsAccumulatedPositions.floorEntry( absPos ); // minus 1, because floorEntry(x) returns values equal to x, but we need strictly smaller than x
             if( entry == null ) {
                 result = 0;
-            }
-            else {
+            } else {
                 result = entry.getValue();
             }
-        }
-        else {
+        } else {
             result = 0;
         }
         return result;
@@ -196,14 +188,8 @@ public class GenomeGapManager {
     public boolean hasGapAt( int absPos ) {
         if( !fitsIntoBounds( absPos ) ) {
             return false;
-        }
-        else {
-            if( maxNumGapsPerOriginalPosition.get( absPos ) == 0 ) {
-                return false;
-            }
-            else {
-                return true;
-            }
+        } else {
+            return maxNumGapsPerOriginalPosition.get( absPos ) != 0;
         }
     }
 
@@ -211,20 +197,14 @@ public class GenomeGapManager {
     public int getNumOfGapsAt( int absPos ) {
         if( !fitsIntoBounds( absPos ) ) {
             return 0;
-        }
-        else {
+        } else {
             return maxNumGapsPerOriginalPosition.get( absPos );
         }
     }
 
 
     private boolean fitsIntoBounds( int absPos ) {
-        if( absPos >= lowerBound && absPos <= upperBound ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return absPos >= lowerBound && absPos <= upperBound;
     }
 
 
@@ -247,22 +227,19 @@ public class GenomeGapManager {
 
             if( maxNumGapsPerOriginalPosition.containsKey( position ) ) {
                 sb.append( maxNumGapsPerOriginalPosition.get( position ) ).append( "\t" );
-            }
-            else {
+            } else {
                 sb.append( "#\t" );
             }
 
             if( addedGapsOriginalPosition.containsKey( position ) ) {
                 sb.append( addedGapsOriginalPosition.get( position ) ).append( "\t" );
-            }
-            else {
+            } else {
                 sb.append( "#\t" );
             }
 
             if( addedGapsAccumulatedPositions.containsKey( position ) ) {
                 sb.append( addedGapsAccumulatedPositions.get( position ) ).append( "\n" );
-            }
-            else {
+            } else {
                 sb.append( "#\n" );
             }
 

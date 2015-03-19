@@ -34,14 +34,14 @@ import java.util.Map;
  * A jok parser, which first reads the jok file, converts it into a bam file
  * sorted by mapping start position and then prepares the new bam file for
  * import into the DB as direct access track.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class JokToBamDirectParser implements MappingParserI, Observer {
 
-    private static final String name = "Jok to Bam Direct Access Parser";
-    private static final String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
-    private static final String fileDescription = "Jok Read Mappings converted to BAM";
+    private static final String NAME = "Jok to Bam Direct Access Parser";
+    private static final String[] FILE_EXTENSION = new String[]{ "out", "Jok", "jok", "JOK" };
+    private static final String FILE_DESCRIPTION = "Jok Read Mappings converted to BAM";
     private final SamBamParser bamParser;
     private final List<Observer> observers;
     private final boolean alreadyConverted = false;
@@ -70,23 +70,22 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
+    public Boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
         return true;
     }
 
 
     @Override
-    public boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
-        Boolean success = preprocessData( trackJob );
+        Boolean success = this.preprocessData( trackJob );
 
         if( success ) {
             //parse the newly converted bam file
             bamParser.registerObserver( this );
             success = bamParser.parseInput( trackJob, chromLengthMap );
             bamParser.removeObserver( this );
-        }
-        else {
+        } else {
             throw new ParsingException( "Preprocessing of the data did not work." );
         }
 
@@ -99,7 +98,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * Also updates the file in the track job to the new file.
      * <p>
      * @param trackJob       the track job containing the jok file
-     * @param chromLengthMap the mapping of chromosome name to chromosome length
+     * @param chromLengthMap the mapping of chromosome NAME to chromosome length
      *                       for this track
      * <p>
      * @return true, if the conversion was successful, false otherwise
@@ -108,13 +107,13 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public boolean convert( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public Boolean convert( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         final boolean success;
         final Iterator<String> it = chromLengthMap.keySet().iterator();
         if( it.hasNext() ) {
             final String chromName = it.next(); //ok, since SARUMAN only supports mapping on a single reference sequence
-
+            //TODO: might still be used in conjunction with a later merged multiple fasta file -> make sure the correct ref is used!
             //Convert jok file to bam
             final JokToBamConverter jokConverter = new JokToBamConverter();
             List<File> jobs = new ArrayList<>();
@@ -126,8 +125,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
             //update the track job with the new bam file
             trackJob.setFile( jokConverter.getOutputFile() );
-        }
-        else {
+        } else {
             success = false;
         }
         return success;
@@ -136,19 +134,19 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSION;
     }
 
 

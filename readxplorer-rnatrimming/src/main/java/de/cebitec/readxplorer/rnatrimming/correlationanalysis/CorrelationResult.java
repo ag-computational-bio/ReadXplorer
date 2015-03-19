@@ -19,10 +19,12 @@ package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,7 +40,7 @@ import java.util.Map.Entry;
 public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
 
     private final List<CorrelatedInterval> correlationsList;
-    private Map<String, Object> params;
+    private Map<String, Object> params = new HashMap<>();
 
 
     /**
@@ -64,7 +66,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      * @return the list of correlations found during the analysis step
      */
     public List<CorrelatedInterval> getCorrelationsList() {
-        return this.correlationsList;
+        return Collections.unmodifiableList( correlationsList );
     }
 
 
@@ -161,7 +163,8 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      * @param params
      */
     public void setAnalysisParameters( Map<String, Object> params ) {
-        this.params = params;
+        this.params.clear();
+        this.params.putAll( params );
     }
 
 
@@ -171,7 +174,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      * @return
      */
     public Map<String, Object> getAnalysisParameters() {
-        return this.params;
+        return Collections.unmodifiableMap( params );
     }
 
 

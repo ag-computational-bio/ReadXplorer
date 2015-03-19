@@ -31,15 +31,14 @@ public interface ReadPairClassifierI extends PreprocessorI {
 
     /**
      * Carries out calculations and returns the container containing all
-     * necessary
-     * data for storing the sequence pairs.
+     * necessary data for storing the sequence pairs.
      * <p>
      * @return seq pair container
      * <p>
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
-    public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError;
+    ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError;
 
 
 }

@@ -22,7 +22,7 @@ import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.logging.Level;
+import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -30,13 +30,20 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * Utils for work with files and directories
  * <p>
  * @author Evgeny Anisiforov
  */
-public class FileUtils {
+public final class FileUtils {
+
+
+    private static final Logger LOG = Logger.getLogger( FileUtils.class.getName() );
+
 
     private FileUtils() {
     }
@@ -73,11 +80,10 @@ public class FileUtils {
 
 
     /**
-     * count lines in a file
-     * equivalent of wc -l in unix
+     * count lines in a file equivalent of wc -l in unix
      * <p>
      * @param file
-     *             <p>
+     * <p>
      * @return number of lines or 0 if an error occured during reading
      */
     public static int countLinesInFile( File file ) {
@@ -86,8 +92,7 @@ public class FileUtils {
             while( reader.readLine() != null ) {
                 lines++;
             }
-        }
-        catch( Exception e ) {
+        } catch( IOException ioe ) {
             lines = 0;
         }
         return lines;
@@ -107,11 +112,11 @@ public class FileUtils {
      * @param textField
      * @param forClass
      * @param parent
-     *                                <p>
+     * <p>
      * @return
      */
     public static File showFileOpenDialogAndChangePrefs( String prefName, FileNameExtensionFilter fileNameExtensionFilter,
-                                                         JTextField textField, Class<?> forClass, Component parent ) {
+            JTextField textField, Class<?> forClass, Component parent ) {
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter( fileNameExtensionFilter );
         Preferences prefs2 = Preferences.userNodeForPackage( forClass );
@@ -131,14 +136,12 @@ public class FileUtils {
                 textField.setText( file.getAbsolutePath() );
                 try {
                     prefs.flush();
-                }
-                catch( BackingStoreException ex ) {
-                    Logger.getLogger( forClass.getName() ).log( Level.SEVERE, null, ex );
+                } catch( BackingStoreException ex ) {
+                    LOG.log( SEVERE, null, ex );
                 }
                 return file;
-            }
-            else {
-                Logger.getLogger( forClass.getName() ).log( Level.WARNING, "Could not read file" );
+            } else {
+                LOG.log( WARNING, "Could not read file" );
             }
         }
         return null;
@@ -149,7 +152,7 @@ public class FileUtils {
      * check that the given path exists
      * <p>
      * @param filePathString
-     *                       <p>
+     * <p>
      * @return boolean true if the file exists
      */
     public static boolean fileExists( String filePathString ) {
@@ -158,12 +161,24 @@ public class FileUtils {
         return result;
     }
 
+    /**
+     * check that the given path exists and is readable.
+     * <p>
+     * @param filePathString <p>
+     * @return boolean true if the file exists, false otherwise
+     */
+    public static boolean fileExistsAndIsReadable( String filePathString ) {
+        File f = new File( filePathString );
+        boolean result = f.exists() && f.canRead();
+        return result;
+    }
+
 
     /**
      * check that the given path exists, is readable and can be executed
      * <p>
      * @param filePathString
-     *                       <p>
+     * <p>
      * @return boolean true if the file can be executed
      */
     public static boolean fileExistsAndIsExecutable( String filePathString ) {

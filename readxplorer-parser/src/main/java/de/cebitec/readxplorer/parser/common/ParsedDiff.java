@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.parser.common;
 
 
 /**
+ * A parsed difference to the reference.
  *
  * @author ddoppmeier
  */
@@ -28,17 +29,31 @@ public class ParsedDiff {
     private final char base;
 
 
-    public ParsedDiff( long position, char c ) {
+    /**
+     * A parsed difference to the reference.
+     * <p>
+     * @param position The reference position in bp at which the difference is
+     *                 observed
+     * @param base     The nucleotide differing to the reference at this
+     *                 position
+     */
+    public ParsedDiff( long position, char base ) {
         this.position = position;
-        this.base = c;
+        this.base = base;
     }
 
 
+    /**
+     * @return The nucleotide differing to the reference at this position
+     */
     public char getBase() {
         return base;
     }
 
 
+    /**
+     * @return The reference position in bp at which the difference is observed
+     */
     public long getPosition() {
         return position;
     }

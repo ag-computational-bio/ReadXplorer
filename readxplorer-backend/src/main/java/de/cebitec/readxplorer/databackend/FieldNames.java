@@ -23,7 +23,7 @@ package de.cebitec.readxplorer.databackend;
  *
  * @author ddoppmeier, rhilker
  */
-public class FieldNames {
+public final class FieldNames {
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -85,7 +85,7 @@ public class FieldNames {
     public static final String TRACK_READ_PAIR_ID = "SEQUENCE_PAIR_ID";
     public static final String TRACK_DESCRIPTION = "DESCRIPTION";
     public static final String TRACK_TIMESTAMP = "CREATIONTIME";
-    public static final String TRACK_PATH = "PATH"; // path to bam (mapping) file.
+    public static final String TRACK_PATH = "PATH";
 
     // statistics table fields
     public static final String STATISTICS_ID = "ID";

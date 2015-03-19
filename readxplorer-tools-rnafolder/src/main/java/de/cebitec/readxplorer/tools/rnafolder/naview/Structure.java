@@ -23,55 +23,54 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.FINE;
+
 
 /**
- * NAVIEW -- A program to make a modified radial drawing of an RNA
- * secondary structure.
- *
- * Copyright (c) 1988 Robert E. Bruccoleri
- * Copying of this software, in whole or in part, is permitted
- * provided that the copies are not made for commercial purposes,
- * appropriate credit for the use of the software is given, this
- * copyright notice appears, and notice is given that the copying
- * is by permission of Robert E. Bruccoleri. Any other copying
- * requires specific permission.
- *
- * See R. Bruccoleri and G. Heinrich, Computer Applications in the
- * Biosciences, 4, 167-173 (1988) for a full description.
- *
- * In November 1997, Michael Zuker made a number of changes to bring
- * naview up to modern standards. All functions defined in naview are
- * now declared before main() with arguments and argument types.
- * When functions are defined, their argument types are declared
- * with the function and these definitions are removed after the '{'.
- * The 'void' declaration was used as necessary for functions.
- *
- * The troublesome na_scanf function was deleted and replaced by
- * scanf. Finally, there is now no default for the minimum separation
- * of bases. A floating point number must be entered. However, as
- * before an entry < 0 will be moved up to 0 and an entry > 0.5
- * will be reduced to 0.5.
- *
- * Adapted for use as a subroutine in the Vienna RNA Package
- * by Ivo Hofacker, May 1998:
- * deleted output routines, replaced main() by naview_xy_coordinates(),
- * which fills the X and Y arrays used by PS_rna_plot() etc.
- * added ansi prototypes and fixed memory leaks.
- *
- * Adapted for use in RNAMovies and therefor translated to java
- * by Alexander Kaiser, April 2006.
- *
+ * NAVIEW -- A program to make a modified radial drawing of an RNA secondary
+ * structure.
+ * <p>
+ * Copyright (c) 1988 Robert E. Bruccoleri Copying of this software, in whole or
+ * in part, is permitted provided that the copies are not made for commercial
+ * purposes, appropriate credit for the use of the software is given, this
+ * copyright notice appears, and notice is given that the copying is by
+ * permission of Robert E. Bruccoleri. Any other copying requires specific
+ * permission.
+ * <p>
+ * See R. Bruccoleri and G. Heinrich, Computer Applications in the Biosciences,
+ * 4, 167-173 (1988) for a full description.
+ * <p>
+ * In November 1997, Michael Zuker made a number of changes to bring naview up
+ * to modern standards. All functions defined in naview are now declared before
+ * main() with arguments and argument types. When functions are defined, their
+ * argument types are declared with the function and these definitions are
+ * removed after the '{'. The 'void' declaration was used as necessary for
+ * functions.
+ * <p>
+ * The troublesome na_scanf function was deleted and replaced by scanf. Finally,
+ * there is now no default for the minimum separation of bases. A floating point
+ * number must be entered. However, as before an entry < 0 will be moved up to 0 and an entry
+ * > 0.5 will be reduced to 0.5.
+ * <p>
+ * Adapted for use as a subroutine in the Vienna RNA Package by Ivo Hofacker,
+ * May 1998: deleted output routines, replaced main() by
+ * naview_xy_coordinates(), which fills the X and Y arrays used by PS_rna_plot()
+ * etc. added ansi prototypes and fixed memory leaks.
+ * <p>
+ * Adapted for use in RNAMovies and therefor translated to java by Alexander
+ * Kaiser, April 2006.
+ * <p>
  * @author R. Bruccoleri (1988), I. Hofacker (1998), A. Kaiser (2006).
  * @version NAVIEW-Java 0.5.
- *
+ * <p>
  */
 public class Structure {
+
+    private static final Logger LOG = Logger.getLogger( Structure.class.getName() );
 
     private static final double ANUM = 9999.0;
     private static final double pi = Math.PI;
     private static final int maxiter = 500;
-
-    private static final Logger log = Logger.getLogger( "Structure" );
 
     private Base[] bases;
     private List<Region> regions;
@@ -114,7 +113,7 @@ public class Structure {
         findCentralLoop();
 
         // show debug output
-        if( log.isLoggable( java.util.logging.Level.FINE ) ) {
+        if( LOG.isLoggable( FINE ) ) {
             dumpLoops();
         }
 
@@ -128,14 +127,18 @@ public class Structure {
         ymax = bases[1].y;
 
         for( i = 2; i <= nbase; i++ ) {
-            if( bases[i].x < xmin )
+            if( bases[i].x < xmin ) {
                 xmin = bases[i].x;
-            if( bases[i].x > xmax )
+            }
+            if( bases[i].x > xmax ) {
                 xmax = bases[i].x;
-            if( bases[i].y < ymin )
+            }
+            if( bases[i].y < ymin ) {
                 ymin = bases[i].y;
-            if( bases[i].y > ymax )
+            }
+            if( bases[i].y > ymax ) {
                 ymax = bases[i].y;
+            }
         }
 
     }
@@ -227,15 +230,14 @@ public class Structure {
         if( connection.start == region.start1 ) {
             start = region.start1;
             end = region.end1;
-        }
-        else {
+        } else {
             start = region.start2;
             end = region.end2;
         }
-        if( bases[connection.start].x > ANUM - 100.0
-            || bases[connection.end].x > ANUM - 100.0 ) {
-            log.severe( "Bad region passed to generateRegion. "
-                        + "Coordinates not defined." );
+        if( bases[connection.start].x > ANUM - 100.0 ||
+                 bases[connection.end].x > ANUM - 100.0 ) {
+            LOG.severe( "Bad region passed to generateRegion. " +
+                     "Coordinates not defined." );
             return;
         }
         for( i = start + 1; i <= end; i++ ) {
@@ -255,15 +257,16 @@ public class Structure {
 
         hhi = (n + 1) / pi;
         hlow = -hhi - b / (n + 1.000001 - b);
-        if( b < 1 )
+        if( b < 1 ) {
             hlow = 0;
+        }
         iter = 0;
         do {
             h = (hhi + hlow) / 2.0;
             r = Math.sqrt( h * h + b * b / 4.0 );
             disc = 1.0 - 0.5 / (r * r);
             if( Math.abs( disc ) > 1.0 ) {
-                log.severe( "Unexpected large magnitude discriminant: " + disc );
+                LOG.severe( "Unexpected large magnitude discriminant: " + disc );
                 return new Point2D.Double( 0.0, 0.0 );
             }
             theta = Math.acos( disc );
@@ -271,14 +274,12 @@ public class Structure {
             e = theta * (n + 1) + 2 * phi - 2 * pi;
             if( e > 0.0 ) {
                 hlow = h;
-            }
-            else {
+            } else {
                 hhi = h;
             }
-        }
-        while( Math.abs( e ) > 0.0001 && ++iter < maxiter );
+        } while( Math.abs( e ) > 0.0001 && ++iter < maxiter );
         if( iter >= maxiter ) {
-            log.severe( "Iteration failed in findCenterForArc" );
+            LOG.severe( "Iteration failed in findCenterForArc" );
             return new Point2D.Double( 0.0, 0.0 );
         }
         return new Point2D.Double( h, theta );
@@ -294,20 +295,21 @@ public class Structure {
         dy = bases[end].y - bases[start].y;
         rr = Math.sqrt( dx * dx + dy * dy );
         l = end - start;
-        if( l < 0 )
+        if( l < 0 ) {
             l += nbase + 1;
+        }
         if( rr >= l ) {
             dx /= rr;
             dy /= rr;
             for( j = 1; j < l; j++ ) {
                 i = start + j;
-                if( i > nbase )
+                if( i > nbase ) {
                     i -= nbase + 1;
+                }
                 bases[i].x = bases[start].x + dx * (double) j / (double) l;
                 bases[i].y = bases[start].y + dy * (double) j / (double) l;
             }
-        }
-        else {
+        } else {
             p = findCenterForArc( l - 1, rr );
             h = p.getX();
             angleinc = p.getY();
@@ -325,8 +327,9 @@ public class Structure {
             a = Math.atan2( my, mx );
             for( j = 1; j < l; j++ ) {
                 i = start + j;
-                if( i > nbase )
+                if( i > nbase ) {
                     i -= nbase + 1;
+                }
                 bases[i].x = nrx + rr * Math.cos( a + j * angleinc );
                 bases[i].y = nry + rr * Math.sin( a + j * angleinc );
             }
@@ -342,21 +345,23 @@ public class Structure {
 
         astart = connection.angle;
         aend2 = aend1 = cnext.angle;
-        if( aend2 < astart )
+        if( aend2 < astart ) {
             aend2 += 2 * pi;
+        }
         aave = (astart + aend2) / 2.0;
         start = connection.end;
         end = cnext.start;
         n = end - start;
-        if( n < 0 )
+        if( n < 0 ) {
             n += nbase + 1;
+        }
         da = cnext.angle - connection.angle;
-        if( da < 0.0 )
+        if( da < 0.0 ) {
             da += 2 * pi;
+        }
         if( n == 2 ) {
             constructCircleSegment( start, end );
-        }
-        else {
+        } else {
             dx = bases[end].x - bases[start].x;
             dy = bases[end].y - bases[start].y;
             rr = Math.sqrt( dx * dx + dy * dy );
@@ -364,11 +369,13 @@ public class Structure {
             dy /= rr;
             if( rr >= 1.5 && da <= pi / 2 ) {
                 nstart = start + 1;
-                if( nstart > nbase )
+                if( nstart > nbase ) {
                     nstart -= nbase + 1;
+                }
                 nend = end - 1;
-                if( nend < 0 )
+                if( nend < 0 ) {
                     nend += nbase + 1;
+                }
                 bases[nstart].x = bases[start].x + 0.5 * dx;
                 bases[nstart].y = bases[start].y + 0.5 * dy;
                 bases[nend].x = bases[end].x - 0.5 * dx;
@@ -380,31 +387,39 @@ public class Structure {
                 collision = false;
                 constructCircleSegment( start, end );
                 nstart = start + 1;
-                if( nstart > nbase )
+                if( nstart > nbase ) {
                     nstart -= nbase + 1;
+                }
                 dx = bases[nstart].x - bases[start].x;
                 dy = bases[nstart].y - bases[start].y;
                 a1 = Math.atan2( dy, dx );
-                if( a1 < 0.0 )
+                if( a1 < 0.0 ) {
                     a1 += 2 * pi;
+                }
                 dac = a1 - astart;
-                if( dac < 0.0 )
+                if( dac < 0.0 ) {
                     dac += 2 * pi;
-                if( dac > pi )
+                }
+                if( dac > pi ) {
                     collision = true;
+                }
                 nend = end - 1;
-                if( nend < 0 )
+                if( nend < 0 ) {
                     nend += nbase + 1;
+                }
                 dx = bases[nend].x - bases[end].x;
                 dy = bases[nend].y - bases[end].y;
                 a2 = Math.atan2( dy, dx );
-                if( a2 < 0.0 )
+                if( a2 < 0.0 ) {
                     a2 += 2 * pi;
+                }
                 dac = aend1 - a2;
-                if( dac < 0.0 )
+                if( dac < 0.0 ) {
                     dac += 2 * pi;
-                if( dac > pi )
+                }
+                if( dac > pi ) {
                     collision = true;
+                }
                 if( collision ) {
                     ac = Math.min( aave, astart + 0.5 );
                     bases[nstart].x = bases[start].x + Math.cos( ac );
@@ -416,8 +431,7 @@ public class Structure {
                     end = nend;
                     n -= 2;
                 }
-            }
-            while( collision && n > 1 );
+            } while( collision && n > 1 );
         }
     }
 
@@ -437,19 +451,22 @@ public class Structure {
         done = false;
         while( !done ) {
             if( ++count > nconn * 2 ) {
-                log.severe( "infinite loop detected" );
+                LOG.severe( "infinite loop detected" );
                 return -1;
             }
-            if( anchor != null && connections[ic] == croot )
+            if( anchor != null && connections[ic] == croot ) {
                 ret = ic;
+            }
             done = ic == icend;
-            if( ++ic >= nconn )
+            if( ++ic >= nconn ) {
                 ic = 0;
+            }
         }
         if( ret == -1 ) {
             for( i = 1, ic = icstart; i < (count + 1) / 2; i++ ) {
-                if( ++ic >= nconn )
+                if( ++ic >= nconn ) {
                     ic = 0;
+                }
             }
             ret = ic;
         }
@@ -490,10 +507,11 @@ public class Structure {
             connection.xrad = xn / r;
             connection.yrad = yn / r;
             connection.angle = Math.atan2( yn, xn );
-            if( connection.angle < 0.0 )
+            if( connection.angle < 0.0 ) {
                 connection.angle += 2 * pi;
-            if( anchor != null
-                && anchor.region.equals( connection.region ) ) {
+            }
+            if( anchor != null &&
+                     anchor.region.equals( connection.region ) ) {
                 icroot = ic;
                 croot = connection;
             }
@@ -505,8 +523,7 @@ public class Structure {
 
             if( anchor == null ) {
                 xc = yc = 0.0;
-            }
-            else {
+            } else {
                 xo = (bases[croot.start].x + bases[croot.end].x) / 2.0;
                 yo = (bases[croot.start].y + bases[croot.end].y) / 2.0;
                 xc = xo - radius * croot.xrad;
@@ -517,19 +534,19 @@ public class Structure {
             connection = connections[icstart];
             count = 0;
 
-            log.fine( "Now processing Loop #" + loop.number
-                      + " (radius=" + radius + ")" );
+            LOG.fine( "Now processing Loop #" + loop.number +
+                     " (radius=" + radius + ")" );
 
             done = false;
             do {
                 j = icstart - 1;
-                if( j < 0 )
+                if( j < 0 ) {
                     j = nconn - 1;
+                }
                 cprev = connections[j];
                 if( !cprev.isConnected( connection ) ) {
                     done = true;
-                }
-                else {
+                } else {
                     icstart = j;
                     connection = cprev;
                 }
@@ -537,13 +554,15 @@ public class Structure {
                     maxang = -1.0;
                     for( ic = 0; ic < nconn; ic++ ) {
                         j = ic + 1;
-                        if( j >= nconn )
+                        if( j >= nconn ) {
                             j = 0;
+                        }
                         connection = connections[ic];
                         cnext = connections[j];
                         ac = cnext.angle - connection.angle;
-                        if( ac < 0.0 )
+                        if( ac < 0.0 ) {
                             ac += 2 * pi;
+                        }
                         if( ac > maxang ) {
                             maxang = ac;
                             imaxloop = ic;
@@ -551,17 +570,17 @@ public class Structure {
                     }
                     icend = imaxloop;
                     icstart = imaxloop + 1;
-                    if( icstart >= nconn )
+                    if( icstart >= nconn ) {
                         icstart = 0;
+                    }
                     connection = connections[icend];
                     connection.broken = true;
                     done = true;
                 }
-            }
-            while( !done );
+            } while( !done );
             done_all = false;
             icstart1 = icstart;
-            log.fine( "icstart1 = " + icstart1 );
+            LOG.fine( "icstart1 = " + icstart1 );
             while( !done_all ) {
                 count = 0;
                 done = false;
@@ -569,34 +588,37 @@ public class Structure {
                 icend = icstart;
                 while( !done ) {
                     connection = connections[icend];
-                    if( icend == icroot )
+                    if( icend == icroot ) {
                         rooted = true;
+                    }
                     j = icend + 1;
-                    if( j >= nconn )
+                    if( j >= nconn ) {
                         j = 0;
+                    }
                     cnext = connections[j];
                     if( connection.isConnected( cnext ) ) {
-                        if( ++count >= nconn )
+                        if( ++count >= nconn ) {
                             break;
+                        }
                         icend = j;
-                    }
-                    else {
+                    } else {
                         done = true;
                     }
                 }
                 icmiddle = getMiddleConnection( icstart, icend, anchor, croot, loop );
                 ic = icup = icdown = icmiddle;
-                log.fine( "icstart = " + icstart + ", icmiddle = " + icmiddle
-                          + ", icend = " + icend );
+                LOG.fine( "icstart = " + icstart + ", icmiddle = " + icmiddle +
+                         ", icend = " + icend );
                 done = false;
                 direction = 0;
                 while( !done ) {
-                    if( direction < 0 )
+                    if( direction < 0 ) {
                         ic = icup;
-                    else if( direction == 0 )
+                    } else if( direction == 0 ) {
                         ic = icmiddle;
-                    else
+                    } else {
                         ic = icdown;
+                    }
                     if( ic >= 0 ) {
                         connection = connections[ic];
                         if( anchor == null || croot != connection ) {
@@ -607,56 +629,62 @@ public class Structure {
                                 bases[connection.start].y = yc + radius * Math.sin( astart );
                                 bases[connection.end].x = xc + radius * Math.cos( aend );
                                 bases[connection.end].y = yc + radius * Math.sin( aend );
-                            }
-                            else if( direction < 0 ) {
+                            } else if( direction < 0 ) {
                                 j = ic + 1;
-                                if( j >= nconn )
+                                if( j >= nconn ) {
                                     j = 0;
+                                }
                                 connection = connections[ic];
                                 cnext = connections[j];
                                 cx = connection.xrad;
                                 cy = connection.yrad;
                                 ac = (connection.angle + cnext.angle) / 2.0;
-                                if( connection.angle > cnext.angle )
+                                if( connection.angle > cnext.angle ) {
                                     ac -= pi;
+                                }
                                 cnx = Math.cos( ac );
                                 cny = Math.sin( ac );
                                 lnx = cny;
                                 lny = -cnx;
                                 da = cnext.angle - connection.angle;
-                                if( da < 0.0 )
+                                if( da < 0.0 ) {
                                     da += 2 * pi;
-                                if( connection.extruded )
+                                }
+                                if( connection.extruded ) {
                                     rl = da <= pi / 2 ? 2.0 : 1.5;
-                                else
+                                } else {
                                     rl = 1.0;
+                                }
                                 bases[connection.end].x = bases[cnext.start].x + rl * lnx;
                                 bases[connection.end].y = bases[cnext.start].y + rl * lny;
                                 bases[connection.start].x = bases[connection.end].x + cy;
                                 bases[connection.start].y = bases[connection.end].y - cx;
-                            }
-                            else {
+                            } else {
                                 j = ic - 1;
-                                if( j < 0 )
+                                if( j < 0 ) {
                                     j = nconn - 1;
+                                }
                                 connection = connections[j];
                                 cnext = connections[ic];
                                 cnextx = cnext.xrad;
                                 cnexty = cnext.yrad;
                                 ac = (connection.angle + cnext.angle) / 2.0;
-                                if( connection.angle > cnext.angle )
+                                if( connection.angle > cnext.angle ) {
                                     ac -= pi;
+                                }
                                 cnx = Math.cos( ac );
                                 cny = Math.sin( ac );
                                 lnx = -cny;
                                 lny = cnx;
                                 da = cnext.angle - connection.angle;
-                                if( da < 0.0 )
+                                if( da < 0.0 ) {
                                     da += 2 * pi;
-                                if( connection.extruded )
+                                }
+                                if( connection.extruded ) {
                                     rl = da <= pi / 2 ? 2.0 : 1.5;
-                                else
+                                } else {
                                     rl = 1.0;
+                                }
                                 bases[cnext.start].x = bases[connection.end].x + rl * lnx;
                                 bases[cnext.start].y = bases[connection.end].y + rl * lny;
                                 bases[cnext.end].x = bases[cnext.start].x - cnexty;
@@ -667,28 +695,28 @@ public class Structure {
                     if( direction < 0 ) {
                         if( icdown == icend ) {
                             icdown = -1;
-                        }
-                        else if( icdown >= 0 ) {
-                            if( ++icdown >= nconn )
+                        } else if( icdown >= 0 ) {
+                            if( ++icdown >= nconn ) {
                                 icdown = 0;
+                            }
                         }
                         direction = 1;
-                    }
-                    else {
+                    } else {
                         if( icup == icstart ) {
                             icup = -1;
-                        }
-                        else if( icup >= 0 ) {
-                            if( --icup < 0 )
+                        } else if( icup >= 0 ) {
+                            if( --icup < 0 ) {
                                 icup = nconn - 1;
+                            }
                         }
                         direction = -1;
                     }
                     done = icup == -1 && icdown == -1;
                 }
                 icnext = icend + 1;
-                if( icnext >= nconn )
+                if( icnext >= nconn ) {
                     icnext = 0;
+                }
                 if( icend != icstart && (!(icstart == icstart1 && icnext == icstart1)) ) {
                     connection = connections[icstart];
                     cnext = connections[icend];
@@ -710,34 +738,38 @@ public class Structure {
                     dx = bases[connection.start].x - xc;
                     dy = bases[connection.start].y - yc;
                     ac = Math.atan2( dy, dx );
-                    if( ac < 0.0 )
+                    if( ac < 0.0 ) {
                         ac += 2 * pi;
+                    }
                     dx = bases[cnext.end].x - xc;
                     dy = bases[cnext.end].y - yc;
                     acn = Math.atan2( dy, dx );
-                    if( acn < 0.0 )
+                    if( acn < 0.0 ) {
                         acn += 2 * pi;
-                    if( acn < ac )
+                    }
+                    if( acn < ac ) {
                         acn += 2 * pi;
-                    if( acn - ac > pi )
+                    }
+                    if( acn - ac > pi ) {
                         sign = -1;
-                    else
+                    } else {
                         sign = 1;
+                    }
                     nmidx = xc + sign * radius * nrx;
                     nmidy = yc + sign * radius * nry;
                     if( rooted ) {
                         xc -= nmidx - midx;
                         yc -= nmidy - midy;
-                    }
-                    else {
+                    } else {
                         for( ic = icstart; true; bar = ++ic >= nconn ? (ic = 0) : 0 ) {
                             connection = connections[ic];
                             bases[connection.start].x += nmidx - midx;
                             bases[connection.start].y += nmidy - midy;
                             bases[connection.end].x += nmidx - midx;
                             bases[connection.end].y += nmidy - midy;
-                            if( ic == icend )
+                            if( ic == icend ) {
                                 break;
+                            }
                         }
                     }
                 }
@@ -747,48 +779,53 @@ public class Structure {
             for( ic = 0; ic < nconn; ic++ ) {
                 connection = connections[ic];
                 j = ic + 1;
-                if( j >= nconn )
+                if( j >= nconn ) {
                     j = 0;
+                }
                 cnext = connections[j];
                 dx = bases[connection.end].x - xc;
                 dy = bases[connection.end].y - yc;
                 rc = Math.sqrt( dx * dx + dy * dy );
                 ac = Math.atan2( dy, dx );
-                if( ac < 0.0 )
+                if( ac < 0.0 ) {
                     ac += 2 * pi;
+                }
                 dx = bases[cnext.start].x - xc;
                 dy = bases[cnext.start].y - yc;
                 rcn = Math.sqrt( dx * dx + dy * dy );
                 acn = Math.atan2( dy, dx );
-                if( acn < 0.0 )
+                if( acn < 0.0 ) {
                     acn += 2 * pi;
-                if( acn < ac )
+                }
+                if( acn < ac ) {
                     acn += 2 * pi;
+                }
                 dan = acn - ac;
                 dc = cnext.angle - connection.angle;
-                if( dc <= 0.0 )
+                if( dc <= 0.0 ) {
                     dc += 2 * pi;
+                }
                 if( Math.abs( dan - dc ) > pi ) {
                     if( connection.extruded ) {
-                        log.warning( "Loop #" + loop.number + " has crossed regions" );
-                    }
-                    else if( (cnext.start - connection.end) != 1 ) {
+                        LOG.warning( "Loop #" + loop.number + " has crossed regions" );
+                    } else if( (cnext.start - connection.end) != 1 ) {
                         connection.extruded = true;
                         continue set_radius;
                     }
                 }
                 if( connection.extruded ) {
                     constructExtrudedSegment( connection, cnext );
-                }
-                else {
+                } else {
                     n = cnext.start - connection.end;
-                    if( n < 0 )
+                    if( n < 0 ) {
                         n += nbase + 1;
+                    }
                     angleinc = dan / n;
                     for( j = 1; j < n; j++ ) {
                         i = connection.end + j;
-                        if( i > nbase )
+                        if( i > nbase ) {
                             i -= nbase + 1;
+                        }
                         a = ac + j * angleinc;
                         rr = rc + (rcn - rc) * (a - ac) / dan;
                         bases[i].x = xc + rr * Math.cos( a );
@@ -808,8 +845,9 @@ public class Structure {
             sy = 0.0;
             for( ic = 0; ic < nconn; ic++ ) {
                 j = ic + 1;
-                if( j >= nconn )
+                if( j >= nconn ) {
                     j = 0;
+                }
                 connection = connections[ic];
                 cnext = connections[j];
                 n += 2;
@@ -817,8 +855,9 @@ public class Structure {
                 sy += bases[connection.start].y + bases[connection.end].y;
                 if( !connection.extruded ) {
                     for( j = connection.end + 1; j != cnext.start; j++ ) {
-                        if( j > nbase )
+                        if( j > nbase ) {
                             j -= nbase + 1;
+                        }
                         n++;
                         sx += bases[j].x;
                         sy += bases[j].y;
@@ -836,13 +875,13 @@ public class Structure {
         int i;
         Loop loop;
 
-        log.fine( "Root loop is: #" + root.number );
+        LOG.fine( "Root loop is: #" + root.number );
         for( i = 0; i < loops.size(); i++ ) {
             loop = loops.get( i );
-            log.fine( loop.toString() );
+            LOG.fine( loop.toString() );
 
             for( Connection connection : loop.connections ) {
-                log.fine( "  " + connection.toString() );
+                LOG.fine( "  " + connection.toString() );
             }
         }
     }
@@ -862,9 +901,8 @@ public class Structure {
                 maxdepth = loop.getDepth();
                 maxconn = loop.connections.size();
                 root = loop;
-            }
-            else if( (d = loop.getDepth()) > maxdepth
-                     && loop.connections.size() == maxconn ) {
+            } else if( (d = loop.getDepth()) > maxdepth &&
+                     loop.connections.size() == maxconn ) {
                 maxdepth = d;
                 root = loop;
             }
@@ -892,35 +930,32 @@ public class Structure {
                         bases[region.start2].extracted = true;
                         bases[region.end2].extracted = true;
                         loop = constructLoop( region.end1 < nbase ? region.end1 + 1 : 0 );
-                    }
-                    else if( i == region.start2 ) {
+                    } else if( i == region.start2 ) {
                         bases[region.start1].extracted = true;
                         bases[region.end1].extracted = true;
                         bases[region.start2].extracted = true;
                         bases[region.end2].extracted = true;
                         loop = constructLoop( region.end2 < nbase ? region.end2 + 1 : 0 );
-                    }
-                    else {
-                        log.severe( "Error in constructLoop: "
-                                    + i + " not found in region table." );
+                    } else {
+                        LOG.severe( "Error in constructLoop: " +
+                                 i + " not found in region table." );
                         return null;
                     }
 
                     if( i == region.start1 ) {
                         retloop.connect( region.start1, region.end2, loop, region );
                         loop.connect( region.start2, region.end1, retloop, region );
-                    }
-                    else {
+                    } else {
                         retloop.connect( region.start2, region.end1, loop, region );
                         loop.connect( region.start1, region.end2, retloop, region );
                     }
                 }
                 i = mate;
             }
-            if( ++i > nbase )
+            if( ++i > nbase ) {
                 i = 0;
-        }
-        while( i != ib );
+            }
+        } while( i != ib );
         return retloop;
     }
 
@@ -954,7 +989,7 @@ public class Structure {
                 region.end1 = --i;
                 region.start2 = mate + 1;
 
-                log.fine( region.toString() );
+                LOG.fine( region.toString() );
             }
         }
     }
@@ -969,10 +1004,10 @@ public class Structure {
             if( pt.getType( i ) > PairTable.NONE && pt.getType( i ) < PairTable.PK1 ) {
                 bases[i + 1] = new Base( pt.getMate( i ) + 1 );
 
-                if( pt.getMate( i ) > i )
+                if( pt.getMate( i ) > i ) {
                     npairs++;
-            }
-            else {
+                }
+            } else {
                 bases[i + 1] = new Base( 0 );
             }
         }

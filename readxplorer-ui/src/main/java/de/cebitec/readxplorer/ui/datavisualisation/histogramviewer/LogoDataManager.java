@@ -18,12 +18,13 @@
 package de.cebitec.readxplorer.ui.datavisualisation.histogramviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.Difference;
-import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataobjects.Difference;
+import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import java.util.Collection;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -31,10 +32,12 @@ import java.util.logging.Logger;
  * After setting the coverage for each position and adding all diffs and gaps,
  * it can return the count of each DNA base or gap for each position in the
  * interval.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class LogoDataManager {
+
+    private static final Logger LOG = Logger.getLogger( LogoDataManager.class.getName() );
 
     private static final int NO_BASE_TYPES = 7;
     private static final int NO_BASE_FIELDS = NO_BASE_TYPES * 2;
@@ -184,7 +187,7 @@ public class LogoDataManager {
                 row = READGAP;
                 break;
             default:
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown base {0}", base );
+                LOG.log( SEVERE, "found unknown base {0}", base );
         }
 
         int column = MATCH;
@@ -265,7 +268,7 @@ public class LogoDataManager {
                         row = N;
                         break;
                     default:
-                        Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found unknown base {0}", base );
+                        LOG.log( SEVERE, "found unknown base {0}", base );
                 }
 
                 if( !gap.isForwardStrand() ) {
@@ -274,8 +277,7 @@ public class LogoDataManager {
 
                 counts[shiftedPos][row] += count;
 
-            }
-            else if( origPos > this.stop ) {
+            } else if( origPos > this.stop ) {
                 break;
             }
         }
@@ -283,8 +285,8 @@ public class LogoDataManager {
 
 
     /**
-     * @return The highest coverage observed in the interval stored in this
-     *         logo data manager.
+     * @return The highest coverage observed in the interval stored in this logo
+     *         data manager.
      */
     public int getMaxFoundCoverage() {
         return maxFoundCoverage;

@@ -20,14 +20,15 @@ package de.cebitec.readxplorer.ui.datavisualisation.referenceviewer;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeatureI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeatureI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
@@ -36,6 +37,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -44,25 +46,24 @@ import org.openide.util.Lookup;
 
 /**
  * Viewer for genome sequences / chromosomes.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class ReferenceViewer extends AbstractViewer {
 
-    private final static long serialVersionUID = 7964236;
-    private static final int height = 230;
+    private static final long serialVersionUID = 7964236;
+    private static final int VIEW_HEIGHT = 230;
     private static final int FRAMEHEIGHT = 20;
     private final Map<FeatureType, Integer> featureStats;
     private JFeature selectedFeature;
     private final int labelMargin;
     private ReferenceConnector refGenConnector;
-    private final ArrayList<JFeature> features;
+    private final List<JFeature> features;
 
-    public final static String PROP_FEATURE_STATS_CHANGED = "feats changed";
-    public final static String PROP_FEATURE_SELECTED = "feat selected";
+    public static final String PROP_FEATURE_STATS_CHANGED = "feats changed";
+    public static final String PROP_FEATURE_SELECTED = "feat selected";
     public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
     private int trackCount = 0;
-    private Lookup viewerLookup;
 
 
     /**
@@ -71,19 +72,19 @@ public class ReferenceViewer extends AbstractViewer {
      * @param boundsInfoManager the global bounds info manager
      * @param basePanel         the base panel
      * @param refGenome         the persistent reference, which is always
-     *                          accessible through the getReference
-     *                          method in any abstract viewer.
+     *                          accessible through the getReference method in
+     *                          any abstract viewer.
      */
     public ReferenceViewer( BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGenome ) {
         super( boundsInfoManager, basePanel, refGenome );
-        this.features = new ArrayList<>();
-        this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenome.getId() );
-        this.featureStats = new EnumMap<>( FeatureType.class );
-        this.getExcludedClassifications().add( FeatureType.UNDEFINED );
-        this.getExcludedClassifications().add( FeatureType.SOURCE );
-        this.showSequenceBar( true, true );
-        this.labelMargin = 3;
-        this.setViewerSize();
+        features = new ArrayList<>();
+        refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenome.getId() );
+        featureStats = new EnumMap<>( FeatureType.class );
+        excludedClassifications.add( FeatureType.UNDEFINED );
+        excludedClassifications.add( FeatureType.SOURCE );
+        showSequenceBar( true, true );
+        labelMargin = 3;
+        setViewerSize();
     }
 
 
@@ -101,8 +102,7 @@ public class ReferenceViewer extends AbstractViewer {
         if( selectedFeature == feature ) {
             selectedFeature.setSelected( false );
             selectedFeature = null;
-        }
-        else {
+        } else {
 
             // if there was a feature selected before, de-select it
             if( selectedFeature != null ) {
@@ -114,8 +114,8 @@ public class ReferenceViewer extends AbstractViewer {
         }
 
         //only recalculate if reading frame was switched
-        if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature()
-                                       != PersistentFeature.Utils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
+        if( selectedFeature == null || this.getSequenceBar().getFrameCurrFeature() !=
+             PositionUtils.determineFrame( selectedFeature.getPersistentFeature() ) ) {
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -124,22 +124,22 @@ public class ReferenceViewer extends AbstractViewer {
     @Override
     public void close() {
         super.close();
-        this.refGenConnector = null;
-        this.featureStats.clear();
-        this.features.clear();
-        this.getExcludedClassifications().clear();
+        refGenConnector = null;
+        featureStats.clear();
+        features.clear();
+        excludedClassifications.clear();
     }
 
 
     @Override
     public int getMaximalHeight() {
-        return height;
+        return VIEW_HEIGHT;
     }
 
 
     @Override
     public void boundsChangedHook() {
-        this.createFeatures();
+        createFeatures();
 
 //        firePropertyChange(PROP_INTERVAL_CHANGED, null, getBoundsInfo());
     }
@@ -149,19 +149,19 @@ public class ReferenceViewer extends AbstractViewer {
      * Creates all feature components to display in this viewer.
      */
     private void createFeatures() {
-        this.removeAll();
-        this.features.clear();
-        this.featureStats.clear();
+        removeAll();
+        features.clear();
+        featureStats.clear();
 
-        if( this.hasLegend() ) {
-            this.add( this.getLegendLabel() );
-            this.add( this.getLegendPanel() );
+        if( hasLegend() ) {
+            add( this.getLegendLabel() );
+            add( this.getLegendPanel() );
         }
-        if( this.hasSequenceBar() ) {
-            this.add( this.getSequenceBar() );
+        if( hasSequenceBar() ) {
+            add( this.getSequenceBar() );
         }
-        if( this.hasChromSelectionPanel() ) {
-            this.add( this.getChromSelectionPanel() );
+        if( hasChromSelectionPanel() ) {
+            add( this.getChromSelectionPanel() );
         }
 
         List<PersistentFeature> featureList = refGenConnector.getFeaturesForRegion(
@@ -171,7 +171,7 @@ public class ReferenceViewer extends AbstractViewer {
         int frame = 0;
         for( Polytree featTree : featureTrees ) { //this means if two roots are on different frames,
             for( Node root : featTree.getRoots() ) { //all children are painted on the frame of the last root node
-                frame = PersistentFeature.Utils.determineFrame( (PersistentFeature) root );
+                frame = PositionUtils.determineFrame( (PersistentFeature) root );
             }
             PaintNodeVisitor paintVisitor = new PaintNodeVisitor( frame );
             featTree.bottomUp( paintVisitor );
@@ -179,7 +179,7 @@ public class ReferenceViewer extends AbstractViewer {
 
         //Correct painting order is guaranteed by the node visitor
         for( JFeature jFeature : this.features ) {
-            this.add( jFeature );
+            add( jFeature );
         }
 
         firePropertyChange( PROP_FEATURE_STATS_CHANGED, null, featureStats );
@@ -194,10 +194,10 @@ public class ReferenceViewer extends AbstractViewer {
      */
     private void registerFeatureInStats( PersistentFeatureI feature ) {
         FeatureType type = feature.getType();
-        if( !this.featureStats.containsKey( type ) ) {
-            this.featureStats.put( type, 0 );
+        if( !featureStats.containsKey( type ) ) {
+            featureStats.put( type, 0 );
         }
-        this.featureStats.put( type, this.featureStats.get( type ) + 1 );
+        featureStats.put( type, featureStats.get( type ) + 1 );
     }
 
 
@@ -257,8 +257,7 @@ public class ReferenceViewer extends AbstractViewer {
         if( frame < 0 ) {
             result = this.getPaintingAreaInfo().getReverseLow();
             result += offset;
-        }
-        else {
+        } else {
             result = this.getPaintingAreaInfo().getForwardLow();
             result -= offset;
         }
@@ -329,11 +328,10 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public void changeToolTipText( int logPos ) {
-        if( this.isMouseOverPaintingRequested() ) {
-            this.setToolTipText( String.valueOf( logPos ) );
-        }
-        else {
-            this.setToolTipText( "" );
+        if( isMouseOverPaintingRequested() ) {
+            setToolTipText( String.valueOf( logPos ) );
+        } else {
+            setToolTipText( "" );
         }
     }
 
@@ -343,7 +341,7 @@ public class ReferenceViewer extends AbstractViewer {
      *         interval.
      */
     public Map<FeatureType, Integer> getFeatureStats() {
-        return this.featureStats;
+        return Collections.unmodifiableMap( featureStats );
     }
 
 
@@ -360,29 +358,27 @@ public class ReferenceViewer extends AbstractViewer {
      */
     private void setViewerSize() {
 
-        this.setPreferredSize( new Dimension( 1, 230 ) );
-        this.revalidate();
+        setPreferredSize( new Dimension( 1, 230 ) );
+        revalidate();
     }
 
 
     /**
-     * Increases count of corresponding tracks.
-     * If more information is needed implement listener model
-     * with possibility to get track viewers.
+     * Increases count of corresponding tracks. If more information is needed
+     * implement listener model with possibility to get track viewers.
      */
     public void increaseTrackCount() {
-        ++this.trackCount;
+        trackCount++;
     }
 
 
     /**
-     * Decreases count of corresponding tracks.
-     * If more information is needed implement listener model
-     * with possibility to get track viewers.
+     * Decreases count of corresponding tracks. If more information is needed
+     * implement listener model with possibility to get track viewers.
      */
     public void decreaseTrackCount() {
-        if( this.trackCount > 0 ) {
-            --this.trackCount;
+        if( trackCount > 0 ) {
+            trackCount--;
         } //nothing to do if it is already 0
     }
 
@@ -391,7 +387,7 @@ public class ReferenceViewer extends AbstractViewer {
      * @return Number of corresponding tracks.
      */
     public int getTrackCount() {
-        return this.trackCount;
+        return trackCount;
     }
 
 
@@ -400,7 +396,7 @@ public class ReferenceViewer extends AbstractViewer {
      *                     reference viewer.
      */
     public void setViewerLookup( Lookup viewerLookup ) {
-        this.viewerLookup = viewerLookup;
+//        this.viewerLookup = viewerLookup;
     }
 
 

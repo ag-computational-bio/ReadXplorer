@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.tools.referenceeditor;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.NotifyDescriptor;
@@ -42,7 +42,7 @@ import org.openide.windows.TopComponent;
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.referenceeditor.ReferenceEditorTopComponent" )
-@ActionReference( path = "Menu/Window" /*, position = 333 */ )
+@ActionReference( path = "Menu/Window" /* , position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_ReferenceEditorAction",
          preferredID = "ReferenceEditorTopComponent"
@@ -172,8 +172,7 @@ public final class ReferenceEditorTopComponent extends TopComponent {
             }
             genomeTextArea.setLineWrap( true );
             genomeTextArea.setText( activeChromSubSeq );
-        }
-        else {
+        } else {
             NotifyDescriptor nd = new NotifyDescriptor.Message( "The values don't fit in the genome range", NotifyDescriptor.INFORMATION_MESSAGE );
         }
     }//GEN-LAST:event_getSequenceButtonActionPerformed

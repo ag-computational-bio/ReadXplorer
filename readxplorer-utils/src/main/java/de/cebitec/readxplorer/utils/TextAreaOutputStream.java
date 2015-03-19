@@ -62,6 +62,7 @@ public class TextAreaOutputStream extends OutputStream {
         if( b == '\n' ) {
             final String text = sb.toString() + "\n";
             SwingUtilities.invokeLater( new Runnable() {
+
                 @Override
                 public void run() {
                     textArea.append( text );

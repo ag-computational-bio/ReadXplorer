@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.Map;
  */
 public class ParsedChromosome {
 
-//    public static String FINISHED = "ParsingFinished";
+    public static final String FINISHED = "ParsingFinished";
     private List<ParsedFeature> features;
     private List<ParsedFeature> finalFeatures;
     private Map<String, Integer> featureIdMap;
@@ -47,10 +48,10 @@ public class ParsedChromosome {
     /**
      * Data holder for a chromosome.
      * <p>
-     * @param name           Name of the chromosome
-     * @param chromLength
-     * @param hasSubfeatures <tt>true</tt>, if it has subfeatures,
-     * <tt>false</tt>, if it already relies on parent ids.
+     * @param name Name of the chromosome
+     * @param chromLength Length of the chromosome in bp
+     * @param hasSubfeatures <code>true</code>, if it has subfeatures,
+     * <code>false</code>, if it already relies on parent ids.
      */
     public ParsedChromosome( String name, long chromLength, boolean hasSubfeatures ) {
         this.features = new ArrayList<>();
@@ -145,11 +146,11 @@ public class ParsedChromosome {
 
 
     /**
-     * Adds all features in the <tt>featureList</tt> to the list of features of
+     * Adds all features in the <code>featureList</code> to the list of features of
      * this reference.
      * <p>
      * @param featureList The list of features to add to the list of features of
-     *                    this reference
+     * this reference
      */
     public void addAllFeatures( List<ParsedFeature> featureList ) {
         for( ParsedFeature feature : featureList ) {
@@ -164,7 +165,7 @@ public class ParsedChromosome {
      * @return The list of root level features.
      */
     public List<ParsedFeature> getFeatures() {
-        return features;
+        return Collections.unmodifiableList( features );
     }
 
 
@@ -172,13 +173,13 @@ public class ParsedChromosome {
      * @return The list of subfeatures (features, which have a parent id).
      */
     public List<ParsedFeature> getSubFeatures() {
-        return finalFeatures;
+        return Collections.unmodifiableList( finalFeatures );
     }
 
 
     /**
      * @param featId The latest feature id used in the db. Set it before
-     *               distributing feature ids with {@link distributeFeatureIds}.
+     * distributing feature ids with {@link distributeFeatureIds()}.
      */
     public void setFeatId( int featId ) {
         this.featId = featId;
@@ -192,14 +193,14 @@ public class ParsedChromosome {
      * assigned parent ids.
      */
     public void distributeFeatureIds() {
-        this.distributeFeatureIds( features ); //this way only the feature ids of this reference features can be distributed!
+        Collections.sort( features ); //sort features by position
+        distributeFeatureIds( features ); //this way only the feature ids of this reference features can be distributed!
 
         if( hasSubFeatures ) {
             this.mutateSubFeatureToParentIds( features );
             this.features = finalFeatures;
             finalFeatures = new ArrayList<>();
-        }
-        else {
+        } else {
             this.replaceParentNamesByIds();
         }
     }
@@ -211,11 +212,8 @@ public class ParsedChromosome {
      * identifier. Further replaces the parent names in the feature by the newly
      * assigned parent ids.
      * <p>
-     * @param id          The unique feature id to start with (will be increased
-     *                    by one
-     *                    for each feature in the reference
      * @param featureList list of features for which the ids need to be
-     *                    distributed
+     * distributed
      */
     private void distributeFeatureIds( List<ParsedFeature> featureList ) {
 
@@ -259,16 +257,11 @@ public class ParsedChromosome {
      * identifier. Further replaces the parent names in the feature by the newly
      * assigned parent ids.
      * <p>
-     * @param id          The unique feature id to start with (will be increased
-     *                    by one
-     *                    for each feature in the reference
-     * @param featureList list of features for which the ids need to be
-     *                    distributed
      */
     private void replaceParentNamesByIds() {
         //replace parent names by parent ids
         List<String> newParentIds;
-        for( ParsedFeature feature : this.features ) {
+        for( ParsedFeature feature : features ) {
             newParentIds = new ArrayList<>();
             for( String parentName : feature.getParentIds() ) {
                 if( featureIdMap.containsKey( parentName ) ) {
@@ -281,8 +274,8 @@ public class ParsedChromosome {
 
 
     /**
-     * @return <tt>true</tt>, if it has subfeatures, <tt>false</tt>, if it
-     *         already relies on parent ids.
+     * @return <code>true</code>, if it has subfeatures, <code>false</code>, if it
+     * already relies on parent ids.
      */
     public boolean hasSubFeatures() {
         return hasSubFeatures;
@@ -294,7 +287,7 @@ public class ParsedChromosome {
      * ids.
      * <p>
      * @param hasSubFeatures True, if it has subfeatures, false, if it already
-     *                       relies on parent ids.
+     * relies on parent ids.
      */
     public void setHasSubFeatures( boolean hasSubFeatures ) {
         this.hasSubFeatures = hasSubFeatures;

@@ -57,11 +57,11 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     private void initComponents() {
 
         transcriptionStartBox = new javax.swing.JCheckBox();
-        rpkmValuesBox = new javax.swing.JCheckBox();
+        normalizationValuesBox = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tssTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
-        rpkmTextArea = new javax.swing.JTextArea();
+        normalizationTextArea = new javax.swing.JTextArea();
         operonDetectionBox = new javax.swing.JCheckBox();
         jScrollPane5 = new javax.swing.JScrollPane();
         operonTextArea = new javax.swing.JTextArea();
@@ -73,10 +73,10 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(rpkmValuesBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.rpkmValuesBox.text")); // NOI18N
-        rpkmValuesBox.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(normalizationValuesBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.normalizationValuesBox.text")); // NOI18N
+        normalizationValuesBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rpkmValuesBoxActionPerformed(evt);
+                normalizationValuesBoxActionPerformed(evt);
             }
         });
 
@@ -90,15 +90,15 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         tssTextArea.setWrapStyleWord(true);
         jScrollPane1.setViewportView(tssTextArea);
 
-        rpkmTextArea.setEditable(false);
-        rpkmTextArea.setBackground(new java.awt.Color(240, 240, 240));
-        rpkmTextArea.setColumns(20);
-        rpkmTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        rpkmTextArea.setLineWrap(true);
-        rpkmTextArea.setRows(2);
-        rpkmTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.rpkmTextArea.text")); // NOI18N
-        rpkmTextArea.setWrapStyleWord(true);
-        jScrollPane3.setViewportView(rpkmTextArea);
+        normalizationTextArea.setEditable(false);
+        normalizationTextArea.setBackground(new java.awt.Color(240, 240, 240));
+        normalizationTextArea.setColumns(20);
+        normalizationTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        normalizationTextArea.setLineWrap(true);
+        normalizationTextArea.setRows(2);
+        normalizationTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.normalizationTextArea.text")); // NOI18N
+        normalizationTextArea.setWrapStyleWord(true);
+        jScrollPane3.setViewportView(normalizationTextArea);
 
         org.openide.awt.Mnemonics.setLocalizedText(operonDetectionBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.operonDetectionBox.text")); // NOI18N
         operonDetectionBox.addActionListener(new java.awt.event.ActionListener() {
@@ -126,9 +126,9 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(transcriptionStartBox)
-                            .addComponent(rpkmValuesBox)
+                            .addComponent(normalizationValuesBox)
                             .addComponent(operonDetectionBox))
-                        .addGap(0, 179, Short.MAX_VALUE))
+                        .addGap(0, 143, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(21, 21, 21)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,7 +144,7 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rpkmValuesBox)
+                .addComponent(normalizationValuesBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -159,9 +159,9 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }//GEN-LAST:event_transcriptionStartBoxActionPerformed
 
-    private void rpkmValuesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rpkmValuesBoxActionPerformed
+    private void normalizationValuesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalizationValuesBoxActionPerformed
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
-    }//GEN-LAST:event_rpkmValuesBoxActionPerformed
+    }//GEN-LAST:event_normalizationValuesBoxActionPerformed
 
     private void operonDetectionBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionBoxActionPerformed
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
@@ -171,10 +171,10 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JTextArea normalizationTextArea;
+    private javax.swing.JCheckBox normalizationValuesBox;
     private javax.swing.JCheckBox operonDetectionBox;
     private javax.swing.JTextArea operonTextArea;
-    private javax.swing.JTextArea rpkmTextArea;
-    private javax.swing.JCheckBox rpkmValuesBox;
     private javax.swing.JCheckBox transcriptionStartBox;
     private javax.swing.JTextArea tssTextArea;
     // End of variables declaration//GEN-END:variables
@@ -199,22 +199,23 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
 
 
     /**
-     * @return true, if the rpkm analysis is selected, false
-     *         otherwise
+     * @return <code>true</code>, if the read count normalization analysis is
+     *         selected, <code>false</code> otherwise
      */
-    public boolean isRPKMAnalysisSelected() {
-        return this.rpkmValuesBox.isSelected();
+    public boolean isNormAnalysisSelected() {
+        return this.normalizationValuesBox.isSelected();
     }
 
 
     /**
-     * @return true, if the panel contains valid information, false otherwise
+     * @return <code>true</code>, if the panel contains valid information,
+     *         <code>false</code> otherwise
      */
     @Override
     public boolean isRequiredInfoSet() {
         return this.transcriptionStartBox.isSelected()
                || this.operonDetectionBox.isSelected()
-               || this.rpkmValuesBox.isSelected();
+               || this.normalizationValuesBox.isSelected();
     }
 
 
@@ -222,18 +223,18 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
      * Updates the components for all offered analyses depending on the
      * selection.
      * <p>
-     * @param isTssSelected    true, if the TSS analysis shall be selected,
-     *                         false otherwise
-     * @param isOperonSelected true, if the operon analysis shall be selected,
-     *                         false otherwise
-     * @param isRpkmSelected   true, if the RPKM analysis shall be selected,
-     *                         false
-     *                         otherwise
+     * @param isTssSelected    <code>true</code>, if the TSS analysis shall be
+     *                         selected, <code>false</code> otherwise
+     * @param isOperonSelected <code>true</code>, if the operon analysis shall
+     *                         be selected, <code>false</code> otherwise
+     * @param isNormSelected   <code>true</code>, if the read count
+     *                         normalization analysis shall be selected,
+     *                         <code>false</code> otherwise
      */
-    void updateAnalysisSelection( boolean isTssSelected, boolean isOperonSelected, boolean isRpkmSelected ) {
-        this.transcriptionStartBox.setSelected( isTssSelected );
-        this.operonDetectionBox.setSelected( isOperonSelected );
-        this.rpkmValuesBox.setSelected( isRpkmSelected );
+    void updateAnalysisSelection( boolean isTssSelected, boolean isOperonSelected, boolean isNormSelected ) {
+        transcriptionStartBox.setSelected( isTssSelected );
+        operonDetectionBox.setSelected( isOperonSelected );
+        normalizationValuesBox.setSelected( isNormSelected );
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }
 

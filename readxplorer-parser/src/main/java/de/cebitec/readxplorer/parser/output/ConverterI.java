@@ -23,8 +23,8 @@ import de.cebitec.readxplorer.utils.Observable;
 
 
 /**
- * Converts the data chosen by the subclasses into another
- * format according to the specific subclass.
+ * Converts the data chosen by the subclasses into another format according to
+ * the specific subclass.
  * <p>
  * @author -Rolf Hilker-
  */
@@ -32,18 +32,24 @@ public interface ConverterI extends ParserI, Observable {
 
     /**
      * Converts the data chosen by the subclasses into another format according
-     * to
-     * the specific subclass.
+     * to the specific subclass.
      * <p>
      * @return true, if the conversion was successful, false otherwise
      * <p>
      * @throws Exception can throw any exception, which has to be specified by
-     *                   the implementation
+     * the implementation
      */
-    public boolean convert() throws Exception;
+    boolean convert() throws Exception;
 
 
-    public void setDataToConvert( Object... data ) throws IllegalArgumentException;
+    /**
+     * Sets the data to convert. Depends on the implementation.
+     * @param data The data to set - as many objects as necessary for the
+     *             implementation.
+     * <p>
+     * @throws IllegalArgumentException
+     */
+    void setDataToConvert( Object... data ) throws IllegalArgumentException;
 
 
 }

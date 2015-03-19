@@ -35,7 +35,7 @@ import org.openide.util.NbPreferences;
 /**
  * A visual wizard job panel. It offers to select read mapping classes and
  * unique or all mapped reads for any further processing.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectReadClassVisualPanel extends JobPanel {
@@ -51,9 +51,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
      * <p>
      * @param wizardName        the name of the corresponding wizard
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate options. <code>false</code>
-     *                          means the analysis generally runs on the strands and should not show the
-     *                          strand option components.
+     *                          genomic features and should show appropriate
+     *                          options. <code>false</code> means the analysis
+     *                          generally runs on the strands and should not
+     *                          show the strand option components.
      */
     public SelectReadClassVisualPanel( String wizardName, boolean isFeatureAnalysis ) {
         this.wizardName = wizardName;
@@ -70,9 +71,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
      * depending on the given boolean.
      * <p>
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate options. <code>false</code>
-     *                          means the analysis generally runs on the strands and should not show the
-     *                          strand option components.
+     *                          genomic features and should show appropriate
+     *                          options. <code>false</code> means the analysis
+     *                          generally runs on the strands and should not
+     *                          show the strand option components.
      */
     private void updateStrandOptionLabels( boolean isFeatureAnalysis ) {
         jSeparator2.setVisible( isFeatureAnalysis );
@@ -282,10 +284,10 @@ public class SelectReadClassVisualPanel extends JobPanel {
     }//GEN-LAST:event_checkBoxCommonActionPerformed
 
     private void checkBoxUniqueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxUniqueActionPerformed
-        this.checkBoxPerfect.setEnabled( !this.checkBoxUnique.isSelected() );
-        this.checkBoxBestMatch.setEnabled( !this.checkBoxUnique.isSelected() );
-        this.checkBoxCommon.setEnabled( !this.checkBoxUnique.isSelected() );
-        this.isRequiredInfoSet();
+        checkBoxPerfect.setEnabled( !checkBoxUnique.isSelected() );
+        checkBoxBestMatch.setEnabled( !checkBoxUnique.isSelected() );
+        checkBoxCommon.setEnabled( !checkBoxUnique.isSelected() );
+        isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxUniqueActionPerformed
 
     private void checkBoxPerfectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPerfectActionPerformed
@@ -340,16 +342,15 @@ public class SelectReadClassVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated
-                = this.checkBoxPerfect.isSelected()
-                  || this.checkBoxBestMatch.isSelected()
-                  || this.checkBoxCommon.isSelected()
-                  || this.checkBoxSinglePerfect.isSelected()
-                  || this.checkBoxSingleBestMatch.isSelected();
+                = this.checkBoxPerfect.isSelected() ||
+                 this.checkBoxBestMatch.isSelected() ||
+                 this.checkBoxCommon.isSelected() ||
+                 this.checkBoxSinglePerfect.isSelected() ||
+                 this.checkBoxSingleBestMatch.isSelected();
 
         if( GeneralUtils.isValidByteInput( minMappingQualityField.getText() ) ) {
             this.minMappingQual = Byte.parseByte( minMappingQualityField.getText() );
-        }
-        else {
+        } else {
             isValidated = false;
         }
         firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
@@ -381,7 +382,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         if( !checkBoxSingleBestMatch.isSelected() ) {
             excludedClasses.add( MappingClass.SINGLE_BEST_MATCH );
         }
-        return new ParametersReadClasses( excludedClasses, this.minMappingQual, this.getSelectedStrandOption() );
+        return new ParametersReadClasses( excludedClasses, minMappingQual, getSelectedStrandOption() );
     }
 
 
@@ -393,8 +394,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         byte strandOption = Properties.STRAND_FEATURE;
         if( this.strandOppositeRadioButton.isSelected() ) {
             strandOption = Properties.STRAND_OPPOSITE;
-        }
-        else if( this.strandBothRadioButton.isSelected() ) {
+        } else if( this.strandBothRadioButton.isSelected() ) {
             strandOption = Properties.STRAND_BOTH;
         }
         return strandOption;
@@ -414,12 +414,12 @@ public class SelectReadClassVisualPanel extends JobPanel {
      */
     private void loadLastParameterSelection() {
         Preferences pref = NbPreferences.forModule( Object.class );
-        boolean isPerfectSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_PERFECT_SELECTED, "0" ).equals( "1" );
-        boolean isBestMatchSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_BEST_MATCH_SELECTED, "0" ).equals( "1" );
-        boolean isCommonMatchSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_COMMON_MATCH_SELECTED, "0" ).equals( "1" );
-        boolean isSinglePerfectSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_PERFECT_SELECTED, "1" ).equals( "1" );
-        boolean isSingleBestMatchSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_BEST_MATCH_SELECTED, "1" ).equals( "1" );
-        boolean isUniqueSelected = pref.get( wizardName + SelectReadClassWizardPanel.PROP_UNIQUE_SELECTED, "0" ).equals( "1" );
+        boolean isPerfectSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_PERFECT_SELECTED, false );
+        boolean isBestMatchSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_BEST_MATCH_SELECTED, false );
+        boolean isCommonMatchSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_COMMON_MATCH_SELECTED, false );
+        boolean isSinglePerfectSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_PERFECT_SELECTED, true );
+        boolean isSingleBestMatchSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_SINGLE_BEST_MATCH_SELECTED, true );
+        boolean isUniqueSelected = pref.getBoolean( wizardName + SelectReadClassWizardPanel.PROP_UNIQUE_SELECTED, false );
         String strandOption = pref.get( wizardName + SelectReadClassWizardPanel.PROP_STRAND_OPTION, String.valueOf( Properties.STRAND_FEATURE ) );
 
         this.checkBoxPerfect.setSelected( isPerfectSelected );

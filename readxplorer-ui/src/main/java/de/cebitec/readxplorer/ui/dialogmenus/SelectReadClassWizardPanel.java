@@ -21,9 +21,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -59,12 +57,12 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * read classes.
      * <p>
      * @param wizardName        the name of the wizard using this wizard panel.
-     *                          It will
-     *                          be used to store the selected settings for this wizard under a unique
-     *                          identifier.
+     *                          It will be used to store the selected settings
+     *                          for this wizard under a unique identifier.
      * @param isFeatureAnalysis <code>true</code> means the analysis runs on
-     *                          genomic features and should show appropriate texts. <code>false</code>
-     *                          means the analysis generally runs on both strands and should show
+     *                          genomic features and should show appropriate
+     *                          texts. <code>false</code> means the analysis
+     *                          generally runs on both strands and should show
      *                          appropriate texts for this case.
      */
     public SelectReadClassWizardPanel( String wizardName, boolean isFeatureAnalysis ) {
@@ -90,9 +88,9 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
-            ParametersReadClasses readClassParams = this.component.getReadClassParams();
+            ParametersReadClasses readClassParams = component.getReadClassParams();
             wiz.putProperty( getPropReadClassParams(), readClassParams );
-            this.storePrefs( readClassParams );
+            storePrefs( readClassParams );
         }
     }
 
@@ -104,23 +102,22 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * @param readClassParams The parameters to store
      */
     private void storePrefs( ParametersReadClasses readClassParams ) {
-        String isPerfectSelected = readClassParams.isClassificationAllowed( MappingClass.PERFECT_MATCH ) ? "1" : "0";
-        String isBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.BEST_MATCH ) ? "1" : "0";
-        String isCommonMatchSelected = readClassParams.isClassificationAllowed( MappingClass.COMMON_MATCH ) ? "1" : "0";
-        String isSinglePerfectSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_PERFECT_MATCH ) ? "1" : "0";
-        String isSingleBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_BEST_MATCH ) ? "1" : "0";
-        String isUniqueSelected = readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "0" : "1";
+        boolean isPerfectSelected = readClassParams.isClassificationAllowed( MappingClass.PERFECT_MATCH );
+        boolean isBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.BEST_MATCH );
+        boolean isCommonMatchSelected = readClassParams.isClassificationAllowed( MappingClass.COMMON_MATCH );
+        boolean isSinglePerfectSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_PERFECT_MATCH );
+        boolean isSingleBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_BEST_MATCH );
+        boolean isUniqueSelected = !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ );
         String minMappingQuality = String.valueOf( readClassParams.getMinMappingQual() );
         String strandOption = String.valueOf( readClassParams.getStrandOption() );
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( wizardName + PROP_PERFECT_SELECTED, isPerfectSelected );
-        pref.put( wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected );
-        pref.put( wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected );
-        pref.put( wizardName + PROP_SINGLE_PERFECT_SELECTED, isSinglePerfectSelected );
-        pref.put( wizardName + PROP_SINGLE_BEST_MATCH_SELECTED, isSingleBestMatchSelected );
-        pref.put( wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected );
-        pref.put( wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality );
-        pref.put( wizardName + PROP_STRAND_OPTION, strandOption );
+        getPref().putBoolean( wizardName + PROP_PERFECT_SELECTED, isPerfectSelected );
+        getPref().putBoolean( wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected );
+        getPref().putBoolean( wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected );
+        getPref().putBoolean( wizardName + PROP_SINGLE_PERFECT_SELECTED, isSinglePerfectSelected );
+        getPref().putBoolean( wizardName + PROP_SINGLE_BEST_MATCH_SELECTED, isSingleBestMatchSelected );
+        getPref().putBoolean( wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected );
+        getPref().put( wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality );
+        getPref().put( wizardName + PROP_STRAND_OPTION, strandOption );
     }
 
 
@@ -129,7 +126,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      *         corresponding wizard.
      */
     public String getPropReadClassParams() {
-        return this.wizardName + PROP_READ_CLASS_PARAMS;
+        return wizardName + PROP_READ_CLASS_PARAMS;
     }
 
 

@@ -79,7 +79,7 @@ public enum MappingClass implements Classification {
 
     /**
      * @return the string representation of the current read mapping
-     *         classification.
+     * classification.
      */
     @Override
     public String getTypeString() {
@@ -89,7 +89,7 @@ public enum MappingClass implements Classification {
 
     /**
      * @return the byte value of the type of the current read mapping
-     *         classification.
+     * classification.
      */
     @Override
     public int getTypeByte() {
@@ -99,7 +99,7 @@ public enum MappingClass implements Classification {
 
     /**
      * @return the string representation of the current read mapping
-     *         classification.
+     * classification.
      */
     @Override
     public String toString() {
@@ -109,11 +109,11 @@ public enum MappingClass implements Classification {
 
     /**
      * @return the desired MappingClass for a given byte of a valid
-     *         classification type.
+     * classification type.
      * <p>
      * @param type Type of MappingClass to return. If the type does not match a
-     *             classification type or is <code>null</code>, MappingClass.COMMON_MATCH is
-     *             returned.
+     * classification type or is <code>null</code>, MappingClass.COMMON_MATCH is
+     * returned.
      */
     public static MappingClass getFeatureType( Byte type ) {
         if( type == null ) {

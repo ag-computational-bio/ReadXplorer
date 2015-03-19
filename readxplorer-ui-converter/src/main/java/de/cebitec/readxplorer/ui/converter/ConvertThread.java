@@ -29,7 +29,7 @@ import org.openide.windows.InputOutput;
 
 /**
  * Thread carrying out the conversion of one file into another format.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ConvertThread extends Thread implements Observer {
@@ -56,8 +56,7 @@ public class ConvertThread extends Thread implements Observer {
         try {
             converter.convert();
             this.progressHandle.finish();
-        }
-        catch( Exception ex ) {
+        } catch( Exception ex ) {
             this.io.getOut().println( ex.toString() );
         }
     }
@@ -67,8 +66,7 @@ public class ConvertThread extends Thread implements Observer {
     public void update( Object data ) {
         if( data instanceof String && ((String) data).contains( "..." ) ) {
             this.progressHandle.progress( String.valueOf( data ) );
-        }
-        else {
+        } else {
             this.io.getOut().println( data.toString() );
             System.out.println( data.toString() );
         }

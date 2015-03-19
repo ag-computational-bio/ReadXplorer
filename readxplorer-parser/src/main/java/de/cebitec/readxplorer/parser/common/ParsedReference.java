@@ -18,10 +18,11 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -35,7 +36,7 @@ import java.util.List;
  */
 public class ParsedReference {
 
-//    public static String FINISHED = "ParsingFinished";
+    public static final String FINISHED = "ParsingFinished";
 
     private final List<ParsedChromosome> chromosomes;
     private String description;
@@ -98,7 +99,7 @@ public class ParsedReference {
 
     /**
      * @param filter The feature filter of this reference genome. It defines,
-     *               which feature types can be added to the reference and which are excluded.
+     * which feature types can be added to the reference and which are excluded.
      */
     public void setFeatureFilter( FeatureFilter filter ) {
         this.filter = filter;
@@ -107,7 +108,7 @@ public class ParsedReference {
 
     /**
      * @return The feature filter of this reference genome. It defines, which
-     *         feature types can be added to the reference and which are excluded.
+     * feature types can be added to the reference and which are excluded.
      */
     public FeatureFilter getFeatureFilter() {
         return filter;
@@ -160,7 +161,7 @@ public class ParsedReference {
      * @return The list of chromosomes for this reference.
      */
     public List<ParsedChromosome> getChromosomes() {
-        return chromosomes;
+        return Collections.unmodifiableList( chromosomes );
     }
 
 

@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.Map;
  * Container for all data belonging to a coverage analysis result. Also converts
  * a all data into the format readable for the ExcelExporter. Generates all
  * three, the sheet names, headers and data to write.
- *
+ * <p>
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -57,8 +57,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         String tableHeader;
         if( parameters.isDetectCoveredIntervals() ) {
             tableHeader = "Covered Intervals Table";
-        }
-        else {
+        } else {
             tableHeader = "Uncovered Intervals Table";
         }
         sheetNames.add( tableHeader );

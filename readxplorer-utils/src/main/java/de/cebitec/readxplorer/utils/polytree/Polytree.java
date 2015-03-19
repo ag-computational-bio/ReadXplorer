@@ -19,64 +19,57 @@ package de.cebitec.readxplorer.utils.polytree;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
 /**
  * *************************************************************************
- * Copyright (C) 2010 by Rolf Hilker *
- * rhilker a t cebitec.uni-bielefeld.de *
- *                                                                         *
- * This program is free software; you can redistribute it and/or modify *
- * it under the terms of the GNU General Public License as published by *
- * the Free Software Foundation; either version 2 of the License, or *
- * (at your option) any later version. *
- *                                                                         *
- * This program is distributed in the hope that it will be useful, *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the *
- * GNU General Public License for more details. *
- *                                                                         *
- * You should have received a copy of the GNU General Public License *
- * along with this program; if not, write to the *
- * Free Software Foundation, Inc., *
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. *
- **************************************************************************
+ * Copyright (C) 2010 by Rolf Hilker * rhilker a t cebitec.uni-bielefeld.de * *
+ * This program is free software; you can redistribute it and/or modify * it
+ * under the terms of the GNU General Public License as published by * the Free
+ * Software Foundation; either version 2 of the License, or * (at your option)
+ * any later version. * * This program is distributed in the hope that it will
+ * be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU General
+ * Public License for more details. * * You should have received a copy of the
+ * GNU General Public License * along with this program; if not, write to the *
+ * Free Software Foundation, Inc., * 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA. *
+ * *************************************************************************
  */
 /**
- * Defines a <tt>traversal</tt> on a <tt>polytree</tt>. Therefore it
- * defines a constructor to create a list of <tt>roots</tt>(which is a list of
- * <tt>nodes</tt>) to
- * create a <tt>tree</tt>-object. Keep in mind, that in a polytree nodes can be
- * visited multiple times during traversal. If a visitor wants to guarantee
- * visiting
- * each node only once, then the <tt>visited</tt> flag of a <tt>node</tt> can be
- * used.
+ * Defines a <tt>traversal</tt> on a <tt>polytree</tt>. Therefore it defines a
+ * constructor to create a list of <tt>roots</tt>(which is a list of
+ * <tt>nodes</tt>) to create a <tt>tree</tt>-object. Keep in mind, that in a
+ * polytree nodes can be visited multiple times during traversal. If a visitor
+ * wants to guarantee visiting each node only once, then the <tt>visited</tt>
+ * flag of a <tt>node</tt> can be used.
  * <p>
  * @author Rolf Hilker
  */
 public class Polytree implements Traversable { //, Cloneable {
 
-    private List<Node> roots;
+    private final List<Node> roots;
 
 
     /**
-     * Defines a <tt>traversal</tt> on a <tt>polytree</tt>. Therefore it
-     * defines a constructor to create a list of <tt>roots</tt>(which is a list
-     * of <tt>nodes</tt>) to create a <tt>tree</tt>-object. Keep in mind, that
-     * in a polytree nodes can be visited multiple times during traversal. If a
+     * Defines a <tt>traversal</tt> on a <tt>polytree</tt>. Therefore it defines
+     * a constructor to create a list of <tt>roots</tt>(which is a list of
+     * <tt>nodes</tt>) to create a <tt>tree</tt>-object. Keep in mind, that in a
+     * polytree nodes can be visited multiple times during traversal. If a
      * visitor wants to guarantee visiting each node only once, then the
      * <tt>visited</tt> flag of a <tt>node</tt> can be used.
      * <p>
      * @param roots the roots
      */
     public Polytree( final List<Node> roots ) {
-        if( roots == null ) {
-            this.roots = new ArrayList<>();
+
+        this.roots = new ArrayList<>();
+        if( roots != null ) {
+            this.roots.addAll( roots );
         }
-        else {
-            this.roots = roots;
-        }
+
     }
 
 
@@ -84,7 +77,7 @@ public class Polytree implements Traversable { //, Cloneable {
      * Constructor to create a <tt>polytree</tt>.
      */
     public Polytree() {
-        this.roots = new ArrayList<>();
+        roots = new ArrayList<>();
     }
 
 
@@ -92,7 +85,7 @@ public class Polytree implements Traversable { //, Cloneable {
      * Checks if the tree is empty.
      * <p>
      * @return <code>true</code> if parentTree is empty, <code>false</code>
-     *         otherwise.
+     * otherwise.
      */
     public boolean isTreeEmpty() {
         return this.roots.isEmpty();
@@ -105,7 +98,7 @@ public class Polytree implements Traversable { //, Cloneable {
      * @return the roots
      */
     public List<Node> getRoots() {
-        return this.roots;
+        return Collections.unmodifiableList( roots );
     }
 
 
@@ -115,7 +108,8 @@ public class Polytree implements Traversable { //, Cloneable {
      * @param roots the roots
      */
     public void setRoots( final List<Node> roots ) {
-        this.roots = roots;
+        this.roots.clear();
+        this.roots.addAll( roots );
     }
 
 

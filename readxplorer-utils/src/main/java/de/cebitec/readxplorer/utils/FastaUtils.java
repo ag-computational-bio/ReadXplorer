@@ -46,7 +46,8 @@ import org.openide.DialogDisplayer;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class FastaUtils implements Observable {
+public final class FastaUtils implements Observable {
+
 
     private final List<Observer> observers;
 
@@ -64,10 +65,9 @@ public class FastaUtils implements Observable {
      * not already exist.
      * <p>
      * @param fastaFileToIndex The fasta file for which an index shall be
-     *                         created, if it not existent already.
-     * @param observers        List of observers, which shall be updated in case
-     *                         of
-     *                         errors.
+     * created, if it not existent already.
+     * @param observers List of observers, which shall be updated in case of
+     * errors.
      */
     public void indexFasta( File fastaFileToIndex, List<Observer> observers ) {
         for( Observer observer : observers ) {
@@ -76,20 +76,17 @@ public class FastaUtils implements Observable {
 
         try {
             IndexedFastaSequenceFile fastaFile = new IndexedFastaSequenceFile( fastaFileToIndex );
-        }
-        catch( FileNotFoundException ex ) {
+        } catch( FileNotFoundException ex ) {
             try {
                 FastaIndexer indexer = new FastaIndexer();
                 List<FastaIndexEntry> sequences = indexer.createIndex( fastaFileToIndex.toPath() );
                 FastaIndexWriter idxWriter = new FastaIndexWriter();
                 Path indexFile = Paths.get( fastaFileToIndex.getAbsolutePath() + ".fai" );
                 idxWriter.writeIndex( indexFile, sequences );
-            }
-            catch( IOException | IllegalStateException e ) {
+            } catch( IOException | IllegalStateException e ) {
                 this.notifyObservers( e.getMessage() );
             }
-        }
-        catch( PicardException e ) {
+        } catch( PicardException e ) {
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + fastaFileToIndex.getAbsolutePath();
             JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
         }
@@ -122,33 +119,32 @@ public class FastaUtils implements Observable {
 
     /**
      * @param fastaFile A fasta file, which shall be checked for an existing
-     *                  index file.
+     * index file.
      * <p>
      * @return The indexed fasta file, if it could be created, null otherwise.
      */
     public IndexedFastaSequenceFile getIndexedFasta( File fastaFile ) {
+
         IndexedFastaSequenceFile indexedFasta = null;
         try {
             if( fastaFile.exists() && fastaFile.canRead() ) {
                 try {
                     indexedFasta = new IndexedFastaSequenceFile( fastaFile ); //Does only work, if index exists
-                }
-                catch( FileNotFoundException ex ) {
+                } catch( FileNotFoundException ex ) {
                     this.indexFasta( fastaFile, this.observers );
                     indexedFasta = this.getIndexedFasta( fastaFile );
                 }
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file is missing or cannot be read! Restore the reference fasta file!",
-                                               "File not found exception", JOptionPane.ERROR_MESSAGE );
+                        "File not found exception", JOptionPane.ERROR_MESSAGE );
             }
-        }
-        catch( NoSuchElementException ex ) { //can occur if the index file is corrupted
+        } catch( NoSuchElementException ex ) { //can occur if the index file is corrupted
             this.indexFasta( fastaFile, this.observers );
             indexedFasta = this.getIndexedFasta( fastaFile );
         }
 
         return indexedFasta;
+
     }
 
 
@@ -159,12 +155,13 @@ public class FastaUtils implements Observable {
      * @param fastaFile The fasta file to index
      */
     public void recreateMissingIndex( final File fastaFile ) {
+
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Fasta index missing, recreating it..." );
         progressHandle.start();
 
         final IndexFileNotificationPanel indexPanel = new IndexFileNotificationPanel();
         final JButton okButton = new JButton( "OK" );
-        DialogDescriptor dialogDescriptor = new DialogDescriptor( indexPanel, "Fasta index missing!", true, new JButton[]{ okButton }, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null );
+        okButton.setEnabled( false );
         Thread indexThread = new Thread( new Runnable() {
 
             @Override
@@ -177,8 +174,8 @@ public class FastaUtils implements Observable {
 
         } );
         indexThread.start();
+        DialogDescriptor dialogDescriptor = new DialogDescriptor( indexPanel, "Fasta index missing!", true, new JButton[]{okButton}, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null );
         Dialog indexDialog = DialogDisplayer.getDefault().createDialog( dialogDescriptor );
-        okButton.setEnabled( false );
         indexDialog.setVisible( true );
     }
 

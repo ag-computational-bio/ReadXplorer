@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.parser.Job;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
@@ -113,8 +113,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
                 trackJobs.add( tj );
             }
 
-        }
-        catch( OutOfMemoryError e ) {
+        } catch( OutOfMemoryError e ) {
             VisualisationUtils.displayOutOfMemoryError( this.component );
         }
 

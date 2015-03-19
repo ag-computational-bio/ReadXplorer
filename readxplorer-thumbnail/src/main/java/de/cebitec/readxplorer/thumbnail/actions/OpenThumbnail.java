@@ -20,13 +20,38 @@ package de.cebitec.readxplorer.thumbnail.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
+import org.openide.util.NbBundle;
 
-
+/**
+ * Action for opening a new thumbnail viewer.
+ * 
+ * @author denis, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
+@ActionID(
+        category = "Tools",
+        id = "de.cebitec.readxplorer.thumbnail.actions.OpenThumbnail"
+)
+@ActionRegistration( displayName = "#CTL_OpenThumbnail", 
+                    iconBase = "de/cebitec/readxplorer/thumbnail/thumbOpen.png" )
+@ActionReferences( {
+    @ActionReference( path = "Menu/Tools/Thumbnail", position = 100, separatorAfter = 160 ),
+    @ActionReference( path = "Toolbars/Tools", position = 400 )
+} )
+@NbBundle.Messages("CTL_OpenThumbnail=Create new Thumbnail View")
 public final class OpenThumbnail implements ActionListener {
 
     private final OpenThumbCookie openCookie;
 
 
+    /**
+     * Action for opening a new thumbnail viewer.
+     * 
+     * @param context 
+     */
     public OpenThumbnail( OpenThumbCookie context ) {
         this.openCookie = context;
     }

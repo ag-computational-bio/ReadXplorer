@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPair;
-import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPair;
+import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.PaintUtilities;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
@@ -50,22 +50,23 @@ import org.openide.util.NbBundle;
 
 /**
  * A BlockComponent represents one read pair and displays all mappings of the
- * pair in the currently shown interval of the genome.
- * TODO: think about overlaps in pairs: enlarge layer height!
+ * pair in the currently shown interval of the genome. TODO: think about
+ * overlaps in pairs: enlarge layer height!
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class BlockComponentPair extends JComponent implements ActionListener {
 
     private static final long serialVersionUID = 1324672345;
-    private static final float satAndBrightSubtrahend = 0.3f;
+    private static final float SAT_AND_BRIGHT_SUBTRAHEND = 0.3f;
 
     /*
-     * In order to be efficient this class holds its main information in 4 arraylists.
-     * Therefore it is important to check that the rectangles representing mappings,
-     * their corresponding colors and their mappingType are added in the SAME order
-     * to the lists, to have access to one mappings data via the same index in
-     * all three arrays. The line list is a bit independent, since it is always grey.
+     * In order to be efficient this class holds its main information in 4
+     * arraylists. Therefore it is important to check that the rectangles
+     * representing mappings, their corresponding colors and their mappingType
+     * are added in the SAME order to the lists, to have access to one mappings
+     * data via the same index in all three arrays. The line list is a bit
+     * independent, since it is always grey.
      */
 
     private final ArrayList<Rectangle> rectList = new ArrayList<>();
@@ -84,7 +85,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     private static final String COPY_TOOLTIP = NbBundle.getMessage( BlockComponentPair.class, "CopyAttention" );
     private JPopupMenu copyMenu = new JPopupMenu();
     private ReadPairPopup readPairPopup;
-    private static JMenuItem COPY_SEQUENCE_ITEM;
+    private static JMenuItem copySequenceItem;
 
 
     public BlockComponentPair( BlockPair block, final AbstractViewer parentViewer, int height, float minSaturationAndBrightness ) {
@@ -195,14 +196,12 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     public boolean inExclusionList( ReadPairType readPairType ) {
         List<Classification> excludedFeatureTypes = this.parentViewer.getExcludedClassifications();
         FeatureType typeOfPair;
-        if( readPairType == ReadPairType.PERFECT_PAIR
-            || readPairType == ReadPairType.PERFECT_UNQ_PAIR ) {
+        if( readPairType == ReadPairType.PERFECT_PAIR ||
+                 readPairType == ReadPairType.PERFECT_UNQ_PAIR ) {
             typeOfPair = FeatureType.PERFECT_PAIR;
-        }
-        else if( readPairType == ReadPairType.UNPAIRED_PAIR ) {
+        } else if( readPairType == ReadPairType.UNPAIRED_PAIR ) {
             typeOfPair = FeatureType.SINGLE_MAPPING;
-        }
-        else {
+        } else {
             typeOfPair = FeatureType.DISTORTED_PAIR;
         }
 
@@ -212,9 +211,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     /**
      * Determines the bounds of the rectangle representing the mapping and
-     * adjusts its color
-     * depending on the mapping type. Also paints the line for a read pair, if
-     * both mappings are visible.
+     * adjusts its color depending on the mapping type. Also paints the line for
+     * a read pair, if both mappings are visible.
      * <p>
      * @param pairColor basic color of the current read pair
      * @param mapping   mapping to create a colored rectangle for
@@ -232,8 +230,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
             int startCurMapping = blockRect.x;
             if( startMapping1 < startCurMapping ) {
                 this.lineList.add( new Line2D.Double( startMapping1 + prevRect.width, 2, startCurMapping - 1, 2 ) );
-            }
-            else { //endMapping2 < endMapping1
+            } else { //endMapping2 < endMapping1
 //                this.lineList.add(new Line2D.Double(rect.x - 1, 2, absStopMapping, 2));
                 this.lineList.add( new Line2D.Double( startCurMapping + blockRect.width, 2, startMapping1 - 1, 2 ) );
             }
@@ -255,12 +252,10 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         MappingClass mappingClass = mapping.getMappingClass();
         if( mappingClass == MappingClass.PERFECT_MATCH || mappingClass == MappingClass.SINGLE_PERFECT_MATCH ) {
             blockColor = Color.getHSBColor( hue, minSatAndBright, minSatAndBright );
-        }
-        else if( mappingClass == MappingClass.BEST_MATCH || mappingClass == MappingClass.SINGLE_BEST_MATCH ) {
-            blockColor = Color.getHSBColor( hue, minSatAndBright - satAndBrightSubtrahend, minSatAndBright - satAndBrightSubtrahend );
-        }
-        else {
-            blockColor = Color.getHSBColor( hue, minSatAndBright - satAndBrightSubtrahend * 2, minSatAndBright - satAndBrightSubtrahend * 2 );
+        } else if( mappingClass == MappingClass.BEST_MATCH || mappingClass == MappingClass.SINGLE_BEST_MATCH ) {
+            blockColor = Color.getHSBColor( hue, minSatAndBright - SAT_AND_BRIGHT_SUBTRAHEND, minSatAndBright - SAT_AND_BRIGHT_SUBTRAHEND );
+        } else {
+            blockColor = Color.getHSBColor( hue, minSatAndBright - SAT_AND_BRIGHT_SUBTRAHEND * 2, minSatAndBright - SAT_AND_BRIGHT_SUBTRAHEND * 2 );
         }
         return blockColor;
     }
@@ -271,7 +266,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * copying the sequence).
      */
     private void setPopupMenu() {
-        this.copyMenu.add( COPY_SEQUENCE_ITEM );
+        this.copyMenu.add( copySequenceItem );
     }
 
 
@@ -279,12 +274,12 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * Initialize this copy item only once for all instances.
      */
     private void initCopySeqItem() {
-        if( COPY_SEQUENCE_ITEM == null ) {
-            COPY_SEQUENCE_ITEM = new JMenuItem();
-            COPY_SEQUENCE_ITEM.addActionListener( this );
-            COPY_SEQUENCE_ITEM.setActionCommand( BlockComponentPair.COPY_SEQUENCE );
-            COPY_SEQUENCE_ITEM.setText( BlockComponentPair.COPY_SEQUENCE );
-            COPY_SEQUENCE_ITEM.setToolTipText( COPY_TOOLTIP );
+        if( copySequenceItem == null ) {
+            copySequenceItem = new JMenuItem();
+            copySequenceItem.addActionListener( this );
+            copySequenceItem.setActionCommand( BlockComponentPair.COPY_SEQUENCE );
+            copySequenceItem.setText( BlockComponentPair.COPY_SEQUENCE );
+            copySequenceItem.setToolTipText( COPY_TOOLTIP );
         }
     }
 
@@ -328,11 +323,9 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         ReadPairType type = readPair.getReadPairType();
         if( type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR ) {
             blockColor = ColorProperties.BLOCK_PERFECT;
-        }
-        else if( type == ReadPairType.UNPAIRED_PAIR ) {
+        } else if( type == ReadPairType.UNPAIRED_PAIR ) {
             blockColor = ColorProperties.BLOCK_UNPAIRED;
-        }
-        else {
+        } else {
             blockColor = ColorProperties.BLOCK_DIST_SMALL;
         }
         return blockColor;
@@ -383,8 +376,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
 
     /**
-     * Creates the popup displaying all information regarding this read pair
-     * and allowing to jump to the position of other mappings of the pair.
+     * Creates the popup displaying all information regarding this read pair and
+     * allowing to jump to the position of other mappings of the pair.
      */
     private void createPopup( MouseEvent e ) {
         String pairType = this.determineReadPairType( this.block );
@@ -405,8 +398,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
             List<ReadPair> readPairs = ((ReadPairGroup) block.getObjectWithId()).getReadPairs();
             if( readPairs.size() > 0 ) {
                 type = readPairs.get( 0 ).getReadPairType().getTypeString();
-            }
-            else {
+            } else {
                 type = ReadPairType.UNPAIRED_PAIR.getTypeString();
             }
         }
@@ -416,8 +408,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     /**
      * @return true, if this component contains rectangles to paint and thus is
-     *         paintable;
-     *         false otherwise.
+     *         paintable; false otherwise.
      */
     public boolean isPaintable() {
         return !this.rectList.isEmpty();

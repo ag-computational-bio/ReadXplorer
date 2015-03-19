@@ -22,11 +22,6 @@
             <artifactId>readxplorer-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.supercsv</groupId>
-            <artifactId>super-csv</artifactId>
-            <version>2.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
             <version>2.6</version>
@@ -57,16 +52,38 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.xerial.snappy</groupId>
-            <artifactId>snappy-java</artifactId>
-            <version>1.0.1-rc4</version>
-            <type>jar</type>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <configuration>
+                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
@@ -78,19 +95,13 @@
                         <publicPackage>de.cebitec.readxplorer.parser.mappings</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.parser.output</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.parser.reference</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.parser.reference.Filter</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.reference.filter</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.parser.tables</publicPackage>
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <useDefaultManifestFile>true</useDefaultManifestFile>
-                </configuration>
-            </plugin>
+
         </plugins>
     </build>
 

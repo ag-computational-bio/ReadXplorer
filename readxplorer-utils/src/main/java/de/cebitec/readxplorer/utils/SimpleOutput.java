@@ -19,17 +19,17 @@ package de.cebitec.readxplorer.utils;
 
 
 /**
- * This is a simple interface to define an abstract output for displaying
- * normal and error messages to the user
+ * This is a simple interface to define an abstract output for displaying normal
+ * and error messages to the user
  * <p>
  * @author Evgeny Anisiforov
  */
 public interface SimpleOutput {
 
-    public void showMessage( String s );
+    void showMessage( String s );
 
 
-    public void showError( String s );
+    void showError( String s );
 
 
 }

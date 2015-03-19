@@ -39,15 +39,15 @@ public interface Movie {
     /**
      * limit minimal zoom
      */
-    public final static int MIN_ZOOM = 25;
+    public static final int MIN_ZOOM = 25;
     /**
      * limit maximal zoom
      */
-    public final static int MAX_ZOOM = 400;
+    public static final int MAX_ZOOM = 400;
     /**
      * frames per millisecond
      */
-    public final static float FPMS = 0.009f;
+    public static final float FPMS = 0.009f;
 
 
     /**

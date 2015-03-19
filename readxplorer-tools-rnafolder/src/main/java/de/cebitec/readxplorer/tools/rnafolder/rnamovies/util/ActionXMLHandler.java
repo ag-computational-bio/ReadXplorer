@@ -38,7 +38,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class ActionXMLHandler implements ContentHandler {
 
-    private static final Logger log = Logger.getLogger( "ActionXMLHandler" );
+    private static final Logger LOG = Logger.getLogger( ActionXMLHandler.class.getName() );
 
     private JMenuBar jmb;
     private JToolBar jtb;
@@ -80,10 +80,10 @@ public class ActionXMLHandler implements ContentHandler {
         if( qName.equalsIgnoreCase( "menu" ) ) {
             name = atts.getValue( "name" );
             menuPath.push( new JMenu( name == null ? "Unnamed" : name ) );
-        }
-        else if( qName.equalsIgnoreCase( "separator" ) ) {
-            if( !menuPath.empty() )
+        } else if( qName.equalsIgnoreCase( "separator" ) ) {
+            if( !menuPath.empty() ) {
                 menuPath.peek().add( new JSeparator() );
+            }
         }
     }
 
@@ -99,16 +99,17 @@ public class ActionXMLHandler implements ContentHandler {
             JMenu menu = menuPath.pop();
 
             String mnemonic = atts.getValue( "mnemonic" );
-            if( mnemonic != null && mnemonic.length() > 0 )
+            if( mnemonic != null && mnemonic.length() > 0 ) {
                 menu.setMnemonic( mnemonic.charAt( 0 ) );
+            }
 
-            if( menuPath.empty() )
+            if( menuPath.empty() ) {
                 jmb.add( menu );
-            else
+            } else {
                 menuPath.peek().add( menu );
+            }
 
-        }
-        else if( qName.equalsIgnoreCase( "action" ) ) {
+        } else if( qName.equalsIgnoreCase( "action" ) ) {
 
             try {
                 Class<?> class_ = Class.forName( atts.getValue( "class" ) );
@@ -125,32 +126,28 @@ public class ActionXMLHandler implements ContentHandler {
                             int modifier = Integer.parseInt( atts.getValue( "modifier" ) );
                             KeyStroke accelerator = KeyStroke.getKeyStroke( key.charAt( 0 ), modifier );
                             item.setAccelerator( accelerator );
-                        }
-                        catch( NumberFormatException e ) {
-                            log.warning( e.getMessage().concat( " is not a valid int." ) );
+                        } catch( NumberFormatException e ) {
+                            LOG.warning( e.getMessage().concat( " is not a valid int." ) );
                         }
                     }
                     menuPath.peek().add( item );
                 }
 
                 String toolBar;
-                if( (toolBar = atts.getValue( "toolBar" )) != null
-                    && (Boolean.valueOf( toolBar ))
-                    && obj_ instanceof AbstractAction )
+                if( (toolBar = atts.getValue( "toolBar" )) != null &&
+                         (Boolean.valueOf( toolBar )) &&
+                         obj_ instanceof AbstractAction ) {
                     jtb.add( (Action) obj_ );
+                }
 
-            }
-            catch( NoSuchMethodException e ) {
-                log.warning( "Could not find Constructor: ".concat( e.getMessage() ) );
-            }
-            catch( InstantiationException e ) {
-                log.warning( "Could not instantiate: ".concat( e.getMessage() ) );
-            }
-            catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
-                log.warning( e.getMessage() );
-            }
-            catch( ClassNotFoundException e ) {
-                log.warning( "Could not find class: ".concat( e.getMessage() ) );
+            } catch( NoSuchMethodException e ) {
+                LOG.warning( "Could not find Constructor: ".concat( e.getMessage() ) );
+            } catch( InstantiationException e ) {
+                LOG.warning( "Could not instantiate: ".concat( e.getMessage() ) );
+            } catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
+                LOG.warning( e.getMessage() );
+            } catch( ClassNotFoundException e ) {
+                LOG.warning( "Could not find class: ".concat( e.getMessage() ) );
             }
         }
     }
@@ -164,14 +161,14 @@ public class ActionXMLHandler implements ContentHandler {
     @Override
     public void startDocument()
             throws SAXException {
-        log.info( "Loading actions..." );
+        LOG.info( "Loading actions..." );
     }
 
 
     @Override
     public void endDocument()
             throws SAXException {
-        log.info( "Actions successfully loaded." );
+        LOG.info( "Actions successfully loaded." );
     }
 
 

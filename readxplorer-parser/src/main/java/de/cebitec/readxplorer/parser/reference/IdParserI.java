@@ -41,7 +41,7 @@ public interface IdParserI extends Observable {
      * <p>
      * @throws ParsingException
      */
-    public List<String> getSequenceIds( File fileToParse ) throws ParsingException;
+    List<String> getSequenceIds( File fileToParse ) throws ParsingException;
 
 
 }

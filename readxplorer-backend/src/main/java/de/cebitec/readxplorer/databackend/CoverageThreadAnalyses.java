@@ -18,13 +18,15 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.Properties;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -35,6 +37,9 @@ import java.util.logging.Logger;
  * @author -Rolf Hilker-
  */
 public class CoverageThreadAnalyses extends CoverageThread {
+
+    private static final Logger LOG = getLogger( CoverageThreadAnalyses.class.getName() );
+
 
     /**
      * Thread for retrieving the coverage for a list of tracks from their
@@ -59,23 +64,19 @@ public class CoverageThreadAnalyses extends CoverageThread {
             if( request != null ) {
                 if( request.getDesiredData() == Properties.READ_STARTS ) {
                     currentCov = this.loadReadStartsAndCoverageMultiple( request );
-                }
-                else if( !currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() ) ) {
+                } else if( !currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() ) ) {
                     if( this.getTrackId2() != 0 ) {
                         currentCov = this.loadCoverageDouble( request ); //at the moment we only need the complete coverage here
-                    }
-                    else if( this.getTrackId() != 0 || this.canQueryCoverage() ) {
+                    } else if( this.getTrackId() != 0 || this.canQueryCoverage() ) {
                         currentCov = this.loadCoverageMultiple( request );
                     }
                 }
                 request.getSender().receiveData( currentCov );
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep( 10 );
-                }
-                catch( InterruptedException ex ) {
-                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
+                } catch( InterruptedException ex ) {
+                    LOG.log( Level.SEVERE, null, ex );
                 }
             }
 

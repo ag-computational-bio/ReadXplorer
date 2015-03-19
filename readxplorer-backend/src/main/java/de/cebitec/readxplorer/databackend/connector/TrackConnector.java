@@ -28,9 +28,9 @@ import de.cebitec.readxplorer.databackend.MappingThread;
 import de.cebitec.readxplorer.databackend.MappingThreadAnalyses;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SQLStatements;
-import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.io.File;
@@ -48,14 +48,14 @@ import java.util.logging.Logger;
 /**
  * A track connector for a single track. It handles all data requests for this
  * track.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class TrackConnector {
 
     private static final Logger LOG = Logger.getLogger( TrackConnector.class.getName() );
 
-    public static int FIXED_INTERVAL_LENGTH = 1000;
+    public static final int FIXED_INTERVAL_LENGTH = 1000;
 
     private int trackID;
     private CoverageThread coverageThread;
@@ -77,8 +77,8 @@ public class TrackConnector {
      */
     protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException {
 
-        this.associatedTracks = new ArrayList<>();
-        this.associatedTracks.add( track );
+        associatedTracks = new ArrayList<>();
+        associatedTracks.add( track );
         initTrackConnector( track.getId(), false );
 
     }
@@ -92,8 +92,7 @@ public class TrackConnector {
      * @param tracks        the list of tracks for which this connector is
      *                      created
      * @param combineTracks true, if the data of these tracks is to be combined,
-     *                      false if
-     *                      it should be kept separated
+     *                      false if it should be kept separated
      * <p>
      * @throws FileNotFoundException
      */
@@ -145,14 +144,14 @@ public class TrackConnector {
      */
     private void startDataThreads( final boolean combineTracks ) {
 
-       mappingThread = new MappingThread( associatedTracks );
-       coverageThread = new CoverageThread( associatedTracks, combineTracks );
-       mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks );
-       coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, combineTracks );
-       coverageThread.start();
-       coverageThreadAnalyses.start();
-       mappingThread.start();
-       mappingThreadAnalyses.start();
+        mappingThread = new MappingThread( associatedTracks );
+        coverageThread = new CoverageThread( associatedTracks, combineTracks );
+        mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks );
+        coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, combineTracks );
+        coverageThread.start();
+        coverageThreadAnalyses.start();
+        mappingThread.start();
+        mappingThreadAnalyses.start();
 
     }
 
@@ -163,10 +162,10 @@ public class TrackConnector {
      * over to the CoverageThread, who will carry out the request as soon as
      * possible. Afterwards the coverage result is handed over to the receiver.
      * (CAUTION:
-     * <br>1. Only the latest request is carried out completely by the
-     * thread. This means when scrolling while a request is in progress the
-     * current data is depleted and only data for the new request for the
-     * currently visible interval is carried out)
+     * <br>1. Only the latest request is carried out completely by the thread.
+     * This means when scrolling while a request is in progress the current data
+     * is depleted and only data for the new request for the currently visible
+     * interval is carried out)
      * <p>
      * @param request the coverage request including the receiving object
      */
@@ -203,7 +202,7 @@ public class TrackConnector {
      * thread. This means when scrolling while a request is in progress the
      * current data is depleted and only data for the new request for the
      * currently visible interval is carried out)
-     *
+     * <p>
      * @param request the mapping request including the receiving object
      */
     public void addMappingRequest( IntervalRequest request ) {
@@ -257,8 +256,7 @@ public class TrackConnector {
                 }
             }
 
-        }
-        catch( SQLException e ) {
+        } catch( SQLException e ) {
             LOG.log( Level.SEVERE, null, e );
         }
         return statsContainer;
@@ -312,8 +310,8 @@ public class TrackConnector {
 
 
     /**
-     * @return TODO: remove this method for encapsulation: hand data from here
-     *         to thread
+     * @return TODO remove this method for encapsulation: hand data from here to
+     *         thread
      */
     public CoverageThread getCoverageThread() {
         return coverageThread;
@@ -321,7 +319,7 @@ public class TrackConnector {
 
 
     public int getNumOfReadPairsCalculate() {
-        return -1; //TODO: implement read pair stats calculate
+        return -1; //TODO implement read pair stats calculate
     }
 
 
@@ -351,8 +349,8 @@ public class TrackConnector {
 
 
     /**
-     * @return The read pair id belonging to the track connectors track id
-     *         or <code>0</code> if this track is not a read pair track.
+     * @return The read pair id belonging to the track connectors track id or
+     *         <code>0</code> if this track is not a read pair track.
      */
     public Integer getReadPairToTrackID() {
         return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID );
@@ -370,8 +368,8 @@ public class TrackConnector {
     /**
      * @param readPairId the read pair id to get the second track id for
      * <p>
-     * @return the second track id of a read pair beyond this track
-     *         connectors track id
+     * @return the second track id of a read pair beyond this track connectors
+     *         track id
      */
     public int getTrackIdToReadPairId( final int readPairId ) {
 
@@ -385,8 +383,7 @@ public class TrackConnector {
                     num = rs.getInt( FieldNames.TRACK_ID );
                 }
             }
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
             LOG.log( Level.SEVERE, null, ex );
         }
 
@@ -423,8 +420,7 @@ public class TrackConnector {
                     }
                 }
 
-            }
-            catch( SQLException ex ) {
+            } catch( SQLException ex ) {
                 LOG.log( Level.SEVERE, null, ex );
             }
         }
@@ -466,9 +462,9 @@ public class TrackConnector {
      *                        analysis results
      * @param handlerTitle    title of the analysis handler
      * @param readClassParams The parameter set which contains all parameters
-     *                        concerning the usage of ReadXplorer's coverage classes and if only
-     *                        uniquely
-     *                        mapped reads shall be used, or all reads.
+     *                        concerning the usage of ReadXplorer's coverage
+     *                        classes and if only uniquely mapped reads shall be
+     *                        used, or all reads.
      * <p>
      * @return the configurable analysis handler
      */
@@ -478,7 +474,11 @@ public class TrackConnector {
     }
 
 
-    public File getTrackPath() {
+    /**
+     * @return The path of the main (first) file associated with this
+     *         TrackConnector.
+     */
+    public File getTrackFile() {
         return new File( associatedTracks.get( 0 ).getFilePath() );
     }
 

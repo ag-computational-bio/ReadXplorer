@@ -18,8 +18,10 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,7 +33,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Holds all the overlapping dataset between all analysis handlers.
- *
+ * <p>
  * @author kstaderm
  */
 public class DeAnalysisData {
@@ -40,7 +42,7 @@ public class DeAnalysisData {
      * Contains ID of the reference features as keys and corresponding feature
      * as values.
      */
-    private Map<String, PersistentFeature> featureData;
+    private final Map<String, PersistentFeature> featureData;
     /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
@@ -51,7 +53,7 @@ public class DeAnalysisData {
     /**
      * The tracks selected by the user to perform the analysis on.
      */
-    private List<PersistentTrack> selectedTracks;
+    private final List<PersistentTrack> selectedTracks;
     /**
      * Track Descriptions. Each description just appears one time.
      */
@@ -60,11 +62,13 @@ public class DeAnalysisData {
 
     /**
      * Creates a new instance of the DeAnalysisData class.
-     *
+     * <p>
      * @param capacity Number of selected tracks.
      */
     public DeAnalysisData( int capacity ) {
+        featureData = new LinkedHashMap<>();
         countData = new ArrayBlockingQueue<>( capacity );
+        selectedTracks = new ArrayList<>();
     }
 
 
@@ -72,7 +76,7 @@ public class DeAnalysisData {
      * Adds count data as an Integer array to a Queue holding all count data
      * necessary for the analysis. The data must be added in an ascending order
      * starting with the count data belonging to the track with the lowest ID.
-     *
+     * <p>
      * @param data count data
      */
     public void addCountDataForTrack( int[] data ) {
@@ -82,9 +86,10 @@ public class DeAnalysisData {
 
     /**
      * Return the first count data value on the Queue and removes it. So this
-     * method will give you back the cound data added bei the @see addCountDataForTrack() method.
-     * The count data added first will also be the first this method returns.
-     * 
+     * method will give you back the cound data added bei the @see
+     * addCountDataForTrack() method. The count data added first will also be
+     * the first this method returns.
+     * <p>
      * @return count data as int[]
      */
     public int[] pollFirstCountData() {
@@ -96,7 +101,7 @@ public class DeAnalysisData {
 
     /**
      * Checks if there is still count data on the Queue
-     *
+     * <p>
      * @return true if there is at least on count data on the Queue or false if
      *         it is empty.
      */
@@ -107,7 +112,7 @@ public class DeAnalysisData {
 
     /**
      * Return the start positions of the reference features.
-     *
+     * <p>
      * @return Start positions of the reference features.
      */
     public int[] getStart() {
@@ -123,7 +128,7 @@ public class DeAnalysisData {
 
     /**
      * Return the stop positions of the reference features.
-     *
+     * <p>
      * @return stop positions of the reference features.
      */
     public int[] getStop() {
@@ -139,7 +144,7 @@ public class DeAnalysisData {
 
     /**
      * Return the names of the reference features.
-     *
+     * <p>
      * @return Names of the reference features as an String Array.
      */
     public String[] getFeatureNames() {
@@ -167,11 +172,11 @@ public class DeAnalysisData {
 
     /**
      * Returns the tracks selected by the user to perform the analysis on.
-     *
+     * <p>
      * @return List of PersistentTrack containing the selected tracks.
      */
     public List<PersistentTrack> getSelectedTracks() {
-        return selectedTracks;
+        return Collections.unmodifiableList( selectedTracks );
     }
 
 
@@ -191,13 +196,12 @@ public class DeAnalysisData {
 
 
     public void setFeatures( List<PersistentFeature> features ) {
-        featureData = new LinkedHashMap<>();
+        featureData.clear();
         int counter = 1;
         for( PersistentFeature persistentFeature : features ) {
             if( featureData.containsKey( persistentFeature.getLocus() ) ) {
                 featureData.put( persistentFeature.getLocus() + "_DN_" + counter++, persistentFeature );
-            }
-            else {
+            } else {
                 featureData.put( persistentFeature.getLocus(), persistentFeature );
             }
         }
@@ -205,7 +209,8 @@ public class DeAnalysisData {
 
 
     public void setSelectedTracks( List<PersistentTrack> selectedTracks ) {
-        this.selectedTracks = selectedTracks;
+        this.selectedTracks.clear();
+        this.selectedTracks.addAll( selectedTracks );
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;
         for( PersistentTrack selectedTrack : selectedTracks ) {

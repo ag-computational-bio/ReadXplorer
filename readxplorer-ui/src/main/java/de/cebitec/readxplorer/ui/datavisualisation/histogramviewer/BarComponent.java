@@ -31,7 +31,7 @@ import javax.swing.JComponent;
  */
 public class BarComponent extends JComponent {
 
-    private final static long serialVersionUID = 38461064;
+    private static final long serialVersionUID = 38461064;
 
     private final int height;
     private final int width;

@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.ui.datamanagement;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -38,8 +39,8 @@ public class ReferenceView extends javax.swing.JPanel implements
         TableModelListener {
 
     private static final long serialVersionUID = 72465263;
-    private List<ReferenceJob> jobs;
-    private List<ReferenceJob> jobs2del;
+    private final List<ReferenceJob> jobs;
+    private final List<ReferenceJob> jobs2del;
     private Boolean hasCheckedJobs;
 
 
@@ -47,31 +48,39 @@ public class ReferenceView extends javax.swing.JPanel implements
      * Creates new form RefGenView
      */
     public ReferenceView() {
+
         initComponents();
         jobs = new ArrayList<>();
+        jobs2del = new ArrayList<>();
+
     }
 
 
     public void setReferenceJobs( List<ReferenceJob> refJobs ) {
-        this.jobs = refJobs;
+
+        this.jobs.clear();
+        jobs.addAll( refJobs );
+
         clearTableRows();
 
         DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         for( ReferenceJob referenceJob : refJobs ) {
             model.addRow( new Object[]{ false, referenceJob.getName(), referenceJob.getDescription(), referenceJob.getTimestamp() } );
         }
+
     }
 
 
     public List<ReferenceJob> getJobs2del() {
-        jobs2del = new ArrayList<>();
+
+        jobs2del.clear();
 
         for( int row = 0; row <= jobTable.getRowCount() - 1; row++ ) {
             if( (Boolean) jobTable.getValueAt( row, 0 ) ) {
                 jobs2del.add( jobs.get( row ) );
             }
         }
-        return jobs2del;
+        return Collections.unmodifiableList( jobs2del );
     }
 
 

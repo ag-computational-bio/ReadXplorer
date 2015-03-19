@@ -51,7 +51,7 @@ public class Unzip implements Runnable, Observable {
     }
 
 
-    public static class NoDirectoryException extends Exception {
+    public class NoDirectoryException extends Exception {
 
         private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class Unzip implements Runnable, Observable {
      * Utility class for unzipping a file.
      * <p>
      * @param zip zip file
-     * @param to  target file for the unzip process
+     * @param to target file for the unzip process
      * <p>
      * @throws de.cebitec.readxplorer.utils.Unzip.NoDirectoryException
      */
@@ -76,8 +76,7 @@ public class Unzip implements Runnable, Observable {
         this.zip = zip;
         if( to.isDirectory() ) {
             this.to = to;
-        }
-        else {
+        } else {
             throw new NoDirectoryException();
         }
     }
@@ -98,8 +97,7 @@ public class Unzip implements Runnable, Observable {
 
                         if( nextEntry.isDirectory() ) {
                             currentNewFile.mkdirs();
-                        }
-                        else {
+                        } else {
                             currentNewFile.getParentFile().mkdirs();
                             try( FileOutputStream fos = new FileOutputStream( currentNewFile ) ) {
                                 int length;
@@ -112,12 +110,10 @@ public class Unzip implements Runnable, Observable {
                     }
                     notifyObservers( Status.FINISHED );
                 }
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 notifyObservers( Status.FAILED );
             }
-        }
-        else {
+        } else {
             notifyObservers( Status.FILE_NOT_FOUND );
         }
     }

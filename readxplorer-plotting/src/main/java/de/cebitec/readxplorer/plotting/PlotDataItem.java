@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.plotting;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import java.awt.Paint;
 import org.jfree.data.xy.XYDataItem;
 

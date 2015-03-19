@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.referenceviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -31,35 +31,38 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 
+import static java.util.logging.Level.SEVERE;
+
 
 /**
  * Contains the content of a feature and takes care of the painting process.
  * Also contains its popup menu.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class JFeature extends JComponent {
 
+    private static final Logger LOG = Logger.getLogger( JFeature.class.getName() );
+
     private static final long serialVersionUID = 347348234;
-    private final PersistentFeature feature;
-    private final Dimension size;
     public static final int NORMAL_HEIGHT = 12;
     public static final int PARENT_FEATURE_HEIGHT = 8;
     public static final byte BORDER_NONE = 0;
     public static final byte BORDER_LEFT = -1;
     public static final byte BORDER_RIGHT = 1;
     public static final byte BORDER_BOTH = 2;
+    private final short border;
     private final int height;
     private final Font font;
+    private final PersistentFeature feature;
+    private final Dimension size;
     private Color color;
-    private final short border;
 
 
     /**
@@ -123,8 +126,7 @@ public class JFeature extends JComponent {
     public void setSelected( boolean selected ) {
         if( selected ) {
             color = ColorProperties.SELECTED_FEATURE;
-        }
-        else {
+        } else {
             color = this.determineColor( feature );
         }
         this.repaint();
@@ -144,8 +146,7 @@ public class JFeature extends JComponent {
             //paint border in feature color, if feature is larger than screen at that border
             g.setColor( color );
             this.overpaintBorder( g, 0, this.height - 1 );
-        }
-        else { //features with sub features have a smaller height
+        } else { //features with sub features have a smaller height
             g.fillRect( 0, (NORMAL_HEIGHT - PARENT_FEATURE_HEIGHT) / 2, this.getSize().width, PARENT_FEATURE_HEIGHT );
             g.setColor( ColorProperties.EXON_BORDER );
             g.drawRect( 0, (NORMAL_HEIGHT - PARENT_FEATURE_HEIGHT) / 2, this.getSize().width - 1, PARENT_FEATURE_HEIGHT - 1 );
@@ -215,60 +216,61 @@ public class JFeature extends JComponent {
     private Color determineColor( PersistentFeature feature ) {
         Color c;
 
-        if( feature.getType() == FeatureType.CDS ) {
-            c = ColorProperties.CDS;
-        }
-        else if( feature.getType() == FeatureType.MRNA ) {
-            c = ColorProperties.MRNA;
-        }
-        else if( feature.getType() == FeatureType.MISC_RNA ) {
-            c = ColorProperties.MISC_RNA;
-        }
-        else if( feature.getType() == FeatureType.REPEAT_UNIT ) {
-            c = ColorProperties.REPEAT_UNIT;
-        }
-        else if( feature.getType() == FeatureType.RRNA ) {
-            c = ColorProperties.RRNA;
-        }
-        else if( feature.getType() == FeatureType.SOURCE ) {
-            c = ColorProperties.SOURCE;
-        }
-        else if( feature.getType() == FeatureType.TRNA ) {
-            c = ColorProperties.TRNA;
-        }
-        else if( feature.getType() == FeatureType.GENE ) {
-            c = ColorProperties.GENE;
-        }
-        else if( feature.getType() == FeatureType.MIRNA ) {
-            c = ColorProperties.MI_RNA;
-        }
-        else if( feature.getType() == FeatureType.EXON ) {
-            c = ColorProperties.EXON;
-        }
-        else if( feature.getType() == FeatureType.UNDEFINED ) {
-            c = ColorProperties.UNDEF_FEATURE;
-        }
-        else if( feature.getType() == FeatureType.FIVE_UTR ) {
-            c = ColorProperties.FIVE_UTR;
-        }
-        else if( feature.getType() == FeatureType.THREE_UTR ) {
-            c = ColorProperties.THREE_UTR;
-        }
-        else if( feature.getType() == FeatureType.NC_RNA ) {
-            c = ColorProperties.NC_RNA;
-        }
-        else if( feature.getType() == FeatureType.RBS ) {
-            c = ColorProperties.RBS;
-        }
-        else if( feature.getType() == FeatureType.MINUS_THIRTYFIVE ) {
-            c = ColorProperties.MINUS_THIRTYFIVE;
-        }
-        else if( feature.getType() == FeatureType.MINUS_TEN ) {
-            c = ColorProperties.MINUS_TEN;
-        }
-        else {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "Found unknown type for feature {0}", feature.getType() );
-            c = ColorProperties.UNDEF_FEATURE;
+        switch( feature.getType() ) {
+            case CDS:
+                c = ColorProperties.CDS;
+                break;
+            case MRNA:
+                c = ColorProperties.MRNA;
+                break;
+            case MISC_RNA:
+                c = ColorProperties.MISC_RNA;
+                break;
+            case REPEAT_UNIT:
+                c = ColorProperties.REPEAT_UNIT;
+                break;
+            case RRNA:
+                c = ColorProperties.RRNA;
+                break;
+            case SOURCE:
+                c = ColorProperties.SOURCE;
+                break;
+            case TRNA:
+                c = ColorProperties.TRNA;
+                break;
+            case GENE:
+                c = ColorProperties.GENE;
+                break;
+            case MIRNA:
+                c = ColorProperties.MI_RNA;
+                break;
+            case EXON:
+                c = ColorProperties.EXON;
+                break;
+            case UNDEFINED:
+                c = ColorProperties.UNDEF_FEATURE;
+                break;
+            case FIVE_UTR:
+                c = ColorProperties.FIVE_UTR;
+                break;
+            case THREE_UTR:
+                c = ColorProperties.THREE_UTR;
+                break;
+            case NC_RNA:
+                c = ColorProperties.NC_RNA;
+                break;
+            case RBS:
+                c = ColorProperties.RBS;
+                break;
+            case MINUS_THIRTYFIVE:
+                c = ColorProperties.MINUS_THIRTYFIVE;
+                break;
+            case MINUS_TEN:
+                c = ColorProperties.MINUS_TEN;
+                break;
+            default:
+                LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
+                c = ColorProperties.UNDEF_FEATURE;
         }
 
         return c;
@@ -323,8 +325,11 @@ public class JFeature extends JComponent {
 
                     MenuItemFactory menuItemFactory = new MenuItemFactory();
 
-                    //add copy option
                     String selFeatureSequence = viewer.getReference().getActiveChromSequence( feature.getStart(), feature.getStop() );
+                    if( !feature.isFwdStrand() ) {
+                        selFeatureSequence = SequenceUtils.getReverseComplement( selFeatureSequence );
+                    }
+                    //add copy option
                     popUp.add( menuItemFactory.getCopyItem( selFeatureSequence ) );
                     //add copy translated feature sequence option
                     popUp.add( menuItemFactory.getCopyTranslatedItem( selFeatureSequence ) );

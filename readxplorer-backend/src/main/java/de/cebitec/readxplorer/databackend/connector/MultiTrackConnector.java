@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend.connector;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.io.FileNotFoundException;
 import java.util.List;
 

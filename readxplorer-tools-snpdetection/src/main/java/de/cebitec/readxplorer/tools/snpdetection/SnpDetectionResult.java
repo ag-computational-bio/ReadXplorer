@@ -20,11 +20,11 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readxplorer.databackend.dataObjects.CodonSnp;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.databackend.dataObjects.Snp;
-import de.cebitec.readxplorer.databackend.dataObjects.SnpI;
+import de.cebitec.readxplorer.databackend.dataobjects.CodonSnp;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.Snp;
+import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
@@ -59,7 +59,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     public SnpDetectionResult( List<SnpI> snpList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks,
                                int trackColumn, int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
-        this.snpList = snpList;
+        this.snpList = new ArrayList<>( snpList );
+        Collections.sort( this.snpList );
     }
 
 
@@ -67,7 +68,15 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * @return the list of snps found during the analysis step
      */
     public List<SnpI> getSnpList() {
-        return this.snpList;
+        return Collections.unmodifiableList( snpList );
+    }
+
+    /**
+     * Adds all new SNPs to the current list of SNPs stored in this result.
+     * @param newSnps The list of new SNPs to add
+     */
+    public void addAllSnps(List<SnpI> newSnps) {
+        snpList.addAll(newSnps);
     }
 
 
@@ -76,19 +85,19 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      */
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
+        List<List<List<Object>>> allData = new ArrayList<>();
+        List<List<Object>> snpExportData = new ArrayList<>();
 
-        List<List<List<Object>>> allData = new ArrayList<>( 2 );
-        List<List<Object>> snpExportData = new ArrayList<>( snpList.size() );
-        final String intergenic = "Intergenic";
+        String intergenic = "Intergenic";
 
         for( SnpI snpi : this.snpList ) {
-            List<Object> snpExport = new ArrayList<>( 25 );
+            List<Object> snpExport = new ArrayList<>();
             Snp snp = (Snp) snpi;
 
             snpExport.add( snp.getPosition() );
             snpExport.add( snp.getGapOrderIndex() );
-            snpExport.add( this.getTrackEntry( snp.getTrackId(), true ) );
-            snpExport.add( this.getChromosomeMap().get( snp.getChromId() ) );
+            snpExport.add( getTrackEntry( snp.getTrackId(), true ) );
+            snpExport.add( getChromosomeMap().get( snp.getChromId() ) );
             snpExport.add( snp.getBase() );
             snpExport.add( snp.getRefBase() );
             snpExport.add( snp.getARate() );
@@ -101,40 +110,39 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             snpExport.add( snp.getFrequency() );
             snpExport.add( snp.getType().getType() );
 
-            String aminoAcidsRef = "";
             String aminoAcidsSnp = "";
-            String codonsRef = "";
+            String aminoAcidsRef = "";
             String codonsSNP = "";
+            String codonsRef = "";
             String effect = "";
             String geneId = "";
             String locus = "";
             String ecNo = "";
             String product = "";
-
+            List<CodonSnp> codons;
             //determine amino acid substitutions among snp substitutions
             if( snp.getType() == SequenceComparison.SUBSTITUTION ) {
 
-                List<CodonSnp> codons = snp.getCodons();
+                codons = snp.getCodons();
+
                 if( codons.isEmpty() ) {
                     aminoAcidsSnp = intergenic;
                     aminoAcidsRef = intergenic;
                 }
 
                 for( CodonSnp codon : codons ) {
-                    char aminoRef = codon.getAminoRef();
-                    char aminoSnp = codon.getAminoSnp();
+                    char aminoSnp = codon.getAminoRef();
+                    char aminoRef = codon.getAminoSnp();
                     codonsRef += codon.getTripletRef() + "\n";
                     codonsSNP += codon.getTripletSnp() + "\n";
                     if( aminoRef != '-' ) {
                         aminoAcidsRef += aminoRef + " (" + AminoAcidProperties.getPropertyForAA( aminoRef ) + ")\n";
-                    }
-                    else {
+                    } else {
                         aminoAcidsRef += aminoRef + "\n";
                     }
                     if( aminoSnp != '-' ) {
                         aminoAcidsSnp += aminoSnp + " (" + AminoAcidProperties.getPropertyForAA( aminoSnp ) + ")\n";
-                    }
-                    else {
+                    } else {
                         aminoAcidsSnp += aminoSnp + "\n";
                     }
                     effect += codon.getEffect().getType() + "\n";
@@ -143,20 +151,17 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                     ecNo += codon.getFeature().getEcNumber() + "\n";
                     product += codon.getFeature().getProduct() + "\n";
                 }
-            }
-            else {
 
-                List<CodonSnp> codons = snp.getCodons();
+            } else {
+                codons = snp.getCodons();
                 if( !codons.isEmpty() ) {
                     if( snp.getType().equals( SequenceComparison.INSERTION ) ) {
                         effect = String.valueOf( SequenceComparison.INSERTION.getType() );
 
-                    }
-                    else if( snp.getType().equals( SequenceComparison.DELETION ) ) {
+                    } else if( snp.getType().equals( SequenceComparison.DELETION ) ) {
                         effect = String.valueOf( SequenceComparison.DELETION.getType() );
 
-                    }
-                    else if( snp.getType().equals( SequenceComparison.MATCH ) ) {
+                    } else if( snp.getType().equals( SequenceComparison.MATCH ) ) {
                         effect = String.valueOf( SequenceComparison.MATCH.getType() );
                     }
 
@@ -164,14 +169,14 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                         geneId += codon.getFeature() + "\n";
                         locus += codon.getFeature().getLocus() + "\n";
                         ecNo += codon.getFeature().getEcNumber() + "\n";
-                        ecNo += codon.getFeature().getProduct() + "\n";
+                        product += codon.getFeature().getProduct() + "\n";
                     }
                     codonsRef = "-";
                     codonsSNP = "-";
                     aminoAcidsRef = "-";
                     aminoAcidsSnp = "-";
-                }
-                else {
+
+                } else {
                     codonsRef = "-";
                     codonsSNP = "-";
                     aminoAcidsRef = intergenic;
@@ -202,9 +207,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         allData.add( snpExportData );
 
         //create statistics sheet
-        ParameterSetSNPs params = (ParameterSetSNPs) this.getParameters();
+        ParameterSetSNPs params = (ParameterSetSNPs) getParameters();
 
-        List<List<Object>> statisticsExportData = new ArrayList<>( 30 );
+        List<List<Object>> statisticsExportData = new ArrayList<>();
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "SNP detection for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
@@ -223,21 +228,21 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "SNP effect statistics:" ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_TOTAL ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_INTERGENEIC ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_SYNONYMOUS ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_STOPS ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_AA_INSERTIONS ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_AA_DELETIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_TOTAL ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_INTERGENEIC ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_SYNONYMOUS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_CHEMIC_NEUTRAL ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_CHEMIC_DIFF ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_STOPS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_AA_INSERTIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_AA_DELETIONS ) );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "SNP type statistics:" ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_INSERTIONS ) );
-        statisticsExportData.add( this.createStatisticTableRow( SNP_DetectionResultPanel.SNPS_DELETIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_SUBSTITUTIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_INSERTIONS ) );
+        statisticsExportData.add( createStatisticTableRow( SNPDetectionResultPanel.SNPS_DELETIONS ) );
 
         allData.add( statisticsExportData );
 
@@ -251,10 +256,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      */
     @Override
     public List<List<String>> dataColumnDescriptions() {
+        List<List<String>> dataColumnDescriptionsList = new ArrayList<>();
 
-        List<List<String>> dataColumnDescriptionsList = new ArrayList<>( 2 );
-
-        List<String> dataColumnDescriptions = new ArrayList<>( 25 );
+        List<String> dataColumnDescriptions = new ArrayList<>();
         dataColumnDescriptions.add( "Position" );
         dataColumnDescriptions.add( "Gap Index" );
         dataColumnDescriptions.add( "Track" );
@@ -280,11 +284,13 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         dataColumnDescriptions.add( "Feature Names" );
         dataColumnDescriptions.add( "Locus" );
         dataColumnDescriptions.add( "EC-Number" );
+        dataColumnDescriptions.add( "Product" );
 
         dataColumnDescriptionsList.add( dataColumnDescriptions );
 
         //add snp statistic sheet header
-        List<String> statisticColumnDescriptions = Collections.singletonList( "SNP detection parameter and statistics table" );
+        List<String> statisticColumnDescriptions = new ArrayList<>();
+        statisticColumnDescriptions.add( "SNP detection parameter and statistics table" );
         dataColumnDescriptionsList.add( statisticColumnDescriptions );
 
         return dataColumnDescriptionsList;
@@ -297,13 +303,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      */
     @Override
     public List<String> dataSheetNames() {
-
-        List<String> sheetNames = new ArrayList<>( 2 );
+        List<String> sheetNames = new ArrayList<>();
         sheetNames.add( "SNP Table" );
         sheetNames.add( "SNP Statistics" );
-
         return sheetNames;
-
     }
 
 

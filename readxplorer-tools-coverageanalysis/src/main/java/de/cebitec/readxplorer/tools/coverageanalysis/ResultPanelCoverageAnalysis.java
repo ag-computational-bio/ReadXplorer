@@ -18,21 +18,21 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -40,13 +40,12 @@ import javax.swing.table.TableRowSorter;
 
 /**
  * CoverageIntervalContainer panel for the coverage analysis. It displays the
- * table with
- * all covered or uncovered intervals of the reference.
+ * table with all covered or uncovered intervals of the reference.
  * <p>
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
+public class ResultPanelCoverageAnalysis extends ResultTablePanel {
 
     public static final String NUMBER_INTERVALS = "Total number of detected intervals";
     public static final String MEAN_INTERVAL_LENGTH = "Mean interval length";
@@ -60,8 +59,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
     /**
      * CoverageIntervalContainer panel for the coverage analysis. It displays
-     * the table
-     * with all covered or uncovered intervals of the reference.
+     * the table with all covered or uncovered intervals of the reference.
      */
     public ResultPanelCoverageAnalysis() {
         initComponents();
@@ -75,15 +73,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         this.coverageStatisticsMap.put( MEAN_INTERVAL_LENGTH, 0 );
         this.coverageStatisticsMap.put( MEAN_INTERVAL_COVERAGE, 0 );
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.coverageAnalysisTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim );
     }
 
 
@@ -212,34 +202,28 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
 
-    /**
-     * @param boundsInformationManager The bounds info manager to update, when
-     *                                 a result is clicked.
-     */
-    public void setBoundsInfoManager( BoundsInfoManager boundsInformationManager ) {
-        this.bim = boundsInformationManager;
-    }
+    @Override
+    public void addResult( ResultTrackAnalysis newResult ) {
 
+        tableFilter.setTrackMap( newResult.getTrackMap() );
 
-    /**
-     * Adds a list of covered or uncovered intervals to this panel.
-     * <p>
-     * @param coverageAnalysisResultNew the new result of intervals to add
-     */
-    public void addCoverageAnalysis( final CoverageAnalysisResult coverageAnalysisResultNew ) {
+        if( newResult instanceof CoverageAnalysisResult ) {
+            CoverageAnalysisResult coverageAnalysisResultNew = (CoverageAnalysisResult) newResult;
+            if( this.coverageAnalysisResult == null ) {
+                this.coverageAnalysisResult = coverageAnalysisResultNew;
+            } else {
+                CoverageIntervalContainer results = coverageAnalysisResult.getResults();
+                List<CoverageInterval> coverageIntervals = new ArrayList<>( results.getCoverageIntervals() );
+                List<CoverageInterval> coverageIntervalsRev = new ArrayList<>( results.getCoverageIntervalsRev() );
+                coverageIntervals.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervals() );
+                coverageIntervalsRev.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervalsRev() );
+                results.setIntervalsSumOrFwd( coverageIntervals );
+                results.setIntervalsRev( coverageIntervalsRev );
+            }
 
-        tableFilter.setTrackMap( coverageAnalysisResultNew.getTrackMap() );
-
-        if( this.coverageAnalysisResult == null ) {
-            this.coverageAnalysisResult = coverageAnalysisResultNew;
+            this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervals() );
+            this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervalsRev() );
         }
-        else {
-            this.coverageAnalysisResult.getResults().getCoverageIntervals().addAll( coverageAnalysisResultNew.getResults().getCoverageIntervals() );
-            this.coverageAnalysisResult.getResults().getCoverageIntervalsRev().addAll( coverageAnalysisResultNew.getResults().getCoverageIntervalsRev() );
-        }
-
-        this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervals() );
-        this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervalsRev() );
     }
 
 
@@ -295,26 +279,26 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
                                                                        parameters.getMinCoverageCount(), coverageCount, uncoveredIntervals ) );
     }
 
-
     /**
      * @return the number of covered or uncovered intervals during the
      *         associated analysis.
      */
-    public int getResultSize() {
+    @Override
+    public int getDataSize() {
         return coverageStatisticsMap.get( NUMBER_INTERVALS );
     }
 
 
     /**
-     * Retrieves the reference sequence of each interval in the result shown
-     * in this panel. A header describing the reference, chromosome and
-     * position is created and the reference sequence is appended in fasta
-     * format. Eventually, a StringFileChooser enables storing a file containing
-     * all interval sequences in mutliple fasta format.
+     * Retrieves the reference sequence of each interval in the result shown in
+     * this panel. A header describing the reference, chromosome and position is
+     * created and the reference sequence is appended in fasta format.
+     * Eventually, a StringFileChooser enables storing a file containing all
+     * interval sequences in mutliple fasta format.
      */
     private void exportSeqAsMultipleFasta() {
         StringBuilder results = new StringBuilder( 100 );
-        List<CoverageInterval> coverageIntervals = coverageAnalysisResult.getResults().getCoverageIntervals();
+        List<CoverageInterval> coverageIntervals = new ArrayList<>( coverageAnalysisResult.getResults().getCoverageIntervals() );
         coverageIntervals.addAll( coverageAnalysisResult.getResults().getCoverageIntervalsRev() );
         PersistentReference reference = coverageAnalysisResult.getReference();
         int start;
@@ -326,8 +310,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
                 start = coverageInterval.getStart();
                 stop = coverageInterval.getStop();
                 seq = reference.getChromSequence( chromId, start, stop );
-            }
-            else {
+            } else {
                 start = coverageInterval.getStop();
                 stop = coverageInterval.getStart();
                 seq = SequenceUtils.getReverseComplement( reference.getChromSequence( chromId, stop, start ) );

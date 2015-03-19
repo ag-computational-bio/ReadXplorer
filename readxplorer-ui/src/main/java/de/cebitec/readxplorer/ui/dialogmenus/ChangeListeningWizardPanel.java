@@ -23,17 +23,19 @@ import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbPreferences;
 
 
 /**
  * A wizard panel which is able to listen to changes with a property change
  * listener, which is added in the readSettings method. When firering the
- * ChangeListeningWizardPanel.PROP_VALIDATE property change with either true
- * or false, the listener either displays the given error message, or nothing.
+ * ChangeListeningWizardPanel.PROP_VALIDATE property change with either true or
+ * false, the listener either displays the given error message, or nothing.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -42,6 +44,7 @@ public abstract class ChangeListeningWizardPanel implements
 
     public static final String PROP_VALIDATE = "validated";
 
+    private final Preferences pref;
     private final ChangeSupport changeSupport;
     private boolean isValidated = true;
     private String errorMsg;
@@ -60,6 +63,7 @@ public abstract class ChangeListeningWizardPanel implements
     public ChangeListeningWizardPanel( String errorMsg ) {
         this.changeSupport = new ChangeSupport( this );
         this.errorMsg = errorMsg;
+        pref = NbPreferences.forModule( Object.class );
     }
 
 
@@ -120,8 +124,7 @@ public abstract class ChangeListeningWizardPanel implements
                 isValidated = (boolean) evt.getNewValue();
                 if( isValidated ) {
                     wiz.putProperty( WizardDescriptor.PROP_ERROR_MESSAGE, null );
-                }
-                else {
+                } else {
                     wiz.putProperty( WizardDescriptor.PROP_ERROR_MESSAGE, errorMsg );
                 }
                 changeSupport.fireChange();
@@ -144,6 +147,15 @@ public abstract class ChangeListeningWizardPanel implements
      */
     public void setErrorMsg( String errorMsg ) {
         this.errorMsg = errorMsg;
+    }
+
+
+    /**
+     * @return Get the preferences for Object.class to load and store
+     *         properties.
+     */
+    protected Preferences getPref() {
+        return pref;
     }
 
 

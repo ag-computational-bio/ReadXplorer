@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class Layout implements LayoutI {
         // gaps do extend the width of this layout
         // so absStop has to be decreased, to fit to old width
 
-        // count the number of gaps occuring in visible area
+        // count the number of gaps occurring in visible area
         int width = absStop - absStart + 1;
         int gapNo = 0; // count the number of gaps
         int widthCount = 0; // count the number of bases
@@ -97,7 +97,7 @@ public class Layout implements LayoutI {
         while( widthCount < width ) {
             int num = gapManager.getNumOfGapsAt( absStart + i ); // get the number of gaps at current position
             ++widthCount; // current position needs 1 base space in visual alignment
-            widthCount += num; // if gaps occured at current position, they need some space, too
+            widthCount += num; // if gaps occurred at current position, they need some space, too
             gapNo += num;
             ++i;
         }
@@ -123,16 +123,14 @@ public class Layout implements LayoutI {
                 if( mapping.getTrimmedFromLeft() > 0 ) {
                     if( mapping.isFwdStrand() ) {
                         start -= mapping.getTrimmedFromLeft();
-                    }
-                    else {
+                    } else {
                         stop += mapping.getTrimmedFromLeft();
                     }
                 }
                 if( mapping.getTrimmedFromRight() > 0 ) {
                     if( mapping.isFwdStrand() ) {
                         stop += mapping.getTrimmedFromRight();
-                    }
-                    else {
+                    } else {
                         start -= mapping.getTrimmedFromRight();
                     }
                 }
@@ -147,8 +145,7 @@ public class Layout implements LayoutI {
                 BlockI block = new Block( start, stop, mapping, gapManager );
                 if( mapping.isFwdStrand() ) {
                     forwardBlockContainer.addBlock( block );
-                }
-                else {
+                } else {
                     reverseBlockContainer.addBlock( block );
                 }
             }
@@ -159,8 +156,7 @@ public class Layout implements LayoutI {
 
     /**
      * Fills each single layer until all blocks were added from the block
-     * container
-     * to the layer list
+     * container to the layer list
      * <p>
      * @param layers list of layers to add the blocks to
      * @param blocks block container to add to layers
@@ -177,8 +173,7 @@ public class Layout implements LayoutI {
 
     /**
      * Fills a single layer with as many blocks as possible, while obeying to
-     * the
-     * rule, that the blocks in one layer are not allowed to overlap.
+     * the rule, that the blocks in one layer are not allowed to overlap.
      * <p>
      * @param l      single layer to fill with blocks
      * @param blocks block container

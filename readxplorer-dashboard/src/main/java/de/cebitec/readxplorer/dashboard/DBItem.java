@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.dashboard;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
 import java.util.Date;
 
@@ -136,10 +136,10 @@ public class DBItem extends StandardItem {
 
 
     /**
-     * @param RefID the unique Reference ID to set
+     * @param refID the unique Reference ID to set
      */
-    public void setRefID( Long RefID ) {
-        this.refID = RefID;
+    public void setRefID( Long refID ) {
+        this.refID = refID;
     }
 
 

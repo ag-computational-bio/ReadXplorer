@@ -31,24 +31,23 @@ import org.openide.windows.InputOutput;
 
 
 /**
- * MappingProcessor allows map a fasta file to a reference sequence
- * by using an external mapping script
- * The user will see a progress info.
+ * MappingProcessor allows map a fasta file to a reference sequence by using an
+ * external mapping script The user will see a progress info.
  * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MappingProcessor {
 
-    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
-    private final static Logger LOG = Logger.getLogger( MappingProcessor.class.getName() );
+    private static final Logger LOG = Logger.getLogger( MappingProcessor.class.getName() );
+
+    private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private RequestProcessor.Task theTask = null;
     private InputOutput io;
 
 
     /**
-     * If any message should be printed to the console, this method is used.
-     * If an error occured during the run of the parser, which does not
-     * interrupt
+     * If any message should be printed to the console, this method is used. If
+     * an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print
@@ -58,16 +57,16 @@ public class MappingProcessor {
     }
 
 
+    @NbBundle.Messages( "MappingProcessor.output.name=Mapper" )
     public MappingProcessor( final String referencePath, final String sourcePath, final String mappingParam ) {
-        this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( MappingProcessor.class, "MappingProcessor.output.name" ), true );
+        this.io = IOProvider.getDefault().getIO( Bundle.MappingProcessor_output_name(), true );
         this.io.setOutputVisible( true );
         this.io.getOut().println( "" );
 
         CentralLookup.getDefault().add( this );
         try {
             io.getOut().reset();
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             Exceptions.printStackTrace( ex );
         }
         io.select();
@@ -77,12 +76,11 @@ public class MappingProcessor {
 
             @Override
             public void run() {
-                
+
                 try {
                     String sam = MappingApi.mapFastaFile( new SimpleIO( io ), referencePath, sourcePath, mappingParam );
                     showMsg( "Extraction ready!" );
-                }
-                catch( IOException ex ) {
+                } catch( IOException ex ) {
                     Exceptions.printStackTrace( ex );
                 }
 

@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -46,22 +47,24 @@ public enum Brick {
     SKIPPED( Brick.SKIPPED_STRING ),
     TRIMMED( Brick.TRIMMED_STRING );
 
-    private final static String READGAP_STRING = "-";
-    private final static String FOREIGN_GENOMEGAP_STRING = "";
-    private final static String BASE_N_STRING = "N";
-    private final static String BASE_A_STRING = "A";
-    private final static String BASE_G_STRING = "G";
-    private final static String BASE_C_STRING = "C";
-    private final static String BASE_T_STRING = "T";
-    private final static String MATCH_STRING = "";
-    private final static String GENOME_GAP_N_STRING = "N";
-    private final static String GENOME_GAP_A_STRING = "A";
-    private final static String GENOME_GAP_G_STRING = "G";
-    private final static String GENOME_GAP_C_STRING = "C";
-    private final static String GENOME_GAP_T_STRING = "T";
-    private final static String UNDEF_STRING = "@";
-    private final static String SKIPPED_STRING = " ";
-    private final static String TRIMMED_STRING = "|";
+    private static final Logger LOG = Logger.getLogger( Brick.class.getName() );
+
+    private static final String READGAP_STRING = "-";
+    private static final String FOREIGN_GENOMEGAP_STRING = "";
+    private static final String BASE_N_STRING = "N";
+    private static final String BASE_A_STRING = "A";
+    private static final String BASE_G_STRING = "G";
+    private static final String BASE_C_STRING = "C";
+    private static final String BASE_T_STRING = "T";
+    private static final String MATCH_STRING = "";
+    private static final String GENOME_GAP_N_STRING = "N";
+    private static final String GENOME_GAP_A_STRING = "A";
+    private static final String GENOME_GAP_G_STRING = "G";
+    private static final String GENOME_GAP_C_STRING = "C";
+    private static final String GENOME_GAP_T_STRING = "T";
+    private static final String UNDEF_STRING = "@";
+    private static final String SKIPPED_STRING = " ";
+    private static final String TRIMMED_STRING = "|";
 
     private final String typeString;
 
@@ -100,7 +103,8 @@ public enum Brick {
      * <p>
      * @return The brick type of the diff
      */
-    public static Brick determineDiffType( char c ) {
+    public static Brick determineDiffType( final char c ) {
+
         Brick type;
         switch( c ) {
             case 'A':
@@ -132,9 +136,10 @@ public enum Brick {
                 break;
             default:
                 type = Brick.UNDEF;
-                Logger.getLogger( Brick.class.getName() ).log( Level.SEVERE, "found unknown brick type {0}", c );
+                LOG.log( SEVERE, "found unknown brick type {0}", c );
         }
         return type;
+
     }
 
 
@@ -145,7 +150,8 @@ public enum Brick {
      * <p>
      * @return The brick type of the gap
      */
-    public static Brick determineGapType( char c ) {
+    public static Brick determineGapType( final char c ) {
+
         Brick type;
         switch( c ) {
             case 'A':
@@ -165,9 +171,10 @@ public enum Brick {
                 break;
             default:
                 type = Brick.UNDEF;
-                Logger.getLogger( Brick.class.getName() ).log( Level.SEVERE, "found unknown brick type {0}", c );
+                LOG.log( SEVERE, "found unknown brick type {0}", c );
         }
         return type;
+
     }
 
 

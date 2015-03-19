@@ -66,7 +66,7 @@ public class Configuration {
 
 
     public Map<String, Category> getCategories() {
-        return categories;
+        return Collections.unmodifiableMap( categories );
     }
 
 

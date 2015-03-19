@@ -25,27 +25,28 @@ import de.cebitec.readxplorer.utils.ErrorLimit;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SamUtils;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import net.sf.samtools.BAMFileWriter;
 import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMSequenceDictionary;
 import net.sf.samtools.SAMSequenceRecord;
 import org.openide.util.NbBundle;
 
+import static java.util.regex.Pattern.compile;
+
 
 /**
  * Converts a jok file from Saruman into a bam file sorted by read start
- * positions
- * for a single reference chromosome.
+ * positions for a single reference chromosome.
  * <p>
  * @author -Rolf Hilker-
  */
@@ -57,9 +58,9 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
     private Integer refSeqLength;
     private File outputFile;
 
-    private static final String name = "Jok to BAM";
-    private static final String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
-    private static final String fileDescription = "Saruman Output (jok)";
+    private static final String NAME = "Jok to BAM";
+    private static final String[] FILE_EXTENSIONS = new String[]{ "out", "Jok", "jok", "JOK" };
+    private static final String FILE_DESCRIPTION = "Saruman Output (jok)";
     private final ArrayList<Observer> observers;
     private String msg;
     private final ErrorLimit errorLimit;
@@ -67,8 +68,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     /**
      * Converts a jok file from Saruman into a bam file sorted by read start
-     * positions
-     * for a single reference chromosome.
+     * positions for a single reference chromosome.
      */
     public JokToBamConverter() {
         this.observers = new ArrayList<>();
@@ -79,7 +79,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
     /**
      * A JokToBamConverter needs exactly the following three parameters:
      * <br>param1 jokFiles a list of jok files to convert into BAM format.
-     * <br>param2 refSeqName name of the single reference chromosome sequence
+     * <br>param2 refSeqName NAME of the single reference chromosome sequence
      * <br>param3 refSeqLength length of the single reference chromosome
      * sequence
      * <p>
@@ -92,24 +92,20 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
         if( data.length >= 3 ) {
             if( data[0] instanceof List ) {
                 this.jokFiles = (List<File>) data[0];
-            }
-            else {
+            } else {
                 works = false;
             }
             if( data[1] instanceof String ) {
                 this.refSeqName = (String) data[1];
-            }
-            else {
+            } else {
                 works = false;
             }
             if( data[2] instanceof Integer ) {
                 this.refSeqLength = (Integer) data[2];
-            }
-            else {
+            } else {
                 works = false;
             }
-        }
-        else {
+        } else {
             works = false;
         }
         if( !works ) {
@@ -155,30 +151,30 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 //                    int counter = 0;
 //                    int emtpy = 0;
                     String line;
+                    final Pattern tabPattern = compile( "\\t+", 8 );
                     while( (line = br.readLine()) != null ) {
                         lineNo++;
 
                         // tokenize input line
-                        final String[] tokens = line.split( "\\t+", 8 );
+                        final String[] tokens = tabPattern.split( line );
                         if( tokens.length == 7 ) { // if the length is not correct the read is not parsed
                             // cast tokens
-                            final String readName = tokens[0];
+                            final String readName = CommonsMappingParser.getReadNameWithoutPairTag( tokens[0] ).getSecond();
                             final int start;
                             final int stop;
                             try {
                                 start = Integer.parseInt( tokens[1] ) + 1;
-                                stop  = Integer.parseInt( tokens[2] ) + 1; // some people (no names here...) start counting at 0, I count genome position starting with 1
-                            }
-                            catch( NumberFormatException e ) { //
+                                stop = Integer.parseInt( tokens[2] ) + 1; // some people (no names here...) start counting at 0, I count genome position starting with 1
+                            } catch( NumberFormatException e ) { //
                                 if( !tokens[1].equals( "*" ) ) {
-                                    this.sendMsgIfAllowed( "Value for current start position in "
-                                                           + outFileName + " line " + lineNo + " is not a number or *. "
-                                                           + "Found start: " + tokens[1] );
+                                    this.sendMsgIfAllowed( "Value for current start position in " +
+                                             outFileName + " line " + lineNo + " is not a number or *. " +
+                                             "Found start: " + tokens[1] );
                                 }
                                 if( !tokens[2].equals( "*" ) ) {
-                                    this.sendMsgIfAllowed( "Value for current stop position in "
-                                                           + outFileName + " line " + lineNo + " is not a number or *. "
-                                                           + "Found stop: " + tokens[2] );
+                                    this.sendMsgIfAllowed( "Value for current stop position in " +
+                                             outFileName + " line " + lineNo + " is not a number or *. " +
+                                             "Found stop: " + tokens[2] );
                                 }
                                 continue; //*'s are ignored = unmapped read
                             }
@@ -186,10 +182,10 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             final byte direction;
                             switch( tokens[3] ) {
                                 case ">>":
-                                    direction = 1;
+                                    direction = SequenceUtils.STRAND_FWD;
                                     break;
                                 case "<<":
-                                    direction = -1;
+                                    direction = SequenceUtils.STRAND_REV;
                                     break;
                                 default:
                                     direction = 0;
@@ -230,19 +226,16 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             //                    samRecord.setFlags(stop); //other fields which could be set
                             //                    samRecord.setAttribute(tag, value);
                             //                    samRecord.setReferenceIndex(lineno);
-                            //                    samRecord.setBaseQualityString(name);
 
                             bamFileWriter.addAlignment( samRecord );
                             //                    samFileWriter.addAlignment(samRecord);
 
-                        }
-                        else {
+                        } else {
                             this.sendMsgIfAllowed( NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.MissingData", lineNo, line ) );
                         }
 
                         // Reads with an error already skip this part because of "continue" statements
-                        noReads++;
-                        if( noReads % 500000 == 0 ) {
+                        if( ++noReads % 500000 == 0 ) {
                             long finish = System.currentTimeMillis();
                             this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " reads converted..." ) );
                         }
@@ -250,20 +243,14 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                     }
                     bamFileWriter.close();
                 }
-                try( SAMFileReader samFileReader = new SAMFileReader( outputFile ) ) {
-                    samFileReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-                    SamUtils samUtils = new SamUtils();
-                    samUtils.registerObserver( this );
-                    success = samUtils.createIndex( samFileReader, new File( outputFile + Properties.BAM_INDEX_EXT ) );
-                }
+                success = SamUtils.createBamIndex( outputFile, this );
 
                 this.notifyObservers( "Converting track..." );
                 long finish = System.currentTimeMillis();
                 msg = NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.Finished", outFileName );
                 this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
-            }
-            catch( IOException ex ) {
+            } catch( IOException ex ) {
                 throw new ParsingException( ex );
             }
         }
@@ -274,8 +261,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     /**
      * Creates the cigar string (String of matches and mismatches: 8=2X3N ...)
-     * for
-     * a given read and reference sequence
+     * for a given read and reference sequence
      * <p>
      * @param readSeq read sequence
      * @param refSeq  reference sequence to which the read was mapped
@@ -289,25 +275,29 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
         int counter = 0;
         byte lastBase = 0;
 
-        /* 0 (M) = alignment match (both, match or mismatch), 1 (I) = insertion,
-         * 2 (D) = deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard clipped,
-         * 6 (P) = padding, 7 (=) = sequene match, 8 (X) = sequence mismatch */
+//        0 (M) = alignment match (both, match or mismatch),
+//        1 (I) = insertion,
+//        2 (D) = deletion,
+//        3 (N) = skipped,
+//        4 (S) = soft clipped,
+//        5 (H) = hard clipped,
+//        6 (P) = padding,
+//        7 (=) = sequene match,
+//        8 (X) = sequence mismatch
+
         for( int i = 0; i < readSeq.length(); i++ ) {
             byte currentBase;
             if( readSeq.charAt( i ) == refSeq.charAt( i ) ) { //match
                 currentBase = 7;
-            }
-            else {
+            } else {
                 if( refSeq.charAt( i ) != '_' ) { //a base in the genome, most frequent case
                     char base = readSeq.charAt( i );
                     if( base != '_' ) { //ACGT or N in the read as well
                         currentBase = 8;
-                    }
-                    else {//a gap in the read
+                    } else {//a gap in the read
                         currentBase = 2;
                     }
-                }
-                else {// a gap in genome
+                } else {// a gap in genome
                     currentBase = 1;
                 }
             }
@@ -316,7 +306,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                 cigarBuilder.append( counter ).append( this.getCigarOpChar( lastBase ) );
                 counter = 0;
             }
-            counter++;
+            ++counter;
             lastBase = currentBase;
         }
         //append cigar operations for last bases
@@ -328,12 +318,11 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     /**
      * Returns the sam format character representing the alignment value at the
-     * given base (cigar operation). The cigar values are as follows:
-     * 0 (M) = alignment match (both, match or mismatch), 1 (I) = insertion,
-     * 2 (D) = deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard
-     * clipped,
-     * 6 (P) = padding, 7 (=) = sequene match, 8 (X) = sequence mismatch.
-     * If the input value is not among 0-8 an 'N' (3) is returned.
+     * given base (cigar operation). The cigar values are as follows: 0 (M) =
+     * alignment match (both, match or mismatch), 1 (I) = insertion, 2 (D) =
+     * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard clipped, 6
+     * (P) = padding, 7 (=) = sequene match, 8 (X) = sequence mismatch. If the
+     * input value is not among 0-8 an 'N' (3) is returned.
      * <p>
      * @param cigarOp value of a cigar operation, whose char representation is
      *                needed
@@ -381,19 +370,19 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     @Override
     public String getInputFileDescription() {
-        return fileDescription;
+        return FILE_DESCRIPTION;
     }
 
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return FILE_EXTENSIONS;
     }
 
 
@@ -439,7 +428,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
     @Override
     public String toString() {
-        return name;
+        return NAME;
     }
 
 

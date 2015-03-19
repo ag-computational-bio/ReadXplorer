@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <actions>
-    <menu name="File" mnemonic="F">
+<!--    <menu name="File" mnemonic="F">
         <action class="de.unibi.bibiserv.rnamovies.actions.OpenAction"
                 key="O" modifier="2"
                 toolBar="true"/>
@@ -65,5 +65,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <action class="de.unibi.bibiserv.rnamovies.actions.About"
                 key="A" modifier="2"
                 toolBar="false"/>
-    </menu>
+    </menu>-->
 </actions>

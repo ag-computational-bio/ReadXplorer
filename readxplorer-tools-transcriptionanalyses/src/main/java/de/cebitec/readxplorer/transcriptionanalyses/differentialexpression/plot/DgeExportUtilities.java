@@ -23,7 +23,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,22 +30,30 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.NotificationDisplayer;
 
+import static java.util.logging.Level.WARNING;
+
 
 /**
  * Class containing utility methods for exporting differential gene expression
  * results.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class DgeExportUtilities {
+public final class DgeExportUtilities {
 
+    private static final Logger LOG = Logger.getLogger( DgeExportUtilities.class.getName() );
+
+
+    /**
+     * Instantiation not allowed.
+     */
     private DgeExportUtilities() {
     }
 
 
     /**
-     * Receives an updated update status and updates the corresponding
-     * progress handle and GUI components.
+     * Receives an updated update status and updates the corresponding progress
+     * handle and GUI components.
      * <p>
      * @param svgExportProgressHandle progress handle to update
      * @param status                  new export status
@@ -71,15 +78,16 @@ public class DgeExportUtilities {
                             svgExportProgressHandle.switchToDeterminate( 100 );
                             svgExportProgressHandle.finish();
                             break;
+                        default:
+                            LOG.info( "Encountered unknown analysis status." );
                     }
                 }
 
 
             } );
-        }
-        catch( InterruptedException | InvocationTargetException ex ) {
+        } catch( InterruptedException | InvocationTargetException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( status.getClass().getName() ).log( Level.WARNING, ex.getMessage(), currentTimestamp );
+            LOG.log( WARNING, ex.getMessage(), currentTimestamp );
         }
     }
 

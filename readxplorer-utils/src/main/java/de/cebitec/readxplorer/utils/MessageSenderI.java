@@ -30,7 +30,7 @@ public interface MessageSenderI {
      * <p>
      * @param msg the message to send
      */
-    public void sendMsgIfAllowed( String msg );
+    void sendMsgIfAllowed( String msg );
 
 
 }
