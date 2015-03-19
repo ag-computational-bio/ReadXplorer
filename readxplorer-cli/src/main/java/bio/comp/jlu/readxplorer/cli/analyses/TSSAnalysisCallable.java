@@ -28,14 +28,12 @@ import java.util.logging.Logger;
  */
 public class TSSAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( TSSAnalysisCallable.class.getName() );
+    private static final Logger LOG = Logger.getLogger( TSSAnalysisCallable.class.getName() );
 
 
     public TSSAnalysisCallable( boolean verbosity ) {
         super( verbosity );
     }
-
-
 
 
     @Override

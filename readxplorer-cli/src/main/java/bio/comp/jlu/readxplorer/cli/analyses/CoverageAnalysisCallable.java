@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class CoverageAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( CoverageAnalysisCallable.class.getName() );
+    private static final Logger LOG = Logger.getLogger( CoverageAnalysisCallable.class.getName() );
 
 
     public CoverageAnalysisCallable( boolean verbosity ) {
@@ -36,8 +36,6 @@ public class CoverageAnalysisCallable extends AnalysisCallable {
         super( verbosity );
 
     }
-
-
 
 
     @Override
@@ -49,5 +47,6 @@ public class CoverageAnalysisCallable extends AnalysisCallable {
         return null;
 
     }
+
 
 }

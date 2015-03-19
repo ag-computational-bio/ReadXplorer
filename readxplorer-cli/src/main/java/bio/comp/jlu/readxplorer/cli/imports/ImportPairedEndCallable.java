@@ -55,10 +55,8 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
 
     private static final Logger LOG = Logger.getLogger( ImportPairedEndCallable.class.getName() );
 
-    private final ImportReferenceResult  referenceResult;
+    private final ImportReferenceResult referenceResult;
     private final ReadPairJobContainer rpjc;
-
-
 
 
     public ImportPairedEndCallable( ImportReferenceResult referenceResult, ReadPairJobContainer rpjc ) {
@@ -69,28 +67,20 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
     }
 
 
-
-
     @Override
     public ImportPairedEndResults call() throws CommandException {
 
         try {
 
             /**
-             * Algorithm:
-             * start file
-             * if (PersistentTrack not yet imported) {
-             *      convert file 1 to sam/bam, if necessary
-             *      if (isTwoTracks) {
-             *          convert file 2 to sam/bam, if necessary
-             *          combine them unsorted (NEW FILE)
-             *      }
-             *      sort by readseq (NEW FILE) - if isTwoTracks: deleteOldFile
-             *      parse mappings
-             *      sort by read name (NEW FILE) - deleteOldFile
-             *      read pair classification, extension & sorting by coordinate - deleteOldFile
-             * }
-             * create position table (advantage: is already sorted by coordinate & classification in file)
+             * Algorithm: start file if (PersistentTrack not yet imported) {
+             * convert file 1 to sam/bam, if necessary if (isTwoTracks) {
+             * convert file 2 to sam/bam, if necessary combine them unsorted
+             * (NEW FILE) } sort by readseq (NEW FILE) - if isTwoTracks:
+             * deleteOldFile parse mappings sort by read name (NEW FILE) -
+             * deleteOldFile read pair classification, extension & sorting by
+             * coordinate - deleteOldFile } create position table (advantage: is
+             * already sorted by coordinate & classification in file)
              */
 
             final ImportPairedEndResults iper = new ImportPairedEndResults();
@@ -103,10 +93,10 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
             }
 
             final File inputFile1 = trackJob1.getFile();
-                inputFile1.setReadOnly(); // prevents changes or deletion of original file!
+            inputFile1.setReadOnly(); // prevents changes or deletion of original file!
             final StatsContainer statsContainer = new StatsContainer();
-                statsContainer.prepareForTrack();
-                statsContainer.prepareForReadPairTrack();
+            statsContainer.prepareForTrack();
+            statsContainer.prepareForReadPairTrack();
 
             try {
                 // executes any conversion before other calculations, if the parser supports any
@@ -140,14 +130,13 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
 
                 // extension for both classification and read pair info
                 SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier( rpjc, chromLengthMap );
-                    samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
-                    samBamDirectReadPairClassifier.classifyReadPairs();
+                samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
+                samBamDirectReadPairClassifier.classifyReadPairs();
 
                 // delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
                 GeneralUtils.deleteOldWorkFile( lastWorkFile );
 
-            }
-            catch( OutOfMemoryError | ParsingException ex ) {
+            } catch( OutOfMemoryError | ParsingException ex ) {
                 LOG.log( SEVERE, "Error during parsing of bam track!", ex );
                 return null;
             }
@@ -155,23 +144,20 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
 
             // create general track stats
             SamBamStatsParser statsParser = new SamBamStatsParser();
-                statsParser.setStatsContainer( statsContainer );
+            statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
             iper.setParsedTrack( track );
 
             return iper;
 
-        }
-        catch( IOException | OutOfMemoryError ex ) {
+        } catch( IOException | OutOfMemoryError ex ) {
             LOG.log( Level.SEVERE, null, ex );
             CommandException ce = new CommandException( 1, "import failed!" );
-                ce.initCause( ex );
+            ce.initCause( ex );
             throw ce;
         }
 
     }
-
-
 
 
     public class ImportPairedEndResults {
@@ -184,21 +170,26 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
             this.output = new ArrayList<>( 10 );
         }
 
+
         void addOutput( String msg ) {
             output.add( msg );
         }
+
 
         public List<String> getOutput() {
             return Collections.unmodifiableList( output );
         }
 
+
         void setParsedTrack( ParsedTrack pr ) {
             this.pt = pr;
         }
 
+
         public ParsedTrack getParsedTrack() {
             return pt;
         }
+
 
     }
 

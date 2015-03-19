@@ -28,14 +28,12 @@ import java.util.logging.Logger;
  */
 public class SNPAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( SNPAnalysisCallable.class.getName() );
+    private static final Logger LOG = Logger.getLogger( SNPAnalysisCallable.class.getName() );
 
 
     public SNPAnalysisCallable( boolean verbosity ) {
         super( verbosity );
     }
-
-
 
 
     @Override

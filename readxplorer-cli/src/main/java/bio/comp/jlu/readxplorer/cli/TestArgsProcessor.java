@@ -38,6 +38,7 @@ public final class TestArgsProcessor implements ArgsProcessor {
 
     private static final Logger LOG = Logger.getLogger( TestArgsProcessor.class.getName() );
 
+
     static {
         LOG.setLevel( Level.ALL );
     }
@@ -61,7 +62,7 @@ public final class TestArgsProcessor implements ArgsProcessor {
         LOG.log( Level.INFO, "trigger Test processor" );
 
         final PrintStream ps = env.getOutputStream();
-            ps.println( "trigger " + getClass().getName() );
+        ps.println( "trigger " + getClass().getName() );
 
 
         LOG.config( "verbose=" + Boolean.toString( verboseArg ) );
@@ -72,7 +73,7 @@ public final class TestArgsProcessor implements ArgsProcessor {
         try {
 
             ProjectConnector pc = ProjectConnector.getInstance();
-                pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
+            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
             LOG.log( Level.FINE, "connected to {0}", dbFileArg );
             ps.println( "connected to " + dbFileArg );
 
@@ -80,7 +81,7 @@ public final class TestArgsProcessor implements ArgsProcessor {
             LOG.fine( "read reference genomes..." );
             List<PersistentReference> refGenomes = pc.getGenomes();
             LOG.fine( "# reference genomes: " + refGenomes.size() );
-            for( PersistentReference refGenome : refGenomes) {
+            for( PersistentReference refGenome : refGenomes ) {
 
                 ps.println( "ref genome: " + refGenome.getId() );
                 LOG.log( Level.FINE, "ref genome: {0}", refGenome.getId() );
@@ -117,15 +118,15 @@ public final class TestArgsProcessor implements ArgsProcessor {
             ps.println( "disconnected from " + dbFileArg );
             LOG.log( Level.FINE, "disconnected from {0}", dbFileArg );
 
-        }
-        catch( SQLException ex ) {
+        } catch( SQLException ex ) {
 
             CommandException ce = new CommandException( 1 );
-                ce.initCause( ex );
+            ce.initCause( ex );
             throw ce;
 
         }
 
     }
+
 
 }

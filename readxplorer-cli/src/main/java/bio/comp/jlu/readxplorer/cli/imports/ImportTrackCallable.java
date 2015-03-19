@@ -51,10 +51,8 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
     private static final Logger LOG = Logger.getLogger( ImportTrackCallable.class.getName() );
 
-    private final ImportReferenceResult  referenceResult;
+    private final ImportReferenceResult referenceResult;
     private final TrackJob trackJob;
-
-
 
 
     public ImportTrackCallable( ImportReferenceResult referenceResult, TrackJob trackJob ) {
@@ -63,8 +61,6 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
         this.trackJob = trackJob;
 
     }
-
-
 
 
     @Override
@@ -81,7 +77,7 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
                 chromLengthMap.put( chrom.getName(), chrom.getLength() );
             }
             final StatsContainer statsContainer = new StatsContainer();
-                statsContainer.prepareForTrack();
+            statsContainer.prepareForTrack();
 
 
             // parse track file
@@ -102,7 +98,7 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
             //file needs to be sorted by coordinate for efficient calculation
             SamBamStatsParser statsParser = new SamBamStatsParser();
-                statsParser.setStatsContainer( statsContainer );
+            statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
 
             LOG.log( Level.FINE, "parsed track file: {0}", trackFile.getName() );
@@ -113,17 +109,14 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
             return result;
 
-        }
-        catch( ParsingException | IOException | OutOfMemoryError ex ) {
+        } catch( ParsingException | IOException | OutOfMemoryError ex ) {
             LOG.log( Level.SEVERE, null, ex );
             CommandException ce = new CommandException( 1, "import failed!" );
-                ce.initCause( ex );
+            ce.initCause( ex );
             throw ce;
         }
 
     }
-
-
 
 
     public class ImportTrackResults {
@@ -136,21 +129,26 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             this.output = new ArrayList<>( 10 );
         }
 
+
         void addOutput( String msg ) {
             output.add( msg );
         }
+
 
         public List<String> getOutput() {
             return Collections.unmodifiableList( output );
         }
 
+
         void setParsedTrack( ParsedTrack pr ) {
             this.pt = pr;
         }
 
+
         public ParsedTrack getParsedTrack() {
             return pt;
         }
+
 
     }
 

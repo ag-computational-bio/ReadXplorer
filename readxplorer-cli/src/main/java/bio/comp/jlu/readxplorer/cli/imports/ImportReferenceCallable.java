@@ -41,9 +41,9 @@ import org.netbeans.api.sendopts.CommandException;
 
 
 /**
- * The <code>ImportReferenceCallable</code> class is responsible for the
- * import of a reference genome in the cli version.
- *
+ * The <code>ImportReferenceCallable</code> class is responsible for the import
+ * of a reference genome in the cli version.
+ * <p>
  * The following options are available:
  * <p>
  * Mandatory:
@@ -56,9 +56,8 @@ import org.netbeans.api.sendopts.CommandException;
  * <lu>-d / --descriptions: reference genome descriptions</lu>
  * </li>
  *
- * Optional:
- * -v / --verbose: print information during import process
- *
+ * Optional: -v / --verbose: print information during import process
+ * <p>
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
 public final class ImportReferenceCallable implements Callable<ImportReferenceResult> {
@@ -68,15 +67,11 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
     private final File referenceFile;
 
 
-
-
     public ImportReferenceCallable( File referenceFile ) {
 
         this.referenceFile = referenceFile;
 
     }
-
-
 
 
     @Override
@@ -87,14 +82,14 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             // create necessary (mockup) objects
             final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) ) );
             final ReferenceJob referenceJob = new ReferenceJob( 0, referenceFile, refParser,
-                "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
+                                                                "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
             final ImportReferenceResult result = new ImportReferenceResult();
-                result.setReferenceJob( referenceJob );
+            result.setReferenceJob( referenceJob );
 
             // parse reference genome
             LOG.log( Level.FINE, "parsing reference file: {0}...", referenceFile.getName() );
             FeatureFilter filter = new FeatureFilter();
-                filter.addBlacklistRule( new FilterRuleSource() );
+            filter.addBlacklistRule( new FilterRuleSource() );
             ParsedReference parsedRefGenome = refParser.parseReference( referenceJob, filter );
             result.setParsedReference( parsedRefGenome );
             LOG.log( Level.FINE, "parsed reference file: {0}", referenceFile.getName() );
@@ -102,17 +97,15 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
 
             return result;
 
-        }
-        catch( ParsingException ex ) {
+        } catch( ParsingException ex ) {
             LOG.log( Level.SEVERE, null, ex );
             CommandException ce = new CommandException( 1, "import failed!" );
-                ce.initCause( ex );
+            ce.initCause( ex );
             throw ce;
-        }
-        catch( OutOfMemoryError ex ) {
+        } catch( OutOfMemoryError ex ) {
             LOG.log( Level.SEVERE, null, ex );
             CommandException ce = new CommandException( 1, "out of memory!" );
-                ce.initCause( ex );
+            ce.initCause( ex );
             throw ce;
         }
 
@@ -139,20 +132,16 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
     }
 
 
-
-
     public class ImportReferenceResult {
 
         private final List<String> output;
-        private ReferenceJob    rj;
+        private ReferenceJob rj;
         private ParsedReference pr;
 
 
         ImportReferenceResult() {
             this.output = new ArrayList<>( 10 );
         }
-
-
 
 
         void addOutput( String msg ) {
@@ -165,8 +154,6 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
         }
 
 
-
-
         void setReferenceJob( ReferenceJob rj ) {
             this.rj = rj;
         }
@@ -177,8 +164,6 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
         }
 
 
-
-
         void setParsedReference( ParsedReference pr ) {
             this.pr = pr;
         }
@@ -187,6 +172,7 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
         public ParsedReference getParsedReference() {
             return pr;
         }
+
 
     }
 

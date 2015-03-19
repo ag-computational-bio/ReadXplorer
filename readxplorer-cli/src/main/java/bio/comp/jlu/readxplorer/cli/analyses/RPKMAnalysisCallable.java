@@ -28,14 +28,12 @@ import java.util.logging.Logger;
  */
 public class RPKMAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( RPKMAnalysisCallable.class.getName() );
+    private static final Logger LOG = Logger.getLogger( RPKMAnalysisCallable.class.getName() );
 
 
     public RPKMAnalysisCallable( boolean verbosity ) {
         super( verbosity );
     }
-
-
 
 
     @Override

@@ -28,14 +28,12 @@ import java.util.logging.Logger;
  */
 public class OperonDetectionAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( OperonDetectionAnalysisCallable.class.getName() );
+    private static final Logger LOG = Logger.getLogger( OperonDetectionAnalysisCallable.class.getName() );
 
 
     public OperonDetectionAnalysisCallable( boolean verbosity ) {
         super( verbosity );
     }
-
-
 
 
     @Override
