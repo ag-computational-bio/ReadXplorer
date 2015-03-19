@@ -77,31 +77,31 @@ public class GASVMainWizardPanel extends ChangeListeningWizardPanel {
 //        if( wiz.getProperty( PROP_GASV_MAIN_PARAMS ) != null ) {
 //            component.setLastParameterSelection( (ParametersGASVMain) wiz.getProperty( PROP_GASV_MAIN_PARAMS ) );
 //        } else {
-            int minClusterSize = getPref().getInt( PROP_MIN_CLUSTER_SIZE, 30 );
-            int maxClusterSize = getPref().getInt( PROP_MAX_CLUSTER_SIZE, 0 );
-            int maxCliqueSize = getPref().getInt( PROP_MAX_CLIQUE_SIZE, 0 );
-            int maxReadPairs = getPref().getInt( PROP_MAX_READ_PAIRS, 0 );
-            String outputType = getPref().get( PROP_OUTPUT_TYPE, ParametersGASVMain.OUT_STANDARD );
-            boolean isMaxSubClusters = getPref().getBoolean( PROP_IS_MAX_SUB_CLUSTERS, false );
-            boolean isNonreciprocal = getPref().getBoolean( PROP_IS_NONRECIPROCAL, false );
-            boolean isHeaderless = getPref().getBoolean( PROP_IS_HEADERLESS, false );
-            boolean isFaster = getPref().getBoolean( PROP_IS_FASTER, false );
-            boolean isVerbose = getPref().getBoolean( PROP_IS_VERBOSE, false );
-            boolean isDebug = getPref().getBoolean( PROP_IS_DEBUG, false );
+        int minClusterSize = getPref().getInt( PROP_MIN_CLUSTER_SIZE, 30 );
+        int maxClusterSize = getPref().getInt( PROP_MAX_CLUSTER_SIZE, 0 );
+        int maxCliqueSize = getPref().getInt( PROP_MAX_CLIQUE_SIZE, 0 );
+        int maxReadPairs = getPref().getInt( PROP_MAX_READ_PAIRS, 0 );
+        String outputType = getPref().get( PROP_OUTPUT_TYPE, ParametersGASVMain.OUT_STANDARD );
+        boolean isMaxSubClusters = getPref().getBoolean( PROP_IS_MAX_SUB_CLUSTERS, false );
+        boolean isNonreciprocal = getPref().getBoolean( PROP_IS_NONRECIPROCAL, false );
+        boolean isHeaderless = getPref().getBoolean( PROP_IS_HEADERLESS, false );
+        boolean isFaster = getPref().getBoolean( PROP_IS_FASTER, false );
+        boolean isVerbose = getPref().getBoolean( PROP_IS_VERBOSE, false );
+        boolean isDebug = getPref().getBoolean( PROP_IS_DEBUG, false );
 
-            ParametersGASVMain parametersGASVMain = new ParametersGASVMain( minClusterSize,
-                                                                            maxClusterSize,
-                                                                            maxCliqueSize,
-                                                                            maxReadPairs,
-                                                                            outputType,
-                                                                            isMaxSubClusters,
-                                                                            isNonreciprocal,
-                                                                            isHeaderless,
-                                                                            isFaster,
-                                                                            isVerbose,
-                                                                            isDebug );
+        ParametersGASVMain parametersGASVMain = new ParametersGASVMain( minClusterSize,
+                                                                        maxClusterSize,
+                                                                        maxCliqueSize,
+                                                                        maxReadPairs,
+                                                                        outputType,
+                                                                        isMaxSubClusters,
+                                                                        isNonreciprocal,
+                                                                        isHeaderless,
+                                                                        isFaster,
+                                                                        isVerbose,
+                                                                        isDebug );
 
-            component.setLastParameterSelection( parametersGASVMain );
+        component.setLastParameterSelection( parametersGASVMain );
 //        }
     }
 
