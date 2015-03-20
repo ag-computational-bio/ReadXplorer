@@ -73,6 +73,7 @@ public final class DiffExpressionWizardIterator implements
     private List<WizardDescriptor.Panel<WizardDescriptor>> deSeqMoreCondsPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> deSeq2Panels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> expressTestPanels;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> linearRegressionPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> exportOnlyPanels;
     private String[] deSeqIndex;
     private String[] baySeqIndex;
@@ -81,6 +82,7 @@ public final class DiffExpressionWizardIterator implements
     private String[] deSeq2Index;
     private String[] expressTestIndex;
     private String[] exportOnlyIndex;
+    private String[] linearRegressionIndex;
     private String[] initialSteps;
     private DeAnalysisHandler.Tool tool;
     private WizardDescriptor wiz;
@@ -263,6 +265,15 @@ public final class DiffExpressionWizardIterator implements
             exportOnlyPanels.add( allPanels.get( 10 ) );
             exportOnlyIndex = new String[]{ steps[0], steps[2], steps[8], steps[10] };
 
+
+            linearRegressionPanels = new ArrayList<>();
+            linearRegressionPanels.add( allPanels.get( 0 ) );
+            linearRegressionPanels.add( allPanels.get( 2 ) );
+            linearRegressionPanels.add( allPanels.get( 7 ) );
+            linearRegressionPanels.add( allPanels.get( 8 ) );
+            linearRegressionPanels.add( allPanels.get( 10 ) );
+            linearRegressionIndex = new String[]{ steps[0], steps[2], steps[8], steps[10] };
+
             currentPanels = baySeqPanels;
         }
     }
@@ -315,6 +326,10 @@ public final class DiffExpressionWizardIterator implements
             if( tool == DeAnalysisHandler.Tool.ExpressTest ) {
                 currentPanels = expressTestPanels;
                 contentData = expressTestIndex;
+            }
+            if( tool == DeAnalysisHandler.Tool.LinearRegression ) {
+                currentPanels = linearRegressionPanels;
+                contentData = linearRegressionIndex;
             }
             if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
                 currentPanels = exportOnlyPanels;

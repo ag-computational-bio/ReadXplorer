@@ -88,7 +88,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
     public static enum Tool {
 
-        ExpressTest( "Express Test" ), DeSeq( "DESeq" ), DeSeq2( "DESeq2" ), BaySeq( "baySeq" ), ExportCountTable( "Export only count table" );
+        ExpressTest( "Express Test" ), DeSeq( "DESeq" ), DeSeq2( "DESeq2" ),
+        BaySeq( "baySeq" ), LinearRegression( "LinearRegression" ),
+        ExportCountTable( "Export only count table" );
 
 
         private Tool( String stringRep ) {
@@ -111,7 +113,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 //If one Tool should not be available to the user return something like :
                 //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
             } else {
-                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
+                Tool[] ret = new Tool[]{ ExpressTest, LinearRegression, ExportCountTable };
                 return ret;
             }
         }
@@ -163,7 +165,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     /**
-     * Acutally starts the differential gene expression analysis.
+     * Actually starts the differential gene expression analysis.
      */
     private void startAnalysis() {
         collectCoverageDataInstances.clear();
@@ -184,7 +186,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
                 collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
                 AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
-                                                                currentTrack.getDescription() + ".", readClassParams );
+                                                                         currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
                 handler.setDesiredData( Properties.REDUCED_MAPPINGS );
                 handler.registerObserver( collCovData );
