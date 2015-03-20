@@ -54,7 +54,7 @@ public class DeSeq2 {
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile )
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
-        gnuR = GnuR.startRServe();
+        gnuR = GnuR.startRServe(analysisData.getProcessingLog());
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         List<ResultDeAnalysis> results = new ArrayList<>();

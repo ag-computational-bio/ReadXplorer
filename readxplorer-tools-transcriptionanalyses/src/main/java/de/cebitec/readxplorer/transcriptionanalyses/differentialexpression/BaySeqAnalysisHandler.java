@@ -67,11 +67,12 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     }
 
 
-    public BaySeqAnalysisHandler( List<PersistentTrack> selectedTracks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
-                                  File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
-        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
+    public BaySeqAnalysisHandler( List<PersistentTrack> selectedTracks, List<Group> groups, Integer refGenomeID,
+                                  int[] replicateStructure, File saveFile, Set<FeatureType> selectedFeatures, int startOffset,
+                                  int stopOffset, ParametersReadClasses readClassParams, ProcessingLog processingLog ) {
+        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, processingLog );
         baySeq = new BaySeq();
-        baySeqAnalysisData = new BaySeqAnalysisData( getSelectedTracks().size(), groups, replicateStructure );
+        baySeqAnalysisData = new BaySeqAnalysisData( getSelectedTracks().size(), groups, replicateStructure, processingLog );
         this.groups = groups;
     }
 
@@ -87,13 +88,13 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         prepareFeatures( baySeqAnalysisData );
         prepareCountData( baySeqAnalysisData, getAllCountData() );
-        List<ResultDeAnalysis> results = baySeq.process( baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        List<ResultDeAnalysis> results = baySeq.process( baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile() );
         return results;
     }
 
 
     public File plot( Plot plot, Group group, int[] samplesA, int[] samplesB ) throws IOException, SamplesNotValidException,
-                                                                                      IllegalStateException, PackageNotLoadableException, 
+                                                                                      IllegalStateException, PackageNotLoadableException,
                                                                                       RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();

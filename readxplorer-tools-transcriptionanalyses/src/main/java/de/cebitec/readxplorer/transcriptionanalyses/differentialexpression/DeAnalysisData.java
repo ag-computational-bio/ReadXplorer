@@ -46,8 +46,8 @@ public class DeAnalysisData {
     /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
-     * secound Integer array holds the count data for the selected track with
-     * the secound lowest id an so on.
+     * second Integer array holds the count data for the selected track with the
+     * second lowest id an so on.
      */
     private final Queue<int[]> countData;
     /**
@@ -59,13 +59,16 @@ public class DeAnalysisData {
      */
     private String[] trackDescriptions;
 
+    private final ProcessingLog processingLog;
+
 
     /**
      * Creates a new instance of the DeAnalysisData class.
      * <p>
      * @param capacity Number of selected tracks.
      */
-    public DeAnalysisData( int capacity ) {
+    public DeAnalysisData( int capacity, ProcessingLog processingLog ) {
+        this.processingLog = processingLog;
         featureData = new LinkedHashMap<>();
         countData = new ArrayBlockingQueue<>( capacity );
         selectedTracks = new ArrayList<>();
@@ -86,7 +89,7 @@ public class DeAnalysisData {
 
     /**
      * Return the first count data value on the Queue and removes it. So this
-     * method will give you back the cound data added bei the @see
+     * method will give you back the count-data added by the @see
      * addCountDataForTrack() method. The count data added first will also be
      * the first this method returns.
      * <p>
@@ -149,7 +152,7 @@ public class DeAnalysisData {
      */
     public String[] getFeatureNames() {
         String[] ret = featureData.keySet().toArray( new String[featureData.keySet().size()] );
-        ProcessingLog.getInstance().addProperty( "Number of annotations", ret.length );
+        processingLog.addProperty( "Number of annotations", ret.length );
         return ret;
     }
 
@@ -192,6 +195,11 @@ public class DeAnalysisData {
 
     public boolean existsPersistentFeatureForGNURName( String gnuRName ) {
         return featureData.containsKey( gnuRName );
+    }
+
+
+    public ProcessingLog getProcessingLog() {
+        return processingLog;
     }
 
 

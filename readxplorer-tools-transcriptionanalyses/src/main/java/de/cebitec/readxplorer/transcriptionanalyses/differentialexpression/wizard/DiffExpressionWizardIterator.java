@@ -113,10 +113,12 @@ public final class DiffExpressionWizardIterator implements
             Integer startOffset = (Integer) wiz.getProperty( "startOffset" );
             Integer stopOffset = (Integer) wiz.getProperty( "stopOffset" );
             DeAnalysisHandler handler = null;
+            ProcessingLog log = new ProcessingLog();
 
             if( tool == DeAnalysisHandler.Tool.BaySeq ) {
                 handler = new BaySeqAnalysisHandler( selectedTracks, createdGroups, genomeID,
-                                                     replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+                                                     replicateStructure, saveFile, featureTypes, startOffset,
+                                                     stopOffset, readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.DeSeq ) {
                 boolean moreThanTwoConditions = (boolean) wiz.getProperty( "moreThanTwoConditions" );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
@@ -128,14 +130,15 @@ public final class DiffExpressionWizardIterator implements
                     fittingGroupTwo = (List<String>) wiz.getProperty( "fittingGroupTwo" );
                 }
                 handler = new DeSeqAnalysisHandler( selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
-                                                    fittingGroupTwo, genomeID, workingWithoutReplicates,
-                                                    saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+                                                    fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile,
+                                                    featureTypes, startOffset, stopOffset, readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.DeSeq2 ) {
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
                 handler = new DeSeq2AnalysisHandler( selectedTracks, design, null,
                                                      null, genomeID, workingWithoutReplicates,
-                                                     saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+                                                     saveFile, featureTypes, startOffset, stopOffset,
+                                                     readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.ExpressTest ) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty( "groupA" );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
@@ -157,17 +160,19 @@ public final class DiffExpressionWizardIterator implements
                 }
 
                 handler = new ExpressTestAnalysisHandler( selectedTracks, groupA, groupB, genomeID, workingWithoutReplicates,
-                                                          saveFile, featureTypes, startOffset, stopOffset, readClassParams, normalizationFeatures );
+                                                          saveFile, featureTypes, startOffset, stopOffset, readClassParams,
+                                                          normalizationFeatures, log );
 
             } else if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
-                handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+                handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset,
+                                                         readClassParams, log );
             }
 
             DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent( handler, tool );
             diffExpResultViewerTopComponent.open();
             diffExpResultViewerTopComponent.requestActive();
             handler.registerObserver( diffExpResultViewerTopComponent );
-            ProcessingLog.getInstance().setProperties( wiz.getProperties() );
+            log.setProperties( wiz.getProperties() );
             handler.start();
         }
     }

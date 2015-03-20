@@ -77,6 +77,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
     private final Set<FeatureType> selectedFeatureTypes;
     private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
+    private final ProcessingLog processingLog;
 
     private int resultsReceivedBack = 0;
     private ReferenceConnector referenceConnector;
@@ -146,8 +147,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      */
     public DeAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID,
                               File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
-                              ParametersReadClasses readClassParams ) {
-        ProcessingLog.getInstance().resetLog();
+                              ParametersReadClasses readClassParams, ProcessingLog processingLog ) {
         this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
@@ -155,6 +155,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
+        this.processingLog = processingLog;
         genomeAnnos = new ArrayList<>();
         results = new ArrayList<>();
         collectCoverageDataInstances = new HashMap<>();
@@ -163,7 +164,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
     /**
-     * Acutally starts the differential gene expression analysis.
+     * Actually starts the differential gene expression analysis.
      */
     private void startAnalysis() {
         collectCoverageDataInstances.clear();
@@ -184,14 +185,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
                 collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
                 AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
-                                                                currentTrack.getDescription() + ".", readClassParams );
+                                                                         currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
                 handler.setDesiredData( Properties.REDUCED_MAPPINGS );
                 handler.registerObserver( collCovData );
                 allHandler.add( handler );
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                ProcessingLog.getInstance().addProperty( "Unresolved track", currentTrack );
+                processingLog.addProperty( "Unresolved track", currentTrack );
                 notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
                 return;
@@ -275,6 +276,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
     public List<ResultDeAnalysis> getResults() {
         return Collections.unmodifiableList( results );
+    }
+
+
+    public ProcessingLog getProcessingLog() {
+        return processingLog;
     }
 
 

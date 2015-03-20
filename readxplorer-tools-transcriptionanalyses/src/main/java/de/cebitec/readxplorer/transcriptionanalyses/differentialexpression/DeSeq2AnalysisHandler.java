@@ -70,13 +70,13 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
 
     public DeSeq2AnalysisHandler( List<PersistentTrack> selectedTracks, Map<String, String[]> design,
-                                  List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-                                  File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
-        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
+                                  List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID,
+                                  boolean workingWithoutReplicates, File saveFile, Set<FeatureType> selectedFeatures,
+                                  int startOffset, int stopOffset, ParametersReadClasses readClassParams, ProcessingLog processingLog ) {
+        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, processingLog );
         deSeq2 = new DeSeq2( this.getRefGenomeID() );
-        deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(),
-                                                   design, false, fittingGroupOne, fittingGroupTwo,
-                                                   workingWithoutReplicates );
+        deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(), design, false, fittingGroupOne,
+                                                   fittingGroupTwo, workingWithoutReplicates, processingLog );
     }
 
 
@@ -85,7 +85,7 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );
-        results = deSeq2.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        results = deSeq2.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile() );
         return results;
 
     }
@@ -103,8 +103,8 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
     }
 
 
-    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException, 
-                                            RserveException, REngineException, REXPMismatchException {
+    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException,
+                                         RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.DispEsts ) {
