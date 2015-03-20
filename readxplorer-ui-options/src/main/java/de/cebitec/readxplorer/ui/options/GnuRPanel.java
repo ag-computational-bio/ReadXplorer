@@ -436,8 +436,17 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 messages.setText( "" );
             }
         } else {
-            messages.setText( "Auto installation is only supported under Windows 7 & 8." );
-            autoButton.setEnabled( false );
+            File cebitecIndicator = new File("/vol/readxplorer/R/CeBiTecMode");
+            if(cebitecIndicator.exists()){
+                messages.setText( "Rserve is already configured correctly for use in CeBiTec" );
+                autoButton.setEnabled( false );
+                manualLocalButton.setEnabled( false );
+                manualRemoteButton.setEnabled( false );
+                cranMirror.setEnabled( false );
+            } else {
+                messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+                autoButton.setEnabled( false );
+            }
         }
         rServePort.setInputVerifier( new PortInputVerifier() );
         rServeStartupScript.setInputVerifier( new ScriptInputVerifier() );
