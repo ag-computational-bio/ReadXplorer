@@ -313,8 +313,14 @@ public final class Properties {
     public static final String STRAND_OPPOSITE_STRING = String.valueOf( STRAND_OPPOSITE );
 
     /**
-     * 2 = Opposite strand option string.
+     * Option for showing base qualities.
      */
     public static final String BASE_QUALITY_OPTION = "BASE_QUALITY_OPTION";
+
+
+    /**
+     * Option for adjusting the alignment block height.
+     */
+    public static final String BLOCK_HEIGHT_OPTION = "BLOCK_HEIGHT_OPTION";
 
 }

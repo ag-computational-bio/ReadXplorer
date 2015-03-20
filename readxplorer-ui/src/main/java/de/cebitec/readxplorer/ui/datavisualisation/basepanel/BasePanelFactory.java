@@ -307,10 +307,11 @@ public class BasePanelFactory {
         optionsLabel.registerObserver( legendLabel );
 
         // add panels to basepanel and add scrollbars
-        int maxSliderValue = 500;
+        int maxSliderValue = 100;
+        viewer.setMaxZoomValue( maxSliderValue );
         b.setViewerInScrollpane( viewer );
         viewer.createListenerForScrollBar();
-        b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, false, maxSliderValue ) );
+        b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, true, maxSliderValue ) );
         b.setTitlePanel( this.getTitlePanel( connector.getAssociatedTrackName() ) );
 
         return b;
@@ -367,6 +368,7 @@ public class BasePanelFactory {
 
         // add panels to basepanel and add scrollbars
         int maxSliderValue = 50; //smaller than usual
+        viewer.setMaxZoomValue( maxSliderValue );
         b.setViewerInScrollpane( viewer );
         b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, true, maxSliderValue ) );
         b.setTitlePanel( this.getTitlePanel( connector.getAssociatedTrackName() ) );

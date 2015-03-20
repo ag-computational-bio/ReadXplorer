@@ -84,8 +84,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 
 
     /**
-     * Creates a new viewer for displaying read pair information between two
-     * tracks. Each of them must hold one sequence of the pair.
+     * Creates a new viewer for displaying read pair information.
      * <p>
      * @param boundsInfoManager the bounds info manager
      * @param basePanel         base panel on which to display this viewer

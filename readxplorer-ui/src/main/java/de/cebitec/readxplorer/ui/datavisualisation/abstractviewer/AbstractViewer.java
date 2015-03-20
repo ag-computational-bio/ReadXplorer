@@ -103,6 +103,7 @@ public abstract class AbstractViewer extends JPanel implements
      * Gap at the edges of the panel.
      */
     private int horizontalMargin;
+    private int maxZoom;
     private int verticalMargin;
     private int zoom = 1;
     private boolean canZoom = true;
@@ -182,6 +183,8 @@ public abstract class AbstractViewer extends JPanel implements
         isInMaxZoomLevel = true;
         inDrawingMode = true;
         isActive = true;
+
+        maxZoom = 500;
 
         // init physical bounds
         horizontalMargin = 40;
@@ -397,17 +400,21 @@ public abstract class AbstractViewer extends JPanel implements
         } );
 
 
-        this.addMouseWheelListener( new MouseWheelListener() {
+        this.addMouseWheelListener(new MouseWheelListener() {
 
             @Override
             public void mouseWheelMoved( MouseWheelEvent e ) {
 
-                if( canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) ||
-                     (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
+                int scrollPaneMax = scrollPane.getHorizontalScrollBar().getMaximum();
+                if( scrollPaneMax < maxZoom ) {
+                    maxZoom = scrollPaneMax;
+                }
+                if( canZoom && ((zoom <= maxZoom && zoom > 0 && e.getUnitsToScroll() > 0) ||
+                                (zoom <= maxZoom && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
                     int oldZoom = zoom;
                     zoom += e.getUnitsToScroll();
-                    if( zoom > 500 ) {
-                        zoom = 500;
+                    if( zoom > maxZoom ) {
+                        zoom = maxZoom;
                     }
                     if( zoom < 1 ) {
                         zoom = 1;
@@ -947,24 +954,48 @@ public abstract class AbstractViewer extends JPanel implements
     }
 
 
+    /**
+     * @return <code>true</code> if the viewer is zoomed in maximally,
+     *         <code>false</code> otherwise.
+     */
     public boolean isInMaxZoomLevel() {
         return isInMaxZoomLevel;
     }
 
 
+    /**
+     * @return <code>true</code> if the viewer is in drawing mode = drawing is
+     *         allowed, <code>false</code> otherwise.
+     */
     public boolean isInDrawingMode() {
         return inDrawingMode;
     }
 
 
+    /**
+     * @param isInMaxZoomLevel <code>true</code> if the viewer is zoomed in
+     *                         maximally, <code>false</code> otherwise.
+     */
     private void setIsInMaxZoomLevel( boolean isInMaxZoomLevel ) {
         this.isInMaxZoomLevel = isInMaxZoomLevel;
 
     }
 
 
+    /**
+     * @param inDrawingMode <code>true</code> if the viewer is in drawing mode =
+     *                      drawing is allowed, <code>false</code> otherwise.
+     */
     public void setInDrawingMode( boolean inDrawingMode ) {
         this.inDrawingMode = inDrawingMode;
+    }
+
+
+    /**
+     * @param maxZoomValue The maximum slider zoom value to allow for zooming.
+     */
+    public void setMaxZoomValue( int maxZoomValue ) {
+        this.maxZoom = maxZoomValue;
     }
 
 

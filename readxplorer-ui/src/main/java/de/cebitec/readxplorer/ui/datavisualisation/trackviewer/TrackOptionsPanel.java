@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -162,7 +163,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      * Creates the normalization options.
      */
     private void createNormalizationOption() {
-        JLabel header2 = LegendAndOptionsProvider.createLabel( "Normalization" );
+        JLabel header2 = LegendAndOptionsProvider.createLabel( "Normalization", Font.BOLD );
         final JPanel headerPanel2 = LegendAndOptionsProvider.createStandardPanel();
         headerPanel2.add( header2, BorderLayout.CENTER );
         headerPanel2.setPreferredSize( new Dimension( headerPanel2.getPreferredSize().width, headerPanel2.getPreferredSize().height + 2 ) );
@@ -305,7 +306,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      */
     private void createNormalizationLabel( JPanel trackPanel, String name ) {
         JPanel placeholder = LegendAndOptionsProvider.createPlaceholder();
-        JLabel nameLabel = LegendAndOptionsProvider.createLabel( "Track: " + name );
+        JLabel nameLabel = LegendAndOptionsProvider.createLabel( "Track: " + name, Font.BOLD );
 
         final JPanel labelPanel = LegendAndOptionsProvider.createStandardPanel();
         labelPanel.add( placeholder, BorderLayout.WEST );
