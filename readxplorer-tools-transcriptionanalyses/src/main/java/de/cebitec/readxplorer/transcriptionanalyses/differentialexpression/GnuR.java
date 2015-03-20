@@ -401,6 +401,10 @@ public final class GnuR extends RConnection {
 
 
     public static boolean gnuRSetupCorrect() {
+        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
+        if( cebitecIndicator.exists() ) {
+            return true;
+        }
         boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_MANUAL_LOCAL_SETUP, false );
         boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_MANUAL_REMOTE_SETUP, false );
 
