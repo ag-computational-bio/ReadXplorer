@@ -400,29 +400,33 @@ public abstract class AbstractViewer extends JPanel implements
         } );
 
 
-        this.addMouseWheelListener(new MouseWheelListener() {
+        this.addMouseWheelListener( new MouseWheelListener() {
 
             @Override
             public void mouseWheelMoved( MouseWheelEvent e ) {
 
-                int scrollPaneMax = scrollPane.getHorizontalScrollBar().getMaximum();
-                if( scrollPaneMax < maxZoom ) {
-                    maxZoom = scrollPaneMax;
-                }
-                if( canZoom && ((zoom <= maxZoom && zoom > 0 && e.getUnitsToScroll() > 0) ||
-                                (zoom <= maxZoom && zoom > 0 && e.getUnitsToScroll() < 0)) ) {
-                    int oldZoom = zoom;
-                    zoom += e.getUnitsToScroll();
-                    if( zoom > maxZoom ) {
-                        zoom = maxZoom;
+                if( canZoom ) {
+                    if( scrollPane != null ) {
+                        int scrollPaneMax = scrollPane.getHorizontalScrollBar().getMaximum();
+                        if( scrollPaneMax < maxZoom ) {
+                            maxZoom = scrollPaneMax;
+                        }
                     }
-                    if( zoom < 1 ) {
-                        zoom = 1;
+                    if( (zoom <= maxZoom && zoom > 0 && e.getUnitsToScroll() > 0) ||
+                        (zoom <= maxZoom && zoom > 0 && e.getUnitsToScroll() < 0) ) {
+                        int oldZoom = zoom;
+                        zoom += e.getUnitsToScroll();
+                        if( zoom > maxZoom ) {
+                            zoom = maxZoom;
+                        }
+                        if( zoom < 1 ) {
+                            zoom = 1;
+                        }
+                        if( zoom < oldZoom ) {
+                            boundsManager.navigatorBarUpdated( currentLogMousePos );
+                        }
+                        boundsManager.zoomLevelUpdated( zoom );
                     }
-                    if( zoom < oldZoom ) {
-                        boundsManager.navigatorBarUpdated( currentLogMousePos );
-                    }
-                    boundsManager.zoomLevelUpdated( zoom );
                 }
             }
 
