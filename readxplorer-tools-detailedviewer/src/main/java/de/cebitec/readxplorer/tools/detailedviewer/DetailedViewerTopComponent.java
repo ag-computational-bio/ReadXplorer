@@ -24,20 +24,22 @@ import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanelFactory;
 import de.cebitec.readxplorer.ui.datavisualisation.histogramviewer.HistogramViewer;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.awt.CardLayout;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+import static de.cebitec.readxplorer.tools.detailedviewer.Bundle.CTL_DetailedViewerTopComponent;
+
 
 /**
- * Top component which displays something.
+ * Top component displaying the DetailedViewer.
  */
 @ConvertAsProperties(
          dtd = "-//de.cebitec.readxplorer.tools.detailedviewer//DetailedViewer//EN",
@@ -57,7 +59,7 @@ import org.openide.windows.WindowManager;
 )
 @Messages( {
     "CTL_DetailedViewerAction=DetailedViewer",
-    "CTL_DetailedViewerTopComponent=DetailedViewer Window",
+    "CTL_DetailedViewerTopComponent=Detailed Viewer",
     "HINT_DetailedViewerTopComponent=This is a DetailedViewer window"
 } )
 public final class DetailedViewerTopComponent extends TopComponentExtended {
@@ -83,20 +85,24 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     private final ViewController viewCon;
 
 
+    /**
+     * Top component displaying the DetailedViewer.
+     */
     public DetailedViewerTopComponent() {
-
         this( Utilities.actionsGlobalContext().lookup( ViewController.class ) );
-
     }
 
 
+    /**
+     * Top component displaying the DetailedViewer.
+     * <p>
+     * @param viewCon The corresponding ViewController
+     */
     public DetailedViewerTopComponent( ViewController viewCon ) {
-
         initComponents();
         setName( Bundle.CTL_DetailedViewerTopComponent() );
         setToolTipText( Bundle.HINT_DetailedViewerTopComponent() );
         this.viewCon = viewCon;
-
     }
 
 
@@ -233,6 +239,8 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     private javax.swing.JPanel switchPanel;
     private javax.swing.JPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
+
+
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files
      * only, i.e. deserialization routines; otherwise you could get a
@@ -265,7 +273,7 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
             return (DetailedViewerTopComponent) win;
         }
         LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID +
-                 "' ID. That is a potential source of errors and unexpected behavior." );
+                     "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
 
@@ -354,20 +362,25 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
      */
     public void setTrackConnector( TrackConnector trackConnector ) {
         this.trackConnector = trackConnector;
-        setName( NbBundle.getMessage( DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent" ) + trackConnector.getAssociatedTrackName() );
+        String trackNames = GeneralUtils.generateConcatenatedString( trackConnector.getAssociatedTrackNames(), 70 );
+        setName( CTL_DetailedViewerTopComponent() + ": " + trackNames );
     }
 
-    /*
-     * Overriding these two methods ensures that only displayed components are
-     * updated and thus increases performance of the viewers.
-     */
 
+    /**
+     * Method is overwritten to ensure that only displayed components are
+     * updated and thus performance of ReadXplorer is increased.
+     */
     @Override
     public void componentShowing() {
         changeViewerStatus( getActiveViewer(), true );
     }
 
 
+    /**
+     * Method is overwritten to ensure that only displayed components are
+     * updated and thus performance of ReadXplorer is increased.
+     */
     @Override
     public void componentHidden() {
         changeViewerStatus( getActiveViewer(), false );
