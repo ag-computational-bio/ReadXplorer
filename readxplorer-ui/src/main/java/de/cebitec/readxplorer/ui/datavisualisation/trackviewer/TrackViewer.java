@@ -103,7 +103,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Create a new panel to show coverage information
      * <p>
      * @param boundsManager manager for component bounds
-     * @param basePanel
+     * @param basePanel     The BasePanel on which the viewer is painted.
      * @param refGen        reference genome
      * @param trackCon      database connection to one track, that is displayed
      * @param combineTracks true, if the coverage of the tracks contained in the

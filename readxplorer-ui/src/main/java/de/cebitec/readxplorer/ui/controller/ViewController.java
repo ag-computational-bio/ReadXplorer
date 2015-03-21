@@ -38,9 +38,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import javax.swing.JOptionPane;
@@ -65,7 +63,6 @@ public class ViewController implements MousePositionListener {
 
     private PersistentReference currentRefGen;
     private BasePanel genomeViewer;
-    private final Map<PersistentTrack, BasePanel> trackToPanel;
     private final List<BasePanel> currentTracks = new ArrayList<>();
 
     private final BoundsInfoManagerFactory boundsInfoManagerFactory;
@@ -84,7 +81,6 @@ public class ViewController implements MousePositionListener {
 
         mousePosListener = new ArrayList<>();
 
-        trackToPanel = new HashMap<>();
         registerInLookup();
         this.boundsInfoManagerFactory = new BoundsInfoManagerFactory();
     }
@@ -156,7 +152,7 @@ public class ViewController implements MousePositionListener {
 
 
     /**
-     * opens the given track on the current genome
+     * Opens the given tracks for the current genome.
      * <p>
      * @param tracks the tracks belonging to the current reference genome
      */
@@ -166,7 +162,6 @@ public class ViewController implements MousePositionListener {
             final BasePanel trackPanel = basePanelFac.getTrackBasePanel( track, currentRefGen );
             if( trackPanel != null ) {
                 currentTracks.add( trackPanel );
-                trackToPanel.put( track, trackPanel );
 
                 // show the panel and the track
                 getApp().showTrackPanel( trackPanel );
@@ -189,8 +184,7 @@ public class ViewController implements MousePositionListener {
 
         if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && !otp.getSelectedTracks().isEmpty() ) {
             if( otp.isCombineTracks() ) {
-                BasePanelFactory factory = this.getBasePanelFac();
-                factory.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
+                basePanelFac.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
             } else {
                 this.openTracksOnCurrentGenome( otp.getSelectedTracks() );
             }
@@ -223,7 +217,7 @@ public class ViewController implements MousePositionListener {
         if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && otp.getSelectedTracks().size() == 2 ) {
             okSelected = true;
         } else if( !(dialogDescriptor.getValue().equals( DialogDescriptor.CANCEL_OPTION ) ||
-                 dialogDescriptor.getValue().equals( DialogDescriptor.CLOSED_OPTION )) ) {
+                     dialogDescriptor.getValue().equals( DialogDescriptor.CLOSED_OPTION )) ) {
             DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message( Bundle.DT_ErrorMsg(),
                                                                                NotifyDescriptor.INFORMATION_MESSAGE ) );
             this.openDoubleTrack();
@@ -294,7 +288,6 @@ public class ViewController implements MousePositionListener {
         getApp().closeTrackPanel( trackBasePanel );
         trackBasePanel.close();
         mousePosListener.remove( trackBasePanel );
-        trackToPanel.values().remove( trackBasePanel );
     }
 
 
