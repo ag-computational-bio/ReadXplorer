@@ -59,6 +59,8 @@ import org.netbeans.spi.sendopts.ArgsProcessor;
 import org.netbeans.spi.sendopts.Description;
 import org.netbeans.spi.sendopts.Env;
 
+import static java.util.logging.Level.SEVERE;
+
 
 public final class CommandLineProcessor implements ArgsProcessor {
 
@@ -145,6 +147,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             props = loadProperties();
             defaultProps = loadDefaultProperties();
         } catch( IOException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
             throw ce;
@@ -172,8 +175,11 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // print optional arguments...
         printFine( ps, "verbosity=" + (verboseArg ? "on" : "off") );
+        printFine( ps, "paired end=" + (pairedEndArg ? "yes" : "no") );
         printFine( ps, "multi-threading=" + (multiThreadingArg ? "on" : "off") );
-        printFine( ps, "db file=" + dbFileArg );
+        printFine( ps, "# threads=" + (threadAmountArg != null ? threadAmountArg : "") );
+        printFine( ps, "db file=" + (dbFileArg != null ? dbFileArg : "") );
+        printFine( ps, "property file=" + (propsFileArg != null ? propsFileArg : "") );
 
 
         // test reference file
@@ -214,7 +220,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 try {
                     noThreads = Integer.parseInt( threadAmountArg );
                 } catch( NumberFormatException nfe ) {
-                    throw new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
+                    LOG.log( SEVERE, nfe.getMessage(), nfe );
+                    CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
+                    ce.initCause( nfe );
+                    throw ce;
                 }
             } else {
                 noThreads = Runtime.getRuntime().availableProcessors();
@@ -241,7 +250,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 importReads( readsFiles, referenceResult, es, ps );
             }
         } catch( InterruptedException | ExecutionException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1, "track import failed!" );
             ce.initCause( ex );
             throw ce;
@@ -256,22 +265,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // print reference info
         ps.println();
-        ps.println( "imported reference: " + pr.getName() );
-        ps.println( "\tdesc: " + pr.getDescription() );
-        ps.println( "\t file: " + pr.getFastaFile().getName() );
-        ps.println( "\t# chromosomes: " + pr.getChromosomes().size() );
+        printInfo( ps, "imported reference: " + pr.getName() );
+        printInfo( ps, "\tdesc: " + pr.getDescription() );
+        printInfo( ps, "\t file: " + pr.getFastaFile().getName() );
+        printInfo( ps, "\t# chromosomes: " + pr.getChromosomes().size() );
         // print read info
-        ps.println();
-        ps.println( "# imported tracks: " + pc.getTracks().size() );
+        printInfo( ps, "" );
+        printInfo( ps, "# imported tracks: " + pc.getTracks().size() );
         // print analyses info
-        ps.println();
-        ps.println( "# run analyses: " + runAnalyses );
+        printInfo( ps, "" );
+        printInfo( ps, "# run analyses: " + runAnalyses );
 
 
         try {
             pc.disconnect();
             printInfo( ps, "disconnected from " + dbFileArg );
         } catch( Exception ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
             throw ce;
@@ -280,44 +290,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private ProjectConnector setupProjectConnector( PrintStream ps ) throws CommandException {
-
-        try {
-
-            if( dbFileArg != null ) {
-
-                if( !dbFileArg.isEmpty() ) {
-                    File dbFile = new File( dbFileArg );
-                    if( !dbFile.canRead() || !dbFile.canWrite() ) {
-                        throw new IOException( "can not access database file!" );
-                    }
-                } else {
-                    throw new FileNotFoundException( "path to database file is empty!" );
-                }
-
-            } else {
-                dbFileArg = System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + DATABASE_NAME;
-                File dbFile = new File( dbFileArg );
-                int i = 0;
-                while( dbFile.exists() ) {
-                    dbFile = new File( dbFileArg + '-' + i );
-                }
-            }
-
-            ProjectConnector pc = ProjectConnector.getInstance();
-            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-            printFine( ps, "connected to " + dbFileArg );
-            return pc;
-
-        } catch( SQLException | IOException ex ) {
-
-            CommandException ce = new CommandException( 1 );
-            ce.initCause( ex );
-            throw ce;
-
-        }
-
-    }
 
 
     private File testReferenceFile( PrintStream ps ) throws CommandException {
@@ -414,13 +386,43 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private static boolean checkFileType( String filePath ) {
 
-        String fileType = filePath.substring( filePath.lastIndexOf( '.' ) ).toLowerCase();
-        return "sam".equals( fileType ) ||
-               "bam".equals( fileType ) ||
-               "out".equals( fileType ) ||
-               "jok".equals( fileType );
+
+    private ProjectConnector setupProjectConnector( PrintStream ps ) throws CommandException {
+
+        try {
+
+            if( dbFileArg != null ) {
+
+                if( !dbFileArg.isEmpty() ) {
+                    File dbFile = new File( dbFileArg );
+                    if( !dbFile.canRead() || !dbFile.canWrite() ) {
+                        throw new IOException( "can not access database file!" );
+                    }
+                } else {
+                    throw new FileNotFoundException( "path to database file is empty!" );
+                }
+
+            } else {
+                dbFileArg = System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + DATABASE_NAME;
+                File dbFile = new File( dbFileArg );
+                int i = 0;
+                while( dbFile.exists() ) {
+                    dbFile = new File( dbFileArg + '-' + i );
+                }
+            }
+
+            ProjectConnector pc = ProjectConnector.getInstance();
+            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
+            printFine( ps, "connected to " + dbFileArg );
+            return pc;
+
+        } catch( SQLException | IOException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            CommandException ce = new CommandException( 1 );
+            ce.initCause( ex );
+            throw ce;
+        }
 
     }
 
@@ -447,7 +449,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return referenceResult;
 
         } catch( InterruptedException | ExecutionException | StorageException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1, "reference import failed!" );
             ce.initCause( ex );
             throw ce;
@@ -554,6 +556,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
+
+
     private void printFine( PrintStream ps, String msg ) {
 
         LOG.fine( msg );
@@ -570,6 +574,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
         ps.println( msg );
 
     }
+
+
 
 
     /**
@@ -636,6 +642,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
+
+
     /**
      * Loads a default <link>java.util.Properties</link> object.
      * <p>
@@ -667,6 +675,17 @@ public final class CommandLineProcessor implements ArgsProcessor {
             default:
                 return new SamBamParser();
         }
+
+    }
+
+
+    private static boolean checkFileType( String filePath ) {
+
+        String fileType = filePath.substring( filePath.lastIndexOf( '.' ) ).toLowerCase();
+        return "sam".equals( fileType ) ||
+               "bam".equals( fileType ) ||
+               "out".equals( fileType ) ||
+               "jok".equals( fileType );
 
     }
 
