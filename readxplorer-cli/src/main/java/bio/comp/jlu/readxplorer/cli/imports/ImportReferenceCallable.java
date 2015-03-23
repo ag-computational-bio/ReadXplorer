@@ -80,7 +80,7 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
         try {
 
             // create necessary (mockup) objects
-            final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) ) );
+            final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) + 1 ) );
             final ReferenceJob referenceJob = new ReferenceJob( 0, referenceFile, refParser,
                                                                 "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
             final ImportReferenceResult result = new ImportReferenceResult();
@@ -114,9 +114,12 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
 
     private static ReferenceParserI selectParser( String fileTypeArg ) {
 
-        switch( fileTypeArg ) {
+        switch( fileTypeArg.toLowerCase() ) {
+            case "ebl":
             case "embl":
                 return new BioJavaParser( BioJavaParser.EMBL );
+            case "gb":
+            case "gbk":
             case "genbank":
                 return new BioJavaParser( BioJavaParser.GENBANK );
             case "gff3":
