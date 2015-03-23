@@ -65,7 +65,8 @@ import static java.util.logging.Level.SEVERE;
 public final class CommandLineProcessor implements ArgsProcessor {
 
     private static final Logger LOG = Logger.getLogger( CommandLineProcessor.class.getName() );
-    private static final String DATABASE_NAME = "readxplorer-db";
+    private static final String DEFAULT_DATABASE_NAME = "readxplorer-db";
+    private static final String H2_FILE_SUFFIX = ".h2.db";
 
 
     static {
@@ -108,12 +109,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Description( shortDescription = "Set this flag if reads are paired-end reads." )
     public boolean pairedEndArg;
 
-    @Arg( shortName = 't', longName = "threading", defaultValue = "1" )
+    @Arg( shortName = 't', longName = "threading" )
     @Description( shortDescription = "Specifies the number of available worker threads. Take care on multi user systems!" )
     public String threadAmountArg;
 
-    @Arg( longName = "db", defaultValue = DATABASE_NAME )
-    @Description( shortDescription = "Set a database name to persistently store imported data (default: "+DATABASE_NAME+"). ATTENTION! Existing databases will be deleted!" )
+    @Arg( longName = "db" )
+    @Description( shortDescription = "Set a database name to persistently store imported data (default: "+DEFAULT_DATABASE_NAME+"). ATTENTION! Existing databases will be deleted!" )
     public String dbFileArg;
 
     @Arg( longName = "props" )
@@ -165,58 +166,45 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
 
-        final PrintStream ps = env.getOutputStream();
-        ps.println( "trigger " + getClass().getName() );
-
-
         // print optional arguments...
-        printFine( ps, "verbosity=" + (verboseArg ? "on" : "off") );
-        printFine( ps, "paired end=" + (pairedEndArg ? "yes" : "no") );
-        printFine( ps, "# threading=" + threadAmountArg );
-        printFine( ps, "db file=" + dbFileArg );
-        printFine( ps, "property file=" + (propsFileArg != null ? propsFileArg : "") );
+        final PrintStream ps = env.getOutputStream();
+        printFine( ps, "verbosity: " + (verboseArg ? "on" : "off") );
+        printFine( ps, "paired end: " + (pairedEndArg ? "yes" : "no") );
+        printFine( ps, "threading: " + (threadAmountArg != null ? threadAmountArg : "1") );
+        printFine( ps, "db file: " + (dbFileArg != null ? dbFileArg : "default") );
+        printFine( ps, "property file: " + (propsFileArg != null ? propsFileArg : "default") );
 
 
         // test reference file
-        final File referenceFile = testReferenceFile( ps );
-        if( referenceFile == null ) {
-            env.usage();
-            return;
-        }
-
+        final File referenceFile = getReferenceFile( ps );
 
         // test track file
-        final File[] readsFiles = testReadsFiles( ps );
-        if( readsFiles == null ) {
-            env.usage();
-            return;
-        }
-
+        final File[] readsFiles = getReadsFiles( ps );
 
         // test paired-end read files
-        final File[] pairedEndFiles = testPairedEndReadsFiles( ps );
-
-
+        final File[] pairedEndFiles = getPairedEndReadsFiles( ps );
 
         // setup ProjectConnector
         final ProjectConnector pc = setupProjectConnector( ps );
 
 
-
         /**
-         * Get a thread pool. If the multi-threading flag is not set, number of
-         * threads is fixed to 1 thus multi-threading is not active.
-         * If the thread-amount option is set this will be used as
-         * size of the worker thread pool.
+         * Create a thread pool.
+         * Number of worker threads are based on the threadAmount argument,
+         * default is 1 (no multithreading).
          */
         final int noThreads;
-        try {
-            noThreads = Integer.parseInt( threadAmountArg );
-        } catch( NumberFormatException nfe ) {
-            LOG.log( SEVERE, nfe.getMessage(), nfe );
-            CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
-            ce.initCause( nfe );
-            throw ce;
+        if( threadAmountArg != null ) {
+            try {
+                noThreads = Integer.parseInt( threadAmountArg );
+            } catch( NumberFormatException nfe ) {
+                LOG.log( SEVERE, nfe.getMessage(), nfe );
+                CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
+                ce.initCause( nfe );
+                throw ce;
+            }
+        } else {
+            noThreads = 1;
         }
         final ExecutorService es = Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
 
@@ -253,8 +241,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
         // print reference info
         ps.println();
         printInfo( ps, "imported reference: " + pr.getName() );
-        printInfo( ps, "\tdesc: " + pr.getDescription() );
-        printInfo( ps, "\t file: " + pr.getFastaFile().getName() );
+        printInfo( ps, "\tdescription: " + pr.getDescription() );
+        printInfo( ps, "\tfasta file: " + pr.getFastaFile().getName() );
         printInfo( ps, "\t# chromosomes: " + pr.getChromosomes().size() );
         // print read info
         printInfo( ps, "" );
@@ -279,61 +267,61 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
 
-    private File testReferenceFile( PrintStream ps ) throws CommandException {
+    private File getReferenceFile( PrintStream ps ) throws CommandException {
 
         if( referenceArg != null ) {
 
             File referenceFile = new File( referenceArg );
             if( !referenceFile.canRead() ) {
-                throw new CommandException( 1, "Cannot access reference file!" );
+                throw new CommandException( 1, "Cannot access reference file ("+ referenceArg +")!" );
             }
             printFine( ps, "reference file to import: " + referenceFile.getName() );
 
             return referenceFile;
 
         } else {
-            return null;
+            throw new CommandException( 1, "No reference file set!" );
         }
 
     }
 
 
-    private File[] testReadsFiles( PrintStream ps ) throws CommandException {
+    private File[] getReadsFiles( PrintStream ps ) throws CommandException {
 
         if( readsArgs != null ) {
 
             Arrays.sort( readsArgs ); // sort read files lexicographically
 
-            printFine( ps, "read files to import:" );
+            printFine( ps, "read files to import: ("+ readsArgs.length +")" );
             File[] trackFiles = new File[readsArgs.length];
-            for( int i = 0; i < trackFiles.length; i++ ) {
+            for( int i = 0; i < readsArgs.length; i++ ) {
 
                 String trackPath = readsArgs[i];
 
-                String fileType = trackPath.substring( trackPath.lastIndexOf( '.' ) ).toLowerCase();
+                String fileType = trackPath.substring( trackPath.lastIndexOf( '.' ) + 1 ).toLowerCase();
                 if( !checkFileType( fileType ) ) { // check file type
-                    throw new CommandException( 1, "wrong paired-end file type \"" + fileType + "\"!" );
+                    throw new CommandException( 1, "Wrong reads file type \"" + fileType + "\"!" );
                 }
 
                 File trackFile = new File( trackPath );
                 if( !trackFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access read file " + (i + 1) + "(" + trackPath + ")!" );
+                    throw new CommandException( 1, "Cannot access read file " + (i+1) + "(" + trackPath + ")!" );
                 }
 
                 trackFiles[i] = trackFile;
-                printFine( ps, "\tadd " + trackFiles[i].getName() );
+                printFine( ps, "\tadd " + trackFile.getName() );
 
             }
             return trackFiles;
 
         } else {
-            return null;
+            throw new CommandException( 1, "No reads files set!" );
         }
 
     }
 
 
-    private File[] testPairedEndReadsFiles( PrintStream ps ) throws CommandException {
+    private File[] getPairedEndReadsFiles( PrintStream ps ) throws CommandException {
 
         if( pairedEndReadsArgs != null ) {
 
@@ -341,7 +329,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 throw new CommandException( 1, "Number of paired-end files (" + pairedEndReadsArgs.length + ") does not match number of read files (" + pairedEndReadsArgs.length + ")!" );
             }
 
-            Arrays.sort(pairedEndReadsArgs ); // sort paired-end read files lexicographically
+            Arrays.sort( pairedEndReadsArgs ); // sort paired-end read files lexicographically
 
             printFine( ps, "paired-end files to import:" );
             File[] pairedEndFiles = new File[pairedEndReadsArgs.length];
@@ -349,14 +337,14 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
                 String peTrackPath = pairedEndReadsArgs[i];
 
-                String fileType = peTrackPath.substring( peTrackPath.lastIndexOf( '.' ) ).toLowerCase();
+                String fileType = peTrackPath.substring( peTrackPath.lastIndexOf( '.' ) + 1 ).toLowerCase();
                 if( !checkFileType( fileType ) ) { // check file type
-                    throw new CommandException( 1, "wrong paired-end file type \"" + fileType + "\"!" );
+                    throw new CommandException( 1, "Wrong paired-end file type \"" + fileType + "\"!" );
                 }
 
                 File pairedEndFile = new File( peTrackPath );
                 if( !pairedEndFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access paired-end file " + (i + 1) + "(" + peTrackPath + ")!" );
+                    throw new CommandException( 1, "Cannot access paired-end file " + (i+1) + "(" + peTrackPath + ")!" );
                 }
 
                 printFine( ps, "\tadd " + pairedEndFile.getName() );
@@ -379,10 +367,11 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         try {
 
-            File dbFile = new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + dbFileArg );
-            if( !dbFile.canWrite() ) {
-                throw new IOException( "can not access database file!" );
+            if( dbFileArg == null ) {
+                dbFileArg = DEFAULT_DATABASE_NAME;
             }
+
+            File dbFile = new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + dbFileArg + H2_FILE_SUFFIX );
             if( dbFile.exists() ) { // delete old copy of the specified file
                 dbFile.delete();
             }
@@ -391,7 +380,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "connected to " + dbFileArg );
             return pc;
 
-        } catch( SQLException | IOException | SecurityException ex ) {
+        } catch( SQLException | SecurityException ex ) {
             LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
@@ -417,7 +406,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             // stores reference sequence in the db
             printFine( ps, "store reference to db..." );
-            ProjectConnector.getInstance().addRefGenome( referenceResult.getParsedReference() );
+            int refGenID = ProjectConnector.getInstance().addRefGenome( referenceResult.getParsedReference() );
+            referenceResult.getReferenceJob().setPersistent( refGenID );
+            referenceResult.getReferenceJob().setFile( referenceResult.getParsedReference().getFastaFile() );
             printFine( ps, "...done!" );
             printInfo( ps, "imported reference genome source " + referenceResult.getParsedReference().getName() );
             return referenceResult;
@@ -640,7 +631,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private static MappingParserI selectParser( File trackFile ) {
 
-        switch( trackFile.getName().substring( trackFile.getName().lastIndexOf( '.' ) ).toLowerCase() ) {
+        switch( trackFile.getName().substring( trackFile.getName().lastIndexOf( '.' ) + 1 ).toLowerCase() ) {
             case "out":
             case "jok":
                 return new JokToBamDirectParser();
@@ -653,9 +644,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private static boolean checkFileType( String filePath ) {
+    private static boolean checkFileType( String fileType ) {
 
-        String fileType = filePath.substring( filePath.lastIndexOf( '.' ) ).toLowerCase();
         return "sam".equals( fileType ) ||
                "bam".equals( fileType ) ||
                "out".equals( fileType ) ||
