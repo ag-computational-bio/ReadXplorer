@@ -79,15 +79,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Mandatory options
      */
     @Arg( shortName = 'f', longName = "reference" )
-    @Description( displayName = "Reference", shortDescription = "Reference genome to import / analysis." )
+    @Description( shortDescription = "Reference genome to import / analysis." )
     public String referenceArg;
 
     @Arg( shortName = 'r', longName = "reads" )
-    @Description( displayName = "SAM/BAM Read Files", shortDescription = "SAM/BAM read files to import / analysis." )
+    @Description( shortDescription = "SAM/BAM read files to import / analysis." )
     public String[] readsArgs;
 
     @Arg( shortName = 'e', longName = "per" )
-    @Description( displayName = "Pair-End Read Files", shortDescription = "SAM/BAM paired-end read files to import / analysis." )
+    @Description( shortDescription = "SAM/BAM paired-end read files to import / analysis." )
     public String[] pairedEndReadsArgs;
 
 
@@ -95,27 +95,27 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Optional options
      */
     @Arg( shortName = 'h', longName = "help" )
-    @Description( displayName = "Help", shortDescription = "Print usage information to the console." )
+    @Description( shortDescription = "Print usage information to the console." )
     public boolean helpArg;
 
     @Arg( shortName = 'v', longName = "verbose" )
-    @Description( displayName = "Verbose", shortDescription = "Print detailed messages to the console." )
+    @Description( shortDescription = "Print detailed messages to the console." )
     public boolean verboseArg;
 
     @Arg( shortName = 'p', longName = "pairedend" )
-    @Description( displayName = "Paired-End", shortDescription = "Set this flag if reads are paired-end reads." )
+    @Description( shortDescription = "Set this flag if reads are paired-end reads." )
     public boolean pairedEndArg;
 
     @Arg( shortName = 'm', longName = "multithreaded" )
-    @Description( displayName = "Multithreaded", shortDescription = "Execute imports and analysis concurrently." )
+    @Description( shortDescription = "Execute imports and analysis concurrently." )
     public boolean multiThreadingArg;
 
     @Arg( longName = "db" )
-    @Description( displayName = "Database", shortDescription = "Set a database name to persistently store imported data." )
+    @Description( shortDescription = "Set a database name to persistently store imported data." )
     public String dbFileArg;
 
     @Arg( longName = "props" )
-    @Description( displayName = "Properties", shortDescription = "Specify a path to a property file." )
+    @Description( shortDescription = "Specify a path to a property file." )
     public String propsFileArg;
 
 
@@ -123,15 +123,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Analysis options
      */
     @Arg( longName = "snp" )
-    @Description( displayName = "SNP", shortDescription = "Single Nucleotide Polymorphism analysis." )
+    @Description( shortDescription = "Perform Single Nucleotide Polymorphism analyses on all tracks." )
     public boolean snpAnalysis;
 
     @Arg( longName = "tss" )
-    @Description( displayName = "TSS", shortDescription = "Transcription Start Site analysis." )
+    @Description( shortDescription = "Perform Transcription Start Site analyses on all tracks." )
     public boolean tssAnalysis;
 
     @Arg( longName = "rpkm" )
-    @Description( displayName = "RPKM", shortDescription = "XXX analysis." )
+    @Description( shortDescription = "Perform RPKM analyses on all tracks." )
     public boolean rpkmAnalysis;
 
 
