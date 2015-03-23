@@ -74,7 +74,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
         final ReferenceConnector referenceConnector = getReferenceConnector();
         //This offset must correspond to the additional fields added by hand
-        final int offset = 6;
+        final int offset = 7;
         for( i = 0; i < data.getFeatures().length; i++ ) {
 
             boolean allZero = true;
@@ -93,6 +93,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             tmp[3] = feature[i].getStop();
             tmp[4] = calculateExonLength( feature[i] );
             tmp[5] = feature[i].getLength();
+            tmp[6] = feature[i].getType();
             for( int j = offset; j < data.getSelectedTracks().size() + offset; j++ ) {
                 int value = countData[j - offset][i];
                 if( value != 0 ) {
@@ -114,7 +115,8 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         colNames.add( "Start" );
         colNames.add( "Stop" );
         colNames.add( "Exon length" );
-        colNames.add( "Gene length" );
+        colNames.add( "Feature length" );
+        colNames.add( "Feature type" );
         colNames.addAll( Arrays.asList( trackDescriptions ) );
 
         results = Collections.singletonList( new ResultDeAnalysis( tableContents, colNames, regionNamesList, "Count Data Table" ) );
