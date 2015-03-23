@@ -71,6 +71,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
+    private final java.util.Properties props;
+    private final java.util.Properties defaultProps;
+
+
     /**
      * Mandatory options
      */
@@ -90,6 +94,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
     /**
      * Optional options
      */
+    @Arg( shortName = 'h', longName = "help" )
+    @Description( displayName = "Help", shortDescription = "Print usage information to the console." )
+    public boolean helpArg;
+
     @Arg( shortName = 'v', longName = "verbose" )
     @Description( displayName = "Verbose", shortDescription = "Print detailed messages to the console." )
     public boolean verboseArg;
@@ -127,10 +135,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public boolean rpkmAnalysis;
 
 
-    private final java.util.Properties props;
-    private final java.util.Properties defaultProps;
-
-
     public CommandLineProcessor() throws CommandException {
 
         try {
@@ -149,6 +153,14 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public void process( final Env env ) throws CommandException {
 
         LOG.log( Level.FINE, "triggered command line processor" );
+
+
+        // check if help/usgae is requested
+        if( helpArg ) {
+            env.usage();
+            return;
+        }
+
 
         final PrintStream ps = env.getOutputStream();
         ps.println( "trigger " + getClass().getName() );
