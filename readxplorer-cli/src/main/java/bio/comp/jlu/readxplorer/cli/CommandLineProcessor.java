@@ -108,12 +108,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Description( shortDescription = "Set this flag if reads are paired-end reads." )
     public boolean pairedEndArg;
 
-    @Arg( shortName = 'm', longName = "multithreaded" )
-    @Description( shortDescription = "Execute imports and analysis concurrently. The amount of used worker threads will be set to the number of available cpu cores." )
-    public boolean multiThreadingArg;
-
-    @Arg( shortName = 't', longName = "threads" )
-    @Description( shortDescription = "Specifies the number of available worker threads. Use this option to restrict the CPU usage on multi user systems!" )
+    @Arg( shortName = 't', longName = "threading", defaultValue = "1" )
+    @Description( shortDescription = "Specifies the number of available worker threads. Take care on multi user systems!" )
     public String threadAmountArg;
 
     @Arg( longName = "db", defaultValue = DATABASE_NAME )
@@ -176,9 +172,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
         // print optional arguments...
         printFine( ps, "verbosity=" + (verboseArg ? "on" : "off") );
         printFine( ps, "paired end=" + (pairedEndArg ? "yes" : "no") );
-        printFine( ps, "multi-threading=" + (multiThreadingArg ? "on" : "off") );
-        printFine( ps, "# threads=" + (threadAmountArg != null ? threadAmountArg : "") );
-        printFine( ps, "db file=" + (dbFileArg != null ? dbFileArg : "") );
+        printFine( ps, "# threading=" + threadAmountArg );
+        printFine( ps, "db file=" + dbFileArg );
         printFine( ps, "property file=" + (propsFileArg != null ? propsFileArg : "") );
 
 
@@ -215,21 +210,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
          * size of the worker thread pool.
          */
         final int noThreads;
-        if( multiThreadingArg ) {
-            if( threadAmountArg != null ) {
-                try {
-                    noThreads = Integer.parseInt( threadAmountArg );
-                } catch( NumberFormatException nfe ) {
-                    LOG.log( SEVERE, nfe.getMessage(), nfe );
-                    CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
-                    ce.initCause( nfe );
-                    throw ce;
-                }
-            } else {
-                noThreads = Runtime.getRuntime().availableProcessors();
-            }
-        } else {
-            noThreads = 1;
+        try {
+            noThreads = Integer.parseInt( threadAmountArg );
+        } catch( NumberFormatException nfe ) {
+            LOG.log( SEVERE, nfe.getMessage(), nfe );
+            CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
+            ce.initCause( nfe );
+            throw ce;
         }
         final ExecutorService es = Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
 
