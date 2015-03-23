@@ -277,6 +277,9 @@ public final class Properties {
      */
     public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
 
+    /** Default max zoom level for the Alignment and ReadPairViewer. */
+    public static final int DEFAULT_ZOOM = 70;
+
     /**
      * 0 = Combine data of both strands option.
      */
@@ -317,10 +320,16 @@ public final class Properties {
      */
     public static final String BASE_QUALITY_OPTION = "BASE_QUALITY_OPTION";
 
-
     /**
      * Option for adjusting the alignment block height.
      */
     public static final String BLOCK_HEIGHT_OPTION = "BLOCK_HEIGHT_OPTION";
+
+
+    /**
+     * Option for setting the maximum zoom level of the Alignment and
+     * ReadPairViewer.
+     */
+    public static final String MAX_ZOOM = "MAX_ZOOM";
 
 }
