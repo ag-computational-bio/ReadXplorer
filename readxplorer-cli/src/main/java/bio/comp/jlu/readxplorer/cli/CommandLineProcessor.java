@@ -116,8 +116,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Description( shortDescription = "Specifies the number of available worker threads. Use this option to restrict the CPU usage on multi user systems!" )
     public String threadAmountArg;
 
-    @Arg( longName = "db" )
-    @Description( shortDescription = "Set a database name to persistently store imported data." )
+    @Arg( longName = "db", defaultValue = DATABASE_NAME )
+    @Description( shortDescription = "Set a database name to persistently store imported data (default: "+DATABASE_NAME+"). ATTENTION! Existing databases will be deleted!" )
     public String dbFileArg;
 
     @Arg( longName = "props" )
@@ -392,32 +392,19 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         try {
 
-            if( dbFileArg != null ) {
-
-                if( !dbFileArg.isEmpty() ) {
-                    File dbFile = new File( dbFileArg );
-                    if( !dbFile.canRead() || !dbFile.canWrite() ) {
-                        throw new IOException( "can not access database file!" );
-                    }
-                } else {
-                    throw new FileNotFoundException( "path to database file is empty!" );
-                }
-
-            } else {
-                dbFileArg = System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + DATABASE_NAME;
-                File dbFile = new File( dbFileArg );
-                int i = 0;
-                while( dbFile.exists() ) {
-                    dbFile = new File( dbFileArg + '-' + i );
-                }
+            File dbFile = new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + dbFileArg );
+            if( !dbFile.canWrite() ) {
+                throw new IOException( "can not access database file!" );
             }
-
+            if( dbFile.exists() ) { // delete old copy of the specified file
+                dbFile.delete();
+            }
             ProjectConnector pc = ProjectConnector.getInstance();
             pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
             printFine( ps, "connected to " + dbFileArg );
             return pc;
 
-        } catch( SQLException | IOException ex ) {
+        } catch( SQLException | IOException | SecurityException ex ) {
             LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
