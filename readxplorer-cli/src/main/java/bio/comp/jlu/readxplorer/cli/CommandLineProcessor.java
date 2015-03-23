@@ -107,7 +107,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public boolean pairedEndArg;
 
     @Arg( shortName = 'm', longName = "multithreaded" )
-    @Description( shortDescription = "Execute imports and analysis concurrently." )
+    @Description( shortDescription = "Execute imports and analysis concurrently. The amount of used worker threads will be set to the number of available cpu cores." )
     public boolean multiThreadingArg;
 
     @Arg( longName = "db" )
@@ -115,7 +115,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public String dbFileArg;
 
     @Arg( longName = "props" )
-    @Description( shortDescription = "Specify a path to a property file." )
+    @Description( shortDescription = "Sets the path to a custom property file." )
     public String propsFileArg;
 
 
