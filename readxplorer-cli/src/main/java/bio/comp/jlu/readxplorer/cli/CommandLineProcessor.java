@@ -110,6 +110,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Description( shortDescription = "Execute imports and analysis concurrently. The amount of used worker threads will be set to the number of available cpu cores." )
     public boolean multiThreadingArg;
 
+    @Arg( shortName = 't', longName = "threads" )
+    @Description( shortDescription = "Specifies the number of available worker threads. Use this option to restrict the CPU usage on multi user systems!" )
+    public String threadAmountArg;
+
     @Arg( longName = "db" )
     @Description( shortDescription = "Set a database name to persistently store imported data." )
     public String dbFileArg;
@@ -199,10 +203,25 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         /**
-         * Get a thread pool. If multi-threading flag is not set, number of
+         * Get a thread pool. If the multi-threading flag is not set, number of
          * threads is fixed to 1 thus multi-threading is not active.
+         * If the thread-amount option is set this will be used as
+         * size of the worker thread pool.
          */
-        int noThreads = multiThreadingArg ? Runtime.getRuntime().availableProcessors() : 1;
+        final int noThreads;
+        if( multiThreadingArg ) {
+            if( threadAmountArg != null ) {
+                try {
+                    noThreads = Integer.parseInt( threadAmountArg );
+                } catch( NumberFormatException nfe ) {
+                    throw new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
+                }
+            } else {
+                noThreads = Runtime.getRuntime().availableProcessors();
+            }
+        } else {
+            noThreads = 1;
+        }
         final ExecutorService es = Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
 
 
