@@ -349,13 +349,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      */
     @Override
     public int compareTo( GenomicRange genomicRange ) {
-        int ret = 0;
-        if( this.start < genomicRange.getStart() ) {
-            ret = -1;
-        } else if( this.start > genomicRange.getStart() ) {
-            ret = 1;
-        }
-        return ret;
+        return GenomicRange.Utils.compareTo( this, genomicRange );
     }
 
 
