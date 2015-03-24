@@ -18,23 +18,34 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 
 /**
- * @author ddoppmei, rhilker
- * <p>
  * A container for blocks. The blocks are added in a sorted fashion.
+ * <p>
+ * @author ddoppmei, rhilker
  */
 public class BlockContainer {
 
-    private final TreeMap<Integer, TreeSet<BlockI>> sortedMappings;
+    private final TreeMap<Integer, TreeSet<BlockI>> sortedMappingBlocks;
+    private boolean sortFwd;
 
 
-    public BlockContainer() {
-        sortedMappings = new TreeMap<>();
+    /**
+     * A container for blocks. The blocks are added in a sorted fashion.
+     * <p>
+     * @param sortFwd <code>true</code> = blocks shall be ordered in fwd
+     *                direction (from smallest to largest genomic position),
+     *                <code>false</code> = blocks shall be ordered in rev
+     *                direction (from largest to smalles genomic position)
+     */
+    public BlockContainer( boolean sortFwd ) {
+        sortedMappingBlocks = new TreeMap<>();
+        this.sortFwd = sortFwd;
     }
 
 
@@ -45,21 +56,32 @@ public class BlockContainer {
      * @param block block to add
      */
     public void addBlock( BlockI block ) {
-        int start = block.getAbsStart();
-        if( !sortedMappings.containsKey( start ) ) {
-            sortedMappings.put( start, new TreeSet<>( new BlockComparator() ) );
+        int start = GenomicRange.Utils.getStartOnStrand( block );
+        if( !sortedMappingBlocks.containsKey( start ) ) {
+            sortedMappingBlocks.put( start, new TreeSet<>( new BlockComparator() ) );
         }
-        sortedMappings.get( start ).add( block );
+        sortedMappingBlocks.get( start ).add( block );
     }
 
 
+    /**
+     * @param pos The genomic position of interest
+     * <p>
+     * @return The next mapping block in the order passed to the BlockContainer
+     *         upon creation.
+     */
     public BlockI getNextByPositionAndRemove( int pos ) {
-        Integer key = sortedMappings.ceilingKey( pos );
+        Integer key;
+        if( sortFwd ) {
+            key = sortedMappingBlocks.ceilingKey( pos );
+        } else {
+            key = sortedMappingBlocks.lowerKey( pos );
+        }
         if( key != null ) {
-            TreeSet<BlockI> set = sortedMappings.get( key );
+            TreeSet<BlockI> set = sortedMappingBlocks.get( key );
             BlockI b = set.pollFirst();
             if( set.isEmpty() ) {
-                sortedMappings.remove( key );
+                sortedMappingBlocks.remove( key );
             }
             return b;
         } else {
@@ -68,25 +90,43 @@ public class BlockContainer {
     }
 
 
+    /**
+     * @return <code>true</code> if the map of mapping blocks is empty,
+     *         <code>false</code> = otherwise
+     */
     public boolean isEmpty() {
-        return sortedMappings.isEmpty();
+        return sortedMappingBlocks.isEmpty();
     }
 
 
+    /**
+     * @return <code>true</code> = blocks shall be ordered in fwd direction
+     *         (from smallest to largest genomic position), <code>false</code> =
+     *         blocks shall be ordered in rev direction (from largest to smalles
+     *         genomic position)
+     */
+    public boolean isSortFwd() {
+        return sortFwd;
+    }
+
+
+    /**
+     * Comparator for blocks.
+     */
     private class BlockComparator implements Comparator<BlockI> {
 
         @Override
         public int compare( BlockI o1, BlockI o2 ) {
             // order by start of block
-            if( o1.getAbsStart() < o2.getAbsStart() ) {
+            if( o1.getStart() < o2.getStart() ) {
                 return -1;
-            } else if( o1.getAbsStart() > o2.getAbsStart() ) {
+            } else if( o1.getStart() > o2.getStart() ) {
                 return 1;
             } else {
                 // if blocks start at identical position use stop position
-                if( o1.getAbsStop() < o2.getAbsStop() ) {
+                if( o1.getStop() < o2.getStop() ) {
                     return -1;
-                } else if( o1.getAbsStop() > o2.getAbsStop() ) {
+                } else if( o1.getStop() > o2.getStop() ) {
                     return 1;
                 } else {
                     // stop position are identical, too

@@ -39,8 +39,8 @@ public class Layout implements LayoutI {
     private final int absStart;
     private int absStop;
     private GenomeGapManager gapManager;
-    private final ArrayList<LayerI> forwardLayers;
-    private final ArrayList<LayerI> reverseLayers;
+    private final List<LayerI> forwardLayers;
+    private final List<LayerI> reverseLayers;
     private final BlockContainer forwardBlockContainer;
     private final BlockContainer reverseBlockContainer;
     private final List<Classification> exclusionList;
@@ -59,8 +59,8 @@ public class Layout implements LayoutI {
         this.absStop = absStop;
         this.forwardLayers = new ArrayList<>();
         this.reverseLayers = new ArrayList<>();
-        this.forwardBlockContainer = new BlockContainer();
-        this.reverseBlockContainer = new BlockContainer();
+        this.forwardBlockContainer = new BlockContainer( true );
+        this.reverseBlockContainer = new BlockContainer( false );
         this.exclusionList = exclusionList;
 
         this.storeGaps( mappings );
@@ -161,7 +161,7 @@ public class Layout implements LayoutI {
      * @param layers list of layers to add the blocks to
      * @param blocks block container to add to layers
      */
-    private void layoutBlocks( ArrayList<LayerI> layers, BlockContainer blocks ) {
+    private void layoutBlocks( List<LayerI> layers, BlockContainer blocks ) {
         LayerI l;
         while( !blocks.isEmpty() ) {
             l = new Layer( absStart, absStop, gapManager );
@@ -179,12 +179,22 @@ public class Layout implements LayoutI {
      * @param blocks block container
      */
     private void fillLayer( LayerI l, BlockContainer blocks ) {
-        BlockI block = blocks.getNextByPositionAndRemove( 0 );
-        int counter = 0;
+        int startPos;
+        if( blocks.isSortFwd() ) {
+            startPos = 0;
+        } else {
+            startPos = absStop + 2;
+        }
+        BlockI block = blocks.getNextByPositionAndRemove( startPos );
         while( block != null ) {
-            counter++;
             l.addBlock( block );
-            block = blocks.getNextByPositionAndRemove( block.getAbsStop() + 1 );
+            int pos;
+            if( blocks.isSortFwd() ) {
+                pos = block.getStop() + 1;
+            } else {
+                pos = block.getStart() - 1;
+            }
+            block = blocks.getNextByPositionAndRemove( pos );
         }
     }
 

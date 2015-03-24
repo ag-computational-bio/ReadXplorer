@@ -114,8 +114,8 @@ public class BlockComponent extends JComponent {
         this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
-        this.absLogBlockStart = block.getAbsStart();
-        this.absLogBlockStop = block.getAbsStop();
+        this.absLogBlockStart = block.getStart();
+        this.absLogBlockStop = block.getStop();
         this.showBaseQualities = showBaseQualities;
         this.gapManager = gapManager;
 

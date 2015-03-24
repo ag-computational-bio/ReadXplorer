@@ -19,27 +19,33 @@ package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
 import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.Iterator;
 
 
 /**
+ * Interface for alignment blocks.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
-public interface BlockI {
-
-    int getAbsStart();
+public interface BlockI extends GenomicRange {
 
 
-    int getAbsStop();
-
-
+    /**
+     * @return An iterator of all bricks belonging to this block.
+     */
     Iterator<Brick> getBrickIterator();
 
 
+    /**
+     * @return The corresponding object with id.
+     */
     ObjectWithId getObjectWithId();
 
 
+    /**
+     * @return The number of bricks of this block.
+     */
     int getNumOfBricks();
 
 
