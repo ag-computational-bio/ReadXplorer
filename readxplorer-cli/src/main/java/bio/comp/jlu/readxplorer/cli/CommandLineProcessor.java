@@ -32,6 +32,7 @@ import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable.ImportTrackResults;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
@@ -624,9 +625,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         if( snpAnalysis ) {
             runAnalyses++;
-            SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg );
-            es.submit( snpAnalysisCallable );
             printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
+            for( PersistentTrack persistentTrack : ProjectConnector.getInstance().getTracks() ) {
+                SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack );
+                es.submit( snpAnalysisCallable );
+                File trackFile = new File( persistentTrack.getFilePath() );
+                printFine( ps, "\t\t" + trackFile.getName() );
+            }
         }
 
         if( tssAnalysis ) {
@@ -667,6 +672,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
             CommandException ce = new CommandException( 1, "analysis failed!" );
             ce.initCause( ex );
             throw ce;
+        }
+
+        if( snpAnalysis ) {
+            // TODO merge created exel files into one.
         }
 
         return runAnalyses;
