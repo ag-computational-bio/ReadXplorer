@@ -93,7 +93,6 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             ParsedReference parsedRefGenome = refParser.parseReference( referenceJob, filter );
             result.setParsedReference( parsedRefGenome );
             LOG.log( Level.FINE, "parsed reference file: {0}", referenceFile.getName() );
-            result.addOutput( "parsed reference file " + referenceFile.getName() );
 
             return result;
 

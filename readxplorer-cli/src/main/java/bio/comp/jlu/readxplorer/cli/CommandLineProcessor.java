@@ -86,12 +86,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public String referenceArg;
 
     @Arg( shortName = 'r', longName = "reads" )
-    @Description( shortDescription = "SAM/BAM read files to import / analysis." )
-    public String[] readsArgs;
+    @Description( shortDescription = "Directory with SAM/BAM read files to import / analysis." )
+    public String readsDirArg;
 
     @Arg( shortName = 'e', longName = "per" )
-    @Description( shortDescription = "SAM/BAM paired-end read files to import / analysis." )
-    public String[] pairedEndReadsArgs;
+    @Description( shortDescription = "Directory with SAM/BAM paired-end read files to import / analysis." )
+    public String pairedEndReadsDirArg;
 
 
     /**
@@ -175,14 +175,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printFine( ps, "property file: " + (propsFileArg != null ? propsFileArg : "default") );
 
 
+        printFine( ps, null );
         // test reference file
         final File referenceFile = getReferenceFile( ps );
 
         // test track file
-        final File[] readsFiles = getReadsFiles( ps );
+        final File[] readFiles = getReadFiles( ps );
 
         // test paired-end read files
-        final File[] pairedEndFiles = getPairedEndReadsFiles( ps );
+        final File[] pairedEndReadFiles = getPairedEndReadFiles( ps, readFiles );
 
         // setup ProjectConnector
         final ProjectConnector pc = setupProjectConnector( ps );
@@ -217,12 +218,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // import tracks
         try {
-            if( pairedEndArg || pairedEndFiles != null ) {
+            if( pairedEndArg || pairedEndReadFiles != null ) {
                 // import paired-end reads
-                importPairedEndReads( readsFiles, pairedEndFiles, referenceResult, es, ps );
+                importPairedEndReads( readFiles, pairedEndReadFiles, referenceResult, es, ps );
             } else {
                 // import normal reads
-                importReads( readsFiles, referenceResult, es, ps );
+                importReads( readFiles, referenceResult, es, ps );
             }
         } catch( InterruptedException | ExecutionException ex ) {
             LOG.log( SEVERE, ex.getMessage(), ex );
@@ -233,6 +234,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         // run analyses
+        printInfo( ps, null );
         printInfo( ps, "start analyses..." );
         int runAnalyses = 0;
 
@@ -245,10 +247,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, "\tfasta file: " + pr.getFastaFile().getName() );
         printInfo( ps, "\t# chromosomes: " + pr.getChromosomes().size() );
         // print read info
-        printInfo( ps, "" );
+        printInfo( ps, null );
         printInfo( ps, "# imported tracks: " + pc.getTracks().size() );
         // print analyses info
-        printInfo( ps, "" );
+        printInfo( ps, null );
         printInfo( ps, "# run analyses: " + runAnalyses );
 
 
@@ -286,76 +288,79 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private File[] getReadsFiles( PrintStream ps ) throws CommandException {
+    private File[] getReadFiles( PrintStream ps ) throws CommandException {
 
-        if( readsArgs != null ) {
+        if( readsDirArg != null ) {
 
-            Arrays.sort( readsArgs ); // sort read files lexicographically
+            File readsDir = new File( readsDirArg );
+            readsDir = readsDir.toPath().toAbsolutePath().normalize().toFile();
+            if( !readsDir.isDirectory() ) {
+                throw new CommandException( 1, readsDirArg + " is not a directory!" );
+            }
+            if( !readsDir.canRead()) {
+                throw new CommandException( 1, "directory " + readsDirArg + " is not readable!" );
+            }
 
-            printFine( ps, "read files to import: ("+ readsArgs.length +")" );
-            File[] trackFiles = new File[readsArgs.length];
-            for( int i = 0; i < readsArgs.length; i++ ) {
+            // get all sam/bam files in lexicographic order
+            File[] readFiles = readsDir.listFiles( new ReadsFileFilter() );
+            Arrays.sort( readFiles );
 
-                String trackPath = readsArgs[i];
+            printFine( ps, "read files to import: ("+ readFiles.length +")" );
+            for( int i = 0; i < readFiles.length; i++ ) {
 
-                String fileType = trackPath.substring( trackPath.lastIndexOf( '.' ) + 1 ).toLowerCase();
-                if( !checkFileType( fileType ) ) { // check file type
-                    throw new CommandException( 1, "Wrong reads file type \"" + fileType + "\"!" );
+                File readFile = readFiles[i];
+                if( !readFile.canRead() ) { // check file permissions
+                    throw new CommandException( 1, "Cannot access read file " + (i+1) + '(' + readFile.getName() + ")!" );
                 }
-
-                File trackFile = new File( trackPath );
-                if( !trackFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access read file " + (i+1) + "(" + trackPath + ")!" );
-                }
-
-                trackFiles[i] = trackFile;
-                printFine( ps, "\tadd " + trackFile.getName() );
+                printFine( ps, "\t- " + readFile.getName() );
 
             }
-            return trackFiles;
+            return readFiles;
 
         } else {
-            throw new CommandException( 1, "No reads files set!" );
+            throw new CommandException( 1, "No read files set!" );
         }
 
     }
 
 
-    private File[] getPairedEndReadsFiles( PrintStream ps ) throws CommandException {
+    private File[] getPairedEndReadFiles( PrintStream ps, File[] readFiles ) throws CommandException {
 
-        if( pairedEndReadsArgs != null ) {
+        if( pairedEndReadsDirArg != null ) {
 
-            if( pairedEndReadsArgs.length != readsArgs.length ) {
-                throw new CommandException( 1, "Number of paired-end files (" + pairedEndReadsArgs.length + ") does not match number of read files (" + pairedEndReadsArgs.length + ")!" );
+            File pairedEndReadsDir = new File( pairedEndReadsDirArg );
+            pairedEndReadsDir = pairedEndReadsDir.toPath().toAbsolutePath().normalize().toFile();
+            if( !pairedEndReadsDir.isDirectory() ) {
+                throw new CommandException( 1, pairedEndReadsDirArg + " is not a directory!" );
+            }
+            if( !pairedEndReadsDir.canRead()) {
+                throw new CommandException( 1, "directory " + pairedEndReadsDirArg + " is not readable!" );
             }
 
-            Arrays.sort( pairedEndReadsArgs ); // sort paired-end read files lexicographically
+            // get all sam/bam files in lexicographic order
+            File[] pairedEndReadFiles = pairedEndReadsDir.listFiles( new ReadsFileFilter() );
+            Arrays.sort( pairedEndReadFiles );
 
-            printFine( ps, "paired-end files to import:" );
-            File[] pairedEndFiles = new File[pairedEndReadsArgs.length];
-            for( int i = 0; i < pairedEndFiles.length; i++ ) {
+            if( pairedEndReadFiles.length != readFiles.length ) {
+                throw new CommandException( 1, "Number of paired-end files (" + pairedEndReadFiles.length + ") does not match number of read files (" + readFiles.length + ")!" );
+            }
 
-                String peTrackPath = pairedEndReadsArgs[i];
+            printFine( ps, "paired-end read files to import: ("+ pairedEndReadFiles.length +")" );
+            for( int i = 0; i < pairedEndReadFiles.length; i++ ) {
 
-                String fileType = peTrackPath.substring( peTrackPath.lastIndexOf( '.' ) + 1 ).toLowerCase();
-                if( !checkFileType( fileType ) ) { // check file type
-                    throw new CommandException( 1, "Wrong paired-end file type \"" + fileType + "\"!" );
+                File pairedEndReadFile = pairedEndReadFiles[i];
+                if( !pairedEndReadFile.canRead() ) { // check file permissions
+                    throw new CommandException( 1, "Cannot access paired-end file " + (i+1) + "(" + pairedEndReadFile.getName() + ")!" );
                 }
 
-                File pairedEndFile = new File( peTrackPath );
-                if( !pairedEndFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access paired-end file " + (i+1) + "(" + peTrackPath + ")!" );
-                }
-
-                printFine( ps, "\tadd " + pairedEndFile.getName() );
-                pairedEndFiles[i] = pairedEndFile;
+                printFine( ps, "\t- " + pairedEndReadFile.getName() );
 
             }
 
-            return pairedEndFiles;
+            return pairedEndReadFiles;
 
         } else {
-            return null;
+            throw new CommandException( 1, "No paired-end read files set!" );
         }
 
     }
@@ -366,6 +371,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private ProjectConnector setupProjectConnector( PrintStream ps ) throws CommandException {
 
         try {
+
+            printFine( ps, null );
 
             if( dbFileArg == null ) {
                 dbFileArg = DEFAULT_DATABASE_NAME;
@@ -394,7 +401,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         try {
 
-            printFine( ps, "parse reference genome..." );
+            printFine( ps, "parse and store reference... " );
             Future<ImportReferenceResult> refFuture = es.submit( new ImportReferenceCallable( referenceFile ) );
             ImportReferenceResult referenceResult = refFuture.get();
 
@@ -402,15 +409,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
             for( String msg : referenceResult.getOutput() ) {
                 printInfo( ps, msg );
             }
-            printInfo( ps, "...done!" );
 
             // stores reference sequence in the db
-            printFine( ps, "store reference to db..." );
             int refGenID = ProjectConnector.getInstance().addRefGenome( referenceResult.getParsedReference() );
             referenceResult.getReferenceJob().setPersistent( refGenID );
             referenceResult.getReferenceJob().setFile( referenceResult.getParsedReference().getFastaFile() );
-            printFine( ps, "...done!" );
-            printInfo( ps, "imported reference genome source " + referenceResult.getParsedReference().getName() );
+            printInfo( ps, "imported reference " + referenceFile.getName() );
             return referenceResult;
 
         } catch( InterruptedException | ExecutionException | StorageException ex ) {
@@ -425,7 +429,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private void importReads( File[] trackFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
 
-        printFine( ps, "submit jobs to import read files..." );
+        printInfo( ps, null );
+        printFine( ps, "submitted jobs to import read files..." );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
         // submit track parse jobs for (concurrent) execution
@@ -446,51 +451,57 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         // store parsed tracks sequently to db
-        printFine( ps, "import read files..." );
+        printFine( ps, null );
+        printFine( ps, "imported read files:" );
         for( Future<ImportTrackResults> future : futures ) {
             ImportTrackResults result = future.get();
-            for( String msg : referenceResult.getOutput() ) {
+            for( String msg : result.getOutput() ) {
                 printInfo( ps, msg );
             }
             ParsedTrack pt = result.getParsedTrack();
             pc.storeBamTrack( pt );
             pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-            printInfo( ps, "\t..." + result.getParsedTrack().getTrackName() );
+            printInfo( ps, "\t- " + result.getParsedTrack().getTrackName() );
         }
-        printInfo( ps, "...done!" );
 
     }
 
 
     private void importPairedEndReads( File[] trackFiles, File[] pairedEndFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
 
-        printFine( ps, "submit jobs to import paired-end read files..." );
+        printInfo( ps, null );
+        printFine( ps, "submitted jobs to import paired-end read files..." );
 
         // submit parse reads jobs for (concurrent) execution
         final int distance = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
         final byte orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
         final short deviation = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
+
         final ProjectConnector pc = ProjectConnector.getInstance();
+        int latestTrackId = pc.getLatestTrackId();
+
         final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
         for( int i = 0; i < trackFiles.length; i++ ) {
 
             File trackFile = trackFiles[i];
             Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
-            TrackJob trackJob1 = new TrackJob( pc.getLatestTrackId(), trackFile,
+            TrackJob trackJob1 = new TrackJob( latestTrackId, trackFile,
                                                trackFile.getName(),
                                                referenceResult.getReferenceJob(),
                                                selectParser( trackFile ),
                                                false,
                                                timestamp );
+            latestTrackId++;
             TrackJob trackJob2 = null;
             if( pairedEndFiles != null ) {
                 File pairedEndFile = pairedEndFiles[i];
-                trackJob2 = new TrackJob( pc.getLatestTrackId(), pairedEndFile,
+                trackJob2 = new TrackJob( latestTrackId, pairedEndFile,
                                           pairedEndFile.getName(),
                                           referenceResult.getReferenceJob(),
                                           selectParser( pairedEndFile ),
                                           false,
                                           timestamp );
+                latestTrackId++;
             }
 
             ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
@@ -500,10 +511,11 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         // store parsed reads sequently to db
-        printFine( ps, "import paired-end read files..." );
+        printFine( ps, null );
+        printFine( ps, "imported paired-end read files:" );
         for( Future<ImportPairedEndResults> future : futures ) {
             ImportPairedEndResults result = future.get();
-            for( String msg : referenceResult.getOutput() ) {
+            for( String msg : result.getOutput() ) {
                 printInfo( ps, msg );
             }
 
@@ -514,9 +526,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             // read pair ids have to be set in track entry
             pc.setReadPairIdsForTrackIds( pt.getID(), -1 );
-            printFine( ps, "\t..." + result.getParsedTrack().getTrackName() );
+            printFine( ps, "\t- " + result.getParsedTrack().getTrackName() );
         }
-        printFine( ps, "...done!" );
 
     }
 
@@ -525,9 +536,11 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private void printFine( PrintStream ps, String msg ) {
 
-        LOG.fine( msg );
+        if( msg != null ) {
+            LOG.fine( msg );
+        }
         if( verboseArg ) {
-            ps.println( msg );
+            ps.println( msg != null ? msg : "" );
         }
 
     }
@@ -535,8 +548,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private static void printInfo( PrintStream ps, String msg ) {
 
-        LOG.info( msg );
-        ps.println( msg );
+        if( msg != null ) {
+            LOG.info( msg );
+            ps.println( msg );
+        } else {
+            ps.println();
+        }
 
     }
 
@@ -640,16 +657,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
             default:
                 return new SamBamParser();
         }
-
-    }
-
-
-    private static boolean checkFileType( String fileType ) {
-
-        return "sam".equals( fileType ) ||
-               "bam".equals( fileType ) ||
-               "out".equals( fileType ) ||
-               "jok".equals( fileType );
 
     }
 
