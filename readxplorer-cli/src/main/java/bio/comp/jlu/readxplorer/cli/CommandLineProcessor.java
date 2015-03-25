@@ -682,10 +682,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
         int hours = runTime / (60*60*1000);
         runTime -= hours * 60 * 60 * 1000;
 
-        int mins = runTime / (60*1000);
+        int mins  = runTime / (60*1000);
         runTime -= mins * 60 * 1000;
 
-        int secs = runTime / 1000;
+        int secs  = runTime / 1000;
 
         printFine( ps, "run time: " + hours + "h " + mins + "m " + secs + "s" );
 
