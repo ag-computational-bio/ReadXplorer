@@ -70,6 +70,7 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
     @Override
     public ImportPairedEndResults call() throws CommandException {
 
+        final ImportPairedEndResults result = new ImportPairedEndResults( rpjc.getTrackJob1().getFile().getName() );
         try {
 
             /**
@@ -83,7 +84,8 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
              * already sorted by coordinate & classification in file)
              */
 
-            final ImportPairedEndResults iper = new ImportPairedEndResults();
+            LOG.log( Level.FINE, "create import objects..." );
+            result.addOutput( "create import objects..." );
             final TrackJob trackJob1 = rpjc.getTrackJob1();
             final TrackJob trackJob2 = rpjc.getTrackJob2();
             final Map<String, Integer> chromLengthMap = new HashMap<>();
@@ -92,82 +94,112 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
                 chromLengthMap.put( chrom.getName(), chrom.getLength() );
             }
 
-            final File inputFile1 = trackJob1.getFile();
-            inputFile1.setReadOnly(); // prevents changes or deletion of original file!
+            final File readFile1 = trackJob1.getFile();
+            readFile1.setReadOnly(); // prevents changes or deletion of original file!
             final StatsContainer statsContainer = new StatsContainer();
             statsContainer.prepareForTrack();
             statsContainer.prepareForReadPairTrack();
 
-            try {
-                // executes any conversion before other calculations, if the parser supports any
-                if( !trackJob1.getParser().convert( trackJob1, chromLengthMap ) ) {
-                    LOG.log( SEVERE, "Conversion of {0} failed!", trackJob1.getName() );
-                    return null;
-                }
 
-                File lastWorkFile = trackJob1.getFile(); // file which was created in the last step of the import process
-                if( trackJob2 != null ) { // only combine, if data is not already combined
-                    File inputFile2 = trackJob2.getFile();
-                    inputFile2.setReadOnly();
-                    boolean success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
-                    File lastWorkFile2 = trackJob2.getFile();
-                    if( !success ) {
-                        LOG.log( SEVERE, "Conversion of {0} failed!", trackJob2.getName() );
-                        return null;
-                    }
-
-                    // combine both tracks and continue with trackJob1, they are unsorted now
-                    SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
-                    if( !combiner.combineData() ) {
-                        LOG.log( SEVERE, "Combination of {0} and {1} failed!", new Object[]{ trackJob1.getName(), trackJob2.getName() } );
-                        return null;
-                    }
-                    GeneralUtils.deleteOldWorkFile( lastWorkFile ); // either were converted or are write protected
-                    GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
-                    lastWorkFile = trackJob1.getFile(); // the combined file
-                    inputFile2.setWritable( true );
-                }
-
-                // extension for both classification and read pair info
-                SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier( rpjc, chromLengthMap );
-                samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
-                samBamDirectReadPairClassifier.classifyReadPairs();
-
-                // delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
-                GeneralUtils.deleteOldWorkFile( lastWorkFile );
-
-            } catch( OutOfMemoryError | ParsingException ex ) {
-                LOG.log( SEVERE, "Error during parsing of bam track!", ex );
-                return null;
+            // executes any conversion before other calculations, if the parser supports any
+            LOG.log( Level.FINE, "convert read file(s): {0}...", readFile1.getName() );
+            result.addOutput( "convert file(s)..." );
+            if( !trackJob1.getParser().convert( trackJob1, chromLengthMap ) ) {
+                LOG.log( SEVERE, "Conversion of {0} failed!", readFile1.getName() );
+                result.addOutput( "Error: Conversion of " + readFile1.getName() + " failed!" );
+                return result;
             }
-            inputFile1.setWritable( true );
+
+            File lastWorkFile = trackJob1.getFile(); // file which was created in the last step of the import process
+            if( trackJob2 != null ) { // only combine, if data is not already combined
+                File readFile2 = trackJob2.getFile();
+                readFile2.setReadOnly();
+                boolean success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
+                File lastWorkFile2 = trackJob2.getFile();
+                if( !success ) {
+                    LOG.log( SEVERE, "Conversion of {0} failed!", trackJob2.getName() );
+                    result.addOutput( "Error: Conversion of " + trackJob1.getName() + " failed!" );
+                    return result;
+                }
+
+                // combine both tracks and continue with trackJob1, they are unsorted now
+                LOG.log( Level.FINE, "combine read files: {0} and {1}", new Object[]{ readFile1.getName(), readFile2.getName() } );
+                result.addOutput( "combine files..." );
+                SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
+                if( !combiner.combineData() ) {
+                    LOG.log( SEVERE, "Combination of {0} and {1} failed!", new Object[]{ readFile1.getName(), readFile2.getName() } );
+                    result.addOutput( "Error: Combination of " + readFile1.getName() + " and " + readFile2.getName() + " failed!" );
+                    return result;
+                }
+                GeneralUtils.deleteOldWorkFile( lastWorkFile ); // either were converted or are write protected
+                GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
+                lastWorkFile = trackJob1.getFile(); // the combined file
+                readFile2.setWritable( true );
+            }
+
+            // extension for both classification and read pair info
+            LOG.log( Level.FINE, "create classification statistics..." );
+            result.addOutput( "create statistics..." );
+            SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier( rpjc, chromLengthMap );
+            samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
+            samBamDirectReadPairClassifier.classifyReadPairs();
+
+            // delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
+            GeneralUtils.deleteOldWorkFile( lastWorkFile );
+            readFile1.setWritable( true );
 
             // create general track stats
             SamBamStatsParser statsParser = new SamBamStatsParser();
             statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
-            iper.setParsedTrack( track );
 
-            return iper;
+            LOG.log( Level.FINE, "parsed read file: {0}", readFile1.getName() );
+            result.addOutput( "parsed read file " + readFile1.getName() );
+            result.setParsedTrack( track );
+            result.setSuccessful( true );
 
-        } catch( IOException | OutOfMemoryError ex ) {
+        } catch( IOException | ParsingException ex ) {
             LOG.log( Level.SEVERE, null, ex );
-            CommandException ce = new CommandException( 1, "import failed!" );
+            result.addOutput( "Error: " + ex.getMessage() );
+        } catch( OutOfMemoryError ex ) {
+            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            CommandException ce = new CommandException( 1, "ran out of memory!" );
             ce.initCause( ex );
             throw ce;
         }
 
+        return result;
+
     }
 
 
-    public class ImportPairedEndResults {
+    public final class ImportPairedEndResults {
 
         private final List<String> output;
+        private boolean successful;
+        private String fileName;
         private ParsedTrack pt;
 
 
-        ImportPairedEndResults() {
+        ImportPairedEndResults( String fileName ) {
+            this.successful = false;
+            this.fileName = fileName;
             this.output = new ArrayList<>( 10 );
+        }
+
+
+        public String getFileName() {
+            return fileName;
+        }
+
+
+        void setSuccessful( boolean success ) {
+            this.successful = true;
+        }
+
+
+        public boolean isSuccessful() {
+            return successful;
         }
 
 

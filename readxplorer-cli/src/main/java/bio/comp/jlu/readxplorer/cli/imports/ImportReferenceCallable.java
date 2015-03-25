@@ -80,19 +80,24 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
         try {
 
             // create necessary (mockup) objects
+            final ImportReferenceResult result = new ImportReferenceResult();
+            LOG.log( Level.FINE, "create import objects..." );
+            result.addOutput( "create import objects..." );
+
             final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) + 1 ) );
             final ReferenceJob referenceJob = new ReferenceJob( 0, referenceFile, refParser,
                                                                 "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
-            final ImportReferenceResult result = new ImportReferenceResult();
             result.setReferenceJob( referenceJob );
 
             // parse reference genome
-            LOG.log( Level.FINE, "parsing reference file: {0}...", referenceFile.getName() );
+            LOG.log( Level.FINE, "parse reference file: {0}...", referenceFile.getName() );
+            result.addOutput( "parse reference file: " + referenceFile.getName() + "..." );
             FeatureFilter filter = new FeatureFilter();
             filter.addBlacklistRule( new FilterRuleSource() );
             ParsedReference parsedRefGenome = refParser.parseReference( referenceJob, filter );
             result.setParsedReference( parsedRefGenome );
             LOG.log( Level.FINE, "parsed reference file: {0}", referenceFile.getName() );
+            result.addOutput( "parsed reference file " + referenceFile.getName() );
 
             return result;
 
@@ -134,7 +139,7 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
     }
 
 
-    public class ImportReferenceResult {
+    public final class ImportReferenceResult {
 
         private final List<String> output;
         private ReferenceJob rj;

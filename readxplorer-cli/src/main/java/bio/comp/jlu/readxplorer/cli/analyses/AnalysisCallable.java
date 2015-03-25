@@ -61,7 +61,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         }
 
 
-        public void addOutput( String msg ) {
+        protected void addOutput( String msg ) {
             output.add( msg );
         }
 
@@ -75,7 +75,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         }
 
 
-        public void setResultFile( String resultFile ) {
+        protected void setResultFile( String resultFile ) {
             this.resultFile = resultFile;
         }
 

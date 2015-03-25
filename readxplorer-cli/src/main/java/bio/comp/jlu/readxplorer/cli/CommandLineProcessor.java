@@ -213,19 +213,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         // import tracks
-        try {
-            if( pairedEndArg || pairedEndReadFiles != null ) {
-                // import paired-end reads
-                importPairedEndReads( readFiles, pairedEndReadFiles, referenceResult, es, ps );
-            } else {
-                // import normal reads
-                importReads( readFiles, referenceResult, es, ps );
-            }
-        } catch( InterruptedException | ExecutionException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
-            CommandException ce = new CommandException( 1, "track import failed!" );
-            ce.initCause( ex );
-            throw ce;
+        if( pairedEndArg || pairedEndReadFiles != null ) {
+            // import paired-end reads
+            importPairedEndReads( readFiles, pairedEndReadFiles, referenceResult, es, ps );
+        } else {
+            // import normal reads
+            importReads( readFiles, referenceResult, es, ps );
         }
 
 
@@ -236,20 +229,20 @@ public final class CommandLineProcessor implements ArgsProcessor {
         // print reference info
         ps.println();
         printInfo( ps, "imported reference: " + pr.getName() );
-        printInfo( ps, "\tdescription: " + pr.getDescription() );
-        printInfo( ps, "\tfasta file: " + pr.getFastaFile().getName() );
-        printInfo( ps, "\t# chromosomes: " + pr.getChromosomes().size() );
+        printFine( ps, "\tfasta file: " + pr.getFastaFile().getName() );
+        printFine( ps, "\t# chromosomes: " + pr.getChromosomes().size() );
         // print read info
-        printInfo( ps, null );
+        printFine( ps, null );
         printInfo( ps, "# imported tracks: " + pc.getTracks().size() );
         // print analyses info
-        printInfo( ps, null );
+        printFine( ps, null );
         printInfo( ps, "# run analyses: " + runAnalyses );
 
 
         try {
             pc.disconnect();
-            printInfo( ps, "disconnected from " + dbFileArg );
+            printFine( ps, null );
+            printFine( ps, "disconnected from " + dbFileArg );
         } catch( Exception ex ) {
             LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
@@ -425,7 +418,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             // print (concurrent) output sequently
             for( String msg : referenceResult.getOutput() ) {
-                printInfo( ps, msg );
+                printFine( ps, "\t" + msg );
             }
 
             // stores reference sequence in the db
@@ -437,6 +430,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         } catch( InterruptedException | ExecutionException | StorageException ex ) {
             LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            printInfo( ps, "import of reference file failed:" );
+            printInfo( ps, "reason: "+ ex.getMessage() );
             CommandException ce = new CommandException( 1, "reference import failed!" );
             ce.initCause( ex );
             throw ce;
@@ -445,49 +440,74 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private void importReads( final File[] trackFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws InterruptedException, ExecutionException {
+    private void importReads( final File[] trackFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws CommandException {
 
-        printInfo( ps, null );
+        printFine( ps, null );
         printFine( ps, "submitted jobs to import read files..." );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
+        int latestTrackId = pc.getLatestTrackId();
         // submit track parse jobs for (concurrent) execution
         List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
         for( int i = 0; i < trackFiles.length; i++ ) {
 
             File trackFile = trackFiles[i];
-            TrackJob trackJob = new TrackJob( pc.getLatestTrackId(), trackFile,
+            TrackJob trackJob = new TrackJob( latestTrackId, trackFile,
                                               trackFile.getName(),
                                               referenceResult.getReferenceJob(),
                                               selectParser( trackFile ),
                                               false,
                                               new Timestamp( System.currentTimeMillis() ) );
+            latestTrackId++;
 
             futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
-            printFine( ps, "\t" + i + ": " + trackFile );
+            printFine( ps, "\t" + (i+1) + ": " + trackFile );
 
         }
 
         // store parsed tracks sequently to db
-        printFine( ps, null );
-        printFine( ps, "imported read files:" );
-        for( Future<ImportTrackResults> future : futures ) {
-            ImportTrackResults result = future.get();
-            for( String msg : result.getOutput() ) {
-                printInfo( ps, msg );
+        printInfo( ps, null );
+        printInfo( ps, "imported read files:" );
+        try {
+
+            for( int i=0; i<futures.size(); i++ ) {
+                ImportTrackResults result = futures.get( i ).get();
+                ParsedTrack pt = result.getParsedTrack();
+
+                // store track entry in db
+                pc.storeBamTrack( pt );
+                pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+
+                // print result information
+                if( result.isSuccessful() ) {
+                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() );
+                    for( String msg : result.getOutput() ) {
+                        printFine( ps, "\t\t" + msg );
+                    }
+                } else {
+                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() + " crashed!" );
+                    for( String msg : result.getOutput() ) {
+                        printInfo( ps, "\t\t" + msg );
+                    }
+                }
+
             }
-            ParsedTrack pt = result.getParsedTrack();
-            pc.storeBamTrack( pt );
-            pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-            printInfo( ps, "\t- " + result.getParsedTrack().getTrackName() );
+
+        } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            printInfo( ps, "import of read file failed:" );
+            printInfo( ps, "reason: "+ ex.getMessage() );
+            CommandException ce = new CommandException( 1, "track import failed!" );
+            ce.initCause( ex );
+            throw ce;
         }
 
     }
 
 
-    private void importPairedEndReads( final File[] trackFiles, final File[] pairedEndFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws InterruptedException, ExecutionException {
+    private void importPairedEndReads( final File[] trackFiles, final File[] pairedEndFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws CommandException {
 
-        printInfo( ps, null );
+        printFine( ps, null );
         printFine( ps, "submitted jobs to import paired-end read files..." );
 
         // submit parse reads jobs for (concurrent) execution
@@ -524,33 +544,55 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
             futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
-            printFine( ps, "\t" + i + ": " + trackFile );
+            printFine( ps, "\t" + (i+1) + ": " + trackFile );
 
         }
 
         // store parsed reads sequently to db
-        printFine( ps, null );
-        printFine( ps, "imported paired-end read files:" );
-        for( Future<ImportPairedEndResults> future : futures ) {
-            ImportPairedEndResults result = future.get();
-            for( String msg : result.getOutput() ) {
-                printInfo( ps, msg );
+        printInfo( ps, null );
+        printInfo( ps, "imported paired-end read files:" );
+        try {
+
+            for( int i=0; i<futures.size(); i++ ) {
+
+                ImportPairedEndResults result = futures.get( i ).get();
+
+                // store track entry in db
+                ParsedTrack pt = result.getParsedTrack();
+                pc.storeBamTrack( pt );
+                pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+
+                // read pair ids have to be set in track entry
+                pc.setReadPairIdsForTrackIds( pt.getID(), -1 );
+
+                // print result information
+                if( result.isSuccessful() ) {
+                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() );
+                    for( String msg : result.getOutput() ) {
+                        printFine( ps, "\t\t" + msg );
+                    }
+                } else {
+                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() + " crashed!" );
+                    for( String msg : result.getOutput() ) {
+                        printInfo( ps, "\t\t" + msg );
+                    }
+                }
+
             }
 
-            // store track entry in db
-            ParsedTrack pt = result.getParsedTrack();
-            pc.storeBamTrack( pt );
-            pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
-
-            // read pair ids have to be set in track entry
-            pc.setReadPairIdsForTrackIds( pt.getID(), -1 );
-            printFine( ps, "\t- " + result.getParsedTrack().getTrackName() );
+        } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            printInfo( ps, "import of paired-end read file failed:" );
+            printInfo( ps, "reason: "+ ex.getMessage() );
+            CommandException ce = new CommandException( 1, "track import failed!" );
+            ce.initCause( ex );
+            throw ce;
         }
 
     }
 
 
-    private int runAnalyses( final ExecutorService es, final PrintStream ps ) {
+    private int runAnalyses( final ExecutorService es, final PrintStream ps ) throws CommandException {
 
 
         printInfo( ps, null );
@@ -596,28 +638,34 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         printInfo( ps, null );
         printInfo( ps, "finished analyses:" );
-        for( int i=0; i<futures.size(); i++ ) {
+        try {
 
-            Future<AnalysisResult> future = futures.get( i );
-            try {
+            for( int i=0; i<futures.size(); i++ ) {
 
+                Future<AnalysisResult> future = futures.get( i );
                 AnalysisResult analysisResult = future.get();
                 String resultFilePath = analysisResult.getResultFile();
-                if( resultFilePath != null ) {
-                    printInfo( ps, "\t"+ i +" "+ analysisResult.getType() + "\tresult file: " + analysisResult.getResultFile() );
-                }
-                else {
-                    printInfo( ps, "\t"+ i +" "+ analysisResult.getType() + " crashed:" );
+                if( resultFilePath != null ) { // successful run
+                    printInfo( ps, "\t"+ (i+1) +" "+ analysisResult.getType() + "\tresult file: " + analysisResult.getResultFile() );
+                    for( String msg : analysisResult.getOutput() ) {
+                        printFine( ps, "\t\t"+msg );
+                    }
+                } else { // something went wrong during this analysis, other runs are not compromised
+                    printInfo( ps, "\t"+ (i+1) +" "+ analysisResult.getType() + " crashed:" );
                     for( String msg : analysisResult.getOutput() ) {
                         printInfo( ps, "\t\t"+msg );
                     }
                 }
 
-            } catch( InterruptedException | ExecutionException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
-                printInfo( ps, dbFileArg );
             }
 
+        } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            printInfo( ps, "analysis failed:" );
+            printInfo( ps, "reason: "+ ex.getMessage() );
+            CommandException ce = new CommandException( 1, "analysis failed!" );
+            ce.initCause( ex );
+            throw ce;
         }
 
         return runAnalyses;

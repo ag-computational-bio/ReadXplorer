@@ -66,9 +66,12 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
     @Override
     public ImportTrackResults call() throws CommandException {
 
+        final ImportTrackResults result = new ImportTrackResults( trackJob.getFile().getName() );
         try {
 
             // create necessary objects
+            LOG.log( Level.FINE, "create import objects..." );
+            result.addOutput( "create import objects..." );
             final File trackFile = trackJob.getFile();
             final MappingParserI mappingParser = trackJob.getParser();
             final Map<String, Integer> chromLengthMap = new HashMap<>();
@@ -80,53 +83,78 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             statsContainer.prepareForTrack();
 
 
-            // parse track file
-            LOG.log( Level.FINE, "parse track file: {0}...", trackFile.getName() );
-            trackFile.setReadOnly(); //prevents changes or deletion of original file!
-            //executes any conversion before other calculations, if the parser supports any
+            // executes any conversion before other calculations, if the parser supports any
+            LOG.log( Level.FINE, "convert read file: {0}...", trackFile.getName() );
+            result.addOutput( "convert file..." );
+            trackFile.setReadOnly(); // prevents changes or deletion of original file!
             boolean success = mappingParser.convert( trackJob, chromLengthMap );
             File lastWorkFile = trackJob.getFile();
 
 
-            //generate classification data in file sorted by read sequence
+            // generate classification data in file sorted by read sequence
+            LOG.log( Level.FINE, "parse read file: {0}...", trackFile.getName() );
+            result.addOutput( "parse..." );
             mappingParser.setStatsContainer( statsContainer );
             mappingParser.parseInput( trackJob, chromLengthMap );
             if( success ) {
                 GeneralUtils.deleteOldWorkFile( lastWorkFile );
-            } //only when we reach this line without exceptions and conversion was successful
+            } // only when we reach this line without exceptions and conversion was successful
             trackFile.setWritable( true );
 
-            //file needs to be sorted by coordinate for efficient calculation
+            // file needs to be sorted by coordinate for efficient calculation
+            LOG.log( Level.FINE, "create classification statistics..." );
+            result.addOutput( "create statistics..." );
             SamBamStatsParser statsParser = new SamBamStatsParser();
             statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
 
-            LOG.log( Level.FINE, "parsed track file: {0}", trackFile.getName() );
-            ImportTrackCallable.ImportTrackResults result = new ImportTrackCallable.ImportTrackResults();
-            result.addOutput( "parsed track file " + trackFile.getName() );
+            LOG.log( Level.FINE, "parsed read file: {0}", trackFile.getName() );
+            result.addOutput( "parsed read file " + trackFile.getName() );
             result.setParsedTrack( track );
+            result.setSuccessful( true );
 
-
-            return result;
-
-        } catch( ParsingException | IOException | OutOfMemoryError ex ) {
-            LOG.log( Level.SEVERE, null, ex );
-            CommandException ce = new CommandException( 1, "import failed!" );
+        } catch( ParsingException | IOException ex ) {
+            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            result.addOutput( "Error: " + ex.getMessage() );
+        } catch( OutOfMemoryError ex ) {
+            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            CommandException ce = new CommandException( 1, "ran out of memory!" );
             ce.initCause( ex );
             throw ce;
         }
 
+        return result;
+
     }
 
 
-    public class ImportTrackResults {
+    public final class ImportTrackResults {
 
         private final List<String> output;
+        private boolean successful;
+        private String fileName;
         private ParsedTrack pt;
 
 
-        ImportTrackResults() {
+        ImportTrackResults( String fileName ) {
+            this.successful = false;
+            this.fileName = fileName;
             this.output = new ArrayList<>( 10 );
+        }
+
+
+        public String getFileName() {
+            return fileName;
+        }
+
+
+        void setSuccessful( boolean success ) {
+            this.successful = true;
+        }
+
+
+        public boolean isSuccessful() {
+            return successful;
         }
 
 
