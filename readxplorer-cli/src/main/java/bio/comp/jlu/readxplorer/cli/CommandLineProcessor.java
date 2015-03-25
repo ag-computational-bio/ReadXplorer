@@ -188,31 +188,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
         // setup ProjectConnector
         final ProjectConnector pc = setupProjectConnector( ps );
 
-
-        /**
-         * Create a thread pool.
-         * Number of worker threads are based on the threadAmount argument,
-         * default is 1 (no multithreading).
-         */
-        final int noThreads;
-        if( threadAmountArg != null ) {
-            try {
-                noThreads = Integer.parseInt( threadAmountArg );
-            } catch( NumberFormatException nfe ) {
-                LOG.log( SEVERE, nfe.getMessage(), nfe );
-                CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
-                ce.initCause( nfe );
-                throw ce;
-            }
-        } else {
-            noThreads = 1;
-        }
-        final ExecutorService es = Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
+        // setup ExecutorService as worker thread pool
+        final ExecutorService es = createWorkerThreadPool();
 
 
         // import reference
         final ImportReferenceResult referenceResult = importReference( referenceFile, es, ps );
-        ParsedReference pr = referenceResult.getParsedReference();
+        final ParsedReference pr = referenceResult.getParsedReference();
 
 
 
@@ -234,10 +216,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         // run analyses
-        printInfo( ps, null );
-        printInfo( ps, "start analyses..." );
-        int runAnalyses = 0;
-
+        int runAnalyses = runAnalyses( es, ps );
 
 
         // print reference info
@@ -269,7 +248,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
 
-    private File getReferenceFile( PrintStream ps ) throws CommandException {
+    private File getReferenceFile( final PrintStream ps ) throws CommandException {
 
         if( referenceArg != null ) {
 
@@ -288,7 +267,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private File[] getReadFiles( PrintStream ps ) throws CommandException {
+    private File[] getReadFiles( final PrintStream ps ) throws CommandException {
 
         if( readsDirArg != null ) {
 
@@ -324,7 +303,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private File[] getPairedEndReadFiles( PrintStream ps, File[] readFiles ) throws CommandException {
+    private File[] getPairedEndReadFiles( final PrintStream ps, File[] readFiles ) throws CommandException {
 
         if( pairedEndReadsDirArg != null ) {
 
@@ -366,9 +345,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-
-
-    private ProjectConnector setupProjectConnector( PrintStream ps ) throws CommandException {
+    private ProjectConnector setupProjectConnector( final PrintStream ps ) throws CommandException {
 
         try {
 
@@ -397,7 +374,34 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private ImportReferenceResult importReference( File referenceFile, ExecutorService es, PrintStream ps ) throws CommandException {
+    private ExecutorService createWorkerThreadPool() throws CommandException {
+
+        /**
+         * Create a thread pool. Number of worker threads are based on the
+         * threadAmount argument, default is 1 (no multithreading).
+         */
+        final int noThreads;
+        if( threadAmountArg != null ) {
+            try {
+                noThreads = Integer.parseInt( threadAmountArg );
+            } catch( NumberFormatException nfe ) {
+                LOG.log( SEVERE, nfe.getMessage(), nfe );
+                CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
+                ce.initCause( nfe );
+                throw ce;
+            }
+        } else {
+            noThreads = 1;
+        }
+
+        return Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
+
+    }
+
+
+
+
+    private ImportReferenceResult importReference( final File referenceFile, final ExecutorService es, final PrintStream ps ) throws CommandException {
 
         try {
 
@@ -427,7 +431,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private void importReads( File[] trackFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
+    private void importReads( final File[] trackFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws InterruptedException, ExecutionException {
 
         printInfo( ps, null );
         printFine( ps, "submitted jobs to import read files..." );
@@ -467,7 +471,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private void importPairedEndReads( File[] trackFiles, File[] pairedEndFiles, ImportReferenceResult referenceResult, ExecutorService es, PrintStream ps ) throws InterruptedException, ExecutionException {
+    private void importPairedEndReads( final File[] trackFiles, final File[] pairedEndFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws InterruptedException, ExecutionException {
 
         printInfo( ps, null );
         printFine( ps, "submitted jobs to import paired-end read files..." );
@@ -532,9 +536,20 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
+    private int runAnalyses( final ExecutorService es, final PrintStream ps ) {
 
 
-    private void printFine( PrintStream ps, String msg ) {
+        printInfo( ps, null );
+        printInfo( ps, "start analyses..." );
+        int runAnalyses = 0;
+        
+
+        return runAnalyses;
+
+    }
+
+
+    private void printFine( final PrintStream ps, final String msg ) {
 
         if( msg != null ) {
             LOG.fine( msg );
@@ -546,7 +561,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private static void printInfo( PrintStream ps, String msg ) {
+    private static void printInfo( final PrintStream ps, final String msg ) {
 
         if( msg != null ) {
             LOG.info( msg );
@@ -568,7 +583,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * <p>
      * @return the property value
      */
-    private String getProperty( String key ) {
+    private String getProperty( final String key ) {
 
         String val = props.getProperty( key );
 
@@ -624,8 +639,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-
-
     /**
      * Loads a default <link>java.util.Properties</link> object.
      * <p>
@@ -646,7 +659,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private static MappingParserI selectParser( File trackFile ) {
+
+
+    private static MappingParserI selectParser( final File trackFile ) {
 
         switch( trackFile.getName().substring( trackFile.getName().lastIndexOf( '.' ) + 1 ).toLowerCase() ) {
             case "out":
