@@ -170,8 +170,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Override
     public void process( final Env env ) throws CommandException {
 
-        LOG.log( Level.FINE, "triggered command line processor" );
-
+        final long startTime = System.currentTimeMillis();
 
         // check if help/usgae is requested
         if( helpArg ) {
@@ -249,6 +248,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
             ce.initCause( ex );
             throw ce;
         }
+
+        printRuntime( startTime, ps );
 
     }
 
@@ -669,6 +670,24 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         return runAnalyses;
+
+    }
+
+
+    private void printRuntime( long startTime, final PrintStream ps ) {
+
+        long endTime = System.currentTimeMillis();
+        int runTime = (int) (endTime - startTime);
+
+        int hours = runTime / (60*60*1000);
+        runTime -= hours * 60 * 60 * 1000;
+
+        int mins  = runTime / (60*1000);
+        runTime -= mins * 60 * 1000;
+
+        int secs  = runTime / 1000;
+
+        printFine( ps, "run time: " + hours + "h " + mins + "m " + secs + "s" );
 
     }
 
