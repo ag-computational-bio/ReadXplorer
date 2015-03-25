@@ -52,13 +52,13 @@ final class ColorsPanel extends OptionsPanel {
      * An option panel for changing the colors of the coverage and mapping
      * classes in ReadXplorer.
      * <p>
-     * @param controller
+     * @param controller The controller belonging to this panel
      */
     ColorsPanel( ColorsOptionsPanelController controller ) {
         this.controller = controller;
         this.initComponents();
         this.initClassToPanelMap();
-        // TODO listen to changes in form fields and call controller.changed()
+        // could do: listen to changes in form fields and call controller.changed()
     }
 
 
@@ -115,6 +115,10 @@ final class ColorsPanel extends OptionsPanel {
         differenceColorPanel = new javax.swing.JPanel();
         track1ColorPanel = new javax.swing.JPanel();
         track2ColorPanel = new javax.swing.JPanel();
+        backgroundColorButton = new javax.swing.JButton();
+        backgroundColorPanel = new javax.swing.JPanel();
+        backgroundColorLabel = new javax.swing.JLabel();
+        generalSeparator1 = new javax.swing.JSeparator();
 
         org.openide.awt.Mnemonics.setLocalizedText(uniformColorationCheckBox, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.uniformColorationCheckBox.text")); // NOI18N
 
@@ -168,7 +172,7 @@ final class ColorsPanel extends OptionsPanel {
         perfectColorPanel.setLayout(perfectColorPanelLayout);
         perfectColorPanelLayout.setHorizontalGroup(
             perfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 226, Short.MAX_VALUE)
         );
         perfectColorPanelLayout.setVerticalGroup(
             perfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -339,6 +343,30 @@ final class ColorsPanel extends OptionsPanel {
             .addGap(0, 23, Short.MAX_VALUE)
         );
 
+        org.openide.awt.Mnemonics.setLocalizedText(backgroundColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.backgroundColorButton.text")); // NOI18N
+        backgroundColorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backgroundColorButtonActionPerformed(evt);
+            }
+        });
+
+        backgroundColorPanel.setBackground( ColorProperties.BACKGROUND_COLOR );
+        backgroundColorPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        backgroundColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+
+        javax.swing.GroupLayout backgroundColorPanelLayout = new javax.swing.GroupLayout(backgroundColorPanel);
+        backgroundColorPanel.setLayout(backgroundColorPanelLayout);
+        backgroundColorPanelLayout.setHorizontalGroup(
+            backgroundColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        backgroundColorPanelLayout.setVerticalGroup(
+            backgroundColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 20, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(backgroundColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.backgroundColorLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -356,17 +384,17 @@ final class ColorsPanel extends OptionsPanel {
                                         .addComponent(bestMatchLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addGap(42, 42, 42)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(perfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                    .addComponent(singleBestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                    .addComponent(bestColorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)))
+                                    .addComponent(perfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                                    .addComponent(singleBestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                                    .addComponent(bestColorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(singlePerfectMatchLabel)
                                     .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(6, 6, 6)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(singlePerfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                    .addComponent(commonColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))))
+                                    .addComponent(singlePerfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                                    .addComponent(commonColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -392,32 +420,39 @@ final class ColorsPanel extends OptionsPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(diffColorLabel)
                                 .addGap(48, 48, 48)
-                                .addComponent(differenceColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
+                                .addComponent(differenceColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(differenceColorButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(track1ColorLabel)
                                 .addGap(63, 63, 63)
-                                .addComponent(track1ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
+                                .addComponent(track1ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(track1ColorButton))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(track2ColorLabel)
-                                .addGap(63, 63, 63)
-                                .addComponent(track2ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(track2ColorButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(uniformColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(doubleTrackLabel))
-                                .addGap(0, 331, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(uniformColorationCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(uniformColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                                .addComponent(uniformColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(uniformColButton)))
+                                .addComponent(uniformColButton))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(track2ColorLabel)
+                                    .addComponent(backgroundColorLabel))
+                                .addGap(42, 42, 42)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                                    .addComponent(track2ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(track2ColorButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(backgroundColorButton, javax.swing.GroupLayout.Alignment.TRAILING)))
+                            .addComponent(generalSeparator1, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -489,7 +524,14 @@ final class ColorsPanel extends OptionsPanel {
                             .addComponent(track2ColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(track2ColorButton)))
                     .addComponent(track2ColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addComponent(generalSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(backgroundColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(backgroundColorButton))
+                .addGap(18, 18, 18)
                 .addComponent(resetButton)
                 .addContainerGap())
         );
@@ -525,6 +567,7 @@ final class ColorsPanel extends OptionsPanel {
         differenceColorPanel.setBackground( ColorProperties.COV_DIFF_COLOR );
         track1ColorPanel.setBackground( ColorProperties.TRACK1_COLOR );
         track2ColorPanel.setBackground( ColorProperties.TRACK2_COLOR );
+        backgroundColorPanel.setBackground( ColorProperties.BACKGROUND_COLOR );
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void differenceColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_differenceColorButtonActionPerformed
@@ -543,6 +586,10 @@ final class ColorsPanel extends OptionsPanel {
         this.displayColorChooser( commonColorPanel );
     }//GEN-LAST:event_commonColorButtonActionPerformed
 
+    private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
+        this.displayColorChooser( backgroundColorPanel );
+    }//GEN-LAST:event_backgroundColorButtonActionPerformed
+
 
     @Override
     void load() {
@@ -552,7 +599,8 @@ final class ColorsPanel extends OptionsPanel {
             classToPanelMap.get( classType ).setBackground( classToColorMap.get( classType ) );
         }
 
-        this.updatePanelColor( ColorProperties.UNIFORM_COLOR_STRING, Color.BLUE, uniformColorPanel );
+        updatePanelColor( ColorProperties.UNIFORM_COLOR_STRING, Color.BLUE, uniformColorPanel );
+        updatePanelColor( ColorProperties.BACKGROUND_COLOR_STRING, ColorProperties.BACKGROUND_COLOR, backgroundColorPanel );
 
         uniformColorationCheckBox.setSelected( this.pref.getBoolean( ColorProperties.UNIFORM_DESIRED, false ) );
     }
@@ -581,6 +629,7 @@ final class ColorsPanel extends OptionsPanel {
         // store modified settings
         this.pref.putBoolean( ColorProperties.UNIFORM_DESIRED, uniformColorationCheckBox.isSelected() );
         this.pref.put( ColorProperties.UNIFORM_COLOR_STRING, Integer.toString( uniformColorPanel.getBackground().getRGB() ) );
+        this.pref.put( ColorProperties.BACKGROUND_COLOR_STRING, Integer.toString( backgroundColorPanel.getBackground().getRGB() ) );
 
         for( Classification classType : classToPanelMap.keySet() ) {
             this.storeColor( classType );
@@ -616,6 +665,9 @@ final class ColorsPanel extends OptionsPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backgroundColorButton;
+    private javax.swing.JLabel backgroundColorLabel;
+    private javax.swing.JPanel backgroundColorPanel;
     private javax.swing.JButton bestColorButton;
     private javax.swing.JPanel bestColorPanel;
     private javax.swing.JLabel bestMatchLabel;
@@ -628,6 +680,7 @@ final class ColorsPanel extends OptionsPanel {
     private javax.swing.JLabel doubleTrackLabel;
     private javax.swing.JSeparator doubleTrackSeparator;
     private javax.swing.JSeparator generalSeparator;
+    private javax.swing.JSeparator generalSeparator1;
     private javax.swing.JButton perfectColorButton;
     private javax.swing.JPanel perfectColorPanel;
     private javax.swing.JLabel perfectMatchLabel;

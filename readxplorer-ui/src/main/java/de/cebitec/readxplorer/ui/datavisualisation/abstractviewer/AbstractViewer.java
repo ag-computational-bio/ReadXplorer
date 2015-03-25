@@ -49,6 +49,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -58,6 +61,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.WARNING;
 
@@ -78,6 +82,7 @@ public abstract class AbstractViewer extends JPanel implements
 
     private static final Logger LOG = Logger.getLogger( AbstractViewer.class.getName() );
 
+    protected final Preferences pref = NbPreferences.forModule( Object.class );
 
     private static final long serialVersionUID = 1L;
     /**
@@ -136,10 +141,7 @@ public abstract class AbstractViewer extends JPanel implements
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
-    public static final Color BACKGROUND_COLOR = new Color( 240, 240, 240 ); //to prevent wrong color on mac
-    /**
-     * Scrollpane, which should adapt, when component is repainted.
-     */
+    /** Scrollpane, which should adapt, when component is repainted. */
     private JScrollPane scrollPane;
     private boolean centerScrollBar = false;
     private BufferedImage loadingIndicator;
@@ -174,7 +176,7 @@ public abstract class AbstractViewer extends JPanel implements
 
         this.excludedClassifications = new ArrayList<>();
         this.setLayout( null );
-        this.setBackground( AbstractViewer.BACKGROUND_COLOR );
+        setBackgroundColor();
         this.boundsManager = boundsManager;
         this.basePanel = basePanel;
         this.reference = reference;
@@ -202,6 +204,36 @@ public abstract class AbstractViewer extends JPanel implements
         this.calcBaseWidth();
         this.recalcCorrelationFactor();
 
+        pref.addPreferenceChangeListener( new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange( PreferenceChangeEvent evt ) {
+                setBackgroundColor();
+                repaint();
+            }
+
+
+        } );
+
+    }
+
+
+    /**
+     * Sets the background color of this viewer according to the
+     * {@link de.cebitec.readxplorer.utils.ColorProperties#BACKGROUND_COLOR_STRING}
+     * property. If that does not work, ReadXplorer's standard background is
+     * chosen:
+     * {@link de.cebitec.readxplorer.utils.ColorProperties#BACKGROUND_COLOR}
+     */
+    private void setBackgroundColor() {
+        String colorRGB = pref.get( ColorProperties.BACKGROUND_COLOR_STRING, "" );
+        Color backgroundColor;
+        if( !colorRGB.isEmpty() ) {
+            backgroundColor = new Color( Integer.parseInt( colorRGB ) );
+        } else {
+            backgroundColor = ColorProperties.BACKGROUND_COLOR;
+        }
+        this.setBackground( backgroundColor );
     }
 
 
@@ -263,6 +295,8 @@ public abstract class AbstractViewer extends JPanel implements
      * <p>
      * @param menuLabel The menu to display including a title.
      * @param menu      The menu panel to display
+     * @param x         x-axis value to start painting the menu
+     * @param y         y-axis value to start painting the menu
      */
     private void setupMenu( MenuLabel menuLabel, JPanel menu, int x, int y ) {
 
@@ -279,7 +313,7 @@ public abstract class AbstractViewer extends JPanel implements
     /**
      * Setup a chromosome selection panel next to the legend panel.
      * <p>
-     * @param chromSelectionPanel the chromosome selection panel to display
+     * @param chromSelectionPanel The chromosome selection panel to display
      */
     public void setupChromSelectionPanel( JPanel chromSelectionPanel ) {
 
@@ -330,6 +364,8 @@ public abstract class AbstractViewer extends JPanel implements
     /**
      * Updates the painting area info of this viewer according to the available
      * heigth and width.
+     * <p>
+     * @param height The height to use for the viewer
      */
     private void adjustPaintingAreaInfo( int height ) {
         if( this.getHeight() > 0 && this.getWidth() > 0 ) {
@@ -364,7 +400,8 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @return true, if this viewer has a sequence bar, false otherwise
+     * @return <code>true</code>, if this viewer has a sequence bar,
+     *         <code>false</code> otherwise
      */
     public boolean hasSequenceBar() {
         return this.seqBar != null;
@@ -516,9 +553,9 @@ public abstract class AbstractViewer extends JPanel implements
 
     /**
      * Sets the current mouse position as the navigator bar center position, if
-     * panning is allowed and panning is currently active
+     * panning is allowed and panning is currently active.
      * <p>
-     * @param position
+     * @param position The position to center in the viewer
      */
     private void setPanPosition( int position ) {
         if( isPanning && canPan ) {
@@ -530,7 +567,8 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @return true, if panning is allowed, false otherwise
+     * @return <code>true</code>, if panning is allowed, <code>false</code>
+     *         otherwise
      */
     public boolean isPanModeOn() {
         return canPan;
@@ -538,7 +576,8 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * @param canPan true, if panning is allowed, false otherwise
+     * @param canPan <code>true</code>, if panning is allowed,
+     *               <code>false</code> otherwise
      */
     public void setIsPanModeOn( boolean canPan ) {
         this.canPan = canPan;
@@ -638,7 +677,7 @@ public abstract class AbstractViewer extends JPanel implements
 
 
     /**
-     * Compute the logical position for any given physical position
+     * Compute the logical position for any given physical position.
      * <p>
      * @param physPos horizontal position of a pixel
      * <p>
@@ -650,7 +689,7 @@ public abstract class AbstractViewer extends JPanel implements
         int currentLog = bounds.getCurrentLogPos();
         int leftbound = bounds.getLogLeft();
         int rightBound = bounds.getLogRight();
-        pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
+        pos = transformToLogicalCoord( physPos );
         int lb = leftbound - ((rightBound - leftbound) / 2);
         //we want to go to smaller positions
         if( lastPhysPos > physPos ) {
@@ -852,6 +891,11 @@ public abstract class AbstractViewer extends JPanel implements
     }
 
 
+    /**
+     * @param position The position whose mouse overlay width is needed
+     * <p>
+     * @return The width of the nucleotide base currently hovered by the mouse
+     */
     protected int getWidthOfMouseOverlay( int position ) {
         PhysicalBaseBounds mouseArea = getPhysBoundariesForLogPos( position );
         return (int) (mouseArea.getPhysWidth() >= 3 ? mouseArea.getPhysWidth() : 3);
@@ -949,6 +993,13 @@ public abstract class AbstractViewer extends JPanel implements
     }
 
 
+    /**
+     * Report the current mouse position on a child of this viewer to the
+     * viewer.
+     * <p>
+     * @param relPhyPos Current mouse position on a child of this viewer
+     * @param child     JComponent on which the mouse currently hovers
+     */
     public void forwardChildrensMousePosition( int relPhyPos, JComponent child ) {
         int phyPos = child.getX() + relPhyPos;
         int logPos = transformToLogicalCoord( phyPos );
@@ -1025,7 +1076,8 @@ public abstract class AbstractViewer extends JPanel implements
      * Set true, if this viewer should be active (in the foreground or it needs
      * to update its data) and false, if it should be inactive.
      * <p>
-     * @param isActive true, if this viewer should be active and false, if not
+     * @param isActive <code>true</code>, if this viewer should be active and
+     *                 <code>false</code>, if not
      */
     public void setActive( boolean isActive ) {
         this.isActive = isActive;
@@ -1036,31 +1088,51 @@ public abstract class AbstractViewer extends JPanel implements
     }
 
 
+    /**
+     * @return The label containing the legend of the viewer.
+     */
     public MenuLabel getLegendLabel() {
         return this.legendLabel;
     }
 
 
+    /**
+     * @return <code>true</code> if this viewer has a legend, <code>false</code>
+     *         otherwise
+     */
     public boolean hasLegend() {
         return this.hasLegend;
     }
 
 
+    /**
+     * @return The panel containing the legend of the viewer.
+     */
     public JPanel getLegendPanel() {
         return this.legend;
     }
 
 
+    /**
+     * @return The label containing the options for the viewer.
+     */
     public MenuLabel getOptionsLabel() {
         return this.optionsLabel;
     }
 
 
+    /**
+     * @return <code>true</code> if this viewer has a options,
+     *         <code>false</code> otherwise
+     */
     public boolean hasOptions() {
         return this.hasOptions;
     }
 
 
+    /**
+     * @return The panel containing the options of the viewer.
+     */
     public JPanel getOptionsPanel() {
         return this.options;
     }
@@ -1143,28 +1215,47 @@ public abstract class AbstractViewer extends JPanel implements
     }
 
 
+    /**
+     * @return <code>true</code> if something (like information about the
+     *         underlying data) should be painted at the current mouse position,
+     *         <code>false</code> otherwise
+     */
     public boolean isMouseOverPaintingRequested() {
         return printMouseOver;
     }
 
 
+    /**
+     * @param horizontalMargin The horizontal margin = gap at the start/end of
+     *                         the panel.
+     */
     public void setHorizontalMargin( int horizontalMargin ) {
         this.horizontalMargin = horizontalMargin;
         this.adjustPaintingAreaInfo();
     }
 
 
+    /**
+     * @return The horizontal margin = gap at the start/end of the panel.
+     */
     public int getHorizontalMargin() {
         return this.horizontalMargin;
     }
 
 
+    /**
+     * @param verticalMargin The vertical margin = gap at the start/end of the
+     *                       panel.
+     */
     public void setVerticalMargin( int verticalMargin ) {
         this.verticalMargin = verticalMargin;
         this.adjustPaintingAreaInfo();
     }
 
 
+    /**
+     * @return The bounds manager of the bounds for this viewer.
+     */
     public BoundsInfoManager getBoundsInformationManager() {
         return this.boundsManager;
     }
@@ -1179,6 +1270,9 @@ public abstract class AbstractViewer extends JPanel implements
     }
 
 
+    /**
+     * @return The size of the base panel on which this viewer is painted.
+     */
     public Dimension getBasePanelSize() {
         return this.basePanel.getSize();
     }
@@ -1189,13 +1283,20 @@ public abstract class AbstractViewer extends JPanel implements
      * its vertical value to the middle position, whenever the genome position
      * was updated.
      * <p>
-     * @param scrollPane the scrollpane which should adapt
+     * @param scrollPane The scrollpane which should adapt
      */
     public void setScrollPane( JScrollPane scrollPane ) {
         this.scrollPane = scrollPane;
     }
 
 
+    /**
+     * A scrollpane should be handed over, in case the scrollpane should adapt
+     * its vertical value to the middle position, whenever the genome position
+     * was updated.
+     * <p>
+     * @return scrollPane The scrollpane which should adapt
+     */
     public JScrollPane getScrollPane() {
         return this.scrollPane;
     }
