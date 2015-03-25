@@ -18,7 +18,6 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -33,13 +32,13 @@ public class CoverageAnalysisCallable extends AnalysisCallable {
 
     public CoverageAnalysisCallable( boolean verbosity ) {
 
-        super( verbosity );
+        super( verbosity, "coverage" );
 
     }
 
 
     @Override
-    public List<String> call() throws Exception {
+    public AnalysisResult call() throws Exception {
 
         LOG.fine( "start coverage analysis" );
         // calc coverage analyses

@@ -18,7 +18,6 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -32,12 +31,12 @@ public class TSSAnalysisCallable extends AnalysisCallable {
 
 
     public TSSAnalysisCallable( boolean verbosity ) {
-        super( verbosity );
+        super( verbosity, "TSS" );
     }
 
 
     @Override
-    public List<String> call() throws Exception {
+    public AnalysisResult call() throws Exception {
 
         LOG.fine( "start TSS analysis" );
         // calc coverage analyses

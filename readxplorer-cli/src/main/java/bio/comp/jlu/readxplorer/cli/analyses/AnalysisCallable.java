@@ -18,6 +18,7 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
+import bio.comp.jlu.readxplorer.cli.analyses.AnalysisCallable.AnalysisResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -27,17 +28,56 @@ import java.util.concurrent.Callable;
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
-public abstract class AnalysisCallable implements Callable<List<String>> {
+public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
     protected final boolean verbosity;
 
-    protected final List<String> output;
+    protected final AnalysisResult result;
 
 
-    protected AnalysisCallable( boolean verbosity ) {
+    protected AnalysisCallable( boolean verbosity, String anaylsis ) {
 
         this.verbosity = verbosity;
-        this.output = new ArrayList<>( 10 );
+        this.result = new AnalysisResult( anaylsis );
+
+    }
+
+
+    public class AnalysisResult {
+
+        private final String analysisType;
+        private final List<String> output;
+        private String resultFile;
+
+
+        public AnalysisResult( String analysisType ) {
+            this.analysisType = analysisType;
+            this.output = new ArrayList<>( 5 );
+        }
+
+
+        public String getType() {
+            return analysisType;
+        }
+
+
+        public void addOutput( String msg ) {
+            output.add( msg );
+        }
+
+        public List<String> getOutput() {
+            return output;
+        }
+
+
+        public String getResultFile() {
+            return resultFile;
+        }
+
+
+        public void setResultFile( String resultFile ) {
+            this.resultFile = resultFile;
+        }
 
     }
 

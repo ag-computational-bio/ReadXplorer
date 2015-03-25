@@ -18,7 +18,6 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -32,12 +31,12 @@ public class SNPAnalysisCallable extends AnalysisCallable {
 
 
     public SNPAnalysisCallable( boolean verbosity ) {
-        super( verbosity );
+        super( verbosity, "SNP" );
     }
 
 
     @Override
-    public List<String> call() throws Exception {
+    public AnalysisResult call() throws Exception {
 
         LOG.fine( "start SNP analysis" );
         // calc coverage analyses

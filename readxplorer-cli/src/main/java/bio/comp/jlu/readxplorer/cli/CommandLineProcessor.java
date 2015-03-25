@@ -18,6 +18,12 @@
 package bio.comp.jlu.readxplorer.cli;
 
 
+import bio.comp.jlu.readxplorer.cli.analyses.AnalysisCallable.AnalysisResult;
+import bio.comp.jlu.readxplorer.cli.analyses.CoverageAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.analyses.OperonDetectionAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.analyses.RPKMAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.analyses.SNPAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.analyses.TSSAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable.ImportPairedEndResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
@@ -125,17 +131,25 @@ public final class CommandLineProcessor implements ArgsProcessor {
     /**
      * Analysis options
      */
+    @Arg( longName = "cvrg" )
+    @Description( shortDescription = "Perform coverage analyses on all tracks." )
+    public boolean cvrgAnalysis;
+
+    @Arg( longName = "opdn" )
+    @Description( shortDescription = "Perform operon detection analyses on all tracks." )
+    public boolean opdnAnalysis;
+
+    @Arg( longName = "rpkm" )
+    @Description( shortDescription = "Perform reads per kilobase of transcript per million (RPKM) analyses on all tracks." )
+    public boolean rpkmAnalysis;
+
     @Arg( longName = "snp" )
-    @Description( shortDescription = "Perform Single Nucleotide Polymorphism analyses on all tracks." )
+    @Description( shortDescription = "Perform single nucleotide polymorphism (SNP) analyses on all tracks." )
     public boolean snpAnalysis;
 
     @Arg( longName = "tss" )
-    @Description( shortDescription = "Perform Transcription Start Site analyses on all tracks." )
+    @Description( shortDescription = "Perform transcription start site (TSS) analyses on all tracks." )
     public boolean tssAnalysis;
-
-    @Arg( longName = "rpkm" )
-    @Description( shortDescription = "Perform RPKM analyses on all tracks." )
-    public boolean rpkmAnalysis;
 
 
     public CommandLineProcessor() throws CommandException {
@@ -540,9 +554,71 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         printInfo( ps, null );
-        printInfo( ps, "start analyses..." );
+        printFine( ps, "submitted analyses:" );
         int runAnalyses = 0;
-        
+
+        final List<Future<AnalysisResult>> futures = new ArrayList<>();
+        if( cvrgAnalysis ) {
+            runAnalyses++;
+            CoverageAnalysisCallable cvrgAnalysisCallable = new CoverageAnalysisCallable( verboseArg );
+            futures.add( es.submit( cvrgAnalysisCallable ) );
+            printFine( ps, "\t"+ runAnalyses +": coverage analysis" );
+        }
+
+        if( opdnAnalysis ) {
+            runAnalyses++;
+            OperonDetectionAnalysisCallable opdnAnalysisCallable = new OperonDetectionAnalysisCallable( verboseArg );
+            es.submit( opdnAnalysisCallable );
+            printFine( ps, "\t"+ runAnalyses +": operon detection analysis" );
+        }
+
+        if( rpkmAnalysis ) {
+            runAnalyses++;
+            RPKMAnalysisCallable rpkmAnalysisCallable = new RPKMAnalysisCallable( verboseArg );
+            es.submit( rpkmAnalysisCallable );
+            printFine( ps, "\t"+ runAnalyses +": RPKM analysis" );
+        }
+
+        if( snpAnalysis ) {
+            runAnalyses++;
+            SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg );
+            es.submit( snpAnalysisCallable );
+            printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
+        }
+
+        if( tssAnalysis ) {
+            runAnalyses++;
+            TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg );
+            es.submit( tssAnalysisCallable );
+            printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
+        }
+
+
+        printInfo( ps, null );
+        printInfo( ps, "finished analyses:" );
+        for( int i=0; i<futures.size(); i++ ) {
+
+            Future<AnalysisResult> future = futures.get( i );
+            try {
+
+                AnalysisResult analysisResult = future.get();
+                String resultFilePath = analysisResult.getResultFile();
+                if( resultFilePath != null ) {
+                    printInfo( ps, "\t"+ i +" "+ analysisResult.getType() + "\tresult file: " + analysisResult.getResultFile() );
+                }
+                else {
+                    printInfo( ps, "\t"+ i +" "+ analysisResult.getType() + " crashed:" );
+                    for( String msg : analysisResult.getOutput() ) {
+                        printInfo( ps, "\t\t"+msg );
+                    }
+                }
+
+            } catch( InterruptedException | ExecutionException ex ) {
+                LOG.log( SEVERE, ex.getMessage(), ex );
+                printInfo( ps, dbFileArg );
+            }
+
+        }
 
         return runAnalyses;
 
