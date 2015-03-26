@@ -630,14 +630,14 @@ public final class CommandLineProcessor implements ArgsProcessor {
         if( opdnAnalysis ) {
             runAnalyses++;
             OperonDetectionAnalysisCallable opdnAnalysisCallable = new OperonDetectionAnalysisCallable( verboseArg );
-            es.submit( opdnAnalysisCallable );
+            futures.add( es.submit( opdnAnalysisCallable ) );
             printFine( ps, "\t"+ runAnalyses +": operon detection analysis" );
         }
 
         if( rpkmAnalysis ) {
             runAnalyses++;
             RPKMAnalysisCallable rpkmAnalysisCallable = new RPKMAnalysisCallable( verboseArg );
-            es.submit( rpkmAnalysisCallable );
+            futures.add( es.submit( rpkmAnalysisCallable ) );
             printFine( ps, "\t"+ runAnalyses +": RPKM analysis" );
         }
 
@@ -660,7 +660,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             for( PersistentTrack persistentTrack : ProjectConnector.getInstance().getTracks() ) {
                 SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack, parameterSet );
-                es.submit( snpAnalysisCallable );
+                futures.add( es.submit( snpAnalysisCallable ) );
                 File trackFile = new File( persistentTrack.getFilePath() );
                 printFine( ps, "\t\t" + trackFile.getName() );
             }
@@ -669,7 +669,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         if( tssAnalysis ) {
             runAnalyses++;
             TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg );
-            es.submit( tssAnalysisCallable );
+            futures.add( es.submit( tssAnalysisCallable ) );
             printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
         }
 
