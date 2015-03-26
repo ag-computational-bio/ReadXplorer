@@ -25,6 +25,7 @@ import bio.comp.jlu.readxplorer.cli.analyses.RPKMAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.SNPAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.TSSAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.filefilter.ReadsFileFilter;
+import bio.comp.jlu.readxplorer.cli.filefilter.SNPAnalysisFileFilter;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable.ImportPairedEndResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
@@ -68,6 +69,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+import jxl.write.Blank;
+import jxl.write.Label;
+import jxl.write.WritableCell;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 import org.netbeans.api.sendopts.CommandException;
 import org.netbeans.spi.sendopts.Arg;
 import org.netbeans.spi.sendopts.ArgsProcessor;
@@ -697,7 +707,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         if( snpAnalysis ) {
-            // TODO merge created exel files into one.
+            mergeAnlaysisFiles( SNPAnalysisFileFilter.PREFIX );
         }
 
         return runAnalyses;
@@ -743,52 +753,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
         } else {
             ps.println();
         }
-
-    }
-
-
-
-
-    private static Set<FeatureType> getSelectedFeatureTypes( String property ) {
-
-        Set<FeatureType> featureTypes = new HashSet<>();
-        for( String number : property.split( "," ) ) {
-            int type = Integer.parseInt( number );
-            FeatureType featureType = FeatureType.getFeatureType( type );
-            featureTypes.add( featureType );
-        }
-        return featureTypes;
-
-    }
-
-
-    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality ) {
-
-        List<MappingClass> mappingClasses = new ArrayList<>();
-        for( String number : property.split( "," ) ) {
-            byte type = Byte.parseByte( number );
-            MappingClass mc = MappingClass.getFeatureType( type );
-            mappingClasses.add( mc );
-        }
-
-        List<Classification> excludedFeatureTypes = new ArrayList<>();
-        if( !mappingClasses.contains( MappingClass.PERFECT_MATCH ) ) {
-            excludedFeatureTypes.add( MappingClass.PERFECT_MATCH );
-        }
-        if( !mappingClasses.contains( MappingClass.BEST_MATCH ) ) {
-            excludedFeatureTypes.add( MappingClass.BEST_MATCH );
-        }
-        if( !mappingClasses.contains( MappingClass.COMMON_MATCH ) ) {
-            excludedFeatureTypes.add( MappingClass.COMMON_MATCH );
-        }
-        if( !mappingClasses.contains( MappingClass.SINGLE_PERFECT_MATCH ) ) {
-            excludedFeatureTypes.add( MappingClass.SINGLE_PERFECT_MATCH );
-        }
-        if( !mappingClasses.contains( MappingClass.SINGLE_BEST_MATCH ) ) {
-            excludedFeatureTypes.add( MappingClass.SINGLE_BEST_MATCH );
-        }
-
-        return new ParametersReadClasses( excludedFeatureTypes, minMappingQuality, Properties.STRAND_FEATURE );
 
     }
 
@@ -875,6 +839,96 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         return properties;
+
+    }
+
+
+
+
+    private static void mergeAnlaysisFiles( final String analysisPrefix ) throws CommandException {
+
+        try {
+            WritableWorkbook wwb = Workbook.createWorkbook( new File( analysisPrefix + "-analyses.xls" ) );
+            int i = 0;
+            for( File snpAnalysisFile : (new File(".")).listFiles( new SNPAnalysisFileFilter() ) ) {
+                Workbook wb = Workbook.getWorkbook( snpAnalysisFile );
+                Sheet sheet = wb.getSheet( 01 );
+                String snpAnalysisName = snpAnalysisFile.getName().replace( analysisPrefix + "-", "" ).replace( ".xls", "" );
+                final WritableSheet ws = wwb.createSheet( snpAnalysisName, i );
+                final int noRows = sheet.getRows();
+                final int noCols = sheet.getColumns();
+                for( int idxRow = 0; idxRow < noRows; idxRow++ ) {
+                    for( int idxCol = 0; idxCol < noCols; idxCol++ ) {
+                        WritableCell wc;
+                        String cellCntnt = sheet.getCell( idxCol, idxRow ).getContents();
+                        if( cellCntnt != null  &&  !cellCntnt.isEmpty() ) {
+                            try {
+                                double val = Double.parseDouble( cellCntnt );
+                                wc = new jxl.write.Number( idxCol, idxRow, val );
+                            } catch( NumberFormatException nfe ) {
+                                wc = new Label( idxCol, idxRow, cellCntnt );
+                            }
+                        } else {
+                            wc = new Blank( idxCol, idxRow );
+                        }
+
+                        ws.addCell( wc );
+                    }
+                }
+                i++;
+                wb.close();
+            }
+            wwb.write();
+            wwb.close();
+        } catch( IOException | BiffException | WriteException ex ) {
+            CommandException ce = new CommandException( 1, "combination of " + analysisPrefix + " analysis files failed!" );
+            ce.initCause( ex );
+            throw ce;
+        }
+
+    }
+
+
+    private static Set<FeatureType> getSelectedFeatureTypes( String property ) {
+
+        Set<FeatureType> featureTypes = new HashSet<>();
+        for( String number : property.split( "," ) ) {
+            int type = Integer.parseInt( number );
+            FeatureType featureType = FeatureType.getFeatureType( type );
+            featureTypes.add( featureType );
+        }
+        return featureTypes;
+
+    }
+
+
+    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality ) {
+
+        List<MappingClass> mappingClasses = new ArrayList<>();
+        for( String number : property.split( "," ) ) {
+            byte type = Byte.parseByte( number );
+            MappingClass mc = MappingClass.getFeatureType( type );
+            mappingClasses.add( mc );
+        }
+
+        List<Classification> excludedFeatureTypes = new ArrayList<>();
+        if( !mappingClasses.contains( MappingClass.PERFECT_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.PERFECT_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.BEST_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.BEST_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.COMMON_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.COMMON_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.SINGLE_PERFECT_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.SINGLE_PERFECT_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.SINGLE_BEST_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.SINGLE_BEST_MATCH );
+        }
+
+        return new ParametersReadClasses( excludedFeatureTypes, minMappingQuality, Properties.STRAND_FEATURE );
 
     }
 
