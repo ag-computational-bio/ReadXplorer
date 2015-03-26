@@ -78,29 +78,41 @@ public enum FeatureType implements Classification {
      */
     EXON( FeatureType.EXON_INT, FeatureType.EXON_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getType() returns '11' = To be used for introns.
+     */
+    INTRON( FeatureType.INTRON_INT, FeatureType.INTRON_STRING ),
+    /**
+     * getType() returns '29' = To be used for five prime untranslated region.
      */
     FIVE_UTR( FeatureType.FIVE_UTR_INT, FeatureType.FIVE_UTR_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getType() returns '30' = To be used for three prime untranslated region.
      */
     THREE_UTR( FeatureType.THREE_UTR_INT, FeatureType.THREE_UTR_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getType() returns '31' = To be used for non coding RNAs.
      */
     NC_RNA( FeatureType.NC_RNA_INT, FeatureType.NC_RNA_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getType() returns '32' = To be used for minus 35 region.
      */
     MINUS_THIRTYFIVE( FeatureType.MINUS_THIRTYFIVE_INT, FeatureType.MINUS_THIRTYFIVE_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getType() returns '33' = To be used for minus 10 region.
      */
     MINUS_TEN( FeatureType.MINUS_TEN_INT, FeatureType.MINUS_TEN_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getType() returns '34' = To be used for ribosome binding sides.
      */
     RBS( FeatureType.RBS_INT, FeatureType.RBS_STRING ),
+    /**
+     * getType() returns '35' = To be used for start codon location.
+     */
+    START_CODON( FeatureType.START_CODON_INT, FeatureType.START_CODON_STRING ),
+    /**
+     * getType() returns '36' = To be used for stop codon location.
+     */
+    STOP_CODON( FeatureType.STOP_CODON_INT, FeatureType.STOP_CODON_STRING_UNDERSCORE ),
     /**
      * feature type for multiple mapped reads (non-unique)
      */
@@ -133,12 +145,16 @@ public enum FeatureType implements Classification {
     private static final int GENE_INT = 8;
     private static final int MIRNA_INT = 9;
     private static final int EXON_INT = 10;
+    private static final int INTRON_INT = 11;
     private static final int FIVE_UTR_INT = 29;
     private static final int THREE_UTR_INT = 30;
     private static final int NC_RNA_INT = 31;
     private static final int MINUS_THIRTYFIVE_INT = 32;
     private static final int MINUS_TEN_INT = 33;
     private static final int RBS_INT = 34;
+    private static final int START_CODON_INT = 35;
+    private static final int STOP_CODON_INT = 36;
+
 
     /**
      * feature type int for multiple mapped reads (non-unique)
@@ -193,8 +209,14 @@ public enum FeatureType implements Classification {
     private static final String GENE_STRING = "Gene";
     private static final String MIRNA_STRING = "miRNA";
     private static final String EXON_STRING = "Exon";
+    private static final String INTRON_STRING = "Intron";
     private static final String FIVE_UTR_STRING = "5'UTR";
     private static final String THREE_UTR_STRING = "3'UTR";
+    /**
+     * UTR strings with underscore.
+     */
+    private static final String FIVE_UTR_STRING_UNDERSCORE = "five_prime_UTR";
+    private static final String THREE_UTR_STRING_UNDERSCORE = "three_prime_UTR";
     private static final String NC_RNA_STRING = "non-coding RNA";
     private static final String MINUS_THIRTYFIVE_STRING = "-35 signal";
     /**
@@ -207,7 +229,16 @@ public enum FeatureType implements Classification {
      */
     private static final String MINUS_TEN_STRING_UNDERSCORE = "-10_signal";
     private static final String RBS_STRING = "RBS";
-
+    private static final String START_CODON_STRING = "Start codon";
+    /**
+     * Start codon string with underscore "start_codon".
+     */
+    private static final String START_CODON_STRING_UNDERSCORE = "start_codon";
+    private static final String STOP_CODON_STRING = "Stop codon";
+    /**
+     * Stop codon string with underscore "stop_codon".
+     */
+    private static final String STOP_CODON_STRING_UNDERSCORE = "stop_codon";
     /**
      * feature type String for multiple mapped reads (non-unique)
      */
@@ -241,7 +272,7 @@ public enum FeatureType implements Classification {
     /**
      * FeatureTypes that are GUI selectable.
      */
-    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA, NC_RNA};
+    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = { GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA, NC_RNA };
 
 
     private FeatureType( int typeInt, String typeString ) {
@@ -270,10 +301,10 @@ public enum FeatureType implements Classification {
 
     /**
      * @return the desired FeatureType for a given integer of a genomic feature
-     * type.
+     *         type.
      * <p>
      * @param type the type of FeatureType to return. If the type does not match
-     * a genomic feature type, FeatureType.UNDEFINED is returned.
+     *             a genomic feature type, FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType( int type ) {
         switch( type ) {
@@ -299,6 +330,8 @@ public enum FeatureType implements Classification {
                 return MIRNA;
             case EXON_INT:
                 return EXON;
+            case INTRON_INT:
+                return INTRON;
             case FIVE_UTR_INT:
                 return FIVE_UTR;
             case THREE_UTR_INT:
@@ -311,6 +344,10 @@ public enum FeatureType implements Classification {
                 return MINUS_TEN;
             case RBS_INT:
                 return RBS;
+            case START_CODON_INT:
+                return START_CODON;
+            case STOP_CODON_INT:
+                return STOP_CODON;
             default:
                 return UNDEFINED;
         }
@@ -321,7 +358,7 @@ public enum FeatureType implements Classification {
      * @return the desired FeatureType for a given genomic feature type string.
      * <p>
      * @param type the type of FeatureType to return. If the type is unknown
-     * FeatureType.UNDEFINED is returned.
+     *             FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType( String type ) {
         FeatureType featType;
@@ -347,13 +384,15 @@ public enum FeatureType implements Classification {
             featType = MIRNA;
         } else if( type.equalsIgnoreCase( EXON_STRING ) ) {
             featType = EXON;
+        } else if( type.equalsIgnoreCase( INTRON_STRING ) ) {
+            featType = INTRON;
         } else if( type.equalsIgnoreCase( SOURCE_STRING ) ) {
             featType = SOURCE;
         } else if( type.equalsIgnoreCase( ANY_STRING ) ) {
             featType = ANY;
-        } else if( type.equalsIgnoreCase( FIVE_UTR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( FIVE_UTR_STRING ) || type.equalsIgnoreCase( FIVE_UTR_STRING_UNDERSCORE ) ) {
             featType = FIVE_UTR;
-        } else if( type.equalsIgnoreCase( THREE_UTR_STRING ) ) {
+        } else if( type.equalsIgnoreCase( THREE_UTR_STRING ) || type.equalsIgnoreCase( THREE_UTR_STRING_UNDERSCORE ) ) {
             featType = THREE_UTR;
         } else if( type.equalsIgnoreCase( NC_RNA_STRING ) ) {
             featType = NC_RNA;
@@ -363,7 +402,11 @@ public enum FeatureType implements Classification {
             featType = MINUS_TEN;
         } else if( type.equalsIgnoreCase( RBS_STRING ) ) {
             featType = RBS;
-        } else {
+        } else if( type.equalsIgnoreCase( START_CODON_STRING ) || type.equalsIgnoreCase( START_CODON_STRING_UNDERSCORE )) {
+            featType = START_CODON;
+        } else if( type.equalsIgnoreCase( STOP_CODON_STRING ) || type.equalsIgnoreCase( STOP_CODON_STRING_UNDERSCORE )) {
+            featType = STOP_CODON;
+        } else{
             featType = UNDEFINED;
         }
 
