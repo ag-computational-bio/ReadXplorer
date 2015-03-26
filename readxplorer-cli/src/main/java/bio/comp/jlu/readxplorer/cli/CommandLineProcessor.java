@@ -30,6 +30,7 @@ import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable.ImportTrackResults;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
@@ -40,7 +41,11 @@ import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamParser;
+import de.cebitec.readxplorer.tools.snpdetection.ParameterSetSNPs;
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +58,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -626,8 +633,22 @@ public final class CommandLineProcessor implements ArgsProcessor {
         if( snpAnalysis ) {
             runAnalyses++;
             printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
+
+            // create necessary parameter objects for all analyses
+            final boolean useMainBases      = Boolean.parseBoolean( getProperty( Constants.SNP_COUNT_MAIN_BASES ) );
+            final byte minBaseQuality       = Byte.parseByte( getProperty( Constants.SNP_MIN_BASE_QUALITY ) );
+            final byte minAvrBaseQuality    = Byte.parseByte( getProperty( Constants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
+            final byte minMappingQuality    = Byte.parseByte( getProperty( Constants.SNP_MIN_MAPPING_QUALITY ) );
+            final int minVaryingBases       = Integer.parseInt( getProperty( Constants.SNP_MIN_MISMATCH_BASES ) );
+            final int minAvrMappingQuality  = Integer.parseInt( getProperty( Constants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
+            final double minPercVariation   = Double.parseDouble( getProperty( Constants.SNP_MIN_VARIATION ) );
+            final Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( Constants.SNP_FEATURE_TYPES ) );
+            final ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( Constants.SNP_MAPPING_CLASSES ), minMappingQuality );
+            final ParameterSetSNPs parameterSet = new ParameterSetSNPs( minVaryingBases, minPercVariation, useMainBases, selFeatureTypes,
+                                                    readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
+
             for( PersistentTrack persistentTrack : ProjectConnector.getInstance().getTracks() ) {
-                SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack );
+                SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack, parameterSet );
                 es.submit( snpAnalysisCallable );
                 File trackFile = new File( persistentTrack.getFilePath() );
                 printFine( ps, "\t\t" + trackFile.getName() );
@@ -650,9 +671,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
                 Future<AnalysisResult> future = futures.get( i );
                 AnalysisResult analysisResult = future.get();
-                String resultFilePath = analysisResult.getResultFile();
-                if( resultFilePath != null ) { // successful run
-                    printInfo( ps, "\t"+ (i+1) +" "+ analysisResult.getType() + "\tresult file: " + analysisResult.getResultFile() );
+                File resultFile = analysisResult.getResultFile();
+                if( resultFile != null ) { // successful run
+                    printInfo( ps, "\t"+ (i+1) +" "+ analysisResult.getType() + "\tresult file: " + resultFile );
                     for( String msg : analysisResult.getOutput() ) {
                         printFine( ps, "\t\t"+msg );
                     }
@@ -721,6 +742,52 @@ public final class CommandLineProcessor implements ArgsProcessor {
         } else {
             ps.println();
         }
+
+    }
+
+
+
+
+    private static Set<FeatureType> getSelectedFeatureTypes( String property ) {
+
+        Set<FeatureType> featureTypes = new HashSet<>();
+        for( String number : property.split( "," ) ) {
+            int type = Integer.parseInt( number );
+            FeatureType featureType = FeatureType.getFeatureType( type );
+            featureTypes.add( featureType );
+        }
+        return featureTypes;
+
+    }
+
+
+    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality ) {
+
+        List<MappingClass> mappingClasses = new ArrayList<>();
+        for( String number : property.split( "," ) ) {
+            byte type = Byte.parseByte( number );
+            MappingClass mc = MappingClass.getFeatureType( type );
+            mappingClasses.add( mc );
+        }
+
+        List<Classification> excludedFeatureTypes = new ArrayList<>();
+        if( !mappingClasses.contains( MappingClass.PERFECT_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.PERFECT_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.BEST_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.BEST_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.COMMON_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.COMMON_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.SINGLE_PERFECT_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.SINGLE_PERFECT_MATCH );
+        }
+        if( !mappingClasses.contains( MappingClass.SINGLE_BEST_MATCH ) ) {
+            excludedFeatureTypes.add( MappingClass.SINGLE_BEST_MATCH );
+        }
+
+        return new ParametersReadClasses( excludedFeatureTypes, minMappingQuality, Properties.STRAND_FEATURE );
 
     }
 

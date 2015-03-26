@@ -19,6 +19,7 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 
 
 import bio.comp.jlu.readxplorer.cli.analyses.AnalysisCallable.AnalysisResult;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -47,7 +48,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
         private final String analysisType;
         private final List<String> output;
-        private String resultFile;
+        private File resultFile;
 
 
         public AnalysisResult( String analysisType ) {
@@ -70,12 +71,12 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         }
 
 
-        public String getResultFile() {
+        public File getResultFile() {
             return resultFile;
         }
 
 
-        protected void setResultFile( String resultFile ) {
+        protected void setResultFile( File resultFile ) {
             this.resultFile = resultFile;
         }
 
