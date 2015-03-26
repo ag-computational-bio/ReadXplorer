@@ -33,6 +33,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
@@ -119,7 +120,7 @@ public final class LegendAndOptionsProvider {
 
 
     /**
-     * @param text Text to place on the label.
+     * @param text      Text to place on the label.
      * @param fontStyle The font style, Font.PLAIN, Font.BOLD, Font.ITALIC, ...
      * <p>
      * @return A label with ColorProperties.LEGEND_BACKGROUND background color
@@ -169,6 +170,25 @@ public final class LegendAndOptionsProvider {
         textField.setEditable( false );
         spinner.setBackground( ColorProperties.LEGEND_BACKGROUND );
         return spinner;
+    }
+
+
+    /**
+     * @param min       Minimum value of the slider.
+     * @param max       Maximum value of the slider.
+     * @param initValue Initial value of the slider.
+     * <p>
+     * @return A JSlider with ColorProperties.LEGEND_BACKGROUND background color
+     *         and a tick spacing of 1, tick labels and snapping to ticks.
+     */
+    public static JSlider createStandardSlider( int min, int max, int initValue ) {
+        final JSlider slider = new JSlider( min, max, initValue );
+        slider.setMajorTickSpacing( 1 );
+        slider.setPaintLabels( true );
+        slider.setPaintTicks( true );
+        slider.setSnapToTicks( true );
+        slider.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        return slider;
     }
 
 

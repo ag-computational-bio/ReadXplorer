@@ -30,8 +30,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.util.NbBundle;
@@ -143,8 +142,7 @@ public class AlignmentOptionsPanel extends JPanel {
         JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
         JLabel label = LegendAndOptionsProvider.createLabel( Bundle.AlignmentOptionsPanel_BlockHeight(), Font.PLAIN );
         int blockHeight = PREF.getInt( Properties.BLOCK_HEIGHT_OPTION, AlignmentViewer.DEFAULT_BLOCK_HEIGHT );
-        JSpinner heightSpinner = LegendAndOptionsProvider.createStandardSpinner(
-                new SpinnerNumberModel( blockHeight, 1, 10, 1 ) );
+        JSlider heightSpinner = LegendAndOptionsProvider.createStandardSlider( 1, 10, blockHeight );
         generalPanel.add( label, BorderLayout.WEST );
         generalPanel.add( heightSpinner, BorderLayout.EAST );
 
@@ -153,7 +151,7 @@ public class AlignmentOptionsPanel extends JPanel {
 
             @Override
             public void stateChanged( ChangeEvent e ) {
-                JSpinner heightSpinner = (JSpinner) e.getSource();
+                JSlider heightSpinner = (JSlider) e.getSource();
                 PREF.putInt( Properties.BLOCK_HEIGHT_OPTION, (Integer) heightSpinner.getValue() );
             }
 
