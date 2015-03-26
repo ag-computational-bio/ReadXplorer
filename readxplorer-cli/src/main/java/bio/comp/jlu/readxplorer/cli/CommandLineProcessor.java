@@ -50,6 +50,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -622,23 +623,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
         final List<Future<AnalysisResult>> futures = new ArrayList<>();
         if( cvrgAnalysis ) {
             runAnalyses++;
+            printFine( ps, "\t"+ runAnalyses +": coverage analysis" );
             CoverageAnalysisCallable cvrgAnalysisCallable = new CoverageAnalysisCallable( verboseArg );
             futures.add( es.submit( cvrgAnalysisCallable ) );
-            printFine( ps, "\t"+ runAnalyses +": coverage analysis" );
         }
 
         if( opdnAnalysis ) {
             runAnalyses++;
+            printFine( ps, "\t"+ runAnalyses +": operon detection analysis" );
             OperonDetectionAnalysisCallable opdnAnalysisCallable = new OperonDetectionAnalysisCallable( verboseArg );
             futures.add( es.submit( opdnAnalysisCallable ) );
-            printFine( ps, "\t"+ runAnalyses +": operon detection analysis" );
         }
 
         if( rpkmAnalysis ) {
             runAnalyses++;
+            printFine( ps, "\t"+ runAnalyses +": RPKM analysis" );
             RPKMAnalysisCallable rpkmAnalysisCallable = new RPKMAnalysisCallable( verboseArg );
             futures.add( es.submit( rpkmAnalysisCallable ) );
-            printFine( ps, "\t"+ runAnalyses +": RPKM analysis" );
         }
 
         if( snpAnalysis ) {
@@ -668,9 +669,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         if( tssAnalysis ) {
             runAnalyses++;
+            printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
+
             TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg );
             futures.add( es.submit( tssAnalysisCallable ) );
-            printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
         }
 
 
@@ -706,8 +708,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
             throw ce;
         }
 
+        printInfo( ps, null );
         if( snpAnalysis ) {
-            mergeAnlaysisFiles( SNPAnalysisFileFilter.PREFIX );
+            mergeAnlaysisFiles( ps, SNPAnalysisFileFilter.PREFIX, new SNPAnalysisFileFilter() );
         }
 
         return runAnalyses;
@@ -845,45 +848,60 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
 
-    private static void mergeAnlaysisFiles( final String analysisPrefix ) throws CommandException {
+    private static void mergeAnlaysisFiles( final PrintStream ps, final String analysisType, final FileFilter fileFilter ) throws CommandException {
 
         try {
-            WritableWorkbook wwb = Workbook.createWorkbook( new File( analysisPrefix + "-analyses.xls" ) );
-            int i = 0;
-            for( File snpAnalysisFile : (new File(".")).listFiles( new SNPAnalysisFileFilter() ) ) {
-                Workbook wb = Workbook.getWorkbook( snpAnalysisFile );
-                Sheet sheet = wb.getSheet( 01 );
-                String snpAnalysisName = snpAnalysisFile.getName().replace( analysisPrefix + "-", "" ).replace( ".xls", "" );
-                final WritableSheet ws = wwb.createSheet( snpAnalysisName, i );
-                final int noRows = sheet.getRows();
-                final int noCols = sheet.getColumns();
-                for( int idxRow = 0; idxRow < noRows; idxRow++ ) {
-                    for( int idxCol = 0; idxCol < noCols; idxCol++ ) {
-                        WritableCell wc;
-                        String cellCntnt = sheet.getCell( idxCol, idxRow ).getContents();
-                        if( cellCntnt != null  &&  !cellCntnt.isEmpty() ) {
-                            try {
-                                double val = Double.parseDouble( cellCntnt );
-                                wc = new jxl.write.Number( idxCol, idxRow, val );
-                            } catch( NumberFormatException nfe ) {
-                                wc = new Label( idxCol, idxRow, cellCntnt );
-                            }
-                        } else {
-                            wc = new Blank( idxCol, idxRow );
-                        }
-
-                        ws.addCell( wc );
-                    }
+            File analysesFile = new File( analysisType + "-analyses.xls" );
+            WritableWorkbook wwb = Workbook.createWorkbook( analysesFile );
+            int idxSheet = 0;
+            for( File analysisFile : (new File(".")).getCanonicalFile().listFiles( fileFilter ) ) {
+                Workbook wb = Workbook.getWorkbook( analysisFile );
+                String analysisName = analysisFile.getName().replace( analysisType + "-", "" ).replace( ".xls", "" );
+                if( idxSheet == 0 ) { // copy analysis statistics
+                    copyExcelSheet( wwb, wb.getSheet( 1 ), idxSheet, "statistics" );
+                    idxSheet++;
                 }
-                i++;
+
+                copyExcelSheet( wwb, wb.getSheet( 0 ), idxSheet, analysisName );
+                idxSheet++;
                 wb.close();
+                analysisFile.delete(); // delete unnecessary analysis file
             }
             wwb.write();
             wwb.close();
-        } catch( IOException | BiffException | WriteException ex ) {
-            CommandException ce = new CommandException( 1, "combination of " + analysisPrefix + " analysis files failed!" );
+            printInfo( ps, "combined " + analysisType + " results file: " + analysesFile.getName() );
+
+        } catch( IOException | BiffException | IndexOutOfBoundsException | WriteException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            CommandException ce = new CommandException( 1, "combination of " + analysisType + " analysis files failed!" );
             ce.initCause( ex );
             throw ce;
+        }
+
+    }
+
+
+    private static void copyExcelSheet( WritableWorkbook wwb, Sheet sourceSheet, int idxSheet, String sheetName ) throws WriteException {
+
+        final WritableSheet ws = wwb.createSheet( sheetName, idxSheet );
+        final int noRows = sourceSheet.getRows();
+        final int noCols = sourceSheet.getColumns();
+        for( int idxRow = 0; idxRow < noRows; idxRow++ ) {
+            for( int idxCol = 0; idxCol < noCols; idxCol++ ) {
+                WritableCell wc;
+                String cellCntnt = sourceSheet.getCell( idxCol, idxRow ).getContents();
+                if( cellCntnt != null && !cellCntnt.isEmpty() ) {
+                    try {
+                        double val = Double.parseDouble( cellCntnt );
+                        wc = new jxl.write.Number( idxCol, idxRow, val );
+                    } catch( NumberFormatException nfe ) {
+                        wc = new Label( idxCol, idxRow, cellCntnt );
+                    }
+                } else {
+                    wc = new Blank( idxCol, idxRow );
+                }
+                ws.addCell( wc );
+            }
         }
 
     }

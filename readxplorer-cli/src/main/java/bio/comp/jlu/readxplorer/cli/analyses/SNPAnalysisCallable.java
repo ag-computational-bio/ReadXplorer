@@ -18,6 +18,7 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
+import bio.comp.jlu.readxplorer.cli.filefilter.SNPAnalysisFileFilter;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -78,7 +79,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
         super( verbosity, "SNP" );
 
         this.persistentTrack = persistentTrack;
-        this.parameterSet    = parameterSet;
+        this.parameterSet = parameterSet;
 
     }
 
@@ -93,28 +94,29 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
 
             LOG.log( FINE, "start SNP analysis for {0}...", trackFileName );
             result.addOutput( "start analysis..." );
-            TrackConnector trackConnector = ProjectConnector.getInstance().getTrackConnector( persistentTrack );
-            AnalysisSNPs analysisSNPs = new AnalysisSNPs( trackConnector, parameterSet );
-            ThreadingHelper threadingHelper = new ThreadingHelper();
-                threadingHelper.start();
-            AnalysesHandler analysisHandler = new AnalysesHandler( trackConnector, threadingHelper, "", parameterSet.getReadClassParams() );
+            final ProjectConnector pc = ProjectConnector.getInstance();
+            final TrackConnector trackConnector = pc.getTrackConnector( persistentTrack );
+            final AnalysisSNPs analysisSNPs = new AnalysisSNPs( trackConnector, parameterSet );
+            final ThreadingHelper threadingHelper = new ThreadingHelper(); // tricky work-around due to MVC blindness of the RX code :-)
+            threadingHelper.start();
+            final AnalysesHandler analysisHandler = new AnalysesHandler( trackConnector, threadingHelper, "", parameterSet.getReadClassParams() );
                 analysisHandler.registerObserver( analysisSNPs );
                 analysisHandler.setCoverageNeeded( true );
                 analysisHandler.setDiffsAndGapsNeeded( true );
                 analysisHandler.startAnalysis();
 
             threadingHelper.join(); // blocks until analysisHandler finishes its job
-            Map<Integer,PersistentTrack> trackMap = new HashMap<>();
-                trackMap.put( persistentTrack.getId(), persistentTrack );
-            PersistentReference reference = ProjectConnector.getInstance().getRefGenomeConnector( persistentTrack.getRefGenID() ).getRefGenome();
+            Map<Integer, PersistentTrack> trackMap = new HashMap<>();
+            trackMap.put( persistentTrack.getId(), persistentTrack );
+            PersistentReference reference = pc.getRefGenomeConnector( persistentTrack.getRefGenID() ).getRefGenome();
             final SnpDetectionResult snpDetectionResult = new SnpDetectionResult( analysisSNPs.getResults(),
-                                                                          trackMap, reference, false, 2, 0 );
+                                                                                  trackMap, reference, false, 2, 0 );
             snpDetectionResult.setParameters( parameterSet );
 
 
             LOG.log( FINE, "store SNP results for {0}...", trackFileName );
             result.addOutput( "store results..." );
-            File resultFile = new File( "snp-result-" + trackFileName + ".xls" );
+            File resultFile = new File( SNPAnalysisFileFilter.PREFIX + '-' + trackFileName + '.' + SNPAnalysisFileFilter.SUFFIX );
             writeFile( resultFile, snpDetectionResult.dataSheetNames(), snpDetectionResult.dataColumnDescriptions(), snpDetectionResult.dataToExcelExportList() );
 
             result.setResultFile( resultFile );
@@ -134,8 +136,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
     }
 
 
-
-    private void writeFile( File file, List<String> sheetNames, List<List<String>> headers, List<List<List<Object>>> exportData ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
+    private static void writeFile( File file, List<String> sheetNames, List<List<String>> headers, List<List<List<Object>>> exportData ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale( new Locale( "en", "EN" ) );
@@ -194,20 +195,22 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             if( dataLeft ) {
                 break;
             }
-            ++row;
+            row++;
         }
 
         if( dataLeft ) {
-            for( int i = 0; i < row; ++i ) {
+            for( int i = 0; i < row; i++ ) {
                 sheetData.remove( 0 );
             }
         }
 
         return dataLeft;
+
     }
 
 
     private static String getObjectType( Object entry ) {
+
         if( entry instanceof Integer || entry instanceof Byte || entry instanceof Long ) {
             return TABLE_INTEGER;
         } else if( entry instanceof String || entry instanceof Character || entry instanceof CharSequence ) {
@@ -221,10 +224,12 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
         } else {
             return UNKNOWN;
         }
+
     }
 
 
     private static void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
+
         WritableFont arialbold = new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD );
         WritableFont arial = new WritableFont( WritableFont.ARIAL, 10 );
         if( cellvalue == null ) {
@@ -240,26 +245,20 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             cellvalue = cellvalue instanceof Character ? String.valueOf( cellvalue ) : cellvalue;
             cellvalue = cellvalue instanceof CharSequence ? String.valueOf( cellvalue ) : cellvalue;
             cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
-            WritableCellFormat string = new WritableCellFormat( arial );
-            Label label = new Label( column, row, (String) cellvalue, string );
-            sheet.addCell( label );
+            sheet.addCell( new Label( column, row, (String) cellvalue, new WritableCellFormat( arial ) ) );
 
         } else if( celltype.equals( TABLE_INTEGER ) ) {
             WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.INTEGER );
             Integer value = Integer.parseInt( cellvalue.toString() );
-            jxl.write.Number number = new jxl.write.Number( column, row, value, integerFormat );
-            sheet.addCell( number );
+            sheet.addCell( new jxl.write.Number( column, row, value, integerFormat ) );
 
         } else if( celltype.equals( TABLE_DOUBLE ) ) {
             Double value = Double.parseDouble( cellvalue.toString() );
-            jxl.write.Number number = new jxl.write.Number( column, row, value );
-            sheet.addCell( number );
+            sheet.addCell( new jxl.write.Number( column, row, value ) );
 
         } else if( celltype.equals( TABLE_FLOAT ) ) {
-            WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.FLOAT );
             Float value = Float.parseFloat( cellvalue.toString() );
-            jxl.write.Number number = new jxl.write.Number( column, row, value, integerFormat );
-            sheet.addCell( number );
+            sheet.addCell( new jxl.write.Number( column, row, value, new WritableCellFormat( NumberFormats.FLOAT ) ) );
 
         } else if( celltype.equals( TABLE_URL_W_TITLE ) ) {
             UrlWithTitle titleUrl = (UrlWithTitle) cellvalue;
@@ -269,14 +268,14 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
 
         } else if( celltype.equals( UNKNOWN ) ) {
             WritableCellFormat string = new WritableCellFormat( arial );
-            Label label = new Label( column, row, cellvalue.toString(), string );
-            sheet.addCell( label );
+            sheet.addCell( new Label( column, row, cellvalue.toString(), string ) );
         }
+
     }
 
 
 
-
+    
     private class ThreadingHelper extends Thread implements DataVisualisationI {
 
         private boolean keepRunning = true;
@@ -305,6 +304,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
         public void showData( Object data ) {
             keepRunning = false;
         }
+
 
     }
 

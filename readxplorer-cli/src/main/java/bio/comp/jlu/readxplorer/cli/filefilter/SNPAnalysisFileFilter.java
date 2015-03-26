@@ -19,6 +19,11 @@ package bio.comp.jlu.readxplorer.cli.filefilter;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -27,21 +32,47 @@ import java.io.FileFilter;
  */
 public class SNPAnalysisFileFilter implements FileFilter {
 
+    private static final Logger LOG = Logger.getLogger( SNPAnalysisFileFilter.class.getName() );
+
+    static {
+        LOG.setLevel( INFO );
+    }
+
     public static final String SUFFIX = "xls";
     public static final String PREFIX = "snp";
     private static final String PREFIX_COMPLETE = PREFIX + '-';
     private static final String SUFFIX_COMPLETE = '.' + SUFFIX;
+    private static final String MERGED_RESULTS_FILE = PREFIX_COMPLETE + "analyses" + SUFFIX_COMPLETE;
 
 
     @Override
     public boolean accept( File file ) {
 
+        LOG.log( FINE, "check file: {0}", file.getAbsolutePath() );
+
+        if( !file.isFile()  ||  !file.canRead() ) {
+            LOG.log( FINER, "file: {0} is either not a file or is not readable!", file.getAbsolutePath() );
+            return false;
+        }
+
+        String fileName = file.getName();
+        if( fileName.indexOf( '.' ) == -1 ) {
+            LOG.log( FINER, "file: {0} doesn't contain a dot ('.') in its name!", file.getAbsolutePath() );
+            return false;
+        }
+        if( fileName.indexOf( '-' ) == -1 ) {
+            LOG.log( FINER, "file: {0} doesn't contain dash ('-') in its name!", file.getAbsolutePath() );
+            return false;
+        }
+        if( MERGED_RESULTS_FILE.equals( fileName ) ) {
+            return false;
+        }
+
+
         String suffix = file.getName().substring( file.getName().lastIndexOf( '.' ) ).toLowerCase();
         String prefix = file.getName().substring( 0, 4 );
 
-        return file.canRead() &&
-               file.isFile() &&
-               SUFFIX_COMPLETE.equals( suffix ) &&
+        return SUFFIX_COMPLETE.equals( suffix ) &&
                PREFIX_COMPLETE.equals( prefix );
 
     }
