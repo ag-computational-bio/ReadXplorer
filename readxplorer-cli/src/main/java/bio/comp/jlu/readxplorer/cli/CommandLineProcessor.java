@@ -24,6 +24,7 @@ import bio.comp.jlu.readxplorer.cli.analyses.OperonDetectionAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.RPKMAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.SNPAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.TSSAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.filefilter.ReadsFileFilter;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable.ImportPairedEndResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
