@@ -51,6 +51,11 @@
             <artifactId>org-openide-util-lookup</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-core-windows</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
