@@ -30,19 +30,28 @@ import static java.util.logging.Level.INFO;
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
-public class SNPAnalysisFileFilter implements FileFilter {
+public class AnalysisFileFilter implements FileFilter {
 
-    private static final Logger LOG = Logger.getLogger( SNPAnalysisFileFilter.class.getName() );
+    private static final Logger LOG = Logger.getLogger(AnalysisFileFilter.class.getName() );
 
     static {
         LOG.setLevel( INFO );
     }
 
     public static final String SUFFIX = "xls";
-    public static final String PREFIX = "snp";
-    private static final String PREFIX_COMPLETE = PREFIX + '-';
     private static final String SUFFIX_COMPLETE = '.' + SUFFIX;
-    private static final String MERGED_RESULTS_FILE = PREFIX_COMPLETE + "analyses" + SUFFIX_COMPLETE;
+    private static final String MERGED_RESULTS_FILE = "analyses" + SUFFIX_COMPLETE;
+
+    private final String analysisType;
+    private final String prefixComplete;
+
+
+    public AnalysisFileFilter( String analysisType ) {
+
+        this.analysisType = analysisType;
+        prefixComplete = analysisType + '-';
+
+    }
 
 
     @Override
@@ -70,10 +79,10 @@ public class SNPAnalysisFileFilter implements FileFilter {
 
 
         String suffix = file.getName().substring( file.getName().lastIndexOf( '.' ) ).toLowerCase();
-        String prefix = file.getName().substring( 0, 4 );
+        String prefix = file.getName().substring( 0, analysisType.length()+1 );
 
         return SUFFIX_COMPLETE.equals( suffix ) &&
-               PREFIX_COMPLETE.equals( prefix );
+               prefixComplete.equals( prefix );
 
     }
 

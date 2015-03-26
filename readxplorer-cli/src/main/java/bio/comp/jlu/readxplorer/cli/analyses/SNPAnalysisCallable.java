@@ -18,7 +18,7 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import bio.comp.jlu.readxplorer.cli.filefilter.SNPAnalysisFileFilter;
+import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -116,7 +116,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
 
             LOG.log( FINE, "store SNP results for {0}...", trackFileName );
             result.addOutput( "store results..." );
-            File resultFile = new File( SNPAnalysisFileFilter.PREFIX + '-' + trackFileName + '.' + SNPAnalysisFileFilter.SUFFIX );
+            File resultFile = new File( "snp-" + trackFileName + '.' + AnalysisFileFilter.SUFFIX );
             writeFile( resultFile, snpDetectionResult.dataSheetNames(), snpDetectionResult.dataColumnDescriptions(), snpDetectionResult.dataToExcelExportList() );
 
             result.setResultFile( resultFile );
@@ -275,7 +275,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
 
 
 
-    
+
     private class ThreadingHelper extends Thread implements DataVisualisationI {
 
         private boolean keepRunning = true;

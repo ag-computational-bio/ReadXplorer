@@ -24,8 +24,8 @@ import bio.comp.jlu.readxplorer.cli.analyses.OperonDetectionAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.RPKMAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.SNPAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.TSSAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import bio.comp.jlu.readxplorer.cli.filefilter.ReadsFileFilter;
-import bio.comp.jlu.readxplorer.cli.filefilter.SNPAnalysisFileFilter;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable.ImportPairedEndResults;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
@@ -710,7 +710,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         printInfo( ps, null );
         if( snpAnalysis ) {
-            mergeAnlaysisFiles( ps, SNPAnalysisFileFilter.PREFIX, new SNPAnalysisFileFilter() );
+            mergeAnlaysisFiles( ps, "snp", new AnalysisFileFilter( "snp" ) );
         }
 
         return runAnalyses;
