@@ -41,8 +41,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -98,7 +96,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * the block height value option.
      */
     private void addPreferenceListeners() {
-        final Preferences pref = NbPreferences.forModule( Object.class );
         this.showBaseQualities = pref.getBoolean( Properties.BASE_QUALITY_OPTION, true );
         pref.addPreferenceChangeListener( new PreferenceChangeListener() {
 
@@ -258,11 +255,14 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 //            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
 //            }
-            if( m.isFwdStrand() ) {
-                ++this.fwdMappingsInInterval;
+            if( m.getStart() <= getBoundsInfo().getLogRight() + 2 && m.getStop() >= getBoundsInfo().getLogLeft() - 2 ) {
+                if( m.isFwdStrand() ) {
+                    fwdMappingsInInterval++;
+                } else {
+                    revMappingsInInterval++;
+                }
             }
         }
-        this.revMappingsInInterval = mappings.size() - this.fwdMappingsInInterval;
     }
 
 
