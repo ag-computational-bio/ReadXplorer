@@ -75,7 +75,8 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             final File trackFile = trackJob.getFile();
             final MappingParserI mappingParser = trackJob.getParser();
             final Map<String, Integer> chromLengthMap = new HashMap<>();
-            Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( referenceResult.getParsedReference().getID() ).getRefGenome().getChromosomes();
+            int refId = referenceResult.getParsedReference().getID();
+            Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( refId ).getRefGenome().getChromosomes();
             for( PersistentChromosome chrom : chromIdMap.values() ) {
                 chromLengthMap.put( chrom.getName(), chrom.getLength() );
             }

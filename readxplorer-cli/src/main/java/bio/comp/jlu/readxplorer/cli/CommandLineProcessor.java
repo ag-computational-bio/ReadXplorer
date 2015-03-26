@@ -490,7 +490,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, "imported read files:" );
         try {
 
-            for( int i=0; i<futures.size(); i++ ) {
+            for( int i = 0; i < futures.size(); i++ ) {
                 ImportTrackResults result = futures.get( i ).get();
                 ParsedTrack pt = result.getParsedTrack();
 
@@ -573,7 +573,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, "imported paired-end read files:" );
         try {
 
-            for( int i=0; i<futures.size(); i++ ) {
+            for( int i = 0; i < futures.size(); i++ ) {
 
                 ImportPairedEndResults result = futures.get( i ).get();
 
@@ -678,7 +678,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, "finished analyses:" );
         try {
 
-            for( int i=0; i<futures.size(); i++ ) {
+            for( int i = 0; i < futures.size(); i++ ) {
 
                 Future<AnalysisResult> future = futures.get( i );
                 AnalysisResult analysisResult = future.get();
@@ -720,10 +720,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
         long endTime = System.currentTimeMillis();
         int runTime = (int) (endTime - startTime);
 
-        int hours = runTime / (60*60*1000);
+        int hours = runTime / (60 * 60 * 1000);
         runTime -= hours * 60 * 60 * 1000;
 
-        int mins  = runTime / (60*1000);
+        int mins  = runTime / (60 * 1000);
         runTime -= mins * 60 * 1000;
 
         int secs  = runTime / 1000;

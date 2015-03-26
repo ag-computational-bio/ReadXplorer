@@ -293,7 +293,8 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             while( keepRunning ) {
                 try {
                     sleep( 100 );
-                } catch( InterruptedException e ) {
+                } catch( InterruptedException ie ) {
+                    LOG.log( SEVERE, ie.getMessage(), ie );
                 }
             }
 
