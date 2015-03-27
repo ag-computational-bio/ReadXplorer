@@ -32,24 +32,25 @@ import static java.util.logging.Level.INFO;
  */
 public class AnalysisFileFilter implements FileFilter {
 
-    private static final Logger LOG = Logger.getLogger(AnalysisFileFilter.class.getName() );
+    private static final Logger LOG = Logger.getLogger( AnalysisFileFilter.class.getName() );
 
     static {
         LOG.setLevel( INFO );
     }
 
     public static final String SUFFIX = "xls";
-    private static final String SUFFIX_COMPLETE = '.' + SUFFIX;
-    private static final String MERGED_RESULTS_FILE = "analyses" + SUFFIX_COMPLETE;
+
+    private static final String DOT_SUFFIX = '.' + SUFFIX;
+    private static final String MERGED_RESULTS_FILE = "analyses" + DOT_SUFFIX;
 
     private final String analysisType;
-    private final String prefixComplete;
+    private final String prefixDash;
 
 
     public AnalysisFileFilter( String analysisType ) {
 
         this.analysisType = analysisType;
-        prefixComplete = analysisType + '-';
+        prefixDash = analysisType + '-';
 
     }
 
@@ -60,29 +61,20 @@ public class AnalysisFileFilter implements FileFilter {
         LOG.log( FINE, "check file: {0}", file.getAbsolutePath() );
 
         if( !file.isFile()  ||  !file.canRead() ) {
-            LOG.log( FINER, "file: {0} is either not a file or is not readable!", file.getAbsolutePath() );
+            LOG.log( FINER, "file ({0}) is either not a file or is not readable!", file.getAbsolutePath() );
             return false;
         }
 
         String fileName = file.getName();
-        if( fileName.indexOf( '.' ) == -1 ) {
-            LOG.log( FINER, "file: {0} doesn't contain a dot ('.') in its name!", file.getAbsolutePath() );
+        if( !fileName.startsWith( prefixDash ) ) {
+            LOG.log( FINER, "file name ({0}) doesn't start with prefix ("+analysisType+"-)!", file.getAbsolutePath() );
             return false;
         }
-        if( fileName.indexOf( '-' ) == -1 ) {
-            LOG.log( FINER, "file: {0} doesn't contain dash ('-') in its name!", file.getAbsolutePath() );
-            return false;
-        }
-        if( MERGED_RESULTS_FILE.equals( fileName ) ) {
+        if( fileName.equals( prefixDash + MERGED_RESULTS_FILE ) ) {
             return false;
         }
 
-
-        String suffix = file.getName().substring( file.getName().lastIndexOf( '.' ) ).toLowerCase();
-        String prefix = file.getName().substring( 0, analysisType.length()+1 );
-
-        return SUFFIX_COMPLETE.equals( suffix ) &&
-               prefixComplete.equals( prefix );
+        return DOT_SUFFIX.equals( fileName.substring( file.getName().lastIndexOf( '.' ) ).toLowerCase() );
 
     }
 
