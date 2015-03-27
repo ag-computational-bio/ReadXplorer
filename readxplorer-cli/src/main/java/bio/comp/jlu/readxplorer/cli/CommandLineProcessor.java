@@ -202,11 +202,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // print optional arguments...
         final PrintStream ps = env.getOutputStream();
-        printFine( ps, "verbosity: " + (verboseArg ? "on" : "off") );
-        printFine( ps, "paired end: " + (pairedEndArg ? "yes" : "no") );
-        printFine( ps, "threading: " + (threadAmountArg != null ? threadAmountArg : "1") );
-        printFine( ps, "db file: " + (dbFileArg != null ? dbFileArg : "default") );
-        printFine( ps, "property file: " + (propsFileArg != null ? propsFileArg : "default") );
+        printFine( ps, "\nrun parameters: " );
+        printFine( ps, "\tverbosity: " + (verboseArg ? "on" : "off") );
+        printFine( ps, "\tpaired end: " + ((pairedEndArg  ||  pairedEndReadsDirArg!=null) ? "yes" : "no") );
+        printFine( ps, "\tthreading: " + (threadAmountArg != null ? threadAmountArg : "1") );
+        printFine( ps, "\tdb file: " + (dbFileArg != null ? dbFileArg : "default") );
+        printFine( ps, "\tproperty file: " + (propsFileArg != null ? propsFileArg : "default") );
 
 
         printFine( ps, null );
@@ -246,17 +247,18 @@ public final class CommandLineProcessor implements ArgsProcessor {
         int runAnalyses = runAnalyses( es, ps );
 
 
-        // print reference info
+        // print information
         ps.println();
-        printInfo( ps, "imported reference: " + pr.getName() );
+        printInfo( ps, "reference genome:" );
+        printFine( ps, "\tname: " + pr.getName() );
+        String desc = pr.getDescription();
+        if( desc != null  &&  !desc.isEmpty() ) {
+            printFine( ps, "\tdescription: " + desc );
+        }
         printFine( ps, "\tfasta file: " + pr.getFastaFile().getName() );
         printFine( ps, "\t# chromosomes: " + pr.getChromosomes().size() );
-        // print read info
-        printFine( ps, null );
-        printInfo( ps, "# imported tracks: " + pc.getTracks().size() );
-        // print analyses info
-        printFine( ps, null );
-        printInfo( ps, "# run analyses: " + runAnalyses );
+        printInfo( ps, "# tracks: " + pc.getTracks().size() );
+        printInfo( ps, "# analyses: " + runAnalyses );
 
 
         try {
@@ -693,7 +695,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             final ParameterSetTSS parameterSet = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
                                                  minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,
                                                  maxLeaderlessFeatureDistance, maxFeatureDistance, associateTSS, associateTssWindow, readClassParams );
-            
+
             for( PersistentTrack persistentTrack : pc.getTracks() ) {
                 TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg, persistentTrack, parameterSet );
                 futures.add( es.submit( tssAnalysisCallable ) );
@@ -736,6 +738,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         printInfo( ps, null );
+        printInfo( ps, "combined analyses result files:" );
         if( snpAnalysis ) {
             mergeAnlaysisFiles( ps, "snp", new AnalysisFileFilter( "snp" ) );
         }
@@ -746,6 +749,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
         return runAnalyses;
 
     }
+
+
 
 
     private void printRuntime( long startTime, final PrintStream ps ) {
@@ -761,7 +766,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         int secs  = runTime / 1000;
 
-        printFine( ps, "run time: " + hours + "h " + mins + "m " + secs + "s" );
+        printFine( ps, "total run time: " + hours + "h " + mins + "m " + secs + "s" );
 
     }
 
@@ -899,11 +904,11 @@ public final class CommandLineProcessor implements ArgsProcessor {
             }
             wwb.write();
             wwb.close();
-            printInfo( ps, "combined " + analysisType + " results file: " + analysesFile.getName() );
+            printInfo( ps, "\t" + analysisType + ": " + analysesFile.getName() );
 
         } catch( IOException | BiffException | IndexOutOfBoundsException | WriteException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
-            CommandException ce = new CommandException( 1, "combination of " + analysisType + " analysis files failed!" );
+            LOG.log( SEVERE, "ERROR: merge " + analysisType + " analysis files: " + ex.getMessage(), ex );
+            CommandException ce = new CommandException( 1, "merge of " + analysisType + " analysis files failed!" );
             ce.initCause( ex );
             throw ce;
         }
@@ -959,6 +964,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             mappingClasses.add( mc );
         }
 
+        // TODO implement UNIQUE option
         List<Classification> excludedFeatureTypes = new ArrayList<>();
         if( !mappingClasses.contains( MappingClass.PERFECT_MATCH ) ) {
             excludedFeatureTypes.add( MappingClass.PERFECT_MATCH );

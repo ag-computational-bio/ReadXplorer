@@ -157,7 +157,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         WritableWorkbook workbook = Workbook.createWorkbook( file, wbSettings );
         WritableSheet sheet = null;
         int totalPage = 0;
-        for( int i = 0; i < exportData.size(); ++i ) {
+        for( int i = 0; i < exportData.size(); i++ ) {
             String sheetName = sheetNames.get( i );
             List<List<Object>> sheetData = exportData.get( i );
             List<String> headerRow = headers.get( i );
@@ -165,10 +165,12 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
             int currentPage = 0;
             while( dataLeft ) { //only 65536 rows allowed per sheet in xls format
                 if( !sheetData.isEmpty() ) {
-                    if( currentPage++ > 0 ) {
+                    if( currentPage > 0 ) {
                         sheetName += "I";
+                        currentPage++;
                     }
-                    sheet = workbook.createSheet( sheetName, totalPage++ );
+                    sheet = workbook.createSheet( sheetName, totalPage );
+                    totalPage++;
                 }
 
                 if( sheet != null ) {
@@ -186,20 +188,21 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
         boolean dataLeft = false;
         int row = 0;
-        int column = 0;
+        int col = 0;
 
         for( String header : headerRow ) {
-            addColumn( sheet, TABLE_LABEL, header, column++, row );
+            addColumn( sheet, TABLE_LABEL, header, col, row );
+            col++;
         }
         row++;
 
         for( List<Object> exportRow : sheetData ) {
-
-            column = 0;
+            col = 0;
             for( Object entry : exportRow ) {
                 String objectType = getObjectType( entry );
                 try {
-                    addColumn( sheet, objectType, entry, column++, row );
+                    addColumn( sheet, objectType, entry, col, row );
+                    col++;
                 } catch( RowsExceededException e ) {
                     dataLeft = true;
                     break;
@@ -243,45 +246,42 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
     private static final void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
 
-        WritableFont arialbold = new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD );
-        WritableFont arial = new WritableFont( WritableFont.ARIAL, 10 );
         if( cellvalue == null ) {
-            Label label = new Label( column, row, "n/a" );
-            sheet.addCell( label );
-
-        } else if( celltype.equals( TABLE_LABEL ) ) {
-            WritableCellFormat header = new WritableCellFormat( arialbold );
-            Label label = new Label( column, row, (String) cellvalue, header );
-            sheet.addCell( label );
-
-        } else if( celltype.equals( TABLE_STRING ) ) {
-            cellvalue = cellvalue instanceof Character ? String.valueOf( cellvalue ) : cellvalue;
-            cellvalue = cellvalue instanceof CharSequence ? String.valueOf( cellvalue ) : cellvalue;
-            cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
-            sheet.addCell( new Label( column, row, (String) cellvalue, new WritableCellFormat( arial ) ) );
-
-        } else if( celltype.equals( TABLE_INTEGER ) ) {
-            WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.INTEGER );
-            Integer value = Integer.parseInt( cellvalue.toString() );
-            sheet.addCell( new jxl.write.Number( column, row, value, integerFormat ) );
-
-        } else if( celltype.equals( TABLE_DOUBLE ) ) {
-            Double value = Double.parseDouble( cellvalue.toString() );
-            sheet.addCell( new jxl.write.Number( column, row, value ) );
-
-        } else if( celltype.equals( TABLE_FLOAT ) ) {
-            Float value = Float.parseFloat( cellvalue.toString() );
-            sheet.addCell( new jxl.write.Number( column, row, value, new WritableCellFormat( NumberFormats.FLOAT ) ) );
-
-        } else if( celltype.equals( TABLE_URL_W_TITLE ) ) {
-            UrlWithTitle titleUrl = (UrlWithTitle) cellvalue;
-            WritableHyperlink link = new WritableHyperlink( column, row, titleUrl.getUrl() );
-            link.setDescription( titleUrl.getTitle() );
-            sheet.addHyperlink( link );
-
-        } else if( celltype.equals( UNKNOWN ) ) {
-            WritableCellFormat string = new WritableCellFormat( arial );
-            sheet.addCell( new Label( column, row, cellvalue.toString(), string ) );
+            sheet.addCell( new Label( column, row, "n/a" ) );
+        } else {
+            switch( celltype ) {
+                case TABLE_LABEL:
+                    WritableCellFormat header = new WritableCellFormat( new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD ) );
+                    Label label = new Label( column, row, (String) cellvalue, header );
+                    sheet.addCell( label );
+                    break;
+                case TABLE_STRING:
+                    cellvalue = cellvalue instanceof Character ? String.valueOf( cellvalue ) : cellvalue;
+                    cellvalue = cellvalue instanceof CharSequence ? String.valueOf( cellvalue ) : cellvalue;
+                    cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
+                    sheet.addCell( new Label( column, row, (String) cellvalue, new WritableCellFormat( new WritableFont( WritableFont.ARIAL, 10 ) ) ) );
+                    break;
+                case TABLE_INTEGER:
+                    sheet.addCell( new jxl.write.Number( column, row, Integer.parseInt( cellvalue.toString() ), new WritableCellFormat( NumberFormats.INTEGER ) ) );
+                    break;
+                case TABLE_DOUBLE:
+                    sheet.addCell( new jxl.write.Number( column, row, Double.parseDouble( cellvalue.toString() ) ) );
+                    break;
+                case TABLE_FLOAT:
+                    sheet.addCell( new jxl.write.Number( column, row, Float.parseFloat( cellvalue.toString() ), new WritableCellFormat( NumberFormats.FLOAT ) ) );
+                    break;
+                case TABLE_URL_W_TITLE:
+                    UrlWithTitle titleUrl = (UrlWithTitle) cellvalue;
+                    WritableHyperlink link = new WritableHyperlink( column, row, titleUrl.getUrl() );
+                    link.setDescription( titleUrl.getTitle() );
+                    sheet.addHyperlink( link );
+                    break;
+                case UNKNOWN:
+                    sheet.addCell( new Label( column, row, cellvalue.toString(), new WritableCellFormat( new WritableFont( WritableFont.ARIAL, 10 ) ) ) );
+                    break;
+                default:
+                    break;
+            }
         }
 
     }
