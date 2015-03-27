@@ -151,6 +151,7 @@
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.transcriptionanalyses</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.transcriptionanalyses.datastructures</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
