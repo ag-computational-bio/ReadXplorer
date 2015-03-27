@@ -334,9 +334,6 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                 @Override
                 public void run() {
 
-                    //get track name(s) for tab descriptions
-                    String trackNames;
-
                     if( parametersTss.isPerformTSSAnalysis() && dataType.equals( AnalysesHandler.DATA_TYPE_COVERAGE ) ) {
 
                         ++finishedCovAnalyses;
@@ -353,7 +350,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         transcriptionStartResultPanel.addResult( tssResult );
 
                         if( finishedCovAnalyses >= tracks.size() || combineTracks ) {
-                            trackNames = GeneralUtils.generateConcatenatedString( tssResult.getTrackNameList(), 120 );
+                            String trackNames = GeneralUtils.generateConcatenatedString( tssResult.getTrackNameList(), 120 ); // get track name(s) for tab descriptions
                             String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getDataSize() + " hits)";
                             transcAnalysesTopComp.openAnalysisTab( panelName, transcriptionStartResultPanel );
                         }
@@ -372,7 +369,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                             operonResultPanel.addResult( operonDetectionResult );
 
                             if( finishedMappingAnalyses >= tracks.size() || combineTracks ) {
-                                trackNames = GeneralUtils.generateConcatenatedString( operonDetectionResult.getTrackNameList(), 120 );
+                                String trackNames = GeneralUtils.generateConcatenatedString( operonDetectionResult.getTrackNameList(), 120 ); // get track name(s) for tab descriptions
                                 String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getDataSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab( panelName, operonResultPanel );
                             }
@@ -392,7 +389,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                             normalizationResultPanel.addResult( normAnalysisResult );
 
                             if( finishedMappingAnalyses >= tracks.size() || combineTracks ) {
-                                trackNames = GeneralUtils.generateConcatenatedString( normAnalysisResult.getTrackNameList(), 120 );
+                                String trackNames = GeneralUtils.generateConcatenatedString( normAnalysisResult.getTrackNameList(), 120 ); // get track name(s) for tab descriptions
                                 String panelName = "TPM, RPKM & read count values for " + trackNames + " (" + normalizationResultPanel.getDataSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab( panelName, normalizationResultPanel );
                             }

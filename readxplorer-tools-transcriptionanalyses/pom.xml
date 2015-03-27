@@ -149,6 +149,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
+                    <publicPackages>
+                        <publicPackage>de.cebitec.readxplorer.transcriptionanalyses</publicPackage>
+                    </publicPackages>
                 </configuration>
             </plugin>
 

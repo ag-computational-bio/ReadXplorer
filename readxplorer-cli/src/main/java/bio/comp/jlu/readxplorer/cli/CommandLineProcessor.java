@@ -44,6 +44,7 @@ import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readxplorer.tools.snpdetection.ParameterSetSNPs;
+import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetTSS;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -619,6 +620,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, null );
         printFine( ps, "submitted analyses:" );
         int runAnalyses = 0;
+        final ProjectConnector pc = ProjectConnector.getInstance();
 
         final List<Future<AnalysisResult>> futures = new ArrayList<>();
         if( cvrgAnalysis ) {
@@ -647,19 +649,20 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
 
             // create necessary parameter objects for all analyses
-            final boolean useMainBases      = Boolean.parseBoolean( getProperty( Constants.SNP_COUNT_MAIN_BASES ) );
-            final byte minBaseQuality       = Byte.parseByte( getProperty( Constants.SNP_MIN_BASE_QUALITY ) );
-            final byte minAvrBaseQuality    = Byte.parseByte( getProperty( Constants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
-            final byte minMappingQuality    = Byte.parseByte( getProperty( Constants.SNP_MIN_MAPPING_QUALITY ) );
-            final int minVaryingBases       = Integer.parseInt( getProperty( Constants.SNP_MIN_MISMATCH_BASES ) );
-            final int minAvrMappingQuality  = Integer.parseInt( getProperty( Constants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
-            final double minPercVariation   = Double.parseDouble( getProperty( Constants.SNP_MIN_VARIATION ) );
-            final Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( Constants.SNP_FEATURE_TYPES ) );
-            final ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( Constants.SNP_MAPPING_CLASSES ), minMappingQuality );
+            boolean useMainBases = Boolean.parseBoolean( getProperty( Constants.SNP_COUNT_MAIN_BASES ) );
+            byte minBaseQuality    = Byte.parseByte( getProperty( Constants.SNP_MIN_BASE_QUALITY ) );
+            byte minAvrBaseQuality = Byte.parseByte( getProperty( Constants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
+            byte minMappingQuality = Byte.parseByte( getProperty( Constants.SNP_MIN_MAPPING_QUALITY ) );
+            int minVaryingBases      = Integer.parseInt( getProperty( Constants.SNP_MIN_MISMATCH_BASES ) );
+            int minAvrMappingQuality = Integer.parseInt( getProperty( Constants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
+            double minPercVariation  = Double.parseDouble( getProperty( Constants.SNP_MIN_VARIATION ) );
+            Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( Constants.SNP_FEATURE_TYPES ) );
+            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( Constants.SNP_MAPPING_CLASSES ), minMappingQuality, Properties.STRAND_FEATURE );
+
             final ParameterSetSNPs parameterSet = new ParameterSetSNPs( minVaryingBases, minPercVariation, useMainBases, selFeatureTypes,
                                                     readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
 
-            for( PersistentTrack persistentTrack : ProjectConnector.getInstance().getTracks() ) {
+            for( PersistentTrack persistentTrack : pc.getTracks() ) {
                 SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack, parameterSet );
                 futures.add( es.submit( snpAnalysisCallable ) );
                 File trackFile = new File( persistentTrack.getFilePath() );
@@ -671,8 +674,32 @@ public final class CommandLineProcessor implements ArgsProcessor {
             runAnalyses++;
             printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
 
-            TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg );
-            futures.add( es.submit( tssAnalysisCallable ) );
+            boolean autoTssParamEstimation     = Boolean.parseBoolean( getProperty( Constants.TSS_PARAMETER_ESTIMATION ) );
+            boolean associateTSS               = Boolean.parseBoolean( getProperty( Constants.TSS_ASSOCIATE ) );
+            boolean performUnannotatedTransDet = Boolean.parseBoolean( getProperty( Constants.TSS_UNANNOTATED_DETECTION ) );
+            byte minMappingQuality = Byte.parseByte( getProperty( Constants.TSS_MIN_MAPPING_QUALITY ) );
+            byte strandUsage       = Byte.parseByte( getProperty( Constants.TSS_STRAND_USAGE ) );
+            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( Constants.TSS_MAPPING_CLASSES ), minMappingQuality, strandUsage );
+                readClassParams.setStrandOption( Properties.STRAND_BOTH_FWD );
+            int minIncreaseTotal             = Integer.parseInt( getProperty( Constants.TSS_MIN_INCREASE_TOTAL ) );
+            int minIncreasePercent           = Integer.parseInt( getProperty( Constants.TSS_MIN_INCREASE_PERCENT ) );
+            int maxFeatureDistance           = Integer.parseInt( getProperty( Constants.TSS_MAX_FEATURE_DISTANCE ) );
+            int maxLeaderlessFeatureDistance = Integer.parseInt( getProperty( Constants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
+            int associateTssWindow           = Integer.parseInt( getProperty( Constants.TSS_ASSOCIATE_WINDOW ) );
+            int maxLowCovInitCount           = Integer.parseInt( getProperty( Constants.TSS_MAX_LOW_COVERAGE_INIT ) );
+            int minLowCovIncrease            = Integer.parseInt( getProperty( Constants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
+            int minTransExtensionCov         = Integer.parseInt( getProperty( Constants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
+
+            final ParameterSetTSS parameterSet = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
+                                                 minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,
+                                                 maxLeaderlessFeatureDistance, maxFeatureDistance, associateTSS, associateTssWindow, readClassParams );
+            
+            for( PersistentTrack persistentTrack : pc.getTracks() ) {
+                TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg, persistentTrack, parameterSet );
+                futures.add( es.submit( tssAnalysisCallable ) );
+                File trackFile = new File( persistentTrack.getFilePath() );
+                printFine( ps, "\t\t" + trackFile.getName() );
+            }
         }
 
 
@@ -711,6 +738,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, null );
         if( snpAnalysis ) {
             mergeAnlaysisFiles( ps, "snp", new AnalysisFileFilter( "snp" ) );
+        }
+        if( snpAnalysis ) {
+            mergeAnlaysisFiles( ps, "tss", new AnalysisFileFilter( "tss" ) );
         }
 
         return runAnalyses;
@@ -920,7 +950,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality ) {
+    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality, byte strandUsage ) {
 
         List<MappingClass> mappingClasses = new ArrayList<>();
         for( String number : property.split( "," ) ) {
@@ -946,7 +976,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             excludedFeatureTypes.add( MappingClass.SINGLE_BEST_MATCH );
         }
 
-        return new ParametersReadClasses( excludedFeatureTypes, minMappingQuality, Properties.STRAND_FEATURE );
+        return new ParametersReadClasses( excludedFeatureTypes, minMappingQuality, strandUsage );
 
     }
 

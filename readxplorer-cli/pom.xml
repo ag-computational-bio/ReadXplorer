@@ -50,6 +50,10 @@
             <artifactId>readxplorer-tools-readpairclassifier</artifactId>
         </dependency>
         <dependency>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <artifactId>readxplorer-tools-transcriptionanalyses</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-tools-snpdetection</artifactId>
         </dependency>
