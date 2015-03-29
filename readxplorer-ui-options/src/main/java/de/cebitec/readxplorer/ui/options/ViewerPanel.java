@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.options;
 
 
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Properties;
 import java.util.prefs.Preferences;
 import javax.swing.event.HyperlinkEvent;
@@ -36,6 +37,8 @@ public final class ViewerPanel extends OptionsPanel {
 
     private final ViewerOptionsPanelController controller;
     private final Preferences pref;
+
+    private int maxZoom;
 
 
     /**
@@ -62,6 +65,11 @@ public final class ViewerPanel extends OptionsPanel {
         descriptionLabel = new javax.swing.JLabel();
         autoScalingBox = new javax.swing.JCheckBox();
         viewerSizeSlider = new javax.swing.JSlider();
+        jSeparator1 = new javax.swing.JSeparator();
+        maxZoomLevelField = new javax.swing.JTextField();
+        maxZoomLevelLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(descriptionLabel, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.descriptionLabel.text")); // NOI18N
 
@@ -77,6 +85,20 @@ public final class ViewerPanel extends OptionsPanel {
         viewerSizeSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.viewerSizeSlider.toolTipText")); // NOI18N
         viewerSizeSlider.setValue(200);
 
+        maxZoomLevelField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        maxZoomLevelField.setText(org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.maxZoomLevelField.text")); // NOI18N
+        maxZoomLevelField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                maxZoomLevelFieldKeyTyped(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(maxZoomLevelLabel, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.maxZoomLevelLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.jLabel1.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.jLabel2.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -85,12 +107,23 @@ public final class ViewerPanel extends OptionsPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jSeparator1)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(descriptionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(2, 2, 2))
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(viewerSizeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(autoScalingBox))
+                            .addComponent(autoScalingBox)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(maxZoomLevelLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(maxZoomLevelField, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -102,15 +135,31 @@ public final class ViewerPanel extends OptionsPanel {
                 .addComponent(viewerSizeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(autoScalingBox)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(maxZoomLevelField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxZoomLevelLabel))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void maxZoomLevelFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_maxZoomLevelFieldKeyTyped
+        valid();
+    }//GEN-LAST:event_maxZoomLevelFieldKeyTyped
 
 
     @Override
     void load() {
         this.viewerSizeSlider.setValue( pref.getInt( Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT ) );
         this.autoScalingBox.setSelected( pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false ) );
+        maxZoom = pref.getInt( Properties.MAX_ZOOM, Properties.DEFAULT_ZOOM );
+        this.maxZoomLevelField.setText( String.valueOf( maxZoom ) );
     }
 
 
@@ -118,11 +167,28 @@ public final class ViewerPanel extends OptionsPanel {
     void store() {
         pref.putInt( Properties.VIEWER_HEIGHT, this.viewerSizeSlider.getValue() );
         pref.putBoolean( Properties.VIEWER_AUTO_SCALING, this.autoScalingBox.isSelected() );
+        pref.putInt( Properties.MAX_ZOOM, maxZoom );
+    }
+
+
+    @Override
+    public boolean valid() {
+        boolean isValid = false;
+        if( GeneralUtils.isValidRangeInput( maxZoomLevelField.getText(), 1, 500 ) ) {
+            maxZoom = Integer.parseInt( maxZoomLevelField.getText() );
+            isValid = true;
+        }
+        return isValid;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autoScalingBox;
     private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField maxZoomLevelField;
+    private javax.swing.JLabel maxZoomLevelLabel;
     private javax.swing.JSlider viewerSizeSlider;
     // End of variables declaration//GEN-END:variables
 

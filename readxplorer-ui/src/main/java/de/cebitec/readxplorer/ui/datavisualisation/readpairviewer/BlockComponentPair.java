@@ -95,9 +95,9 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         this.minSatAndBright = minSaturationAndBrightness;
         this.initCopySeqItem();
         // component boundaries //
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( block.getAbsStart() );
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( block.getStart() );
         this.phyLeft = (int) bounds.getLeftPhysBound();
-        this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos( block.getAbsStop() ).getRightPhysBound();
+        this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos( block.getStop() ).getRightPhysBound();
         this.length = phyRight - phyLeft;
         this.length = this.length < 3 ? 3 : this.length;
 

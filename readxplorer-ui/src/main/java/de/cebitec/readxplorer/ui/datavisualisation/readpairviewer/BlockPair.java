@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.ObjectWithId;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.BlockI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.Brick;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.Iterator;
 
 
@@ -59,19 +60,35 @@ public class BlockPair implements BlockI {
 
 
     @Override
-    public int getAbsStart() {
-        return this.absStart;
+    public int compareTo( GenomicRange o ) {
+        return GenomicRange.Utils.compareTo( this, o );
+    }
+
+
+    public long getReadPairId() {
+        return this.readPairGroup.getId();
     }
 
 
     @Override
-    public int getAbsStop() {
-        return this.absStop;
+    public int getStart() {
+        return absStart;
     }
 
 
-    public long getSeqPairId() {
-        return this.readPairGroup.getId();
+    @Override
+    public int getStop() {
+        return absStop;
+    }
+
+
+    /**
+     * @return Always returns true, because pairs are currently not associated
+     * to a certain strand.
+     */
+    @Override
+    public boolean isFwdStrand() {
+        return true;
     }
 
 
@@ -101,7 +118,7 @@ public class BlockPair implements BlockI {
 
 
     /**
-     * @return The associated seq pair group.
+     * @return The associated read pair group.
      */
     @Override
     public ObjectWithId getObjectWithId() {

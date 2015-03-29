@@ -42,7 +42,9 @@ import de.cebitec.readxplorer.ui.dialogmenus.ChromosomeVisualizationHelper;
 import de.cebitec.readxplorer.ui.dialogmenus.ChromosomeVisualizationHelper.ChromosomeListener;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.ColorUtils;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.ComparisonClass;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -219,14 +221,20 @@ public class BasePanelFactory {
             TrackViewer trackV;
             if( combineTracks ) {
                 trackV = new MultipleTrackViewer( boundsManager, basePanel, refGen, trackCon, combineTracks );
+                String viewerName = "Combined: " + tracks.get( 0 ).getDescription() + tracks.get( 1 ).getDescription();
+                if( tracks.size() > 2 ) {
+                    viewerName += ",...";
+                }
+                trackV.setName( viewerName );
             } else {
                 trackV = new DoubleTrackViewer( boundsManager, basePanel, refGen, trackCon );
+                trackV.setName( "Double Track: " + tracks.get( 0 ).getDescription() + tracks.get( 1 ).getDescription() );
             }
 
             this.initializeLegendAndOptions( basePanel, trackV, combineTracks );
 
-            String title = tracks.get( 0 ).getDescription() + " - " + tracks.get( 1 ).getDescription();
-            basePanel.setTitlePanel( this.getTitlePanel( title ) );
+            String title = GeneralUtils.generateConcatenatedString( trackCon.getAssociatedTrackNames(), 80 );
+            basePanel.setTitlePanel( getTitlePanel( title ) );
 
             viewController.openTrack2( basePanel );
             return basePanel;
@@ -307,11 +315,13 @@ public class BasePanelFactory {
         optionsLabel.registerObserver( legendLabel );
 
         // add panels to basepanel and add scrollbars
-        int maxSliderValue = 500;
+        int maxSliderValue = pref.getInt( Properties.MAX_ZOOM, Properties.DEFAULT_ZOOM );
+        viewer.setMaxZoomValue( maxSliderValue );
         b.setViewerInScrollpane( viewer );
         viewer.createListenerForScrollBar();
-        b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, false, maxSliderValue ) );
-        b.setTitlePanel( this.getTitlePanel( connector.getAssociatedTrackName() ) );
+        b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, true, maxSliderValue ) );
+        String title = GeneralUtils.generateConcatenatedString( connector.getAssociatedTrackNames(), 80 );
+        b.setTitlePanel( getTitlePanel( title ) );
 
         return b;
     }
@@ -366,7 +376,8 @@ public class BasePanelFactory {
         viewer.setupLegend( new MenuLabel( seqPairPanelLegend, MenuLabel.TITLE_LEGEND ), seqPairPanelLegend );
 
         // add panels to basepanel and add scrollbars
-        int maxSliderValue = 50; //smaller than usual
+        int maxSliderValue = pref.getInt( Properties.MAX_ZOOM, Properties.DEFAULT_ZOOM ); //smaller than usual
+        viewer.setMaxZoomValue( maxSliderValue );
         b.setViewerInScrollpane( viewer );
         b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, true, maxSliderValue ) );
         b.setTitlePanel( this.getTitlePanel( connector.getAssociatedTrackName() ) );
@@ -455,11 +466,11 @@ public class BasePanelFactory {
 
 
     /**
-     * @param type      the feature type whose legend entry is created
-     * @param viewer    the viewer to which the legend entry belongs. If no
-     *                  function is assigend to the legend entry, viewer can be
-     *                  set to null. In this case a simple label is returned
-     *                  instead of the checkbox.
+     * @param type   the feature type whose legend entry is created
+     * @param viewer the viewer to which the legend entry belongs. If no
+     *               function is assigend to the legend entry, viewer can be set
+     *               to null. In this case a simple label is returned instead of
+     *               the checkbox.
      * <p>
      * @return A legend entry for a feature type.
      */

@@ -29,10 +29,14 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
 import org.openide.util.NbBundle;
 
 
@@ -116,15 +120,16 @@ public final class LegendAndOptionsProvider {
 
 
     /**
-     * @param text Text to place on the label.
+     * @param text      Text to place on the label.
+     * @param fontStyle The font style, Font.PLAIN, Font.BOLD, Font.ITALIC, ...
      * <p>
      * @return A label with ColorProperties.LEGEND_BACKGROUND background color
      *         and font Arial in 11 with the given text.
      */
-    public static JLabel createLabel( String text ) {
+    public static JLabel createLabel( String text, int fontStyle ) {
         final JLabel label = new JLabel( text );
         label.setBackground( ColorProperties.LEGEND_BACKGROUND );
-        label.setFont( new Font( "Arial", Font.BOLD, 11 ) );
+        label.setFont( new Font( "Arial", fontStyle, 11 ) );
         return label;
     }
 
@@ -154,6 +159,40 @@ public final class LegendAndOptionsProvider {
 
 
     /**
+     * @param model The model to set into the spinner.
+     * <p>
+     * @return A JSpinner with ColorProperties.LEGEND_BACKGROUND background
+     *         color and an uneditable text field.
+     */
+    public static JSpinner createStandardSpinner( SpinnerModel model ) {
+        final JSpinner spinner = new JSpinner( model );
+        JFormattedTextField textField = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+        textField.setEditable( false );
+        spinner.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        return spinner;
+    }
+
+
+    /**
+     * @param min       Minimum value of the slider.
+     * @param max       Maximum value of the slider.
+     * @param initValue Initial value of the slider.
+     * <p>
+     * @return A JSlider with ColorProperties.LEGEND_BACKGROUND background color
+     *         and a tick spacing of 1, tick labels and snapping to ticks.
+     */
+    public static JSlider createStandardSlider( int min, int max, int initValue ) {
+        final JSlider slider = new JSlider( min, max, initValue );
+        slider.setMajorTickSpacing( 1 );
+        slider.setPaintLabels( true );
+        slider.setPaintTicks( true );
+        slider.setSnapToTicks( true );
+        slider.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        return slider;
+    }
+
+
+    /**
      * Creates a panel to use as header for some other component.
      * <p>
      * @param text The text to place on the header panel
@@ -161,7 +200,7 @@ public final class LegendAndOptionsProvider {
      * @return The header panel
      */
     public static JPanel createHeader( String text ) {
-        JLabel header = LegendAndOptionsProvider.createLabel( text );
+        JLabel header = LegendAndOptionsProvider.createLabel( text, Font.BOLD );
         final JPanel headerPanel = LegendAndOptionsProvider.createStandardPanel();
         headerPanel.add( header, BorderLayout.CENTER );
         headerPanel.setPreferredSize( new Dimension( headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2 ) );

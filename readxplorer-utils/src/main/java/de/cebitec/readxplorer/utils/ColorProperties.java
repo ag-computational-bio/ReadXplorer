@@ -23,7 +23,7 @@ import java.awt.Color;
 
 /**
  * Class containing all general colors of ReadXplorer.
- *
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public final class ColorProperties {
@@ -86,49 +86,33 @@ public final class ColorProperties {
      */
     public static final Color TRACK2_COLOR = new Color( 255, 117, 48 );
 
-    /**
-     * Property string for the perfect match color.
-     */
+    /** Property string for ReadXplorer's background color. */
+    public static final String BACKGROUND_COLOR_STRING = "backgroundColor";
+    /** Property string for the perfect match color. */
     public static final String PERFECT_MATCH_STRING = "perfectMatchColor";
-    /**
-     * Property string for the best match color.
-     */
+    /** Property string for the best match color. */
     public static final String BEST_MATCH_STRING = "bestMatchColor";
-    /**
-     * Property string for the common match color.
-     */
+    /** Property string for the common match color. */
     public static final String COMMON_MATCH_STRING = "commonMatchColor";
-    /**
-     * Property string for the single perfect match color.
-     */
+    /** Property string for the single perfect match color. */
     public static final String SINGLE_PERFECT_MATCH_STRING = "singlePerfectMatchColor";
-    /**
-     * Property string for the single best match color.
-     */
+    /** Property string for the single best match color. */
     public static final String SINGLE_BEST_MATCH_STRING = "singleBestMatchColor";
-    /**
-     * Property string for uniform color.
-     */
+    /** Property string for uniform color. */
     public static final String UNIFORM_COLOR_STRING = "uniformColor";
-    /**
-     * Property string to address if uniform coloring is desired.
-     */
+    /** Property string to address if uniform coloring is desired. */
     public static final String UNIFORM_DESIRED = "uniformDesired";
-    /**
-     * Property string for the coverage difference color of two tracks.
-     */
+    /** Property string for the coverage difference color of two tracks. */
     public static final String COV_DIFF_STRING = "covDiffColor";
-    /**
-     * Property string for the first track color in the double track viewer.
-     */
+    /** Property string for the first track color in the double track viewer. */
     public static final String TRACK1_COLOR_STRING = "track1Color";
-    /**
-     * Property string for the first track color in the double track viewer.
-     */
+    /** Property string for the first track color in the double track viewer. */
     public static final String TRACK2_COLOR_STRING = "track2Color";
 
 
     // global colors
+    /** Global background color of ReadXplorer. */
+    public static final Color BACKGROUND_COLOR = new Color( 240, 240, 240 ); //to prevent wrong color on mac
     public static final Color TRACKPANEL_SCALE_LINES = new Color( 153, 153, 153 );
     public static final Color TRACKPANEL_MIDDLE_LINE = new Color( 25, 25, 25 );
     public static final Color MOUSEOVER = new Color( 127, 127, 127 );

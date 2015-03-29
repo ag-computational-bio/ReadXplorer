@@ -98,9 +98,13 @@ public class BlockComponent extends JComponent {
      *                          shown
      * @param gapManager        The gap manager for this alignment
      * @param height            The height of this block
-     * @param showBaseQualities
+     * @param showBaseQualities <code>true</code> if each base of the alignment
+     *                          is shaded by base quality, <code>false</code>
+     *                          otherwise
      */
-    public BlockComponent( BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, boolean showBaseQualities ) {
+    public BlockComponent( BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager,
+                           int height,
+                           boolean showBaseQualities ) {
 
         super();
         this.classToColorMap = ColorUtils.updateMappingClassColors();
@@ -110,8 +114,8 @@ public class BlockComponent extends JComponent {
         this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
-        this.absLogBlockStart = block.getAbsStart();
-        this.absLogBlockStop = block.getAbsStop();
+        this.absLogBlockStart = block.getStart();
+        this.absLogBlockStop = block.getStop();
         this.showBaseQualities = showBaseQualities;
         this.gapManager = gapManager;
 
@@ -401,10 +405,12 @@ public class BlockComponent extends JComponent {
         for( BrickData brick : brickDataList ) {
             graphics2D.setColor( brick.getBrickColor() );
             graphics2D.fill( brick.getRectangle() );
-            int labelWidth = graphics.getFontMetrics().stringWidth( brick.toString() );
-            int labelX = brick.getLabelCenter() - labelWidth / 2;
-            graphics2D.setColor( ColorProperties.BRICK_LABEL );
-            graphics2D.drawString( brick.toString(), labelX, height );
+            if( parentViewer.isInMaxZoomLevel() && height >= AlignmentViewer.DEFAULT_BLOCK_HEIGHT ) {
+                int labelWidth = graphics.getFontMetrics().stringWidth( brick.toString() );
+                int labelX = brick.getLabelCenter() - labelWidth / 2;
+                graphics2D.setColor( ColorProperties.BRICK_LABEL );
+                graphics2D.drawString( brick.toString(), labelX, height );
+            }
         }
     }
 

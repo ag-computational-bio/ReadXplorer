@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
+import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
  * <p>
  * @author ddoppmei, Rolf Hilker
  */
-public class Block implements BlockI {
+public class Block implements BlockI, GenomicRange {
 
     private final int absStart;
     private final int absStop;
@@ -146,20 +147,32 @@ public class Block implements BlockI {
 
 
     @Override
-    public int getAbsStart() {
-        return absStart;
-    }
-
-
-    @Override
-    public int getAbsStop() {
-        return absStop;
+    public int compareTo( GenomicRange genomicRange ) {
+        return GenomicRange.Utils.compareTo( this, genomicRange );
     }
 
 
     @Override
     public Mapping getObjectWithId() {
         return mapping;
+    }
+
+
+    @Override
+    public int getStart() {
+        return absStart;
+    }
+
+
+    @Override
+    public int getStop() {
+        return absStop;
+    }
+
+
+    @Override
+    public boolean isFwdStrand() {
+        return mapping.isFwdStrand();
     }
 
 

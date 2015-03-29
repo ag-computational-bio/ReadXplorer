@@ -31,8 +31,9 @@ public class ExpressTestAnalysisData extends DeAnalysisData {
 
 
     public ExpressTestAnalysisData( int capacity, int[] groupA, int[] groupB,
-                                    boolean workingWithoutReplicates, int[] normalizationFeatures ) {
-        super( capacity );
+                                    boolean workingWithoutReplicates, int[] normalizationFeatures,
+                                    ProcessingLog processingLog ) {
+        super( capacity, processingLog );
         this.groupA = groupA;
         this.groupB = groupB;
         this.workingWithoutReplicates = workingWithoutReplicates;

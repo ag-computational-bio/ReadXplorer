@@ -52,7 +52,6 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JSlider;
-import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.SEVERE;
 
@@ -70,7 +69,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 572406471;
     private static final int MININTERVALLENGTH = 25000;
 
-    private final Preferences pref = NbPreferences.forModule( Object.class );
     private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
     private final List<Integer> trackIDs;
@@ -103,7 +101,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Create a new panel to show coverage information
      * <p>
      * @param boundsManager manager for component bounds
-     * @param basePanel
+     * @param basePanel     The BasePanel on which the viewer is painted.
      * @param refGen        reference genome
      * @param trackCon      database connection to one track, that is displayed
      * @param combineTracks true, if the coverage of the tracks contained in the
@@ -237,7 +235,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         g.setColor( ColorProperties.TRACKPANEL_SCALE_LINES );
         this.createLines( this.scaleLineStep, g );
 
-        // draw black middle line
+        // draw black middle lines
         g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
         drawBaseLines( g );
     }
@@ -341,7 +339,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     @Override
     public void boundsChangedHook() {
         if( this.covManager == null || this.isNewDataRequestNeeded() ||
-                 !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
+            !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
             this.requestCoverage();
         } else {
             // coverage already loaded
@@ -762,6 +760,15 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
 
+    /**
+     * Creates a label for a genomic position. A label will only appear each
+     * 500bp if the current interval is larger than 1000 bp.
+     * <p>
+     * @param logPos position whose label shall be returned
+     * @param step   The scaling step to paint
+     * <p>
+     * @return A label for a genomic position
+     */
     private String getLabel( int logPos, int step ) {
         String label = null;
         if( logPos >= 1000 && step >= 1000 ) {

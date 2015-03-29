@@ -350,7 +350,9 @@ public class TrackConnector {
 
     /**
      * @return The read pair id belonging to the track connectors track id or
-     *         <code>0</code> if this track is not a read pair track.
+     *         <code>0</code> if this track is not a read pair track or
+     *         <code>-1</code> if this the track id is not found in the DB
+     *         (which is the case for combined tracks).
      */
     public Integer getReadPairToTrackID() {
         return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID );
@@ -361,7 +363,7 @@ public class TrackConnector {
      * @return True, if this is a read pair track, false otherwise.
      */
     public boolean isReadPairTrack() {
-        return getReadPairToTrackID() != 0;
+        return getReadPairToTrackID() > 0;
     }
 
 

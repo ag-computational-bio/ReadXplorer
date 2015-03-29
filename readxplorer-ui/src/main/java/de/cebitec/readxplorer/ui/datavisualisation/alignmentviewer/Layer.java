@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -29,7 +30,8 @@ import java.util.Iterator;
  */
 public class Layer implements LayerI {
 
-    private final ArrayList<BlockI> blocks;
+
+    private final List<BlockI> blocks;
     private final int absStart;
     private final int absStop;
     private final GenomeGapManager gapManager;
@@ -55,10 +57,10 @@ public class Layer implements LayerI {
         StringBuilder sb = new StringBuilder();
         int from = absStart;
         for( BlockI b : blocks ) {
-            int to = b.getAbsStart() - 1;
+            int to = b.getStart() - 1;
             this.fillWithGaps( from, to, sb );
             sb.append( b.toString() );
-            from = b.getAbsStop() + 1;
+            from = b.getStop() + 1;
         }
         if( from < absStop ) {
 

@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 /**
+ * An object with an ID.
  *
  * @author Rolf Hilker
  */

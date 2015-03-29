@@ -34,8 +34,8 @@ import java.util.List;
 
 
 /**
- * A LayoutPairs holds all information to display for read pair alignments
- * in different, non-overlapping layers.
+ * A LayoutPairs holds all information to display for read pair alignments in
+ * different, non-overlapping layers.
  * <p>
  * @author rhilker
  */
@@ -60,7 +60,7 @@ public class LayoutPairs implements LayoutI {
         this.absStart = absStart;
         this.absStop = absStop;
         this.reverseLayers = new ArrayList<>();
-        this.reverseBlockContainer = new BlockContainer();
+        this.reverseBlockContainer = new BlockContainer( true );
         this.exclusionList = exclusionList;
 
         this.createBlocks( readPairs );
@@ -87,8 +87,8 @@ public class LayoutPairs implements LayoutI {
             //handle pairs
             while( pairIt.hasNext() ) {
                 ReadPair pair = pairIt.next();
-                containsVisibleMapping = !exclusionList.contains( pair.getVisibleMapping().getMappingClass() )
-                                         || !exclusionList.contains( pair.getVisibleMapping2().getMappingClass() );
+                containsVisibleMapping = !exclusionList.contains( pair.getVisibleMapping().getMappingClass() ) ||
+                         !exclusionList.contains( pair.getVisibleMapping2().getMappingClass() );
 
                 if( containsVisibleMapping ) {
                     // get start position
@@ -131,8 +131,7 @@ public class LayoutPairs implements LayoutI {
 
     /**
      * Fills each single layer until all blocks were added from the block
-     * container
-     * to the layer list
+     * container to the layer list
      * <p>
      * @param layers list of layers to add the blocks to
      * @param blocks block container to add to layers
@@ -149,27 +148,23 @@ public class LayoutPairs implements LayoutI {
 
     /**
      * Fills a single layer with as many blocks as possible, while obeying to
-     * the
-     * rule, that the blocks in one layer are not allowed to overlap.
+     * the rule, that the blocks in one layer are not allowed to overlap.
      * <p>
      * @param l      single layer to fill with blocks
      * @param blocks block container
      */
     private void fillLayer( LayerI l, BlockContainer blocks ) {
         BlockI block = blocks.getNextByPositionAndRemove( 0 );
-        int counter = 0;
         while( block != null ) {
-            counter++;
             l.addBlock( block );
-            block = blocks.getNextByPositionAndRemove( block.getAbsStop() + 1 );
+            block = blocks.getNextByPositionAndRemove( block.getStop() + 1 );
         }
     }
 
 
     /**
      * @return Since all mappings are shown on the "reverse strand" aka below
-     *         the
-     *         sequence bar, it only returns null!
+     *         the sequence bar, it only returns null!
      */
     @Override
     public Iterator<LayerI> getForwardIterator() {

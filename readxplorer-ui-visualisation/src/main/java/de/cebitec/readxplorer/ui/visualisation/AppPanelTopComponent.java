@@ -27,7 +27,6 @@ import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.MultipleTrackViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.Component;
@@ -327,12 +326,13 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 
         // put the panel's TrackViewer in lookup so it can be accessed
         BasePanel basePanel = (BasePanel) trackPanel;
-        // make sure the multiple track viewers do not cause a mess in the lookup
-        if( !(basePanel.getViewer() instanceof MultipleTrackViewer) ) {
-            TrackViewer trackViewer = (TrackViewer) basePanel.getViewer();
-            this.content.add( trackViewer );
-            this.trackViewerList.add( trackViewer );
-        }
+        //Make sure the multiple track viewers do not cause a mess in the lookup
+        //Problem is: Now we need them, their ID should never collide with real tracks
+//        if( !(basePanel.getViewer() instanceof MultipleTrackViewer) ) {
+        TrackViewer trackViewer = (TrackViewer) basePanel.getViewer();
+        this.content.add( trackViewer );
+        this.trackViewerList.add( trackViewer );
+//        }
 
         CloseTrackCookie closeTrackCookie = new CloseTrackCookie() {
             @Override

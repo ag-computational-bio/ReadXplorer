@@ -77,7 +77,6 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private boolean diffsLoaded;
     private boolean coverageLoaded;
 //    private boolean isUpperBoundCorrected;
-//    private ZoomLevelExcusePanel zoomExcuse;
     // maximum coverage found in interval, regarding both strands
     private int maxCoverage;
     private List<Integer> scaleValues;
@@ -109,7 +108,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
         this.scaleValues = new ArrayList<>();
-//        zoomExcuse = new ZoomLevelExcusePanel();
+        setCanZoom( false );
 
         logoData = new LogoDataManager( lowerBound, upperBound );
         gapManager = new GenomeGapManager( lowerBound, upperBound );

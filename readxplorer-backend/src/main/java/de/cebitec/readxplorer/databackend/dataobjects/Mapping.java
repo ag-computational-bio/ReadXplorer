@@ -297,13 +297,7 @@ public class Mapping implements ObjectWithId, GenomicRange {
      */
     @Override
     public int compareTo( GenomicRange genomicRange ) {
-        int result = 0;
-        if( this.start < genomicRange.getStart() ) {
-            result = -1;
-        } else if( this.start > genomicRange.getStart() ) {
-            result = 1;
-        }
-        return result;
+        return GenomicRange.Utils.compareTo( this, genomicRange );
     }
 
 

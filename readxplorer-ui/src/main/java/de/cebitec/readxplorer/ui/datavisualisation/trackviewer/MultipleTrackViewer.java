@@ -25,7 +25,9 @@ import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 
 
 /**
- *
+ * Class to distinguish MultipleTrackViewers from TrackViewers. This is a
+ * MultipleTrackViewers integrating multiple tracks as one data set.
+ * <p>
  * @author jwinneba
  */
 public class MultipleTrackViewer extends TrackViewer {
@@ -33,6 +35,18 @@ public class MultipleTrackViewer extends TrackViewer {
     private static final long serialVersionUID = 2L;
 
 
+    /**
+     * Class to distinguish MultipleTrackViewers from TrackViewers. This is a
+     * MultipleTrackViewers integrating multiple tracks as one data set.
+     * <p>
+     * @param boundsManager manager for component bounds
+     * @param basePanel     The BasePanel on which the viewer is painted.
+     * @param refGen        reference genome
+     * @param trackCon      database connection to one track, that is displayed
+     * @param combineTracks <code>true</code>, if the coverage of the tracks
+     *                      contained in the track connector should be combined,
+     *                      <code>false</code> otherwise.
+     */
     public MultipleTrackViewer( BoundsInfoManager boundsManager, BasePanel basePanel,
                                 PersistentReference refGen, TrackConnector trackCon, boolean combineTracks ) {
         super( boundsManager, basePanel, refGen, trackCon, combineTracks );

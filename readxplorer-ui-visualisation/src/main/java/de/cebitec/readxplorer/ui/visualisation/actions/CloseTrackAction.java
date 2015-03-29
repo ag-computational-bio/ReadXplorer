@@ -24,16 +24,31 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 
+/**
+ * Action for closing a list of tracks.
+ * <p>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
 public final class CloseTrackAction implements ActionListener {
 
     private final List<CloseTrackCookie> context;
 
 
+    /**
+     * Action for closing a list of tracks.
+     * <p>
+     * @param context The list of CloseTrackCookie for closing their tracks
+     */
     public CloseTrackAction( List<CloseTrackCookie> context ) {
         this.context = context;
     }
 
 
+    /**
+     * Close all tracks registered by a CloseTrackCookie in this action.
+     * <p>
+     * @param e The event
+     */
     @Override
     public void actionPerformed( ActionEvent e ) {
         for( CloseTrackCookie closeCookie : context ) {
