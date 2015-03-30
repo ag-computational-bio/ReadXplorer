@@ -19,9 +19,6 @@ package bio.comp.jlu.readxplorer.cli;
 
 
 import bio.comp.jlu.readxplorer.cli.analyses.AnalysisCallable.AnalysisResult;
-import bio.comp.jlu.readxplorer.cli.analyses.CoverageAnalysisCallable;
-import bio.comp.jlu.readxplorer.cli.analyses.OperonDetectionAnalysisCallable;
-import bio.comp.jlu.readxplorer.cli.analyses.RPKMAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.SNPAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.TSSAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.constants.PairedEndConstants;
@@ -107,19 +104,19 @@ import static java.util.logging.Level.SEVERE;
  * <p>
  * Mandatory:
  * <ul>
- * <li>-f / --reference {file}: the reference genome to import</li>
- * <li>-r / --reads {dir}: a directory with read files</li>
- * <li>-e / --per {dir}: a directory with paired-end read files</li>
+ * <li>--ref {file}: the reference genome to import</li>
+ * <li>--reads {dir}: a directory with read files</li>
+ * <li>--per {dir}: a directory with paired-end read files</li>
  * </ul>
  * <p>
  * Optional:
  * <ul>
- * <li>-v / --verbose: enables verbose output</li>
- * <li>-p / --pairedend: files stored in -r/--reads dir are combined paired-end files</li>
- * <li>-t{n} / --threading {n}: enables multithreading with {n} worker threads</li>
- * <li>-h / --help: prints a usage to STD out</li>
  * <li>--db {name}: name of newly created H2 database file</li>
  * <li>--props {file}: a customised property file</li>
+ * <li>--threads {n}: enables multithreading with {n} worker threads</li>
+ * <li>-p / --pairedend: files stored in -r/--reads dir are combined paired-end files</li>
+ * <li>-v / --verbose: enables verbose output</li>
+ * <li>-h / --help: prints a usage to STD out</li>
  * </ul>
  * <p>
  * Analyses Options:
@@ -147,15 +144,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
     /**
      * Mandatory options
      */
-    @Arg( shortName = 'f', longName = "reference" )
+    @Arg( longName = "ref" )
     @Description( shortDescription = "Reference genome to import / analysis." )
     public String referenceArg;
 
-    @Arg( shortName = 'r', longName = "reads" )
+    @Arg( longName = "reads" )
     @Description( shortDescription = "Directory with SAM/BAM read files to import / analysis." )
     public String readsDirArg;
 
-    @Arg( shortName = 'e', longName = "per" )
+    @Arg( longName = "per" )
     @Description( shortDescription = "Directory with SAM/BAM paired-end read files to import / analysis." )
     public String pairedEndReadsDirArg;
 
@@ -163,19 +160,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     /**
      * Optional options
      */
-    @Arg( shortName = 'h', longName = "help" )
-    @Description( shortDescription = "Print usage information to the console." )
-    public boolean helpArg;
-
-    @Arg( shortName = 'v', longName = "verbose" )
-    @Description( shortDescription = "Print detailed messages to the console." )
-    public boolean verboseArg;
-
-    @Arg( shortName = 'p', longName = "pairedend" )
-    @Description( shortDescription = "Set this flag if reads are paired-end reads." )
-    public boolean pairedEndArg;
-
-    @Arg( shortName = 't', longName = "threading" )
+    @Arg( longName = "threads" )
     @Description( shortDescription = "Specifies the number of available worker threads. Take care on multi user systems!" )
     public String threadAmountArg;
 
@@ -187,10 +172,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Description( shortDescription = "Sets the path to a custom property file." )
     public String propsFileArg;
 
+    @Arg( shortName = 'p', longName = "pairedend" )
+    @Description( shortDescription = "Set this flag if reads are paired-end reads." )
+    public boolean pairedEndArg;
+
+    @Arg( shortName = 'v', longName = "verbose" )
+    @Description( shortDescription = "Print detailed messages to the console." )
+    public boolean verboseArg;
+
+    @Arg( shortName = 'h', longName = "help" )
+    @Description( shortDescription = "Print usage information to the console." )
+    public boolean helpArg;
+
 
     /**
      * Analysis options
      */
+    /**
     @Arg( longName = "cvrg" )
     @Description( shortDescription = "Perform coverage analyses on all tracks." )
     public boolean cvrgAnalysis;
@@ -202,6 +200,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Arg( longName = "rpkm" )
     @Description( shortDescription = "Perform reads per kilobase of transcript per million (RPKM) analyses on all tracks." )
     public boolean rpkmAnalysis;
+    */
 
     @Arg( longName = "snp" )
     @Description( shortDescription = "Perform single nucleotide polymorphism (SNP) analyses on all tracks." )
@@ -664,6 +663,8 @@ public final class CommandLineProcessor implements ArgsProcessor {
         final ProjectConnector pc = ProjectConnector.getInstance();
 
         final List<Future<AnalysisResult>> futures = new ArrayList<>();
+
+        /**
         if( cvrgAnalysis ) {
             runAnalyses++;
             printFine( ps, "\t"+ runAnalyses +": coverage analysis" );
@@ -684,6 +685,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             RPKMAnalysisCallable rpkmAnalysisCallable = new RPKMAnalysisCallable( verboseArg );
             futures.add( es.submit( rpkmAnalysisCallable ) );
         }
+        */
 
         if( snpAnalysis ) {
             runAnalyses++;
