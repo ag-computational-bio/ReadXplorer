@@ -107,7 +107,8 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
 
     private void updateTracks() {
-        ProjectConnector projectConnector = ProjectConnector.getInstance();
+
+        final ProjectConnector projectConnector = ProjectConnector.getInstance();
         List<TrackJob> trackJobs = this.getTrackJobs();
         if( !trackJobs.isEmpty() ) {
             workunits = trackJobs.size();
@@ -125,7 +126,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
                     StatsContainer statsContainer = new StatsContainer();
                     statsContainer.prepareForTrack();
                     parser.setStatsContainer( statsContainer );
-                    Boolean success = parser.parseInput( trackJob, chromLengthMap );
+                    boolean success = parser.parseInput( trackJob, chromLengthMap );
                     parser.removeObserver( this );
                     if( success ) {
                         try {
@@ -239,7 +240,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
     protected void done() {
         super.done();
         ph.finish();
-        if( this.noErrors ) {
+        if( noErrors ) {
             io.getOut().println( "Re-calculation of classification for all tracks finished successfully! (If no error messages were printed!)" );
         } else {
             io.getOut().println( "At least the update of one data set failed (check earlier log messages for more info)" );

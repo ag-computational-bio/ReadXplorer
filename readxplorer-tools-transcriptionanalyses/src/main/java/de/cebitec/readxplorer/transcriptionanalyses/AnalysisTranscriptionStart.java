@@ -250,7 +250,7 @@ public class AnalysisTranscriptionStart implements Observer,
         totalStarts.setFwdCoverage( this.fixLeftCoverageBound( totalStarts.getFwdCov(), 0 ) ); //for read starts the left pos is not important
         totalStarts.setRevCoverage( this.fixLeftCoverageBound( totalStarts.getRevCov(), totalReadStartsLastRevPos ) ); //on fwd strand
 
-        for( int i = fixedLeftBound; i < rightBound; ++i ) {
+        for( int i = fixedLeftBound; i < rightBound; i++ ) {
             this.gatherDataAndDetect( chromId, chromLength, chromFeatures, totalCoverage, totalStarts, i );
         }
 
@@ -280,10 +280,10 @@ public class AnalysisTranscriptionStart implements Observer,
         int[] readStartArrayFwd = readStarts.getFwdCov();
         int[] readStartArrayRev = readStarts.getRevCov();
         int pos = coverage.getInternalPos( refPos );
-        int fwdCov1;
-        int revCov1;
-        int fwdCov2;
-        int revCov2;
+        int fwdCov1 = covArrayFwd[pos];
+        int revCov1 = covArrayRev[pos];
+        int fwdCov2 = covArrayFwd[pos + 1];
+        int revCov2 = covArrayRev[pos + 1];
         int increaseFwd;
         int increaseRev;
         int readStartsFwd;
@@ -291,10 +291,6 @@ public class AnalysisTranscriptionStart implements Observer,
         int percentIncFwd;
         int percentIncRev;
 
-        fwdCov1 = covArrayFwd[pos];
-        revCov1 = covArrayRev[pos];
-        fwdCov2 = covArrayFwd[pos + 1];
-        revCov2 = covArrayRev[pos + 1];
         if( !isStrandBothOption ) { //calc values based on analysis strand selection (4 possibilities)
             if( isFeatureStrand ) { //default increases for correctly stranded libraries
                 increaseFwd = fwdCov2 - fwdCov1;
@@ -418,14 +414,12 @@ public class AnalysisTranscriptionStart implements Observer,
         final int maxFeatureDist = parametersTSS.getMaxFeatureDistance();
         int minStartPos = tssPos - maxFeatureDist < 0 ? 0 : tssPos - maxFeatureDist;
         int maxStartPos = tssPos + maxFeatureDist > chromLength ? chromLength : tssPos + maxFeatureDist;
-        PersistentFeature feature;
         DetectedFeatures detectedFeatures = new DetectedFeatures();
-        int start;
         boolean fstFittingFeature = true;
         if( isFwdStrand ) {
-            for( int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); ++i ) {
-                feature = chromFeatures.get( i );
-                start = feature.getStart();
+            for( int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); i++ ) {
+                PersistentFeature feature = chromFeatures.get( i );
+                int start = feature.getStart();
 
                 /*
                  * We use all features, because also mRNA or rRNA features can
@@ -500,9 +494,9 @@ public class AnalysisTranscriptionStart implements Observer,
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); ++i ) {
-                feature = chromFeatures.get( i );
-                start = feature.getStop();
+            for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); i++ ) {
+                PersistentFeature feature = chromFeatures.get( i );
+                int start = feature.getStop();
 
                 if( start >= minStartPos && feature.isFwdStrand() == isFwdStrand && start <= maxStartPos ) {
 
@@ -673,7 +667,7 @@ public class AnalysisTranscriptionStart implements Observer,
 
         int nbTSSs = 0;
         int selectedIndex = 1;
-        for( int i = distributionValues.length - 1; i > 0; --i ) {
+        for( int i = distributionValues.length - 1; i > 0; i-- ) {
             // we use the index which first exceeds maxEstimatedNbOfActiveGenes
             if( nbTSSs < maxEstimatedNbOfActiveGenes ) {
                 nbTSSs += distributionValues[i];
@@ -726,6 +720,7 @@ public class AnalysisTranscriptionStart implements Observer,
             ProjectConnector.getInstance().insertCountDistribution( readStartDistribution, this.trackConnector.getTrackID() );
             ProjectConnector.getInstance().insertCountDistribution( covIncPercentDistribution, this.trackConnector.getTrackID() );
         }
+
     }
 
 

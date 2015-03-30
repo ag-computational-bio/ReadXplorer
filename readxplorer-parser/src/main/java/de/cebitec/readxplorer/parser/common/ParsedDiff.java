@@ -71,10 +71,7 @@ public class ParsedDiff {
         if( this.position != other.getPosition() ) {
             return false;
         }
-        if( this.base != other.getBase() ) {
-            return false;
-        }
-        return true;
+        return this.base == other.getBase();
     }
 
 

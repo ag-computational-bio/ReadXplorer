@@ -67,6 +67,11 @@
             <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress</artifactId>
+            <version>RELEASE80</version>
+        </dependency>
     </dependencies>
 
 
@@ -101,6 +106,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
+                    <publicPackages>
+                        <publicPackage>de.cebitec.readxplorer.tools.snpdetection</publicPackage>
+                    </publicPackages>
                 </configuration>
             </plugin>
 

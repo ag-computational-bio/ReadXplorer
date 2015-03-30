@@ -25,11 +25,14 @@ import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import net.sf.picard.PicardException;
 import net.sf.picard.reference.IndexedFastaSequenceFile;
 import org.openide.util.Exceptions;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -39,6 +42,8 @@ import org.openide.util.Exceptions;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class RefSeqFetcher implements Observable {
+
+    private static final Logger LOG = Logger.getLogger( RefSeqFetcher.class.getName() );
 
     private List<Observer> observers;
     private IndexedFastaSequenceFile refFile = null;
@@ -57,10 +62,12 @@ public class RefSeqFetcher implements Observable {
         this.observers.add( observer );
         try {
             refFile = new IndexedFastaSequenceFile( indexedFastaFile );
-        } catch( FileNotFoundException ex ) {
+        } catch( FileNotFoundException fnfe ) {
+            LOG.log( SEVERE, fnfe.getMessage(), fnfe );
             this.notifyObservers( "Fasta reference index file not found. Please make sure it exist." );
-            this.notifyObservers( ex.getMessage() );
-        } catch( PicardException e ) {
+            this.notifyObservers( fnfe.getMessage() );
+        } catch( PicardException pe ) {
+            LOG.log( SEVERE, pe.getMessage(), pe );
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + indexedFastaFile.getAbsolutePath();
             JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
         }
@@ -83,11 +90,12 @@ public class RefSeqFetcher implements Observable {
         String refSeq = "";
         try {
             refSeq = new String( refFile.getSubsequenceAt( refName, start, stop ).getBases(), Charset.forName( "UTF-8" ) ).toUpperCase();
-        } catch( PicardException e ) {
+        } catch( PicardException pe ) {
+            LOG.log( SEVERE, pe.getMessage(), pe );
             String msg = "Mapping and reference data are out of sync for reference " + refName + ". One of the queried positions is out of reach!"
                     + "Reimport the correct reference or fix the mapping data!";
             JOptionPane.showMessageDialog( new JPanel(), msg, "Reference sequence error", JOptionPane.ERROR_MESSAGE );
-            Exceptions.printStackTrace( e );
+            Exceptions.printStackTrace( pe );
         }
         return refSeq;
     }

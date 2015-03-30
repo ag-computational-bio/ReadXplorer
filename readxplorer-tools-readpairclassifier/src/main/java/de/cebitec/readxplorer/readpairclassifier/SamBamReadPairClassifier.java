@@ -396,7 +396,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                 List<ReadPair> unorSmallPairList = new ArrayList<>();
                 List<ReadPair> potUnorSmallPairList = new ArrayList<>();
 
-                ReadPair readPair;
                 for( Map.Entry<SAMRecord, Integer> entry : diffMap1.entrySet() ) { //block for one readname, pos and direction can deviate
                     SAMRecord recordA = entry.getKey();
                     int diffs1 = entry.getValue();
@@ -431,7 +430,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                         }
                                         if( currDist <= this.maxDist && currDist >= this.minDist ) { //distance fits
                                             ///////////////////////////// found a perfect pair! /////////////////////////////////
-                                            readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.PERFECT_PAIR, currDist );
+                                            ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.PERFECT_PAIR, currDist );
                                             if( diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //only perfect and best match mappings pass here
                                                 this.addPairedRecord( readPair );
                                                 omitList.add( recordA );
@@ -441,7 +440,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                             }
                                         } else //////////////// distance too small, potential pair //////////////////////////
                                         if( currDist < this.minDist ) {
-                                            readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.DIST_SMALL_PAIR, currDist );
+                                            ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.DIST_SMALL_PAIR, currDist );
                                             if( largestSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //best mappings
                                                 largestSmallerDist = currDist;
                                                 potSmallPairList.add( readPair );
@@ -457,14 +456,14 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                         ++currDist;
 
                                         if( currDist <= this.maxDist && currDist >= this.minDist ) { ////distance fits, orientation not ///////////
-                                            readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.ORIENT_WRONG_PAIR, currDist );
+                                            ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.ORIENT_WRONG_PAIR, currDist );
                                             if( diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //best mappings
                                                 unorPairList.add( readPair );
                                             } else {
                                                 potUnorPairList.add( readPair );
                                             }
                                         } else if( currDist < this.maxDist && largestSmallerDist < currDist ) {///// orientation wrong & distance too small //////////////////////////////
-                                            readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.OR_DIST_SMALL_PAIR, currDist );
+                                            ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.OR_DIST_SMALL_PAIR, currDist );
                                             if( largestUnorSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //best mappings
                                                 largestUnorSmallerDist = currDist;
                                                 unorSmallPairList.add( readPair );

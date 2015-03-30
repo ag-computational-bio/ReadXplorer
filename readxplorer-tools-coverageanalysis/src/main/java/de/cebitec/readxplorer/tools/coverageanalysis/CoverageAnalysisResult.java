@@ -51,7 +51,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     @Override
     public List<String> dataSheetNames() {
-        List<String> sheetNames = new ArrayList<>();
+        List<String> sheetNames = new ArrayList<>( 2 );
 
         ParameterSetCoverageAnalysis parameters = (ParameterSetCoverageAnalysis) this.getParameters();
         String tableHeader;
@@ -73,8 +73,8 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         ParameterSetCoverageAnalysis parameters = (ParameterSetCoverageAnalysis) this.getParameters();
         String coveredString = parameters.isDetectCoveredIntervals() ? "Covered" : "Uncovered";
 
-        List<List<String>> dataColumnDescriptions = new ArrayList<>();
-        List<String> resultDescriptions = new ArrayList<>();
+        List<List<String>> dataColumnDescriptions = new ArrayList<>( 2 );
+        List<String> resultDescriptions = new ArrayList<>( 10 );
 
         resultDescriptions.add( "Start" );
         resultDescriptions.add( "Stop" );
@@ -99,8 +99,8 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
-        List<List<List<Object>>> coveredIntervalsExport = new ArrayList<>();
-        List<List<Object>> coveredIntervalsResultList = new ArrayList<>();
+        List<List<List<Object>>> coveredIntervalsExport = new ArrayList<>( 1 );
+        List<List<Object>> coveredIntervalsResultList = new ArrayList<>( 2 );
 
         fillTableRow( this.results.getCoverageIntervals(), coveredIntervalsResultList );
         fillTableRow( this.results.getCoverageIntervalsRev(), coveredIntervalsResultList );
@@ -111,7 +111,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         ParameterSetCoverageAnalysis parameters = (ParameterSetCoverageAnalysis) this.getParameters();
         String coveredString = parameters.isDetectCoveredIntervals() ? "Covered" : "Uncovered";
 
-        List<List<Object>> statisticsExportData = new ArrayList<>();
+        List<List<Object>> statisticsExportData = new ArrayList<>( 10 );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( coveredString + " interval analysis statistics for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
 
@@ -149,7 +149,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     private void fillTableRow( List<CoverageInterval> coverageList, List<List<Object>> coveredFeaturesResultList ) {
         for( CoverageInterval interval : coverageList ) {
-            List<Object> coveredIntervalRow = new ArrayList<>();
+            List<Object> coveredIntervalRow = new ArrayList<>( 10 );
             coveredIntervalRow.add( interval.isFwdStrand() ? interval.getStart() : interval.getStop() );
             coveredIntervalRow.add( interval.isFwdStrand() ? interval.getStop() : interval.getStart() );
             coveredIntervalRow.add( this.getTrackEntry( interval.getTrackId(), true ) );

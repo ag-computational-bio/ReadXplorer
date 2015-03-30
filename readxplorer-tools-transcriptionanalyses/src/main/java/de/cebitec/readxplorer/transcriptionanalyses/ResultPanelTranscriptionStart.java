@@ -250,21 +250,16 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     final int nbColumns = 21;
 
                     DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
-                    String strand;
-                    int distance;
-                    DetectedFeatures detFeatures;
-                    PersistentFeature feature;
-                    TransStartUnannotated tSSU;
-
                     for( TranscriptionStart tss : tsss ) {
 
+                        final String strand;
                         if( tss.isFwdStrand() ) {
                             strand = SequenceUtils.STRAND_FWD_STRING;
                         } else {
                             strand = SequenceUtils.STRAND_REV_STRING;
                         }
 
-                        Object[] rowData = new Object[nbColumns];
+                        final Object[] rowData = new Object[nbColumns];
                         int i = 0;
                         rowData[i++] = tss.getPos();
                         rowData[i++] = tssResult.getTrackEntry( tss.getTrackId(), false );
@@ -274,8 +269,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         rowData[i++] = tss.getCoverageIncrease();
                         rowData[i++] = tss.getPercentIncrease();
 
-                        detFeatures = tss.getDetFeatures();
-                        feature = detFeatures.getCorrectStartFeature();
+                        DetectedFeatures detFeatures = tss.getDetFeatures();
+                        PersistentFeature feature = detFeatures.getCorrectStartFeature();
                         if( feature != null ) {
                             rowData[i++] = feature.toString();
                         } else {
@@ -292,15 +287,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         feature = detFeatures.getDownstreamFeature();
                         if( feature != null ) {
                             rowData[i++] = feature.toString();
-                            distance = Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) );
-                            rowData[i++] = distance;
+                            rowData[i++] = Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) );
                         } else {
                             rowData[i++] = "-";
                             rowData[i++] = null;
                         }
 
                         if( tss instanceof TransStartUnannotated ) {
-                            tSSU = (TransStartUnannotated) tss;
+                            TransStartUnannotated tSSU = (TransStartUnannotated) tss;
                             rowData[i++] = true;
                             rowData[i++] = tSSU.getDetectedStop();
                             if( tSSU.hasStartCodon() ) {
@@ -367,18 +361,17 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
         //get reference sequence for promoter regions
         PersistentReference ref = this.referenceViewer.getReference();
-        String promoter;
 
         //get the promoter region for each TSS
-        int promoterStart;
         int chromLength = ref.getActiveChromosome().getLength();
         for( TranscriptionStart tSS : this.tssResult.getResults() ) {
+            final String promoter;
             if( tSS.isFwdStrand() ) {
-                promoterStart = tSS.getPos() - 70;
+                int promoterStart = tSS.getPos() - 70;
                 promoterStart = promoterStart < 0 ? 0 : promoterStart;
                 promoter = ref.getActiveChromSequence( promoterStart, tSS.getPos() );
             } else {
-                promoterStart = tSS.getPos() + 70;
+                int promoterStart = tSS.getPos() + 70;
                 promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
                 promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( tSS.getPos(), promoterStart ) );
             }
