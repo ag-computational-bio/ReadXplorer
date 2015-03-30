@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+ * Copyright (C) 2015 Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,39 +18,34 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import java.util.logging.Logger;
-
-import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.RPKM;
-
-
 /**
- * Analysis Callable Mockup Class.
- * This mockup class is a basic framework for future
- * operon detection cli implementations.
+ * CLI Analyses Enumeration.
+ * Represents available CLI analyses.
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
-public class RPKMAnalysisCallable extends AnalysisCallable {
+public enum CLIAnalyses {
 
-    private static final Logger LOG = Logger.getLogger( RPKMAnalysisCallable.class.getName() );
+    Coverage( "cvrg" ),
+    OperonDetection( "opdt" ),
+    RPKM( "rpkm" ),
+    SNP( "snp" ),
+    TSS( "tss" );
 
 
-    public RPKMAnalysisCallable( boolean verbosity ) {
+    private final String prefix;
 
-        super( verbosity, RPKM );
-        
+
+    CLIAnalyses( String prefix ) {
+        this.prefix = prefix;
     }
 
 
     @Override
-    public AnalysisResult call() throws Exception {
+    public String toString() {
 
-        LOG.fine( "start RPKM analysis" );
-        // calc coverage analyses
-
-        return null;
+        return prefix;
 
     }
-
 
 }

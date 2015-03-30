@@ -74,7 +74,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
      * @param verbosity is verbosity required?
      * @param anaylsis type of analysis
      */
-    protected AnalysisCallable( boolean verbosity, String anaylsis ) {
+    protected AnalysisCallable( boolean verbosity, CLIAnalyses anaylsis ) {
 
         this.verbosity = verbosity;
         this.result = new AnalysisResult( anaylsis );
@@ -84,19 +84,19 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
     public final class AnalysisResult {
 
-        private final String analysisType;
+        private final CLIAnalyses analysisType;
         private final List<String> output;
         private File resultFile;
 
 
-        private AnalysisResult( String analysisType ) {
+        private AnalysisResult( CLIAnalyses analysisType ) {
             this.analysisType = analysisType;
             this.output = new ArrayList<>( 5 );
         }
 
 
         public String getType() {
-            return analysisType;
+            return analysisType.toString();
         }
 
 

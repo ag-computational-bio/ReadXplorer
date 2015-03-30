@@ -20,6 +20,8 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 
 import java.util.logging.Logger;
 
+import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.Coverage;
+
 
 /**
  * Analysis Callable Mockup Class.
@@ -35,7 +37,7 @@ public class CoverageAnalysisCallable extends AnalysisCallable {
 
     public CoverageAnalysisCallable( boolean verbosity ) {
 
-        super( verbosity, "coverage" );
+        super( verbosity, Coverage );
 
     }
 

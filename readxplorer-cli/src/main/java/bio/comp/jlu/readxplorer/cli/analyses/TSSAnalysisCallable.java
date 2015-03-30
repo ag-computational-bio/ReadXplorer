@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import jxl.write.WriteException;
 import org.netbeans.api.sendopts.CommandException;
 
+import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.TSS;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 
@@ -76,7 +77,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
      */
     public TSSAnalysisCallable( boolean verbosity, PersistentTrack persistentTrack, ParameterSetTSS parameterSetTSS ) {
 
-        super( verbosity, "TSS" );
+        super( verbosity, TSS );
 
         this.persistentTrack = persistentTrack;
         this.parameterSet    = parameterSetTSS;

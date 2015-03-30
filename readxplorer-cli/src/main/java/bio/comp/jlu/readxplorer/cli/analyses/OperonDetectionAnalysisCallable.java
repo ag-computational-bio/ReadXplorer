@@ -20,6 +20,8 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 
 import java.util.logging.Logger;
 
+import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.OperonDetection;
+
 
 /**
  * Analysis Callable Mockup Class.
@@ -34,7 +36,9 @@ public class OperonDetectionAnalysisCallable extends AnalysisCallable {
 
 
     public OperonDetectionAnalysisCallable( boolean verbosity ) {
-        super( verbosity, "operon detection" );
+
+        super( verbosity, OperonDetection );
+        
     }
 
 

@@ -19,6 +19,7 @@
 package bio.comp.jlu.readxplorer.cli.filefilter;
 
 
+import bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.logging.Logger;
@@ -50,7 +51,7 @@ public class AnalysisFileFilter implements FileFilter {
     private static final String DOT_SUFFIX = '.' + SUFFIX;
     private static final String MERGED_RESULTS_FILE = "analyses" + DOT_SUFFIX;
 
-    private final String analysisType;
+    private final CLIAnalyses analysisType;
     private final String prefixDash;
 
 
@@ -61,10 +62,10 @@ public class AnalysisFileFilter implements FileFilter {
      * be created with an "snp" analysis type.
      * @param analysisType analysis type and file prefix
      */
-    public AnalysisFileFilter( String analysisType ) {
+    public AnalysisFileFilter( CLIAnalyses analysisType ) {
 
         this.analysisType = analysisType;
-        prefixDash = analysisType + '-';
+        prefixDash = analysisType.toString() + '-';
 
     }
 

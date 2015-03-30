@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import jxl.write.WriteException;
 import org.netbeans.api.sendopts.CommandException;
 
+import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.SNP;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 
@@ -70,7 +71,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
      */
     public SNPAnalysisCallable( boolean verbosity, PersistentTrack persistentTrack, ParameterSetSNPs parameterSet ) {
 
-        super( verbosity, "SNP" );
+        super( verbosity, SNP );
 
         this.persistentTrack = persistentTrack;
         this.parameterSet = parameterSet;

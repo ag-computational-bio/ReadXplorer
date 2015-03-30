@@ -89,6 +89,8 @@ import org.netbeans.spi.sendopts.ArgsProcessor;
 import org.netbeans.spi.sendopts.Description;
 import org.netbeans.spi.sendopts.Env;
 
+import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.SNP;
+import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.TSS;
 import static java.util.logging.Level.SEVERE;
 
 
@@ -101,13 +103,13 @@ import static java.util.logging.Level.SEVERE;
  * <li>output to the CLI and persistence of merged analysis files</li>
  * </ol>
  * <p>
- * The following options are available:
+ * The following options and arguments are available:
  * <p>
  * Mandatory:
  * <ul>
- * <li>-f {file} / --reference {file}: the reference genome to import</li>
- * <li>-r {dir}/ --reads {dir}: a directory with read files</li>
- * <li>-e {dir}/ --per{dir}: a directory with paired-end read files</li>
+ * <li>-f / --reference {file}: the reference genome to import</li>
+ * <li>-r / --reads {dir}: a directory with read files</li>
+ * <li>-e / --per {dir}: a directory with paired-end read files</li>
  * </ul>
  * <p>
  * Optional:
@@ -193,7 +195,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     @Description( shortDescription = "Perform coverage analyses on all tracks." )
     public boolean cvrgAnalysis;
 
-    @Arg( longName = "opdn" )
+    @Arg( longName = "opdt" )
     @Description( shortDescription = "Perform operon detection analyses on all tracks." )
     public boolean opdnAnalysis;
 
@@ -777,10 +779,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, null );
         printInfo( ps, "combined analyses result files:" );
         if( snpAnalysis ) {
-            mergeAnlaysisFiles( ps, "snp", new AnalysisFileFilter( "snp" ) );
+            mergeAnlaysisFiles( ps, "snp", new AnalysisFileFilter( SNP ) );
         }
         if( snpAnalysis ) {
-            mergeAnlaysisFiles( ps, "tss", new AnalysisFileFilter( "tss" ) );
+            mergeAnlaysisFiles( ps, "tss", new AnalysisFileFilter( TSS ) );
         }
 
         return runAnalyses;
