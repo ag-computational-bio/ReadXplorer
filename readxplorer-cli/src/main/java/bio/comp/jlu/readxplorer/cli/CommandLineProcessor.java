@@ -24,6 +24,9 @@ import bio.comp.jlu.readxplorer.cli.analyses.OperonDetectionAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.RPKMAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.SNPAnalysisCallable;
 import bio.comp.jlu.readxplorer.cli.analyses.TSSAnalysisCallable;
+import bio.comp.jlu.readxplorer.cli.constants.PairedEndConstants;
+import bio.comp.jlu.readxplorer.cli.constants.SNPConstants;
+import bio.comp.jlu.readxplorer.cli.constants.TSSConstants;
 import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import bio.comp.jlu.readxplorer.cli.filefilter.ReadsFileFilter;
 import bio.comp.jlu.readxplorer.cli.imports.ImportPairedEndCallable;
@@ -535,9 +538,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printFine( ps, "submitted jobs to import paired-end read files..." );
 
         // submit parse reads jobs for (concurrent) execution
-        final int distance = Integer.parseInt( getProperty( Constants.PER_DISTANCE ) );
-        final byte orientation = (byte) Integer.parseInt( getProperty( Constants.PER_ORIENTATION ) );
-        final short deviation = (short) Integer.parseInt( getProperty( Constants.PER_DEVIATION ) );
+        final int distance = Integer.parseInt( getProperty( PairedEndConstants.PER_DISTANCE ) );
+        final byte orientation = (byte) Integer.parseInt( getProperty( PairedEndConstants.PER_ORIENTATION ) );
+        final short deviation = (short) Integer.parseInt( getProperty( PairedEndConstants.PER_DEVIATION ) );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
         int latestTrackId = pc.getLatestTrackId();
@@ -651,15 +654,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
 
             // create necessary parameter objects for all analyses
-            boolean useMainBases = Boolean.parseBoolean( getProperty( Constants.SNP_COUNT_MAIN_BASES ) );
-            byte minBaseQuality    = Byte.parseByte( getProperty( Constants.SNP_MIN_BASE_QUALITY ) );
-            byte minAvrBaseQuality = Byte.parseByte( getProperty( Constants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
-            byte minMappingQuality = Byte.parseByte( getProperty( Constants.SNP_MIN_MAPPING_QUALITY ) );
-            int minVaryingBases      = Integer.parseInt( getProperty( Constants.SNP_MIN_MISMATCH_BASES ) );
-            int minAvrMappingQuality = Integer.parseInt( getProperty( Constants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
-            double minPercVariation  = Double.parseDouble( getProperty( Constants.SNP_MIN_VARIATION ) );
-            Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( Constants.SNP_FEATURE_TYPES ) );
-            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( Constants.SNP_MAPPING_CLASSES ), minMappingQuality, Properties.STRAND_FEATURE );
+            boolean useMainBases = Boolean.parseBoolean( getProperty( SNPConstants.SNP_COUNT_MAIN_BASES ) );
+            byte minBaseQuality    = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_BASE_QUALITY ) );
+            byte minAvrBaseQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
+            byte minMappingQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_MAPPING_QUALITY ) );
+            int minVaryingBases      = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_MISMATCH_BASES ) );
+            int minAvrMappingQuality = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
+            double minPercVariation  = Double.parseDouble( getProperty( SNPConstants.SNP_MIN_VARIATION ) );
+            Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( SNPConstants.SNP_FEATURE_TYPES ) );
+            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( SNPConstants.SNP_MAPPING_CLASSES ), minMappingQuality, Properties.STRAND_FEATURE );
 
             final ParameterSetSNPs parameterSet = new ParameterSetSNPs( minVaryingBases, minPercVariation, useMainBases, selFeatureTypes,
                                                     readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
@@ -676,21 +679,21 @@ public final class CommandLineProcessor implements ArgsProcessor {
             runAnalyses++;
             printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
 
-            boolean autoTssParamEstimation     = Boolean.parseBoolean( getProperty( Constants.TSS_PARAMETER_ESTIMATION ) );
-            boolean associateTSS               = Boolean.parseBoolean( getProperty( Constants.TSS_ASSOCIATE ) );
-            boolean performUnannotatedTransDet = Boolean.parseBoolean( getProperty( Constants.TSS_UNANNOTATED_DETECTION ) );
-            byte minMappingQuality = Byte.parseByte( getProperty( Constants.TSS_MIN_MAPPING_QUALITY ) );
-            byte strandUsage       = Byte.parseByte( getProperty( Constants.TSS_STRAND_USAGE ) );
-            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( Constants.TSS_MAPPING_CLASSES ), minMappingQuality, strandUsage );
+            boolean autoTssParamEstimation     = Boolean.parseBoolean( getProperty( TSSConstants.TSS_PARAMETER_ESTIMATION ) );
+            boolean associateTSS               = Boolean.parseBoolean( getProperty( TSSConstants.TSS_ASSOCIATE ) );
+            boolean performUnannotatedTransDet = Boolean.parseBoolean( getProperty( TSSConstants.TSS_UNANNOTATED_DETECTION ) );
+            byte minMappingQuality = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
+            byte strandUsage       = Byte.parseByte( getProperty( TSSConstants.TSS_STRAND_USAGE ) );
+            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( TSSConstants.TSS_MAPPING_CLASSES ), minMappingQuality, strandUsage );
                 readClassParams.setStrandOption( Properties.STRAND_BOTH_FWD );
-            int minIncreaseTotal             = Integer.parseInt( getProperty( Constants.TSS_MIN_INCREASE_TOTAL ) );
-            int minIncreasePercent           = Integer.parseInt( getProperty( Constants.TSS_MIN_INCREASE_PERCENT ) );
-            int maxFeatureDistance           = Integer.parseInt( getProperty( Constants.TSS_MAX_FEATURE_DISTANCE ) );
-            int maxLeaderlessFeatureDistance = Integer.parseInt( getProperty( Constants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
-            int associateTssWindow           = Integer.parseInt( getProperty( Constants.TSS_ASSOCIATE_WINDOW ) );
-            int maxLowCovInitCount           = Integer.parseInt( getProperty( Constants.TSS_MAX_LOW_COVERAGE_INIT ) );
-            int minLowCovIncrease            = Integer.parseInt( getProperty( Constants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
-            int minTransExtensionCov         = Integer.parseInt( getProperty( Constants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
+            int minIncreaseTotal             = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_TOTAL ) );
+            int minIncreasePercent           = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_PERCENT ) );
+            int maxFeatureDistance           = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_FEATURE_DISTANCE ) );
+            int maxLeaderlessFeatureDistance = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
+            int associateTssWindow           = Integer.parseInt( getProperty( TSSConstants.TSS_ASSOCIATE_WINDOW ) );
+            int maxLowCovInitCount           = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LOW_COVERAGE_INIT ) );
+            int minLowCovIncrease            = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
+            int minTransExtensionCov         = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
 
             final ParameterSetTSS parameterSet = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
                                                  minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,

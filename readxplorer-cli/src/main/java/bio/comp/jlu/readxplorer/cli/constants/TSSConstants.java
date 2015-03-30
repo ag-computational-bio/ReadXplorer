@@ -15,55 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bio.comp.jlu.readxplorer.cli;
+package bio.comp.jlu.readxplorer.cli.constants;
 
 
 /**
- *
+ * TSS Detection constants.
  * @author Oliver Schwengers
  * <oliver.schwengers@computational.bio.uni-giessen.de>
  */
-public final class Constants {
+public final class TSSConstants {
 
-    private Constants() {}
+    private TSSConstants() {}
 
-    /**
-     * Paired End
-     */
-    // paired-end distance
-    public static final String PER_DISTANCE = "per.distance";
-    // paired-end deviation
-    public static final String PER_DEVIATION = "per.deviation";
-    // paired-end orientation
-    public static final String PER_ORIENTATION = "per.orientation";
-
-
-    /**
-     * SNP Detection
-     */
-    // snp analysis count main bases
-    public static final String SNP_COUNT_MAIN_BASES = "snp.count-main-bases";
-    // snp analysis feature types
-    public static final String SNP_FEATURE_TYPES = "snp.feature-types";
-    // snp analysis mapping classes
-    public static final String SNP_MAPPING_CLASSES = "snp.mapping-classes";
-    // snp analysis min base quality
-    public static final String SNP_MIN_MAPPING_QUALITY = "snp.min-mapping-quality";
-    // snp analysis min base quality
-    public static final String SNP_MIN_BASE_QUALITY = "snp.min-base-quality";
-    // snp analysis min amount of mismatch bases
-    public static final String SNP_MIN_MISMATCH_BASES = "snp.min-mismatch-bases";
-    // snp analysis min percental variation
-    public static final String SNP_MIN_VARIATION = "snp.min-variation";
-    // snp analysis min average base quality
-    public static final String SNP_MIN_AVERAGE_BASE_QUALITY = "snp.min-average-base-quality";
-    // snp analysis min average mapping quality
-    public static final String SNP_MIN_AVERAGE_MAPPING_QUALITY = "snp.min-average-mapping-quality";
-
-
-    /**
-     * TSS Detection
-     */
+    
     // tss analysis mapping classes
     public static final String TSS_MAPPING_CLASSES = "tss.mapping-classes";
     // tss strand usage
