@@ -43,7 +43,9 @@ import org.netbeans.api.sendopts.CommandException;
 
 
 /**
- *
+ * Reads CLI Importer.
+ * The <code>ImportTrackCallable</code> class is responsible for the parallelised
+ * import of read files in the CLI version.
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
@@ -55,6 +57,12 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
     private final TrackJob trackJob;
 
 
+    /**
+     * Reads CLI Importer
+     *
+     * @param referenceResult imported reference genome as mapping target
+     * @param rpjc <code>TrackJob</code> with import information
+     */
     public ImportTrackCallable( ImportReferenceResult referenceResult, TrackJob trackJob ) {
 
         this.referenceResult = referenceResult;
@@ -129,6 +137,10 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
     }
 
 
+    /**
+     * Result Class.
+     * Contains all available result and import information.
+     */
     public final class ImportTrackResults {
 
         private final List<String> output;

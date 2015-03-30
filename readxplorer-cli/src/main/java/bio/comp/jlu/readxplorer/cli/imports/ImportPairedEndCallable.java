@@ -47,7 +47,9 @@ import static java.util.logging.Level.SEVERE;
 
 
 /**
- *
+ * Paired-End CLI Importer.
+ * The <code>ImportPairedEndCallable</code> class is responsible for the parallelised
+ * import of read file pairs in the CLI version.
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
@@ -59,6 +61,12 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
     private final ReadPairJobContainer rpjc;
 
 
+    /**
+     * Paired-End CLI Importer
+     *
+     * @param referenceResult imported reference genome as mapping target
+     * @param rpjc <code>ReadPairJobContainer</code> with import information
+     */
     public ImportPairedEndCallable( ImportReferenceResult referenceResult, ReadPairJobContainer rpjc ) {
 
         this.referenceResult = referenceResult;
@@ -173,6 +181,10 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
     }
 
 
+    /**
+     * Result Class.
+     * Contains all available result and import information.
+     */
     public final class ImportPairedEndResults {
 
         private final List<String> output;

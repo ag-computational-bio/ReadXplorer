@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package bio.comp.jlu.readxplorer.cli.filefilter;
+
 
 import java.io.File;
 import java.io.FileFilter;
@@ -27,6 +29,9 @@ import static java.util.logging.Level.INFO;
 
 
 /**
+ * Analysis File Filter.
+ * This <code>FileFilter</code> implementation only accepts excel (.xls) files
+ * which names contain a certain analysis type prefix e.g. "snp".
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
@@ -34,9 +39,11 @@ public class AnalysisFileFilter implements FileFilter {
 
     private static final Logger LOG = Logger.getLogger( AnalysisFileFilter.class.getName() );
 
+
     static {
         LOG.setLevel( INFO );
     }
+
 
     public static final String SUFFIX = "xls";
 
@@ -47,6 +54,13 @@ public class AnalysisFileFilter implements FileFilter {
     private final String prefixDash;
 
 
+    /**
+     * Creates an <code>AnalysisFileFilter</code> instance for a certain type of analysis.
+     * <p>
+     * For example a file filter accepting SNP analysis result files should
+     * be created with an "snp" analysis type.
+     * @param analysisType analysis type and file prefix
+     */
     public AnalysisFileFilter( String analysisType ) {
 
         this.analysisType = analysisType;
@@ -60,14 +74,14 @@ public class AnalysisFileFilter implements FileFilter {
 
         LOG.log( FINE, "check file: {0}", file.getAbsolutePath() );
 
-        if( !file.isFile()  ||  !file.canRead() ) {
+        if( !file.isFile() || !file.canRead() ) {
             LOG.log( FINER, "file ({0}) is either not a file or is not readable!", file.getAbsolutePath() );
             return false;
         }
 
         String fileName = file.getName();
         if( !fileName.startsWith( prefixDash ) ) {
-            LOG.log( FINER, "file name ({0}) doesn't start with prefix ("+analysisType+"-)!", file.getAbsolutePath() );
+            LOG.log( FINER, "file name ({0}) doesn't start with prefix (" + analysisType + "-)!", file.getAbsolutePath() );
             return false;
         }
         if( fileName.equals( prefixDash + MERGED_RESULTS_FILE ) ) {
@@ -77,5 +91,6 @@ public class AnalysisFileFilter implements FileFilter {
         return DOT_SUFFIX.equals( fileName.substring( file.getName().lastIndexOf( '.' ) ).toLowerCase() );
 
     }
+
 
 }

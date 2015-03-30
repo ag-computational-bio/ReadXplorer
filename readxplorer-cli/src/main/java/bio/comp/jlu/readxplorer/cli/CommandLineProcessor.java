@@ -92,6 +92,40 @@ import org.netbeans.spi.sendopts.Env;
 import static java.util.logging.Level.SEVERE;
 
 
+/**
+ * Entry Point of ReadXplorer's CLI Version.
+ * The <code>CommandLineProcessor</code> is responsible of:
+ * <ol>
+ * <li>option and argument handling</li>
+ * <li>orchestration of import and analysis threads</li>
+ * <li>output to the CLI and persistence of merged analysis files</li>
+ * </ol>
+ * <p>
+ * The following options are available:
+ * <p>
+ * Mandatory:
+ * <ul>
+ * <li>-f {file} / --reference {file}: the reference genome to import</li>
+ * <li>-r {dir}/ --reads {dir}: a directory with read files</li>
+ * <li>-e {dir}/ --per{dir}: a directory with paired-end read files</li>
+ * </ul>
+ * <p>
+ * Optional:
+ * <ul>
+ * <li>-v / --verbose: enables verbose output</li>
+ * <li>-p / --pairedend: files stored in -r/--reads dir are combined paired-end files</li>
+ * <li>-t{n} / --threading {n}: enables multithreading with {n} worker threads</li>
+ * <li>-h / --help: prints a usage to STD out</li>
+ * <li>--db {name}: name of newly created H2 database file</li>
+ * <li>--props {file}: a customised property file</li>
+ * </ul>
+ * <p>
+ * Analyses Options:
+ * <ul>
+ * <li>--tss: perform TSS analses for all imported tracks</li>
+ * <li>--snp: perform SNP analses for all imported tracks</li>
+ * </ul>
+ */
 public final class CommandLineProcessor implements ArgsProcessor {
 
     private static final Logger LOG = Logger.getLogger( CommandLineProcessor.class.getName() );

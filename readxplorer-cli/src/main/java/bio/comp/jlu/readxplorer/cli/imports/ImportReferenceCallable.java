@@ -41,23 +41,11 @@ import org.netbeans.api.sendopts.CommandException;
 
 
 /**
+ * Reference CLI Importer.
+ *
  * The <code>ImportReferenceCallable</code> class is responsible for the import
  * of a reference genome in the cli version.
- * <p>
- * The following options are available:
- * <p>
- * Mandatory:
- * <li>
- * <lu>-r / --ref-import</lu>
- * <lu>-d / --db: file to H2 database</lu>
- * <lu>-t / --file-type: sequence file type</lu>
- * <lu>-f / --files: reference genome files</lu>
- * <lu>-n / --names: reference genome names</lu>
- * <lu>-d / --descriptions: reference genome descriptions</lu>
- * </li>
- *
- * Optional: -v / --verbose: print information during import process
- * <p>
+ * 
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
 public final class ImportReferenceCallable implements Callable<ImportReferenceResult> {

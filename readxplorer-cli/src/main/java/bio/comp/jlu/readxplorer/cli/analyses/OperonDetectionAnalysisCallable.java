@@ -22,6 +22,9 @@ import java.util.logging.Logger;
 
 
 /**
+ * Analysis Callable Mockup Class.
+ * This mockup class is a basic framework for future
+ * operon detection cli implementations.
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */

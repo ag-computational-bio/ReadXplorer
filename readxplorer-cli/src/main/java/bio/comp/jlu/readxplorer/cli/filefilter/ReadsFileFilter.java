@@ -15,14 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package bio.comp.jlu.readxplorer.cli.filefilter;
+
 
 import java.io.File;
 import java.io.FileFilter;
 
 
 /**
- *
+ * Reads File Filter.
+ * This <code>FileFilter</code> implementation only accepts read files.
+ * Currently, sam/bam, out and job files are accepted.
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
 public class ReadsFileFilter implements FileFilter {
@@ -31,12 +35,13 @@ public class ReadsFileFilter implements FileFilter {
     @Override
     public boolean accept( File file ) {
 
-        String suffix = file.getName().substring( file.getName().lastIndexOf( '.') + 1 ).toLowerCase();
+        String suffix = file.getName().substring( file.getName().lastIndexOf( '.' ) + 1 ).toLowerCase();
 
         return file.canRead() &&
                file.isFile() &&
-               ( "bam".equals( suffix ) || "sam".equals( suffix ) || "out".equals( suffix ) || "jok".equals( suffix ) );
+               ("bam".equals( suffix ) || "sam".equals( suffix ) || "out".equals( suffix ) || "jok".equals( suffix ));
 
     }
+
 
 }

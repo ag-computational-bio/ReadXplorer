@@ -46,6 +46,8 @@ import static java.util.logging.Level.SEVERE;
 
 
 /**
+ * Base Class for all Analysis Implementations.
+ * Provides common objects and logic for all CLI analysis implementations.
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
@@ -66,6 +68,12 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
     protected final AnalysisResult result;
 
 
+    /**
+     * Super Constructor for all Analysis Implementations.
+     *
+     * @param verbosity is verbosity required?
+     * @param anaylsis type of analysis
+     */
     protected AnalysisCallable( boolean verbosity, String anaylsis ) {
 
         this.verbosity = verbosity;

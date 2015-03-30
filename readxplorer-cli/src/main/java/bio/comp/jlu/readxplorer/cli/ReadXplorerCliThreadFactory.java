@@ -22,7 +22,9 @@ import java.util.concurrent.ThreadFactory;
 
 
 /**
- *
+ * ReadXplorer CLI Worker Thread Factory.
+ * This implementation of <code>ThreadFactory</code> creates
+ * daemon low priority worker threads for the CLI ReadXplorer version.
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
 public class ReadXplorerCliThreadFactory implements ThreadFactory {

@@ -40,6 +40,16 @@ import static java.util.logging.Level.SEVERE;
 
 
 /**
+ * Analysis Logic for CLI SNP Analysis.
+ * Performs parallelised SNP analysis calculations and result output.
+ * <p>
+ * For each imported track a single nucleotide polymorphism analysis will be performed.
+ * Analysis preferences are read from set properties file or if not specified
+ * from standard property file. After all calculations have been performed
+ * results will be written to an output file.
+ * <p>
+ * After all analyses have been performed, common result files will be merged
+ * into a single result file for each type of analysis.
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
@@ -51,6 +61,13 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
     private final ParameterSetSNPs parameterSet;
 
 
+    /**
+     * SNP Analysis Callable constructor.
+     *
+     * @param verbosity is verbosity required?
+     * @param persistentTrack imported track to analyse
+     * @param parameterSetTSS set with snp parameters
+     */
     public SNPAnalysisCallable( boolean verbosity, PersistentTrack persistentTrack, ParameterSetSNPs parameterSet ) {
 
         super( verbosity, "SNP" );
