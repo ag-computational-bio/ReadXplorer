@@ -14,8 +14,8 @@ public class CalculatePerpendicular implements CoreCalculationI{
     public static int LEAST_SQUARES_INTERCEPT = 0;
     public static int LEAST_SQUARES_SLOPE = 1;
     public static int LEAST_SQUARES_RSQUARE = 2;
-    public static int LEAST_SQUARES_STDERR = 3;
-    public static int LEAST_SQUARES_SUM_SQUARED_ERROR = 4;
+ // public static int LEAST_SQUARES_STDERR = 3;
+ // public static int LEAST_SQUARES_SUM_SQUARED_ERROR = 4;
 
     @Override
     public double[] calculate(int[] conditionA, int[] conditionB) 
