@@ -50,8 +50,8 @@ public class LinearRegression implements LinearRegressionI {
     @Override
     public void process( Map<Integer, Map<PersistentFeature, int[]>> countData ) {
         Set<Integer> conditions = countData.keySet();
-        String[] conditionsArray = conditions.toArray(
-            new String[conditions.size()]);
+        Integer[] conditionsArray = conditions.toArray(
+            new Integer[conditions.size()]);
         Map<PersistentFeature, int[]> geneSet1 =
             countData.get(conditionsArray[0]);
         Map<PersistentFeature, int[]> geneSet2 =
