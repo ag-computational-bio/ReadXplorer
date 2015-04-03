@@ -167,7 +167,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     /**
      * Actually starts the differential gene expression analysis.
      */
-    private void startAnalysis() {
+    public void startAnalysis() {
         collectCoverageDataInstances.clear();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
