@@ -107,7 +107,7 @@ public class CollectContinuousCoverageData implements Observer{
                 boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
-                int[] featurePositions = new int[feature.getLength()];
+                int[] featurePositions = new int[featStop-featStart];
                 if( !continuousCountData.containsKey( feature ) ) {                                    
                     Arrays.fill(featurePositions, 0);
                     continuousCountData.put( feature,  featurePositions);
@@ -125,12 +125,14 @@ public class CollectContinuousCoverageData implements Observer{
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
                             featurePositions = continuousCountData.get( feature );
                             for( int i = mapping.getStart()-feature.getStart() ;
-                                 i <= mapping.getStop()-feature.getStart(); i++ ) {
-                                 featurePositions[i]++;
+                               ((i <= mapping.getStop()-feature.getStart()) && (i < featurePositions.length)); i++ ) {
+                                if(i<0){
+                                    i=0;
+                                }
+                                featurePositions[i]++;
                             }
                             continuousCountData.put( feature, featurePositions );
                         }
-
                         //still mappings left, but need next feature
                     } else if( mapping.getStart() > featStop ) {
                         break;
