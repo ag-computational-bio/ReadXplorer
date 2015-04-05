@@ -192,7 +192,12 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
             results.addAll( processWithTool() );
             notifyObservers( AnalysisStatus.FINISHED );
         }
-    }    
+    }
+    
+    @Override
+    public List<ResultDeAnalysis> getResults() {
+        return Collections.unmodifiableList( results );
+    }
     
     @Override
     public void endAnalysis() {
