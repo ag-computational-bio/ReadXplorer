@@ -1,8 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2015 Agne Matuseviciute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 /**
@@ -11,11 +23,11 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
  */
 public class CalculatePerpendicular implements CoreCalculationI{
     
-    public static int LEAST_SQUARES_INTERCEPT = 0;
-    public static int LEAST_SQUARES_SLOPE = 1;
-    public static int LEAST_SQUARES_RSQUARE = 2;
- // public static int LEAST_SQUARES_STDERR = 3;
- // public static int LEAST_SQUARES_SUM_SQUARED_ERROR = 4;
+    private static int leastSquaresIntercept = 0;
+    private static int leastSquaresSlope = 1;
+    private static int leastSquaresRSquare = 2;
+ // public static int least_SQUARES_STDERR = 3;
+ // public static int least_SQUARES_SUM_SQUARED_ERROR = 4;
 
     @Override
     public double[] calculate(int[] conditionA, int[] conditionB) 
@@ -43,13 +55,14 @@ public class CalculatePerpendicular implements CoreCalculationI{
 
         int n = conditionA.length;
         
-        // B <- 0.5*((sum(x^2) - n*mean(x)^2) - (sum(y^2) - n*mean(y)^2)) / (n*mean(y)*mean(x) - sum(y*x))
-        double B = 0.5 * (
-                ((sumConditionA2 - (n * meanConditionA*meanConditionA)) - (sumConditionB2 - (n * meanConditionB * meanConditionB)))
-                / (n * meanConditionB * meanConditionA - sumConditionsAB));
+        // b <- 0.5*((sum(x^2) - n*mean(x)^2) - (sum(y^2) - n*mean(y)^2)) / (n*mean(y)*mean(x) - sum(y*x))
+        double b = 0.5 * (
+                ((sumConditionA2 - (n * meanConditionA * meanConditionA)) - 
+                 (sumConditionB2 - (n * meanConditionB * meanConditionB))) /
+                 (n * meanConditionB * meanConditionA - sumConditionsAB));
 
-        //slope <- (-B + sqrt(B^2 + 1))
-        double slope = (-1.0 * B) + Math.sqrt( (B * B) +1);
+        //slope <- (-b + sqrt(b^2 + 1))
+        double slope = (-1.0 * b) + Math.sqrt( (b * b) +1);
 
         //inter <- mean(x) - slope*mean(y)
         double inter = meanConditionA - (slope * meanConditionB);
@@ -58,10 +71,10 @@ public class CalculatePerpendicular implements CoreCalculationI{
         double r = computePearsonsCorrelationCoefficient(conditionA,conditionB,meanConditionA,meanConditionB);
         //double rsq = r; // * r;
 
-        result[LEAST_SQUARES_INTERCEPT] = inter;
-        result[LEAST_SQUARES_SLOPE] = slope;
-        result[LEAST_SQUARES_RSQUARE] = r;
-        //result[LEAST_SQUARES_STDERR] = Double.NaN;
+        result[leastSquaresIntercept] = inter;
+        result[leastSquaresSlope] = slope;
+        result[leastSquaresRSquare] = r;
+        //result[least_SQUARES_STDERR] = Double.NaN;
 
         return result;
     }
@@ -93,14 +106,16 @@ public class CalculatePerpendicular implements CoreCalculationI{
             final double meanx,
             final double meany) {
 
-        if (x.length != y.length) return Double.NaN;
+        if (x.length != y.length) {
+            return Double.NaN;
+        }
         int n = x.length;
 
         double covxy = 0.0;
         double varx = 0.0;
         double vary = 0.0;
 
-        for (int i=0; i<n; i++) {
+        for (int i = 0; i<n; i++) {
             covxy += (x[i] - meanx) * (y[i] - meany);
             
             double xm = x[i] - meanx;
@@ -120,10 +135,10 @@ public class CalculatePerpendicular implements CoreCalculationI{
      */
     protected static final double computeMean(int[] values) {
         double mean = 0.0;
-        for (int i=0; i<values.length; i++) {
+        for (int i = 0; i<values.length; i++) {
             mean += values[i];
         }
-        return mean / (double) values.length;
+        return mean / values.length;
     }
 
     /**
@@ -135,7 +150,7 @@ public class CalculatePerpendicular implements CoreCalculationI{
      */
     protected static final double computeSquaredSum(int[] values) {
         double sqrsum = 0.0;
-        for (int i=0; i<values.length; i++) {
+        for (int i = 0; i<values.length; i++) {
             sqrsum += values[i] * values[i];
         }
         return sqrsum;
@@ -153,10 +168,12 @@ public class CalculatePerpendicular implements CoreCalculationI{
      * @return sum
      */
     protected static final double computeSumOfProducts(int[] values1, int[] values2) {
-        if (values1.length != values2.length) return Double.NaN;
+        if (values1.length != values2.length) {
+           return Double.NaN;
+        }
 
         double sum = 0.0;
-        for (int i=0; i<values1.length; i++) {
+        for (int i = 0; i<values1.length; i++) {
             sum += values1[i] * values2[i];
         }
         return sum;

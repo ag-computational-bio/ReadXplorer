@@ -100,10 +100,12 @@ public class CollectContinuousCoverageData implements Observer{
 
             if( feature.getChromId() == result.getRequest().getChromId() ) {
 
-                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, stopOffset );
+                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ),
+                    startOffset, stopOffset );
                 int featStart = featTypeParams.calcFeatureStartOffset( feature );
                 int featStop = featTypeParams.calcFeatureStopOffset( feature );
-                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() :
+                    !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                 boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
@@ -124,10 +126,11 @@ public class CollectContinuousCoverageData implements Observer{
                         }
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
                             featurePositions = continuousCountData.get( feature );
-                            for( int i = mapping.getStart()-feature.getStart() ;
-                               ((i <= mapping.getStop()-feature.getStart()) && (i < featurePositions.length)); i++ ) {
+                            for( int i = mapping.getStart()-feature.getStart();
+                               ((i <= mapping.getStop()-feature.getStart()) && 
+                                (i < featurePositions.length)); i++ ) {
                                 if(i<0){
-                                    i=0;
+                                    i = 0;
                                 }
                                 featurePositions[i]++;
                             }
