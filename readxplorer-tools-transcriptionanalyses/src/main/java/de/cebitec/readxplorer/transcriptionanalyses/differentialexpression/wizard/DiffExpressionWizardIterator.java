@@ -29,6 +29,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffE
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExportOnlyAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExpressTestAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
+import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.LinearRegressionAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -163,6 +164,8 @@ public final class DiffExpressionWizardIterator implements
 
             } else if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
                 handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams );
+            } else if( tool == DeAnalysisHandler.Tool.LinearRegression ) {
+                handler = new LinearRegressionAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams );
             }
 
             DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent( handler, tool );
