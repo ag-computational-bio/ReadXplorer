@@ -34,6 +34,7 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -47,7 +48,7 @@ import org.openide.util.NbBundle;
  * <p>
  * @author ddoppmeier, rhilker
  */
-public class ImportSetupCard extends javax.swing.JPanel {
+public class ImportSetupCard extends JPanel {
 
     private static final long serialVersionUID = 127732323;
     private static final Logger LOG = Logger.getLogger( ImportSetupCard.class.getName() );
@@ -247,7 +248,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
                         int largestSize = mappingFiles1.size() > mappingFiles2.size() ? mappingFiles1.size() : mappingFiles2.size();
 
-                        for( int i = 0; i < largestSize; ++i ) {
+                        for( int i = 0; i < largestSize; i++ ) {
                             File file1 = null;
                             File file2 = null;
                             if( i < mappingFiles1.size() ) {
@@ -256,7 +257,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                             if( i < mappingFiles2.size() ) {
                                 file2 = mappingFiles2.get( i );
                             }
-                            this.addReadPairJobToList( readPairPane, file1, file2 );
+                            addReadPairJobToList( readPairPane, file1, file2 );
                         }
                     } else {
                         this.addReadPairJobToList( readPairPane, readPairPane.getMappingFile1(), readPairPane.getMappingFile2() );
@@ -267,7 +268,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
                     for( File mappingFile : newTrackPanel.getMappingFiles() ) {
 
-                        TrackJob trackJob = this.createTrackJob( newTrackPanel, mappingFile );
+                        TrackJob trackJob = createTrackJob( newTrackPanel, mappingFile );
                         trackJobView.add( trackJob );
                     }
                 }
@@ -337,13 +338,13 @@ public class ImportSetupCard extends javax.swing.JPanel {
             mappingFile2 = null;
         }
 
-        TrackJob trackJob1 = this.createTrackJob( readPairPane, mappingFile1 );
+        TrackJob trackJob1 = createTrackJob( readPairPane, mappingFile1 );
         TrackJob trackJob2 = null;
         if( mappingFile2 != null ) {
-            trackJob2 = this.createTrackJob( readPairPane, mappingFile2 );
+            trackJob2 = createTrackJob( readPairPane, mappingFile2 );
         }
 
-        this.readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,
+        readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,
                                                                   readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation() ) );
     }
 
@@ -360,12 +361,13 @@ public class ImportSetupCard extends javax.swing.JPanel {
      */
     private TrackJob createTrackJob( ImportTrackBasePanel importPanel, File mappingFile ) {
         ReferenceJob refJob = importPanel.getReferenceJob();
-        TrackJob trackJob = new TrackJob( trackID++, mappingFile,
+        TrackJob trackJob = new TrackJob( trackID, mappingFile,
                                           importPanel.useMultipleImport() && mappingFile != null ? mappingFile.getName() : importPanel.getTrackName(),
-                                          importPanel.getReferenceJob(),
+                                          refJob,
                                           importPanel.getCurrentParser(),
                                           importPanel.isAlreadyImported(),
                                           new Timestamp( System.currentTimeMillis() ) );
+        trackID++;
         refJob.registerTrackWithoutRunJob( trackJob );
         return trackJob;
     }

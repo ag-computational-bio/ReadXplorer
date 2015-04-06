@@ -142,19 +142,13 @@ public class ExcelExporter implements TableExporterI {
 
         WritableWorkbook workbook = Workbook.createWorkbook( file, wbSettings );
         WritableSheet sheet = null;
-        int currentPage;
         int totalPage = 0;
-        boolean dataLeft;
-        String sheetName;
-        List<List<Object>> sheetData;
-        List<String> headerRow;
-
         for( int i = 0; i < exportData.size(); ++i ) {
-            sheetName = sheetNames.get( i );
-            sheetData = exportData.get( i );
-            headerRow = headers.get( i );
-            dataLeft = true;
-            currentPage = 0;
+            String sheetName = sheetNames.get( i );
+            List<List<Object>> sheetData = exportData.get( i );
+            List<String> headerRow = headers.get( i );
+            boolean dataLeft = true;
+            int currentPage = 0;
             while( dataLeft ) { //only 65536 rows allowed per sheet in xls format
                 if( !sheetData.isEmpty() ) {
                     if( currentPage++ > 0 ) {
@@ -207,12 +201,11 @@ public class ExcelExporter implements TableExporterI {
         row++;
         this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
 
-        String objectType;
         for( List<Object> exportRow : sheetData ) {
 
             column = 0;
             for( Object entry : exportRow ) {
-                objectType = this.getObjectType( entry );
+                String objectType = getObjectType( entry );
                 try {
                     this.addColumn( sheet, objectType, entry, column++, row );
                 } catch( RowsExceededException e ) {
@@ -245,7 +238,7 @@ public class ExcelExporter implements TableExporterI {
      * @return The string representing the object type of the entry. Among
      *         {@link #TABLE_STRING} and all other constants defined above.
      */
-    private String getObjectType( Object entry ) {
+    private static String getObjectType( Object entry ) {
         if( entry instanceof Integer || entry instanceof Byte || entry instanceof Long ) {
             return TABLE_INTEGER;
         } else if( entry instanceof String || entry instanceof Character || entry instanceof CharSequence ) {
@@ -274,7 +267,7 @@ public class ExcelExporter implements TableExporterI {
      * @throws WriteException
      * @throws OutOfMemoryError
      */
-    public void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
+    public static void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
         WritableFont arialbold = new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD );
         WritableFont arial = new WritableFont( WritableFont.ARIAL, 10 );
         if( cellvalue == null ) {

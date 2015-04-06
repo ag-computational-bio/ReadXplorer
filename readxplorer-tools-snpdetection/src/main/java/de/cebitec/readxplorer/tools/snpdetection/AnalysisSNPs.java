@@ -46,7 +46,7 @@ import net.sf.samtools.util.RuntimeIOException;
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
+public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
     private static final Logger LOG = Logger.getLogger( AnalysisSNPs.class.getName() );
 
@@ -97,7 +97,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      * @param trackConnector the track connector for this analysis
      * @param analysisParams the set of parameters for this analysis
      */
-    AnalysisSNPs( TrackConnector trackConnector, ParameterSetSNPs analysisParams ) {
+    public AnalysisSNPs( TrackConnector trackConnector, ParameterSetSNPs analysisParams ) {
         this.trackConnector = trackConnector;
         this.analysisParams = analysisParams;
         this.excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
@@ -153,99 +153,6 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
 
     /**
-     * @param typeInt value between 0 and 4
-     * <p>
-     * @return the type of a mismatch (only subs and del) as character
-     */
-    private SequenceComparison getType( int typeInt ) {
-
-        SequenceComparison type = SequenceComparison.UNKNOWN;
-
-        if( typeInt >= 0 && typeInt < 5 ) {
-            type = SequenceComparison.SUBSTITUTION;
-        } else if( typeInt == 5 ) {
-            type = SequenceComparison.DELETION;
-        } else {
-            LOG.log( Level.SEVERE, "found unknown diff type" );
-        }
-
-        return type;
-
-    }
-
-
-    /**
-     * @param index The index whose corresponding character is needed.
-     * <p>
-     * @return The character for a given base index.
-     */
-    private char getBase( int index ) {
-
-        char base = ' ';
-
-        switch( index ) {
-            case BASE_A:
-                base = 'A';
-                break;
-            case BASE_C:
-                base = 'C';
-                break;
-            case BASE_G:
-                base = 'G';
-                break;
-            case BASE_T:
-                base = 'T';
-                break;
-            case BASE_N:
-                base = 'N';
-                break;
-            case BASE_GAP:
-                base = '-';
-                break;
-            default:
-                LOG.log( Level.SEVERE, "found unknown snp type" );
-        }
-
-        return base;
-    }
-
-
-    /**
-     * @param base the base whose integer value is needed
-     * <p>
-     * @return the integer value for the given base type
-     */
-    private int getBaseInt( char base ) {
-
-        int baseInt = 0;
-        switch( base ) {
-            case 'A':
-                baseInt = BASE_A;
-                break;
-            case 'C':
-                baseInt = BASE_C;
-                break;
-            case 'G':
-                baseInt = BASE_G;
-                break;
-            case 'T':
-                baseInt = BASE_T;
-                break;
-            case 'N':
-                baseInt = BASE_N;
-                break;
-            case '-':
-                baseInt = BASE_GAP;
-                break;
-            default:
-                LOG.severe( "Analysis SNPs: Encountered unknown nucleotide character!" );
-        }
-
-        return baseInt;
-    }
-
-
-    /**
      * Creates the count arrays for the SNP/DIP positions and then checks each
      * position, if it fulfills the given parameters. Only these positions are
      * then stored in the SNP result.
@@ -284,11 +191,10 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             }
         }
 
-        int relativeGapPos;
         for( ReferenceGap gap : gaps ) {
             if( gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound() &&
                      (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality()) ) {
-                relativeGapPos = gap.getPosition() - coverage.getLeftBound();
+                int relativeGapPos = gap.getPosition() - coverage.getLeftBound();
                 if( gapCounts[relativeGapPos] == null ) {
                     gapCounts[relativeGapPos] = new GapCount();
                 }
@@ -305,7 +211,6 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
         IntervalRequest request = covAndDiffs.getRequest();
         String refSubSeq = trackConnector.getRefGenome().getChromSequence( request.getChromId(), request.getFrom(), request.getTo() );
-        SequenceComparison snpType;
         try {
 
             for( int i = 0; i < baseArray.length; ++i ) {
@@ -348,11 +253,12 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                             int refBaseIdx = getBaseInt( refBase );
                             //determine SNP type, can still be match, if match coverage is largest
                             baseCounts[refBaseIdx][COUNT_IDX] = cov - diffCount;
+                            SequenceComparison snpType;
                             if( maxBaseIdx == refBaseIdx ) {
                                 continue;//snpType = SequenceComparison.MATCH; base = refBase;
                             } else {
-                                snpType = this.getType( maxBaseIdx );
-                                base = this.getBase( maxBaseIdx );
+                                snpType = getType( maxBaseIdx );
+                                base = getBase( maxBaseIdx );
                             }
 
                             this.snps.add( new Snp(
@@ -377,16 +283,13 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 }
             }
 
-            List<int[][]> gapOrderList;
-            int[][] gapCountArray;
-
             for( int i = 0; i < gapCounts.length; ++i ) {
                 if( gapCounts[i] != null ) {
-                    gapOrderList = gapCounts[i].getGapOrderCount();
+                    List<int[][]> gapOrderList = gapCounts[i].getGapOrderCount();
                     int absPos = i + coverage.getLeftBound();
 
                     for( int j = 0; j < gapOrderList.size(); ++j ) {
-                        gapCountArray = gapOrderList.get( j );
+                        int[][] gapCountArray = gapOrderList.get( j );
 
                         // i=0..5 is ACGTN (DIFFS) ...
                         int diffCount = 0;
@@ -420,7 +323,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                 double frequency = (diffCount * 100.0) / cov;
 
                                 if( frequency >= analysisParams.getMinPercentage() ) {
-                                    base = this.getBase( maxBaseIdx );
+                                    base = getBase( maxBaseIdx );
 
                                     this.snps.add( new Snp(
                                             absPos,
@@ -449,6 +352,99 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         } catch( RuntimeIOException e ) {
             LOG.log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackFile() );
         }
+    }
+
+
+    /**
+     * @param typeInt value between 0 and 4
+     * <p>
+     * @return the type of a mismatch (only subs and del) as character
+     */
+    private static SequenceComparison getType( int typeInt ) {
+
+        SequenceComparison type = SequenceComparison.UNKNOWN;
+
+        if( typeInt >= 0 && typeInt < 5 ) {
+            type = SequenceComparison.SUBSTITUTION;
+        } else if( typeInt == 5 ) {
+            type = SequenceComparison.DELETION;
+        } else {
+            LOG.log( Level.SEVERE, "found unknown diff type" );
+}
+
+        return type;
+
+    }
+
+
+    /**
+     * @param index The index whose corresponding character is needed.
+     * <p>
+     * @return The character for a given base index.
+     */
+    private static char getBase( int index ) {
+
+        char base = ' ';
+
+        switch( index ) {
+            case BASE_A:
+                base = 'A';
+                break;
+            case BASE_C:
+                base = 'C';
+                break;
+            case BASE_G:
+                base = 'G';
+                break;
+            case BASE_T:
+                base = 'T';
+                break;
+            case BASE_N:
+                base = 'N';
+                break;
+            case BASE_GAP:
+                base = '-';
+                break;
+            default:
+                LOG.log( Level.SEVERE, "found unknown snp type" );
+        }
+
+        return base;
+    }
+
+
+    /**
+     * @param base the base whose integer value is needed
+     * <p>
+     * @return the integer value for the given base type
+     */
+    private static int getBaseInt( char base ) {
+
+        int baseInt = 0;
+        switch( base ) {
+            case 'A':
+                baseInt = BASE_A;
+                break;
+            case 'C':
+                baseInt = BASE_C;
+                break;
+            case 'G':
+                baseInt = BASE_G;
+                break;
+            case 'T':
+                baseInt = BASE_T;
+                break;
+            case 'N':
+                baseInt = BASE_N;
+                break;
+            case '-':
+                baseInt = BASE_GAP;
+                break;
+            default:
+                LOG.severe( "Analysis SNPs: Encountered unknown nucleotide character!" );
+        }
+
+        return baseInt;
     }
 
 

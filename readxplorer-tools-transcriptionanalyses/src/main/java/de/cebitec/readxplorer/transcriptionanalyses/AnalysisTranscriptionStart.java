@@ -249,7 +249,7 @@ public class AnalysisTranscriptionStart implements Observer,
         totalStarts.setFwdCoverage( this.fixLeftCoverageBound( totalStarts.getFwdCov(), 0 ) ); //for read starts the left pos is not important
         totalStarts.setRevCoverage( this.fixLeftCoverageBound( totalStarts.getRevCov(), totalReadStartsLastRevPos ) ); //on fwd strand
 
-        for( int i = fixedLeftBound; i < rightBound; ++i ) {
+        for( int i = fixedLeftBound; i < rightBound; i++ ) {
             this.gatherDataAndDetect( chromId, chromLength, chromFeatures, totalCoverage, totalStarts, i );
         }
 
@@ -413,14 +413,12 @@ public class AnalysisTranscriptionStart implements Observer,
         final int maxFeatureDist = parametersTSS.getMaxFeatureDistance();
         int minStartPos = tssPos - maxFeatureDist < 0 ? 0 : tssPos - maxFeatureDist;
         int maxStartPos = tssPos + maxFeatureDist > chromLength ? chromLength : tssPos + maxFeatureDist;
-        PersistentFeature feature;
         DetectedFeatures detectedFeatures = new DetectedFeatures();
-        int start;
         boolean fstFittingFeature = true;
         if( isFwdStrand ) {
-            for( int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); ++i ) {
-                feature = chromFeatures.get( i );
-                start = feature.getStart();
+            for( int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); i++ ) {
+                PersistentFeature feature = chromFeatures.get( i );
+                int start = feature.getStart();
 
                 /*
                  * We use all features, because also mRNA or rRNA features can
@@ -495,9 +493,9 @@ public class AnalysisTranscriptionStart implements Observer,
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); ++i ) {
-                feature = chromFeatures.get( i );
-                start = feature.getStop();
+            for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); i++ ) {
+                PersistentFeature feature = chromFeatures.get( i );
+                int start = feature.getStop();
 
                 if( start >= minStartPos && feature.isFwdStrand() == isFwdStrand && start <= maxStartPos ) {
 
@@ -668,7 +666,7 @@ public class AnalysisTranscriptionStart implements Observer,
 
         int nbTSSs = 0;
         int selectedIndex = 1;
-        for( int i = distributionValues.length - 1; i > 0; --i ) {
+        for( int i = distributionValues.length - 1; i > 0; i-- ) {
             // we use the index which first exceeds maxEstimatedNbOfActiveGenes
             if( nbTSSs < maxEstimatedNbOfActiveGenes ) {
                 nbTSSs += distributionValues[i];
