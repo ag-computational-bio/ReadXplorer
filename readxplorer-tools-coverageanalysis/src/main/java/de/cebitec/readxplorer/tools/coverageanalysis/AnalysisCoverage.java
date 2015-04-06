@@ -130,7 +130,7 @@ public class AnalysisCoverage implements Observer,
             currentTempInterval = tempInterval;
             if( startPos - 1 == currentTempInterval.getStop() && currentTempInterval.getChromId() == chromId ) {
                 if( currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_BOTH_STRING ) ||
-                         currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_FWD_STRING ) ) {
+                    currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_FWD_STRING ) ) {
 
                     overlapIntervalSumOrFwdStart = tempInterval;
 
@@ -140,7 +140,7 @@ public class AnalysisCoverage implements Observer,
             }
             if( coverageResult.getRequest().getTo() + 1 == currentTempInterval.getStart() ) {
                 if( currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_BOTH_STRING ) ||
-                         currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_FWD_STRING ) ) {
+                    currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_FWD_STRING ) ) {
 
                     overlapIntervalSumOrFwdEnd = tempInterval;
 
@@ -185,7 +185,7 @@ public class AnalysisCoverage implements Observer,
         int startPos = currentInterval.getStart();
         boolean addToTempIntervals = false;
         boolean isCoverageOk = coverageArray.length > 0 &&
-                 (coverageArray[0] >= parameters.getMinCoverageCount() && parameters.isDetectCoveredIntervals() ||
+                               (coverageArray[0] >= parameters.getMinCoverageCount() && parameters.isDetectCoveredIntervals() ||
                                 coverageArray[0] < parameters.getMinCoverageCount() && !parameters.isDetectCoveredIntervals());
 
         // if possible overlap interval does not overlap, because start coverage of current coverageArray is too low (high)
@@ -201,7 +201,7 @@ public class AnalysisCoverage implements Observer,
         for( int i = 0; i < coverageArray.length; i++ ) {
 
             isCoverageOk = coverageArray[i] >= parameters.getMinCoverageCount() && parameters.isDetectCoveredIntervals() ||
-                     coverageArray[i] < parameters.getMinCoverageCount() && !parameters.isDetectCoveredIntervals();
+                           coverageArray[i] < parameters.getMinCoverageCount() && !parameters.isDetectCoveredIntervals();
 
             if( isCoverageOk ) {
                 isInInterval = true;
@@ -224,20 +224,18 @@ public class AnalysisCoverage implements Observer,
                     }
                     //no reinitialization of currentInterval needed, since we are at the end of the data package
                 }
-            } else {
-                if( isInInterval ) { //check if this is the first position which is below (over) given threshold
-                    if( addToTempIntervals ) { //i - 1, because current position does not satisfy the preliminaries anymore
-                        this.storeInterval( currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, tempIntervals );
-                        addToTempIntervals = false;
-                    } else {
-                        this.storeInterval( currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, intervalListToAddTo );
-                    }
-                    //reinitialize currentInterval for next interval
-                    currentInterval = new CoverageInterval( connector.getTrackID(), chromId, strand );
-                    startPos = currentInterval.getStart();
-                    isInInterval = false;
-                    summedCoverage = 0;
+            } else if( isInInterval ) { //check if this is the first position which is below (over) given threshold
+                if( addToTempIntervals ) { //i - 1, because current position does not satisfy the preliminaries anymore
+                    this.storeInterval( currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, tempIntervals );
+                    addToTempIntervals = false;
+                } else {
+                    this.storeInterval( currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, intervalListToAddTo );
                 }
+                //reinitialize currentInterval for next interval
+                currentInterval = new CoverageInterval( connector.getTrackID(), chromId, strand );
+                startPos = currentInterval.getStart();
+                isInInterval = false;
+                summedCoverage = 0;
                 //else do nothing, just continue
             }
         }

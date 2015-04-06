@@ -55,6 +55,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      *                      generated
      * @param combineTracks <code>true</code>, if the tracks in the list are
      *                      combined, <code>false</code> otherwise
+     * @param trackColumn   Track column in the result table
+     * @param filterColumn  Position column in the result table
      */
     public SnpDetectionResult( List<SnpI> snpList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks,
                                int trackColumn, int filterColumn ) {
@@ -71,12 +73,14 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         return Collections.unmodifiableList( snpList );
     }
 
+
     /**
      * Adds all new SNPs to the current list of SNPs stored in this result.
+     * <p>
      * @param newSnps The list of new SNPs to add
      */
-    public void addAllSnps(List<SnpI> newSnps) {
-        snpList.addAll(newSnps);
+    public void addAllSnps( List<SnpI> newSnps ) {
+        snpList.addAll( newSnps );
     }
 
 

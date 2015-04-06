@@ -42,7 +42,8 @@ import org.openide.windows.InputOutput;
 
 
 /**
- *
+ * NP phylogeny class.
+ * <p>
  * @author jhess
  */
 public class SnpPhylogeny {
@@ -54,6 +55,11 @@ public class SnpPhylogeny {
     HashMap<Integer, HashMap<String, Snp>> sortedSnps;
 
 
+    /**
+     * A new SNP phylogeny.
+     * <p>
+     * @param snpData The snp data for which the phylogeny shall be created
+     */
     public SnpPhylogeny( SnpDetectionResult snpData ) {
         this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( SnpPhylogeny.class, "SNP_Phylogeny.output.name" ), false );
         this.snpData = snpData;
@@ -61,11 +67,16 @@ public class SnpPhylogeny {
     }
 
 
+    /**
+     * Create an alignment from a SNP detection result.
+     * <p>
+     * @param snpData The snp data for which the alignment shall be created
+     */
     private void createAlignment( SnpDetectionResult snpData ) {
 
         int numberOfTracks;
-        HashMap<Integer, HashMap<Integer, String>> bases = new HashMap<>();
-        HashMap<Integer, String> refBases = new HashMap<>();
+        Map<Integer, Map<Integer, String>> bases = new HashMap<>();
+        Map<Integer, String> refBases = new HashMap<>();
         List<SnpI> snps = snpData.getSnpList();
         Map<Integer, PersistentTrack> trackNames = snpData.getTrackMap();
         List<Integer> trackIdsWithSnps = new ArrayList<>();
@@ -91,7 +102,7 @@ public class SnpPhylogeny {
                 HashMap<Integer, String> track = new HashMap<>();
                 bases.put( position, track );
             }
-            HashMap<Integer, String> track = bases.get( position );
+            Map<Integer, String> track = bases.get( position );
             track.put( snp.getTrackId(), snp.getBase() );
         }
 
@@ -99,11 +110,11 @@ public class SnpPhylogeny {
 
 
         // add reference base to all position maps, where it is missing for at least one track
-        Iterator<Entry<Integer, HashMap<Integer, String>>> positionIterator = bases.entrySet().iterator();
+        Iterator<Entry<Integer, Map<Integer, String>>> positionIterator = bases.entrySet().iterator();
         while( positionIterator.hasNext() ) {
 
-            Map.Entry<Integer, HashMap<Integer, String>> posToBaseMap = positionIterator.next();
-            HashMap<Integer, String> positionEntry = posToBaseMap.getValue();
+            Map.Entry<Integer, Map<Integer, String>> posToBaseMap = positionIterator.next();
+            Map<Integer, String> positionEntry = posToBaseMap.getValue();
             // fill positions without snpData with reference base
 
             for( int trackId : trackIdsWithSnps ) {
@@ -113,10 +124,10 @@ public class SnpPhylogeny {
             }
         }
 
-        HashMap<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap( trackIdsWithSnps );
+        Map<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap( trackIdsWithSnps );
         String[] alignment = new String[numberOfTracks + 1];
         for( Integer l : new TreeSet<>( bases.keySet() ) ) {
-            HashMap<Integer, String> snpsAtPosMap = bases.get( l );
+            Map<Integer, String> snpsAtPosMap = bases.get( l );
             for( Integer trackId : new TreeSet<>( snpsAtPosMap.keySet() ) ) {
                 if( alignment[trackIdToIndex.get( trackId )] == null ) {
                     alignment[trackIdToIndex.get( trackId )] = ">" + trackNames.get( trackId ).getDescription() + System.getProperty( "line.separator" );
@@ -132,9 +143,11 @@ public class SnpPhylogeny {
 
 
     /**
-     * Creates the multiple .fasta file for input in fdnaml
+     * Creates the multiple .fasta file for input in fdnaml.
      * <p>
      * @param alignment alignment of snpData to write as multiple fasta
+     * <p>
+     * @return The multiple fasta file.
      */
     private File createMultipleFastaFile( String[] alignment ) {
 

@@ -213,8 +213,8 @@ public final class OpenSnpDetectionAction implements ActionListener,
     /**
      * Creates the analysis for a TrackConnector.
      * <p>
-     * @param connector         the connector
-     * @param readClassesParams the read class parameters
+     * @param connector       The connector
+     * @param readClassParams The read class parameters
      */
     private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassParams ) {
         AnalysesHandler snpAnalysisHandler = connector.createAnalysisHandler( this,

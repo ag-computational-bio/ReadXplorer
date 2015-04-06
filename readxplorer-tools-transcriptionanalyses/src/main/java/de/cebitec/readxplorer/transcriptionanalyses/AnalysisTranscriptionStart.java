@@ -69,7 +69,6 @@ import static java.util.logging.Logger.getLogger;
  * Wahrscheinlichkeitsformel (Binomialverteilung)
  * <p>
  * @author -Rolf Hilker-
- * <p>
  */
 public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
@@ -195,7 +194,7 @@ public class AnalysisTranscriptionStart implements Observer,
     @Override
     public void update( Object data ) {
         if( data instanceof CoverageAndDiffResult ) {
-            CoverageAndDiffResult result = ((CoverageAndDiffResult) data);
+            CoverageAndDiffResult result = (CoverageAndDiffResult) data;
             this.detectTSSs( result );
 
         } else if( data instanceof Byte && ((Byte) data) == 1 ) {
@@ -280,10 +279,6 @@ public class AnalysisTranscriptionStart implements Observer,
         int[] readStartArrayFwd = readStarts.getFwdCov();
         int[] readStartArrayRev = readStarts.getRevCov();
         int pos = coverage.getInternalPos( refPos );
-        int fwdCov1;
-        int revCov1;
-        int fwdCov2;
-        int revCov2;
         int increaseFwd;
         int increaseRev;
         int readStartsFwd;
@@ -291,10 +286,10 @@ public class AnalysisTranscriptionStart implements Observer,
         int percentIncFwd;
         int percentIncRev;
 
-        fwdCov1 = covArrayFwd[pos];
-        revCov1 = covArrayRev[pos];
-        fwdCov2 = covArrayFwd[pos + 1];
-        revCov2 = covArrayRev[pos + 1];
+        int fwdCov1 = covArrayFwd[pos];
+        int revCov1 = covArrayRev[pos];
+        int fwdCov2 = covArrayFwd[pos + 1];
+        int revCov2 = covArrayRev[pos + 1];
         if( !isStrandBothOption ) { //calc values based on analysis strand selection (4 possibilities)
             if( isFeatureStrand ) { //default increases for correctly stranded libraries
                 increaseFwd = fwdCov2 - fwdCov1;

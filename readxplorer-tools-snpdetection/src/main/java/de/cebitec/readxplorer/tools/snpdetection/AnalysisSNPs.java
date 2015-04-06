@@ -258,28 +258,26 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         List<ReferenceGap> gaps = covAndDiffs.getGaps();
 
 
-        //in base array the first index is the relative position. The second aindex is the base index, the third contains count (0) and average base quality (1)
+        //The first index is the relative position, the second the base index, the third contains count (0), average base (1) and mapping quality (2)
         int[][][] baseArray = new int[coverage.getRightBound() - coverage.getLeftBound() + 1][NO_BASES][NO_VALUES]; //+1 because sequence starts at 1 not 0
         GapCount[] gapCounts = new GapCount[coverage.getRightBound() - coverage.getLeftBound() + 1]; //right bound is excluded in CoverageManager
 
         char base;
-        int maxBaseIdx;
-        int pos;
         for( Difference diff : diffs ) {
             if( diff.getPosition() >= coverage.getLeftBound() && diff.getPosition() < coverage.getRightBound() &&
                      (diff.getBaseQuality() > analysisParams.getMinBaseQuality() || diff.getBaseQuality() == -1) ) {
                 base = diff.isForwardStrand() ? diff.getBase() : SequenceUtils.getDnaComplement( diff.getBase() );
-                maxBaseIdx = this.getBaseInt( base );
-                pos = diff.getPosition() - coverage.getLeftBound();
-                baseArray[pos][maxBaseIdx][COUNT_IDX] += diff.getCount(); //+1 because sequence starts at 1 not 0
-                if( diff.getBaseQuality() > -1 ) {
-                    baseArray[pos][maxBaseIdx][BASE_QUAL_IDX] += diff.getBaseQuality(); //can be -1 if unknown
+                int baseIdx = this.getBaseInt( base );
+                int pos = diff.getPosition() - coverage.getLeftBound();
+                baseArray[pos][baseIdx][COUNT_IDX] += diff.getCount();
+                if( diff.getBaseQuality() > -1 ) { //can be -1 if unknown
+                    baseArray[pos][baseIdx][BASE_QUAL_IDX] += diff.getBaseQuality();
                 } else {
                     hasBaseQualities = false;
                 }
                 if( diff.getMappingQuality() != SamBamFileReader.UNKNOWN_MAP_QUAL ||
                          diff.getMappingQuality() != SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL ) {
-                    baseArray[pos][maxBaseIdx][MAP_QUAL_IDX] += diff.getMappingQuality();
+                    baseArray[pos][baseIdx][MAP_QUAL_IDX] += diff.getMappingQuality();
                 } else {
                     hasMappingQualities = false; //TODO: check before analysis for a track, if it supports base and mapping qualities - could lead to errors when stored in DB or takes a while
                 }
@@ -307,29 +305,18 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
         IntervalRequest request = covAndDiffs.getRequest();
         String refSubSeq = trackConnector.getRefGenome().getChromSequence( request.getChromId(), request.getFrom(), request.getTo() );
-        int absPos;
-        int[][] baseCounts;
-        char refBase;
-        int maxCount;
-        int refBaseIdx;
-        int diffCount;
-        int largestBaseCount;
-        int cov;
-        double frequency;
         SequenceComparison snpType;
-        int averageBaseQual;
-        int averageMappingQual;
         try {
 
             for( int i = 0; i < baseArray.length; ++i ) {
-                absPos = i + coverage.getLeftBound();
-                baseCounts = baseArray[i];
+                int absPos = i + coverage.getLeftBound();
+                int[][] baseCounts = baseArray[i];
 
                 // i=0..5 is ACGTN_GAP (DIFFS) ...
-                diffCount = 0;
-                largestBaseCount = 0;
-                maxCount = 0;
-                maxBaseIdx = 0;
+                int diffCount = 0;
+                int largestBaseCount = 0;
+                int maxCount = 0;
+                int maxBaseIdx = 0;
                 for( int j = 0; j <= BASE_GAP; j++ ) {
                     if( maxCount < baseCounts[j][COUNT_IDX] ) {
                         maxCount = baseCounts[j][COUNT_IDX];
@@ -343,22 +330,22 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 if( maxCount > 0 && !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases() ||
                          analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases() ) {
 
-                    averageBaseQual = baseCounts[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
-                    averageMappingQual = baseCounts[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
+                    int averageBaseQual = baseCounts[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
+                    int averageMappingQual = baseCounts[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
 
                     if( (!this.hasBaseQualities || averageBaseQual >= analysisParams.getMinAverageBaseQual()) &&
                              (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual()) ) {
 
-                        cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
+                        int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                         if( cov == 0 ) {
                             ++cov;
                             LOG.log( Level.SEVERE, "found uncovered position in diffs: {0}", absPos );
                         }
-                        frequency = (diffCount * 100.0) / cov;
+                        double frequency = (diffCount * 100.0) / cov;
 
                         if( frequency >= analysisParams.getMinPercentage() ) {
-                            refBase = refSubSeq.charAt( i );
-                            refBaseIdx = getBaseInt( refBase );
+                            char refBase = refSubSeq.charAt( i );
+                            int refBaseIdx = getBaseInt( refBase );
                             //determine SNP type, can still be match, if match coverage is largest
                             baseCounts[refBaseIdx][COUNT_IDX] = cov - diffCount;
                             if( maxBaseIdx == refBaseIdx ) {
@@ -396,16 +383,16 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             for( int i = 0; i < gapCounts.length; ++i ) {
                 if( gapCounts[i] != null ) {
                     gapOrderList = gapCounts[i].getGapOrderCount();
-                    absPos = i + coverage.getLeftBound();
+                    int absPos = i + coverage.getLeftBound();
 
                     for( int j = 0; j < gapOrderList.size(); ++j ) {
                         gapCountArray = gapOrderList.get( j );
 
                         // i=0..5 is ACGTN (DIFFS) ...
-                        diffCount = 0;
-                        largestBaseCount = 0;
-                        maxCount = 0;
-                        maxBaseIdx = 0;
+                        int diffCount = 0;
+                        int largestBaseCount = 0;
+                        int maxCount = 0;
+                        int maxBaseIdx = 0;
                         for( int k = 0; k < BASE_GAP; k++ ) { //here we only have bases including 'N'
                             if( maxCount < gapCountArray[k][COUNT_IDX] ) {
                                 maxCount = gapCountArray[k][COUNT_IDX];
@@ -419,18 +406,18 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                         if( !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases() ||
                                  analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases() ) {
 
-                            averageBaseQual = gapCountArray[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
-                            averageMappingQual = gapCountArray[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
+                            int averageBaseQual = gapCountArray[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
+                            int averageMappingQual = gapCountArray[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
 
                             if( (!this.hasBaseQualities || averageBaseQual >= analysisParams.getMinAverageBaseQual()) &&
                                      (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual()) ) {
 
-                                cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
+                                int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                                 if( cov == 0 ) {
                                     ++cov;
                                     LOG.log( Level.SEVERE, "found uncovered position in gaps: {0}", absPos );
                                 }
-                                frequency = (diffCount * 100.0) / cov;
+                                double frequency = (diffCount * 100.0) / cov;
 
                                 if( frequency >= analysisParams.getMinPercentage() ) {
                                     base = this.getBase( maxBaseIdx );

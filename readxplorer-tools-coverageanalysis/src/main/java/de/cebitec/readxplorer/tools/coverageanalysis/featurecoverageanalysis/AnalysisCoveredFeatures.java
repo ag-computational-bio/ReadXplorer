@@ -134,30 +134,22 @@ public class AnalysisCoveredFeatures implements Observer,
         int rightBound = covManager.getRightBound();
         boolean isStrandBothOption = analysisParams.getReadClassParams().isStrandBothOption();
         boolean isFeatureStrand = analysisParams.getReadClassParams().isStrandFeatureOption();
-        boolean analysisStrand;
-
-        PersistentFeature feature;
-        int noCoveredBases;
-        int featureStart;
-        int featureStop;
-        int coveredBases;
-        int meanCov = 0;
 
         //coverage identified within an feature
         for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
-            noCoveredBases = 0;
-            feature = this.genomeFeatures.get( i );
-            summedCov = 0;
+            PersistentFeature feature = this.genomeFeatures.get( i );
 
             if( feature.getChromId() == coverageAndDiffResult.getRequest().getChromId() ) {
-                featureStart = feature.getStart();
-                featureStop = feature.getStop();
+                int featureStart = feature.getStart();
 
                 if( featureStart < rightBound ) {
+                    summedCov = 0;
+                    int noCoveredBases = 0;
 //                    if (featureStop >= rightBound) {
 //                        this.lastFeatureIdx = i; //still works, since one result only contains results for one chromosome
 //                    }
 
+                    int featureStop = feature.getStop();
                     if( isStrandBothOption ) {
                         for( int j = featureStart; j <= featureStop; ++j ) {
                             if( this.checkCanIncreaseAndSumBothStrands( covManager, j ) ) {
@@ -165,7 +157,7 @@ public class AnalysisCoveredFeatures implements Observer,
                             }
                         }
                     } else {
-                        analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                        boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
                         for( int j = featureStart; j <= featureStop; ++j ) {
                             if( this.checkCanIncreaseAndSumOneStrand( covManager, j, analysisStrand ) ) {
                                 ++noCoveredBases;
@@ -175,14 +167,14 @@ public class AnalysisCoveredFeatures implements Observer,
 
                     //store covered features
                     CoveredFeature coveredFeature = coveredFeatureCount.get( feature.getId() );
-                    coveredBases = this.coveredFeatureCount.get( feature.getId() ).getNoCoveredBases();
                     if( noCoveredBases > 0 ) {
-                        meanCov = (coveredFeature.getMeanCoverage() + (summedCov / noCoveredBases));
+                        int meanCov = (coveredFeature.getMeanCoverage() + (summedCov / noCoveredBases));
                         if( coveredFeature.getMeanCoverage() > 0 ) {
                             meanCov /= 2;
                         }
                         coveredFeature.setMeanCoverage( meanCov );
                     }
+                    int coveredBases = coveredFeature.getNoCoveredBases();
                     coveredFeature.setNoCoveredBases( coveredBases + noCoveredBases );
                 } else {
                     break;
@@ -197,17 +189,16 @@ public class AnalysisCoveredFeatures implements Observer,
      * at least the given minimum percentage of bases of the feature.
      */
     private void findCoveredFeatures() {
-        int percentCovered;
         if( analysisParams.isGetCoveredFeatures() ) {
             for( Integer id : this.coveredFeatureCount.keySet() ) {
-                percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
+                int percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered > analysisParams.getMinCoveredPercent() ) {
                     this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
                 }
             }
         } else {
             for( Integer id : coveredFeatureCount.keySet() ) {
-                percentCovered = coveredFeatureCount.get( id ).getPercentCovered();
+                int percentCovered = coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered <= analysisParams.getMinCoveredPercent() ) {
                     detectedFeatures.add( coveredFeatureCount.get( id ) );
                 }
@@ -222,6 +213,9 @@ public class AnalysisCoveredFeatures implements Observer,
     }
 
 
+    /**
+     * @return The number of genomic features.
+     */
     public int getNoGenomeFeatures() {
         return genomeFeatures.size();
     }
@@ -238,7 +232,7 @@ public class AnalysisCoveredFeatures implements Observer,
     private boolean checkCanIncreaseAndSumBothStrands( CoverageManager coverage, int j ) {
         List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
         int cov = coverage.getTotalCoverage( excludedClasses, j, true ) +
-                 coverage.getTotalCoverage( excludedClasses, j, false );
+                  coverage.getTotalCoverage( excludedClasses, j, false );
         return this.increaseSumIfCanIncrease( cov );
     }
 
