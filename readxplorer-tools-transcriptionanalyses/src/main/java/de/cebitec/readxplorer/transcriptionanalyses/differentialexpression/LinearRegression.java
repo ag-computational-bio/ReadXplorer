@@ -68,24 +68,36 @@ public class LinearRegression implements LinearRegressionI {
     
     private  Map<PersistentFeature, double[]> findSimilarity(Map<PersistentFeature, int[]> geneSet1,
                 Map<PersistentFeature, int[]> geneSet2) {
-        
+        int limit = 10;
         Map<PersistentFeature, double[]> result = new HashMap<>();
         for (Map.Entry<PersistentFeature, int[]> gene1 :
             geneSet1.entrySet() ){
             for (Map.Entry<PersistentFeature, int[]> gene2 :
                 geneSet2.entrySet()) {
                 if (gene1.getKey() == null ? gene2.getKey() ==
-                    null : gene1.getKey().equals( gene2.getKey() )) {                    
-                    CalculatePerpendicular rSqrt =
-                        new CalculatePerpendicular();
-                        double[] calculation =
-                            rSqrt.calculate(gene1.getValue(),
-                            gene2.getValue());
-                        result.put(gene1.getKey(), calculation);                        
+                    null : gene1.getKey().equals( gene2.getKey() )) {
+                    int [] gene1Values = gene1.getValue();
+                    int [] gene2Values = gene2.getValue();
+                    if( coverageFilter( gene1Values, limit ) ||
+                        coverageFilter( gene2Values, limit ) ) {
+                        CalculatePerpendicular rSqrt = new CalculatePerpendicular();
+                        double[] calculation = rSqrt.calculate( gene1Values, gene2Values );
+                        result.put(gene1.getKey(), calculation);
+                    }
                 }                            
             }                          
         }
         return result;
-    }  
+    }
+
+    private boolean coverageFilter(int[] geneValues, int limit){
+        
+        for( int k = 0; k < geneValues.length; k++ ){
+                        if( geneValues[k] >= limit ) {
+                            return true;
+                        }
+        }
+        return true;
+    }
     
 }

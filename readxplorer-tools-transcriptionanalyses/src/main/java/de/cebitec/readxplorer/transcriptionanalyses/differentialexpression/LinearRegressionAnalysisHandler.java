@@ -137,8 +137,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         Map<PersistentFeature, double[]> calculated = linReg.getResults();
         results = prepareResults(calculated);
         return results;
-    } 
-   
+    }
+      
     private List<ResultDeAnalysis> prepareResults(Map<PersistentFeature, double[]> calculated) {
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Continuous Count Data Table" );
         progressHandle.start( calculated.size() );
