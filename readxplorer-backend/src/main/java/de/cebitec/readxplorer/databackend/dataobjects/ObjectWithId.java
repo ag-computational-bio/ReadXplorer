@@ -28,7 +28,7 @@ public interface ObjectWithId {
     /**
      * @return The id of this object
      */
-    public long getId();
+    long getId();
 
 
 }

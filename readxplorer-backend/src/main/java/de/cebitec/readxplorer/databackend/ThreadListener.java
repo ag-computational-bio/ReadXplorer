@@ -19,15 +19,23 @@ package de.cebitec.readxplorer.databackend;
 
 
 /**
+ * An interface for listeners of a thread.
  *
- * @author ddoppmeier, rhilker
+ * @author rhilker
  */
 public interface ThreadListener {
 
-    public void receiveData( Object data );
+    /**
+     * Method to call when the listener shall receive any kind of data.
+     * @param data The data to hand over to the listener
+     */
+    void receiveData( Object data );
 
 
-    public void notifySkipped();
+    /**
+     * Notify the listener when something shall be skipped.
+     */
+    void notifySkipped();
 
 
 }

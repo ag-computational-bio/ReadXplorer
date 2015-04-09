@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -58,7 +59,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private int nbRequests;
     private int nbCarriedOutRequests;
     private String queryType;
-    private final ArrayList<Observer> observers;
+    private final List<Observer> observers;
     private boolean diffsAndGapsNeeded;
     private boolean coverageNeeded;
     private boolean mappingsNeeded;

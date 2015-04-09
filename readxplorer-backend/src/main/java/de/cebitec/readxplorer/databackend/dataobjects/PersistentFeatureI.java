@@ -34,7 +34,7 @@ public interface PersistentFeatureI extends GenomicRange {
      *         stop.
      */
     @Override
-    public int getStart();
+    int getStart();
 
 
     /**
@@ -42,13 +42,13 @@ public interface PersistentFeatureI extends GenomicRange {
      *         stop.
      */
     @Override
-    public int getStop();
+    int getStop();
 
 
     /**
      * @return Type of the feature among {@link FeatureType}s.
      */
-    public FeatureType getType();
+    FeatureType getType();
 
 
 }
