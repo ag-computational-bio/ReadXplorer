@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.databackend.dataobjects;
 
 
 import de.cebitec.readxplorer.databackend.IntervalRequest;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,8 +30,7 @@ import java.util.List;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoverageAndDiffResult extends AnalysisResult implements
-        Serializable {
+public class CoverageAndDiffResult extends AnalysisResult {
 
     public static final long serialVersionUID = 42L;
 

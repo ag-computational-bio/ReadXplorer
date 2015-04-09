@@ -240,8 +240,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                     public void run() {
 
                         if( coverageAnalysisResultPanel == null ) {
-                            coverageAnalysisResultPanel = new ResultPanelCoverageAnalysis();
-                            coverageAnalysisResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
+                            coverageAnalysisResultPanel = new ResultPanelCoverageAnalysis( context.getBoundsInformationManager() );
                         }
                         coverageAnalysisResultPanel.addResult( result );
 

@@ -18,8 +18,10 @@
 package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
@@ -44,14 +46,13 @@ import javax.swing.table.TableRowSorter;
  * <p>
  * @author -Rolf Hilker-
  */
-public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
+public class ResultPanelCoveredFeatures extends ResultTablePanel {
 
     private static final long serialVersionUID = 1L;
 
     public static final String FEATURES_COVERED = "Total number of covered features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
 
-    private BoundsInfoManager bim;
     private CoveredFeatureResult coveredFeaturesResult;
     private Map<String, Integer> coveredStatisticsMap;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -62,10 +63,11 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      * Panel showing a result of an analysis filtering for features with a min
      * and max certain readcount.
      * <p>
-     * @param coveredFeaturesParameters parameter set used for this feature
-     *                                  filtering
+     * @param BoundsInfoManager of the reference on which this analysis was
+     *                          performed.
      */
-    public ResultPanelCoveredFeatures() {
+    public ResultPanelCoveredFeatures( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumnIdx = 0;
         final int trackColumnIdx = 1;
@@ -80,7 +82,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             @Override
             public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( coveredFeaturesTable, posColumnIdx, chromColumnIdx, bim );
+                TableUtils.showPosition( coveredFeaturesTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
                 refFeatureComp.showTableFeature( coveredFeaturesTable, 0 );
             }
 
@@ -198,72 +200,66 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
 
-    public void setBoundsInfoManager( BoundsInfoManager boundsInformationManager ) {
-        this.bim = boundsInformationManager;
+    @Override
+    public void addResult( ResultTrackAnalysis newResult ) {
+
+        tableFilter.setTrackMap( newResult.getTrackMap() );
+
+        if( newResult instanceof CoveredFeatureResult ) {
+
+            CoveredFeatureResult coveredFeaturesResultNew = (CoveredFeatureResult) newResult;
+            final int nbColumns = 10;
+            final List<CoveredFeature> features = new ArrayList<>( coveredFeaturesResultNew.getResults() );
+
+            if( this.coveredFeaturesResult == null ) {
+                this.coveredFeaturesResult = coveredFeaturesResultNew;
+                this.coveredStatisticsMap = new HashMap<>( coveredFeaturesResult.getStatsMap() );
+                this.coveredStatisticsMap.put( FEATURES_COVERED, 0 );
+            } else {
+                this.coveredFeaturesResult.addAllToResult( coveredFeaturesResultNew.getResults() );
+            }
+
+            DefaultTableModel model = (DefaultTableModel) coveredFeaturesTable.getModel();
+
+            PersistentFeature feature;
+            for( CoveredFeature coveredFeature : features ) {
+
+                Object[] rowData = new Object[nbColumns];
+                int i = 0;
+                feature = coveredFeature.getCoveredFeature();
+                rowData[i++] = feature;
+                rowData[i++] = coveredFeaturesResultNew.getTrackEntry( coveredFeature.getTrackId(), false );
+                rowData[i++] = coveredFeaturesResultNew.getChromosomeMap().get( feature.getChromId() );
+                rowData[i++] = feature.isFwdStrandString();
+                rowData[i++] = feature.getStartOnStrand();
+                rowData[i++] = feature.getStopOnStrand();
+                rowData[i++] = feature.getLength();
+                rowData[i++] = coveredFeature.getMeanCoverage();
+                rowData[i++] = coveredFeature.getPercentCovered();
+                rowData[i++] = coveredFeature.getNoCoveredBases();
+
+                model.addRow( rowData );
+            }
+
+            coveredStatisticsMap.put( FEATURES_COVERED, coveredStatisticsMap.get( FEATURES_COVERED ) + features.size() );
+            coveredFeaturesResult.setStatsMap( coveredStatisticsMap );
+
+            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+            coveredFeaturesTable.setRowSorter( sorter );
+            sorter.setModel( model );
+
+            ParameterSetCoveredFeatures parameters = ((ParameterSetCoveredFeatures) coveredFeaturesResult.getParameters());
+            String strandOption = parameters.getReadClassParams().getStrandOptionString();
+            String coveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
+            parametersLabel.setText( org.openide.util.NbBundle.getMessage( ResultPanelCoveredFeatures.class,
+                                                                           "ResultPanelCoveredFeatures.parametersLabel.text", parameters.getMinCoveredPercent(),
+                                                                           parameters.getMinCoverageCount(), strandOption, coveredFeatures ) );
+        }
     }
 
 
-    /**
-     * Adds a list of covered features to this panel.
-     * <p>
-     * @param coveredFeaturesResultNew
-     */
-    public void addCoveredFeatures( final CoveredFeatureResult coveredFeaturesResultNew ) {
-        tableFilter.setTrackMap( coveredFeaturesResultNew.getTrackMap() );
-
-        final int nbColumns = 10;
-        final List<CoveredFeature> features = new ArrayList<>( coveredFeaturesResultNew.getResults() );
-
-        if( this.coveredFeaturesResult == null ) {
-            this.coveredFeaturesResult = coveredFeaturesResultNew;
-            this.coveredStatisticsMap = new HashMap<>( coveredFeaturesResult.getStatsMap() );
-            this.coveredStatisticsMap.put( FEATURES_COVERED, 0 );
-        } else {
-            this.coveredFeaturesResult.addAllToResult( coveredFeaturesResultNew.getResults() );
-        }
-
-        DefaultTableModel model = (DefaultTableModel) coveredFeaturesTable.getModel();
-
-        PersistentFeature feature;
-        for( CoveredFeature coveredFeature : features ) {
-
-            Object[] rowData = new Object[nbColumns];
-            int i = 0;
-            feature = coveredFeature.getCoveredFeature();
-            rowData[i++] = feature;
-            rowData[i++] = coveredFeaturesResultNew.getTrackEntry( coveredFeature.getTrackId(), false );
-            rowData[i++] = coveredFeaturesResultNew.getChromosomeMap().get( feature.getChromId() );
-            rowData[i++] = feature.isFwdStrandString();
-            rowData[i++] = feature.getStartOnStrand();
-            rowData[i++] = feature.getStopOnStrand();
-            rowData[i++] = feature.getLength();
-            rowData[i++] = coveredFeature.getMeanCoverage();
-            rowData[i++] = coveredFeature.getPercentCovered();
-            rowData[i++] = coveredFeature.getNoCoveredBases();
-
-            model.addRow( rowData );
-        }
-
-        coveredStatisticsMap.put( FEATURES_COVERED, coveredStatisticsMap.get( FEATURES_COVERED ) + features.size() );
-        coveredFeaturesResult.setStatsMap( coveredStatisticsMap );
-
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-        coveredFeaturesTable.setRowSorter( sorter );
-        sorter.setModel( model );
-
-        ParameterSetCoveredFeatures parameters = ((ParameterSetCoveredFeatures) coveredFeaturesResult.getParameters());
-        String strandOption = parameters.getReadClassParams().getStrandOptionString();
-        String coveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
-        parametersLabel.setText( org.openide.util.NbBundle.getMessage( ResultPanelCoveredFeatures.class,
-                                                                       "ResultPanelCoveredFeatures.parametersLabel.text", parameters.getMinCoveredPercent(),
-                                                                       parameters.getMinCoverageCount(), strandOption, coveredFeatures ) );
-    }
-
-
-    /**
-     * @return the number of features filtered during the associated analysis
-     */
-    public int getResultSize() {
+    @Override
+    public int getDataSize() {
         return this.coveredFeaturesResult.getResults().size();
     }
 

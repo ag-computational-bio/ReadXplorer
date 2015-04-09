@@ -51,7 +51,6 @@ public class ResultPanelCoverageAnalysis extends ResultTablePanel {
     public static final String MEAN_INTERVAL_LENGTH = "Mean interval length";
     public static final String MEAN_INTERVAL_COVERAGE = "Global mean interval coverage";
     private static final long serialVersionUID = 1L;
-    private BoundsInfoManager bim;
     private CoverageAnalysisResult coverageAnalysisResult;
     private final Map<String, Integer> coverageStatisticsMap;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -60,8 +59,12 @@ public class ResultPanelCoverageAnalysis extends ResultTablePanel {
     /**
      * CoverageIntervalContainer panel for the coverage analysis. It displays
      * the table with all covered or uncovered intervals of the reference.
+     * <p>
+     * @param BoundsInfoManager of the reference on which this analysis was
+     *                          performed.
      */
-    public ResultPanelCoverageAnalysis() {
+    public ResultPanelCoverageAnalysis( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumnIdx = 0;
         final int trackColumnIdx = 2;
@@ -73,7 +76,7 @@ public class ResultPanelCoverageAnalysis extends ResultTablePanel {
         this.coverageStatisticsMap.put( MEAN_INTERVAL_LENGTH, 0 );
         this.coverageStatisticsMap.put( MEAN_INTERVAL_COVERAGE, 0 );
 
-        TableUtils.addTableListSelectionListener( coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim );
+        TableUtils.addTableListSelectionListener( coverageAnalysisTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
     }
 
 
@@ -278,6 +281,7 @@ public class ResultPanelCoverageAnalysis extends ResultTablePanel {
                                                                        "ResultPanelCoverageAnalysis.parametersLabel.text",
                                                                        parameters.getMinCoverageCount(), coverageCount, uncoveredIntervals ) );
     }
+
 
     /**
      * @return the number of covered or uncovered intervals during the

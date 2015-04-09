@@ -259,10 +259,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                     public void run() {
 
                         if( coveredFeaturesResultPanel == null ) {
-                            coveredFeaturesResultPanel = new ResultPanelCoveredFeatures();
-                            coveredFeaturesResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
+                            coveredFeaturesResultPanel = new ResultPanelCoveredFeatures( context.getBoundsInformationManager() );
                         }
-                        coveredFeaturesResultPanel.addCoveredFeatures( result );
+                        coveredFeaturesResultPanel.addResult( result );
 
                         if( finishedCovAnalyses >= tracks.size() || combineTracks ) {
 
@@ -284,7 +283,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                             } else {
                                 title = "Detected uncovered features for ";
                             }
-                            String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
+                            String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getDataSize() + " hits)";
                             coveredAnnoAnalysisTopComp.openAnalysisTab( panelName, coveredFeaturesResultPanel );
                         }
                     }
