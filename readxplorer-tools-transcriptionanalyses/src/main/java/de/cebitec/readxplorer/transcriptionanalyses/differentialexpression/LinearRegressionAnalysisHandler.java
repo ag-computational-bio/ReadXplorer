@@ -78,6 +78,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     private List<ResultDeAnalysis> results;
     Integer indexForA = 0;
     Integer indexForB = 1;
+    boolean workingWithoutReplicates;
 
     
     public LinearRegressionAnalysisHandler( List<PersistentTrack> selectedTracks, int[] groupA, int[] groupB,
@@ -93,6 +94,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         this.stopOffset = stopOffset;
         this.groupA = groupA;
         this.groupB = groupB;
+        this.workingWithoutReplicates = workingWithoutReplicates;
         this.readClassParams = readClassParams;
         this.selectedFeatureTypes = selectedFeatureTypes;
         genomeAnnos = new ArrayList<>();
@@ -216,10 +218,14 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     
     @Override
     protected List<ResultDeAnalysis> processWithTool() {
-        MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> sortedDataForConditions =
-            sortDataForConditions(allContinuousCoverageData);
-        Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = 
-            findMeanForReplicates(sortedDataForConditions);
+        Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
+        if( workingWithoutReplicates ) {
+            preparedDataForConditions = allContinuousCoverageData;
+        } else {
+            MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> sortedDataForConditions =
+                sortDataForConditions(allContinuousCoverageData);
+            preparedDataForConditions = findMeanForReplicates(sortedDataForConditions);
+        }
         linRegForConditions.process( preparedDataForConditions ); 
     //  linRegForReplicates.process( allContinuousCoverageData );
         Map<PersistentFeature, double[]> calculatedForConditions = linRegForConditions.getResults();
