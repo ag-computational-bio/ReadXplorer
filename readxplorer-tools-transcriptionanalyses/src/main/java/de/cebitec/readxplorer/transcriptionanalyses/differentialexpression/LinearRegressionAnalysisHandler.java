@@ -34,19 +34,21 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
+import org.apache.commons.collections4.map.MultiValueMap;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
 import static java.util.logging.Level.INFO;
-
 
 
 /**
@@ -59,7 +61,10 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     private final int refGenomeID;
     private final int startOffset;
     private final int stopOffset;
-    private LinearRegression linReg;
+    private final int[] groupA;
+    private final int[] groupB;
+    private LinearRegression linRegForConditions;
+    private LinearRegression linRegForReplicates;
     private File saveFile = null;
     private final ParametersReadClasses readClassParams;
     private final List<PersistentTrack> selectedTracks;
@@ -71,10 +76,12 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     private final Set<FeatureType> selectedFeatureTypes;
     private final Map<Integer, Map<PersistentFeature, int[]>> allContinuousCoverageData;
     private List<ResultDeAnalysis> results;
+    Integer indexForA = 0;
+    Integer indexForB = 1;
 
     
-    public LinearRegressionAnalysisHandler( List<PersistentTrack> selectedTracks,
-                                     int refGenomeID, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
+    public LinearRegressionAnalysisHandler( List<PersistentTrack> selectedTracks, int[] groupA, int[] groupB,
+                                     int refGenomeID, boolean workingWithoutReplicates, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
                                      ParametersReadClasses readClassParams ) {
          
         super( selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams );
@@ -84,12 +91,15 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         this.saveFile = saveFile;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
+        this.groupA = groupA;
+        this.groupB = groupB;
         this.readClassParams = readClassParams;
         this.selectedFeatureTypes = selectedFeatureTypes;
         genomeAnnos = new ArrayList<>();
         allContinuousCoverageData = new HashMap<>();
         results = new ArrayList<>();
-        linReg = new LinearRegression();
+        linRegForConditions = new LinearRegression();
+        linRegForReplicates = new LinearRegression();
     }
     
     @Override
@@ -130,15 +140,100 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
             handler.startAnalysis();
         }
     }
+   
+    private MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> sortDataForConditions( 
+            Map<Integer, Map<PersistentFeature, int[]>> allData ) {
+        MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> preparedDataForConditions = new MultiValueMap<>();
+        MultiValueMap<PersistentFeature, int[]> innerMultiMapA;
+        MultiValueMap<PersistentFeature, int[]> innerMultiMapB;
+        
+        innerMultiMapA = formInnerMultiMap( allData, groupA );
+        innerMultiMapB = formInnerMultiMap( allData, groupB );
+        preparedDataForConditions.put( indexForA, innerMultiMapA );
+        preparedDataForConditions.put( indexForB, innerMultiMapB );
+        return preparedDataForConditions;
+    }
+    
+     
+    private MultiValueMap<PersistentFeature, int[]> formInnerMultiMap(
+            Map<Integer, Map<PersistentFeature, int[]>> allData, int[] conditionGroup) {
+        MultiValueMap<PersistentFeature, int[]> innerMultiMap = new MultiValueMap<>();
+        
+        for( int track: conditionGroup ) {
+            Map<PersistentFeature, int[]> innerMap = allData.get( track );
+            for (Map.Entry<PersistentFeature, int[]> gene :
+                innerMap.entrySet()) {
+                innerMultiMap.put(gene.getKey(), gene.getValue() );
+            }
+        } 
+        return innerMultiMap;
+    }
+   
+    private Map<Integer, Map<PersistentFeature, int[]>> findMeanForReplicates( 
+            MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> allData) {
+        Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
+        Integer[] conditions = { indexForA, indexForB };
+            
+        for( Integer condition : conditions ) {
+            Map<PersistentFeature, int[]> preparedInnerMap = new HashMap<>();
+            Iterator<MultiValueMap<PersistentFeature, int[]>> geneSet =
+                allData.getCollection( condition ).iterator();               
+            while(geneSet.hasNext()) {
+                MultiValueMap<PersistentFeature, int[]> replicate = geneSet.next();
+                for( PersistentFeature feature : replicate.keySet() ) {
+                    Collection<int[]> countData = replicate.getCollection( feature );
+                    int[] means = findMeanBetweenArraysInCollection( countData );
+                    preparedInnerMap.put( feature, means );
+                }
+            }
+            preparedDataForConditions.put( condition, preparedInnerMap );
+        }
+        return preparedDataForConditions;
+    }
+    
+    private int[] findMeanBetweenArraysInCollection(Collection<int[]> countData) {
+        Iterator<int[]> countDataIterator = countData.iterator();
+        int[] dataSum = new int[countDataIterator.next().length];
+        int[] means = new int[countDataIterator.next().length];
+        int k = 0;
+        for( int[] data : countData ) {
+            for( int i = 0; i<data.length; i++ ) {
+                if( k == 0 ) {
+                    dataSum[i] = data[i];
+                } else {
+                    dataSum[i] += data[i];
+                }
+            }
+            k++;
+        }
+        int i = 0;
+        for(int sum : dataSum) {
+            means[i] = (int)((sum / countData.size()) + 0.5); 
+            i++;
+        }
+        return means;
+    }
     
     @Override
     protected List<ResultDeAnalysis> processWithTool() {
-        linReg.process( allContinuousCoverageData ); 
-        Map<PersistentFeature, double[]> calculated = linReg.getResults();
-        results = prepareResults(calculated);
+        MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> sortedDataForConditions =
+            sortDataForConditions(allContinuousCoverageData);
+        Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = 
+            findMeanForReplicates(sortedDataForConditions);
+        linRegForConditions.process( preparedDataForConditions ); 
+    //  linRegForReplicates.process( allContinuousCoverageData );
+        Map<PersistentFeature, double[]> calculatedForConditions = linRegForConditions.getResults();
+    //  Map<PersistentFeature, double[]> calculatedForReplicates = linRegForReplicates.getResults();
+        results = prepareResults(calculatedForConditions);
+    //  List<ResultDeAnalysis> resultsForReplicates = prepareResults(calculatedForReplicates);
+    //  results = concatenateResults(resultsForConditions, resultsForReplicates);
         return results;
     }
-      
+    
+    private List<ResultDeAnalysis> concatenateResults(List<ResultDeAnalysis> a, List<ResultDeAnalysis> b) {
+      return results;  
+    }
+    
     private List<ResultDeAnalysis> prepareResults(Map<PersistentFeature, double[]> calculated) {
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Continuous Count Data Table" );
         progressHandle.start( calculated.size() );
