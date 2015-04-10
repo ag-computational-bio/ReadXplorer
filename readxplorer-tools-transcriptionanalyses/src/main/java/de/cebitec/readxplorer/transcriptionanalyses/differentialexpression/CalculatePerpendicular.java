@@ -61,15 +61,23 @@ public class CalculatePerpendicular implements CoreCalculationI{
                  (sumConditionB2 - (n * meanConditionB * meanConditionB))) /
                  (n * meanConditionB * meanConditionA - sumConditionsAB));
 
+        //r <- cor(y,x)
+        double r = computePearsonsCorrelationCoefficient(conditionA,conditionB,meanConditionA,meanConditionB);
+     
+        
         //slope <- (-b + sqrt(b^2 + 1))
-        double slope = (-1.0 * b) + Math.sqrt( (b * b) +1);
+        double slope;
+        if ( r>=0 ) {
+            slope = (-1.0 * b) + Math.sqrt( (b * b) +1);
+        } else {
+            slope = (-1.0 * b) - Math.sqrt( (b * b) +1);
+        }
 
         //inter <- mean(x) - slope*mean(y)
         double inter = meanConditionA - (slope * meanConditionB);
-
-        //rsq <- cor(y,x)^2
-        double r = computePearsonsCorrelationCoefficient(conditionA,conditionB,meanConditionA,meanConditionB);
+        
         //double rsq = r; // * r;
+        //r *= r;
 
         result[leastSquaresIntercept] = inter;
         result[leastSquaresSlope] = slope;
