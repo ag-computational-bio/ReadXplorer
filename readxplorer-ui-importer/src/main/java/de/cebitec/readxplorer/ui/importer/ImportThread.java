@@ -165,14 +165,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         io.getOut().println( Benchmark.calculateDuration( start, finish, msg ) );
                     } catch( StorageException ex ) {
                         // if something went wrong, mark all dependent track jobs
-                        io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
+                        io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                         this.noErrors = false;
                         LOG.log( SEVERE, null, ex );
                     }
 
                 } catch( ParsingException ex ) {
                     // if something went wrong, mark all dependent track jobs
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
+                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                     this.noErrors = false;
                     LOG.log( INFO, null, ex );
                 } catch( OutOfMemoryError ex ) {

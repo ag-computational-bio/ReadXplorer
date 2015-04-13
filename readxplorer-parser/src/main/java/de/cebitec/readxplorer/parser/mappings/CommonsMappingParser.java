@@ -466,20 +466,17 @@ public final class CommonsMappingParser {
                                         final String filename,
                                         final int lineNo ) {
 
-
         boolean isConsistent = true;
         if( SAMRecord.NULL_SEQUENCE_STRING.equals( readSeq ) ) { //RX requires read strings
             parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadEmpty( filename, lineNo, readSeq ) );
             isConsistent = false;
         }
-        /* Check if read maps beyond reference sequence not needed because we
-         * need the CIGAR and SamRecord automatically validates the
-         * AlignmentBlocks
-         */
-        /*
-         * Check if start > stop not necessary, because SAMRecord calculates the
-         * stop based on the start + length
-         */
+//        Check if read maps beyond reference sequence not needed because we
+//        need the CIGAR and SamRecord automatically validates the
+//        AlignmentBlocks
+
+//        Check if start > stop not necessary, because SAMRecord calculates the
+//        stop based on the start + length
 
         return isConsistent;
     }
