@@ -29,9 +29,9 @@ import org.openide.util.NbPreferences;
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public final class CodonUtilities {
+public final class CodonUtils {
 
-    private CodonUtilities() {
+    private CodonUtils() {
     }
 
 
@@ -90,7 +90,7 @@ public final class CodonUtilities {
             startCodons = code.getStartCodons().toArray( startCodons );
             stopCodons = code.getStopCodons().toArray( stopCodons );
         } else {
-            Pair<String[], String[]> codonPair = CodonUtilities.parseCustomCodons( codeIndex,
+            Pair<String[], String[]> codonPair = CodonUtils.parseCustomCodons( codeIndex,
                     pref.get( Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD_CODE_INDEX ) );
             startCodons = codonPair.getFirst();
             stopCodons = codonPair.getSecond();

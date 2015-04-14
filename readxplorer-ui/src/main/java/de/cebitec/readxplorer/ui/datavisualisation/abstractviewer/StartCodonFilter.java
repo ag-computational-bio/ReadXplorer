@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
-import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.CodonUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
@@ -242,7 +242,7 @@ public class StartCodonFilter extends PatternFilter {
      * selected genetic code.
      */
     public final void resetCodons() {
-        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
+        Pair<String[], String[]> geneticCode = CodonUtils.getGeneticCodeArrays();
 
         startCodons = geneticCode.getFirst();
         stopCodons = geneticCode.getSecond();
