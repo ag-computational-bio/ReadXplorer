@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.readpairclassifier;
 
 
 import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
@@ -217,7 +218,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     //separate all mappings of same pair by read pair tag and hand it over to classification then
                     SAMRecord record = samItor.next();
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
-                        char pairTag = CommonsMappingParser.getReadPairTag( record );
+                        ReadPairExtensions pairTag = CommonsMappingParser.getReadPairTag( record );
                         CommonsMappingParser.checkOrRemovePairTag( record );
                         String readName = record.getReadName();
 
@@ -233,11 +234,11 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                         }
 
                         boolean classified;
-                        if( pairTag == Properties.EXT_A1 ) {
+                        if( pairTag == ReadPairExtensions.A1 ) {
                             record.setReadPairedFlag( true );
                             record.setFirstOfPairFlag( true );
                             classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap1, class1 );
-                        } else if( pairTag == Properties.EXT_A2 ) {
+                        } else if( pairTag == ReadPairExtensions.A2 ) {
                             record.setReadPairedFlag( true );
                             record.setSecondOfPairFlag( true );
                             classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap2, class2 );

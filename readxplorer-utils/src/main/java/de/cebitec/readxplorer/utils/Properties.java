@@ -45,7 +45,7 @@ public final class Properties {
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
 
-    
+
 
     /**
      * Type value identifying an object as belonging to a "Start".
@@ -86,40 +86,6 @@ public final class Properties {
      * 'Ys' = Tag for the read pair type.
      */
     public static final String TAG_READ_PAIR_TYPE = "Ys";
-
-    //Supported read pair extensions.
-    /**
-     * / = separator used for read pair tags before Casava 1.8 format.
-     */
-    public static final char EXT_SEPARATOR = '/';
-    /**
-     * 0 = For reads not having a pair tag.
-     */
-    public static final char EXT_UNDEFINED = '0';
-    /**
-     * 1 = Supported extension of read 1.
-     */
-    public static final char EXT_A1 = '1';
-    /**
-     * 2 = Supported extension of read 2.
-     */
-    public static final char EXT_A2 = '2';
-    /**
-     * f = Supported extension of read 1.
-     */
-    public static final char EXT_B1 = 'f';
-    /**
-     * r = Supported extension of read 2.
-     */
-    public static final char EXT_B2 = 'r';
-    /**
-     * 1 = Supported extension of read 1 as String.
-     */
-    public static final String EXT_A1_STRING = String.valueOf( EXT_A1 );
-    /**
-     * 2 = Supported extension of read 2 as String.
-     */
-    public static final String EXT_A2_STRING = String.valueOf( EXT_A2 );
 
 
     /**

@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.readpairclassifier;
 
 
 import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;
@@ -102,9 +103,9 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                 //separate all mappings of same pair by read pair tag and hand it over to classification then
                 SAMRecord record = samItor.next();
                 if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
-                    char pairTag = CommonsMappingParser.getReadPairTag( record );
+                    ReadPairExtensions pairTag = CommonsMappingParser.getReadPairTag( record );
 
-                    if( pairTag == Properties.EXT_A1 ) {
+                    if( pairTag == ReadPairExtensions.A1 ) {
 
                         Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
                         if( classobj != null ) {
@@ -121,7 +122,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                             this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
                         }
 
-                    } else if( pairTag == Properties.EXT_A2 ) {
+                    } else if( pairTag == ReadPairExtensions.A2 ) {
 
                         Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
                         if( classobj != null && classobj instanceof Integer ) {
