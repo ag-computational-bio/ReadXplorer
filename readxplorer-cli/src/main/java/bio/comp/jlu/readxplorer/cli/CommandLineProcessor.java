@@ -374,7 +374,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private File[] getPairedEndReadFiles( final PrintStream ps, File[] readFiles ) throws CommandException {
 
-        if( pairedEndReadsDirArg != null ) {
+        if( pairedEndArg ) {
+            return null;
+        } else if( pairedEndReadsDirArg != null ) {
 
             File pairedEndReadsDir = new File( pairedEndReadsDirArg );
             pairedEndReadsDir = pairedEndReadsDir.toPath().toAbsolutePath().normalize().toFile();
@@ -593,7 +595,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
                                                timestamp );
             latestTrackId++;
             TrackJob trackJob2 = null;
-            if( pairedEndFiles != null ) {
+            if( pairedEndFiles != null ) { // if no pairedEndFiles are available, this is a paired end track within a combined read file!
                 File pairedEndFile = pairedEndFiles[i];
                 trackJob2 = new TrackJob( latestTrackId, pairedEndFile,
                                           pairedEndFile.getName(),
