@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.HighlightAreaListener;
@@ -156,7 +157,7 @@ public class RegionManager {
      * JRegion and displayed in the regionVisualizer (SequenceBar).
      */
     public void showCdsRegions() {
-        this.regionVisualizer.removeAll( Properties.CDS );
+        this.regionVisualizer.removeAll( RegionType.CDS );
 
         if( !this.cdsRegions.isEmpty() ) {
             for( Region region : this.cdsRegions ) {
@@ -174,7 +175,7 @@ public class RegionManager {
      */
     public void findCodons() {
         //create the list of component types, that should be removed (only patterns)
-        List<Byte> typeList = Arrays.asList( Properties.START, Properties.STOP );
+        List<RegionType> typeList = Arrays.asList( RegionType.Start, RegionType.Stop );
         this.regionVisualizer.removeAll( typeList );
         this.highlightListener.clearSpecialRegions();
         this.codonFilter.setInterval( this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight() );
@@ -202,7 +203,7 @@ public class RegionManager {
      */
     public int findPattern() {
         //create the list of component types, that should be removed (only patterns)
-        this.regionVisualizer.removeAll( Properties.PATTERN );
+        this.regionVisualizer.removeAll( RegionType.Pattern );
         this.patternFilter.setInterval( this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight() );
 
         List<Region> patternHitsToHighlight = this.patternFilter.findRegions();

@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.api.enums.Strand;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.sequence.SequenceMatcher;
 import de.cebitec.readxplorer.utils.sequence.SequenceScanner;
@@ -53,7 +53,7 @@ public class PatternFilter implements RegionFilterI {
     private Pattern pattern;
     private Pattern patternRev;
     private int analysisFrame;
-    private byte regionType;
+    private RegionType regionType;
     private Strand analysisStrand;
     private int maxNoResults;
     private boolean analyzeInRevDirection;
@@ -79,7 +79,7 @@ public class PatternFilter implements RegionFilterI {
         matchedPatterns = new ArrayList<>();
         maxNoResults = 0;
         analysisStrand = Strand.Both;
-        regionType = Properties.PATTERN;
+        regionType = RegionType.Pattern;
         analyzeInRevDirection = false;
         addOffset = true;
         requireSameFrame = false;
@@ -345,7 +345,7 @@ public class PatternFilter implements RegionFilterI {
     /**
      * @return The type to use for the identified regions
      */
-    public byte getRegionType() {
+    public RegionType getRegionType() {
         return regionType;
     }
 
@@ -353,7 +353,7 @@ public class PatternFilter implements RegionFilterI {
     /**
      * @param regionType The type to use for the identified regions
      */
-    public void setRegionType( byte regionType ) {
+    public void setRegionType( RegionType regionType ) {
         this.regionType = regionType;
     }
 

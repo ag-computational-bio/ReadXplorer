@@ -17,6 +17,9 @@
 
 package de.cebitec.readxplorer.utils.sequence;
 
+import de.cebitec.readxplorer.api.enums.RegionType;
+
+
 
 /**
  * A region marked by a start and stop position and if it should be read in fwd
@@ -29,7 +32,7 @@ public class Region implements GenomicRange {
     private final int start;
     private final int stop;
     private final boolean isForwardStrand;
-    private final int type;
+    private final RegionType type;
 
 
     /**
@@ -45,7 +48,7 @@ public class Region implements GenomicRange {
      *                        Properties.START, Properties.STOP,
      *                        Properties.PATTERN or Properties.ALL
      */
-    public Region( int start, int stop, boolean isForwardStrand, int type ) {
+    public Region( int start, int stop, boolean isForwardStrand, RegionType type ) {
         this.start = start;
         this.stop = stop;
         this.isForwardStrand = isForwardStrand;
@@ -114,7 +117,7 @@ public class Region implements GenomicRange {
      * @return The type of the region. Either Properties.CDS, Properties.START,
      *         Properties.STOP, Properties.PATTERN or Properties.ALL
      */
-    public int getType() {
+    public RegionType getType() {
         return this.type;
     }
 
@@ -157,7 +160,7 @@ public class Region implements GenomicRange {
         hash = 23 * hash + this.start;
         hash = 23 * hash + this.stop;
         hash = 23 * hash + (this.isForwardStrand ? 1 : 0);
-        hash = 23 * hash + this.type;
+        hash = 23 * hash + this.type.getType();
         return hash;
     }
 

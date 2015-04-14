@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
@@ -726,9 +727,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * <p>
      * @param typeList list of types of components to remove
      */
-    protected void removeAll( List<Byte> typeList ) {
+    protected void removeAll( List<RegionType> typeList ) {
         for( Component comp : this.getComponents() ) {
-            for( int type : typeList ) {
+            for( RegionType type : typeList ) {
                 if( comp instanceof JRegion && ((JRegion) comp).getType() == type ) {
                     this.remove( comp );
                     break;
@@ -745,8 +746,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * <p>
      * @param type the type of components to remove
      */
-    protected void removeAll( Byte type ) {
-        List<Byte> typeList = new ArrayList<>();
+    protected void removeAll( RegionType type ) {
+        List<RegionType> typeList = new ArrayList<>();
         typeList.add( type );
         this.removeAll( typeList );
     }

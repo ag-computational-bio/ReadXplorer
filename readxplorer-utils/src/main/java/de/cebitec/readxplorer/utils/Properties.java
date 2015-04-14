@@ -44,30 +44,7 @@ public final class Properties {
     public static final String STANDARD_CODE_INDEX = "1";
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
-
-
-
-    /**
-     * Type value identifying an object as belonging to a "Start".
-     */
-    public static final byte START = 1;
-    /**
-     * Type value identifying an object as belonging to a "Stop".
-     */
-    public static final byte STOP = 2;
-    /**
-     * Type value identifying an object as belonging to a "pattern".
-     */
-    public static final byte PATTERN = 3;
-    /**
-     * Type value identifying an object as belonging to a "CDS" = coding
-     * sequence.
-     */
-    public static final byte CDS = 4;
-    /**
-     * Type value identifying an object as belonging to any of the other types.
-     */
-    public static final byte ALL = 0;
+    
 
     /**
      * 'Yc' = Tag for read classification in one of the three readxplorer

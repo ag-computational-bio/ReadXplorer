@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.api.enums.RegionType;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,9 +70,9 @@ public class StartCodonFilter extends PatternFilter {
     public List<Region> findRegions() {
         regions.clear();
         if( atLeastOneCodonSelected() ) {
-            setRegionType( Properties.START );
+            setRegionType( RegionType.Start );
             startSearch( selectedStarts, startCodons );
-            setRegionType( Properties.STOP );
+            setRegionType( RegionType.Stop );
             startSearch( selectedStops, stopCodons );
         }
         return Collections.unmodifiableList( regions );

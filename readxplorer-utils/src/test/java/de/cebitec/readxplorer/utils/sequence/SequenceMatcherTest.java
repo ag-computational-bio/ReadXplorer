@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.utils.sequence;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
-import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +94,7 @@ public class SequenceMatcherTest {
 
         //////// Test search all codons in area ///////////////////////////////
         ArrayList<Region> result;
-        int type = Properties.START;
+        RegionType type = RegionType.Start;
         SequenceMatcher startMatcher = new SequenceMatcher();
 
         for( int i = 0; i < startCodonPatterns.length; i++ ) {
@@ -125,7 +125,7 @@ public class SequenceMatcherTest {
         assertTrue( result.size() == 14 );
 
         //////// Test stop codons with absolute position shifted by 9bp ///////
-        type = Properties.STOP;
+        type = RegionType.Stop;
         SequenceMatcher stopMatcher = new SequenceMatcher();
         stopMatcher.setAbsoluteStart( 10 );
         for( int i = 0; i < stopCodonPatterns.length; i++ ) {

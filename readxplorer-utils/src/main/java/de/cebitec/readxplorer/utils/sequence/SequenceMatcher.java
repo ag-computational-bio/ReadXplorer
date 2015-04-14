@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils.sequence;
 
 
+import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,7 @@ public class SequenceMatcher {
      * @param type The type of the regions to create. Either Region.START or
      * Region.STOP, Properties.PATTERN or Properties.CDS.
      */
-    public void matchPattern( String sequence, Pattern pattern, boolean isForwardStrand, int type ) {
+    public void matchPattern( String sequence, Pattern pattern, boolean isForwardStrand, RegionType type ) {
 
         //the if-clause is needed because otherwise data for the fwd strand can be passed and analyzed for frame -2 = nonsense
         if( !requireSameFrame || isForwardStrand && targetFrame > 0 || !isForwardStrand && targetFrame < 0 ) {
