@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.utils.Properties;
+import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
 
@@ -79,15 +80,16 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void readSettings( final WizardDescriptor wiz ) {
         super.readSettings( wiz );
-        byte strandOption = Byte.valueOf( NbPreferences.forModule( Object.class ).get(
-                PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1" ) );
-        boolean isBothStrandOption = strandOption == Properties.STRAND_BOTH;
+        Strand strandOption = Strand.fromString( NbPreferences.forModule( Object.class ).get(
+                PROP_WIZARD_NAME + PROP_STRAND_OPTION, Strand.Feature.toString() ) );
+        boolean isBothStrandOption = strandOption == Strand.Both;
         component.setDirectionOptionsVisible( isBothStrandOption );
     }
 
 
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
+
         if( isValid() ) {
             wiz.putProperty( PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() );
             wiz.putProperty( PROP_MIN_TOTAL_INCREASE, component.getMinTotalIncrease() );
@@ -103,6 +105,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
             wiz.putProperty( PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() );
             storePrefs();
         }
+
     }
 
 
@@ -111,18 +114,21 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
      * after restarting the software.
      */
     private void storePrefs() {
-        getPref().putBoolean( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() );
-        getPref().put( PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, String.valueOf( component.getMinTotalIncrease() ) );
-        getPref().put( PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, String.valueOf( component.getMinTotalPercentIncrease() ) );
-        getPref().put( PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, String.valueOf( component.getMaxLowCovInitialCount() ) );
-        getPref().put( PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, String.valueOf( component.getMinLowCovIncrease() ) );
-        getPref().putBoolean( PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, component.getDetectUnannotatedTranscripts() );
-        getPref().put( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, String.valueOf( component.getMinTranscriptExtensionCov() ) );
-        getPref().put( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, String.valueOf( component.getMaxLeaderlessDistance() ) );
-        getPref().put( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, String.valueOf( component.getMaxFeatureDistance() ) );
-        getPref().putBoolean(PROP_WIZARD_NAME + PROP_IS_ASSOCIATE_TSS, component.isAssociateTss() );
-        getPref().put(PROP_WIZARD_NAME + PROP_ASSOCIATE_TSS_WINDOW, String.valueOf( component.getAssociateTssWindow() ) );
-        getPref().putBoolean( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() );
+
+        Preferences pref = getPref();
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, String.valueOf( component.getMinTotalIncrease() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, String.valueOf( component.getMinTotalPercentIncrease() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, String.valueOf( component.getMaxLowCovInitialCount() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, String.valueOf( component.getMinLowCovIncrease() ) );
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, component.getDetectUnannotatedTranscripts() );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, String.valueOf( component.getMinTranscriptExtensionCov() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, String.valueOf( component.getMaxLeaderlessDistance() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, String.valueOf( component.getMaxFeatureDistance() ) );
+        pref.putBoolean(PROP_WIZARD_NAME + PROP_IS_ASSOCIATE_TSS, component.isAssociateTss() );
+        pref.put(PROP_WIZARD_NAME + PROP_ASSOCIATE_TSS_WINDOW, String.valueOf( component.getAssociateTssWindow() ) );
+        pref.putBoolean( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() );
+
     }
 
 

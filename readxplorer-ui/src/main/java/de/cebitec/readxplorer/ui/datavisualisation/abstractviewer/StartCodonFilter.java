@@ -23,7 +23,7 @@ import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +102,7 @@ public class StartCodonFilter extends PatternFilter {
         }
 
         setInterval( startOnStrand, stop );
-        setAnalysisStrand( isFwdStrand ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV );
+        setAnalysisStrand( isFwdStrand ? Strand.Forward : Strand.Reverse );
         if( isRequireSameFrame() ) {
             int frame = isFwdStrand ? PositionUtils.determineFwdFrame( start ) : PositionUtils.determineRevFrame( stop );
             setAnalysisFrame( frame );

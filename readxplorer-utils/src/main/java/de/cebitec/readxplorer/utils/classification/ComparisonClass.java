@@ -27,30 +27,22 @@ public enum ComparisonClass implements Classification {
     /**
      * Classification for the coverage difference between two tracks.
      */
-    DIFF_COVERAGE( ComparisonClass.DIFF_COVERAGE_BYTE, ComparisonClass.DIFF_COVERAGE_STRING ),
+    DIFF_COVERAGE( 1, "Coverage Difference" ),
     /**
      * Classification for the coverage of track 1 of a track comparison.
      */
-    TRACK1_COVERAGE( ComparisonClass.TRACK1_COVERAGE_BYTE, ComparisonClass.TRACK1_COVERAGE_STRING ),
+    TRACK1_COVERAGE( 2, "Coverage Track 1" ),
     /**
      * Classification for the coverage of track 2 of a track comparison.
      */
-    TRACK2_COVERAGE( ComparisonClass.TRACK2_COVERAGE_BYTE, ComparisonClass.TRACK2_COVERAGE_STRING );
+    TRACK2_COVERAGE( 3, "Coverage Track 2" );
 
-    private static final byte DIFF_COVERAGE_BYTE = 1;
-    private static final byte TRACK1_COVERAGE_BYTE = 2;
-    private static final byte TRACK2_COVERAGE_BYTE = 3;
-
-    private static final String DIFF_COVERAGE_STRING = "Coverage Difference";
-    private static final String TRACK1_COVERAGE_STRING = "Coverage Track 1";
-    private static final String TRACK2_COVERAGE_STRING = "Coverage Track 2";
-
-    private final byte typeByte;
+    private final int typeInt;
     private final String typeString;
 
 
-    private ComparisonClass( byte typeByte, String typeString ) {
-        this.typeByte = typeByte;
+    private ComparisonClass( int typeByte, String typeString ) {
+        this.typeInt = typeByte;
         this.typeString = typeString;
     }
 
@@ -70,8 +62,8 @@ public enum ComparisonClass implements Classification {
      * classification.
      */
     @Override
-    public int getTypeByte() {
-        return this.typeByte;
+    public int getTypeInt() {
+        return this.typeInt;
     }
 
 
@@ -92,17 +84,16 @@ public enum ComparisonClass implements Classification {
      * @param type Type of ComparisonClass to return. If the type does not match
      * a classification type, null is returned.
      */
-    public static ComparisonClass getFeatureType( byte type ) {
-        switch( type ) {
-            case DIFF_COVERAGE_BYTE:
-                return DIFF_COVERAGE;
-            case TRACK1_COVERAGE_BYTE:
-                return TRACK1_COVERAGE;
-            case TRACK2_COVERAGE_BYTE:
-                return TRACK2_COVERAGE;
-            default:
-                return null;
+    public static ComparisonClass getFeatureType( int type ) {
+
+        for( ComparisonClass cc : values() ) {
+            if( cc.typeInt == type ) {
+                return cc;
+            }
         }
+
+        return null;
+        
     }
 
 

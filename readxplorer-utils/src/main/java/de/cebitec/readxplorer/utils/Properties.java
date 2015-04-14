@@ -33,7 +33,6 @@ public final class Properties {
     // different adapter types for a project and or database
     public static final String ADAPTER_MYSQL = "mysql";
     public static final String ADAPTER_H2 = "h2";
-    public static final String ADAPTER_DIRECT_ACCESS = "direct";
 
     // protein DB properties
     public static final String DB_BRENDA = "http://www.brenda-enzymes.org/enzyme.php?ecno=";
@@ -279,41 +278,6 @@ public final class Properties {
 
     /** Default max zoom level for the Alignment and ReadPairViewer. */
     public static final int DEFAULT_ZOOM = 70;
-
-    /**
-     * 0 = Combine data of both strands option.
-     */
-    public static final byte STRAND_BOTH = 0;
-    /**
-     * 3 = Combine data of both strands option and treat them as if they were
-     * originating from fwd strand.
-     */
-    public static final byte STRAND_BOTH_FWD = 3;
-    /**
-     * 4 = Combine data of both strands option and treat them as if they were
-     * originating from rev strand.
-     */
-    public static final byte STRAND_BOTH_REV = 4;
-    /**
-     * 1 = Feature/analysis strand option.
-     */
-    public static final byte STRAND_FEATURE = 1;
-    /**
-     * 2 = Opposite strand option.
-     */
-    public static final byte STRAND_OPPOSITE = 2;
-    /**
-     * 0 = Combine data of both strands option string.
-     */
-    public static final String STRAND_BOTH_STRING = String.valueOf( STRAND_BOTH );
-    /**
-     * 1 = Feature/analysis strand option string.
-     */
-    public static final String STRAND_FEATURE_STRING = String.valueOf( STRAND_FEATURE );
-    /**
-     * 2 = Opposite strand option string.
-     */
-    public static final String STRAND_OPPOSITE_STRING = String.valueOf( STRAND_OPPOSITE );
 
     /**
      * Option for showing base qualities.

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
@@ -248,8 +248,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * @return SequenceUtils.STRAND_FWD_STRING ("Fwd") or
      *         SequenceUtils.STRAND_REV_STRING ("Rev")
      */
-    public String isFwdStrandString() {
-        return isFwdStrand ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING;
+    public String getStrandString() {
+        return isFwdStrand ? Strand.Forward.toString() : Strand.Reverse.toString();
     }
 
 

@@ -30,87 +30,87 @@ package de.cebitec.readxplorer.utils.classification;
 public enum FeatureType implements Classification {
 
     /**
-     * getType() returns '-1' = To be used if feature type does not matter.
+     * getTypeInt() returns '-1' = To be used if feature type does not matter.
      */
     ANY( FeatureType.ANY_INT, FeatureType.ANY_STRING ),
     /**
-     * getType() returns '0' = To be used for a feature with unknown type.
+     * getTypeInt() returns '0' = To be used for a feature with unknown type.
      */
     UNDEFINED( FeatureType.UNDEFINED_INT, FeatureType.UNDEFINED_STRING ),
     /**
-     * getType() returns '1' = To be used for mRNAs.
+     * getTypeInt() returns '1' = To be used for mRNAs.
      */
     MRNA( FeatureType.MRNA_INT, FeatureType.MRNA_STRING ),
     /**
-     * getType() returns '2' = To be used for coding sequences.
+     * getTypeInt() returns '2' = To be used for coding sequences.
      */
     CDS( FeatureType.CDS_INT, FeatureType.CDS_STRING ),
     /**
-     * getType() returns '3' = To be used for misc rnas.
+     * getTypeInt() returns '3' = To be used for misc rnas.
      */
     MISC_RNA( FeatureType.MISC_RNA_INT, FeatureType.MISC_RNA_STRING ),
     /**
-     * getType() returns '4' = To be used for rRNAs.
+     * getTypeInt() returns '4' = To be used for rRNAs.
      */
     RRNA( FeatureType.RRNA_INT, FeatureType.RRNA_STRING ),
     /**
-     * getType() returns '5' = To be used for repeat units.
+     * getTypeInt() returns '5' = To be used for repeat units.
      */
     REPEAT_UNIT( FeatureType.REPEAT_UNIT_INT, FeatureType.REPEAT_UNIT_STRING ),
     /**
-     * getType() returns '6' = To be used for sources.
+     * getTypeInt() returns '6' = To be used for sources.
      */
     SOURCE( FeatureType.SOURCE_INT, FeatureType.SOURCE_STRING ),
     /**
-     * getType() returns '7' = To be used for tRNAs.
+     * getTypeInt() returns '7' = To be used for tRNAs.
      */
     TRNA( FeatureType.TRNA_INT, FeatureType.TRNA_STRING ),
     /**
-     * getType() returns '8' = To be used for genes.
+     * getTypeInt() returns '8' = To be used for genes.
      */
     GENE( FeatureType.GENE_INT, FeatureType.GENE_STRING ),
     /**
-     * getType() returns '9' = To be used for micro RNAs.
+     * getTypeInt() returns '9' = To be used for micro RNAs.
      */
     MIRNA( FeatureType.MIRNA_INT, FeatureType.MIRNA_STRING ),
     /**
-     * getType() returns '10' = To be used for exons.
+     * getTypeInt() returns '10' = To be used for exons.
      */
     EXON( FeatureType.EXON_INT, FeatureType.EXON_STRING ),
     /**
-     * getType() returns '11' = To be used for introns.
+     * getTypeInt() returns '11' = To be used for introns.
      */
     INTRON( FeatureType.INTRON_INT, FeatureType.INTRON_STRING ),
     /**
-     * getType() returns '29' = To be used for five prime untranslated region.
+     * getTypeInt() returns '29' = To be used for five prime untranslated region.
      */
     FIVE_UTR( FeatureType.FIVE_UTR_INT, FeatureType.FIVE_UTR_STRING ),
     /**
-     * getType() returns '30' = To be used for three prime untranslated region.
+     * getTypeInt() returns '30' = To be used for three prime untranslated region.
      */
     THREE_UTR( FeatureType.THREE_UTR_INT, FeatureType.THREE_UTR_STRING ),
     /**
-     * getType() returns '31' = To be used for non coding RNAs.
+     * getTypeInt() returns '31' = To be used for non coding RNAs.
      */
     NC_RNA( FeatureType.NC_RNA_INT, FeatureType.NC_RNA_STRING ),
     /**
-     * getType() returns '32' = To be used for minus 35 region.
+     * getTypeInt() returns '32' = To be used for minus 35 region.
      */
     MINUS_THIRTYFIVE( FeatureType.MINUS_THIRTYFIVE_INT, FeatureType.MINUS_THIRTYFIVE_STRING ),
     /**
-     * getType() returns '33' = To be used for minus 10 region.
+     * getTypeInt() returns '33' = To be used for minus 10 region.
      */
     MINUS_TEN( FeatureType.MINUS_TEN_INT, FeatureType.MINUS_TEN_STRING ),
     /**
-     * getType() returns '34' = To be used for ribosome binding sides.
+     * getTypeInt() returns '34' = To be used for ribosome binding sides.
      */
     RBS( FeatureType.RBS_INT, FeatureType.RBS_STRING ),
     /**
-     * getType() returns '35' = To be used for start codon location.
+     * getTypeInt() returns '35' = To be used for start codon location.
      */
     START_CODON( FeatureType.START_CODON_INT, FeatureType.START_CODON_STRING ),
     /**
-     * getType() returns '36' = To be used for stop codon location.
+     * getTypeInt() returns '36' = To be used for stop codon location.
      */
     STOP_CODON( FeatureType.STOP_CODON_INT, FeatureType.STOP_CODON_STRING_UNDERSCORE ),
     /**
@@ -294,7 +294,7 @@ public enum FeatureType implements Classification {
      * @return the integer value of the type of the current feature.
      */
     @Override
-    public int getTypeByte() {
+    public int getTypeInt() {
         return this.typeInt;
     }
 

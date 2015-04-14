@@ -245,7 +245,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
                 rowData[i++] = feat.getType();
                 rowData[i++] = normalizationResult.getTrackEntry( normValue.getTrackId(), false );
                 rowData[i++] = normalizationResultNew.getChromosomeMap().get( feat.getChromId() );
-                rowData[i++] = feat.isFwdStrandString();
+                rowData[i++] = feat.getStrandString();
                 rowData[i++] = feat.getStartOnStrand();
                 rowData[i++] = feat.getStopOnStrand();
                 rowData[i++] = feat.getLength();

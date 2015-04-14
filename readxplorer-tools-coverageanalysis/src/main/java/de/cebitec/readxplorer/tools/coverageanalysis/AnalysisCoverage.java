@@ -23,8 +23,7 @@ import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,19 +117,19 @@ public class AnalysisCoverage implements Observer,
         /* check temp intervals at first, which might be elongated by the new
          * result */
         int chromId = coverageResult.getRequest().getChromId();
-        byte strandFwdOrBoth = this.parameters.isSumCoverageOfBothStrands() ? Properties.STRAND_BOTH : SequenceUtils.STRAND_FWD;
+        Strand strand = this.parameters.isSumCoverageOfBothStrands() ? Strand.Both : Strand.Forward;
 
-        CoverageInterval overlapIntervalSumOrFwdStart = new CoverageInterval( connector.getTrackID(), chromId, strandFwdOrBoth );
-        CoverageInterval overlapIntervalRevStart = new CoverageInterval( connector.getTrackID(), chromId, SequenceUtils.STRAND_REV );
-        CoverageInterval overlapIntervalSumOrFwdEnd = new CoverageInterval( connector.getTrackID(), chromId, strandFwdOrBoth );
-        CoverageInterval overlapIntervalRevEnd = new CoverageInterval( connector.getTrackID(), chromId, SequenceUtils.STRAND_REV );
+        CoverageInterval overlapIntervalSumOrFwdStart = new CoverageInterval( connector.getTrackID(), chromId, strand );
+        CoverageInterval overlapIntervalRevStart = new CoverageInterval( connector.getTrackID(), chromId, Strand.Reverse );
+        CoverageInterval overlapIntervalSumOrFwdEnd = new CoverageInterval( connector.getTrackID(), chromId, strand );
+        CoverageInterval overlapIntervalRevEnd = new CoverageInterval( connector.getTrackID(), chromId, Strand.Reverse );
         CoverageInterval currentTempInterval;
         int startPos = coverageResult.getRequest().getFrom();
         for( CoverageInterval tempInterval : tempIntervals ) {
             currentTempInterval = tempInterval;
             if( startPos - 1 == currentTempInterval.getStop() && currentTempInterval.getChromId() == chromId ) {
-                if( currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_BOTH_STRING ) ||
-                    currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_FWD_STRING ) ) {
+                if( currentTempInterval.getStrandString().equals( Strand.Both.toString() ) ||
+                    currentTempInterval.getStrandString().equals( Strand.Forward.toString() ) ) {
 
                     overlapIntervalSumOrFwdStart = tempInterval;
 
@@ -139,8 +138,8 @@ public class AnalysisCoverage implements Observer,
                 }
             }
             if( coverageResult.getRequest().getTo() + 1 == currentTempInterval.getStart() ) {
-                if( currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_BOTH_STRING ) ||
-                    currentTempInterval.getStrandString().equals( SequenceUtils.STRAND_FWD_STRING ) ) {
+                if( currentTempInterval.getStrandString().equals( Strand.Both.toString() ) ||
+                    currentTempInterval.getStrandString().equals( Strand.Forward.toString() ) ) {
 
                     overlapIntervalSumOrFwdEnd = tempInterval;
 
@@ -151,10 +150,10 @@ public class AnalysisCoverage implements Observer,
         }
 
         this.calculateIntervals( chromId, overlapIntervalSumOrFwdStart, overlapIntervalSumOrFwdEnd, coverageArraySumOrFwd,
-                                 strandFwdOrBoth, coverageResult.getRequest().getFrom(), intervalsSumOrFwd );
+                                 strand, coverageResult.getRequest().getFrom(), intervalsSumOrFwd );
         if( !this.parameters.isSumCoverageOfBothStrands() ) {
             this.calculateIntervals( chromId, overlapIntervalRevStart, overlapIntervalRevEnd, coverageArrayRev,
-                                     SequenceUtils.STRAND_REV, coverageResult.getRequest().getFrom(), intervalsRev );
+                                     Strand.Reverse, coverageResult.getRequest().getFrom(), intervalsRev );
         }
 
         intervalContainer.setIntervalsSumOrFwd( intervalsSumOrFwd );
@@ -177,7 +176,7 @@ public class AnalysisCoverage implements Observer,
      * @param intervalListToAddTo the interval list, to which detected intervals
      *                            shall be added
      */
-    private void calculateIntervals( int chromId, CoverageInterval currentInterval, CoverageInterval tempEndInterval, int[] coverageArray, byte strand,
+    private void calculateIntervals( int chromId, CoverageInterval currentInterval, CoverageInterval tempEndInterval, int[] coverageArray, Strand strand,
                                      int refIntervalStart, List<CoverageInterval> intervalListToAddTo ) {
 
         int summedCoverage = 0;
@@ -299,7 +298,7 @@ public class AnalysisCoverage implements Observer,
     public void finishAnalysis() {
         //add all remaining temp intervals to results, but only, if this is the last data package
         for( CoverageInterval interval : tempIntervals ) {
-            if( interval.getStrandString().equals( SequenceUtils.STRAND_REV_STRING ) ) {
+            if( interval.getStrandString().equals( Strand.Reverse.toString() ) ) {
                 intervalsRev.add( interval );
             } else {
                 intervalsSumOrFwd.add( interval );

@@ -35,7 +35,7 @@ public interface Classification {
     /**
      * @return The integer value associated with this Classification.
      */
-    int getTypeByte();
+    int getTypeInt();
 
 
 }

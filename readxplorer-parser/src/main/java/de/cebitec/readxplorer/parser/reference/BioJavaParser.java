@@ -31,7 +31,7 @@ import de.cebitec.readxplorer.utils.ErrorLimit;
 import de.cebitec.readxplorer.utils.FastaUtils;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.BufferedReader;
 import java.io.File;
@@ -183,10 +183,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         final RichFeature richFeature = (RichFeature) feature;
                         Location location = richFeature.getLocation();
 
-                        final int strand;
+                        final Strand strand;
                         final String parsedType = richFeature.getType();
                         try {
-                            strand = richFeature.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                            strand = richFeature.getStrand().equals( StrandedFeature.POSITIVE ) ? Strand.Forward : Strand.Reverse;
                         } catch( IllegalStateException e ) {
                             this.sendMsgIfAllowed( e.getMessage() );
                             continue;
@@ -245,7 +245,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 //                        while (subFeatureIt.hasNext()) {
 //
 //                            RichFeature subFeature = subFeatureIt.next();
-//                            type = FeatureType.getFeatureType(subFeature.getType());
+//                            type = FeatureType.getFeatureType(subFeature.getTypeInt());
 //
 //                            subStart = subFeature.getLocation().getMin();
 //                            subStop = subFeature.getLocation().getMax();

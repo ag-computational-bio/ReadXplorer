@@ -156,7 +156,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
             normRow.add( feat.getType() );
             normRow.add( getTrackEntry( normValue.getTrackId(), true ) );
             normRow.add( getChromosomeMap().get( feat.getChromId() ) );
-            normRow.add( feat.isFwdStrandString() );
+            normRow.add( feat.getStrandString() );
             normRow.add( feat.getStartOnStrand() );
             normRow.add( feat.getStopOnStrand() );
             normRow.add( feat.getLength() );

@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -215,7 +215,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 
                         int start = gffr.getStart();
                         int stop = gffr.getEnd();
-                        int strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                        Strand strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? Strand.Forward : Strand.Reverse;
                         ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand,
                                 locusTag, product, ecNumber, geneName, null, parentIds, identifier );
                         currentChrom.addFeature( currentFeature );

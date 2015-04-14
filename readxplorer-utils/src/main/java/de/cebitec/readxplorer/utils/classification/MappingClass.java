@@ -55,11 +55,11 @@ public enum MappingClass implements Classification {
      */
     COMMON_MATCH( MappingClass.COMMON_MATCH_BYTE, MappingClass.COMMON_MATCH_STRING );
 
-    private static final byte PERFECT_MATCH_BYTE = 1;
-    private static final byte BEST_MATCH_BYTE = 2;
-    private static final byte COMMON_MATCH_BYTE = 3;
-    private static final byte SINGLE_PERFECT_MATCH_BYTE = 4;
-    private static final byte SINGLE_BEST_MATCH_BYTE = 5;
+    private static final int PERFECT_MATCH_BYTE = 1;
+    private static final int BEST_MATCH_BYTE = 2;
+    private static final int COMMON_MATCH_BYTE = 3;
+    private static final int SINGLE_PERFECT_MATCH_BYTE = 4;
+    private static final int SINGLE_BEST_MATCH_BYTE = 5;
 
     private static final String PERFECT_MATCH_STRING = "Perfect Match";
     private static final String BEST_MATCH_STRING = "Best Match";
@@ -67,12 +67,12 @@ public enum MappingClass implements Classification {
     private static final String SINGLE_PERFECT_MATCH_STRING = "Single Perfect Match";
     private static final String SINGLE_BEST_MATCH_STRING = "Single Best Match";
 
-    private final byte typeByte;
+    private final int typeInt;
     private final String typeString;
 
 
-    private MappingClass( byte typeByte, String typeString ) {
-        this.typeByte = typeByte;
+    private MappingClass( int typeInt, String typeString ) {
+        this.typeInt = typeInt;
         this.typeString = typeString;
     }
 
@@ -92,8 +92,8 @@ public enum MappingClass implements Classification {
      * classification.
      */
     @Override
-    public int getTypeByte() {
-        return this.typeByte;
+    public int getTypeInt() {
+        return this.typeInt;
     }
 
 
@@ -115,8 +115,8 @@ public enum MappingClass implements Classification {
      * classification type or is <code>null</code>, MappingClass.COMMON_MATCH is
      * returned.
      */
-    public static MappingClass getFeatureType( Byte type ) {
-        if( type == null ) {
+    public static MappingClass getFeatureType( int type ) {
+        if( type == 0 ) {
             return COMMON_MATCH;
         }
         switch( type ) {

@@ -37,6 +37,10 @@ Please, have a look at CommandLineProcessor's JavaDoc for further information.</
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-databackend</artifactId>
         </dependency>
         <dependency>

@@ -129,7 +129,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add( feature.toString() );
             coveredFeatureRow.add( this.getTrackEntry( coveredFeature.getTrackId(), true ) );
             coveredFeatureRow.add( this.getChromosomeMap().get( feature.getChromId() ) );
-            coveredFeatureRow.add( feature.isFwdStrandString() );
+            coveredFeatureRow.add( feature.getStrandString() );
             coveredFeatureRow.add( feature.getStartOnStrand() );
             coveredFeatureRow.add( feature.getStopOnStrand() );
             coveredFeatureRow.add( feature.getLength() );

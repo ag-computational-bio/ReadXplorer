@@ -39,8 +39,8 @@ import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.api.enums.Strand;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -343,18 +343,18 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 
                 SAMRecord record1 = diffMap1.keySet().iterator().next();
                 SAMRecord record2 = diffMap2.keySet().iterator().next();
-                byte direction = record1.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                Strand direction = record1.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                 int start1 = record1.getAlignmentStart();
                 int stop1 = record1.getAlignmentEnd();
 
                 int start2 = record2.getAlignmentStart();
                 int stop2 = record2.getAlignmentEnd();
-                byte direction2 = record2.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                Strand direction2 = record2.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                 //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
 
-                boolean case1 = direction == orient1 && start1 <= start2;
-                if( (case1 || direction == -orient1 && start2 <= start1) &&
-                    direction == dir * direction2 ) {
+                boolean case1 = direction.getType() == orient1 && start1 <= start2;
+                if( (case1 || direction.getType() == -orient1 && start2 <= start1) &&
+                    direction.getType() == dir * direction2.getType() ) {
 
                     //determine insert size between both reads
                     int currDist;
@@ -401,7 +401,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     int diffs1 = entry.getValue();
 
                     try {
-                        byte direction = recordA.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                        Strand direction = recordA.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                         int start1 = recordA.getAlignmentStart();
                         int stop1 = recordA.getAlignmentEnd();
 
@@ -413,13 +413,13 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                 if( !(omitList.contains( recordA ) && omitList.contains( recordB )) ) {
                                     int start2 = recordB.getAlignmentStart();
                                     int stop2 = recordB.getAlignmentEnd();
-                                    byte direction2 = recordB.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                                    Strand direction2 = recordB.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
 
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
-                                    boolean case1 = direction == orient1 && start1 < start2;
-                                    if( (case1 || direction == -orient1 && start2 < start1) &&
-                                        direction == dir * direction2 ) { //direction fits
+                                    boolean case1 = direction.getType() == orient1 && start1 < start2;
+                                    if( (case1 || direction.getType() == -orient1 && start2 < start1) &&
+                                        direction.getType() == dir * direction2.getType() ) { //direction fits
 
                                         //determine insert size between both reads
                                         int currDist;

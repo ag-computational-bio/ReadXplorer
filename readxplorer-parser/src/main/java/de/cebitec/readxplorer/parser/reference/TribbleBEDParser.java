@@ -25,7 +25,6 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class TribbleBEDParser implements ReferenceParserI {
 
                         final int start = feat.getStart();
                         final int stop = feat.getEnd();
-                        final int strand = feat.getStrand().equals( Strand.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                        final de.cebitec.readxplorer.api.enums.Strand strand = feat.getStrand().equals( Strand.POSITIVE ) ? de.cebitec.readxplorer.api.enums.Strand.Forward : de.cebitec.readxplorer.api.enums.Strand.Reverse;
                         final String geneName = feat.getName();
                         final String locusTag = feat.getDescription();
                         final String ecNumber = feat.getDescription(); //TODO check this and test it

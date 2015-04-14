@@ -56,7 +56,7 @@ public enum TotalCoverage implements Classification {
      * @return the byte value of the type of the total coverage.
      */
     @Override
-    public int getTypeByte() {
+    public int getTypeInt() {
         return this.typeByte;
     }
 

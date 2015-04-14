@@ -616,13 +616,13 @@ public final class ProjectConnector extends Observable {
                     batchCounter++;
                     insertFeature.setLong( 1, feature.getId() );
                     insertFeature.setString( 3, feature.getParentIdsConcat() );
-                    insertFeature.setInt( 4, feature.getType().getTypeByte() );
+                    insertFeature.setInt( 4, feature.getType().getTypeInt() );
                     insertFeature.setInt( 5, feature.getStart() );
                     insertFeature.setInt( 6, feature.getStop() );
                     insertFeature.setString( 7, feature.getLocusTag() );
                     insertFeature.setString( 8, feature.getProduct() );
                     insertFeature.setString( 9, feature.getEcNumber() );
-                    insertFeature.setInt( 10, feature.getStrand() );
+                    insertFeature.setInt( 10, feature.getStrand().getType() );
                     insertFeature.setString( 11, feature.getGeneName() );
                     insertFeature.addBatch();
 

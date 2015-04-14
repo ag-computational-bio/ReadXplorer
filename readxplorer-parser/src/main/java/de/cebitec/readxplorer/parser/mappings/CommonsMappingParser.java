@@ -27,6 +27,7 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -293,7 +294,7 @@ public final class CommonsMappingParser {
      * <p>
      * @return the diff and gap result for the read
      */
-    public static DiffAndGapResult createDiffsAndGaps( String readSeq, String refSeq, int start, final byte direction ) {
+    public static DiffAndGapResult createDiffsAndGaps( String readSeq, String refSeq, int start, final Strand direction ) {
 
         final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
         final List<ParsedDiff> diffs = new ArrayList<>();
@@ -306,7 +307,7 @@ public final class CommonsMappingParser {
             if( readSeq.charAt( i ) != refSeq.charAt( i ) ) {
                 errors++;
                 char base = readSeq.charAt( i );
-                if( direction == SequenceUtils.STRAND_REV ) {
+                if( direction == Strand.Reverse ) {
                     base = SequenceUtils.getDnaComplement( base );
                 }
                 if( refSeq.charAt( i ) == '_' ) {
@@ -528,7 +529,7 @@ public final class CommonsMappingParser {
             final int refSeqLength,
             final int start,
             final int stop,
-            final int direction,
+            final Strand direction,
             final String filename,
             final int lineNo ) {
 
@@ -542,7 +543,7 @@ public final class CommonsMappingParser {
             parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadname( filename, lineNo, readname ) );
             isConsistent = false;
         }
-        if( direction == 0 ) {
+        if( direction == Strand.Both ) {
             parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorDirectionJok( filename, lineNo ) );
             isConsistent = false;
         }
@@ -840,20 +841,20 @@ public final class CommonsMappingParser {
 
             if( differences == 0 ) { //perfect mapping
                 if( sameMismatchCount == 1 ) {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.SINGLE_PERFECT_MATCH.getTypeByte() );
+                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.SINGLE_PERFECT_MATCH.getTypeInt() );
                 } else {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.PERFECT_MATCH.getTypeByte() );
+                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.PERFECT_MATCH.getTypeInt() );
                 }
 
             } else if( differences == lowestDiffRate ) { //best match mapping
                 if( sameMismatchCount == 1 ) {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.SINGLE_BEST_MATCH.getTypeByte() );
+                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.SINGLE_BEST_MATCH.getTypeInt() );
                 } else {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.BEST_MATCH.getTypeByte() );
+                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.BEST_MATCH.getTypeInt() );
                 }
 
             } else if( differences > lowestDiffRate ) { //common mapping
-                record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.COMMON_MATCH.getTypeByte() );
+                record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.COMMON_MATCH.getTypeInt() );
 
             } else { //meaning: differences < lowestDiffRate
                 throw new AssertionError( "Cannot contain less than the lowest diff rate number of differences!" );

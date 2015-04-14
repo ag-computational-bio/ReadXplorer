@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.parser.common;
 
 
 import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ import java.util.List;
  */
 public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
-    private Integer start;
-    private Integer stop;
-    private Integer strand;
+    private int start;
+    private int stop;
+    private Strand strand;
     private String locusTag;
     private String product;
     private String ecNumber;
@@ -64,7 +65,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @param parentIds the ids of the features to which the current feature
      * belongs
      */
-    public ParsedFeature( FeatureType type, int start, int stop, int strand, String locusTag, String product,
+    public ParsedFeature( FeatureType type, int start, int stop, Strand strand, String locusTag, String product,
             String ecNumber, String geneName, List<ParsedFeature> subFeatures, List<String> parentIds ) {
         super( type, null ); // if type is null, 0 is assumed, which is equal to FeatureType.UNDEFINED
         this.start = start;
@@ -74,8 +75,8 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
         this.product = product;
         this.ecNumber = ecNumber;
         this.geneName = geneName;
-        this.subFeatures = subFeatures != null ? subFeatures : new ArrayList<ParsedFeature>();
-        this.parentIds = parentIds != null ? parentIds : new ArrayList<String>();
+        this.subFeatures = subFeatures != null ? subFeatures : new ArrayList<>();
+        this.parentIds = parentIds != null ? parentIds : new ArrayList<>();
     }
 
 
@@ -98,7 +99,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * belongs
      * @param identifier unique identifier of this feature in this data set
      */
-    public ParsedFeature( FeatureType type, int start, int stop, int strand, String locusTag, String product,
+    public ParsedFeature( FeatureType type, int start, int stop, Strand strand, String locusTag, String product,
             String ecNumber, String geneName, List<ParsedFeature> subFeatures, List<String> parentIds, String identifier ) {
         this( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, parentIds );
         this.identifier = identifier;
@@ -112,7 +113,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @param identifier unique identifier of this feature in this data set
      */
     public ParsedFeature( String identifier ) {
-        this( null, 0, 0, 0, null, null, null, null, null, null, identifier );
+        this( null, 0, 0, Strand.Both, null, null, null, null, null, null, identifier );
         this.identifier = identifier;
     }
 
@@ -205,7 +206,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @return true, if it has strand information, false otherwise
      */
     public boolean hasStrand() {
-        return strand != null && strand != 0;
+        return strand != null && strand.getType() != 0;
     }
 
 
@@ -213,7 +214,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
      * @return SequenceUtils.STRAND_FWD for featues on forward and
      *         SequenceUtils.STRAND_REV on reverse strand
      */
-    public int getStrand() {
+    public Strand getStrand() {
         return strand;
     }
 

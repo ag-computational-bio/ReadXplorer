@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SamUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -179,16 +179,16 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                                 continue; //*'s are ignored = unmapped read
                             }
 
-                            final byte direction;
+                            final Strand direction;
                             switch( tokens[3] ) {
                                 case ">>":
-                                    direction = SequenceUtils.STRAND_FWD;
+                                    direction = Strand.Forward;
                                     break;
                                 case "<<":
-                                    direction = SequenceUtils.STRAND_REV;
+                                    direction = Strand.Reverse;
                                     break;
                                 default:
-                                    direction = 0;
+                                    direction = Strand.Both;
                             }
                             String readSeq = tokens[4];
                             String refSeq = tokens[5];
@@ -210,7 +210,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             SAMRecord samRecord = new SAMRecord( fileHeader );
                             samRecord.setReadName( readName );
 
-                            samRecord.setReadNegativeStrandFlag( direction != 1 ); //needed or set with flags?
+                            samRecord.setReadNegativeStrandFlag( direction != Strand.Forward ); //needed or set with flags?
                             samRecord.setReadUnmappedFlag( false ); //only mapped reads in jok??
 
                             samRecord.setReferenceName( this.refSeqName );
