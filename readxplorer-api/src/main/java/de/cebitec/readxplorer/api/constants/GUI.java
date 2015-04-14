@@ -45,7 +45,7 @@ public final class GUI {
      */
     public static final int MIN_HEIGHT = 120;
 
-    
+
     /**
      * Property for auto scaling of viewers.
      */

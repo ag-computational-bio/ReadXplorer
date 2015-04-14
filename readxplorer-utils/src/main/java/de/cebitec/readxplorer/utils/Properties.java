@@ -57,49 +57,6 @@ public final class Properties {
     public static final String READXPLORER_FILECHOOSER_DIRECTORY = "readXplorerFileChooser.Directory";
     public static final String READXPLORER_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
 
-    //Properties to set different viewers active
-    public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
-    public static final String PROP_HISTOGRAM_VIEWER = "HistogramViewerActive";
-    public static final String PROP_ALIGNMENT_VIEWER = "AlignmentViewerActive";
-    public static final String PROP_READ_PAIR_VIEWER = "ReadPairViewerActive";
-
-    public static final byte NONE = -1;
-    public static final byte BOTH = 0;
-    public static final byte READ_PAIRS = 1;
-    public static final byte SINGLE_MAPPINGS = 2;
-
-    /**
-     * Standard value, if all data is needed (0).
-     */
-    public static final byte NORMAL = 0;
-
-    /**
-     * Value for diffs (5).
-     */
-    public static final byte DIFFS = 5;
-    /**
-     * Value for mappings sorted by id (6).
-     */
-    public static final byte MAPPINGS_DB_BY_ID = 6;
-    /**
-     * Value for mappings without diffs (7).
-     */
-    public static final byte MAPPINGS_WO_DIFFS = 7;
-    /**
-     * kasterm: Value for all reduced mappings (8).
-     */
-    public static final byte REDUCED_MAPPINGS = 8;
-    /**
-     * Value for obtaining read starts instead of coverage (9).
-     */
-    public static final byte READ_STARTS = 9;
-    /**
-     * Value for viewing all mappings as if they came from the fwd. strand (10).
-     * This should only be used in combination with {@link STRAND_BOTH} to
-     * infer, if all mappings shall be treated as if the came from the fwd. or
-     * the rev. strand ()
-     */
-    public static final byte STRAND_FWD_ANALYSIS = 10;
 
     /**
      * Value for read start distribution = 5.

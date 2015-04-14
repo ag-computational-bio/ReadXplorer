@@ -19,6 +19,7 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 
 
 import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -29,7 +30,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.AnalysisUnannotatedTransStar
 import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetTSS;
 import de.cebitec.readxplorer.transcriptionanalyses.TssDetectionResult;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.io.File;
 import java.io.IOException;
@@ -110,7 +110,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             AnalysesHandler analysisHandler = new AnalysesHandler( trackConnector, threadingHelper, "", parameterSet.getReadClassParams() );
                 analysisHandler.registerObserver( analysisTSS );
                 analysisHandler.setCoverageNeeded( true );
-                analysisHandler.setDesiredData( Properties.READ_STARTS );
+                analysisHandler.setDesiredData( IntervalRequestData.ReadStarts );
                 analysisHandler.startAnalysis();
 
             threadingHelper.join(); // blocks until analysisHandler finishes its job

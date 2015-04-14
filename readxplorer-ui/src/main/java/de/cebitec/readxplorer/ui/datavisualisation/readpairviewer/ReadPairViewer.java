@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.ThreadListener;
@@ -34,7 +35,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayoutI;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -177,7 +177,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses( excludedFeatureTypes, new Byte( "0" ) );
         trackConnector.addMappingRequest( new IntervalRequest( from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false,
-                                                               Properties.READ_PAIRS, Byte.valueOf( "0" ), readClassParams ) );
+                                                               IntervalRequestData.ReadPairs, IntervalRequestData.Normal, readClassParams ) );
         this.oldLogLeft = from;
         this.oldLogRight = to;
     }

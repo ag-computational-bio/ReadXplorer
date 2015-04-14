@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
@@ -31,7 +32,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalyses
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -294,21 +294,21 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             }
             covAnalysisHandler.registerObserver( analysisTSS );
             covAnalysisHandler.setCoverageNeeded( true );
-            covAnalysisHandler.setDesiredData( Properties.READ_STARTS );
+            covAnalysisHandler.setDesiredData( IntervalRequestData.ReadStarts );
         }
         if( parametersOperonDet.isPerformOperonAnalysis() ) {
             analysisOperon = new AnalysisOperon( connector, parametersOperonDet );
 
             mappingAnalysisHandler.registerObserver( analysisOperon );
             mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
+            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
         if( parametersNormalization.isPerformNormAnalysis() ) {
             analysisNormalization = new AnalysisNormalization( connector, parametersNormalization );
 
             mappingAnalysisHandler.registerObserver( analysisNormalization );
             mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
+            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
 
         trackToAnalysisMap.put( connector.getTrackID(), new AnalysisContainer( analysisTSS, analysisOperon, analysisNormalization ) );

@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
-import de.cebitec.readxplorer.utils.Properties;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -63,7 +63,7 @@ public class MappingThreadAnalyses extends MappingThread {
             IntervalRequest request = requestQueue.poll();
             List<Mapping> currentMappings;
             if( request != null ) {
-                if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
+                if( request.getDesiredData() == IntervalRequestData.ReducedMappings ) {
                     currentMappings = this.loadReducedMappings( request );
                 } else {
                     currentMappings = this.loadMappings( request );

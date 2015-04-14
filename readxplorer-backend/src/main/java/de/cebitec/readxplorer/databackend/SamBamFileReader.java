@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.databackend.dataobjects.DiffAndGapResult;
@@ -499,7 +500,7 @@ public class SamBamFileReader implements Observable, Observer {
      */
     public CoverageAndDiffResult getCoverageAndReadStartsFromBam( IntervalRequest request ) {
 
-        byte trackNeeded = request.getWhichTrackNeeded();
+        IntervalRequestData trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         ParametersReadClasses readClassParams = request.getReadClassParams();
