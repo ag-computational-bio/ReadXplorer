@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils;
+package de.cebitec.readxplorer.api.constants;
 
 
 import java.awt.Color;
@@ -26,12 +26,12 @@ import java.awt.Color;
  * <p>
  * @author ddoppmeier, rhilker
  */
-public final class ColorProperties {
+public final class Colors {
 
     /**
      * Private constructor so this utility class can not be instantiated.
      */
-    private ColorProperties() {
+    private Colors() {
     }
 
 

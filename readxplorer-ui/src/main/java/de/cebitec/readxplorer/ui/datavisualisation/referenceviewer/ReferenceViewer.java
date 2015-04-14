@@ -27,7 +27,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
@@ -271,7 +271,7 @@ public class ReferenceViewer extends AbstractViewer {
         Graphics2D g = (Graphics2D) graphics;
 
         // draw lines for frames
-        g.setColor( ColorProperties.TRACKPANEL_SCALE_LINES );
+        g.setColor(Colors.TRACKPANEL_SCALE_LINES );
         this.drawScales( g );
     }
 

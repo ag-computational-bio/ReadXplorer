@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.options;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.ComparisonClass;
@@ -350,7 +350,7 @@ final class ColorsPanel extends OptionsPanel {
             }
         });
 
-        backgroundColorPanel.setBackground( ColorProperties.BACKGROUND_COLOR );
+        backgroundColorPanel.setBackground(Colors.BACKGROUND_COLOR );
         backgroundColorPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         backgroundColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
 
@@ -558,16 +558,16 @@ final class ColorsPanel extends OptionsPanel {
     }//GEN-LAST:event_singleBestColorButtonActionPerformed
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
-        perfectColorPanel.setBackground( ColorProperties.PERFECT_MATCH );
-        bestColorPanel.setBackground( ColorProperties.BEST_MATCH );
-        commonColorPanel.setBackground( ColorProperties.COMMON_MATCH );
-        singlePerfectColorPanel.setBackground( ColorProperties.PERFECT_MATCH_SINGLE );
-        singleBestColorPanel.setBackground( ColorProperties.BEST_MATCH_SINGLE );
+        perfectColorPanel.setBackground(Colors.PERFECT_MATCH );
+        bestColorPanel.setBackground(Colors.BEST_MATCH );
+        commonColorPanel.setBackground(Colors.COMMON_MATCH );
+        singlePerfectColorPanel.setBackground(Colors.PERFECT_MATCH_SINGLE );
+        singleBestColorPanel.setBackground(Colors.BEST_MATCH_SINGLE );
         uniformColorPanel.setBackground( Color.BLUE );
-        differenceColorPanel.setBackground( ColorProperties.COV_DIFF_COLOR );
-        track1ColorPanel.setBackground( ColorProperties.TRACK1_COLOR );
-        track2ColorPanel.setBackground( ColorProperties.TRACK2_COLOR );
-        backgroundColorPanel.setBackground( ColorProperties.BACKGROUND_COLOR );
+        differenceColorPanel.setBackground(Colors.COV_DIFF_COLOR );
+        track1ColorPanel.setBackground(Colors.TRACK1_COLOR );
+        track2ColorPanel.setBackground(Colors.TRACK2_COLOR );
+        backgroundColorPanel.setBackground(Colors.BACKGROUND_COLOR );
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void differenceColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_differenceColorButtonActionPerformed
@@ -599,10 +599,10 @@ final class ColorsPanel extends OptionsPanel {
             classToPanelMap.get( classType ).setBackground( classToColorMap.get( classType ) );
         }
 
-        updatePanelColor( ColorProperties.UNIFORM_COLOR_STRING, Color.BLUE, uniformColorPanel );
-        updatePanelColor( ColorProperties.BACKGROUND_COLOR_STRING, ColorProperties.BACKGROUND_COLOR, backgroundColorPanel );
+        updatePanelColor(Colors.UNIFORM_COLOR_STRING, Color.BLUE, uniformColorPanel );
+        updatePanelColor(Colors.BACKGROUND_COLOR_STRING, Colors.BACKGROUND_COLOR, backgroundColorPanel );
 
-        uniformColorationCheckBox.setSelected( this.pref.getBoolean( ColorProperties.UNIFORM_DESIRED, false ) );
+        uniformColorationCheckBox.setSelected(this.pref.getBoolean(Colors.UNIFORM_DESIRED, false ) );
     }
 
 
@@ -627,9 +627,9 @@ final class ColorsPanel extends OptionsPanel {
     @Override
     void store() {
         // store modified settings
-        this.pref.putBoolean( ColorProperties.UNIFORM_DESIRED, uniformColorationCheckBox.isSelected() );
-        this.pref.put( ColorProperties.UNIFORM_COLOR_STRING, Integer.toString( uniformColorPanel.getBackground().getRGB() ) );
-        this.pref.put( ColorProperties.BACKGROUND_COLOR_STRING, Integer.toString( backgroundColorPanel.getBackground().getRGB() ) );
+        this.pref.putBoolean(Colors.UNIFORM_DESIRED, uniformColorationCheckBox.isSelected() );
+        this.pref.put(Colors.UNIFORM_COLOR_STRING, Integer.toString( uniformColorPanel.getBackground().getRGB() ) );
+        this.pref.put(Colors.BACKGROUND_COLOR_STRING, Integer.toString( backgroundColorPanel.getBackground().getRGB() ) );
 
         for( Classification classType : classToPanelMap.keySet() ) {
             this.storeColor( classType );

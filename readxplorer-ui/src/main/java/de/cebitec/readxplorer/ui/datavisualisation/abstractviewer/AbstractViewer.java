@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.LogicalBoundsListener;
 import de.cebitec.readxplorer.ui.datavisualisation.MousePositionListener;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -226,12 +226,12 @@ public abstract class AbstractViewer extends JPanel implements
      * {@link de.cebitec.readxplorer.utils.ColorProperties#BACKGROUND_COLOR}
      */
     private void setBackgroundColor() {
-        String colorRGB = pref.get( ColorProperties.BACKGROUND_COLOR_STRING, "" );
+        String colorRGB = pref.get(Colors.BACKGROUND_COLOR_STRING, "" );
         Color backgroundColor;
         if( !colorRGB.isEmpty() ) {
             backgroundColor = new Color( Integer.parseInt( colorRGB ) );
         } else {
-            backgroundColor = ColorProperties.BACKGROUND_COLOR;
+            backgroundColor = Colors.BACKGROUND_COLOR;
         }
         this.setBackground( backgroundColor );
     }
@@ -885,7 +885,7 @@ public abstract class AbstractViewer extends JPanel implements
     private void paintCurrentCenterPosition( Graphics g ) {
         PhysicalBaseBounds coords = getPhysBoundariesForLogPos( getBoundsInfo().getCurrentLogPos() );
         PaintingAreaInfo info = this.getPaintingAreaInfo();
-        g.setColor( ColorProperties.CURRENT_POSITION );
+        g.setColor(Colors.CURRENT_POSITION );
         int width = (int) (coords.getPhysWidth() >= 1 ? coords.getPhysWidth() : 1);
         g.fillRect( (int) coords.getLeftPhysBound(), info.getForwardHigh(), width, info.getCompleteHeight() );
     }
@@ -910,7 +910,7 @@ public abstract class AbstractViewer extends JPanel implements
         super.paintComponent( graphics );
 
         if( isInDrawingMode() ) {
-            graphics.setColor( ColorProperties.MOUSEOVER );
+            graphics.setColor(Colors.MOUSEOVER );
             if( printMouseOver ) {
                 drawMouseCursor( graphics );
             }

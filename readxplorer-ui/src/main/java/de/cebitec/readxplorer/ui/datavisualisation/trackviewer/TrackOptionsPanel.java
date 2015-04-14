@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -69,7 +69,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     public TrackOptionsPanel( TrackViewer parentTrackViewer ) {
         this.trackViewer = parentTrackViewer;
         this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-        this.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        this.setBackground(Colors.LEGEND_BACKGROUND );
         this.initOtherComponents();
 
     }

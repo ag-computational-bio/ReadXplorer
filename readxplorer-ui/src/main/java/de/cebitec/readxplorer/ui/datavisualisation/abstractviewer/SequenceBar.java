@@ -27,7 +27,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.HighlightAreaListener;
 import de.cebitec.readxplorer.ui.datavisualisation.HighlightableI;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
@@ -182,7 +182,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         BoundsInfo bounds = parentViewer.getBoundsInfo();
         PaintingAreaInfo info = parentViewer.getPaintingAreaInfo();
 
-        g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+        g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
         this.drawSequence( g );
         // draw a line indicating the sequence
         g.draw( new Line2D.Double( info.getPhyLeft(), baseLineY, info.getPhyRight(), baseLineY ) );
@@ -203,9 +203,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
         //paint the hightlight rectangle if there is currently one
         if( this.highlightRect != null ) {
-            g.setColor( ColorProperties.HIGHLIGHT_BORDER );
+            g.setColor(Colors.HIGHLIGHT_BORDER );
             g.draw( this.highlightRect );
-            g.setColor( ColorProperties.HIGHLIGHT_FILL );
+            g.setColor(Colors.HIGHLIGHT_FILL );
             g.fill( this.highlightRect );
         }
     }

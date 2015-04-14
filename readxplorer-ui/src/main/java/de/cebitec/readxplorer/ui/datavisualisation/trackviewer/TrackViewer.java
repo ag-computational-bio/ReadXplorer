@@ -30,7 +30,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.classification.Classification;
@@ -181,9 +181,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     protected Map<Classification, Color> createColors( Preferences pref ) {
         Map<Classification, Color> newClassToColorMap = new HashMap<>();
-        boolean uniformColoration = pref.getBoolean( ColorProperties.UNIFORM_DESIRED, false );
+        boolean uniformColoration = pref.getBoolean(Colors.UNIFORM_DESIRED, false );
         if( uniformColoration ) {
-            String colorRGB = pref.get( ColorProperties.UNIFORM_COLOR_STRING, "" );
+            String colorRGB = pref.get(Colors.UNIFORM_COLOR_STRING, "" );
             if( !colorRGB.isEmpty() ) {
                 for( Classification classType : classList ) {
                     newClassToColorMap.put( classType, new Color( Integer.parseInt( colorRGB ) ) );
@@ -222,7 +222,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.paintCoverage( g );
 
         } else {
-            Color fillcolor = ColorProperties.TITLE_BACKGROUND;
+            Color fillcolor = Colors.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
             if( loadingIndicator != null ) {
@@ -232,11 +232,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         }
 
         // draw scales
-        g.setColor( ColorProperties.TRACKPANEL_SCALE_LINES );
+        g.setColor(Colors.TRACKPANEL_SCALE_LINES );
         this.createLines( this.scaleLineStep, g );
 
         // draw black middle lines
-        g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+        g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
         drawBaseLines( g );
     }
 

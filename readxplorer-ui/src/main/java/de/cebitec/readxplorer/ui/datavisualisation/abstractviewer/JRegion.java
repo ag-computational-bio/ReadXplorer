@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
 import de.cebitec.readxplorer.api.enums.RegionType;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -35,7 +35,7 @@ public class JRegion extends JComponent {
 
     private static final long serialVersionUID = 279564654;
 
-    private Color backgroundColor = ColorProperties.START_CODON;
+    private Color backgroundColor = Colors.START_CODON;
     private RegionType type = RegionType.Start;
     private final int genomeStart;
     private final int genomeStop;
@@ -49,11 +49,11 @@ public class JRegion extends JComponent {
         this.genomeStop = genomeStop;
 
         if( type == RegionType.Pattern ) {
-            this.backgroundColor = ColorProperties.PATTERN;
+            this.backgroundColor = Colors.PATTERN;
         } else if( type == RegionType.Stop ) {
-            this.backgroundColor = ColorProperties.STOP_CODON;
+            this.backgroundColor = Colors.STOP_CODON;
         } else if( type == RegionType.CDS ) {
-            this.backgroundColor = ColorProperties.HIGHLIGHT_FILL;
+            this.backgroundColor = Colors.HIGHLIGHT_FILL;
         } // else { //currently not needed, because start codon color already set.
     }
 

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.basepanel;
 
 
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -64,7 +64,7 @@ public final class LegendAndOptionsProvider {
     public static void createMappingQualityFilter( final AbstractViewer viewer, JPanel parentPanel ) {
         final JPanel optionPanel = new JPanel();
         optionPanel.setLayout( new BoxLayout( optionPanel, BoxLayout.X_AXIS ) );
-        optionPanel.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        optionPanel.setBackground(Colors.LEGEND_BACKGROUND );
         final JTextField minMappingQualityField = new JTextField( "0" );
         minMappingQualityField.setMinimumSize( new Dimension( 50, 20 ) );
         minMappingQualityField.setPreferredSize( new Dimension( 50, 20 ) );
@@ -112,7 +112,7 @@ public final class LegendAndOptionsProvider {
      */
     public static JPanel createPlaceholder() {
         JPanel placeholder = new JPanel();
-        placeholder.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        placeholder.setBackground(Colors.LEGEND_BACKGROUND );
         placeholder.setMinimumSize( new Dimension( 3, 20 ) );
         placeholder.setPreferredSize( new Dimension( 3, 20 ) );
         return placeholder;
@@ -123,24 +123,24 @@ public final class LegendAndOptionsProvider {
      * @param text      Text to place on the label.
      * @param fontStyle The font style, Font.PLAIN, Font.BOLD, Font.ITALIC, ...
      * <p>
-     * @return A label with ColorProperties.LEGEND_BACKGROUND background color
-     *         and font Arial in 11 with the given text.
+     * @return A label with Colors.LEGEND_BACKGROUND background color
+         and font Arial in 11 with the given text.
      */
     public static JLabel createLabel( String text, int fontStyle ) {
         final JLabel label = new JLabel( text );
-        label.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        label.setBackground(Colors.LEGEND_BACKGROUND );
         label.setFont( new Font( "Arial", fontStyle, 11 ) );
         return label;
     }
 
 
     /**
-     * @return A JPanel with ColorProperties.LEGEND_BACKGROUND background color
-     *         and a standard border layout.
+     * @return A JPanel with Colors.LEGEND_BACKGROUND background color
+         and a standard border layout.
      */
     public static JPanel createStandardPanel() {
         final JPanel panel = new JPanel( new BorderLayout() );
-        panel.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        panel.setBackground(Colors.LEGEND_BACKGROUND );
         return panel;
     }
 
@@ -148,12 +148,12 @@ public final class LegendAndOptionsProvider {
     /**
      * @param text The text to place on the check box
      * <p>
-     * @return A JCheckBox with ColorProperties.LEGEND_BACKGROUND background
-     *         color.
+     * @return A JCheckBox with Colors.LEGEND_BACKGROUND background
+         color.
      */
     public static JCheckBox createStandardCheckBox( String text ) {
         final JCheckBox checkBox = new JCheckBox( text );
-        checkBox.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        checkBox.setBackground(Colors.LEGEND_BACKGROUND );
         return checkBox;
     }
 
@@ -161,14 +161,14 @@ public final class LegendAndOptionsProvider {
     /**
      * @param model The model to set into the spinner.
      * <p>
-     * @return A JSpinner with ColorProperties.LEGEND_BACKGROUND background
-     *         color and an uneditable text field.
+     * @return A JSpinner with Colors.LEGEND_BACKGROUND background
+         color and an uneditable text field.
      */
     public static JSpinner createStandardSpinner( SpinnerModel model ) {
         final JSpinner spinner = new JSpinner( model );
         JFormattedTextField textField = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
         textField.setEditable( false );
-        spinner.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        spinner.setBackground(Colors.LEGEND_BACKGROUND );
         return spinner;
     }
 
@@ -178,8 +178,8 @@ public final class LegendAndOptionsProvider {
      * @param max       Maximum value of the slider.
      * @param initValue Initial value of the slider.
      * <p>
-     * @return A JSlider with ColorProperties.LEGEND_BACKGROUND background color
-     *         and a tick spacing of 1, tick labels and snapping to ticks.
+     * @return A JSlider with Colors.LEGEND_BACKGROUND background color
+         and a tick spacing of 1, tick labels and snapping to ticks.
      */
     public static JSlider createStandardSlider( int min, int max, int initValue ) {
         final JSlider slider = new JSlider( min, max, initValue );
@@ -187,7 +187,7 @@ public final class LegendAndOptionsProvider {
         slider.setPaintLabels( true );
         slider.setPaintTicks( true );
         slider.setSnapToTicks( true );
-        slider.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        slider.setBackground(Colors.LEGEND_BACKGROUND );
         return slider;
     }
 

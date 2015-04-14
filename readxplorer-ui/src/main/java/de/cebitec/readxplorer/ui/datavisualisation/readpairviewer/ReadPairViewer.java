@@ -34,7 +34,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayerI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayoutI;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.Benchmark;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -301,14 +301,14 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //        if (this.mappingsLoaded) {
 //
         if( isInDrawingMode() ) {
-            g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+            g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
             drawBaseLines( g );
         }
 ////            g.setColor(Color.black);
 //        }
 
         if( mappingsLoading ) {
-            Color fillcolor = ColorProperties.TITLE_BACKGROUND;
+            Color fillcolor = Colors.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
             if( loadingIndicator != null ) {

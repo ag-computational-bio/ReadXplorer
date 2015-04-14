@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.ComparisonClass;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
@@ -51,7 +52,7 @@ public final class ColorUtils {
      */
     public static Color getAdaptedColor( int currentValue, int maxValue, Color origColor ) {
         float[] hsbColorValues = Color.RGBtoHSB( origColor.getRed(), origColor.getGreen(), origColor.getBlue(), null );
-        float sAndB = ColorProperties.MIN_SATURATION_AND_BRIGTHNESS + currentValue * ColorUtils.getSaturationAndBrightnessPerUnit( maxValue );
+        float sAndB = Colors.MIN_SATURATION_AND_BRIGTHNESS + currentValue * ColorUtils.getSaturationAndBrightnessPerUnit( maxValue );
         return Color.getHSBColor( hsbColorValues[0], sAndB, sAndB );
     }
 
@@ -65,7 +66,7 @@ public final class ColorUtils {
      * @return The saturation and brigthness value of a color per given unit.
      */
     public static float getSaturationAndBrightnessPerUnit( int numberOfUnits ) {
-        return ColorProperties.SPAN_SATURATION_AND_BRIGTHNESS / numberOfUnits;
+        return Colors.SPAN_SATURATION_AND_BRIGTHNESS / numberOfUnits;
     }
 
 
@@ -77,14 +78,14 @@ public final class ColorUtils {
      */
     public static Map<Classification, Color> getDefaultColorMap() {
         Map<Classification, Color> classToColorMap = new HashMap<>();
-        classToColorMap.put( MappingClass.COMMON_MATCH, ColorProperties.COMMON_MATCH );
-        classToColorMap.put( MappingClass.BEST_MATCH, ColorProperties.BEST_MATCH );
-        classToColorMap.put( MappingClass.SINGLE_BEST_MATCH, ColorProperties.BEST_MATCH_SINGLE );
-        classToColorMap.put( MappingClass.PERFECT_MATCH, ColorProperties.PERFECT_MATCH );
-        classToColorMap.put( MappingClass.SINGLE_PERFECT_MATCH, ColorProperties.PERFECT_MATCH_SINGLE );
-        classToColorMap.put( ComparisonClass.DIFF_COVERAGE, ColorProperties.COV_DIFF_COLOR );
-        classToColorMap.put( ComparisonClass.TRACK1_COVERAGE, ColorProperties.TRACK1_COLOR );
-        classToColorMap.put( ComparisonClass.TRACK2_COVERAGE, ColorProperties.TRACK2_COLOR );
+        classToColorMap.put(MappingClass.COMMON_MATCH, Colors.COMMON_MATCH );
+        classToColorMap.put(MappingClass.BEST_MATCH, Colors.BEST_MATCH );
+        classToColorMap.put(MappingClass.SINGLE_BEST_MATCH, Colors.BEST_MATCH_SINGLE );
+        classToColorMap.put(MappingClass.PERFECT_MATCH, Colors.PERFECT_MATCH );
+        classToColorMap.put(MappingClass.SINGLE_PERFECT_MATCH, Colors.PERFECT_MATCH_SINGLE );
+        classToColorMap.put(ComparisonClass.DIFF_COVERAGE, Colors.COV_DIFF_COLOR );
+        classToColorMap.put(ComparisonClass.TRACK1_COVERAGE, Colors.TRACK1_COLOR );
+        classToColorMap.put(ComparisonClass.TRACK2_COVERAGE, Colors.TRACK2_COLOR );
         return classToColorMap;
     }
 

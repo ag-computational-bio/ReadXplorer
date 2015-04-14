@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import java.awt.Graphics;
@@ -112,7 +112,7 @@ public class MenuLabel extends JLabel implements Observer, Observable {
 
     @Override
     protected void paintComponent( Graphics g ) {
-        g.setColor( ColorProperties.LEGEND_BACKGROUND );
+        g.setColor(Colors.LEGEND_BACKGROUND );
         g.fillRect( 0, 0, this.getSize().width - 1, this.getSize().height - 1 );
         super.paintComponent( g );
     }
