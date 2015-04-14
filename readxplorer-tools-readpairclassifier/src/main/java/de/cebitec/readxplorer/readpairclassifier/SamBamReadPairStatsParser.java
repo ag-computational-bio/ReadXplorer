@@ -29,7 +29,7 @@ import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
-import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.Map;
 import java.util.logging.Logger;

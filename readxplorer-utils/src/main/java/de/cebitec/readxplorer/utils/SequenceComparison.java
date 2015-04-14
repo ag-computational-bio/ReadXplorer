@@ -30,26 +30,32 @@ public enum SequenceComparison {
      * getType() returns 'S' = To be used for substitutions.
      */
     SUBSTITUTION( SequenceComparison.S ),
+
     /**
      * getType() returns 'N' = To be used for neutral substitutions.
      */
     NEUTRAL( SequenceComparison.N ),
+
     /**
      * getType() returns 'E' = To be used for missense substitutions.
      */
     MISSENSE( SequenceComparison.E ),
+
     /**
      * getType() returns 'M' = To be used for matches.
      */
     MATCH( SequenceComparison.M ),
+
     /**
      * getType() returns 'D' = To be used for deletions.
      */
     DELETION( SequenceComparison.D ),
+
     /**
      * getType() returns 'I' = To be used for insertions.
      */
     INSERTION( SequenceComparison.I ),
+
     /**
      * getType() returns ' ' = To be used for unknown type.
      */

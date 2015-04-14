@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.api.enums.MappingClass;
