@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.readpairclassifier;
 
 import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
@@ -39,7 +40,6 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
@@ -566,16 +566,16 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         SAMRecord mapping1 = readPair.getRecord1();
         SAMRecord mapping2 = readPair.getRecord2();
         this.setReadPairForType( readPair );
-        mapping1.setAttribute( Properties.TAG_READ_PAIR_TYPE, readPair.getType().getTypeInt() );
-        mapping1.setAttribute( Properties.TAG_READ_PAIR_ID, readPair.getReadPairId() );
+        mapping1.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getTypeInt() );
+        mapping1.setAttribute( SAMRecordTag.ReadPairId.toString(), readPair.getReadPairId() );
         mapping1.setMateUnmappedFlag( false );
         mapping1.setMateReferenceName( mapping2.getReferenceName() );
         mapping1.setMateAlignmentStart( mapping2.getAlignmentStart() );
         mapping1.setMateNegativeStrandFlag( mapping2.getReadNegativeStrandFlag() );
         mapping1.setProperPairFlag( readPair.getType() == ReadPairType.PERFECT_PAIR || readPair.getType() == ReadPairType.PERFECT_UNQ_PAIR );
 
-        mapping2.setAttribute( Properties.TAG_READ_PAIR_TYPE, readPair.getType().getTypeInt() );
-        mapping2.setAttribute( Properties.TAG_READ_PAIR_ID, readPair.getReadPairId() );
+        mapping2.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getTypeInt() );
+        mapping2.setAttribute( SAMRecordTag.ReadPairId.toString(), readPair.getReadPairId() );
         mapping2.setMateUnmappedFlag( false );
         mapping2.setMateReferenceName( mapping1.getReferenceName() );
         mapping2.setMateAlignmentStart( mapping1.getAlignmentStart() );
@@ -632,8 +632,8 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         record.setMateAlignmentStart( mateStart );
         record.setMateUnmappedFlag( mateStart == 0 );
         record.setNotPrimaryAlignmentFlag( mateStart != 0 );
-        record.setAttribute( Properties.TAG_READ_PAIR_TYPE, ReadPairType.UNPAIRED_PAIR.getTypeInt() );
-        record.setAttribute( Properties.TAG_READ_PAIR_ID, readPairId );
+        record.setAttribute( SAMRecordTag.ReadPairType.toString(), ReadPairType.UNPAIRED_PAIR.getTypeInt() );
+        record.setAttribute( SAMRecordTag.ReadPairId.toString(), readPairId );
         this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
     }
 

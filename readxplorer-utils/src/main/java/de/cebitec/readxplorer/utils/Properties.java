@@ -47,30 +47,9 @@ public final class Properties {
 
 
     /**
-     * 'Yc' = Tag for read classification in one of the three readxplorer
-     * classes.
-     */
-    public static final String TAG_READ_CLASS = "Yc";
-    /**
-     * 'Yt' = Tag for number of positions a sequence maps to in a reference.
-     */
-    public static final String TAG_MAP_COUNT = "Yt";
-    /**
-     * 'Yi' = Tag for the read pair id.
-     */
-    public static final String TAG_READ_PAIR_ID = "Yi";
-    /**
-     * 'Ys' = Tag for the read pair type.
-     */
-    public static final String TAG_READ_PAIR_TYPE = "Ys";
-
-
-    /**
      * Protein database prefix used for creating EC-number links.
      */
     public static final String ENZYME_DB_LINK = "PROTEIN_DB_LINK";
-
-
 
 
     /**

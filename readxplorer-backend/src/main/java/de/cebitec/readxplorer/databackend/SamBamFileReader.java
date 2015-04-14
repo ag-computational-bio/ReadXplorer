@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.databackend;
 
 
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.databackend.dataobjects.DiffAndGapResult;
@@ -31,7 +32,6 @@ import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.IndexFileNotificationPanel;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SamUtils;
@@ -193,9 +193,9 @@ public class SamBamFileReader implements Observable, Observer {
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                     boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    byte classification = Byte.valueOf(record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification parameters
@@ -290,9 +290,9 @@ public class SamBamFileReader implements Observable, Observer {
             while( samRecordIterator.hasNext() ) {
                 final SAMRecord record = samRecordIterator.next();
                 if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification paramters
@@ -344,9 +344,9 @@ public class SamBamFileReader implements Observable, Observer {
                 final SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
 
                     if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
@@ -356,8 +356,8 @@ public class SamBamFileReader implements Observable, Observer {
                         //            start = start < 0 ? 0 : start;
                         //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                         boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                        Integer pairId = (Integer) record.getAttribute( Properties.TAG_READ_PAIR_ID );
-                        Integer pairType = (Integer) record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
+                        Integer pairId = (Integer) record.getAttribute( SAMRecordTag.ReadPairId.toString() );
+                        Integer pairType = (Integer) record.getAttribute( SAMRecordTag.ReadPairType.toString() );
                         int mateStart = record.getMateAlignmentStart();
                         boolean bothVisible = mateStart > from && mateStart < to;
 
@@ -455,9 +455,9 @@ public class SamBamFileReader implements Observable, Observer {
                 SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
 
                     if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
@@ -521,9 +521,9 @@ public class SamBamFileReader implements Observable, Observer {
                 SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
 
                     if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
@@ -613,9 +613,9 @@ public class SamBamFileReader implements Observable, Observer {
                 SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
 
                     if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {

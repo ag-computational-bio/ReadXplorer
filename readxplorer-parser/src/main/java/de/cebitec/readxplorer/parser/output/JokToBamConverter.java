@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.output;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SamUtils;
-import de.cebitec.readxplorer.api.enums.Strand;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

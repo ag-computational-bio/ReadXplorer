@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.parser.mappings;
 
 
 import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.Benchmark;
@@ -29,7 +30,6 @@ import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
@@ -135,14 +135,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
                         //statistics calculations: count no mappings in classifications and distinct sequences ////////////
 
-                        Integer mappingCount = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                        Integer mappingCount = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                         int mapCount = mappingCount != null ? mappingCount : 0;
                         if( mapCount == 1 ) {
                             statsContainer.increaseValue( StatsContainer.NO_UNIQ_MAPPINGS, mapCount );
                         }
                         statsContainer.increaseValue( StatsContainer.NO_MAPPINGS, 1 );
 
-                        Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                        Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                         MappingClass mappingClass = classification != null ? MappingClass.getFeatureType( classification ) : MappingClass.COMMON_MATCH;
                         readLengthDistribution.increaseDistribution( readSeq.length() );
 

@@ -17,9 +17,10 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv;
 
+
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.List;
@@ -171,7 +172,7 @@ public final class GASVUtils {
      * @throws NumberFormatException
      */
     public static boolean isForbiddenMapping( SAMRecord record ) throws NumberFormatException {
-        Object readClass = record.getAttribute( Properties.TAG_READ_CLASS );
+        Object readClass = record.getAttribute( SAMRecordTag.ReadClass.toString());
         if( readClass != null ) {
             Byte classification = Byte.valueOf( readClass.toString() );
             MappingClass mappingClass = MappingClass.getFeatureType( classification );

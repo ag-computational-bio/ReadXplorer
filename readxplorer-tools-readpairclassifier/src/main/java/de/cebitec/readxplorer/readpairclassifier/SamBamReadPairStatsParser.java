@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.readpairclassifier;
 
 import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;
@@ -28,7 +29,6 @@ import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.Map;
@@ -107,7 +107,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
                     if( pairTag == ReadPairExtensions.A1 ) {
 
-                        Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
+                        Object classobj = record.getAttribute( SAMRecordTag.ReadPairType.toString() );
                         if( classobj != null ) {
                             if( classobj instanceof Integer && ((int) classobj) >= -128 && ((int) classobj) <= 128 ) {
                                 ReadPairType pairClass = ReadPairType.getReadPairType( Integer.valueOf( classobj.toString() ) );
@@ -124,7 +124,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
                     } else if( pairTag == ReadPairExtensions.A2 ) {
 
-                        Object classobj = record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
+                        Object classobj = record.getAttribute( SAMRecordTag.ReadPairType.toString() );
                         if( classobj != null && classobj instanceof Integer ) {
                             ReadPairType pairClass = ReadPairType.getReadPairType( Integer.valueOf( classobj.toString() ) );
                             if( pairClass == ReadPairType.UNPAIRED_PAIR ) {
