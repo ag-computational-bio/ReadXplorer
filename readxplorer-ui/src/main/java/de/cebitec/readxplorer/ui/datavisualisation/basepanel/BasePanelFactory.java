@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.basepanel;
 
 
+import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
@@ -44,7 +45,6 @@ import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.ComparisonClass;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -315,7 +315,7 @@ public class BasePanelFactory {
         optionsLabel.registerObserver( legendLabel );
 
         // add panels to basepanel and add scrollbars
-        int maxSliderValue = pref.getInt( Properties.MAX_ZOOM, Properties.DEFAULT_ZOOM );
+        int maxSliderValue = pref.getInt( GUI.MAX_ZOOM, GUI.DEFAULT_ZOOM );
         viewer.setMaxZoomValue( maxSliderValue );
         b.setViewerInScrollpane( viewer );
         viewer.createListenerForScrollBar();
@@ -376,7 +376,7 @@ public class BasePanelFactory {
         viewer.setupLegend( new MenuLabel( seqPairPanelLegend, MenuLabel.TITLE_LEGEND ), seqPairPanelLegend );
 
         // add panels to basepanel and add scrollbars
-        int maxSliderValue = pref.getInt( Properties.MAX_ZOOM, Properties.DEFAULT_ZOOM ); //smaller than usual
+        int maxSliderValue = pref.getInt( GUI.MAX_ZOOM, GUI.DEFAULT_ZOOM ); //smaller than usual
         viewer.setMaxZoomValue( maxSliderValue );
         b.setViewerInScrollpane( viewer );
         b.setHorizontalAdjustmentPanel( this.createAdjustmentPanel( true, true, maxSliderValue ) );

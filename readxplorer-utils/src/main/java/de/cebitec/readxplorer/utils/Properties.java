@@ -207,7 +207,7 @@ public final class Properties {
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
 
-   
+
     public static final String MAPPER_PATH = "MAPPER_PATH";
 
     /**
@@ -221,29 +221,7 @@ public final class Properties {
     public static final String NO_PARENT_STRING = "-1";
     public static final String MAPPER_PARAMS = "MAPPER_PARAMS";
 
-    /**
-     * Property for the height of data viewers.
-     */
-    public static final String VIEWER_HEIGHT = "VIEWER_HEIGHT";
-    /**
-     * Minimum viewer height = "120" pixels.
-     */
-    public static final int MIN_HEIGHT = 120;
-    /**
-     * Medium/default viewer height = "200" pixels.
-     */
-    public static final int DEFAULT_HEIGHT = 200;
-    /**
-     * Large viewer height = "250" pixels.
-     */
-    public static final int MAX_HEIGHT = 250;
-    /**
-     * Property for auto scaling of viewers.
-     */
-    public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
 
-    /** Default max zoom level for the Alignment and ReadPairViewer. */
-    public static final int DEFAULT_ZOOM = 70;
 
     /**
      * Option for showing base qualities.
@@ -255,11 +233,5 @@ public final class Properties {
      */
     public static final String BLOCK_HEIGHT_OPTION = "BLOCK_HEIGHT_OPTION";
 
-
-    /**
-     * Option for setting the maximum zoom level of the Alignment and
-     * ReadPairViewer.
-     */
-    public static final String MAX_ZOOM = "MAX_ZOOM";
 
 }

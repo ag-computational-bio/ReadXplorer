@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.controller;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.ApplicationFrameI;
+import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
@@ -31,7 +32,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanelFactory;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.OpenRefGenPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksVisualPanel;
-import de.cebitec.readxplorer.utils.Properties;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -245,7 +245,7 @@ public class ViewController implements MousePositionListener {
             @Override
             public void preferenceChange( final PreferenceChangeEvent evt ) {
                 AbstractViewer viewer = trackPanel.getViewer();
-                if( evt.getKey().equals( Properties.VIEWER_HEIGHT ) ) {
+                if( evt.getKey().equals( GUI.VIEWER_HEIGHT ) ) {
 
                     int height = Integer.parseInt( evt.getNewValue() );
                     trackPanel.setSize( trackPanel.getSize().width, height );
@@ -256,7 +256,7 @@ public class ViewController implements MousePositionListener {
                     viewer.updatePhysicalBounds();
                     viewer.setNewDataRequestNeeded( true );
                     viewer.boundsChangedHook();
-                } else if( evt.getKey().equals( Properties.VIEWER_AUTO_SCALING ) ) {
+                } else if( evt.getKey().equals( GUI.VIEWER_AUTO_SCALING ) ) {
                     if( viewer instanceof TrackViewer ) {
                         ((TrackViewer) viewer).setAutomaticScaling( evt.getNewValue().equals( "true" ) );
                     }

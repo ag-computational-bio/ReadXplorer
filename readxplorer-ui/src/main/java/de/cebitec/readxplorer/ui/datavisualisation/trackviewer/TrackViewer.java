@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
@@ -32,7 +33,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
@@ -80,7 +80,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private final int id2;
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
-    private boolean automaticScaling = pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false );
+    private boolean automaticScaling = pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false );
     private boolean useMinimalIntervalLength = true;
 
     private JSlider verticalSlider = null;
@@ -523,7 +523,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     @Override
     public int getMaximalHeight() {
-        return pref.getInt( Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT );
+        return pref.getInt( GUI.VIEWER_HEIGHT, GUI.DEFAULT_HEIGHT );
     }
 
 

@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
 import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -129,7 +129,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     private void createScalingOption() {
         JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
         final JCheckBox scaleBox = LegendAndOptionsProvider.createStandardCheckBox( "Automatic scaling enabled" );
-        scaleBox.setSelected( pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false ) );
+        scaleBox.setSelected( pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false ) );
 
         //automatic scaling enabled event
         scaleBox.addActionListener( new ActionListener() {
@@ -147,8 +147,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
             @Override
             public void preferenceChange( PreferenceChangeEvent evt ) {
-                if( evt.getKey().equals( Properties.VIEWER_AUTO_SCALING ) ) {
-                    scaleBox.setSelected( pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false ) );
+                if( evt.getKey().equals( GUI.VIEWER_AUTO_SCALING ) ) {
+                    scaleBox.setSelected( pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false ) );
                 }
             }
 
