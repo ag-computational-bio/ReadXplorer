@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.MousePositionListener;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
@@ -333,7 +333,7 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
 
         Set<FeatureType> keys = featureStats.keySet();
         for( FeatureType type : keys ) {
-            String typeS = type.getTypeString();
+            String typeS = type.getString();
             model.addElement( typeS + ": " + featureStats.get( type ) );
         }
         statisticsList.setModel( model );

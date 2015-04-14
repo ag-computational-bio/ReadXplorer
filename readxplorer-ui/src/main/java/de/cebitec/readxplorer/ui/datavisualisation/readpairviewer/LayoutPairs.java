@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPair;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.BlockContaine
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.BlockI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayerI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayoutI;
-import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;

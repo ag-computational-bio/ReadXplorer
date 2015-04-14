@@ -35,7 +35,7 @@ import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.FastaUtils;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -616,7 +616,7 @@ public final class ProjectConnector extends Observable {
                     batchCounter++;
                     insertFeature.setLong( 1, feature.getId() );
                     insertFeature.setString( 3, feature.getParentIdsConcat() );
-                    insertFeature.setInt( 4, feature.getType().getTypeInt() );
+                    insertFeature.setInt( 4, feature.getType().getType() );
                     insertFeature.setInt( 5, feature.getStart() );
                     insertFeature.setInt( 6, feature.getStop() );
                     insertFeature.setString( 7, feature.getLocusTag() );
@@ -1439,12 +1439,12 @@ public final class ProjectConnector extends Observable {
             try( final ResultSet rs = fetch.executeQuery(); ) {
                 while( rs.next() ) {
                     //General data
-                    statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_PERFECT_MAPPINGS ) );
-                    statsContainer.increaseValue( MappingClass.BEST_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_BM_MAPPINGS ) );
-                    statsContainer.increaseValue( MappingClass.COMMON_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_OF_MAPPINGS ) );
-                    statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME ) );
-                    statsContainer.increaseValue( MappingClass.BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME ) );
-                    statsContainer.increaseValue( MappingClass.COMMON_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME ) );
+                    statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getString(), rs.getInt( FieldNames.STATISTICS_NUMBER_PERFECT_MAPPINGS ) );
+                    statsContainer.increaseValue( MappingClass.BEST_MATCH.getString(), rs.getInt( FieldNames.STATISTICS_NUMBER_BM_MAPPINGS ) );
+                    statsContainer.increaseValue( MappingClass.COMMON_MATCH.getString(), rs.getInt( FieldNames.STATISTICS_NUMBER_OF_MAPPINGS ) );
+                    statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME ) );
+                    statsContainer.increaseValue( MappingClass.BEST_MATCH.getString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME ) );
+                    statsContainer.increaseValue( MappingClass.COMMON_MATCH.getString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME ) );
                     statsContainer.increaseValue( StatsContainer.NO_READS, rs.getInt( FieldNames.STATISTICS_NUMBER_READS ) );
                     statsContainer.increaseValue( StatsContainer.NO_REPEATED_SEQ, rs.getInt( FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ ) );
                     statsContainer.increaseValue( StatsContainer.NO_UNIQUE_SEQS, rs.getInt( FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ ) );

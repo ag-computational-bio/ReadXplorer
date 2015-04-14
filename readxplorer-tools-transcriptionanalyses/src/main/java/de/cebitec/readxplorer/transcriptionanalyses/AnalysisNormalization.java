@@ -30,7 +30,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.AssignedMappi
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.UnionFractionMapping;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
@@ -43,12 +43,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static de.cebitec.readxplorer.utils.classification.FeatureType.CDS;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.EXON;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.GENE;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.MRNA;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.RRNA;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.TRNA;
+import static de.cebitec.readxplorer.api.enums.FeatureType.CDS;
+import static de.cebitec.readxplorer.api.enums.FeatureType.EXON;
+import static de.cebitec.readxplorer.api.enums.FeatureType.GENE;
+import static de.cebitec.readxplorer.api.enums.FeatureType.MRNA;
+import static de.cebitec.readxplorer.api.enums.FeatureType.RRNA;
+import static de.cebitec.readxplorer.api.enums.FeatureType.TRNA;
 
 
 /**

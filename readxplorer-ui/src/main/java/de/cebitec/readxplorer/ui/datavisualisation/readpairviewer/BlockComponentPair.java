@@ -18,17 +18,17 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPair;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.PaintUtilities;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ReadPairType;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -397,9 +397,9 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         if( block.getObjectWithId() instanceof ReadPairGroup ) {
             List<ReadPair> readPairs = ((ReadPairGroup) block.getObjectWithId()).getReadPairs();
             if( readPairs.size() > 0 ) {
-                type = readPairs.get( 0 ).getReadPairType().getTypeString();
+                type = readPairs.get( 0 ).getReadPairType().getString();
             } else {
-                type = ReadPairType.UNPAIRED_PAIR.getTypeString();
+                type = ReadPairType.UNPAIRED_PAIR.getString();
             }
         }
         return type;

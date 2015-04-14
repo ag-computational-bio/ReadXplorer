@@ -33,7 +33,7 @@ import de.cebitec.readxplorer.ui.dialogmenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;

@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
@@ -34,8 +36,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayerI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayoutI;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.Benchmark;
-import de.cebitec.readxplorer.api.constants.Colors;
-import de.cebitec.readxplorer.utils.classification.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;

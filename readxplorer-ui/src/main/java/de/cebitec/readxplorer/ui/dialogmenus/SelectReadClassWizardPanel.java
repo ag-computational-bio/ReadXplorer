@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 

@@ -34,7 +34,7 @@ import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Color;
 import java.awt.Font;

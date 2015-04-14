@@ -18,13 +18,13 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;

@@ -32,7 +32,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalyses
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;

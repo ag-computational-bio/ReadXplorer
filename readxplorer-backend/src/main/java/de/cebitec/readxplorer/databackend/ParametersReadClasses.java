@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.Strand;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -143,10 +143,10 @@ public class ParametersReadClasses {
         classList.addAll( Arrays.asList( MappingClass.values() ) );
         for( Classification classType : classList ) {
             String isAllowed = isClassificationAllowed( classType ) ? "yes" : "no";
-            statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getTypeString() + " included:", isAllowed ) );
+            statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getString() + " included:", isAllowed ) );
         }
         String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "yes" : "no";
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getTypeString() + ":", isAllowed ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getString() + ":", isAllowed ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Mapping strand selection:", getStrandOptionString() ) );
     }
 

@@ -29,7 +29,7 @@ import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -842,20 +842,20 @@ public final class CommonsMappingParser {
 
             if( differences == 0 ) { //perfect mapping
                 if( sameMismatchCount == 1 ) {
-                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.SINGLE_PERFECT_MATCH.getTypeInt() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.SINGLE_PERFECT_MATCH.getType() );
                 } else {
-                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.PERFECT_MATCH.getTypeInt() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.PERFECT_MATCH.getType() );
                 }
 
             } else if( differences == lowestDiffRate ) { //best match mapping
                 if( sameMismatchCount == 1 ) {
-                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.SINGLE_BEST_MATCH.getTypeInt() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.SINGLE_BEST_MATCH.getType() );
                 } else {
-                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.BEST_MATCH.getTypeInt() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.BEST_MATCH.getType() );
                 }
 
             } else if( differences > lowestDiffRate ) { //common mapping
-                record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.COMMON_MATCH.getTypeInt() );
+                record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.COMMON_MATCH.getType() );
 
             } else { //meaning: differences < lowestDiffRate
                 throw new AssertionError( "Cannot contain less than the lowest diff rate number of differences!" );

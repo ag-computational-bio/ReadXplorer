@@ -18,7 +18,9 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
@@ -36,8 +38,6 @@ import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Dialog;
 import java.io.File;
 import java.nio.BufferUnderflowException;

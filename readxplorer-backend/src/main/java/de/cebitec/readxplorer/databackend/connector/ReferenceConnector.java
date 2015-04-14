@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.api.enums.Strand;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -197,7 +197,7 @@ public class ReferenceConnector {
                 fetch.setLong( 1, chromId );
                 fetch.setInt( 2, from );
                 fetch.setInt( 3, to );
-                fetch.setInt( 4, featureType.getTypeInt() );
+                fetch.setInt( 4, featureType.getType() );
             }
 
             try( final ResultSet rs = fetch.executeQuery() ) {
@@ -443,7 +443,7 @@ public class ReferenceConnector {
                 } else {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
                     fetch.setLong( 1, currentID );
-                    fetch.setLong( 2, type.getTypeInt() );
+                    fetch.setLong( 2, type.getType() );
                 }
                 ResultSet rs = fetch.executeQuery();
                 if( rs.next() ) {

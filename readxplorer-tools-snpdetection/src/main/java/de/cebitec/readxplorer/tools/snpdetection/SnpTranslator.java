@@ -28,7 +28,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 
 
 /**

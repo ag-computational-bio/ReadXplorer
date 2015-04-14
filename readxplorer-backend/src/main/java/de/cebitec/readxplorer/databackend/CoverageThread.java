@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
@@ -29,7 +30,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

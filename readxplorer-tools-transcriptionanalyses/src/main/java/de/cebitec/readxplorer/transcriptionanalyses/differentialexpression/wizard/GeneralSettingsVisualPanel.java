@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.List;

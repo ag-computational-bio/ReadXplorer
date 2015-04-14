@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.utils;
 
 
 import de.cebitec.readxplorer.api.constants.Colors;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.ComparisonClass;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.ComparisonClass;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
@@ -147,7 +147,7 @@ public final class ColorUtils {
      * @return The color of the given class type.
      */
     public static Color initColor( Classification classType, Color defaultColor ) {
-        String colorRGB = NbPreferences.forModule( Object.class ).get( classType.getTypeString(), "" );
+        String colorRGB = NbPreferences.forModule( Object.class ).get( classType.getString(), "" );
         if( !colorRGB.isEmpty() ) { //otherwise default color is kept
             return new Color( Integer.parseInt( colorRGB ) );
         } else {

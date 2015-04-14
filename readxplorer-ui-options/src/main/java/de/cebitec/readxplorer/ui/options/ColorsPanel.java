@@ -20,9 +20,9 @@ package de.cebitec.readxplorer.ui.options;
 
 import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.ComparisonClass;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.ComparisonClass;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
@@ -645,7 +645,7 @@ final class ColorsPanel extends OptionsPanel {
      */
     private void storeColor( Classification classType ) {
         String colorRGB = Integer.toString( classToPanelMap.get( classType ).getBackground().getRGB() );
-        this.pref.put( classType.getTypeString(), colorRGB );
+        this.pref.put( classType.getString(), colorRGB );
     }
 
 

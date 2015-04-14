@@ -28,7 +28,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

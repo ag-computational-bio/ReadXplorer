@@ -18,6 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.ComparisonClass;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
@@ -26,9 +29,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorUtils;
-import de.cebitec.readxplorer.api.enums.Strand;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.ComparisonClass;
 import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
@@ -268,7 +268,7 @@ public class DoubleTrackViewer extends TrackViewer {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage, double coverageNorm, String strandString ) {
-        String classType = classification.getTypeString() + " " + strandString;
+        String classType = classification.getString() + " " + strandString;
         if( this.hasNormalizationFactor() ) {
             sb.append( createTableRow( classType, coverage, coverageNorm ) );
         } else {

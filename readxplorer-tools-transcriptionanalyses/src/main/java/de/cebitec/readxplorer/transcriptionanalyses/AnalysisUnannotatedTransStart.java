@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatu
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.List;
 

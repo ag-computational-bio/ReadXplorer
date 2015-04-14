@@ -27,7 +27,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.MousePositionListener;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.api.constants.Colors;
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;

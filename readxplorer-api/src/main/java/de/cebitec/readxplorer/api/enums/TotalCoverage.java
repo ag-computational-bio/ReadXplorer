@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils.classification;
+package de.cebitec.readxplorer.api.enums;
+
+import de.cebitec.readxplorer.api.Classification;
+
 
 
 /**
@@ -28,18 +31,15 @@ public enum TotalCoverage implements Classification {
     /**
      * Total coverage constant.
      */
-    TOTAL_COVERAGE( TotalCoverage.TOTAL_COVERAGE_BYTE, TotalCoverage.TOTAL_COVERAGE_STRING );
+    TOTAL_COVERAGE( 0, "Total Coverage" );
 
-    private static final byte TOTAL_COVERAGE_BYTE = 0;
-    private static final String TOTAL_COVERAGE_STRING = "Total Coverage";
-
-    private final byte typeByte;
-    private final String typeString;
+    private final int type;
+    private final String string;
 
 
-    private TotalCoverage( byte typeByte, String typeString ) {
-        this.typeByte = typeByte;
-        this.typeString = typeString;
+    private TotalCoverage( int type, String string ) {
+        this.type = type;
+        this.string = string;
     }
 
 
@@ -47,8 +47,8 @@ public enum TotalCoverage implements Classification {
      * @return the string representation of the total coverage.
      */
     @Override
-    public String getTypeString() {
-        return this.typeString;
+    public String getString() {
+        return this.string;
     }
 
 
@@ -56,8 +56,8 @@ public enum TotalCoverage implements Classification {
      * @return the byte value of the type of the total coverage.
      */
     @Override
-    public int getTypeInt() {
-        return this.typeByte;
+    public int getType() {
+        return this.type;
     }
 
 
@@ -66,7 +66,7 @@ public enum TotalCoverage implements Classification {
      */
     @Override
     public String toString() {
-        return this.getTypeString();
+        return this.getString();
     }
 
 

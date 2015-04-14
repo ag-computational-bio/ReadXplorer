@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils.classification;
+package de.cebitec.readxplorer.api;
 
 
 /**
@@ -29,13 +29,13 @@ public interface Classification {
     /**
      * @return The string representation associated with this Classification.
      */
-    String getTypeString();
+    String getString();
 
 
     /**
      * @return The integer value associated with this Classification.
      */
-    int getTypeInt();
+    int getType();
 
 
 }

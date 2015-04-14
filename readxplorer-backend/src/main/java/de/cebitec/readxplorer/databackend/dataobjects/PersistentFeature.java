@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;

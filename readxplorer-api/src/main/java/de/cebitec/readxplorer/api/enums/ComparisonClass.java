@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils.classification;
+package de.cebitec.readxplorer.api.enums;
+
+import de.cebitec.readxplorer.api.Classification;
+
 
 
 /**
@@ -28,22 +31,24 @@ public enum ComparisonClass implements Classification {
      * Classification for the coverage difference between two tracks.
      */
     DIFF_COVERAGE( 1, "Coverage Difference" ),
+
     /**
      * Classification for the coverage of track 1 of a track comparison.
      */
     TRACK1_COVERAGE( 2, "Coverage Track 1" ),
+
     /**
      * Classification for the coverage of track 2 of a track comparison.
      */
     TRACK2_COVERAGE( 3, "Coverage Track 2" );
 
-    private final int typeInt;
-    private final String typeString;
+    private final int type;
+    private final String string;
 
 
-    private ComparisonClass( int typeByte, String typeString ) {
-        this.typeInt = typeByte;
-        this.typeString = typeString;
+    private ComparisonClass( int type, String string ) {
+        this.type = type;
+        this.string = string;
     }
 
 
@@ -52,8 +57,8 @@ public enum ComparisonClass implements Classification {
      * classification.
      */
     @Override
-    public String getTypeString() {
-        return this.typeString;
+    public String getString() {
+        return this.string;
     }
 
 
@@ -62,8 +67,8 @@ public enum ComparisonClass implements Classification {
      * classification.
      */
     @Override
-    public int getTypeInt() {
-        return this.typeInt;
+    public int getType() {
+        return this.type;
     }
 
 
@@ -73,7 +78,7 @@ public enum ComparisonClass implements Classification {
      */
     @Override
     public String toString() {
-        return this.getTypeString();
+        return this.getString();
     }
 
 
@@ -87,13 +92,13 @@ public enum ComparisonClass implements Classification {
     public static ComparisonClass getFeatureType( int type ) {
 
         for( ComparisonClass cc : values() ) {
-            if( cc.typeInt == type ) {
+            if( cc.getType() == type ) {
                 return cc;
             }
         }
 
         return null;
-        
+
     }
 
 

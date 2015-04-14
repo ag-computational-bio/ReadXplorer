@@ -32,7 +32,7 @@ import de.cebitec.readxplorer.utils.FastaUtils;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.api.enums.Strand;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -245,7 +245,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 //                        while (subFeatureIt.hasNext()) {
 //
 //                            RichFeature subFeature = subFeatureIt.next();
-//                            type = FeatureType.getFeatureType(subFeature.getTypeInt());
+//                            type = FeatureType.getFeatureType(subFeature.getType());
 //
 //                            subStart = subFeature.getLocation().getMin();
 //                            subStop = subFeature.getLocation().getMax();

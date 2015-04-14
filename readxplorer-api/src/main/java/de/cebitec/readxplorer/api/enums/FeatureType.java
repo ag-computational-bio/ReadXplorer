@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils.classification;
+package de.cebitec.readxplorer.api.enums;
+
+
+import de.cebitec.readxplorer.api.Classification;
 
 
 /**
@@ -31,92 +34,115 @@ public enum FeatureType implements Classification {
 
     /**
      * getTypeInt() returns '-1' = To be used if feature type does not matter.
+     * getType() returns '-1' = To be used if feature type does not matter.
      */
     ANY( FeatureType.ANY_INT, FeatureType.ANY_STRING ),
+
     /**
-     * getTypeInt() returns '0' = To be used for a feature with unknown type.
+     * getType() returns '0' = To be used for a feature with unknown type.
      */
     UNDEFINED( FeatureType.UNDEFINED_INT, FeatureType.UNDEFINED_STRING ),
+
     /**
-     * getTypeInt() returns '1' = To be used for mRNAs.
+     * getType() returns '1' = To be used for mRNAs.
      */
     MRNA( FeatureType.MRNA_INT, FeatureType.MRNA_STRING ),
+
     /**
-     * getTypeInt() returns '2' = To be used for coding sequences.
+     * getType() returns '2' = To be used for coding sequences.
      */
     CDS( FeatureType.CDS_INT, FeatureType.CDS_STRING ),
+
     /**
-     * getTypeInt() returns '3' = To be used for misc rnas.
+     * getType() returns '3' = To be used for misc rnas.
      */
     MISC_RNA( FeatureType.MISC_RNA_INT, FeatureType.MISC_RNA_STRING ),
+
     /**
-     * getTypeInt() returns '4' = To be used for rRNAs.
+     * getType() returns '4' = To be used for rRNAs.
      */
     RRNA( FeatureType.RRNA_INT, FeatureType.RRNA_STRING ),
+
     /**
-     * getTypeInt() returns '5' = To be used for repeat units.
+     * getType() returns '5' = To be used for repeat units.
      */
     REPEAT_UNIT( FeatureType.REPEAT_UNIT_INT, FeatureType.REPEAT_UNIT_STRING ),
+
     /**
-     * getTypeInt() returns '6' = To be used for sources.
+     * getType() returns '6' = To be used for sources.
      */
     SOURCE( FeatureType.SOURCE_INT, FeatureType.SOURCE_STRING ),
+
     /**
-     * getTypeInt() returns '7' = To be used for tRNAs.
+     * getType() returns '7' = To be used for tRNAs.
      */
     TRNA( FeatureType.TRNA_INT, FeatureType.TRNA_STRING ),
+
     /**
-     * getTypeInt() returns '8' = To be used for genes.
+     * getType() returns '8' = To be used for genes.
      */
     GENE( FeatureType.GENE_INT, FeatureType.GENE_STRING ),
+
     /**
-     * getTypeInt() returns '9' = To be used for micro RNAs.
+     * getType() returns '9' = To be used for micro RNAs.
      */
     MIRNA( FeatureType.MIRNA_INT, FeatureType.MIRNA_STRING ),
+
     /**
-     * getTypeInt() returns '10' = To be used for exons.
+     * getType() returns '10' = To be used for exons.
      */
     EXON( FeatureType.EXON_INT, FeatureType.EXON_STRING ),
+
     /**
-     * getTypeInt() returns '11' = To be used for introns.
+     * getType() returns '11' = To be used for introns.
      */
     INTRON( FeatureType.INTRON_INT, FeatureType.INTRON_STRING ),
+
     /**
-     * getTypeInt() returns '29' = To be used for five prime untranslated region.
+     * getType() returns '29' = To be used for five prime untranslated region.
      */
     FIVE_UTR( FeatureType.FIVE_UTR_INT, FeatureType.FIVE_UTR_STRING ),
+
     /**
-     * getTypeInt() returns '30' = To be used for three prime untranslated region.
+     * getType() returns '30' = To be used for three prime untranslated region.
      */
     THREE_UTR( FeatureType.THREE_UTR_INT, FeatureType.THREE_UTR_STRING ),
+
     /**
-     * getTypeInt() returns '31' = To be used for non coding RNAs.
+     * getType() returns '31' = To be used for non coding RNAs.
      */
     NC_RNA( FeatureType.NC_RNA_INT, FeatureType.NC_RNA_STRING ),
+
     /**
-     * getTypeInt() returns '32' = To be used for minus 35 region.
+     * getType() returns '32' = To be used for minus 35 region.
      */
     MINUS_THIRTYFIVE( FeatureType.MINUS_THIRTYFIVE_INT, FeatureType.MINUS_THIRTYFIVE_STRING ),
+
     /**
-     * getTypeInt() returns '33' = To be used for minus 10 region.
+     * getType() returns '33' = To be used for minus 10 region.
      */
     MINUS_TEN( FeatureType.MINUS_TEN_INT, FeatureType.MINUS_TEN_STRING ),
+
     /**
-     * getTypeInt() returns '34' = To be used for ribosome binding sides.
+     * getType() returns '34' = To be used for ribosome binding sides.
      */
     RBS( FeatureType.RBS_INT, FeatureType.RBS_STRING ),
+
     /**
-     * getTypeInt() returns '35' = To be used for start codon location.
+     * getType() returns '35' = To be used for start codon location.
      */
     START_CODON( FeatureType.START_CODON_INT, FeatureType.START_CODON_STRING ),
+
     /**
-     * getTypeInt() returns '36' = To be used for stop codon location.
+     * getType() returns '36' = To be used for stop codon location.
      */
     STOP_CODON( FeatureType.STOP_CODON_INT, FeatureType.STOP_CODON_STRING_UNDERSCORE ),
+
     /**
      * feature type for multiple mapped reads (non-unique)
      */
     MULTIPLE_MAPPED_READ( FeatureType.MULTIPLE_MAPPED_READ_INT, FeatureType.MULTIPLE_MAPPED_READ_STRING ),
+
     //feature types for the histogram viewer
     BASE_A( FeatureType.BASE_A_INT, FeatureType.BASE_A_STRING ),
     BASE_C( FeatureType.BASE_C_INT, FeatureType.BASE_C_STRING ),
@@ -125,8 +151,10 @@ public enum FeatureType implements Classification {
     BASE_N( FeatureType.BASE_N_INT, FeatureType.BASE_N_STRING ),
     MATCH( FeatureType.MATCH_INT, FeatureType.MATCH_STRING ),
     GAP( FeatureType.GAP_INT, FeatureType.GAP_STRING ),
+
     //feature types for the alignment viewer
     DIFF( FeatureType.DIFF_INT, FeatureType.DIFF_STRING ),
+
     //feature types for the read pair viewer
     PERFECT_PAIR( FeatureType.PERFECT_PAIR_INT, FeatureType.PERFECT_PAIR_STRING ),
     DISTORTED_PAIR( FeatureType.DISTORTED_PAIR_INT, FeatureType.DISTORTED_PAIR_STRING ),
@@ -160,11 +188,6 @@ public enum FeatureType implements Classification {
      * feature type int for multiple mapped reads (non-unique)
      */
     private static final int MULTIPLE_MAPPED_READ_INT = 14;
-
-    //feature types for the double track viewer
-    private static final int COMPLETE_COVERAGE_INT = 15;
-    private static final int TRACK1_COVERAGE_INT = 16;
-    private static final int TRACK2_COVERAGE_INT = 17;
 
     //feature types for the histogram viewer
     private static final int BASE_A_INT = 18;
@@ -244,11 +267,6 @@ public enum FeatureType implements Classification {
      */
     private static final String MULTIPLE_MAPPED_READ_STRING = "Include multiple mapped reads";
 
-    //feature types for the double track viewer
-    private static final String COMPLETE_COVERAGE_STRING = "Difference between both";
-    private static final String TRACK1_COVERAGE_STRING = "Track 1 coverage";
-    private static final String TRACK2_COVERAGE_STRING = "Track 2 coverage";
-
     //feature types for the histogram viewer
     private static final String BASE_A_STRING = "A";
     private static final String BASE_C_STRING = "C";
@@ -266,8 +284,8 @@ public enum FeatureType implements Classification {
     private static final String DISTORTED_PAIR_STRING = "Distorted read pair";
     private static final String SINGLE_MAPPING_STRING = "Single mapping";
 
-    private final int typeInt;
-    private final String typeString;
+    private final int type;
+    private final String string;
 
     /**
      * FeatureTypes that are GUI selectable.
@@ -275,9 +293,9 @@ public enum FeatureType implements Classification {
     public static final FeatureType[] SELECTABLE_FEATURE_TYPES = { GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA, NC_RNA };
 
 
-    private FeatureType( int typeInt, String typeString ) {
-        this.typeInt = typeInt;
-        this.typeString = typeString;
+    private FeatureType( int type, String string ) {
+        this.type = type;
+        this.string = string;
     }
 
 
@@ -285,8 +303,8 @@ public enum FeatureType implements Classification {
      * @return the string representation of the current feature type.
      */
     @Override
-    public String getTypeString() {
-        return this.typeString;
+    public String getString() {
+        return this.string;
     }
 
 
@@ -294,8 +312,8 @@ public enum FeatureType implements Classification {
      * @return the integer value of the type of the current feature.
      */
     @Override
-    public int getTypeInt() {
-        return this.typeInt;
+    public int getType() {
+        return this.type;
     }
 
 
@@ -416,7 +434,7 @@ public enum FeatureType implements Classification {
 
     @Override
     public String toString() {
-        return this.getTypeString();
+        return this.string;
     }
 
 

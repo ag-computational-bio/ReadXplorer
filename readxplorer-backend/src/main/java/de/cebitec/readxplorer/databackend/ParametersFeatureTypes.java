@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

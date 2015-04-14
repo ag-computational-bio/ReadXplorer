@@ -32,7 +32,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

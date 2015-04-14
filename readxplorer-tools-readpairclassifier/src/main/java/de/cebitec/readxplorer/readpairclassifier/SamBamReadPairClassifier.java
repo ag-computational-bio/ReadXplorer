@@ -566,7 +566,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         SAMRecord mapping1 = readPair.getRecord1();
         SAMRecord mapping2 = readPair.getRecord2();
         this.setReadPairForType( readPair );
-        mapping1.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getTypeInt() );
+        mapping1.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getType() );
         mapping1.setAttribute( SAMRecordTag.ReadPairId.toString(), readPair.getReadPairId() );
         mapping1.setMateUnmappedFlag( false );
         mapping1.setMateReferenceName( mapping2.getReferenceName() );
@@ -574,7 +574,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         mapping1.setMateNegativeStrandFlag( mapping2.getReadNegativeStrandFlag() );
         mapping1.setProperPairFlag( readPair.getType() == ReadPairType.PERFECT_PAIR || readPair.getType() == ReadPairType.PERFECT_UNQ_PAIR );
 
-        mapping2.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getTypeInt() );
+        mapping2.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getType() );
         mapping2.setAttribute( SAMRecordTag.ReadPairId.toString(), readPair.getReadPairId() );
         mapping2.setMateUnmappedFlag( false );
         mapping2.setMateReferenceName( mapping1.getReferenceName() );
@@ -632,7 +632,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         record.setMateAlignmentStart( mateStart );
         record.setMateUnmappedFlag( mateStart == 0 );
         record.setNotPrimaryAlignmentFlag( mateStart != 0 );
-        record.setAttribute( SAMRecordTag.ReadPairType.toString(), ReadPairType.UNPAIRED_PAIR.getTypeInt() );
+        record.setAttribute( SAMRecordTag.ReadPairType.toString(), ReadPairType.UNPAIRED_PAIR.getType() );
         record.setAttribute( SAMRecordTag.ReadPairId.toString(), readPairId );
         this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
     }

@@ -18,7 +18,12 @@
 package de.cebitec.readxplorer.ui.datavisualisation.basepanel;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.api.constants.GUI;
+import de.cebitec.readxplorer.api.enums.ComparisonClass;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
@@ -41,14 +46,9 @@ import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackOptionsPanel
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.ChromosomeVisualizationHelper;
 import de.cebitec.readxplorer.ui.dialogmenus.ChromosomeVisualizationHelper.ChromosomeListener;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.ComparisonClass;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -458,7 +458,7 @@ public class BasePanelFactory {
         if( viewer != null ) {
             entry.add( this.getFeatureTypeBox( type, viewer ) );
         } else {
-            entry.add( new JLabel( type.getTypeString() ) );
+            entry.add( new JLabel( type.getString() ) );
         }
         entry.setAlignmentX( Component.LEFT_ALIGNMENT );
         return entry;
@@ -488,7 +488,7 @@ public class BasePanelFactory {
      *         viewer.
      */
     private JCheckBox getFeatureTypeBox( Classification type, AbstractViewer viewer ) {
-        JCheckBox checker = new JCheckBox( type.getTypeString() );
+        JCheckBox checker = new JCheckBox( type.getString() );
         //special cases are handled here
         if( type != FeatureType.UNDEFINED ) {
             checker.setSelected( true );

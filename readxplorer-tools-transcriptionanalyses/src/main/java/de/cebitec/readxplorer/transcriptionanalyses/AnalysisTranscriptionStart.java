@@ -38,7 +38,7 @@ import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -18,7 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.api.constants.GUI;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
@@ -30,11 +33,8 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -589,7 +589,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage ) {
-        String classType = classification.getTypeString();
+        String classType = classification.getString();
         if( hasNormalizationFactor ) {
             sb.append( createTableRow( classType, coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
         } else {
