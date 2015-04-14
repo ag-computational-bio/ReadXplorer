@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.utils.classification.TotalCoverage;
@@ -79,8 +80,8 @@ public class StatsContainer {
         statsMap = new HashMap<>();
         readLengthDistribution = new DiscreteCountingDistribution();
         readPairSizeDistribution = new DiscreteCountingDistribution();
-        readLengthDistribution.setType( Properties.READ_LENGTH_DISTRIBUTION );
-        readPairSizeDistribution.setType( Properties.READ_PAIR_SIZE_DISTRIBUTION );
+        readLengthDistribution.setType( Distribution.ReadLengthDistribution );
+        readPairSizeDistribution.setType( Distribution.ReadPairSizeDistribution );
     }
 
 

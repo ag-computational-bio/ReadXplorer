@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
@@ -36,7 +37,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.logic.TssLinker;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
@@ -140,8 +140,8 @@ public class AnalysisTranscriptionStart implements Observer,
         refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackConnector.getRefGenome().getId() );
         chromosomes = refConnector.getChromosomesForGenome();
 
-        this.readStartDistribution = trackConnector.getCountDistribution( Properties.READ_START_DISTRIBUTION );
-        this.covIncPercentDistribution = trackConnector.getCountDistribution( Properties.COVERAGE_INC_PERCENT_DISTRIBUTION );
+        this.readStartDistribution = trackConnector.getCountDistribution( Distribution.ReadStartDistribution );
+        this.covIncPercentDistribution = trackConnector.getCountDistribution( Distribution.CoverageIncPercentDistribution );
         this.calcCoverageDistributions = this.readStartDistribution.isEmpty() || this.covIncPercentDistribution.isEmpty();
 
         if( this.parametersTSS.isAutoTssParamEstimation() ) {

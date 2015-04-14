@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.mappings;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.Benchmark;
@@ -69,7 +70,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         this.observers = new ArrayList<>();
         this.errorLimit = new ErrorLimit( 100 );
         this.readLengthDistribution = new DiscreteCountingDistribution( 400 );
-        readLengthDistribution.setType( Properties.READ_LENGTH_DISTRIBUTION );
+        readLengthDistribution.setType( Distribution.ReadLengthDistribution );
     }
 
 

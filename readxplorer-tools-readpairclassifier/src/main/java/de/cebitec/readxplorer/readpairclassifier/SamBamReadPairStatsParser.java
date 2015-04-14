@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.readpairclassifier;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;
@@ -72,7 +73,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
         this.dist = readPairJobContainer.getDistance();
         int maxDist = this.calculateMinAndMaxDist( dist, readPairJobContainer.getDeviation() );
         this.readPairSizeDistribution = new DiscreteCountingDistribution( maxDist * 3 );
-        readPairSizeDistribution.setType( Properties.READ_PAIR_SIZE_DISTRIBUTION );
+        readPairSizeDistribution.setType( Distribution.ReadPairSizeDistribution );
     }
 
 

@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.readpairclassifier;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;
@@ -40,7 +42,6 @@ import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.api.enums.Strand;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         this.chromLengthMap = chromLengthMap;
         this.errorLimit = new ErrorLimit( 100 );
         this.readPairSizeDistribution = new DiscreteCountingDistribution( maxDist * 3 );
-        readPairSizeDistribution.setType( Properties.READ_PAIR_SIZE_DISTRIBUTION );
+        readPairSizeDistribution.setType( Distribution.ReadPairSizeDistribution );
     }
 
 

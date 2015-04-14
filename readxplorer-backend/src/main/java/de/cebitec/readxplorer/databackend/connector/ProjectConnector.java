@@ -764,7 +764,7 @@ public final class ProjectConnector extends Observable {
         int[] countDistribution = distribution.getDiscreteCountingDistribution();
         try( PreparedStatement insert = con.prepareStatement( SQLStatements.INSERT_COUNT_DISTRIBUTION ) ) {
             insert.setInt( 1, trackID );
-            insert.setByte( 2, distribution.getType() );
+            insert.setByte( 2, (byte)distribution.getType().getType() );
             for( int i = 0; i < countDistribution.length; ++i ) {
                 insert.setInt( 3, i );
                 insert.setInt( 4, countDistribution[i] );

@@ -56,24 +56,7 @@ public final class Properties {
     // ReadXplorer file chooser properties
     public static final String READXPLORER_FILECHOOSER_DIRECTORY = "readXplorerFileChooser.Directory";
     public static final String READXPLORER_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
-
-
-    /**
-     * Value for read start distribution = 5.
-     */
-    public static final byte READ_START_DISTRIBUTION = 5;
-    /**
-     * Value for coverage increase in percent distribution = 6.
-     */
-    public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 6;
-    /**
-     * Value for read length distribution = 3.
-     */
-    public static final byte READ_LENGTH_DISTRIBUTION = 3;
-    /**
-     * Value for seq pair size distribution = 4.
-     */
-    public static final byte READ_PAIR_SIZE_DISTRIBUTION = 4;
+    
 
     /**
      * Type value identifying an object as belonging to a "Start".
