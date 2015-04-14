@@ -31,6 +31,8 @@ public final class Paths {
      */
     public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
 
+    public static final String MAPPER_PATH = "MAPPER_PATH";
+
 
     // protein DB properties
     public static final String DB_BRENDA = "http://www.brenda-enzymes.org/enzyme.php?ecno=";

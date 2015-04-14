@@ -44,7 +44,7 @@ public final class Properties {
     public static final String STANDARD_CODE_INDEX = "1";
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
-    
+
 
     /**
      * 'Yc' = Tag for read classification in one of the three readxplorer
@@ -71,8 +71,6 @@ public final class Properties {
     public static final String ENZYME_DB_LINK = "PROTEIN_DB_LINK";
 
 
-
-    public static final String MAPPER_PATH = "MAPPER_PATH";
 
 
     /**
