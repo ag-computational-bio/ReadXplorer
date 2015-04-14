@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.options;
 
 
+import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.Downloader;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.PasswordStore;
@@ -826,28 +827,28 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     void load() {
         autoOrmanual.clearSelection();
         cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
-        rServeHost.setText( pref.get( Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
-        rServePort.setText( String.valueOf( pref.getInt( Properties.RSERVE_PORT, DEFAULT_RSERVE_PORT ) ) );
-        boolean manualRemoteButtonSelected = pref.getBoolean( Properties.RSERVE_MANUAL_REMOTE_SETUP, false );
-        boolean authSelected = pref.getBoolean( Properties.RSERVE_USE_AUTH, false );
+        rServeHost.setText( pref.get( RServe.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
+        rServePort.setText( String.valueOf( pref.getInt( RServe.RSERVE_PORT, DEFAULT_RSERVE_PORT ) ) );
+        boolean manualRemoteButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
+        boolean authSelected = pref.getBoolean( RServe.RSERVE_USE_AUTH, false );
         if( manualRemoteButtonSelected ) {
             autoOrmanual.setSelected( manualRemoteButton.getModel(), true );
             manualRemoteButtonSelected();
             if( authSelected ) {
                 useAuthCheckBox.setSelected( true );
-                usernameTextField.setText( pref.get( Properties.RSERVE_USER, "" ) );
+                usernameTextField.setText( pref.get( RServe.RSERVE_USER, "" ) );
                 passwordTextField.setText( "xxxxxxxx" );
                 useAuthCheckboxSelected();
             }
         } else {
-            boolean manualLocalButtonSelected = pref.getBoolean( Properties.RSERVE_MANUAL_LOCAL_SETUP, false );
+            boolean manualLocalButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
             if( manualLocalButtonSelected ) {
                 autoOrmanual.setSelected( manualLocalButton.getModel(), true );
-                rServeStartupScript.setText( pref.get( Properties.RSERVE_STARTUP_SCRIPT, "" ) );
+                rServeStartupScript.setText( pref.get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
                 manualLocalButtonSelected();
                 if( authSelected ) {
                     useAuthCheckBox.setSelected( true );
-                    usernameTextField.setText( pref.get( Properties.RSERVE_USER, "" ) );
+                    usernameTextField.setText( pref.get( RServe.RSERVE_USER, "" ) );
                     passwordTextField.setText( "xxxxxxxx" );
                     useAuthCheckboxSelected();
                 }
@@ -863,45 +864,45 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         pref.put( Properties.CRAN_MIRROR, cranMirror.getText() );
         boolean manualRemoteButtonSelected = manualRemoteButton.isSelected();
         boolean manualLocalButtonSelected = manualLocalButton.isSelected();
-        pref.putBoolean( Properties.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButtonSelected );
-        pref.putBoolean( Properties.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButtonSelected );
+        pref.putBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButtonSelected );
+        pref.putBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButtonSelected );
         if( manualRemoteButton.isSelected() ) {
-            pref.put( Properties.RSERVE_HOST, rServeHost.getText() );
-            pref.putInt( Properties.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
-            pref.remove( Properties.RSERVE_STARTUP_SCRIPT );
+            pref.put( RServe.RSERVE_HOST, rServeHost.getText() );
+            pref.putInt( RServe.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
+            pref.remove( RServe.RSERVE_STARTUP_SCRIPT );
             if( useAuthCheckBox.isSelected() ) {
-                pref.putBoolean( Properties.RSERVE_USE_AUTH, true );
-                pref.put( Properties.RSERVE_USER, usernameTextField.getText() );
+                pref.putBoolean( RServe.RSERVE_USE_AUTH, true );
+                pref.put( RServe.RSERVE_USER, usernameTextField.getText() );
                 if( passwordChanged ) {
-                    PasswordStore.save( Properties.RSERVE_PASSWORD, passwordTextField.getPassword(), "" );
+                    PasswordStore.save( RServe.RSERVE_PASSWORD, passwordTextField.getPassword(), "" );
                     passwordChanged = false;
                 }
             } else {
-                pref.remove( Properties.RSERVE_USER );
-                PasswordStore.delete( Properties.RSERVE_PASSWORD );
+                pref.remove( RServe.RSERVE_USER );
+                PasswordStore.delete( RServe.RSERVE_PASSWORD );
             }
         } else if( manualLocalButton.isSelected() ) {
-            pref.put( Properties.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText() );
-            pref.putInt( Properties.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
-            pref.remove( Properties.RSERVE_HOST );
+            pref.put( RServe.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText() );
+            pref.putInt( RServe.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
+            pref.remove( RServe.RSERVE_HOST );
             if( useAuthCheckBox.isSelected() ) {
-                pref.putBoolean( Properties.RSERVE_USE_AUTH, true );
-                pref.put( Properties.RSERVE_USER, usernameTextField.getText() );
+                pref.putBoolean( RServe.RSERVE_USE_AUTH, true );
+                pref.put( RServe.RSERVE_USER, usernameTextField.getText() );
                 if( passwordChanged ) {
-                    PasswordStore.save( Properties.RSERVE_PASSWORD, passwordTextField.getPassword(), "" );
+                    PasswordStore.save( RServe.RSERVE_PASSWORD, passwordTextField.getPassword(), "" );
                     passwordChanged = false;
                 }
             } else {
-                pref.remove( Properties.RSERVE_USER );
-                PasswordStore.delete( Properties.RSERVE_PASSWORD );
+                pref.remove( RServe.RSERVE_USER );
+                PasswordStore.delete( RServe.RSERVE_PASSWORD );
             }
         } else {
-            pref.remove( Properties.RSERVE_HOST );
-            pref.remove( Properties.RSERVE_PORT );
-            pref.remove( Properties.RSERVE_STARTUP_SCRIPT );
-            pref.remove( Properties.RSERVE_USE_AUTH );
-            pref.remove( Properties.RSERVE_USER );
-            PasswordStore.delete( Properties.RSERVE_PASSWORD );
+            pref.remove( RServe.RSERVE_HOST );
+            pref.remove( RServe.RSERVE_PORT );
+            pref.remove( RServe.RSERVE_STARTUP_SCRIPT );
+            pref.remove( RServe.RSERVE_USE_AUTH );
+            pref.remove( RServe.RSERVE_USER );
+            PasswordStore.delete( RServe.RSERVE_PASSWORD );
         }
     }
 
