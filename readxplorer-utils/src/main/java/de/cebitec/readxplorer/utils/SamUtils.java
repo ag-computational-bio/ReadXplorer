@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,7 +169,7 @@ public class SamUtils implements Observable {
             samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
             SamUtils utils = new SamUtils();
             utils.registerObserver( observer );
-            success = utils.createIndex( samReader, new File( bamFile + Properties.BAM_INDEX_EXT ) );
+            success = utils.createIndex( samReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
             utils.removeObserver( observer );
         }
         return success;
@@ -203,7 +204,7 @@ public class SamUtils implements Observable {
 //        }
 //        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
-        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Properties.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
 //        if (extension.toLowerCase().contains("sam")) {
 //            outputFile = new File(newFileName + newEnding + ".sam");
 //            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);

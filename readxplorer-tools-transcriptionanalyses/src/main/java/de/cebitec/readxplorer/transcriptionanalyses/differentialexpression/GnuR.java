@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.PasswordStore;
-import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -111,7 +111,7 @@ public final class GnuR extends RConnection {
 
 
     private void setDefaultCranMirror() throws RserveException {
-        cranMirror = NbPreferences.forModule( Object.class ).get( Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
+        cranMirror = NbPreferences.forModule( Object.class ).get( Paths.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
         this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
     }
 

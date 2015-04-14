@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -326,7 +327,7 @@ public final class GeneralUtils {
             try {
                 Files.delete( lastWorkFile.toPath() );
                 deleted = true;
-                File indexFile = new File( lastWorkFile.getAbsolutePath().concat( Properties.BAM_INDEX_EXT ) );
+                File indexFile = new File( lastWorkFile.getAbsolutePath().concat( Paths.BAM_INDEX_EXT ) );
                 if( indexFile.canWrite() ) {
                     Files.delete( indexFile.toPath() );
                 }
@@ -562,7 +563,7 @@ public final class GeneralUtils {
     public static String createEcHtmlLink( String ecNumber ) {
         String ecLink = "<html> </html>";
         if( ecNumber != null && !ecNumber.isEmpty() ) {
-            String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+            String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
             ecLink = "<a href=\"" + dbUrl + ecNumber + "\">" + ecNumber + "</a>";
         }
         return ecLink;
@@ -582,7 +583,7 @@ public final class GeneralUtils {
         UrlWithTitle url = null;
         if( ecNumber != null && !ecNumber.isEmpty() ) {
             try {
-                String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+                String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
                 url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
             } catch( MalformedURLException ex ) {
                 LOG.log( SEVERE, ex.getMessage() );

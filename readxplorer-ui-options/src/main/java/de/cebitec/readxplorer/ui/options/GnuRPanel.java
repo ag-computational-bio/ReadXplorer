@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.ui.options;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.Downloader;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.PasswordStore;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.Unzip;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -424,7 +424,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.pref = NbPreferences.forModule( Object.class );
         initComponents();
         warningMessage.setText( "" );
-        String sourceUri = pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
+        String sourceUri = pref.get( Paths.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
         sourceFileTextField.setText(sourceUri );
         jProgressBar1.setMaximum( 100 );
         setUpListener();
@@ -826,7 +826,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     @Override
     void load() {
         autoOrmanual.clearSelection();
-        cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
+        cranMirror.setText( pref.get( Paths.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
         rServeHost.setText( pref.get( RServe.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
         rServePort.setText( String.valueOf( pref.getInt( RServe.RSERVE_PORT, DEFAULT_RSERVE_PORT ) ) );
         boolean manualRemoteButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
@@ -861,7 +861,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     @Override
     void store() {
-        pref.put( Properties.CRAN_MIRROR, cranMirror.getText() );
+        pref.put( Paths.CRAN_MIRROR, cranMirror.getText() );
         boolean manualRemoteButtonSelected = manualRemoteButton.isSelected();
         boolean manualLocalButtonSelected = manualLocalButton.isSelected();
         pref.putBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButtonSelected );
