@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
-import de.cebitec.readxplorer.utils.SequenceComparison;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 
 
 /**

@@ -30,7 +30,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceComparison;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.api.Classification;
 import java.util.ArrayList;

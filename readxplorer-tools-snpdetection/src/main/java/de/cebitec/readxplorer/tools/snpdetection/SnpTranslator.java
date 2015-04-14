@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.utils.CodonUtils;
-import de.cebitec.readxplorer.utils.SequenceComparison;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
