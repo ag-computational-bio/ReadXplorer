@@ -212,7 +212,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return means;
     }
     
-    protected Map<PersistentFeature, Double> calculateAverageRSquareOfReplicates(
+    protected Map<Integer, Map<PersistentFeature, Double>> calculateAverageRSquareOfReplicates(
         Map<Integer, MultiValueMap<PersistentFeature, int[]>> countData) {
         Map<Integer, Map<PersistentFeature, Double>> preparedDataForConditions = new HashMap<>();
         Map<PersistentFeature, Double> preparedData;
@@ -241,8 +241,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
             preparedDataForConditions.put( condition, averagesOfReplicatesForCondition );
             
         }
-        preparedData = findMeanOfReplicatesRSquareBeteenConditions(preparedDataForConditions); 
-        return preparedData;
+        //preparedData = findMeanOfReplicatesRSquareBeteenConditions(preparedDataForConditions); 
+        return preparedDataForConditions;
     }
     
     protected double averageOfArray( ArrayList<Double> array) {
@@ -276,7 +276,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     @Override
     protected List<ResultDeAnalysis> processWithTool() {
         Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions;
-        Map<PersistentFeature, Double> calculatedForReplicates = new HashMap<>();
+        Map<Integer, Map<PersistentFeature, Double>> calculatedForReplicates = new HashMap<>();
         if( workingWithoutReplicates ) {
             preparedDataForConditions = allContinuousCoverageData;
         } else {
@@ -295,7 +295,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
       return results;  
     }
     
-    private List<ResultDeAnalysis> prepareResults( Map<PersistentFeature, double[]> calculated , Map<PersistentFeature, Double> replicatesData ) {
+    private List<ResultDeAnalysis> prepareResults( Map<PersistentFeature, double[]> calculated,
+                                                   Map<Integer, Map<PersistentFeature, Double>> replicatesData ) {
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Continuous Count Data Table" );
         progressHandle.start( calculated.size() );
        
@@ -305,13 +306,13 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         int k = 0;
         for (Map.Entry<PersistentFeature, double[]> feature : calculated.entrySet() ) {
             k++;
-            int tableSize = feature.getValue().length+2; // Plus feature name and  r square of replicates
+            int tableSize = feature.getValue().length+3; // Plus feature name and  r square of replicates(2 cond)
             //boolean allZero = true;
             final Object[] tmp = new Object[tableSize];
             double[] rSqrt = feature.getValue();
             
             tmp[0] = feature.getKey();
-            for(int i = 1; i<tableSize-1; i++ ){
+            for(int i = 1; i<tableSize-2; i++ ){
                 //if( ! ( Double.isNaN( rSqrt[i-1] ) ) && 
                   //( Double.isFinite( rSqrt[i-1] ) ) ) {
                   //  allZero = false;
@@ -319,9 +320,11 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
                 //}
             }
             if(replicatesData.isEmpty()) {
+                tmp[tableSize-2] = "There are no replicates";
                 tmp[tableSize-1] = "There are no replicates";
             } else {
-                tmp[tableSize-1] = replicatesData.get( feature.getKey() );
+                tmp[tableSize-2] = replicatesData.get( indexForA ).get( feature.getKey() );
+                tmp[tableSize-1] = replicatesData.get( indexForB ).get( feature.getKey() );
             }
                 
             //if(!allZero){
@@ -336,7 +339,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         colNames.add( "Intercept" );
         colNames.add( "Slope" );
         colNames.add( "R^2 for Conditions" );
-        colNames.add( "R^2 for Replicates" );
+        colNames.add( "R^2 for Replicates (Cond. 1)" );
+        colNames.add( "R^2 for Replicates (Cond. 2)" );
 
         List<ResultDeAnalysis> result = Collections.singletonList( new ResultDeAnalysis(
             tableContents, colNames, regionNamesList, "Count Data Table" ) );
