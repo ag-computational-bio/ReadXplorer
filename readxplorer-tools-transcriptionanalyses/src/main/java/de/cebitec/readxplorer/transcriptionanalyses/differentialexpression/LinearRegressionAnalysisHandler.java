@@ -143,9 +143,9 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         }
     }
    
-    private MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> sortDataForConditions( 
+    private Map<Integer, MultiValueMap<PersistentFeature, int[]>> sortDataForConditions( 
             Map<Integer, Map<PersistentFeature, int[]>> allData ) {
-        MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> preparedDataForConditions = new MultiValueMap<>();
+        Map<Integer, MultiValueMap<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
         MultiValueMap<PersistentFeature, int[]> innerMultiMapA;
         MultiValueMap<PersistentFeature, int[]> innerMultiMapB;
         
@@ -171,23 +171,19 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return innerMultiMap;
     }
    
-    private Map<Integer, Map<PersistentFeature, int[]>> findMeanForReplicates( 
-            MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> allData) {
+    private Map<Integer, Map<PersistentFeature, int[]>> findMeanOfReplicatesDataForEachCondition( 
+            Map<Integer, MultiValueMap<PersistentFeature, int[]>> allData) {
         Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
         Integer[] conditions = { indexForA, indexForB };
             
         for( Integer condition : conditions ) {
             Map<PersistentFeature, int[]> preparedInnerMap = new HashMap<>();
-            Iterator<MultiValueMap<PersistentFeature, int[]>> geneSet =
-                allData.getCollection( condition ).iterator();               
-            while(geneSet.hasNext()) {
-                MultiValueMap<PersistentFeature, int[]> replicate = geneSet.next();
-                for( PersistentFeature feature : replicate.keySet() ) {
-                    Collection<int[]> countData = replicate.getCollection( feature );
+            MultiValueMap<PersistentFeature, int[]> featureSet = allData.get( condition );               
+                for( PersistentFeature feature : featureSet.keySet() ) {
+                    Collection<int[]> countData = featureSet.getCollection( feature );
                     int[] means = findMeanBetweenArraysInCollection( countData );
                     preparedInnerMap.put( feature, means );
                 }
-            }
             preparedDataForConditions.put( condition, preparedInnerMap );
         }
         return preparedDataForConditions;
@@ -216,23 +212,82 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return means;
     }
     
+    protected Map<PersistentFeature, Double> calculateAverageRSquareOfReplicates(
+        Map<Integer, MultiValueMap<PersistentFeature, int[]>> countData) {
+        Map<Integer, Map<PersistentFeature, Double>> preparedDataForConditions = new HashMap<>();
+        Map<PersistentFeature, Double> preparedData;
+        for( Integer condition : countData.keySet() ) {
+            MultiValueMap<PersistentFeature, int[]> featureSetForCondition = countData.get( condition );
+            Map<PersistentFeature, Double> averagesOfReplicatesForCondition = new HashMap<>(); 
+            Integer firstReplicateNr = 0;
+            Integer secondReplicateNr = 1;
+            Map<Integer, Map<PersistentFeature, int[]>> replicatePairs = new HashMap<>(); 
+            for( PersistentFeature feature : featureSetForCondition.keySet()) {
+                ArrayList<Double> rSqueareMeans = new ArrayList<>();
+                 ArrayList<int[]> data = (ArrayList<int[]>) featureSetForCondition.getCollection( feature );
+                 for(int i = 0; i<data.size(); i++) {
+                    for(int j = i+1; j<data.size(); j++) {
+                       int[] firstReplicateData = data.get( i );
+                       int[] secondReplicateData = data.get( j );
+                       CalculatePerpendicular calculation = new CalculatePerpendicular();
+                       double[] regCalculation = calculation.calculate( firstReplicateData, secondReplicateData );
+                       double rSquare = regCalculation[2];
+                       rSqueareMeans.add( rSquare );
+                    }
+                 }
+                 double rSquareAverage = averageOfArray( rSqueareMeans );
+                 averagesOfReplicatesForCondition.put( feature, rSquareAverage );
+            }
+            preparedDataForConditions.put( condition, averagesOfReplicatesForCondition );
+            
+        }
+        preparedData = findMeanOfReplicatesRSquareBeteenConditions(preparedDataForConditions); 
+        return preparedData;
+    }
+    
+    protected double averageOfArray( ArrayList<Double> array) {
+        double sum = 0;
+        for (Double data : array) {
+            sum += data;
+        }
+        double average = sum / array.size();
+        return average;
+    }
+    
+    protected Map<PersistentFeature, Double> findMeanOfReplicatesRSquareBeteenConditions(
+            Map<Integer, Map<PersistentFeature, Double>> averageData ) {
+        Map<PersistentFeature, Double> featureSet1 = averageData.get( indexForA );
+        Map<PersistentFeature, Double> featureSet2 = averageData.get( indexForB );
+        Map<PersistentFeature, Double> result = new HashMap<>();
+        for (Map.Entry<PersistentFeature, Double> feature1 : featureSet1.entrySet() ){
+            for (Map.Entry<PersistentFeature, Double> feature2 : featureSet2.entrySet()) {
+                if (feature1.getKey() == null ? feature2.getKey() ==
+                    null : feature1.getKey().equals( feature2.getKey() )) {
+                    Double feature1Average = feature1.getValue();
+                    Double feature2Average = feature2.getValue();
+                    Double mean = ( feature1Average + feature2Average ) / 2;
+                    result.put( feature1.getKey(), mean ); 
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     protected List<ResultDeAnalysis> processWithTool() {
-        Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
+        Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions;
+        Map<PersistentFeature, Double> calculatedForReplicates = new HashMap<>();
         if( workingWithoutReplicates ) {
             preparedDataForConditions = allContinuousCoverageData;
         } else {
-            MultiValueMap<Integer, MultiValueMap<PersistentFeature, int[]>> sortedDataForConditions =
+            Map<Integer, MultiValueMap<PersistentFeature, int[]>> sortedDataForConditions =
                 sortDataForConditions(allContinuousCoverageData);
-            preparedDataForConditions = findMeanForReplicates(sortedDataForConditions);
+            preparedDataForConditions = findMeanOfReplicatesDataForEachCondition(sortedDataForConditions);
+            calculatedForReplicates = calculateAverageRSquareOfReplicates(sortedDataForConditions);
         }
         linRegForConditions.process( preparedDataForConditions ); 
-    //  linRegForReplicates.process( allContinuousCoverageData );
         Map<PersistentFeature, double[]> calculatedForConditions = linRegForConditions.getResults();
-    //  Map<PersistentFeature, double[]> calculatedForReplicates = linRegForReplicates.getResults();
-        results = prepareResults(calculatedForConditions);
-    //  List<ResultDeAnalysis> resultsForReplicates = prepareResults(calculatedForReplicates);
-    //  results = concatenateResults(resultsForConditions, resultsForReplicates);
+        results = prepareResults( calculatedForConditions, calculatedForReplicates );
         return results;
     }
     
@@ -240,30 +295,35 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
       return results;  
     }
     
-    private List<ResultDeAnalysis> prepareResults(Map<PersistentFeature, double[]> calculated) {
+    private List<ResultDeAnalysis> prepareResults( Map<PersistentFeature, double[]> calculated , Map<PersistentFeature, Double> replicatesData ) {
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Continuous Count Data Table" );
         progressHandle.start( calculated.size() );
        
         final List<Object> regionNamesList = new ArrayList<>();
-
         List<List<Object>> tableContents = new ArrayList<>();
         
         int k = 0;
         for (Map.Entry<PersistentFeature, double[]> feature : calculated.entrySet() ) {
             k++;
-            int tableSize = feature.getValue().length+1;
+            int tableSize = feature.getValue().length+2; // Plus feature name and  r square of replicates
             boolean allZero = true;
             final Object[] tmp = new Object[tableSize];
             double[] rSqrt = feature.getValue();
             
             tmp[0] = feature.getKey();
-            for(int i = 1; i<tableSize; i++ ){
+            for(int i = 1; i<tableSize-1; i++ ){
                 if( ! ( Double.isNaN( rSqrt[i-1] ) ) && 
                   ( Double.isFinite( rSqrt[i-1] ) ) ) {
                     allZero = false;
                     tmp[i] = rSqrt[i-1];
                 }
             }
+            if(replicatesData.isEmpty()) {
+                tmp[tableSize-1] = "There are no replicates";
+            } else {
+                tmp[tableSize-1] = replicatesData.get( feature.getKey() );
+            }
+                
             if(!allZero){
                 tableContents.add( new Vector( Arrays.asList( tmp ) ) );
                 regionNamesList.add( feature.getKey() );
@@ -275,7 +335,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         colNames.add( "Feature" );
         colNames.add( "Intercept" );
         colNames.add( "Slope" );
-        colNames.add( "R^2" );
+        colNames.add( "R^2 for Conditions" );
+        colNames.add( "R^2 for Replicates" );
 
         List<ResultDeAnalysis> result = Collections.singletonList( new ResultDeAnalysis(
             tableContents, colNames, regionNamesList, "Count Data Table" ) );
