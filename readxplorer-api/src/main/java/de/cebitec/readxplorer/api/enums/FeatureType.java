@@ -22,13 +22,14 @@ import de.cebitec.readxplorer.api.Classification;
 
 
 /**
- * Enumeration for all different features types used in readxplorer. This does
- * not only include genetic features, but also features displayed in viewers.
+ * Enumeration for all different features types used in readxplorer.
+ * This does not only include genetic features, but also features displayed
+ * in viewers.
  * Each type is created with an integer and a string representation and it can
  * return values for both. It also allows to return the feature type represented
  * by a given integer or string.
  * <p>
- * @author ddoppmeier, rhilker
+ * @author ddoppmeier, rhilker, Oliver Schwengers
  */
 public enum FeatureType implements Classification {
 
@@ -36,253 +37,166 @@ public enum FeatureType implements Classification {
      * getTypeInt() returns '-1' = To be used if feature type does not matter.
      * getType() returns '-1' = To be used if feature type does not matter.
      */
-    ANY( FeatureType.ANY_INT, FeatureType.ANY_STRING ),
+    ANY( -1, "any" ),
 
     /**
      * getType() returns '0' = To be used for a feature with unknown type.
      */
-    UNDEFINED( FeatureType.UNDEFINED_INT, FeatureType.UNDEFINED_STRING ),
+    UNDEFINED( 0, "unknown" ),
 
     /**
      * getType() returns '1' = To be used for mRNAs.
      */
-    MRNA( FeatureType.MRNA_INT, FeatureType.MRNA_STRING ),
+    MRNA( 1, "mRNA" ),
 
     /**
      * getType() returns '2' = To be used for coding sequences.
      */
-    CDS( FeatureType.CDS_INT, FeatureType.CDS_STRING ),
+    CDS( 2, "CDS" ),
 
     /**
      * getType() returns '3' = To be used for misc rnas.
      */
-    MISC_RNA( FeatureType.MISC_RNA_INT, FeatureType.MISC_RNA_STRING ),
+    MISC_RNA( 3, "misc RNA" ),
 
     /**
      * getType() returns '4' = To be used for rRNAs.
      */
-    RRNA( FeatureType.RRNA_INT, FeatureType.RRNA_STRING ),
+    RRNA( 4, "rRNA" ),
 
     /**
      * getType() returns '5' = To be used for repeat units.
      */
-    REPEAT_UNIT( FeatureType.REPEAT_UNIT_INT, FeatureType.REPEAT_UNIT_STRING ),
+    REPEAT_UNIT( 5, "Repeat unit" ),
 
     /**
      * getType() returns '6' = To be used for sources.
      */
-    SOURCE( FeatureType.SOURCE_INT, FeatureType.SOURCE_STRING ),
+    SOURCE( 6, "Source" ),
 
     /**
      * getType() returns '7' = To be used for tRNAs.
      */
-    TRNA( FeatureType.TRNA_INT, FeatureType.TRNA_STRING ),
+    TRNA( 7, "tRNA" ),
 
     /**
      * getType() returns '8' = To be used for genes.
      */
-    GENE( FeatureType.GENE_INT, FeatureType.GENE_STRING ),
+    GENE( 8, "Gene" ),
 
     /**
      * getType() returns '9' = To be used for micro RNAs.
      */
-    MIRNA( FeatureType.MIRNA_INT, FeatureType.MIRNA_STRING ),
+    MIRNA( 9, "miRNA" ),
 
     /**
      * getType() returns '10' = To be used for exons.
      */
-    EXON( FeatureType.EXON_INT, FeatureType.EXON_STRING ),
+    EXON( 10, "Exon" ),
 
     /**
      * getType() returns '11' = To be used for introns.
      */
-    INTRON( FeatureType.INTRON_INT, FeatureType.INTRON_STRING ),
+    INTRON( 11, "Intron" ),
 
     /**
      * getType() returns '29' = To be used for five prime untranslated region.
      */
-    FIVE_UTR( FeatureType.FIVE_UTR_INT, FeatureType.FIVE_UTR_STRING ),
+    FIVE_UTR( 29, "5'UTR" ),
 
     /**
      * getType() returns '30' = To be used for three prime untranslated region.
      */
-    THREE_UTR( FeatureType.THREE_UTR_INT, FeatureType.THREE_UTR_STRING ),
+    THREE_UTR( 30, "3'UTR" ),
 
     /**
      * getType() returns '31' = To be used for non coding RNAs.
      */
-    NC_RNA( FeatureType.NC_RNA_INT, FeatureType.NC_RNA_STRING ),
+    NC_RNA( 31, "non-coding RNA" ),
 
     /**
      * getType() returns '32' = To be used for minus 35 region.
      */
-    MINUS_THIRTYFIVE( FeatureType.MINUS_THIRTYFIVE_INT, FeatureType.MINUS_THIRTYFIVE_STRING ),
+    MINUS_THIRTYFIVE( 32, "-35 signal" ),
 
     /**
      * getType() returns '33' = To be used for minus 10 region.
      */
-    MINUS_TEN( FeatureType.MINUS_TEN_INT, FeatureType.MINUS_TEN_STRING ),
+    MINUS_TEN( 33, "-10 signal" ),
 
     /**
      * getType() returns '34' = To be used for ribosome binding sides.
      */
-    RBS( FeatureType.RBS_INT, FeatureType.RBS_STRING ),
+    RBS( 34, "RBS" ),
 
     /**
      * getType() returns '35' = To be used for start codon location.
      */
-    START_CODON( FeatureType.START_CODON_INT, FeatureType.START_CODON_STRING ),
+    START_CODON( 35, "Start codon" ),
 
     /**
      * getType() returns '36' = To be used for stop codon location.
      */
-    STOP_CODON( FeatureType.STOP_CODON_INT, FeatureType.STOP_CODON_STRING_UNDERSCORE ),
+    STOP_CODON( 36, "Stop codon" ),
 
     /**
      * feature type for multiple mapped reads (non-unique)
      */
-    MULTIPLE_MAPPED_READ( FeatureType.MULTIPLE_MAPPED_READ_INT, FeatureType.MULTIPLE_MAPPED_READ_STRING ),
+    MULTIPLE_MAPPED_READ( 14, "Include multiple mapped reads" ),
 
-    //feature types for the histogram viewer
-    BASE_A( FeatureType.BASE_A_INT, FeatureType.BASE_A_STRING ),
-    BASE_C( FeatureType.BASE_C_INT, FeatureType.BASE_C_STRING ),
-    BASE_G( FeatureType.BASE_G_INT, FeatureType.BASE_G_STRING ),
-    BASE_T( FeatureType.BASE_T_INT, FeatureType.BASE_T_STRING ),
-    BASE_N( FeatureType.BASE_N_INT, FeatureType.BASE_N_STRING ),
-    MATCH( FeatureType.MATCH_INT, FeatureType.MATCH_STRING ),
-    GAP( FeatureType.GAP_INT, FeatureType.GAP_STRING ),
+    // feature types for the histogram viewer
+    BASE_A( 18, "A" ),
+    BASE_C( 19, "C" ),
+    BASE_G( 20, "G" ),
+    BASE_T( 21, "T" ),
+    BASE_N( 22, "N" ),
+    MATCH( 23, "Match" ),
+    GAP( 24, "Gap in read" ),
 
-    //feature types for the alignment viewer
-    DIFF( FeatureType.DIFF_INT, FeatureType.DIFF_STRING ),
+    // feature types for the alignment viewer
+    DIFF( 25, "Diff." ),
 
-    //feature types for the read pair viewer
-    PERFECT_PAIR( FeatureType.PERFECT_PAIR_INT, FeatureType.PERFECT_PAIR_STRING ),
-    DISTORTED_PAIR( FeatureType.DISTORTED_PAIR_INT, FeatureType.DISTORTED_PAIR_STRING ),
-    SINGLE_MAPPING( FeatureType.SINGLE_MAPPING_INT, FeatureType.SINGLE_MAPPING_STRING );
-
-    //feature types supported by the reference viewer
-    private static final int ANY_INT = -1;
-    private static final int UNDEFINED_INT = 0;
-    private static final int MRNA_INT = 1;
-    private static final int CDS_INT = 2;
-    private static final int MISC_RNA_INT = 3;
-    private static final int RRNA_INT = 4;
-    private static final int REPEAT_UNIT_INT = 5;
-    private static final int SOURCE_INT = 6;
-    private static final int TRNA_INT = 7;
-    private static final int GENE_INT = 8;
-    private static final int MIRNA_INT = 9;
-    private static final int EXON_INT = 10;
-    private static final int INTRON_INT = 11;
-    private static final int FIVE_UTR_INT = 29;
-    private static final int THREE_UTR_INT = 30;
-    private static final int NC_RNA_INT = 31;
-    private static final int MINUS_THIRTYFIVE_INT = 32;
-    private static final int MINUS_TEN_INT = 33;
-    private static final int RBS_INT = 34;
-    private static final int START_CODON_INT = 35;
-    private static final int STOP_CODON_INT = 36;
+    // feature types for the read pair viewer
+    PERFECT_PAIR( 26, "Perfect read pair" ),
+    DISTORTED_PAIR( 27, "Distorted read pair" ),
+    SINGLE_MAPPING( 28, "Single mapping" );
 
 
-    /**
-     * feature type int for multiple mapped reads (non-unique)
-     */
-    private static final int MULTIPLE_MAPPED_READ_INT = 14;
-
-    //feature types for the histogram viewer
-    private static final int BASE_A_INT = 18;
-    private static final int BASE_C_INT = 19;
-    private static final int BASE_G_INT = 20;
-    private static final int BASE_T_INT = 21;
-    private static final int BASE_N_INT = 22;
-    private static final int MATCH_INT = 23;
-    private static final int GAP_INT = 24;
-
-    //feature types for the alignment viewer
-    private static final int DIFF_INT = 25;
-
-    //feature types for the read pair viewer
-    private static final int PERFECT_PAIR_INT = 26;
-    private static final int DISTORTED_PAIR_INT = 27;
-    private static final int SINGLE_MAPPING_INT = 28;
-
-    //feature types supported by ReadXplorer
-    //Underscore Strings are needed to parse the official feature keys
-    private static final String ANY_STRING = "any";
-    private static final String UNDEFINED_STRING = "unknown";
-    private static final String MRNA_STRING = "mRNA";
-    private static final String CDS_STRING = "CDS";
+    // Underscore Strings are needed to parse the official feature keys
     /**
      * ORF string is only used for input. It cannot be returned.
      */
     private static final String ORF_STRING = "ORF";
-    private static final String MISC_RNA_STRING = "misc RNA";
     /**
      * misc RNA string with underscore "misc_RNA".
      */
-    private static final String MISC_RNA_STRING_USCORE = "misc_RNA";
-    private static final String RRNA_STRING = "rRNA";
-    private static final String REPEAT_UNIT_STRING = "Repeat unit";
+    private static final String MISC_RNA_STRING_UNDERSCORE = "misc_RNA";
     /**
      * Repeat unit string with underscore "repeat_unit".
      */
-    private static final String REPEAT_UNIT_STRING_USCORE = "Repeat_unit";
-    private static final String SOURCE_STRING = "Source";
-    private static final String TRNA_STRING = "tRNA";
-    private static final String GENE_STRING = "Gene";
-    private static final String MIRNA_STRING = "miRNA";
-    private static final String EXON_STRING = "Exon";
-    private static final String INTRON_STRING = "Intron";
-    private static final String FIVE_UTR_STRING = "5'UTR";
-    private static final String THREE_UTR_STRING = "3'UTR";
+    private static final String REPEAT_UNIT_STRING_UNDERSCORE = "Repeat_unit";
     /**
      * UTR strings with underscore.
      */
     private static final String FIVE_UTR_STRING_UNDERSCORE = "five_prime_UTR";
     private static final String THREE_UTR_STRING_UNDERSCORE = "three_prime_UTR";
-    private static final String NC_RNA_STRING = "non-coding RNA";
-    private static final String MINUS_THIRTYFIVE_STRING = "-35 signal";
     /**
      * -35 signal string with underscore "-35_signal".
      */
     private static final String MINUS_THIRTYFIVE_STRING_UNDERSCORE = "-35_signal";
-    private static final String MINUS_TEN_STRING = "-10 signal";
     /**
      * -10 signal string with underscore "-10_signal".
      */
     private static final String MINUS_TEN_STRING_UNDERSCORE = "-10_signal";
-    private static final String RBS_STRING = "RBS";
-    private static final String START_CODON_STRING = "Start codon";
+
     /**
      * Start codon string with underscore "start_codon".
      */
     private static final String START_CODON_STRING_UNDERSCORE = "start_codon";
-    private static final String STOP_CODON_STRING = "Stop codon";
     /**
      * Stop codon string with underscore "stop_codon".
      */
     private static final String STOP_CODON_STRING_UNDERSCORE = "stop_codon";
-    /**
-     * feature type String for multiple mapped reads (non-unique)
-     */
-    private static final String MULTIPLE_MAPPED_READ_STRING = "Include multiple mapped reads";
-
-    //feature types for the histogram viewer
-    private static final String BASE_A_STRING = "A";
-    private static final String BASE_C_STRING = "C";
-    private static final String BASE_G_STRING = "G";
-    private static final String BASE_T_STRING = "T";
-    private static final String BASE_N_STRING = "N";
-    private static final String MATCH_STRING = "Match";
-    private static final String GAP_STRING = "Gap in read";
-
-    //feature types for the alignment viewer
-    private static final String DIFF_STRING = "Diff.";
-
-    //feature types for the read pair viewer
-    private static final String PERFECT_PAIR_STRING = "Perfect read pair";
-    private static final String DISTORTED_PAIR_STRING = "Distorted read pair";
-    private static final String SINGLE_MAPPING_STRING = "Single mapping";
 
     private final int type;
     private final String string;
@@ -325,50 +239,15 @@ public enum FeatureType implements Classification {
      *             a genomic feature type, FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType( int type ) {
-        switch( type ) {
-            case ANY_INT:
-                return ANY;
-            case MRNA_INT:
-                return MRNA;
-            case CDS_INT:
-                return CDS;
-            case MISC_RNA_INT:
-                return MISC_RNA;
-            case RRNA_INT:
-                return RRNA;
-            case REPEAT_UNIT_INT:
-                return REPEAT_UNIT;
-            case SOURCE_INT:
-                return SOURCE;
-            case TRNA_INT:
-                return TRNA;
-            case GENE_INT:
-                return GENE;
-            case MIRNA_INT:
-                return MIRNA;
-            case EXON_INT:
-                return EXON;
-            case INTRON_INT:
-                return INTRON;
-            case FIVE_UTR_INT:
-                return FIVE_UTR;
-            case THREE_UTR_INT:
-                return THREE_UTR;
-            case NC_RNA_INT:
-                return NC_RNA;
-            case MINUS_THIRTYFIVE_INT:
-                return MINUS_THIRTYFIVE;
-            case MINUS_TEN_INT:
-                return MINUS_TEN;
-            case RBS_INT:
-                return RBS;
-            case START_CODON_INT:
-                return START_CODON;
-            case STOP_CODON_INT:
-                return STOP_CODON;
-            default:
-                return UNDEFINED;
+
+        for( FeatureType featType : values() ) {
+            if( featType.getType() == type ) {
+                return featType;
+            }
         }
+
+        return UNDEFINED;
+
     }
 
 
@@ -379,56 +258,36 @@ public enum FeatureType implements Classification {
      *             FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType( String type ) {
-        FeatureType featType;
-        if( type.equalsIgnoreCase( UNDEFINED_STRING ) ) {
-            featType = UNDEFINED;
-        } else if( type.equalsIgnoreCase( MRNA_STRING ) ) {
-            featType = MRNA;
-        } else if( type.equalsIgnoreCase( CDS_STRING ) ) {
-            featType = CDS;
-        } else if( type.equalsIgnoreCase( ORF_STRING ) ) {
-            featType = CDS;
-        } else if( type.equalsIgnoreCase( MISC_RNA_STRING ) || type.equalsIgnoreCase( MISC_RNA_STRING_USCORE ) ) {
-            featType = MISC_RNA;
-        } else if( type.equalsIgnoreCase( RRNA_STRING ) ) {
-            featType = RRNA;
-        } else if( type.equalsIgnoreCase( REPEAT_UNIT_STRING ) || type.equalsIgnoreCase( REPEAT_UNIT_STRING_USCORE ) ) {
-            featType = REPEAT_UNIT;
-        } else if( type.equalsIgnoreCase( TRNA_STRING ) ) {
-            featType = TRNA;
-        } else if( type.equalsIgnoreCase( GENE_STRING ) ) {
-            featType = GENE;
-        } else if( type.equalsIgnoreCase( MIRNA_STRING ) ) {
-            featType = MIRNA;
-        } else if( type.equalsIgnoreCase( EXON_STRING ) ) {
-            featType = EXON;
-        } else if( type.equalsIgnoreCase( INTRON_STRING ) ) {
-            featType = INTRON;
-        } else if( type.equalsIgnoreCase( SOURCE_STRING ) ) {
-            featType = SOURCE;
-        } else if( type.equalsIgnoreCase( ANY_STRING ) ) {
-            featType = ANY;
-        } else if( type.equalsIgnoreCase( FIVE_UTR_STRING ) || type.equalsIgnoreCase( FIVE_UTR_STRING_UNDERSCORE ) ) {
-            featType = FIVE_UTR;
-        } else if( type.equalsIgnoreCase( THREE_UTR_STRING ) || type.equalsIgnoreCase( THREE_UTR_STRING_UNDERSCORE ) ) {
-            featType = THREE_UTR;
-        } else if( type.equalsIgnoreCase( NC_RNA_STRING ) ) {
-            featType = NC_RNA;
-        } else if( type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING ) || type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING_UNDERSCORE ) ) {
-            featType = MINUS_THIRTYFIVE;
-        } else if( type.equalsIgnoreCase( MINUS_TEN_STRING ) || type.equalsIgnoreCase( MINUS_TEN_STRING_UNDERSCORE ) ) {
-            featType = MINUS_TEN;
-        } else if( type.equalsIgnoreCase( RBS_STRING ) ) {
-            featType = RBS;
-        } else if( type.equalsIgnoreCase( START_CODON_STRING ) || type.equalsIgnoreCase( START_CODON_STRING_UNDERSCORE )) {
-            featType = START_CODON;
-        } else if( type.equalsIgnoreCase( STOP_CODON_STRING ) || type.equalsIgnoreCase( STOP_CODON_STRING_UNDERSCORE )) {
-            featType = STOP_CODON;
-        } else{
-            featType = UNDEFINED;
+
+        type = type.toLowerCase();
+        for( FeatureType featType : values() ) {
+            if( featType.getString().equals( type ) ) {
+                return featType;
+            }
         }
 
-        return featType;
+        if( type.equals( ORF_STRING ) ) {
+            return CDS;
+        } else if( type.equals( MISC_RNA_STRING_UNDERSCORE ) ) {
+            return MISC_RNA;
+        } else if( type.equals( REPEAT_UNIT_STRING_UNDERSCORE ) ) {
+            return REPEAT_UNIT;
+        } else if( type.equals( FIVE_UTR_STRING_UNDERSCORE ) ) {
+            return FIVE_UTR;
+        } else if( type.equals( THREE_UTR_STRING_UNDERSCORE ) ) {
+            return THREE_UTR;
+        } else if( type.equals( MINUS_THIRTYFIVE_STRING_UNDERSCORE ) ) {
+            return MINUS_THIRTYFIVE;
+        } else if( type.equalsIgnoreCase( MINUS_TEN_STRING_UNDERSCORE ) ) {
+            return MINUS_TEN;
+        } else if( type.equalsIgnoreCase( START_CODON_STRING_UNDERSCORE )) {
+            return START_CODON;
+        } else if( type.equalsIgnoreCase( STOP_CODON_STRING_UNDERSCORE )) {
+            return STOP_CODON;
+        }
+
+        return UNDEFINED;
+
     }
 
 
@@ -436,6 +295,5 @@ public enum FeatureType implements Classification {
     public String toString() {
         return this.string;
     }
-
 
 }
