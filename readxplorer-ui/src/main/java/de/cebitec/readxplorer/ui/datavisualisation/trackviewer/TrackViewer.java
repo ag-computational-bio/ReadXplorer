@@ -18,6 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.constants.GUI;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
@@ -29,12 +33,8 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -80,7 +80,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private final int id2;
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
-    private boolean automaticScaling = pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false );
+    private boolean automaticScaling = pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false );
     private boolean useMinimalIntervalLength = true;
 
     private JSlider verticalSlider = null;
@@ -181,9 +181,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     protected Map<Classification, Color> createColors( Preferences pref ) {
         Map<Classification, Color> newClassToColorMap = new HashMap<>();
-        boolean uniformColoration = pref.getBoolean( ColorProperties.UNIFORM_DESIRED, false );
+        boolean uniformColoration = pref.getBoolean(Colors.UNIFORM_DESIRED, false );
         if( uniformColoration ) {
-            String colorRGB = pref.get( ColorProperties.UNIFORM_COLOR_STRING, "" );
+            String colorRGB = pref.get(Colors.UNIFORM_COLOR_STRING, "" );
             if( !colorRGB.isEmpty() ) {
                 for( Classification classType : classList ) {
                     newClassToColorMap.put( classType, new Color( Integer.parseInt( colorRGB ) ) );
@@ -222,7 +222,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.paintCoverage( g );
 
         } else {
-            Color fillcolor = ColorProperties.TITLE_BACKGROUND;
+            Color fillcolor = Colors.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
             if( loadingIndicator != null ) {
@@ -232,11 +232,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         }
 
         // draw scales
-        g.setColor( ColorProperties.TRACKPANEL_SCALE_LINES );
+        g.setColor(Colors.TRACKPANEL_SCALE_LINES );
         this.createLines( this.scaleLineStep, g );
 
         // draw black middle lines
-        g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+        g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
         drawBaseLines( g );
     }
 
@@ -523,7 +523,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     @Override
     public int getMaximalHeight() {
-        return pref.getInt( Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT );
+        return pref.getInt( GUI.VIEWER_HEIGHT, GUI.DEFAULT_HEIGHT );
     }
 
 
@@ -589,7 +589,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage ) {
-        String classType = classification.getTypeString();
+        String classType = classification.getString();
         if( hasNormalizationFactor ) {
             sb.append( createTableRow( classType, coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
         } else {

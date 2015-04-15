@@ -17,8 +17,8 @@
 
 package de.cebitec.readxplorer.parser.mappings;
 
+import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMRecord;
 import org.junit.After;
@@ -245,7 +245,7 @@ public class CommonsMappingParserTest {
 //        fail( "The test case is a prototype." );
 //    }
 
-    
+
     /**
      * Test of getReadNameWithoutPairTag method, of class CommonsMappingParser.
      */
@@ -273,18 +273,18 @@ public class CommonsMappingParserTest {
     @Test
     public void testGetReadPairTag() {
         System.out.println( "getReadPairTag" );
-        char readPairTag1 = CommonsMappingParser.getReadPairTag( record );
-        char readPairTag2 = CommonsMappingParser.getReadPairTag( record2 );
-        char readPairTag3 = CommonsMappingParser.getReadPairTag( record3 );
-        char readPairTag4 = CommonsMappingParser.getReadPairTag( record4 );
-        char readPairTag5 = CommonsMappingParser.getReadPairTag( record5 );
-        char readPairTag6 = CommonsMappingParser.getReadPairTag( record6 );
-        assertEquals( Properties.EXT_UNDEFINED, readPairTag1 );
-        assertEquals( Properties.EXT_A1, readPairTag2 );
-        assertEquals( Properties.EXT_A2, readPairTag3 );
-        assertEquals( Properties.EXT_A1, readPairTag4 );
-        assertEquals( Properties.EXT_A1, readPairTag5 );
-        assertEquals( Properties.EXT_A2, readPairTag6 );
+        ReadPairExtensions readPairTag1 = CommonsMappingParser.getReadPairTag( record );
+        ReadPairExtensions readPairTag2 = CommonsMappingParser.getReadPairTag( record2 );
+        ReadPairExtensions readPairTag3 = CommonsMappingParser.getReadPairTag( record3 );
+        ReadPairExtensions readPairTag4 = CommonsMappingParser.getReadPairTag( record4 );
+        ReadPairExtensions readPairTag5 = CommonsMappingParser.getReadPairTag( record5 );
+        ReadPairExtensions readPairTag6 = CommonsMappingParser.getReadPairTag( record6 );
+        assertEquals( ReadPairExtensions.Undefined, readPairTag1 );
+        assertEquals( ReadPairExtensions.A1, readPairTag2 );
+        assertEquals( ReadPairExtensions.A2, readPairTag3 );
+        assertEquals( ReadPairExtensions.A1, readPairTag4 );
+        assertEquals( ReadPairExtensions.A1, readPairTag5 );
+        assertEquals( ReadPairExtensions.A2, readPairTag6 );
     }
 
 

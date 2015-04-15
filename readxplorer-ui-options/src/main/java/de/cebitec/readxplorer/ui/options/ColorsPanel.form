@@ -651,7 +651,7 @@
     <Container class="javax.swing.JPanel" name="backgroundColorPanel">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code=" ColorProperties.BACKGROUND_COLOR " type="code"/>
+          <Connection code=" de.cebitec.readxplorer.api.constants.Colors.BACKGROUND_COLOR " type="code"/>
         </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">

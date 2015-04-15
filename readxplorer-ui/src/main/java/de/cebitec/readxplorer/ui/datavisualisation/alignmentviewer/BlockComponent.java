@@ -30,11 +30,11 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Color;
 import java.awt.Font;
@@ -110,7 +110,7 @@ public class BlockComponent extends JComponent {
         this.classToColorMap = ColorUtils.updateMappingClassColors();
         this.rectList = new ArrayList<>();
         this.brickDataList = new ArrayList<>();
-        this.blockColor = ColorProperties.COMMON_MATCH;
+        this.blockColor = Colors.COMMON_MATCH;
         this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
@@ -392,7 +392,7 @@ public class BlockComponent extends JComponent {
         graphics2D.setFont( new Font( Font.MONOSPACED, Font.BOLD, 11 ) );
 
         // paint this block's background
-        graphics2D.setColor( ColorProperties.BLOCK_BACKGROUND );
+        graphics2D.setColor(Colors.BLOCK_BACKGROUND );
         graphics2D.fillRect( 0, 0, length, height );
 
         //paint SamAlignmentBlocks (for split read mappings)
@@ -408,7 +408,7 @@ public class BlockComponent extends JComponent {
             if( parentViewer.isInMaxZoomLevel() && height >= AlignmentViewer.DEFAULT_BLOCK_HEIGHT ) {
                 int labelWidth = graphics.getFontMetrics().stringWidth( brick.toString() );
                 int labelX = brick.getLabelCenter() - labelWidth / 2;
-                graphics2D.setColor( ColorProperties.BRICK_LABEL );
+                graphics2D.setColor(Colors.BRICK_LABEL );
                 graphics2D.drawString( brick.toString(), labelX, height );
             }
         }
@@ -543,23 +543,23 @@ public class BlockComponent extends JComponent {
             case GENOMEGAP_G: //fallthrough
             case GENOMEGAP_T: //fallthrough
             case GENOMEGAP_N:
-                c = ColorProperties.MISMATCH_BACKGROUND;
+                c = Colors.MISMATCH_BACKGROUND;
                 break;
             case SKIPPED:
-                c = ColorProperties.SKIPPED;
+                c = Colors.SKIPPED;
                 break;
             case FOREIGN_GENOMEGAP:
-                c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP;
+                c = Colors.ALIGNMENT_FOREIGN_GENOMEGAP;
                 break;
             case TRIMMED:
-                c = ColorProperties.TRIMMED;
+                c = Colors.TRIMMED;
                 break;
             case UNDEF:
-                c = ColorProperties.MISMATCH_BACKGROUND;
+                c = Colors.MISMATCH_BACKGROUND;
                 LOG.log( SEVERE, "found unknown brick type {0}", brick );
                 break;
             default:
-                c = ColorProperties.MISMATCH_BACKGROUND;
+                c = Colors.MISMATCH_BACKGROUND;
                 LOG.log( SEVERE, "found unknown brick type {0}", brick );
         }
 

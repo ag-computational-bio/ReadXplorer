@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils.classification;
+package de.cebitec.readxplorer.api.enums;
+
+import de.cebitec.readxplorer.api.Classification;
+
 
 
 /**
@@ -31,49 +34,41 @@ public enum MappingClass implements Classification {
      * reference). Other Common Match mappings are allowed to exist for the
      * read.
      */
-    SINGLE_PERFECT_MATCH( MappingClass.SINGLE_PERFECT_MATCH_BYTE, MappingClass.SINGLE_PERFECT_MATCH_STRING ),
+    SINGLE_PERFECT_MATCH( 4, "Single Perfect Match" ),
+
     /**
      * Perfect Match classification = Classification for all mappings of a read
      * without differences to the reference.
      */
-    PERFECT_MATCH( MappingClass.PERFECT_MATCH_BYTE, MappingClass.PERFECT_MATCH_STRING ),
+    PERFECT_MATCH( 1, "Perfect Match" ),
+
     /**
      * Single Best Match classification = MappingClass for read mappings whose
      * read only has a single best mapping (with the least number of differences
      * to the reference). Other Common Match mappings are allowed to exist for
      * the read.
      */
-    SINGLE_BEST_MATCH( MappingClass.SINGLE_BEST_MATCH_BYTE, MappingClass.SINGLE_BEST_MATCH_STRING ),
+    SINGLE_BEST_MATCH( 5, "Single Best Match" ),
+
     /**
      * Best Match classification = MappingClass for all best mappings (least
      * differences to the reference) of a read.
      */
-    BEST_MATCH( MappingClass.BEST_MATCH_BYTE, MappingClass.BEST_MATCH_STRING ),
+    BEST_MATCH( 2, "Best Match" ),
+
     /**
      * Common Match classification = MappingClass for read mappings having at
      * least one other, better mapping (with less differences to the reference).
      */
-    COMMON_MATCH( MappingClass.COMMON_MATCH_BYTE, MappingClass.COMMON_MATCH_STRING );
+    COMMON_MATCH( 3, "Common Match" );
 
-    private static final byte PERFECT_MATCH_BYTE = 1;
-    private static final byte BEST_MATCH_BYTE = 2;
-    private static final byte COMMON_MATCH_BYTE = 3;
-    private static final byte SINGLE_PERFECT_MATCH_BYTE = 4;
-    private static final byte SINGLE_BEST_MATCH_BYTE = 5;
-
-    private static final String PERFECT_MATCH_STRING = "Perfect Match";
-    private static final String BEST_MATCH_STRING = "Best Match";
-    private static final String COMMON_MATCH_STRING = "Common Match";
-    private static final String SINGLE_PERFECT_MATCH_STRING = "Single Perfect Match";
-    private static final String SINGLE_BEST_MATCH_STRING = "Single Best Match";
-
-    private final byte typeByte;
-    private final String typeString;
+    private final int type;
+    private final String string;
 
 
-    private MappingClass( byte typeByte, String typeString ) {
-        this.typeByte = typeByte;
-        this.typeString = typeString;
+    private MappingClass( int type, String string ) {
+        this.type = type;
+        this.string = string;
     }
 
 
@@ -82,8 +77,8 @@ public enum MappingClass implements Classification {
      * classification.
      */
     @Override
-    public String getTypeString() {
-        return this.typeString;
+    public String getString() {
+        return this.string;
     }
 
 
@@ -92,8 +87,8 @@ public enum MappingClass implements Classification {
      * classification.
      */
     @Override
-    public int getTypeByte() {
-        return this.typeByte;
+    public int getType() {
+        return this.type;
     }
 
 
@@ -103,7 +98,7 @@ public enum MappingClass implements Classification {
      */
     @Override
     public String toString() {
-        return this.getTypeString();
+        return this.string;
     }
 
 
@@ -115,24 +110,20 @@ public enum MappingClass implements Classification {
      * classification type or is <code>null</code>, MappingClass.COMMON_MATCH is
      * returned.
      */
-    public static MappingClass getFeatureType( Byte type ) {
-        if( type == null ) {
+    public static MappingClass getFeatureType( int type ) {
+
+        if( type == 0 ) {
             return COMMON_MATCH;
         }
-        switch( type ) {
-            case SINGLE_PERFECT_MATCH_BYTE:
-                return SINGLE_PERFECT_MATCH;
-            case SINGLE_BEST_MATCH_BYTE:
-                return SINGLE_BEST_MATCH;
-            case PERFECT_MATCH_BYTE:
-                return PERFECT_MATCH;
-            case BEST_MATCH_BYTE:
-                return BEST_MATCH;
-            case COMMON_MATCH_BYTE:
-                return COMMON_MATCH;
-            default:
-                return COMMON_MATCH;
+
+        for( MappingClass mappingClass : values() ) {
+            if( mappingClass.getType() == type ) {
+                return mappingClass;
+            }
         }
+
+        return COMMON_MATCH;
+
     }
 
 

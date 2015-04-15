@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.ArrayList;
 import java.util.Collections;

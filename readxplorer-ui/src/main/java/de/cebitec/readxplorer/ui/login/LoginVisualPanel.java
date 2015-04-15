@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.login;
 
 
-import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.io.IOException;
@@ -300,16 +300,16 @@ public final class LoginVisualPanel extends JPanel {
             @Override
             public void open( String fileLocation ) {
                 try { //store current directory
-                    NbPreferences.forModule( Object.class ).put( Properties.READXPLORER_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
+                    NbPreferences.forModule( Object.class ).put( Paths.READXPLORER_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
                 } catch( IOException ex ) {
-                    LOG.log( WARNING, Properties.READXPLORER_DATABASE_DIRECTORY + " could not be stored" );
+                    LOG.log( WARNING, Paths.READXPLORER_DATABASE_DIRECTORY + " could not be stored" );
                 }
                 databaseField.setText( fileLocation );
             }
 
 
         };
-        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Properties.READXPLORER_DATABASE_DIRECTORY, null ) );
+        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Paths.READXPLORER_DATABASE_DIRECTORY, null ) );
 
         Preferences prefs2 = Preferences.userNodeForPackage( LoginVisualPanel.class );
         String db = dbTypeBox.getSelectedItem().toString();

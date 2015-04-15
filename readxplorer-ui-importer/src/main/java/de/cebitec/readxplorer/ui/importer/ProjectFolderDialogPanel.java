@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.importer;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
-import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import javax.swing.JFileChooser;
 import org.openide.DialogDisplayer;
@@ -101,7 +101,7 @@ public class ProjectFolderDialogPanel extends javax.swing.JPanel implements
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
-        JFileChooser chooser = new JFileChooser( NbPreferences.forModule( Object.class ).get( Properties.READXPLORER_DATABASE_DIRECTORY, null ) );
+        JFileChooser chooser = new JFileChooser( NbPreferences.forModule( Object.class ).get( Paths.READXPLORER_DATABASE_DIRECTORY, null ) );
         chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
 
         int result = chooser.showOpenDialog( this );

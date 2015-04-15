@@ -16,6 +16,8 @@
  */
 package de.cebitec.readxplorer.ui.options;
 
+
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Color;
@@ -294,17 +296,17 @@ final class LocationsPanel extends OptionsPanel {
 
         };
 
-        fc.setDirectoryProperty( Properties.TMP_IMPORT_DIR );
+        fc.setDirectoryProperty( Paths.TMP_IMPORT_DIR );
         fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
         fc.openFileChooser( ReadXplorerFileChooser.OPEN_DIALOG );
     }//GEN-LAST:event_chooseTmpImportDirButtonActionPerformed
 
     private void dbExpasyRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbExpasyRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_EXPASY;
+        selectedDbLink = Paths.DB_EXPASY;
     }//GEN-LAST:event_dbExpasyRadioButtonActionPerformed
 
     private void dbKeggRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbKeggRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_KEGG;
+        selectedDbLink = Paths.DB_KEGG;
     }//GEN-LAST:event_dbKeggRadioButtonActionPerformed
 
     private void dbOwnRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbOwnRadioButtonActionPerformed
@@ -312,23 +314,23 @@ final class LocationsPanel extends OptionsPanel {
     }//GEN-LAST:event_dbOwnRadioButtonActionPerformed
 
     private void dbBrendaRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbBrendaRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_BRENDA;
+        selectedDbLink = Paths.DB_BRENDA;
     }//GEN-LAST:event_dbBrendaRadioButtonActionPerformed
 
     private void dbEc2pdbRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbEc2pdbRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_EC2PDB;
+        selectedDbLink = Paths.DB_EC2PDB;
     }//GEN-LAST:event_dbEc2pdbRadioButtonActionPerformed
 
     private void dbPriamRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbPriamRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_PRIAM;
+        selectedDbLink = Paths.DB_PRIAM;
     }//GEN-LAST:event_dbPriamRadioButtonActionPerformed
 
     private void dbIntEnzRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbIntEnzRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_INTENZ;
+        selectedDbLink = Paths.DB_INTENZ;
     }//GEN-LAST:event_dbIntEnzRadioButtonActionPerformed
 
     private void dbMetaCycRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbMetaCycRadioButtonActionPerformed
-        selectedDbLink = Properties.DB_METACYC;
+        selectedDbLink = Paths.DB_METACYC;
     }//GEN-LAST:event_dbMetaCycRadioButtonActionPerformed
 
     private void validateUrlButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validateUrlButtonActionPerformed
@@ -344,8 +346,8 @@ final class LocationsPanel extends OptionsPanel {
 
     @Override
     void load() {
-        tempImportDirField.setText( pref.get( Properties.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) );
-        selectedDbLink = pref.get(Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+        tempImportDirField.setText( pref.get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) );
+        selectedDbLink = pref.get(Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
         setDbButtonSelected();
     }
 
@@ -355,13 +357,13 @@ final class LocationsPanel extends OptionsPanel {
      * corresponding radio button.
      */
     private void setDbButtonSelected() {
-        dbExpasyRadioButton.setSelected( Properties.DB_EXPASY.equals( selectedDbLink ) );
-        dbBrendaRadioButton.setSelected( Properties.DB_BRENDA.equals( selectedDbLink ) );
-        dbEc2pdbRadioButton.setSelected( Properties.DB_EC2PDB.equals( selectedDbLink ) );
-        dbIntEnzRadioButton.setSelected( Properties.DB_INTENZ.equals( selectedDbLink ) );
-        dbKeggRadioButton.setSelected( Properties.DB_KEGG.equals( selectedDbLink ) );
-        dbMetaCycRadioButton.setSelected( Properties.DB_METACYC.equals( selectedDbLink ) );
-        dbPriamRadioButton.setSelected( Properties.DB_PRIAM.equals( selectedDbLink ) );
+        dbExpasyRadioButton.setSelected( Paths.DB_EXPASY.equals( selectedDbLink ) );
+        dbBrendaRadioButton.setSelected( Paths.DB_BRENDA.equals( selectedDbLink ) );
+        dbEc2pdbRadioButton.setSelected( Paths.DB_EC2PDB.equals( selectedDbLink ) );
+        dbIntEnzRadioButton.setSelected( Paths.DB_INTENZ.equals( selectedDbLink ) );
+        dbKeggRadioButton.setSelected( Paths.DB_KEGG.equals( selectedDbLink ) );
+        dbMetaCycRadioButton.setSelected( Paths.DB_METACYC.equals( selectedDbLink ) );
+        dbPriamRadioButton.setSelected( Paths.DB_PRIAM.equals( selectedDbLink ) );
         if (dbButtonGroup.getSelection() == null) {
             dbOwnRadioButton.setSelected( true );
             dbOwnTextField.setText( selectedDbLink );
@@ -375,8 +377,8 @@ final class LocationsPanel extends OptionsPanel {
             selectedDbLink = dbOwnTextField.getText();
         }
 
-        pref.put( Properties.TMP_IMPORT_DIR, tempImportDirField.getText() );
-        pref.put(Properties.ENZYME_DB_LINK, selectedDbLink );
+        pref.put( Paths.TMP_IMPORT_DIR, tempImportDirField.getText() );
+        pref.put( Properties.ENZYME_DB_LINK, selectedDbLink );
     }
 
 

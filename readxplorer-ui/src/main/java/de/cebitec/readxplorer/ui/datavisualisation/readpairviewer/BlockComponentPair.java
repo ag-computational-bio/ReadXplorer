@@ -18,17 +18,17 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPair;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.PaintUtilities;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
-import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.ReadPairType;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -182,7 +182,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         if( !parentViewer.getExcludedClassifications().contains( FeatureType.SINGLE_MAPPING ) ) {
             for( int i = 0; i < singleMappings.size(); ++i ) {
                 mapping = singleMappings.get( i );
-                this.addRectAndItsColor( ColorProperties.BLOCK_UNPAIRED, mapping, false );
+                this.addRectAndItsColor(Colors.BLOCK_UNPAIRED, mapping, false );
             }
         }
     }
@@ -291,7 +291,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 //        graphics.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
 
         //fill pair background to indicate pair length
-        graphics2D.setColor( ColorProperties.BLOCK_BACKGROUND );
+        graphics2D.setColor(Colors.BLOCK_BACKGROUND );
         graphics2D.fill( new Rectangle2D.Double( 0, 0, this.length, this.height ) );
 
         // paint this block's mappings
@@ -301,7 +301,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         }
 
         //paint connecting lines for pairs
-        graphics2D.setColor( ColorProperties.CURRENT_POSITION );
+        graphics2D.setColor(Colors.CURRENT_POSITION );
         for( int i = 0; i < this.lineList.size(); ++i ) {
             graphics2D.draw( this.lineList.get( i ) );
         }
@@ -322,11 +322,11 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         Color blockColor;
         ReadPairType type = readPair.getReadPairType();
         if( type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR ) {
-            blockColor = ColorProperties.BLOCK_PERFECT;
+            blockColor = Colors.BLOCK_PERFECT;
         } else if( type == ReadPairType.UNPAIRED_PAIR ) {
-            blockColor = ColorProperties.BLOCK_UNPAIRED;
+            blockColor = Colors.BLOCK_UNPAIRED;
         } else {
-            blockColor = ColorProperties.BLOCK_DIST_SMALL;
+            blockColor = Colors.BLOCK_DIST_SMALL;
         }
         return blockColor;
 
@@ -397,9 +397,9 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         if( block.getObjectWithId() instanceof ReadPairGroup ) {
             List<ReadPair> readPairs = ((ReadPairGroup) block.getObjectWithId()).getReadPairs();
             if( readPairs.size() > 0 ) {
-                type = readPairs.get( 0 ).getReadPairType().getTypeString();
+                type = readPairs.get( 0 ).getReadPairType().getString();
             } else {
-                type = ReadPairType.UNPAIRED_PAIR.getTypeString();
+                type = ReadPairType.UNPAIRED_PAIR.getString();
             }
         }
         return type;

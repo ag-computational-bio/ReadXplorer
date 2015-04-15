@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;

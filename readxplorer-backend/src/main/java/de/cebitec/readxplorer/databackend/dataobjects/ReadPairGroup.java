@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
-import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

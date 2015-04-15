@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -33,8 +34,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -187,7 +187,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
                                                                          currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
-                handler.setDesiredData( Properties.REDUCED_MAPPINGS );
+                handler.setDesiredData( IntervalRequestData.ReducedMappings );
                 handler.registerObserver( collCovData );
                 allHandler.add( handler );
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JComponent;
@@ -57,25 +57,25 @@ public class BaseBackground extends JComponent {
         super.paintComponent( graphics );
         switch( base ) {
             case "A":
-                graphics.setColor( ColorProperties.BACKGROUND_A );
+                graphics.setColor(Colors.BACKGROUND_A );
                 break;
             case "C":
-                graphics.setColor( ColorProperties.BACKGROUND_C );
+                graphics.setColor(Colors.BACKGROUND_C );
                 break;
             case "G":
-                graphics.setColor( ColorProperties.BACKGROUND_G );
+                graphics.setColor(Colors.BACKGROUND_G );
                 break;
             case "T":
-                graphics.setColor( ColorProperties.BACKGROUND_T );
+                graphics.setColor(Colors.BACKGROUND_T );
                 break;
             case "-":
-                graphics.setColor( ColorProperties.BACKGROUND_READGAP );
+                graphics.setColor(Colors.BACKGROUND_READGAP );
                 break;
             case "N":
-                graphics.setColor( ColorProperties.BACKGROUND_N );
+                graphics.setColor(Colors.BACKGROUND_N );
                 break;
             default:
-                graphics.setColor( ColorProperties.BACKGROUND_BASE_UNDEF );
+                graphics.setColor(Colors.BACKGROUND_BASE_UNDEF );
         }
 
         graphics.fillRect( 0, 0, this.getSize().width - 1, this.getSize().height - 1 );

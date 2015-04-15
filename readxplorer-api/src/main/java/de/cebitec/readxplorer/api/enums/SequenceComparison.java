@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils;
+package de.cebitec.readxplorer.api.enums;
 
 
 /**
- * Enumeration for sequence comparisons. The different types can represent for
- * example if something matches, was substituted, inserted, or deleted.
+ * Enumeration for sequence comparisons.
+ * The different types can represent for example if something matches,
+ * was substituted, inserted, or deleted.
  *
  * @author rhilker
  */
@@ -29,57 +30,38 @@ public enum SequenceComparison {
     /**
      * getType() returns 'S' = To be used for substitutions.
      */
-    SUBSTITUTION( SequenceComparison.S ),
+    SUBSTITUTION( 'S' ),
+
     /**
      * getType() returns 'N' = To be used for neutral substitutions.
      */
-    NEUTRAL( SequenceComparison.N ),
+    NEUTRAL( 'N' ),
+
     /**
      * getType() returns 'E' = To be used for missense substitutions.
      */
-    MISSENSE( SequenceComparison.E ),
+    MISSENSE( 'E' ),
+
     /**
      * getType() returns 'M' = To be used for matches.
      */
-    MATCH( SequenceComparison.M ),
+    MATCH( 'M' ),
+
     /**
      * getType() returns 'D' = To be used for deletions.
      */
-    DELETION( SequenceComparison.D ),
+    DELETION( 'D' ),
+
     /**
      * getType() returns 'I' = To be used for insertions.
      */
-    INSERTION( SequenceComparison.I ),
+    INSERTION( 'I' ),
+
     /**
      * getType() returns ' ' = To be used for unknown type.
      */
     UNKNOWN( ' ' );
 
-
-    /**
-     * 'S' = To be used for substitutions.
-     */
-    private static final char S = 'S';
-    /**
-     * 'N' = To be used for neutral substituions.
-     */
-    private static final char N = 'N';
-    /**
-     * 'E' = To be used for missense substitutions.
-     */
-    private static final char E = 'E';
-    /**
-     * 'M' = To be used for matches.
-     */
-    private static final char M = 'M';
-    /**
-     * 'D' = To be used for deletions.
-     */
-    private static final char D = 'D';
-    /**
-     * 'I' = To be used for insertions.
-     */
-    private static final char I = 'I';
 
     private final char type;
 
@@ -108,22 +90,15 @@ public enum SequenceComparison {
      * SequenceComparison.UNKNOWN is returned.
      */
     public static SequenceComparison getSequenceComparison( char type ) {
-        switch( type ) {
-            case SequenceComparison.S:
-                return SUBSTITUTION;
-            case SequenceComparison.N:
-                return NEUTRAL;
-            case SequenceComparison.E:
-                return MISSENSE;
-            case SequenceComparison.M:
-                return MATCH;
-            case SequenceComparison.I:
-                return INSERTION;
-            case SequenceComparison.D:
-                return DELETION;
-            default:
-                return UNKNOWN;
+
+        for( SequenceComparison seqComp : values() ) {
+            if( seqComp.getType() == type ) {
+                return seqComp;
+            }
         }
+
+        return UNKNOWN;
+
     }
 
 

@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -30,8 +32,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalyses
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -215,7 +216,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             associateTssWindow = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ASSOCIATE_TSS_WINDOW );
             boolean isFwdAnalysisDirection = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION );
             if( readClassParams.isStrandBothOption() ) {
-                readClassParams.setStrandOption( isFwdAnalysisDirection ? Properties.STRAND_BOTH_FWD : Properties.STRAND_BOTH_REV );
+                readClassParams.setStrandOption( isFwdAnalysisDirection ? Strand.BothForward : Strand.BothReverse );
             }
         }
         if( performOperonAnalysis ) {
@@ -293,21 +294,21 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             }
             covAnalysisHandler.registerObserver( analysisTSS );
             covAnalysisHandler.setCoverageNeeded( true );
-            covAnalysisHandler.setDesiredData( Properties.READ_STARTS );
+            covAnalysisHandler.setDesiredData( IntervalRequestData.ReadStarts );
         }
         if( parametersOperonDet.isPerformOperonAnalysis() ) {
             analysisOperon = new AnalysisOperon( connector, parametersOperonDet );
 
             mappingAnalysisHandler.registerObserver( analysisOperon );
             mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
+            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
         if( parametersNormalization.isPerformNormAnalysis() ) {
             analysisNormalization = new AnalysisNormalization( connector, parametersNormalization );
 
             mappingAnalysisHandler.registerObserver( analysisNormalization );
             mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
+            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
 
         trackToAnalysisMap.put( connector.getTrackID(), new AnalysisContainer( analysisTSS, analysisOperon, analysisNormalization ) );

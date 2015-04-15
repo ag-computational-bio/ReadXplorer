@@ -32,6 +32,7 @@ import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable;
 import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable.ImportTrackResults;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
@@ -46,9 +47,9 @@ import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readxplorer.tools.snpdetection.ParameterSetSNPs;
 import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetTSS;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -702,7 +703,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             int minAvrMappingQuality = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
             double minPercVariation  = Double.parseDouble( getProperty( SNPConstants.SNP_MIN_VARIATION ) );
             Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( SNPConstants.SNP_FEATURE_TYPES ) );
-            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( SNPConstants.SNP_MAPPING_CLASSES ), minMappingQuality, Properties.STRAND_FEATURE );
+            ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( SNPConstants.SNP_MAPPING_CLASSES ), minMappingQuality, Strand.Feature );
 
             final ParameterSetSNPs parameterSet = new ParameterSetSNPs( minVaryingBases, minPercVariation, useMainBases, selFeatureTypes,
                                                     readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
@@ -722,10 +723,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
             boolean autoTssParamEstimation     = Boolean.parseBoolean( getProperty( TSSConstants.TSS_PARAMETER_ESTIMATION ) );
             boolean associateTSS               = Boolean.parseBoolean( getProperty( TSSConstants.TSS_ASSOCIATE ) );
             boolean performUnannotatedTransDet = Boolean.parseBoolean( getProperty( TSSConstants.TSS_UNANNOTATED_DETECTION ) );
-            byte minMappingQuality = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
-            byte strandUsage       = Byte.parseByte( getProperty( TSSConstants.TSS_STRAND_USAGE ) );
+            byte minMappingQuality             = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
+            Strand strandUsage                 = Strand.fromType( Integer.parseInt( getProperty( TSSConstants.TSS_STRAND_USAGE ) ) );
             ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( TSSConstants.TSS_MAPPING_CLASSES ), minMappingQuality, strandUsage );
-                readClassParams.setStrandOption( Properties.STRAND_BOTH_FWD );
+                readClassParams.setStrandOption( Strand.BothForward );
             int minIncreaseTotal             = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_TOTAL ) );
             int minIncreasePercent           = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_PERCENT ) );
             int maxFeatureDistance           = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_FEATURE_DISTANCE ) );
@@ -998,7 +999,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality, byte strandUsage ) {
+    private static ParametersReadClasses getParametersReadClasses( String property, byte minMappingQuality, Strand strandUsage ) {
 
         List<MappingClass> mappingClasses = new ArrayList<>();
         for( String number : property.split( "," ) ) {

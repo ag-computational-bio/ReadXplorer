@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.api.enums.RegionType;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import de.cebitec.readxplorer.utils.sequence.SequenceMatcher;
@@ -52,8 +53,8 @@ public class PatternFilter implements RegionFilterI {
     private Pattern pattern;
     private Pattern patternRev;
     private int analysisFrame;
-    private byte regionType;
-    private byte analysisStrand;
+    private RegionType regionType;
+    private Strand analysisStrand;
     private int maxNoResults;
     private boolean analyzeInRevDirection;
     private boolean addOffset;
@@ -77,8 +78,8 @@ public class PatternFilter implements RegionFilterI {
         this.refGen = refGen;
         matchedPatterns = new ArrayList<>();
         maxNoResults = 0;
-        analysisStrand = 0;
-        regionType = Properties.PATTERN;
+        analysisStrand = Strand.Both;
+        regionType = RegionType.Pattern;
         analyzeInRevDirection = false;
         addOffset = true;
         requireSameFrame = false;
@@ -293,11 +294,11 @@ public class PatternFilter implements RegionFilterI {
         requireSameFrame = analysisFrame != 0 && analysisFrame != INIT;
 
         if( analysisFrame < 0 ) {
-            analysisStrand = SequenceUtils.STRAND_REV;
+            analysisStrand = Strand.Reverse;
         } else if( !requireSameFrame || analysisFrame == 0 ) {
-            analysisStrand = 0;
+            analysisStrand = Strand.Both;
         } else {
-            analysisStrand = SequenceUtils.STRAND_FWD;
+            analysisStrand = Strand.Forward;
         }
     }
 
@@ -307,7 +308,7 @@ public class PatternFilter implements RegionFilterI {
      * {@link SequenceUtils#STRAND_REV} and 0 to indicate using both strands. 0
      *         is also the default value, thus does not have to be set explictly.
      */
-    public byte getAnalysisStrand() {
+    public Strand getAnalysisStrand() {
         return analysisStrand;
     }
 
@@ -320,7 +321,7 @@ public class PatternFilter implements RegionFilterI {
      *               is also the default value, thus does not have to be set
      *               explictly.
      */
-    public void setAnalysisStrand( byte strand ) {
+    public void setAnalysisStrand( Strand strand ) {
         this.analysisStrand = strand;
     }
 
@@ -344,7 +345,7 @@ public class PatternFilter implements RegionFilterI {
     /**
      * @return The type to use for the identified regions
      */
-    public byte getRegionType() {
+    public RegionType getRegionType() {
         return regionType;
     }
 
@@ -352,7 +353,7 @@ public class PatternFilter implements RegionFilterI {
     /**
      * @param regionType The type to use for the identified regions
      */
-    public void setRegionType( byte regionType ) {
+    public void setRegionType( RegionType regionType ) {
         this.regionType = regionType;
     }
 
@@ -418,7 +419,7 @@ public class PatternFilter implements RegionFilterI {
     private class PatternScanner extends SequenceScanner {
 
         private final SequenceMatcher seqMatcher;
-        private byte analysisStrand;
+        private Strand analysisStrand;
 
 
         /**
@@ -439,7 +440,7 @@ public class PatternFilter implements RegionFilterI {
         public PatternScanner( int totalStart, int totalStop, int intervalSize, SequenceMatcher seqMatcher ) {
             super( totalStart, totalStop, intervalSize );
             this.seqMatcher = seqMatcher;
-            analysisStrand = 0;
+            analysisStrand = Strand.Both;
         }
 
 
@@ -461,10 +462,10 @@ public class PatternFilter implements RegionFilterI {
             seqMatcher.clearRegions();
             seqMatcher.setAbsoluteStart( currentStart );
 
-            if( analysisStrand != SequenceUtils.STRAND_REV ) { //run analysis only on selected strand(s)
+            if( analysisStrand != Strand.Reverse ) { //run analysis only on selected strand(s)
                 seqMatcher.matchPattern( seq, pattern, true, regionType );
             }
-            if( analysisStrand != SequenceUtils.STRAND_FWD ) {
+            if( analysisStrand != Strand.Forward ) {
                 seqMatcher.matchPattern( seq, patternRev, false, regionType );
             }
 
@@ -480,7 +481,7 @@ public class PatternFilter implements RegionFilterI {
          *                       strands. 0 is also the default value, thus does
          *                       not have to be set explictly.
          */
-        public void setAnalysisStrand( byte analysisStrand ) {
+        public void setAnalysisStrand( Strand analysisStrand ) {
             this.analysisStrand = analysisStrand;
         }
 

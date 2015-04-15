@@ -120,7 +120,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
             PersistentFeature feat1 = operon.getOperonAdjacencies().get( 0 ).getFeature1();
             String annoName1 = "";
             String annoName2 = "";
-            String strand = feat1.isFwdStrandString() + "\n";
+            String strand = feat1.getStrandString() + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";

@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
+import de.cebitec.readxplorer.api.enums.Strand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class ParametersReadClasses {
 
     private List<Classification> excludedClasses;
     private final byte minMappingQual;
-    private byte strandOption;
+    private Strand strandOption;
 
 
     /**
@@ -54,11 +54,11 @@ public class ParametersReadClasses {
      * @param strandOption    The strand option: Determines if mappings from the
      *                        feature strand, from the opposite strand or combined from both strands
      *                        are used. The values are among<br>
-     *                        {@link Properties.STRAND_FEATURE}<br>
-     *                        {@link Properties.STRAND_OPPOSITE} and<br>
-     *                        {@link Properties.STRAND_BOTH}
+     *                        {@link Strand.Feature}<br>
+     *                        {@link Strand.Opposite} and<br>
+     *                        {@link Strand.Both}
      */
-    public ParametersReadClasses( List<Classification> excludedClasses, byte minMappingQual, byte strandOption ) {
+    public ParametersReadClasses( List<Classification> excludedClasses, byte minMappingQual, Strand strandOption ) {
         this.excludedClasses = new ArrayList<>( excludedClasses );
         this.minMappingQual = minMappingQual;
         this.strandOption = strandOption;
@@ -75,7 +75,7 @@ public class ParametersReadClasses {
      * @param minMappingQual  Minimum phred scaled mapping quality.
      */
     public ParametersReadClasses( List<Classification> excludedClasses, byte minMappingQual ) {
-        this( excludedClasses, minMappingQual, Properties.STRAND_FEATURE );
+        this( excludedClasses, minMappingQual, Strand.Feature );
     }
 
 
@@ -84,7 +84,7 @@ public class ParametersReadClasses {
      * included here.
      */
     public ParametersReadClasses() {
-        this( new ArrayList<Classification>(), Byte.valueOf( "0" ), Properties.STRAND_FEATURE );
+        this( new ArrayList<>(), (byte)0, Strand.Feature );
     }
 
 
@@ -100,11 +100,11 @@ public class ParametersReadClasses {
      * @return The strand option: Determines if mappings from the feature
      *         strand, from the opposite strand or combined from both strands are used.
      *         The values are among<br>
-     *         {@link Properties.STRAND_FEATURE}<br>
-     *         {@link Properties.STRAND_OPPOSITE} and<br>
-     *         {@link Properties.STRAND_BOTH}
+     *         {@link Strand.Feature}<br>
+     *         {@link Strand.Opposite} and<br>
+     *         {@link Strand.Both}
      */
-    public byte getStrandOption() {
+    public Strand getStrandOption() {
         return strandOption;
     }
 
@@ -143,10 +143,10 @@ public class ParametersReadClasses {
         classList.addAll( Arrays.asList( MappingClass.values() ) );
         for( Classification classType : classList ) {
             String isAllowed = isClassificationAllowed( classType ) ? "yes" : "no";
-            statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getTypeString() + " included:", isAllowed ) );
+            statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getString() + " included:", isAllowed ) );
         }
         String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "yes" : "no";
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getTypeString() + ":", isAllowed ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getString() + ":", isAllowed ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Mapping strand selection:", getStrandOptionString() ) );
     }
 
@@ -159,11 +159,11 @@ public class ParametersReadClasses {
      */
     public String getStrandOptionString() {
         String strandOptionString = "Feature/analysis strand"; //default
-        if( getStrandOption() == Properties.STRAND_OPPOSITE ) {
+        if( getStrandOption() == Strand.Opposite ) {
             strandOptionString += "Opposite Strand";
-        } else if( getStrandOption() == Properties.STRAND_BOTH
-                   || getStrandOption() == Properties.STRAND_BOTH_FWD
-                   || getStrandOption() == Properties.STRAND_BOTH_REV ) {
+        } else if( getStrandOption() == Strand.Both
+                   || getStrandOption() == Strand.BothForward
+                   || getStrandOption() == Strand.BothReverse ) {
             strandOptionString += "Combine both strands";
         }
         return strandOptionString;
@@ -179,7 +179,7 @@ public class ParametersReadClasses {
      *         <code>false</code>, if one of the other options is chosen.
      */
     public boolean isStrandFeatureOption() {
-        return getStrandOption() == Properties.STRAND_FEATURE;
+        return getStrandOption() == Strand.Feature;
     }
 
 
@@ -192,7 +192,7 @@ public class ParametersReadClasses {
      *         <code>false</code>, if one of the other options is chosen.
      */
     public boolean isStrandOppositeOption() {
-        return getStrandOption() == Properties.STRAND_OPPOSITE;
+        return getStrandOption() == Strand.Opposite;
     }
 
 
@@ -205,9 +205,9 @@ public class ParametersReadClasses {
      *         if one of the other options is chosen.
      */
     public boolean isStrandBothOption() {
-        return getStrandOption() == Properties.STRAND_BOTH
-               || getStrandOption() == Properties.STRAND_BOTH_FWD
-               || getStrandOption() == Properties.STRAND_BOTH_REV;
+        return getStrandOption() == Strand.Both
+               || getStrandOption() == Strand.BothForward
+               || getStrandOption() == Strand.BothReverse;
     }
 
 
@@ -223,7 +223,7 @@ public class ParametersReadClasses {
      *         reverse strand OR if another strand option is chosen.
      */
     public boolean isStrandBothFwdOption() {
-        return getStrandOption() == Properties.STRAND_BOTH_FWD;
+        return getStrandOption() == Strand.BothForward;
     }
 
 
@@ -232,9 +232,9 @@ public class ParametersReadClasses {
      * collected after the inital selection.
      * <p>
      * @param strandOption The updated strand option, e.g. {@link
-     * Properties.STRAND_BOTH_FWD} or {@link Properties.STRAND_BOTH_REV}.
+     * Strand.BothForward} or {@link Strand.BothReverse}.
      */
-    public void setStrandOption( byte strandOption ) {
+    public void setStrandOption( Strand strandOption ) {
         this.strandOption = strandOption;
     }
 

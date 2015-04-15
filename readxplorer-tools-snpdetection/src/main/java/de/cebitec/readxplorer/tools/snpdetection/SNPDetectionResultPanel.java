@@ -35,7 +35,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
-import de.cebitec.readxplorer.utils.SequenceComparison;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.util.HashMap;

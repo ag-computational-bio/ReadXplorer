@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -60,7 +60,7 @@ public class AlignmentOptionsPanel extends JPanel {
     public AlignmentOptionsPanel( AlignmentViewer alignmentViewer ) {
         this.alignmentViewer = alignmentViewer;
         this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-        this.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        this.setBackground(Colors.LEGEND_BACKGROUND );
         this.initOtherComponents();
     }
 

@@ -18,6 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.ThreadListener;
@@ -33,9 +36,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayerI;
 import de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer.LayoutI;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.Benchmark;
-import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -177,7 +177,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses( excludedFeatureTypes, new Byte( "0" ) );
         trackConnector.addMappingRequest( new IntervalRequest( from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false,
-                                                               Properties.READ_PAIRS, Byte.valueOf( "0" ), readClassParams ) );
+                                                               IntervalRequestData.ReadPairs, IntervalRequestData.Normal, readClassParams ) );
         this.oldLogLeft = from;
         this.oldLogRight = to;
     }
@@ -301,14 +301,14 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //        if (this.mappingsLoaded) {
 //
         if( isInDrawingMode() ) {
-            g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+            g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
             drawBaseLines( g );
         }
 ////            g.setColor(Color.black);
 //        }
 
         if( mappingsLoading ) {
-            Color fillcolor = ColorProperties.TITLE_BACKGROUND;
+            Color fillcolor = Colors.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
             if( loadingIndicator != null ) {

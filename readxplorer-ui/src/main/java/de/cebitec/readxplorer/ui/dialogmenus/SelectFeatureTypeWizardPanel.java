@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -128,7 +128,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
         List<FeatureType> featureTypeList = component.getSelectedFeatureTypes();
         StringBuilder featTypeString = new StringBuilder( 30 );
         for( FeatureType type : featureTypeList ) {
-            featTypeString.append( type.getTypeString() ).append( "," );
+            featTypeString.append( type.getString() ).append( "," );
         }
         getPref().put( getPropSelectedFeatTypes(), featTypeString.toString() );
         getPref().put( getPropFeatureStartOffset(), component.getStartOffsetField().getText() );

@@ -230,7 +230,7 @@ public class ResultPanelCoveredFeatures extends ResultTablePanel {
                 rowData[i++] = feature;
                 rowData[i++] = coveredFeaturesResultNew.getTrackEntry( coveredFeature.getTrackId(), false );
                 rowData[i++] = coveredFeaturesResultNew.getChromosomeMap().get( feature.getChromId() );
-                rowData[i++] = feature.isFwdStrandString();
+                rowData[i++] = feature.getStrandString();
                 rowData[i++] = feature.getStartOnStrand();
                 rowData[i++] = feature.getStopOnStrand();
                 rowData[i++] = feature.getLength();

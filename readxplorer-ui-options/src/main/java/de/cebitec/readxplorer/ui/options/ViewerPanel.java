@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.options;
 
 
+import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.Properties;
 import java.util.prefs.Preferences;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -76,8 +76,8 @@ public final class ViewerPanel extends OptionsPanel {
         org.openide.awt.Mnemonics.setLocalizedText(autoScalingBox, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.autoScalingBox.text")); // NOI18N
 
         viewerSizeSlider.setMajorTickSpacing(30);
-        viewerSizeSlider.setMaximum(Properties.MAX_HEIGHT);
-        viewerSizeSlider.setMinimum(Properties.MIN_HEIGHT);
+        viewerSizeSlider.setMaximum(GUI.MAX_HEIGHT);
+        viewerSizeSlider.setMinimum(GUI.MIN_HEIGHT);
         viewerSizeSlider.setMinorTickSpacing(5);
         viewerSizeSlider.setPaintLabels(true);
         viewerSizeSlider.setPaintTicks(true);
@@ -156,18 +156,18 @@ public final class ViewerPanel extends OptionsPanel {
 
     @Override
     void load() {
-        this.viewerSizeSlider.setValue( pref.getInt( Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT ) );
-        this.autoScalingBox.setSelected( pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false ) );
-        maxZoom = pref.getInt( Properties.MAX_ZOOM, Properties.DEFAULT_ZOOM );
+        this.viewerSizeSlider.setValue( pref.getInt( GUI.VIEWER_HEIGHT, GUI.DEFAULT_HEIGHT ) );
+        this.autoScalingBox.setSelected( pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false ) );
+        maxZoom = pref.getInt( GUI.MAX_ZOOM, GUI.DEFAULT_ZOOM );
         this.maxZoomLevelField.setText( String.valueOf( maxZoom ) );
     }
 
 
     @Override
     void store() {
-        pref.putInt( Properties.VIEWER_HEIGHT, this.viewerSizeSlider.getValue() );
-        pref.putBoolean( Properties.VIEWER_AUTO_SCALING, this.autoScalingBox.isSelected() );
-        pref.putInt( Properties.MAX_ZOOM, maxZoom );
+        pref.putInt( GUI.VIEWER_HEIGHT, this.viewerSizeSlider.getValue() );
+        pref.putBoolean( GUI.VIEWER_AUTO_SCALING, this.autoScalingBox.isSelected() );
+        pref.putInt( GUI.MAX_ZOOM, maxZoom );
     }
 
 

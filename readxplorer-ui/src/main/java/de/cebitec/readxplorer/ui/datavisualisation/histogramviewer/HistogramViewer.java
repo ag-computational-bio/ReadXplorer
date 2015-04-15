@@ -35,7 +35,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaIn
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -481,32 +481,32 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         value = logoData.getNumOfMatchesAt( relPos, isForwardStrand );
         if( value > 0 ) {
             if( !isColored ) {
-                c = ColorProperties.LOGO_MATCH;
+                c = Colors.LOGO_MATCH;
             } else {
                 if( !isForwardStrand ) {
                     base = SequenceUtils.getDnaComplement( base );
                 }
                 switch( base ) {
                     case 'A':
-                        c = ColorProperties.LOGO_A;
+                        c = Colors.LOGO_A;
                         break;
                     case 'T':
-                        c = ColorProperties.LOGO_T;
+                        c = Colors.LOGO_T;
                         break;
                     case 'C':
-                        c = ColorProperties.LOGO_C;
+                        c = Colors.LOGO_C;
                         break;
                     case 'G':
-                        c = ColorProperties.LOGO_G;
+                        c = Colors.LOGO_G;
                         break;
                     case 'N':
-                        c = ColorProperties.LOGO_N;
+                        c = Colors.LOGO_N;
                         break;
                     case '-':
-                        c = ColorProperties.LOGO_READGAP;
+                        c = Colors.LOGO_READGAP;
                         break;
                     default:
-                        c = ColorProperties.LOGO_BASE_UNDEF;
+                        c = Colors.LOGO_BASE_UNDEF;
                         break;
                 }
             }
@@ -514,27 +514,27 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         }
         value = logoData.getNumOfAAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_A, x, y );
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_A, x, y );
         }
         value = logoData.getNumOfCAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_C, x, y );
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_C, x, y );
         }
         value = logoData.getNumOfGAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_G, x, y );
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_G, x, y );
         }
         value = logoData.getNumOfTAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_T, x, y );
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_T, x, y );
         }
         value = logoData.getNumOfReadGapsAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_READGAP, x, y );
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_READGAP, x, y );
         }
         value = logoData.getNumOfNAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_N, x, y );
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_N, x, y );
         }
     }
 
@@ -679,7 +679,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             if( !dataLoaded ) {
                 g.fillRect( 0, 0, this.getSize().width - 1, this.getSize().height - 1 );
             }
-            g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+            g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
             drawBaseLines( g );
 
             // draw coverage values and lines for the coverage values depending

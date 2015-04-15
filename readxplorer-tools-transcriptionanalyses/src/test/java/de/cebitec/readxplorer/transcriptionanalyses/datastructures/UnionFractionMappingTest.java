@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.After;

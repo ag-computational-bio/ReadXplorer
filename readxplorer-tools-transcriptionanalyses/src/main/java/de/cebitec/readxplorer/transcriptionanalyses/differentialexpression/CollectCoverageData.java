@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -103,7 +103,7 @@ public class CollectCoverageData implements Observer {
                 ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, stopOffset );
                 int featStart = featTypeParams.calcFeatureStartOffset( feature );
                 int featStop = featTypeParams.calcFeatureStopOffset( feature );
-                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Strand.Both is not selected
                 boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.

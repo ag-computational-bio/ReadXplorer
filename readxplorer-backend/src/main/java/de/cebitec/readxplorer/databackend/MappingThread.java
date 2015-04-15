@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairResultPersistent;
-import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -193,15 +193,15 @@ public class MappingThread extends RequestThread {
             IntervalRequest request = requestQueue.poll();
             if( request != null ) {
                 if( doesNotMatchLatestRequestBounds( request ) ) {
-                    if( request.getDesiredData() == Properties.READ_PAIRS ) {
+                    if( request.getDesiredData() == IntervalRequestData.ReadPairs ) {
                         this.currentReadPairs = this.getReadPairMappings( request );
-                    } else if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
+                    } else if( request.getDesiredData() == IntervalRequestData.ReducedMappings ) {
                         currentMappings = this.loadReducedMappings( request );
                     } else {
                         currentMappings = this.loadMappings( request );
                     }
                     //switch between ordinary mappings and read pairs
-                    if( request.getDesiredData() != Properties.READ_PAIRS ) {
+                    if( request.getDesiredData() != IntervalRequestData.ReadPairs ) {
                         request.getSender().receiveData( new MappingResult( currentMappings, request ) );
                     } else {
                         request.getSender().receiveData( new ReadPairResultPersistent( currentReadPairs, request ) );

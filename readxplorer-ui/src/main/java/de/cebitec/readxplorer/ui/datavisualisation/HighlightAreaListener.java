@@ -18,13 +18,13 @@
 package de.cebitec.readxplorer.ui.datavisualisation;
 
 
+import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.JRegion;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Rectangle;
@@ -359,7 +359,7 @@ public class HighlightAreaListener extends MouseAdapter {
         List<Region> cdsRegions = new ArrayList<>();
         for( JRegion specialRegion : specialRegions ) {
 
-            if( specialRegion.getType() == Properties.START ) {
+            if( specialRegion.getType() == RegionType.Start ) {
                 if( isFwdStrand && specialRegion.getY() < baseLineY ) {
                     //detect stop pos of special region for fwd strand
                     Region cdsToHighlight = findCdsRegion( specialRegion.getStart(), parentComponent.getPersistentReference() );
@@ -404,7 +404,7 @@ public class HighlightAreaListener extends MouseAdapter {
             }
         }
 
-        return new Region( cdsStart, cdsStop, isFwdStrand, Properties.CDS );
+        return new Region( cdsStart, cdsStop, isFwdStrand, RegionType.CDS );
     }
 
 

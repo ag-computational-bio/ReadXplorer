@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.Set;
 
 

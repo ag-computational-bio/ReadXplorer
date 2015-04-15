@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 
 
 /**
@@ -37,8 +37,8 @@ public class IntervalRequest {
     private int totalTo;
     private int chromId;
     private ThreadListener sender;
-    private byte whichTrackNeeded;
-    private byte desiredData;
+    private IntervalRequestData whichTrackNeeded;
+    private IntervalRequestData desiredData;
     private final ParametersReadClasses readClassParams;
     private boolean diffsAndGapsNeeded;
 
@@ -76,7 +76,7 @@ public class IntervalRequest {
      *                           mapped reads shall be used, or all reads.
      */
     public IntervalRequest( int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender,
-                            boolean diffsAndGapsNeeded, byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams ) {
+                            boolean diffsAndGapsNeeded, IntervalRequestData desiredData, IntervalRequestData whichTrackNeeded, ParametersReadClasses readClassParams ) {
         this.from = from;
         this.to = to;
         this.totalFrom = totalFrom;
@@ -122,7 +122,7 @@ public class IntervalRequest {
      *                           ordinary track request.
      */
     public IntervalRequest( int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender,
-                            boolean diffsAndGapsNeeded, byte desiredData, byte whichTrackNeeded ) {
+                            boolean diffsAndGapsNeeded, IntervalRequestData desiredData, IntervalRequestData whichTrackNeeded ) {
         this( from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, desiredData, whichTrackNeeded, new ParametersReadClasses() );
     }
 
@@ -154,7 +154,7 @@ public class IntervalRequest {
      */
     public IntervalRequest( int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender,
                             boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams ) {
-        this( from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams );
+        this( from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, IntervalRequestData.Normal, IntervalRequestData.Normal, readClassParams );
     }
 
 
@@ -180,7 +180,7 @@ public class IntervalRequest {
      *                           the result, false otherwise
      */
     public IntervalRequest( int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded ) {
-        this( from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses() );
+        this( from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, IntervalRequestData.Normal, IntervalRequestData.Normal, new ParametersReadClasses() );
     }
 
 
@@ -206,8 +206,8 @@ public class IntervalRequest {
      *                           uniquely
      *                           mapped reads shall be used, or all reads.
      */
-    public IntervalRequest( int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData, ParametersReadClasses readClassParams ) {
-        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, readClassParams );
+    public IntervalRequest( int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, IntervalRequestData desiredData, ParametersReadClasses readClassParams ) {
+        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, desiredData, IntervalRequestData.Normal, readClassParams );
     }
 
 
@@ -229,8 +229,8 @@ public class IntervalRequest {
      *                           flag for
      *                           the results.
      */
-    public IntervalRequest( int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData ) {
-        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, new ParametersReadClasses() );
+    public IntervalRequest( int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, IntervalRequestData desiredData ) {
+        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, desiredData, IntervalRequestData.Normal, new ParametersReadClasses() );
     }
 
 
@@ -254,7 +254,7 @@ public class IntervalRequest {
      *                           mapped reads shall be used, or all reads.
      */
     public IntervalRequest( int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams ) {
-        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams );
+        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, IntervalRequestData.Normal, IntervalRequestData.Normal, readClassParams );
     }
 
 
@@ -274,7 +274,7 @@ public class IntervalRequest {
      *                           the result, false otherwise
      */
     public IntervalRequest( int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded ) {
-        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses() );
+        this( from, to, from, to, chromId, sender, diffsAndGapsNeeded, IntervalRequestData.Normal, IntervalRequestData.Normal, new ParametersReadClasses() );
     }
 
 
@@ -325,7 +325,7 @@ public class IntervalRequest {
      * @return Can be any byte value representing a filter flag for the results.
      *         E.g. Properties.READ_STARTS
      */
-    public byte getDesiredData() {
+    public IntervalRequestData getDesiredData() {
         return this.desiredData;
     }
 
@@ -336,7 +336,7 @@ public class IntervalRequest {
      *         double track request or Properties.NORMAL, if this is a ordinary track
      *         request.
      */
-    public byte getWhichTrackNeeded() {
+    public IntervalRequestData getWhichTrackNeeded() {
         return whichTrackNeeded;
     }
 

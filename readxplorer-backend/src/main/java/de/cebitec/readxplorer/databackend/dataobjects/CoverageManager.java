@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,10 +29,10 @@ import java.util.Map;
 
 
 /**
- * Container for all different coverage types for a given interval. If you want
- * to set each coverage position separately you have to call
- * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length
- * 0.
+ * Container for all different coverage types for a given interval.
+ * If you want to set each coverage position separately you have to call
+ * <code>incArraysToIntervalSize()</code>.
+ * Otherwise the arrays all have length 0.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -50,9 +50,6 @@ public class CoverageManager implements Serializable {
 
     private int highestCoverage;
 
-    public static final byte DIFF = 1;
-    public static final byte TRACK2 = 2;
-    public static final byte TRACK1 = 3;
     private Coverage totalCoverage;
 
 

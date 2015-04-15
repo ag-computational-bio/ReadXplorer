@@ -18,6 +18,9 @@
 package de.cebitec.readxplorer.parser.mappings;
 
 
+import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.common.DiffAndGapResult;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;
 import de.cebitec.readxplorer.parser.common.ParsedDiff;
@@ -25,9 +28,8 @@ import de.cebitec.readxplorer.parser.common.ParsedReferenceGap;
 import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -293,7 +295,7 @@ public final class CommonsMappingParser {
      * <p>
      * @return the diff and gap result for the read
      */
-    public static DiffAndGapResult createDiffsAndGaps( String readSeq, String refSeq, int start, final byte direction ) {
+    public static DiffAndGapResult createDiffsAndGaps( String readSeq, String refSeq, int start, final Strand direction ) {
 
         final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
         final List<ParsedDiff> diffs = new ArrayList<>();
@@ -306,7 +308,7 @@ public final class CommonsMappingParser {
             if( readSeq.charAt( i ) != refSeq.charAt( i ) ) {
                 errors++;
                 char base = readSeq.charAt( i );
-                if( direction == SequenceUtils.STRAND_REV ) {
+                if( direction == Strand.Reverse ) {
                     base = SequenceUtils.getDnaComplement( base );
                 }
                 if( refSeq.charAt( i ) == '_' ) {
@@ -525,7 +527,7 @@ public final class CommonsMappingParser {
             final int refSeqLength,
             final int start,
             final int stop,
-            final int direction,
+            final Strand direction,
             final String filename,
             final int lineNo ) {
 
@@ -539,7 +541,7 @@ public final class CommonsMappingParser {
             parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorReadname( filename, lineNo, readname ) );
             isConsistent = false;
         }
-        if( direction == 0 ) {
+        if( direction == Strand.Both ) {
             parent.sendMsgIfAllowed( Bundle.Parser_checkMapping_ErrorDirectionJok( filename, lineNo ) );
             isConsistent = false;
         }
@@ -659,9 +661,9 @@ public final class CommonsMappingParser {
             final char lastChar = readName.charAt( readName.length() - 1 );
             final char prevLastChar = readName.charAt( readName.length() - 2 );
 
-            if( prevLastChar == Properties.EXT_SEPARATOR &&
-                (lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_A2 ||
-                 lastChar == Properties.EXT_B1 || lastChar == Properties.EXT_B2) ) {
+            if( prevLastChar == ReadPairExtensions.Separator.getChar() &&
+                (lastChar == ReadPairExtensions.A1.getChar() || lastChar == ReadPairExtensions.A2.getChar() ||
+                 lastChar == ReadPairExtensions.B1.getChar() || lastChar == ReadPairExtensions.B2.getChar()) ) {
 
                 readName = readNameFull.substring( 0, readNameFull.length() - 2 );
                 changed = true;
@@ -685,13 +687,13 @@ public final class CommonsMappingParser {
      * @return Either '1' for first read of pair, '2' for second read of pair or
      *         '0' for a single end mapping
      */
-    public static char getReadPairTag( final SAMRecord record ) {
+    public static ReadPairExtensions getReadPairTag( final SAMRecord record ) {
 
-        char pairTag = Properties.EXT_UNDEFINED;
+        ReadPairExtensions pairTag = ReadPairExtensions.Undefined;
 
         //if paired read flag is set, we can directly use it
         if( record.getReadPairedFlag() ) {
-            pairTag = record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2;
+            pairTag = record.getFirstOfPairFlag() ? ReadPairExtensions.A1 : ReadPairExtensions.A2;
 
         } else {
             final String readName = record.getReadName();
@@ -700,22 +702,22 @@ public final class CommonsMappingParser {
                 final char lastChar = readName.charAt( readName.length() - 1 );
                 final char prevLastChar = readName.charAt( readName.length() - 2 );
 
-                if( prevLastChar == Properties.EXT_SEPARATOR ) {
-                    if( lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1 ) {
-                        pairTag = Properties.EXT_A1;
+                if( prevLastChar == ReadPairExtensions.Separator.getChar() ) {
+                    if( lastChar == ReadPairExtensions.A1.getChar() || lastChar == ReadPairExtensions.B1.getChar() ) {
+                        pairTag = ReadPairExtensions.A1;
 
-                    } else if( lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2 ) {
-                        pairTag = Properties.EXT_A2;
+                    } else if( lastChar == ReadPairExtensions.A2.getChar() || lastChar == ReadPairExtensions.B2.getChar() ) {
+                        pairTag = ReadPairExtensions.A2;
                     }
                 } else {
 
                     //check for casava > 1.8 paired read
                     String[] nameParts = SPACE_REGEX.split( readName );
                     if( nameParts.length == 2 ) {
-                        if( nameParts[1].startsWith( Properties.EXT_A1_STRING ) ) {
-                            pairTag = Properties.EXT_A1;
-                        } else if( nameParts[1].startsWith( Properties.EXT_A2_STRING ) ) {
-                            pairTag = Properties.EXT_A2;
+                        if( nameParts[1].startsWith( ReadPairExtensions.A1.toString() ) ) {
+                            pairTag = ReadPairExtensions.A1;
+                        } else if( nameParts[1].startsWith( ReadPairExtensions.A2.toString() ) ) {
+                            pairTag = ReadPairExtensions.A2;
                         }
                     }
                 }
@@ -735,13 +737,13 @@ public final class CommonsMappingParser {
      */
     public static boolean isCasavaLarger1Dot8Format( final String readName ) {
         String[] nameParts = SPACE_REGEX.split( readName );
-        return nameParts.length == 2 && (nameParts[1].startsWith( Properties.EXT_A1_STRING ) ||
-                                         nameParts[1].startsWith( Properties.EXT_A2_STRING ));
+        return nameParts.length == 2 && (nameParts[1].startsWith( ReadPairExtensions.A1.toString() ) ||
+                                         nameParts[1].startsWith( ReadPairExtensions.A2.toString() ));
     }
 
 
     /**
-     * Adds a {@link Properties.EXT_A1} or {@link Properties.EXT_A2) at the end
+     * Adds a {@link ReadPairExtensions.A1} or {@link ReadPairExtensions.A2) at the end
      * of the given records read name, if it is a paired read and does not
      * already contain a paired read ending.
      * <p>
@@ -755,10 +757,10 @@ public final class CommonsMappingParser {
 
         String readName = record.getReadName();
         final char pairTag = readName.charAt( readName.length() - 1 );
-        if( record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1 &&
-            pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2 &&
+        if( record.getReadPairedFlag() && pairTag != ReadPairExtensions.A1.getChar() && pairTag != ReadPairExtensions.B1.getChar() &&
+            pairTag != ReadPairExtensions.A2.getChar() && pairTag != ReadPairExtensions.B2.getChar() &&
             !isCasavaLarger1Dot8Format( readName ) ) {
-            readName += "/" + (record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2);
+            readName += "/" + (record.getFirstOfPairFlag() ? ReadPairExtensions.A1 : ReadPairExtensions.A2 );
         }
         return readName;
     }
@@ -837,25 +839,25 @@ public final class CommonsMappingParser {
 
             if( differences == 0 ) { //perfect mapping
                 if( sameMismatchCount == 1 ) {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.SINGLE_PERFECT_MATCH.getTypeByte() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.SINGLE_PERFECT_MATCH.getType() );
                 } else {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.PERFECT_MATCH.getTypeByte() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.PERFECT_MATCH.getType() );
                 }
 
             } else if( differences == lowestDiffRate ) { //best match mapping
                 if( sameMismatchCount == 1 ) {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.SINGLE_BEST_MATCH.getTypeByte() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.SINGLE_BEST_MATCH.getType() );
                 } else {
-                    record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.BEST_MATCH.getTypeByte() );
+                    record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.BEST_MATCH.getType() );
                 }
 
             } else if( differences > lowestDiffRate ) { //common mapping
-                record.setAttribute( Properties.TAG_READ_CLASS, MappingClass.COMMON_MATCH.getTypeByte() );
+                record.setAttribute( SAMRecordTag.ReadClass.toString(), MappingClass.COMMON_MATCH.getType() );
 
             } else { //meaning: differences < lowestDiffRate
                 throw new AssertionError( "Cannot contain less than the lowest diff rate number of differences!" );
             }
-            record.setAttribute( Properties.TAG_MAP_COUNT, classification.getNumberOccurrences() );
+            record.setAttribute( SAMRecordTag.MapCount.toString(), classification.getNumberOccurrences() );
         }
     }
 

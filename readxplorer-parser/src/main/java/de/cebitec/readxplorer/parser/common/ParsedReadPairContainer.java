@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.parser.common;
 
 
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.ArrayList;
 import java.util.Collections;

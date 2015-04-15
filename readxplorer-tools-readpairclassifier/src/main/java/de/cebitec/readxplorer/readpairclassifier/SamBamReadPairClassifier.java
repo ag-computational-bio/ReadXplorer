@@ -18,6 +18,11 @@
 package de.cebitec.readxplorer.readpairclassifier;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
+import de.cebitec.readxplorer.api.enums.SAMRecordTag;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;
@@ -36,10 +41,7 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.io.File;
 import java.io.IOException;
@@ -132,7 +134,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         this.chromLengthMap = chromLengthMap;
         this.errorLimit = new ErrorLimit( 100 );
         this.readPairSizeDistribution = new DiscreteCountingDistribution( maxDist * 3 );
-        readPairSizeDistribution.setType( Properties.READ_PAIR_SIZE_DISTRIBUTION );
+        readPairSizeDistribution.setType( Distribution.ReadPairSizeDistribution );
     }
 
 
@@ -218,7 +220,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     //separate all mappings of same pair by read pair tag and hand it over to classification then
                     SAMRecord record = samItor.next();
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
-                        char pairTag = CommonsMappingParser.getReadPairTag( record );
+                        ReadPairExtensions pairTag = CommonsMappingParser.getReadPairTag( record );
                         CommonsMappingParser.checkOrRemovePairTag( record );
                         String readName = record.getReadName();
 
@@ -234,11 +236,11 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                         }
 
                         boolean classified;
-                        if( pairTag == Properties.EXT_A1 ) {
+                        if( pairTag == ReadPairExtensions.A1 ) {
                             record.setReadPairedFlag( true );
                             record.setFirstOfPairFlag( true );
                             classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap1, class1 );
-                        } else if( pairTag == Properties.EXT_A2 ) {
+                        } else if( pairTag == ReadPairExtensions.A2 ) {
                             record.setReadPairedFlag( true );
                             record.setSecondOfPairFlag( true );
                             classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap, outputFile.getName(), lineNo, refSeqFetcher, diffMap2, class2 );
@@ -332,26 +334,27 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 
         if( !diffMap2.isEmpty() ) { //both sides of the read pair have been mapped
 
-            int orient1 = this.orienation == 1 ? -1 : 1;
-            int dir = this.orienation == 2 ? 1 : -1;
+            Strand orient1 = this.orienation == 1 ? Strand.Reverse : Strand.Forward;
+            Strand dir = this.orienation == 2 ? Strand.Forward : Strand.Reverse;
             boolean pairSize = diffMap1.size() == 1 && diffMap2.size() == 1;
 
             if( pairSize ) { //only one mapping per readname = we can always store a pair object
 
                 SAMRecord record1 = diffMap1.keySet().iterator().next();
                 SAMRecord record2 = diffMap2.keySet().iterator().next();
-                byte direction = record1.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                Strand direction = record1.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                 int start1 = record1.getAlignmentStart();
                 int stop1 = record1.getAlignmentEnd();
 
                 int start2 = record2.getAlignmentStart();
                 int stop2 = record2.getAlignmentEnd();
-                byte direction2 = record2.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                Strand direction2 = record2.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                 //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
 
                 boolean case1 = direction == orient1 && start1 <= start2;
-                if( (case1 || direction == -orient1 && start2 <= start1) &&
-                    direction == dir * direction2 ) {
+                if( (case1 || direction.getType() == -orient1.getType()
+                    && start2 <= start1)
+                    && direction.getType() == dir.getType() * direction2.getType() ) {
 
                     int currDist = calcDistance( case1, start1, stop2, start2, stop1 );
 
@@ -392,7 +395,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     int diffs1 = entry.getValue();
 
                     try {
-                        byte direction = recordA.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                        Strand direction = recordA.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                         int start1 = recordA.getAlignmentStart();
                         int stop1 = recordA.getAlignmentEnd();
 
@@ -409,13 +412,13 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                 if( !(omitList.contains( recordA ) && omitList.contains( recordB )) ) {
                                     int start2 = recordB.getAlignmentStart();
                                     int stop2 = recordB.getAlignmentEnd();
-                                    byte direction2 = recordB.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                                    Strand direction2 = recordB.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
 
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
                                     boolean case1 = direction == orient1 && start1 < start2;
-                                    if( (case1 || direction == -orient1 && start2 < start1) &&
-                                        direction == dir * direction2 ) {
+                                    if( (case1 || direction.getType() == -orient1.getType() && start2 < start1)
+                                        && direction.getType() == dir.getType() * direction2.getType() ) {
                                         int currDist = calcDistance( case1, start1, stop2, start2, stop1 );
                                         if( currDist <= this.maxDist && currDist >= this.minDist ) { //distance fits
                                             ///////////////////////////// found a perfect pair! /////////////////////////////////
@@ -571,16 +574,16 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         SAMRecord mapping1 = readPair.getRecord1();
         SAMRecord mapping2 = readPair.getRecord2();
         this.setReadPairForType( readPair );
-        mapping1.setAttribute( Properties.TAG_READ_PAIR_TYPE, readPair.getType().getTypeInt() );
-        mapping1.setAttribute( Properties.TAG_READ_PAIR_ID, readPair.getReadPairId() );
+        mapping1.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getType() );
+        mapping1.setAttribute( SAMRecordTag.ReadPairId.toString(), readPair.getReadPairId() );
         mapping1.setMateUnmappedFlag( false );
         mapping1.setMateReferenceName( mapping2.getReferenceName() );
         mapping1.setMateAlignmentStart( mapping2.getAlignmentStart() );
         mapping1.setMateNegativeStrandFlag( mapping2.getReadNegativeStrandFlag() );
         mapping1.setProperPairFlag( readPair.getType() == ReadPairType.PERFECT_PAIR || readPair.getType() == ReadPairType.PERFECT_UNQ_PAIR );
 
-        mapping2.setAttribute( Properties.TAG_READ_PAIR_TYPE, readPair.getType().getTypeInt() );
-        mapping2.setAttribute( Properties.TAG_READ_PAIR_ID, readPair.getReadPairId() );
+        mapping2.setAttribute( SAMRecordTag.ReadPairType.toString(), readPair.getType().getType() );
+        mapping2.setAttribute( SAMRecordTag.ReadPairId.toString(), readPair.getReadPairId() );
         mapping2.setMateUnmappedFlag( false );
         mapping2.setMateReferenceName( mapping1.getReferenceName() );
         mapping2.setMateAlignmentStart( mapping1.getAlignmentStart() );
@@ -637,8 +640,8 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         record.setMateAlignmentStart( mateStart );
         record.setMateUnmappedFlag( mateStart == 0 );
         record.setNotPrimaryAlignmentFlag( mateStart != 0 );
-        record.setAttribute( Properties.TAG_READ_PAIR_TYPE, ReadPairType.UNPAIRED_PAIR.getTypeInt() );
-        record.setAttribute( Properties.TAG_READ_PAIR_ID, readPairId );
+        record.setAttribute( SAMRecordTag.ReadPairType.toString(), ReadPairType.UNPAIRED_PAIR.getType() );
+        record.setAttribute( SAMRecordTag.ReadPairId.toString(), readPairId );
         this.statsContainer.incReadPairStats( ReadPairType.UNPAIRED_PAIR, 1 );
     }
 

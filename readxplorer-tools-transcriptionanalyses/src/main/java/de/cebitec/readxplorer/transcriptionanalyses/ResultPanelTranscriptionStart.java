@@ -32,6 +32,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -254,9 +255,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
                         final String strand;
                         if( tss.isFwdStrand() ) {
-                            strand = SequenceUtils.STRAND_FWD_STRING;
+                            strand = Strand.Forward.toString();
                         } else {
-                            strand = SequenceUtils.STRAND_REV_STRING;
+                            strand = Strand.Reverse.toString();
                         }
 
                         final Object[] rowData = new Object[nbColumns];

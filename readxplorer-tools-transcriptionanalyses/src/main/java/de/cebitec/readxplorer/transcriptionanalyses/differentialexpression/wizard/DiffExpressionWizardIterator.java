@@ -31,7 +31,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Expre
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

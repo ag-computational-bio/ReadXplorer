@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.List;
 import javax.swing.JTextField;
 

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.utils.polytree;
 
 
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

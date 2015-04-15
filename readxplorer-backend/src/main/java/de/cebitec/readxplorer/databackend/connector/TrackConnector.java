@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend.connector;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.CoverageThread;
 import de.cebitec.readxplorer.databackend.CoverageThreadAnalyses;
@@ -401,9 +402,11 @@ public class TrackConnector {
      *             Properties.READ_START_DISTRIBUTION or
      *             Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
      * <p>
-     * @return a {@link DiscreteCountingDistribution} for this track.
+     * @return a {@link DiscreteCountingDistribution} for this track. If the
+     *         desired distribution is not yet stored in the DB, the returned
+     *         distribution is empty.
      */
-    public DiscreteCountingDistribution getCountDistribution( final byte type ) {
+    public DiscreteCountingDistribution getCountDistribution( final Distribution type ) {
 
         DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
         countDistribution.setType( type );
@@ -412,7 +415,7 @@ public class TrackConnector {
             try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_COUNT_DISTRIBUTION ) ) {
 
                 fetch.setInt( 1, track.getId() );
-                fetch.setByte( 2, type );
+                fetch.setByte( 2, (byte) type.getType() );
 
                 try( final ResultSet rs = fetch.executeQuery() ) {
                     while( rs.next() ) {

@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -200,7 +200,7 @@ public class CorrelationResultPanel extends ResultTablePanel {
     public void addData( CorrelatedInterval data ) {
         DefaultTableModel model = (DefaultTableModel) this.correlationTable.getModel();
         //TODO: get chromosome map and set chromosome correctly
-        String strandString = data.getDirection() == SequenceUtils.STRAND_FWD ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING;
+        String strandString = data.getDirection() == Strand.Forward ? Strand.Forward.toString() : Strand.Reverse.toString();
         model.addRow( new Object[]{ data.getChromId(), strandString, data.getFrom(), data.getTo(), data.getCorrelation(), data.getMinPeakCoverage() } );
     }
 

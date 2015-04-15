@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.api.objects.JobI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private boolean diffsAndGapsNeeded;
     private boolean coverageNeeded;
     private boolean mappingsNeeded;
-    private byte desiredData = Properties.NORMAL;
+    private IntervalRequestData desiredData = IntervalRequestData.Normal;
     private final ParametersReadClasses readClassParams;
     private long start;
 
@@ -252,7 +252,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      *                    Properties.REDUCED_MAPPINGS, Properties.NORMAL or
      *                    Properties.READ_STARTS.
      */
-    public void setDesiredData( byte desiredData ) {
+    public void setDesiredData( IntervalRequestData desiredData ) {
         this.desiredData = desiredData;
     }
 
