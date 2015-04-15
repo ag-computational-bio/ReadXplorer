@@ -31,9 +31,9 @@
                               </Group>
                               <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="perfectColorPanel" alignment="0" pref="226" max="32767" attributes="0"/>
-                                  <Component id="singleBestColorPanel" alignment="0" pref="226" max="32767" attributes="0"/>
-                                  <Component id="bestColorPanel" alignment="1" pref="226" max="32767" attributes="0"/>
+                                  <Component id="perfectColorPanel" alignment="0" pref="228" max="32767" attributes="0"/>
+                                  <Component id="singleBestColorPanel" alignment="0" pref="228" max="32767" attributes="0"/>
+                                  <Component id="bestColorPanel" alignment="1" pref="228" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -43,8 +43,8 @@
                               </Group>
                               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="singlePerfectColorPanel" pref="226" max="32767" attributes="0"/>
-                                  <Component id="commonColorPanel" pref="226" max="32767" attributes="0"/>
+                                  <Component id="singlePerfectColorPanel" pref="243" max="32767" attributes="0"/>
+                                  <Component id="commonColorPanel" pref="243" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -81,14 +81,14 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="diffColorLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
-                              <Component id="differenceColorPanel" pref="226" max="32767" attributes="0"/>
+                              <Component id="differenceColorPanel" pref="229" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="differenceColorButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="track1ColorLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
-                              <Component id="track1ColorPanel" pref="226" max="32767" attributes="0"/>
+                              <Component id="track1ColorPanel" pref="240" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="track1ColorButton" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -102,7 +102,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="uniformColorationCheckBox" min="-2" pref="123" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="uniformColorPanel" pref="227" max="32767" attributes="0"/>
+                              <Component id="uniformColorPanel" pref="265" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="uniformColButton" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -143,12 +143,12 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="perfectColorButton" max="32767" attributes="0"/>
-                          <Component id="perfectColorPanel" pref="23" max="32767" attributes="0"/>
+                          <Component id="perfectColorPanel" pref="29" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="bestColorButton" max="32767" attributes="0"/>
-                          <Component id="bestColorPanel" pref="23" max="32767" attributes="0"/>
+                          <Component id="bestColorPanel" pref="29" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -174,7 +174,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="singleBestColorButton" max="32767" attributes="0"/>
-                  <Component id="singleBestColorPanel" pref="23" max="32767" attributes="0"/>
+                  <Component id="singleBestColorPanel" pref="29" max="32767" attributes="0"/>
                   <Component id="singleBestMatchLabel" alignment="1" min="-2" pref="18" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -185,7 +185,7 @@
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="uniformColButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="uniformColorationCheckBox" min="-2" max="-2" attributes="0"/>
-                  <Component id="uniformColorPanel" pref="23" max="32767" attributes="0"/>
+                  <Component id="uniformColorPanel" pref="29" max="32767" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="doubleTrackSeparator" min="-2" pref="10" max="-2" attributes="0"/>
@@ -222,10 +222,10 @@
               <EmptySpace pref="13" max="32767" attributes="0"/>
               <Component id="generalSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="backgroundColorLabel" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="backgroundColorPanel" alignment="0" min="-2" pref="24" max="-2" attributes="0"/>
                   <Component id="backgroundColorButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="backgroundColorLabel" min="-2" pref="24" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="resetButton" min="-2" max="-2" attributes="0"/>

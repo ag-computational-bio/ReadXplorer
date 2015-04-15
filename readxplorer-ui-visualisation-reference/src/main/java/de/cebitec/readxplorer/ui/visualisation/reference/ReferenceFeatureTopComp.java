@@ -474,7 +474,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
             productText.setToolTipText( feat.getProduct() );
             locusField.setText( feat.getLocus() );
             geneField.setText( feat.getName() );
-            typeText.setText( feat.getType().getString() );
+            typeText.setText( feat.getType().toString() );
             parentList.setListData( parentVect );
             subfeatureList.setListData( childrenVect );
 

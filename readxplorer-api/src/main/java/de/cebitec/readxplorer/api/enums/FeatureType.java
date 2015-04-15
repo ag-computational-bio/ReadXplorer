@@ -214,20 +214,17 @@ public enum FeatureType implements Classification {
 
 
     /**
-     * @return the string representation of the current feature type.
-     */
-    @Override
-    public String getString() {
-        return this.string;
-    }
-
-
-    /**
      * @return the integer value of the type of the current feature.
      */
     @Override
     public int getType() {
-        return this.type;
+        return type;
+    }
+
+
+    @Override
+    public String toString() {
+        return string;
     }
 
 
@@ -261,7 +258,7 @@ public enum FeatureType implements Classification {
 
         type = type.toLowerCase();
         for( FeatureType featType : values() ) {
-            if( featType.getString().equals( type ) ) {
+            if( featType.toString().equals( type ) ) {
                 return featType;
             }
         }
@@ -288,12 +285,6 @@ public enum FeatureType implements Classification {
 
         return UNDEFINED;
 
-    }
-
-
-    @Override
-    public String toString() {
-        return this.string;
     }
 
 }

@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.ui.datavisualisation.readpairviewer;
 
 
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPair;
 import de.cebitec.readxplorer.databackend.dataobjects.ReadPairGroup;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
-import de.cebitec.readxplorer.api.enums.ReadPairType;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -291,7 +291,7 @@ public class ReadPairPopup extends JPopupMenu {
                         ? NbBundle.getMessage( BlockComponentPair.class, "Fwd" )
                         : NbBundle.getMessage( BlockComponentPair.class, "Rev" );
         return NbBundle.getMessage( BlockComponentPair.class, "Type" ).concat( " " ).
-                concat( mapping.getMappingClass().getString() ).
+                concat( mapping.getMappingClass().toString() ).
                 concat( NbBundle.getMessage( BlockComponentPair.class, "Start" ) ).concat( " " ).
                 concat( String.valueOf( mapping.getStart() ) ).
                 concat( NbBundle.getMessage( BlockComponentPair.class, "Stop" ) ).concat( " " ).

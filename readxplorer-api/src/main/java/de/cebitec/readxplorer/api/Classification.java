@@ -27,15 +27,8 @@ package de.cebitec.readxplorer.api;
 public interface Classification {
 
     /**
-     * @return The string representation associated with this Classification.
-     */
-    String getString();
-
-
-    /**
      * @return The integer value associated with this Classification.
      */
     int getType();
-
 
 }

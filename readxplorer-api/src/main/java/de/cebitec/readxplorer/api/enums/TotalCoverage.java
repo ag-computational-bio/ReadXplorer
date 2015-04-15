@@ -44,15 +44,6 @@ public enum TotalCoverage implements Classification {
 
 
     /**
-     * @return the string representation of the total coverage.
-     */
-    @Override
-    public String getString() {
-        return this.string;
-    }
-
-
-    /**
      * @return the byte value of the type of the total coverage.
      */
     @Override
@@ -66,7 +57,7 @@ public enum TotalCoverage implements Classification {
      */
     @Override
     public String toString() {
-        return this.getString();
+        return string;
     }
 
 

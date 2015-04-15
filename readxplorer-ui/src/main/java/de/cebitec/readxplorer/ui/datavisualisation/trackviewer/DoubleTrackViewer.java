@@ -268,7 +268,7 @@ public class DoubleTrackViewer extends TrackViewer {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage, double coverageNorm, String strandString ) {
-        String classType = classification.getString() + " " + strandString;
+        String classType = classification.toString() + ' ' + strandString;
         if( this.hasNormalizationFactor() ) {
             sb.append( createTableRow( classType, coverage, coverageNorm ) );
         } else {

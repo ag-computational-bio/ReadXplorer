@@ -101,7 +101,7 @@ public class JFeature extends JComponent {
         sb.append( "<table>" );
 
         sb.append( createTableRow( "Locus", feature.getLocus() ) );
-        sb.append( createTableRow( "Type", feature.getType().getString() ) );
+        sb.append( createTableRow( "Type", feature.getType().toString() ) );
         sb.append( createTableRow( "Strand", (feature.isFwdStrand() ? "forward" : "reverse") ) );
         sb.append( createTableRow( "Start", String.valueOf( feature.getStart() ) ) );
         sb.append( createTableRow( "Stop", String.valueOf( feature.getStop() ) ) );

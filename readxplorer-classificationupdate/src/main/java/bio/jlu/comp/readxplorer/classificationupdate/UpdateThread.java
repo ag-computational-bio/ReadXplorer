@@ -19,6 +19,8 @@ package bio.jlu.comp.readxplorer.classificationupdate;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.api.enums.MappingClass;
+import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
@@ -32,8 +34,6 @@ import de.cebitec.readxplorer.parser.mappings.SamBamStatsParser;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.api.enums.MappingClass;
-import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -148,10 +148,10 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
                             List<String> statsKeysToDelete = new ArrayList<>();
                             for( MappingClass mappingClass : MappingClass.values() ) {
-                                statsKeysToDelete.add( mappingClass.getString() );
-                                statsKeysToDelete.add( mappingClass.getString() + StatsContainer.COVERAGE_STRING );
+                                statsKeysToDelete.add( mappingClass.toString());
+                                statsKeysToDelete.add( mappingClass.toString() + StatsContainer.COVERAGE_STRING );
                             }
-                            statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE.getString() + StatsContainer.COVERAGE_STRING );
+                            statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE + StatsContainer.COVERAGE_STRING );
                             statsKeysToDelete.add( StatsContainer.NO_MAPPINGS );
                             statsKeysToDelete.add( StatsContainer.NO_UNIQUE_SEQS );
                             statsKeysToDelete.add( StatsContainer.NO_REPEATED_SEQ );

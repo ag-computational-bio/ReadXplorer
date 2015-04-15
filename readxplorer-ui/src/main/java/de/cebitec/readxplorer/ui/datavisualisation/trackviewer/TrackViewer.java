@@ -589,11 +589,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage ) {
-        String classType = classification.getString();
         if( hasNormalizationFactor ) {
-            sb.append( createTableRow( classType, coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
+            sb.append( createTableRow( classification.toString(), coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
         } else {
-            sb.append( createTableRow( classType, coverage ) );
+            sb.append( createTableRow( classification.toString(), coverage ) );
         }
     }
 

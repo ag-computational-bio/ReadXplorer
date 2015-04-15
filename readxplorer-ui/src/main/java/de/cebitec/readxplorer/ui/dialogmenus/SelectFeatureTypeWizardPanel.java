@@ -128,7 +128,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
         List<FeatureType> featureTypeList = component.getSelectedFeatureTypes();
         StringBuilder featTypeString = new StringBuilder( 30 );
         for( FeatureType type : featureTypeList ) {
-            featTypeString.append( type.getString() ).append( "," );
+            featTypeString.append( type ).append( ',' );
         }
         getPref().put( getPropSelectedFeatTypes(), featTypeString.toString() );
         getPref().put( getPropFeatureStartOffset(), component.getStartOffsetField().getText() );

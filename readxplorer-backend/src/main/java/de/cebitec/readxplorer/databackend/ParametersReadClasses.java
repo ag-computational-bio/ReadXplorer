@@ -143,10 +143,10 @@ public class ParametersReadClasses {
         classList.addAll( Arrays.asList( MappingClass.values() ) );
         for( Classification classType : classList ) {
             String isAllowed = isClassificationAllowed( classType ) ? "yes" : "no";
-            statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getString() + " included:", isAllowed ) );
+            statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType + " included:", isAllowed ) );
         }
         String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "yes" : "no";
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getString() + ":", isAllowed ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ + ":", isAllowed ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Mapping strand selection:", getStrandOptionString() ) );
     }
 

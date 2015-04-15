@@ -458,7 +458,7 @@ public class BasePanelFactory {
         if( viewer != null ) {
             entry.add( this.getFeatureTypeBox( type, viewer ) );
         } else {
-            entry.add( new JLabel( type.getString() ) );
+            entry.add( new JLabel( type.toString() ) );
         }
         entry.setAlignmentX( Component.LEFT_ALIGNMENT );
         return entry;
@@ -488,7 +488,7 @@ public class BasePanelFactory {
      *         viewer.
      */
     private JCheckBox getFeatureTypeBox( Classification type, AbstractViewer viewer ) {
-        JCheckBox checker = new JCheckBox( type.getString() );
+        JCheckBox checker = new JCheckBox( type.toString() );
         //special cases are handled here
         if( type != FeatureType.UNDEFINED ) {
             checker.setSelected( true );

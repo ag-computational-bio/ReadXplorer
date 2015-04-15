@@ -18,8 +18,11 @@
 package de.cebitec.readxplorer.parser.mappings;
 
 
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
+import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.Benchmark;
@@ -31,9 +34,6 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.api.Classification;
-import de.cebitec.readxplorer.api.enums.MappingClass;
-import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -167,7 +167,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                         ++seqCount;
                         lastReadSeq = readSeq;
 
-                        statsContainer.increaseValue( mappingClass.getString(), 1 );
+                        statsContainer.increaseValue( mappingClass.toString(), 1 );
                         PositionUtils.updateIntervals( classToCoveredIntervalsMap.get( refName ).get( mappingClass ), start, stop );
                         PositionUtils.updateIntervals( classToCoveredIntervalsMap.get( refName ).get( TotalCoverage.TOTAL_COVERAGE ), start, stop );
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1

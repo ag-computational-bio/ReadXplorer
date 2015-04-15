@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.utils;
 
 
-import de.cebitec.readxplorer.api.enums.ReadPairType;
-import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.enums.MappingClass;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -156,7 +156,7 @@ public class StatsContainer {
         for( Map<Classification, List<Pair<Integer, Integer>>> chromMap : classToCoveredIntervalsMap.values() ) {
             for( Classification mappingClass : chromMap.keySet() ) {
                 List<Pair<Integer, Integer>> coveredIntervals = chromMap.get( mappingClass );
-                String coverageId = mappingClass.getString() + COVERAGE_STRING;
+                String coverageId = mappingClass + COVERAGE_STRING;
                 statsMap.put( coverageId, statsMap.get( coverageId ) + this.calcCoveredBases( coveredIntervals ) );
             }
         }
@@ -284,10 +284,10 @@ public class StatsContainer {
         List<String> statsList = new ArrayList<>();
 
         for( MappingClass mappingClass : MappingClass.values() ) {
-            statsList.add( mappingClass.getString() );
-            statsList.add( mappingClass.getString() + StatsContainer.COVERAGE_STRING );
+            statsList.add( mappingClass.toString() );
+            statsList.add( mappingClass.toString() + StatsContainer.COVERAGE_STRING );
         }
-        statsList.add( TotalCoverage.TOTAL_COVERAGE.getString() + StatsContainer.COVERAGE_STRING );
+        statsList.add( TotalCoverage.TOTAL_COVERAGE.toString() + StatsContainer.COVERAGE_STRING );
         statsList.add( NO_MAPPINGS );
         statsList.add( NO_UNIQUE_SEQS );
         statsList.add( NO_REPEATED_SEQ );

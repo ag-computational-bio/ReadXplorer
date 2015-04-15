@@ -333,7 +333,7 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
 
         Set<FeatureType> keys = featureStats.keySet();
         for( FeatureType type : keys ) {
-            String typeS = type.getString();
+            String typeS = type.toString();
             model.addElement( typeS + ": " + featureStats.get( type ) );
         }
         statisticsList.setModel( model );
