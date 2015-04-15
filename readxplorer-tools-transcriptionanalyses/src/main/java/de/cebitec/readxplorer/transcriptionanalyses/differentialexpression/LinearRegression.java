@@ -68,7 +68,7 @@ public class LinearRegression implements LinearRegressionI {
     
     private  Map<PersistentFeature, double[]> findSimilarity(Map<PersistentFeature, int[]> geneSet1,
                 Map<PersistentFeature, int[]> geneSet2) {
-        int limit = 10;
+        int limit2 = 2;
         Map<PersistentFeature, double[]> result = new HashMap<>();
         for (Map.Entry<PersistentFeature, int[]> gene1 :
             geneSet1.entrySet() ){
@@ -78,12 +78,25 @@ public class LinearRegression implements LinearRegressionI {
                     null : gene1.getKey().equals( gene2.getKey() )) {
                     int [] gene1Values = gene1.getValue();
                     int [] gene2Values = gene2.getValue();
-                    if( coverageFilter( gene1Values, limit ) ||
-                        coverageFilter( gene2Values, limit ) ) {
+                    double[] calculation;
+                    if(  coverageFilter( gene1Values, limit2 ) &&
+                        coverageFilter( gene2Values, limit2 ) ) {
                         CalculatePerpendicular rSqrt = new CalculatePerpendicular();
-                        double[] calculation = rSqrt.calculate( gene1Values, gene2Values );
-                        result.put(gene1.getKey(), calculation);
+                        calculation = rSqrt.calculate( gene1Values, gene2Values );
+                    } else if( coverageFilter( gene1Values, limit2 ) &&
+                       !( coverageFilter( gene2Values, limit2 ) ) ) {
+                        calculation = new double[] { Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY };
+                    } else if( !( coverageFilter( gene1Values, limit2 ) ) &&
+                        coverageFilter( gene2Values, limit2 ) ) {
+                        calculation = new double[] { Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY };
+                    } else {
+                        continue;
                     }
+                    result.put(gene1.getKey(), calculation);
                 }                            
             }                          
         }
@@ -97,7 +110,7 @@ public class LinearRegression implements LinearRegressionI {
                             return true;
                         }
         }
-        return true;
+        return false;
     }
-    
+     
 }

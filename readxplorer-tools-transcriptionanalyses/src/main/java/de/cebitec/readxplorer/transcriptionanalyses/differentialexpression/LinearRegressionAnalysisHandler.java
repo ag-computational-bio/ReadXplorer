@@ -306,17 +306,17 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         for (Map.Entry<PersistentFeature, double[]> feature : calculated.entrySet() ) {
             k++;
             int tableSize = feature.getValue().length+2; // Plus feature name and  r square of replicates
-            boolean allZero = true;
+            //boolean allZero = true;
             final Object[] tmp = new Object[tableSize];
             double[] rSqrt = feature.getValue();
             
             tmp[0] = feature.getKey();
             for(int i = 1; i<tableSize-1; i++ ){
-                if( ! ( Double.isNaN( rSqrt[i-1] ) ) && 
-                  ( Double.isFinite( rSqrt[i-1] ) ) ) {
-                    allZero = false;
+                //if( ! ( Double.isNaN( rSqrt[i-1] ) ) && 
+                  //( Double.isFinite( rSqrt[i-1] ) ) ) {
+                  //  allZero = false;
                     tmp[i] = rSqrt[i-1];
-                }
+                //}
             }
             if(replicatesData.isEmpty()) {
                 tmp[tableSize-1] = "There are no replicates";
@@ -324,10 +324,10 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
                 tmp[tableSize-1] = replicatesData.get( feature.getKey() );
             }
                 
-            if(!allZero){
+            //if(!allZero){
                 tableContents.add( new Vector( Arrays.asList( tmp ) ) );
                 regionNamesList.add( feature.getKey() );
-            }
+            //}
             progressHandle.progress( k );
         }
 
