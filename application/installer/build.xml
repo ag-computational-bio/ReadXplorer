@@ -162,13 +162,13 @@
 
             <create-bundle root="${output.dir}/registry-temp" platform="${platform}" 
                target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-jre.${bundle.extention}">
-                <component uid="${main.product.uid}" version="1.0.0.0.0"/>
+                <component uid="${main.product.uid}" version="2.1.0.0.0"/>
                 <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Documents\NetBeansProjects\JRE_1.8.0_40_x64.exe"/>
             </create-bundle>
             
             <create-bundle root="${output.dir}/registry-temp" platform="${platform}" 
                target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
-                <component uid="${main.product.uid}" version="1.0.0.0.0"/>
+                <component uid="${main.product.uid}" version="2.1.0.0.0"/>
             </create-bundle>
             
             <if property="bundle.extention" value="zip">

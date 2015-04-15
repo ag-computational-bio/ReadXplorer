@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.readpairclassifier;
 
 import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
@@ -40,7 +41,6 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.io.File;
@@ -177,8 +177,10 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         this.refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
         boolean success = this.preprocessData( trackJob );
         if( !success ) {
-            throw new ParsingException( "Sorting of the input file by read name was not successful, please try again and make sure to have enough " +
-                                        "free space in your systems temp directory to store intermediate files for sorting (e.g. on Windows 7 the hard disk containing: " +
+            throw new ParsingException( "Sorting of the input file by read name was not successful. Please either switch your RX temp directory " +
+                                        "(Tools->Options->Miscellaneous->Directories) to a disk with sufficient space or make sure to have " +
+                                        "enough free space in your systems temp directory to store intermediate files for sorting (e.g. on " +
+                                        "Windows 7 the standard disk and folder: " +
                                         "C:\\Users\\UserName\\AppData\\Local\\Temp needs to have enough free space)." );
         }
         File oldWorkFile = trackJob.getFile();
@@ -326,19 +328,14 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
     @NbBundle.Messages( { "# {0} - read", "Classifier.UnclassifiedRead=Found unclassified read. Also no read pair classification for this read: {0}" } )
     private void performClassification( Map<SAMRecord, Integer> diffMap1, Map<SAMRecord, Integer> diffMap2, int readPairId ) {
 
-        int largestSmallerDist = Integer.MIN_VALUE;
-        int largestPotSmallerDist = Integer.MIN_VALUE;
-        int largestUnorSmallerDist = Integer.MIN_VALUE;
-        int largestPotUnorSmallerDist = Integer.MIN_VALUE;
-
 //        0 = fr -r1(1)-> <-r2(-1)- (stop1<start2) or -r2(1)-> <-r1(-1)-(stop2 < start1)
 //        1 = rf <-r1(-1)- -r2(1)-> (stop1<start2) or <-r2(-1)- -r1(1)-> (stop2 < start1)
 //        2 = ff -r1(1)-> -r2(1)-> (stop1<start2)  or <-r2(-1)- <-r1(-1)- (stop2 < start1)
 
         if( !diffMap2.isEmpty() ) { //both sides of the read pair have been mapped
 
-            int orient1 = this.orienation == 1 ? -1 : 1;
-            int dir = this.orienation == 2 ? 1 : -1;
+            Strand orient1 = this.orienation == 1 ? Strand.Reverse : Strand.Forward;
+            Strand dir = this.orienation == 2 ? Strand.Forward : Strand.Reverse;
             boolean pairSize = diffMap1.size() == 1 && diffMap2.size() == 1;
 
             if( pairSize ) { //only one mapping per readname = we can always store a pair object
@@ -354,17 +351,12 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                 Strand direction2 = record2.getReadNegativeStrandFlag() ? Strand.Reverse : Strand.Forward;
                 //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
 
-                boolean case1 = direction.getType() == orient1 && start1 <= start2;
-                if( (case1 || direction.getType() == -orient1 && start2 <= start1) &&
-                    direction.getType() == dir * direction2.getType() ) {
+                boolean case1 = direction == orient1 && start1 <= start2;
+                if( (case1 || direction.getType() == -orient1.getType()
+                    && start2 <= start1)
+                    && direction.getType() == dir.getType() * direction2.getType() ) {
 
-                    //determine insert size between both reads
-                    int currDist;
-                    if( case1 ) {
-                        currDist = Math.abs( start1 - stop2 ) + 1; //distance if on different chromosomes??? read 1 + rest chr1 + start chr2 bis read2?
-                    } else {
-                        currDist = Math.abs( start2 - stop1 ) + 1;
-                    }
+                    int currDist = calcDistance( case1, start1, stop2, start2, stop1 );
 
                     if( currDist <= this.maxDist && currDist >= this.minDist ) {
                         ///////////////////////////// found a perfect pair! /////////////////////////////////
@@ -407,6 +399,11 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                         int start1 = recordA.getAlignmentStart();
                         int stop1 = recordA.getAlignmentEnd();
 
+                        int largestSmallerDist = Integer.MIN_VALUE;
+                        int largestPotSmallerDist = Integer.MIN_VALUE;
+                        int largestUnorSmallerDist = Integer.MIN_VALUE;
+                        int largestPotUnorSmallerDist = Integer.MIN_VALUE;
+
                         for( Map.Entry<SAMRecord, Integer> entry2 : diffMap2.entrySet() ) {
                             try {
 
@@ -419,17 +416,10 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
-                                    boolean case1 = direction.getType() == orient1 && start1 < start2;
-                                    if( (case1 || direction.getType() == -orient1 && start2 < start1) &&
-                                        direction.getType() == dir * direction2.getType() ) { //direction fits
-
-                                        //determine insert size between both reads
-                                        int currDist;
-                                        if( case1 ) {
-                                            currDist = Math.abs( start1 - stop2 ) + 1;
-                                        } else {
-                                            currDist = Math.abs( start2 - stop1 ) + 1;
-                                        }
+                                    boolean case1 = direction == orient1 && start1 < start2;
+                                    if( (case1 || direction.getType() == -orient1.getType() && start2 < start1)
+                                        && direction.getType() == dir.getType() * direction2.getType() ) {
+                                        int currDist = calcDistance( case1, start1, stop2, start2, stop1 );
                                         if( currDist <= this.maxDist && currDist >= this.minDist ) { //distance fits
                                             ///////////////////////////// found a perfect pair! /////////////////////////////////
                                             ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.PERFECT_PAIR, currDist );
@@ -483,10 +473,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                 Exceptions.printStackTrace( e );
                             }
                         }
-                        largestSmallerDist = Integer.MIN_VALUE;
-                        largestPotSmallerDist = Integer.MIN_VALUE;
-                        largestUnorSmallerDist = Integer.MIN_VALUE;
-                        largestPotUnorSmallerDist = Integer.MIN_VALUE;
 
                     } catch( NullPointerException e ) {
                         this.sendMsgIfAllowed( Bundle.Classifier_UnclassifiedRead( recordA.getReadName() ) );
@@ -523,9 +509,11 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     this.addPairedRecord( pairMapping, omitList );
                 }
 
-//                for( ReadPair pairMapping : potUnorPairList ) { //potential large unoriented pairs are excluded currently
-//                    this.addPairedRecord( pairMapping, omitList ); //remove comment to treat them as pairs instead of single mappings
-//                }
+                for( ReadPair pairMapping : potUnorPairList ) {
+                    this.addPairedRecord( pairMapping, omitList );
+                }
+
+                 //potential large unoriented pairs are excluded currently
 
                 SAMRecord mateRecord;
                 for( SAMRecord record : diffMap1.keySet() ) {
@@ -553,6 +541,26 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                 this.classifySingleRecord( record, readPairId, 0, "*" );
             }
         }
+    }
+
+
+    /**
+     * Determine insert size between both reads.
+     * @param case1
+     * @param start1 start of mapping 1
+     * @param stop2 stop of mapping 1
+     * @param start2 start of mapping 2
+     * @param stop1 stop of mapping 1
+     * @return insert size between both reads
+     */
+    private int calcDistance( boolean case1, int start1, int stop2, int start2, int stop1 ) {
+        int currDist;
+        if( case1 ) {
+            currDist = Math.abs( start1 - stop2 ) + 1; //distance if on different chromosomes??? read 1 + rest chr1 + start chr2 bis read2?
+        } else {
+            currDist = Math.abs( start2 - stop1 ) + 1;
+        }
+        return currDist;
     }
 
 

@@ -112,9 +112,7 @@ public class Layout implements LayoutI {
      * @param mappings mappings in current interval
      */
     private void createBlocks( Collection<Mapping> mappings ) {
-        Iterator<Mapping> mappingIt = mappings.iterator();
-        while( mappingIt.hasNext() ) {
-            Mapping mapping = mappingIt.next();
+        for( Mapping mapping : mappings ) {
             if( !exclusionList.contains( mapping.getMappingClass() ) ) {
 
                 int start = mapping.getStart();
