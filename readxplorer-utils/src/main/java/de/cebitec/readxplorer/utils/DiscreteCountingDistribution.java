@@ -224,9 +224,7 @@ public class DiscreteCountingDistribution {
     /**
      * Set the type of this distribution.
      * <p>
-     * @param type of this distribution: Either
-     * Properties.COVERAGE_INCREASE_DISTRIBUTION or
-     * Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
+     * @param type of this distribution
      */
     public void setType( Distribution type ) {
         this.type = type;
