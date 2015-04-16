@@ -70,7 +70,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         this.observers = new ArrayList<>();
         this.errorLimit = new ErrorLimit( 100 );
         this.readLengthDistribution = new DiscreteCountingDistribution( 400 );
-        readLengthDistribution.setType( Distribution.ReadLengthDistribution );
+        readLengthDistribution.setType( Distribution.ReadLength );
     }
 
 

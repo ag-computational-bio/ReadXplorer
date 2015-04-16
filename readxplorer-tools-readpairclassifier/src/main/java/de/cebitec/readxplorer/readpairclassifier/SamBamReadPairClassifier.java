@@ -134,7 +134,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         this.chromLengthMap = chromLengthMap;
         this.errorLimit = new ErrorLimit( 100 );
         this.readPairSizeDistribution = new DiscreteCountingDistribution( maxDist * 3 );
-        readPairSizeDistribution.setType( Distribution.ReadPairSizeDistribution );
+        readPairSizeDistribution.setType( Distribution.ReadPairSize );
     }
 
 

@@ -829,15 +829,15 @@ public class AnalysisTranscriptionStart implements Observer,
         Distribution distType;
         if( isStrandBothOption ) {
             if( isBothFwdDirection ) {
-                distType = Distribution.ReadStartBothFwdStrandDistribution;
+                distType = Distribution.ReadStartBothFwdStrand;
             } else {
-                distType = Distribution.ReadStartBothRevStrandDistribution;
+                distType = Distribution.ReadStartBothRevStrand;
             }
         } else {
             if( isFeatureStrand ) {
-                distType = Distribution.ReadStartFeatStrandDistribution;
+                distType = Distribution.ReadStartFeatStrand;
             } else {
-                distType = Distribution.ReadStartOppStrandDistribution;
+                distType = Distribution.ReadStartOppStrand;
             }
         }
         return distType;
@@ -852,15 +852,15 @@ public class AnalysisTranscriptionStart implements Observer,
         Distribution distType;
         if( isStrandBothOption ) {
             if( isBothFwdDirection ) {
-                distType = Distribution.CovIncPercentBothFwdStrandDistribution;
+                distType = Distribution.CovIncPercentBothFwdStrand;
             } else {
-                distType = Distribution.CovIncPercentBothRevStrandDistribution;
+                distType = Distribution.CovIncPercentBothRevStrand;
             }
         } else {
             if( isFeatureStrand ) {
-                distType = Distribution.CovIncPercentFeatStrandDistribution;
+                distType = Distribution.CovIncPercentFeatStrand;
             } else {
-                distType = Distribution.CovIncPercentOppStrandDistribution;
+                distType = Distribution.CovIncPercentOppStrand;
             }
         }
         return distType;

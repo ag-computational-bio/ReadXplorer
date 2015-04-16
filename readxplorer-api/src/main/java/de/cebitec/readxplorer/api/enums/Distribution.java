@@ -30,59 +30,59 @@ public enum Distribution {
     /**
      * Value for read length distribution = 3.
      */
-    ReadLengthDistribution( 3, "Read Length Distribution" ),
+    ReadLength( 3, "Read Length Distribution" ),
 
     /**
      * Value for read pair size distribution = 4.
      */
-    ReadPairSizeDistribution( 4, "Read Pair Size Distribution" ),
+    ReadPairSize( 4, "Read Pair Size Distribution" ),
 
     /**
      * Value for read starts on the feature strand distribution = 7.
      */
-    ReadStartFeatStrandDistribution( 7, "Read Start Feature Strand Distribution" ),
+    ReadStartFeatStrand( 7, "Read Start Feature Strand Distribution" ),
 
     /**
      * Value for read starts on the opposite strand of features distribution =
      * 8.
      */
-    ReadStartOppStrandDistribution( 8, "Read Start Opposite Strand Distribution" ),
+    ReadStartOppStrand( 8, "Read Start Opposite Strand Distribution" ),
 
     /**
      * Value for read starts combined for both strands in fwd direction
      * distribution = 9.
      */
-    ReadStartBothFwdStrandDistribution( 9, "Read Start Combine Strands Fwd Distribution" ),
+    ReadStartBothFwdStrand( 9, "Read Start Combine Strands Fwd Distribution" ),
 
     /**
      * Value for read starts combined for both strands in rev direction
      * distribution = 10.
      */
-    ReadStartBothRevStrandDistribution( 10, "Read Start Combine Strands Rev Distribution" ),
+    ReadStartBothRevStrand( 10, "Read Start Combine Strands Rev Distribution" ),
 
     /**
      * Value for coverage increase in percent on the feature strand distribution
      * = 11.
      */
-    CovIncPercentFeatStrandDistribution( 11, "Coverage Increase Percent Feature Strand Distribution" ),
+    CovIncPercentFeatStrand( 11, "Coverage Increase Percent Feature Strand Distribution" ),
 
     /**
      * Value for coverage increase in percent on the opposite strand of features
      * distribution = 12.
      */
-    CovIncPercentOppStrandDistribution( 12, "Coverage Increase Percent Opposite Strand Distribution" ),
+    CovIncPercentOppStrand( 12, "Coverage Increase Percent Opposite Strand Distribution" ),
 
     /**
      * Value for coverage increase in percent combined for both strands in fwd
      * direction distribution = 13.
      */
-    CovIncPercentBothFwdStrandDistribution( 13, "Coverage Increase Percent Combine Strands Fwd Distribution" ),
+    CovIncPercentBothFwdStrand( 13, "Coverage Increase Percent Combine Strands Fwd Distribution" ),
 
     /**
      * Value for coverage increase in percent combined for both strands in rev
      * direction distribution = 14.
      */
-    CovIncPercentBothRevStrandDistribution( 14, "Coverage Increase Percent Combine Strands Rev Distribution" );
+    CovIncPercentBothRevStrand( 14, "Coverage Increase Percent Combine Strands Rev Distribution" );
 
 
     private final int typeInt;

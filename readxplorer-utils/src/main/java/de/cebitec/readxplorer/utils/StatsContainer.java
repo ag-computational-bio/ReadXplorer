@@ -81,8 +81,8 @@ public class StatsContainer {
         statsMap = new HashMap<>();
         readLengthDistribution = new DiscreteCountingDistribution();
         readPairSizeDistribution = new DiscreteCountingDistribution();
-        readLengthDistribution.setType( Distribution.ReadLengthDistribution );
-        readPairSizeDistribution.setType( Distribution.ReadPairSizeDistribution );
+        readLengthDistribution.setType( Distribution.ReadLength );
+        readPairSizeDistribution.setType( Distribution.ReadPairSize );
     }
 
 
