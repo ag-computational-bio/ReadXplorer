@@ -20,15 +20,15 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.databackend.dataobjects.CodonSnp;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.utils.CodonUtils;
-import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;

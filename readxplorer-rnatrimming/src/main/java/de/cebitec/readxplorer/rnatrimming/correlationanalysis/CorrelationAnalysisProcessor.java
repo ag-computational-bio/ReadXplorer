@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
@@ -30,7 +31,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.api.enums.Strand;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

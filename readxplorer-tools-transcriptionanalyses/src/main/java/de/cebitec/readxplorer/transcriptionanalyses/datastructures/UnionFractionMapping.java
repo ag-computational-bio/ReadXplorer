@@ -18,16 +18,15 @@
 package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
-import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 
 /**

@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
@@ -27,7 +28,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.HighlightAreaListener;
 import de.cebitec.readxplorer.ui.datavisualisation.HighlightableI;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.sequence.Region;

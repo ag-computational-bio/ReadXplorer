@@ -18,13 +18,13 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.StartCodonFilter;
-import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.util.List;
 

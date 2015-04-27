@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
@@ -27,7 +28,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expre
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTestI;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTestObserver;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTestStatus;
-import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

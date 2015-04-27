@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
@@ -25,7 +26,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;

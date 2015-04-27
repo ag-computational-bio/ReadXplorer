@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.api.constants.GUI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
-import de.cebitec.readxplorer.api.constants.Colors;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;

@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.api.enums.Strand;
 import java.util.ArrayList;
 import java.util.List;
 

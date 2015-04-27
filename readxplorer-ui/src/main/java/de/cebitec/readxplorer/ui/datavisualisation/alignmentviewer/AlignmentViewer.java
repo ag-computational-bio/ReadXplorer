@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -29,7 +30,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.Cursor;
 import java.awt.Dimension;

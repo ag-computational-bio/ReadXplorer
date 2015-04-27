@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
@@ -34,7 +35,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;

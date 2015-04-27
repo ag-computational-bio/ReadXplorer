@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.SamBamFileReader;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Difference;
@@ -30,11 +32,9 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.awt.Color;
 import java.awt.Font;

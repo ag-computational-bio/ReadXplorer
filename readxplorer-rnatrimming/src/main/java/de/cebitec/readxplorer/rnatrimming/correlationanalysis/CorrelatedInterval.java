@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
-import de.cebitec.readxplorer.databackend.dataobjects.TrackChromResultEntry;
 import de.cebitec.readxplorer.api.enums.Strand;
+import de.cebitec.readxplorer.databackend.dataobjects.TrackChromResultEntry;
 
 
 /**

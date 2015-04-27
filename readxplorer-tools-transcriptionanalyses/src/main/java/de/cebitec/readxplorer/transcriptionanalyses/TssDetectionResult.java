@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -27,7 +28,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUna
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.util.ArrayList;
 import java.util.Collections;

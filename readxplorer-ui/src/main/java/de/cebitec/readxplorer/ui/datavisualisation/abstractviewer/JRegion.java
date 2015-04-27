@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.api.enums.RegionType;
 import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.RegionType;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;

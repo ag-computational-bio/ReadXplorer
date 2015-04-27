@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import java.util.EnumSet;
 import org.junit.After;
 import org.junit.AfterClass;

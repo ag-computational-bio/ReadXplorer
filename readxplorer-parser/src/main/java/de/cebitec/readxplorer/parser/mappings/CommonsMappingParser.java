@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.mappings;
 
 
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.api.enums.Strand;
@@ -29,7 +30,6 @@ import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

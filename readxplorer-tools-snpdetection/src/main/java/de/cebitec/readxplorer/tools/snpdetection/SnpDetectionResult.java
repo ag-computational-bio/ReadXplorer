@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.CodonSnp;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.tools.snpdetection;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.SamBamFileReader;
@@ -30,9 +32,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.api.Classification;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -18,10 +18,10 @@
 package bio.comp.jlu.readxplorer.tools.gasv;
 
 
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.api.enums.MappingClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

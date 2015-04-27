@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
-import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

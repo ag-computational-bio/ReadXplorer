@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.histogramviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.ThreadListener;
@@ -35,7 +36,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaIn
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Color;
 import java.awt.Cursor;

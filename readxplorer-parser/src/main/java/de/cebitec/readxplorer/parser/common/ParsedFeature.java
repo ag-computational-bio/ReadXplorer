@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.Strand;
+import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.util.ArrayList;
 import java.util.Collections;

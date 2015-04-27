@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.reference;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedChromosome;
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
@@ -25,7 +26,6 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;

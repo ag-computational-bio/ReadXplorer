@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
@@ -35,7 +36,6 @@ import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
-import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.util.HashMap;
