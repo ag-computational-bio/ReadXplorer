@@ -114,8 +114,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             snpExport.add( snp.getFrequency() );
             snpExport.add( snp.getType().getType() );
 
-            String aminoAcidsSnp = "";
             String aminoAcidsRef = "";
+            String aminoAcidsSnp = "";
             String codonsSNP = "";
             String codonsRef = "";
             String effect = "";
@@ -130,13 +130,13 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                 codons = snp.getCodons();
 
                 if( codons.isEmpty() ) {
-                    aminoAcidsSnp = intergenic;
                     aminoAcidsRef = intergenic;
+                    aminoAcidsSnp = intergenic;
                 }
 
                 for( CodonSnp codon : codons ) {
-                    char aminoSnp = codon.getAminoRef();
-                    char aminoRef = codon.getAminoSnp();
+                    char aminoRef = codon.getAminoRef();
+                    char aminoSnp = codon.getAminoSnp();
                     codonsRef += codon.getTripletRef() + "\n";
                     codonsSNP += codon.getTripletSnp() + "\n";
                     if( aminoRef != '-' ) {
