@@ -618,31 +618,31 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     numberReadsAbsLabel.setText( String.valueOf( numReads ) );
                 }
 
-                int numOfPerfectMappings = statsMap.get( MappingClass.PERFECT_MATCH );
+                int numOfPerfectMappings = statsMap.get( MappingClass.PERFECT_MATCH.toString() );
                 if( numOfPerfectMappings == -1 ) {
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText( String.valueOf( numOfPerfectMappings ) );
 
-                int numOfBestMatchMappings = statsMap.get( MappingClass.BEST_MATCH );
+                int numOfBestMatchMappings = statsMap.get( MappingClass.BEST_MATCH.toString() );
                 if( numOfBestMatchMappings == -1 ) {
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText( String.valueOf( numOfBestMatchMappings ) );
 
-                int numOfCommonMatchMappings = statsMap.get( MappingClass.COMMON_MATCH );
+                int numOfCommonMatchMappings = statsMap.get( MappingClass.COMMON_MATCH.toString() );
                 if( numOfCommonMatchMappings == -1 ) {
                     recalculated = true;
                 }
                 commonMappingsAbsLabel.setText( String.valueOf( numOfCommonMatchMappings ) );
 
-                int numOfSPerfectMappings = statsMap.get( MappingClass.SINGLE_PERFECT_MATCH );
+                int numOfSPerfectMappings = statsMap.get( MappingClass.SINGLE_PERFECT_MATCH.toString() );
                 if( numOfSPerfectMappings == -1 ) {
                     recalculated = true;
                 }
                 singlePerfectAbsLabel.setText( String.valueOf( numOfSPerfectMappings ) );
 
-                int numOfSBestMatchMappings = statsMap.get( MappingClass.SINGLE_BEST_MATCH );
+                int numOfSBestMatchMappings = statsMap.get( MappingClass.SINGLE_BEST_MATCH.toString() );
                 if( numOfSBestMatchMappings == -1 ) {
                     recalculated = true;
                 }
