@@ -268,7 +268,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 int subStart = subLocation.getMin();
                                 int subStop = subLocation.getMax();
                                 subFeatures.add( new ParsedFeature( type, subStart, subStop, strand,
-                                        locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null ) );
+                                        locusTag, product, ecNumber, geneName, new ArrayList<>(), null ) );
                                 featAcrossBorder = subStart == 1 && index > 0; //feature across circular chrom start, separate in two features
                                 ++index;
                             }
@@ -278,14 +278,14 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         if( featAcrossBorder ) { //feature across circular chrom start, add each subfeature separately
                             for( ParsedFeature subFeature : subFeatures ) {
                                 if( !featMap.containsKey( type ) ) {
-                                    featMap.put( type, new ArrayList<ParsedFeature>() );
+                                    featMap.put( type, new ArrayList<>() );
                                 }
                                 featMap.get( type ).add( subFeature );
                             }
                         } else {
                             ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
                             if( !featMap.containsKey( type ) ) {
-                                featMap.put( type, new ArrayList<ParsedFeature>() );
+                                featMap.put( type, new ArrayList<>() );
                             }
                             featMap.get( type ).add( currentFeature );
                         }

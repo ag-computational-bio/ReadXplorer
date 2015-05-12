@@ -256,24 +256,23 @@ public enum FeatureType implements Classification {
      */
     public static FeatureType getFeatureType( String type ) {
 
-        type = type.toLowerCase();
         for( FeatureType featType : values() ) {
-            if( featType.toString().equals( type ) ) {
+            if( featType.toString().equalsIgnoreCase( type ) ) {
                 return featType;
             }
         }
 
-        if( type.equals( ORF_STRING ) ) {
+        if( type.equalsIgnoreCase( ORF_STRING ) ) {
             return CDS;
-        } else if( type.equals( MISC_RNA_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( MISC_RNA_STRING_UNDERSCORE ) ) {
             return MISC_RNA;
-        } else if( type.equals( REPEAT_UNIT_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( REPEAT_UNIT_STRING_UNDERSCORE ) ) {
             return REPEAT_UNIT;
-        } else if( type.equals( FIVE_UTR_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( FIVE_UTR_STRING_UNDERSCORE ) ) {
             return FIVE_UTR;
-        } else if( type.equals( THREE_UTR_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( THREE_UTR_STRING_UNDERSCORE ) ) {
             return THREE_UTR;
-        } else if( type.equals( MINUS_THIRTYFIVE_STRING_UNDERSCORE ) ) {
+        } else if( type.equalsIgnoreCase( MINUS_THIRTYFIVE_STRING_UNDERSCORE ) ) {
             return MINUS_THIRTYFIVE;
         } else if( type.equalsIgnoreCase( MINUS_TEN_STRING_UNDERSCORE ) ) {
             return MINUS_TEN;
