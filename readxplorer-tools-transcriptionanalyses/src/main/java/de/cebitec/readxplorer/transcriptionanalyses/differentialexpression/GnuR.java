@@ -26,6 +26,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -262,7 +263,11 @@ public final class GnuR extends RConnection {
         boolean useAuth = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_AUTH, false );
         File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
         if( cebitecIndicator.exists() ) {
-            instance = new GnuR( "129.70.80.99", 6311, false, processingLog );
+            String ip;
+            try( FileReader fr = new FileReader( cebitecIndicator ); BufferedReader br = new BufferedReader( fr ) ) {
+                ip = br.readLine();
+            }
+            instance = new GnuR( ip, 6311, false, processingLog );
             instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
         } else {
             if( manualRemoteSetup ) {
