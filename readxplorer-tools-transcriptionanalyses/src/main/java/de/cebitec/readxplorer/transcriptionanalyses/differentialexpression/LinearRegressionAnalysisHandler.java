@@ -338,9 +338,9 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         colNames.add( "Feature" );
         colNames.add( "Intercept" );
         colNames.add( "Slope" );
-        colNames.add( "R^2 for Conditions" );
-        colNames.add( "R^2 for Replicates (Cond. 1)" );
-        colNames.add( "R^2 for Replicates (Cond. 2)" );
+        colNames.add( "R for Conditions" );
+        colNames.add( "R for Replicates (Cond. 1)" );
+        colNames.add( "R for Replicates (Cond. 2)" );
 
         List<ResultDeAnalysis> result = Collections.singletonList( new ResultDeAnalysis(
             tableContents, colNames, regionNamesList, "Count Data Table" ) );
