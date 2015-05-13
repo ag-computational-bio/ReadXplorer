@@ -70,7 +70,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private final File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
     private static final String SOURCE_URI = "R.tar.gz";
     private static final String R_ZIP = "R.zip";
-    private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
+    private static final String DEFAULT_R_DOWNLOAD_MIRROR = "http://wwwhomes.uni-bielefeld.de/kstadermann/";
     private static final String DEFAULT_RSERVE_HOST = "localhost";
     private static final int DEFAULT_RSERVE_PORT = 6311;
     private static final String OS = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
@@ -424,7 +424,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.pref = NbPreferences.forModule( Object.class );
         initComponents();
         warningMessage.setText( "" );
-        String sourceUri = pref.get( Paths.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
+        String sourceUri = pref.get( Paths.CRAN_MIRROR, DEFAULT_R_DOWNLOAD_MIRROR ) + SOURCE_URI;
         sourceFileTextField.setText(sourceUri );
         jProgressBar1.setMaximum( 100 );
         setUpListener();
@@ -826,7 +826,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     @Override
     void load() {
         autoOrmanual.clearSelection();
-        cranMirror.setText( pref.get( Paths.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
+        cranMirror.setText( pref.get( Paths.CRAN_MIRROR, DEFAULT_R_DOWNLOAD_MIRROR ) );
         rServeHost.setText( pref.get( RServe.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
         rServePort.setText( String.valueOf( pref.getInt( RServe.RSERVE_PORT, DEFAULT_RSERVE_PORT ) ) );
         boolean manualRemoteButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );

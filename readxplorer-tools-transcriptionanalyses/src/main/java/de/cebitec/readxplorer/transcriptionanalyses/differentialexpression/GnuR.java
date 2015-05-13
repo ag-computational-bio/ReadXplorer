@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.PasswordStore;
 import java.io.BufferedReader;
@@ -111,10 +110,10 @@ public final class GnuR extends RConnection {
     }
 
 
-    private void setDefaultCranMirror() throws RserveException {
-        cranMirror = NbPreferences.forModule( Object.class ).get( Paths.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
-        this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
-    }
+//    private void setDefaultCranMirror() throws RserveException {
+//        cranMirror = NbPreferences.forModule( Object.class ).get( Paths.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
+//        this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
+//    }
 
 
     /**
@@ -128,22 +127,15 @@ public final class GnuR extends RConnection {
             this.eval( "library(\"" + packageName + "\")" );
         } catch( RserveException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{ currentTimestamp, packageName } );
-            try {
-                currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.INFO, "{0}: Trying to install package {1}.", new Object[]{ currentTimestamp, packageName } );
-                this.eval( "install.packages(\"" + packageName + "\")" );
-                this.eval( "library(" + packageName + ')' );
-            } catch( RserveException ex1 ) {
-                currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{ currentTimestamp, packageName } );
-                throw new PackageNotLoadableException( packageName );
-            }
+            LOG.log( Level.WARNING, "{0}: Package {1} is not installed. Please install it manually and try again.", new Object[]{ currentTimestamp, packageName } );
         }
     }
 
 
     public static class PackageNotLoadableException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
 
         public PackageNotLoadableException( String packageName ) {
             super( "The Gnu R package " + packageName + " can't be loaded automatically. Please install it manually!" );
@@ -154,6 +146,9 @@ public final class GnuR extends RConnection {
 
 
     public static class UnknownGnuRException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
 
         public UnknownGnuRException( Exception e ) {
             super( "An unknown exception occurred in GNU R while processing your data. " +
@@ -398,7 +393,7 @@ public final class GnuR extends RConnection {
                     if( rserveProcess != null && rserveProcess.isAlive() ) {
                         instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
                         instance.login( user, password );
-                        instance.setDefaultCranMirror();
+//                        instance.setDefaultCranMirror();
                     } else {
                         throw new IOException( "Could not start Rserve instance!" );
                     }
