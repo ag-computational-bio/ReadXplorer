@@ -181,8 +181,8 @@
                         <configuration.logic.file>${basedir}/installer/ConfigurationLogic.java</configuration.logic.file>
                         <nbi.stub.buildfile>${basedir}/installer/build.xml</nbi.stub.buildfile>
                     </userSettings>
-                    <installerOsMacosx>false</installerOsMacosx>
                     <installerOsLinux>false</installerOsLinux>
+                    <installerOsWindows>false</installerOsWindows>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
