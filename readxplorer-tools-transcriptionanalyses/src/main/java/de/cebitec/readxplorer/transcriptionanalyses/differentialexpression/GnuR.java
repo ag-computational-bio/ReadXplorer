@@ -114,8 +114,6 @@ public final class GnuR extends RConnection {
 //        cranMirror = NbPreferences.forModule( Object.class ).get( Paths.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
 //        this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
 //    }
-
-
     /**
      * Loads the specified Gnu R package. If not installed the method will try
      * to download and install the package.
@@ -415,9 +413,8 @@ public final class GnuR extends RConnection {
         if( !(manualLocalSetup || manualRemoteSetup) ) {
             File userDir = Places.getUserDirectory();
             File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
-            String startupBat = rDir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
-            File batFile = new File( startupBat );
-            return (batFile.exists() && batFile.canExecute());
+            File versionIndicator = new File( rDir.getAbsolutePath() + File.separator + "rx_minimal_version_2_1" );
+            return versionIndicator.exists();
         } else {
             return true;
         }
