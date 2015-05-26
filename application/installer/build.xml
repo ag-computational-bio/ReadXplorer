@@ -1,15 +1,15 @@
 <project name="build installers" default="build" basedir=".">
     <property file="${basedir}/build.properties"/>
     <property file="${basedir}/custom.properties"/>
-    
+
     <target name="build" depends="init,-build,-generate-bundles,post-build"/>
-    
+
     <target name="init" depends="-clean,-checkout,-init,-init-properties,-post-init-clean"/>
 
     <target name="-clean-cvs" unless="no.checkout">
         <delete dir="${nbi.all.dir}"/>
     </target>
-    
+
     <target name="-clean" depends="-clean-cvs" unless="no.clean">
         <delete dir="${output.dir}"/>
         <delete dir="${nbi.ext.dir}/products/helloworld/build"/>
@@ -23,9 +23,9 @@
     <target name="post-build">
         <delete dir="${output.dir}/registry-temp"/>
     </target>
-    
+
     <target name="-checkout">
-        
+
         <copy todir="${nbi.all.dir}/.common">
             <fileset dir="${basedir}/.common"/>
         </copy>
@@ -37,27 +37,27 @@
     </target>
 
     <target name="-init">
-        <taskdef 
-            name="if" 
-            classpath="${custom.tasks.cls}" 
+        <taskdef
+            name="if"
+            classpath="${custom.tasks.cls}"
             classname="org.netbeans.installer.infra.build.ant.If"/>
-        <taskdef 
-            name="for-each" 
-            classpath="${custom.tasks.cls}" 
+        <taskdef
+            name="for-each"
+            classpath="${custom.tasks.cls}"
             classname="org.netbeans.installer.infra.build.ant.ForEach"/>
-        <taskdef 
-            name="set" 
-            classpath="${custom.tasks.cls}" 
+        <taskdef
+            name="set"
+            classpath="${custom.tasks.cls}"
             classname="org.netbeans.installer.infra.build.ant.SetProperty"/>
 
-        <taskdef 
-            name="create-bundle" 
-            classpath="${custom.tasks.cls}" 
+        <taskdef
+            name="create-bundle"
+            classpath="${custom.tasks.cls}"
             classname="org.netbeans.installer.infra.build.ant.registries.CreateBundle"/>
-        
+
         <delete file="${temp.file}"/>
     </target>
-    
+
     <target name="-init-properties">
         <echo file="${nbi.all.dir}/environment.tmp" encoding="utf-8">
             checkout.sources=false
@@ -83,42 +83,42 @@
         <replace file="${nbi.all.dir}/environment.tmp" token="\" value="/" encoding="utf-8"/>
         <native2ascii src="${nbi.all.dir}" dest="${nbi.all.dir}" encoding="utf-8" includes="environment.tmp" ext=".properties"/>
     </target>
-    
+
     <target name="-post-init-clean">
         <delete dir="${basedir}/cache/raw"/>
     </target>
-    
+
     <target name="-build">
         <delete dir="${output.dir}"/>
-        
+
         <mkdir dir="${output.dir}"/>
         <mkdir dir="${bundles.release.dir}"/>
         <mkdir dir="${output.dir}/components"/>
-        
+
         <property name="engine.dist.file.name" value="nbi-engine.jar"/>
 
         <echo message="BUILDING HELLOWORLD EXT ENGINE =================================="/>
         <ant dir="${nbi.ext.dir}/infra/build/engine" target="release-all">
-            <property 
-                name="basedir" 
+            <property
+                name="basedir"
                 value="${nbi.ext.dir}/infra/build/engine"/>
-            <property 
-                name="environment.properties" 
+            <property
+                name="environment.properties"
                 value="${environment.properties}"/>
-            
-            <property 
-                name="core.engine.dist.file" 
+
+            <property
+                name="core.engine.dist.file"
                 value="${nbi.engine.jar}"/>
         </ant>
 
 
         <echo message="BUILDING HELLOWORLD PRODUCT =================================="/>
         <ant dir="${nbi.ext.dir}/infra/build/products/helloworld" target="release-all">
-            <property 
-                name="basedir" 
+            <property
+                name="basedir"
                 value="${nbi.ext.dir}/infra/build/products/helloworld"/>
-            <property 
-                name="environment.properties" 
+            <property
+                name="environment.properties"
                 value="${environment.properties}"/>
             <property
                 name="dist.dir"
@@ -134,8 +134,8 @@
                 name="release.parent.platforms"
                 value=""/>
 
-            <property 
-                name="engine.dist.file" 
+            <property
+                name="engine.dist.file"
                 value="${output.dir}/registry-temp/engine.jar"/>
 
 
@@ -160,17 +160,48 @@
 
             <set property="bundle.extention" source="bundle.extention.${platform}"/>
 
-            <create-bundle root="${output.dir}/registry-temp" platform="${platform}" 
-               target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-jre.${bundle.extention}">
-                <component uid="${main.product.uid}" version="2.1.0.0.0"/>
-                <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Documents\NetBeansProjects\JRE_1.8.0_40_x64.exe"/>
-            </create-bundle>
-            
-            <create-bundle root="${output.dir}/registry-temp" platform="${platform}" 
-               target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
-                <component uid="${main.product.uid}" version="2.1.0.0.0"/>
-            </create-bundle>
-            
+
+            <!-- Linux installer -->
+            <!--if property="platform" value="linux">
+                <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
+                   target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
+                    <component uid="${main.product.uid}" version="2.1.0.0.0"/>
+                    <property name="nbi.bundled.jvm.file" value="/home/ernest/bundled_jres/linux_jvm.bin"/>
+                </create-bundle>
+            </if-->
+
+            <!-- Solaris installer -->
+            <!--if property="platform" value="solaris">
+                <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
+                   target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
+                    <component uid="${main.product.uid}" version="2.1.0.0.0"/>
+                    <property name="nbi.bundled.jvm.file" value="/home/ernest/bundled_jres/linux_jvm.bin"/>
+                </create-bundle>
+            </if-->
+
+            <!-- Windows installer -->
+            <if property="platform" value="windows">
+                <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
+                               target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-x64.${bundle.extention}">
+                    <component uid="${main.product.uid}" version="2.1.0.0.0"/>
+                    <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Documents\NetBeansProjects\JRE_1.8.0_40_x64.exe"/>
+                </create-bundle>
+                <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
+                                               target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-i386.${bundle.extention}">
+                    <component uid="${main.product.uid}" version="2.1.0.0.0"/>
+                    <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Documents\NetBeansProjects\JRE_1.8.0_40_i386.exe"/>
+                </create-bundle>
+            </if>
+
+            <!-- Mac installer BUNDLING JRE NOT WORKING DUE TO BUG https://netbeans.org/bugzilla/show_bug.cgi?id=250103 -->
+            <if property="platform" value="macosx">
+                <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
+                               target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
+                    <component uid="${main.product.uid}" version="2.1.0.0.0"/>
+                    <property name="nbi.bundled.jvm.file" value="/Users/kstadermann/NetBeansProjects/readxplorer/jre"/>
+                </create-bundle>
+            </if>
+
             <if property="bundle.extention" value="zip">
                 <antcall target="zip-to-tgz">
                     <param name="input.file"  value="${bundles.release.dir}/${bundle.files.prefix}-${platform}.zip"/>
@@ -188,11 +219,11 @@
 
         <mkdir dir="${tar.tmpdir}"/>
 
-        <unzip 
+        <unzip
             src="${input.file}"
             dest="${tar.tmpdir}"/>
 
-        <tar tarfile="${output.file}" 
+        <tar tarfile="${output.file}"
              compression="gzip">
             <tarfileset dir="${tar.tmpdir}" mode="644">
                 <include name="**/*.*"/>
