@@ -446,8 +446,16 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
             } else {
-                messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+                if( OS.contains( "mac" ) ) {
+                messages.setText( "Rserve is bundled with the Mac installation and hence no configuration is needed." );
                 autoButton.setEnabled( false );
+                manualLocalButton.setEnabled( false );
+                manualRemoteButton.setEnabled( false );
+                cranMirror.setEnabled( false );
+                } else {
+                    messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+                    autoButton.setEnabled( false );
+                }
             }
         }
         rServePort.setInputVerifier( new PortInputVerifier() );
@@ -938,9 +946,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
 
     private void unzipGNUR() {
-        if(!versionIndicator.exists() && rDir.exists()){
+        if( !versionIndicator.exists() && rDir.exists() ) {
             rDir.delete();
-        }     
+        }
         rDir.mkdir();
         try {
             unzip = new Unzip( zipFile, rDir );
@@ -1040,7 +1048,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         }
 
     }
-    
+
 
     class PortInputVerifier extends InputVerifier {
 
@@ -1115,6 +1123,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return false;
             }
         }
+
+
     }
 
 }

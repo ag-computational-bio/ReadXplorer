@@ -153,6 +153,12 @@
                         <publicPackage>de.cebitec.readxplorer.transcriptionanalyses</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.transcriptionanalyses.datastructures</publicPackage>
                     </publicPackages>
+                    <nbmResources>
+                        <nbmResource>
+                            <directory>release/</directory>
+                            <targetPath>modules/</targetPath>
+                        </nbmResource>
+                    </nbmResources>
                 </configuration>
             </plugin>
 

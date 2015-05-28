@@ -198,7 +198,7 @@
                 <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
                                target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
                     <component uid="${main.product.uid}" version="2.1.0.0.0"/>
-                    <property name="nbi.bundled.jvm.file" value="/Users/kstadermann/NetBeansProjects/readxplorer/jre"/>
+                    <!--property name="nbi.bundled.jvm.file" value="/Users/kstadermann/NetBeansProjects/readxplorer/jre"/-->
                 </create-bundle>
             </if>
 
