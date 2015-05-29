@@ -384,12 +384,13 @@ public final class GnuR extends RConnection {
         pb.directory( startUpScript.getAbsoluteFile().getParentFile() );
         Process rserveProcess = pb.start();
         new Thread( new Runnable() {
+
             @Override
             public void run() {
                 try {
                     BufferedReader reader
                             = new BufferedReader( new InputStreamReader( rserveProcess.getInputStream() ) );
-                    String line = null;
+                    String line;
                     while( (line = reader.readLine()) != null ) {
                         processingLog1.logGNURoutput( line );
                     }
@@ -398,16 +399,14 @@ public final class GnuR extends RConnection {
                     LOG.log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
                 }
             }
-
-
-        } ).start();
+        }).start();
         new Thread( new Runnable() {
             @Override
             public void run() {
                 try {
                     BufferedReader reader
                             = new BufferedReader( new InputStreamReader( rserveProcess.getErrorStream() ) );
-                    String line = null;
+                    String line;
                     while( (line = reader.readLine()) != null ) {
                         processingLog1.logGNURoutput( line );
                     }

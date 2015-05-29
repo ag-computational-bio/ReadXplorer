@@ -212,6 +212,16 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
         } catch (IOException e) {
             throw new InstallationException("Cannot copy JRE", e);
         }
+        
+        // set permissions:
+        File binDir = new File(target, "bin");
+            for (File file : binDir.listFiles()) {
+            try {
+                file.setExecutable(true);
+            } catch (Exception ex) { 
+                throw new InstallationException("Cannot set JRE binaries executable", ex);
+            }
+        }
 
         // to add uninstaller logic:
         SystemUtils.getNativeUtils().addUninstallerJVM(new LauncherResource(false, target));
