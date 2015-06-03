@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import java.util.Map;
-import java.util.Observer;
 
 /**
  *
@@ -36,20 +35,6 @@ public interface LinearRegressionI {
      * @param countData The count data for each gene.
      */
     void process(Map<Integer, Map<PersistentFeature, int[]>> countData);
-
-    /**
-     * Adds an observer that is notified when the calculation is finished.
-     * 
-     * @param o The observer that should be added.
-     */
-    void addObserver(Observer o);
-
-    /**
-     * Removes an observer from the list of observers that are notified when the calculation is finished.
-     * 
-     * @param o The observer that should be remove.
-     */
-    void removeObserver(Observer o);
     
     /**
      * Returns the result of the analysis run.

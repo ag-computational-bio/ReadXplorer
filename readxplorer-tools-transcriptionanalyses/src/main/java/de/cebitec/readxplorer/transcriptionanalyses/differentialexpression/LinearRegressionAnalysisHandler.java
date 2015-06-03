@@ -61,6 +61,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     private final int refGenomeID;
     private final int startOffset;
     private final int stopOffset;
+    private final int[] groupAindex;
+    private final int[] groupBindex;
     private final int[] groupA;
     private final int[] groupB;
     private LinearRegression linRegForConditions;
@@ -76,14 +78,17 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     private final Set<FeatureType> selectedFeatureTypes;
     private final Map<Integer, Map<PersistentFeature, int[]>> allContinuousCoverageData;
     private List<ResultDeAnalysis> results;
-    Integer indexForA = 0;
-    Integer indexForB = 1;
+    Integer indexForConditionA = 0;
+    Integer indexForConditionB = 1;
     boolean workingWithoutReplicates;
 
     
-    public LinearRegressionAnalysisHandler( List<PersistentTrack> selectedTracks, int[] groupA, int[] groupB,
-                                     int refGenomeID, boolean workingWithoutReplicates, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
-                                     ParametersReadClasses readClassParams ) {
+     /**
+     * Constructor of the class.
+     */
+    public LinearRegressionAnalysisHandler( List<PersistentTrack> selectedTracks, int[] groupAindex, int[] groupBindex,
+                                     int refGenomeID, boolean workingWithoutReplicates, File saveFile, Set<FeatureType> selectedFeatureTypes,
+                                     int startOffset, int stopOffset, ParametersReadClasses readClassParams ) {
          
         super( selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams );
         ProcessingLog.getInstance().resetLog();
@@ -92,8 +97,10 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         this.saveFile = saveFile;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
-        this.groupA = groupA;
-        this.groupB = groupB;
+        this.groupAindex = groupAindex;
+        this.groupBindex = groupBindex;
+        this.groupA = new int[groupAindex.length];
+        this.groupB = new int[groupBindex.length];
         this.workingWithoutReplicates = workingWithoutReplicates;
         this.readClassParams = readClassParams;
         this.selectedFeatureTypes = selectedFeatureTypes;
@@ -103,18 +110,23 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         linRegForConditions = new LinearRegression();
         linRegForReplicates = new LinearRegression();
     }
-    
+   
+     /**
+     * Starts the analysis and collects data for all selected tracks.
+     */
     @Override
     public void startAnalysis() {
         allContinuousCoverageData.clear();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
+        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.",
+            currentTimestamp );
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos.clear();
 
         for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
-            genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
+            genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(),
+                selectedFeatureTypes, chrom.getId() ) );
         }
 
         for( PersistentTrack currentTrack : selectedTracks ) {
@@ -124,8 +136,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
                 CollectContinuousCoverageData collCovData = new CollectContinuousCoverageData( 
                     genomeAnnos, startOffset, stopOffset, readClassParams );
                 allContinuousCoverageData.put(currentTrack.getId(), collCovData.getContinuousCountData() );
-                AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this, "Collecting coverage data for track " +
-                                                                         currentTrack.getDescription() + ".", readClassParams );
+                AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this,
+                    "Collecting coverage data for track " + currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
                 handler.setDesiredData( Properties.REDUCED_MAPPINGS );
                 handler.registerObserver( collCovData );
@@ -143,6 +155,28 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         }
     }
    
+    /**
+     * Determines which tracks belong to which condition.
+     */
+    private void determineGroupsForConditions() {
+        int idxA = 0;
+        for (int i : groupAindex) {
+            groupA[idxA] = selectedTracks.get(i-1).getId();
+            idxA++;
+        }
+        
+        int idxB = 0;
+        for (int i : groupBindex) {
+            groupB[idxB] = selectedTracks.get(i-1).getId();
+            idxB++;
+        }
+    }
+    
+     /**
+     * Determines in which of two possible conditions belongs collected data.
+     * <p>
+     * @param allData Raw data as it was collected, with trackID as key.
+     */
     private Map<Integer, MultiValueMap<PersistentFeature, int[]>> sortDataForConditions( 
             Map<Integer, Map<PersistentFeature, int[]>> allData ) {
         Map<Integer, MultiValueMap<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
@@ -151,12 +185,18 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         
         innerMultiMapA = formInnerMultiMap( allData, groupA );
         innerMultiMapB = formInnerMultiMap( allData, groupB );
-        preparedDataForConditions.put( indexForA, innerMultiMapA );
-        preparedDataForConditions.put( indexForB, innerMultiMapB );
+        preparedDataForConditions.put( indexForConditionA, innerMultiMapA );
+        preparedDataForConditions.put( indexForConditionB, innerMultiMapB );
         return preparedDataForConditions;
     }
     
-     
+     /**
+     * Prepares inner Map for condition, consisting of gene names and count data. 
+     * <p>
+     * @param allData data with trackID as key.
+     * 
+     * @param conditionGroup array with trackIDs for the same condition.
+     */ 
     private MultiValueMap<PersistentFeature, int[]> formInnerMultiMap(
             Map<Integer, Map<PersistentFeature, int[]>> allData, int[] conditionGroup) {
         MultiValueMap<PersistentFeature, int[]> innerMultiMap = new MultiValueMap<>();
@@ -170,11 +210,16 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         } 
         return innerMultiMap;
     }
-   
+    
+    /**
+     * Calculates mean value of countData for replicates. 
+     * <p>
+     * @param allData data with condition as key.
+     */ 
     private Map<Integer, Map<PersistentFeature, int[]>> findMeanOfReplicatesDataForEachCondition( 
             Map<Integer, MultiValueMap<PersistentFeature, int[]>> allData) {
         Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions = new HashMap<>();
-        Integer[] conditions = { indexForA, indexForB };
+        Integer[] conditions = { indexForConditionA, indexForConditionB };
             
         for( Integer condition : conditions ) {
             Map<PersistentFeature, int[]> preparedInnerMap = new HashMap<>();
@@ -189,6 +234,11 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return preparedDataForConditions;
     }
     
+     /**
+     * Calculates mean value of countData for replicates. 
+     * <p>
+     * @param allData data with condition as key.
+     */ 
     private int[] findMeanBetweenArraysInCollection(Collection<int[]> countData) {
         Iterator<int[]> countDataIterator = countData.iterator();
         int[] dataSum = new int[countDataIterator.next().length];
@@ -212,6 +262,11 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return means;
     }
     
+    /**
+     * Calculates mean value of r square for each pair of replicates in condition. 
+     * <p>
+     * @param allData data with condition as key.
+     */ 
     protected Map<Integer, Map<PersistentFeature, Double>> calculateAverageRSquareOfReplicates(
         Map<Integer, MultiValueMap<PersistentFeature, int[]>> countData) {
         Map<Integer, Map<PersistentFeature, Double>> preparedDataForConditions = new HashMap<>();
@@ -219,8 +274,6 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         for( Integer condition : countData.keySet() ) {
             MultiValueMap<PersistentFeature, int[]> featureSetForCondition = countData.get( condition );
             Map<PersistentFeature, Double> averagesOfReplicatesForCondition = new HashMap<>(); 
-            Integer firstReplicateNr = 0;
-            Integer secondReplicateNr = 1;
             Map<Integer, Map<PersistentFeature, int[]>> replicatePairs = new HashMap<>(); 
             for( PersistentFeature feature : featureSetForCondition.keySet()) {
                 ArrayList<Double> rSqueareMeans = new ArrayList<>();
@@ -241,10 +294,14 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
             preparedDataForConditions.put( condition, averagesOfReplicatesForCondition );
             
         }
-        //preparedData = findMeanOfReplicatesRSquareBeteenConditions(preparedDataForConditions); 
         return preparedDataForConditions;
     }
     
+    /**
+     * Finds average value of double list elements. 
+     * <p>
+     * @param array list with data
+     */
     protected double averageOfArray( ArrayList<Double> array) {
         double sum = 0;
         for (Double data : array) {
@@ -254,29 +311,18 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return average;
     }
     
-    protected Map<PersistentFeature, Double> findMeanOfReplicatesRSquareBeteenConditions(
-            Map<Integer, Map<PersistentFeature, Double>> averageData ) {
-        Map<PersistentFeature, Double> featureSet1 = averageData.get( indexForA );
-        Map<PersistentFeature, Double> featureSet2 = averageData.get( indexForB );
-        Map<PersistentFeature, Double> result = new HashMap<>();
-        for (Map.Entry<PersistentFeature, Double> feature1 : featureSet1.entrySet() ){
-            for (Map.Entry<PersistentFeature, Double> feature2 : featureSet2.entrySet()) {
-                if (feature1.getKey() == null ? feature2.getKey() ==
-                    null : feature1.getKey().equals( feature2.getKey() )) {
-                    Double feature1Average = feature1.getValue();
-                    Double feature2Average = feature2.getValue();
-                    Double mean = ( feature1Average + feature2Average ) / 2;
-                    result.put( feature1.getKey(), mean ); 
-                }
-            }
-        }
-        return result;
-    }
+    /**
+     * Runs linear regression tool after data are collected
+     * determines if data set contains replicates data
+     * <p>
+     * 
+     */
     
     @Override
     protected List<ResultDeAnalysis> processWithTool() {
         Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions;
         Map<Integer, Map<PersistentFeature, Double>> calculatedForReplicates = new HashMap<>();
+        determineGroupsForConditions();
         if( workingWithoutReplicates ) {
             preparedDataForConditions = allContinuousCoverageData;
         } else {
@@ -291,10 +337,12 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         return results;
     }
     
-    private List<ResultDeAnalysis> concatenateResults(List<ResultDeAnalysis> a, List<ResultDeAnalysis> b) {
-      return results;  
-    }
     
+     /**
+     * Forms table of results. 
+     * <p>
+     * @param calculated data calculated using linear regression
+     */
     private List<ResultDeAnalysis> prepareResults( Map<PersistentFeature, double[]> calculated,
                                                    Map<Integer, Map<PersistentFeature, Double>> replicatesData ) {
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Continuous Count Data Table" );
@@ -307,30 +355,23 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         for (Map.Entry<PersistentFeature, double[]> feature : calculated.entrySet() ) {
             k++;
             int tableSize = feature.getValue().length+3; // Plus feature name and  r square of replicates(2 cond)
-            //boolean allZero = true;
             final Object[] tmp = new Object[tableSize];
             double[] rSqrt = feature.getValue();
             
             tmp[0] = feature.getKey();
             for(int i = 1; i<tableSize-2; i++ ){
-                //if( ! ( Double.isNaN( rSqrt[i-1] ) ) && 
-                  //( Double.isFinite( rSqrt[i-1] ) ) ) {
-                  //  allZero = false;
                     tmp[i] = rSqrt[i-1];
-                //}
             }
             if(replicatesData.isEmpty()) {
                 tmp[tableSize-2] = "There are no replicates";
                 tmp[tableSize-1] = "There are no replicates";
             } else {
-                tmp[tableSize-2] = replicatesData.get( indexForA ).get( feature.getKey() );
-                tmp[tableSize-1] = replicatesData.get( indexForB ).get( feature.getKey() );
+                tmp[tableSize-2] = replicatesData.get( indexForConditionA ).get( feature.getKey() );
+                tmp[tableSize-1] = replicatesData.get( indexForConditionB ).get( feature.getKey() );
             }
                 
-            //if(!allZero){
-                tableContents.add( new Vector( Arrays.asList( tmp ) ) );
-                regionNamesList.add( feature.getKey() );
-            //}
+            tableContents.add( new Vector( Arrays.asList( tmp ) ) );
+            regionNamesList.add( feature.getKey() );
             progressHandle.progress( k );
         }
 
@@ -349,10 +390,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     }
 
     @Override
-    public synchronized void showData( Object data ) {
-      //Integer <- trackID String <- queryType{{coverageNeeded ? DATA_TYPE_COVERAGE : DATA_TYPE_MAPPINGS}}
-      //Pair<Integer, String> res = (Pair<Integer, String>) data; 
-      //allContinuousCoverageData.put( res.getFirst(), allContinuousCoverageData.get( res.getFirst() ) ); // <- Why to do this????
+    public synchronized void showData( Object data ) { 
         if( ++resultsReceivedBack == allContinuousCoverageData.size() ) {
             results.clear();
             results.addAll( processWithTool() );

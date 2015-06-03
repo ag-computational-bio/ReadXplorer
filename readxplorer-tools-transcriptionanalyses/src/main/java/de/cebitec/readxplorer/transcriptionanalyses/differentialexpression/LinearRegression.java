@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Observer;
 import java.util.Set;
 
 
@@ -35,12 +34,6 @@ public class LinearRegression implements LinearRegressionI {
     public LinearRegression() {
     }
     
-    @Override
-    public void addObserver( Observer o ) {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
-    }
-
-
     @Override
     public Map<PersistentFeature, double[]> getResults() throws IllegalStateException {
         return genesToScoreMap;
@@ -60,11 +53,6 @@ public class LinearRegression implements LinearRegressionI {
          genesToScoreMap = this.findSimilarity(geneSet1, geneSet2);
     }
 
-
-    @Override
-    public void removeObserver( Observer o ) {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
-    }
     
     private  Map<PersistentFeature, double[]> findSimilarity(Map<PersistentFeature, int[]> geneSet1,
                 Map<PersistentFeature, int[]> geneSet2) {

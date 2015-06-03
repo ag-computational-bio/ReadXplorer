@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 AM
+ * Copyright (C) 2015 Agne Matuseviciute
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Collect the coverage data for a given track.
  * <p>
- * @author AM
+ * @author Agne Matuseviciute
  */
 public class CollectContinuousCoverageData implements Observer{
 
