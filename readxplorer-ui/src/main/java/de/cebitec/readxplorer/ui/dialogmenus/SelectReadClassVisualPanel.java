@@ -281,21 +281,29 @@ public class SelectReadClassVisualPanel extends JobPanel {
 
     private void checkBoxCommonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommonActionPerformed
         this.updateUniqueBox();
+        this.isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxCommonActionPerformed
 
     private void checkBoxUniqueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxUniqueActionPerformed
-        checkBoxPerfect.setEnabled( !checkBoxUnique.isSelected() );
-        checkBoxBestMatch.setEnabled( !checkBoxUnique.isSelected() );
-        checkBoxCommon.setEnabled( !checkBoxUnique.isSelected() );
+        updateStateOfReadClassBoxes( !checkBoxUnique.isSelected() );
         isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxUniqueActionPerformed
 
+
+    private void updateStateOfReadClassBoxes( boolean areBoxesEnabled ) {
+        checkBoxPerfect.setEnabled( areBoxesEnabled );
+        checkBoxBestMatch.setEnabled( areBoxesEnabled );
+        checkBoxCommon.setEnabled( areBoxesEnabled );
+    }
+
     private void checkBoxPerfectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPerfectActionPerformed
         this.updateUniqueBox();
+        this.isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxPerfectActionPerformed
 
     private void checkBoxBestMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxBestMatchActionPerformed
         this.updateUniqueBox();
+        this.isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxBestMatchActionPerformed
 
     private void checkBoxSinglePerfectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxSinglePerfectActionPerformed
@@ -331,7 +339,6 @@ public class SelectReadClassVisualPanel extends JobPanel {
 
     private void updateUniqueBox() {
         this.checkBoxUnique.setEnabled( !checkBoxPerfect.isSelected() && !checkBoxBestMatch.isSelected() && !checkBoxCommon.isSelected() );
-        this.isRequiredInfoSet();
     }
 
 
@@ -432,6 +439,9 @@ public class SelectReadClassVisualPanel extends JobPanel {
         this.strandFeatureRadioButton.setSelected( strandOption == Strand.Feature );
         this.strandOppositeRadioButton.setSelected( strandOption == Strand.Opposite );
         this.strandBothRadioButton.setSelected( strandOption == Strand.Both );
+
+        updateStateOfReadClassBoxes( !isUniqueSelected );
+        updateUniqueBox();
     }
 
 
