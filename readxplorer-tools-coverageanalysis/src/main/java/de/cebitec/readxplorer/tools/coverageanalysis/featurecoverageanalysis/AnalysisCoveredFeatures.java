@@ -192,7 +192,7 @@ public class AnalysisCoveredFeatures implements Observer,
         if( analysisParams.isGetCoveredFeatures() ) {
             for( Integer id : this.coveredFeatureCount.keySet() ) {
                 int percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
-                if( percentCovered > analysisParams.getMinCoveredPercent() ) {
+                if( percentCovered >= analysisParams.getMinCoveredPercent() ) {
                     this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
                 }
             }
