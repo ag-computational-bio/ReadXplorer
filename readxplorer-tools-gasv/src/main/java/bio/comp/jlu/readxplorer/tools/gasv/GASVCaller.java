@@ -18,6 +18,7 @@
 package bio.comp.jlu.readxplorer.tools.gasv;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -55,7 +56,7 @@ public class GASVCaller implements Runnable {
     public static final InputOutput IO = IOProvider.getDefault().getIO( Bundle.GASV_output_name(), false );
 
     private final PersistentReference reference;
-    private final File bamFile;
+    private final TrackConnector trackConnector;
     private final ParametersBamToGASV bamToGASVParams;
     private final ParametersGASVMain gasvMainParams;
     private final DataVisualisationI parent;
@@ -70,7 +71,7 @@ public class GASVCaller implements Runnable {
      * rearrangements.
      * <p>
      * @param reference       The reference whose tracks are analyzed here.
-     * @param bamFile         The bam file to analyze
+     * @param trackConnector  The track connector for the bam file to analyze
      * @param bamToGASVParams BamToGASV parameter set to apply.
      * @param gasvMainParams  GASVMain parameter set to apply.
      * @param parent          The parent to notify when the calculation has
@@ -79,12 +80,12 @@ public class GASVCaller implements Runnable {
      *                        intermediate steps have finished.
      */
     @NbBundle.Messages( { "CallerProgressName=Storing chromosome names in file..." } )
-    public GASVCaller( PersistentReference reference, File bamFile, ParametersBamToGASV bamToGASVParams,
+    public GASVCaller( PersistentReference reference, TrackConnector trackConnector, ParametersBamToGASV bamToGASVParams,
                        ParametersGASVMain gasvMainParams,
                        DataVisualisationI parent,
                        ProgressHandle progressHandle ) {
         this.reference = reference;
-        this.bamFile = bamFile;
+        this.trackConnector = trackConnector;
         this.bamToGASVParams = bamToGASVParams;
         this.gasvMainParams = gasvMainParams;
         this.parent = parent;
@@ -106,13 +107,21 @@ public class GASVCaller implements Runnable {
      * Executes all necessary steps to prepare and run GASV for the detection of
      * genome rearrangements within read mapping data.
      */
+    @NbBundle.Messages( { "# {0} - Track File Name",
+                          "ErrorPairedTrack=The selected track {0} is not a read pair track and cannot be analyzed with GASV!" } )
     public void callGASV() {
 
         IO.getOut().flush(); //delete data from previous GASV runs
         IO.select();
-        createChromosomeNamingFile( reference );
-        runBamToGASV( bamFile );
-        runGASVMain( bamFile.getAbsolutePath() + ".gasv.in" );
+        //check if a paired file has been passed:
+        if( trackConnector.isReadPairTrack() ) {
+            createChromosomeNamingFile( reference );
+            runBamToGASV( trackConnector.getTrackFile() );
+            runGASVMain( trackConnector.getTrackFile().getAbsolutePath() + ".gasv.in" );
+        } else {
+            IO.getOut().println( Bundle.ErrorPairedTrack( trackConnector.getTrackFile().getName() ) );
+            parent.showData( "noReadPairTrack" );
+        }
 
     }
 
@@ -125,7 +134,7 @@ public class GASVCaller implements Runnable {
      * <p>
      * @param reference The reference whose tracks are analyzed here.
      */
-    @NbBundle.Messages( { "Error=An error occured during the file saving process.",
+    @NbBundle.Messages( { "Error=An error occurred during the file saving process.",
                           "SuccessMsg=Chromosome names successfully stored in ",
                           "SuccessHeader=Success",
                           "ChromFileWritingStart=Starting to write chromosome naming file for GASV...",

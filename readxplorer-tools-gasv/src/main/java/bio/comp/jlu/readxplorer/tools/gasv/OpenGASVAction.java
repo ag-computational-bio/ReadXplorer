@@ -209,10 +209,9 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
      */
     @NbBundle.Messages( { "ActionProgressName=Genome Rearrangements are calculated with GASV..." } )
     private void createAnalysis( TrackConnector connector, ParametersBamToGASV bamToGASVParams, ParametersGASVMain gasvMainParams ) {
-        trackFile = connector.getTrackFile();
         progressHandle = ProgressHandleFactory.createHandle( Bundle.ActionProgressName() );
         progressHandle.start();
-        GASVCaller gasvCaller = new GASVCaller( reference, trackFile, bamToGASVParams, gasvMainParams, this, progressHandle );
+        GASVCaller gasvCaller = new GASVCaller( reference, connector, bamToGASVParams, gasvMainParams, this, progressHandle );
         Thread thread = new Thread( gasvCaller );
         thread.start();
     }
@@ -226,43 +225,45 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
     @Override
     public void showData( Object data ) {
 
-        File tableFile = new File( trackFile.getAbsolutePath() + ".gasv.in.clusters" );
-        if( tableFile.exists() && tableFile.canRead() ) {
-            CsvTableParser csvParser = new CsvTableParser();
-            csvParser.setAutoDelimiter( false );
-            csvParser.setCsvPref( CsvPreference.TAB_PREFERENCE );
-            csvParser.setTableModel( GASV_TABLE );
-            List<List<?>> tableData;
-            try {
-                tableData = csvParser.parseTable( tableFile );
-                if( tableData.size() > 1 ) { //there is more content than just the header
-                    tableData = GASVUtils.editGASVResultTable( tableData );
-                    final UneditableTableModel tableModel = TableUtils.transformDataToTableModel( tableData );
+        if( data instanceof String && "done".equals( data ) ) {
+            File tableFile = new File( trackFile.getAbsolutePath() + ".gasv.in.clusters" );
+            if( tableFile.exists() && tableFile.canRead() ) {
+                CsvTableParser csvParser = new CsvTableParser();
+                csvParser.setAutoDelimiter( false );
+                csvParser.setCsvPref( CsvPreference.TAB_PREFERENCE );
+                csvParser.setTableModel( GASV_TABLE );
+                List<List<?>> tableData;
+                try {
+                    tableData = csvParser.parseTable( tableFile );
+                    if( tableData.size() > 1 ) { //there is more content than just the header
+                        tableData = GASVUtils.editGASVResultTable( tableData );
+                        final UneditableTableModel tableModel = TableUtils.transformDataToTableModel( tableData );
 
-                    //open table visualization panel with given reference for jumping to the position
-                    SwingUtilities.invokeLater( new Runnable() { //because it is not called from the swing dispatch thread
-                        @Override
-                        public void run() {
-                            PosTablePanel tablePanel = new PosTablePanel( tableModel, GASV_TABLE );
-                            tablePanel.setReferenceGenome( reference );
-                            TableVisualizationHelper.checkAndOpenRefViewer( reference, tablePanel );
+                        //open table visualization panel with given reference for jumping to the position
+                        SwingUtilities.invokeLater( new Runnable() { //because it is not called from the swing dispatch thread
+                            @Override
+                            public void run() {
+                                PosTablePanel tablePanel = new PosTablePanel( tableModel, GASV_TABLE );
+                                tablePanel.setReferenceGenome( reference );
+                                TableVisualizationHelper.checkAndOpenRefViewer( reference, tablePanel );
 
-                            String panelName = "Imported table from: " + tableFile.getName();
-                            gasvTopComp.openAnalysisTab( panelName, tablePanel );
-                        }
+                                String panelName = "Imported table from: " + tableFile.getName();
+                                gasvTopComp.openAnalysisTab( panelName, tablePanel );
+                            }
 
 
-                    } );
-                } else {
-                    JOptionPane.showMessageDialog( gasvTopComp,
-                                                   "No rearrangements have been detected by GASV for this data set: " +
-                                                   trackFile.getAbsolutePath(), "No rearrangements detected", JOptionPane.INFORMATION_MESSAGE );
+                        } );
+                    } else {
+                        JOptionPane.showMessageDialog( gasvTopComp,
+                                                       "No rearrangements have been detected by GASV for this data set: " +
+                                                       trackFile.getAbsolutePath(), "No rearrangements detected", JOptionPane.INFORMATION_MESSAGE );
+                    }
+                } catch( ParsingException ex ) {
+                    GASVCaller.IO.getOut().println( "An error occurred during parsing of the mapping data:\\n" + ex.getMessage() );
+                    LOG.log( Level.SEVERE, "An error occurred during parsing of the mapping data:\\n{0}", ex.getMessage() );
                 }
-            } catch( ParsingException ex ) {
-                GASVCaller.IO.getOut().println( "An error occurred during parsing of the mapping data:\\n" + ex.getMessage() );
-                LOG.log( Level.SEVERE, "An error occurred during parsing of the mapping data:\\n{0}", ex.getMessage() );
-            }
 
+            }
         }
         progressHandle.finish();
     }
