@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -297,13 +297,7 @@ public class Mapping implements ObjectWithId, GenomicRange {
      */
     @Override
     public int compareTo( GenomicRange genomicRange ) {
-        int result = 0;
-        if( this.start < genomicRange.getStart() ) {
-            result = -1;
-        } else if( this.start > genomicRange.getStart() ) {
-            result = 1;
-        }
-        return result;
+        return GenomicRange.Utils.compareTo( this, genomicRange );
     }
 
 

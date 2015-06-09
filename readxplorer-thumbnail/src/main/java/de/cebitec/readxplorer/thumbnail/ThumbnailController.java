@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.thumbnail;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
@@ -41,7 +42,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.DoubleTrackViewer
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
-import de.cebitec.readxplorer.utils.ColorProperties;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -359,7 +359,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         final JCheckBox compare = new JCheckBox( "Compare" );
         compare.addActionListener( cbListener );
         p.add( compare );
-        p.setBackground( ColorProperties.TITLE_BACKGROUND );
+        p.setBackground(Colors.TITLE_BACKGROUND );
         return p;
     }
 
@@ -773,7 +773,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             String title = tracks.get( 0 ).getDescription() + " - " + tracks.get( 1 ).getDescription();
             JPanel tp = new JPanel();
             tp.add( new JLabel( title ) );
-            tp.setBackground( ColorProperties.TITLE_BACKGROUND );
+            tp.setBackground(Colors.TITLE_BACKGROUND );
             b.setTitlePanel( tp );
             //estimate current size of other BPs based on first BP
             BasePanel refBP = featureToTrackpanelList.get( feature ).get( 0 );

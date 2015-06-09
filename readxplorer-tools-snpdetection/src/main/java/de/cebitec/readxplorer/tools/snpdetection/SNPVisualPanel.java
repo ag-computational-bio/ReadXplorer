@@ -291,9 +291,9 @@ public final class SNPVisualPanel extends JobPanel {
 
 
     /**
-     * @return <cc>true</cc>, if the minMismatchBases count corresponds to the
+     * @return <code>true</code>, if the minMismatchBases count corresponds to the
      *         count of the most frequent base at the current position.
-     *         <cc>false</cc>, if the minMismatchBases count corresponds to the
+     *         <code>false</code>, if the minMismatchBases count corresponds to the
      *         overall mismatch count at the current position.
      */
     public boolean isUseMainBase() {
@@ -302,24 +302,33 @@ public final class SNPVisualPanel extends JobPanel {
 
 
     /**
-     * @return <cc>true</cc>, if the quality filter options should be enabled.
-     * <cc>false</cc>, if the quality options should not have any effect.
+     * @return <code>true</code>, if the quality filter options should be enabled.
+     * <code>false</code>, if the quality options should not have any effect.
      */
     public boolean isUseQualFilter() {
         return this.qualFilterCheckBox.isSelected();
     }
 
 
+    /**
+     * @return The minimum base quality to apply.
+     */
     byte getMinBaseQuality() {
         return minBaseQuality;
     }
 
 
+    /**
+     * @return The minimum average base quality to apply.
+     */
     byte getMinAverageBaseQual() {
         return minAverageBaseQual;
     }
 
 
+    /**
+     * @return The minimum average mapping quality to apply.
+     */
     byte getMinAverageMappingQual() {
         return minAverageMappingQual;
     }

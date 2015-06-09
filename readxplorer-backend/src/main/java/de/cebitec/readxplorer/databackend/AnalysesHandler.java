@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.api.objects.JobI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -26,8 +27,8 @@ import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -58,11 +59,11 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private int nbRequests;
     private int nbCarriedOutRequests;
     private String queryType;
-    private final ArrayList<Observer> observers;
+    private final List<Observer> observers;
     private boolean diffsAndGapsNeeded;
     private boolean coverageNeeded;
     private boolean mappingsNeeded;
-    private byte desiredData = Properties.NORMAL;
+    private IntervalRequestData desiredData = IntervalRequestData.Normal;
     private final ParametersReadClasses readClassParams;
     private long start;
 
@@ -78,9 +79,9 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * @param parent          the parent for visualization of the results
      * @param handlerTitle    title of the analysis handler
      * @param readClassParams The parameter set which contains all parameters
-     *                        concerning the usage of ReadXplorer's coverage classes and if only
-     *                        uniquely
-     *                        mapped reads shall be used, or all reads.
+     *                        concerning the usage of ReadXplorer's coverage
+     *                        classes and if only uniquely mapped reads shall be
+     *                        used, or all reads.
      */
     public AnalysesHandler( TrackConnector trackConnector, DataVisualisationI parent,
                             String handlerTitle, ParametersReadClasses readClassParams ) {
@@ -98,8 +99,8 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
 
     /**
-     * Needs to be called in order to start the transcription analyses. Creates
-     * the needed database requests and carries them out. The parent has to be a
+     * Needs to be called in order to start an analysis. Creates the needed
+     * database requests and carries them out. The parent has to be a
      * ThreadListener in order to receive the coverage or mapping data.
      * Afterwards the results are returned to the observers of this analyses
      * handler by the {@link receiveData()} method.
@@ -170,8 +171,8 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     public void receiveData( Object data ) {
         long finish = System.currentTimeMillis();
         String benchmark = Benchmark.calculateDuration( start, finish, ". Elapsed time: " );
-        this.progressHandle.progress( this.queryType + " request "
-                                      + (nbCarriedOutRequests + 1) + " of " + nbRequests + benchmark, ++nbCarriedOutRequests );
+        this.progressHandle.progress( this.queryType + " request " +
+                 (nbCarriedOutRequests + 1) + " of " + nbRequests + benchmark, ++nbCarriedOutRequests );
         this.notifyObservers( data );
 
         //when the last request is finished signalize the parent to collect the data
@@ -194,7 +195,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     /**
      * Set before an anylsis is is started. True, if the analysis works with
      * coverage, false otherwise. By default it is false.
-     *
+     * <p>
      * @param coverageNeeded True, if the analysis works with coverage, false
      *                       otherwise.
      */
@@ -236,8 +237,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * diffs and gaps, false otherwise. By default it is false.
      * <p>
      * @param diffsAndGapsNeeded True, if the analysis works with diffs and
-     *                           gaps, false
-     *                           otherwise.
+     *                           gaps, false otherwise.
      */
     public void setDiffsAndGapsNeeded( boolean diffsAndGapsNeeded ) {
         this.diffsAndGapsNeeded = diffsAndGapsNeeded;
@@ -249,9 +249,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * Properties.REDUCED_MAPPINGS or back to Properties.NORMAL.
      * <p>
      * @param desiredData the byte value of the desired data. Currently among
-     *                    Properties.REDUCED_MAPPINGS, Properties.NORMAL or Properties.READ_STARTS.
+     *                    Properties.REDUCED_MAPPINGS, Properties.NORMAL or
+     *                    Properties.READ_STARTS.
      */
-    public void setDesiredData( byte desiredData ) {
+    public void setDesiredData( IntervalRequestData desiredData ) {
         this.desiredData = desiredData;
     }
 

@@ -18,11 +18,10 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.Map;
-
 
 
 /**

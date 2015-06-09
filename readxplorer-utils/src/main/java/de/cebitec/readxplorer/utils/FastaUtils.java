@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,6 +41,9 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Logger.getLogger;
+
 
 /**
  * Contains some utils for fasta files.
@@ -47,6 +51,8 @@ import org.openide.DialogDisplayer;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class FastaUtils implements Observable {
+
+    private static final Logger LOG = getLogger( FastaUtils.class.getName() );
 
 
     private final List<Observer> observers;
@@ -76,17 +82,19 @@ public final class FastaUtils implements Observable {
 
         try {
             IndexedFastaSequenceFile fastaFile = new IndexedFastaSequenceFile( fastaFileToIndex );
-        } catch( FileNotFoundException ex ) {
+        } catch( FileNotFoundException fnfe ) {
             try {
                 FastaIndexer indexer = new FastaIndexer();
                 List<FastaIndexEntry> sequences = indexer.createIndex( fastaFileToIndex.toPath() );
                 FastaIndexWriter idxWriter = new FastaIndexWriter();
                 Path indexFile = Paths.get( fastaFileToIndex.getAbsolutePath() + ".fai" );
                 idxWriter.writeIndex( indexFile, sequences );
-            } catch( IOException | IllegalStateException e ) {
-                this.notifyObservers( e.getMessage() );
+            } catch( IOException | IllegalStateException ex ) {
+                LOG.log( SEVERE, ex.getMessage(), ex );
+                this.notifyObservers( ex.getMessage() );
             }
-        } catch( PicardException e ) {
+        } catch( PicardException pe ) {
+            LOG.log( SEVERE, pe.getMessage(), pe );
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + fastaFileToIndex.getAbsolutePath();
             JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
         }
@@ -130,7 +138,8 @@ public final class FastaUtils implements Observable {
             if( fastaFile.exists() && fastaFile.canRead() ) {
                 try {
                     indexedFasta = new IndexedFastaSequenceFile( fastaFile ); //Does only work, if index exists
-                } catch( FileNotFoundException ex ) {
+                } catch( FileNotFoundException fnfe ) {
+                    LOG.log( SEVERE, fnfe.getMessage(), fnfe );
                     this.indexFasta( fastaFile, this.observers );
                     indexedFasta = this.getIndexedFasta( fastaFile );
                 }
@@ -138,7 +147,8 @@ public final class FastaUtils implements Observable {
                 JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file is missing or cannot be read! Restore the reference fasta file!",
                         "File not found exception", JOptionPane.ERROR_MESSAGE );
             }
-        } catch( NoSuchElementException ex ) { //can occur if the index file is corrupted
+        } catch( NoSuchElementException nsex ) { //can occur if the index file is corrupted
+            LOG.log( SEVERE, nsex.getMessage(), nsex );
             this.indexFasta( fastaFile, this.observers );
             indexedFasta = this.getIndexedFasta( fastaFile );
         }

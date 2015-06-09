@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.MappingClass;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -111,8 +111,9 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
         boolean isSingleBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_BEST_MATCH );
         boolean isUniqueSelected = !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ );
         String minMappingQuality = String.valueOf( readClassParams.getMinMappingQual() );
-        String strandOption = String.valueOf( readClassParams.getStrandOption() );
-        Preferences pref = NbPreferences.forModule( Object.class );
+        Strand strandOption = readClassParams.getStrandOption();
+
+        Preferences pref = getPref();
         pref.putBoolean( wizardName + PROP_PERFECT_SELECTED, isPerfectSelected );
         pref.putBoolean( wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected );
         pref.putBoolean( wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected );
@@ -120,7 +121,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
         pref.putBoolean( wizardName + PROP_SINGLE_BEST_MATCH_SELECTED, isSingleBestMatchSelected );
         pref.putBoolean( wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected );
         pref.put( wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality );
-        pref.put( wizardName + PROP_STRAND_OPTION, strandOption );
+        pref.put( wizardName + PROP_STRAND_OPTION, strandOption.toString() );
     }
 
 

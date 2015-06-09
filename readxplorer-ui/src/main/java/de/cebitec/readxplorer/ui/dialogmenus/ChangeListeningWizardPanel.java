@@ -23,10 +23,12 @@ import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbPreferences;
 
 
 /**
@@ -42,6 +44,7 @@ public abstract class ChangeListeningWizardPanel implements
 
     public static final String PROP_VALIDATE = "validated";
 
+    private final Preferences pref;
     private final ChangeSupport changeSupport;
     private boolean isValidated = true;
     private String errorMsg;
@@ -60,6 +63,7 @@ public abstract class ChangeListeningWizardPanel implements
     public ChangeListeningWizardPanel( String errorMsg ) {
         this.changeSupport = new ChangeSupport( this );
         this.errorMsg = errorMsg;
+        pref = NbPreferences.forModule( Object.class );
     }
 
 
@@ -143,6 +147,15 @@ public abstract class ChangeListeningWizardPanel implements
      */
     public void setErrorMsg( String errorMsg ) {
         this.errorMsg = errorMsg;
+    }
+
+
+    /**
+     * @return Get the preferences for Object.class to load and store
+     *         properties.
+     */
+    protected Preferences getPref() {
+        return pref;
     }
 
 

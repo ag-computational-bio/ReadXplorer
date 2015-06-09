@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.io.File;
 import java.util.ArrayList;
@@ -45,9 +45,11 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     private List<ResultDeAnalysis> results;
 
 
-    public ExportOnlyAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset, ParametersReadClasses readClassParams ) {
-        super( selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams );
-        data = new DeAnalysisData( selectedTracks.size() );
+    public ExportOnlyAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID,
+                                      File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset,
+                                      int stopOffset, ParametersReadClasses readClassParams, ProcessingLog processingLog ) {
+        super( selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams, processingLog );
+        data = new DeAnalysisData( selectedTracks.size(), processingLog );
         data.setSelectedTracks( selectedTracks );
     }
 
@@ -72,7 +74,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
         final ReferenceConnector referenceConnector = getReferenceConnector();
         //This offset must correspond to the additional fields added by hand
-        final int offset = 6;
+        final int offset = 8;
         for( i = 0; i < data.getFeatures().length; i++ ) {
 
             boolean allZero = true;
@@ -89,8 +91,10 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             }
             tmp[2] = feature[i].getStart();
             tmp[3] = feature[i].getStop();
-            tmp[4] = calculateExonLength( feature[i] );
-            tmp[5] = feature[i].getLength();
+            tmp[4] = calculateFeatureTypeLength( feature[i], FeatureType.EXON );
+            tmp[5] = calculateFeatureTypeLength( feature[i], FeatureType.INTRON );
+            tmp[6] = feature[i].getLength();
+            tmp[7] = feature[i].getType();
             for( int j = offset; j < data.getSelectedTracks().size() + offset; j++ ) {
                 int value = countData[j - offset][i];
                 if( value != 0 ) {
@@ -112,7 +116,9 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         colNames.add( "Start" );
         colNames.add( "Stop" );
         colNames.add( "Exon length" );
-        colNames.add( "Gene length" );
+        colNames.add( "Intron length" );
+        colNames.add( "Feature length" );
+        colNames.add( "Feature type" );
         colNames.addAll( Arrays.asList( trackDescriptions ) );
 
         results = Collections.singletonList( new ResultDeAnalysis( tableContents, colNames, regionNamesList, "Count Data Table" ) );
@@ -123,18 +129,18 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     }
 
 
-    private static int calculateExonLength( PersistentFeature feature ) {
+    private static int calculateFeatureTypeLength( PersistentFeature feature, FeatureType type ) {
 
         int length = 0;
         for( Node n : feature.getNodeChildren() ) {
 
             FeatureType nodeType = n.getNodeType();
-            if( nodeType == FeatureType.EXON ) {
+            if( nodeType == type ) {
                 PersistentFeature current = (PersistentFeature) n;
                 length += current.getLength();
             } else {
                 PersistentFeature current = (PersistentFeature) n;
-                length += calculateExonLength( current );
+                length += calculateFeatureTypeLength( current, type );
             }
 
         }

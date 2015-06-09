@@ -38,8 +38,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
@@ -126,8 +126,8 @@ public final class ImportTableWizardAction implements ActionListener {
                         xlsParser.setTableType( tableType );
                         xlsParser.parseTable( new File( fileLocation ) );
                         DefaultTableModel model = xlsParser.getModel();
-                        HashMap<String, String> secondSheetMap = xlsParser.getSecondSheetMap();
-                        HashMap<String, String> secondSheetMapThirdCol = xlsParser.getSecondSheetMapThirdCol();
+                        Map<String, String> secondSheetMap = xlsParser.getSecondSheetMap();
+                        Map<String, String> secondSheetMapThirdCol = xlsParser.getSecondSheetMapThirdCol();
                         tableView.processXlsInput( ref, model, secondSheetMap, secondSheetMapThirdCol );
 
                     } else if( parser instanceof CsvTableParser ) {
@@ -150,7 +150,6 @@ public final class ImportTableWizardAction implements ActionListener {
                         public void run() {
                             PosTablePanel tablePanel = new PosTablePanel( tableModel, tableType );
                             tablePanel.setReferenceGenome( ref );
-//                            tablePanel.setTableType(tableType);
                             TableVisualizationHelper.checkAndOpenRefViewer( ref, tablePanel );
 
                             String panelName = "Imported table from: " + tableFile.getName();

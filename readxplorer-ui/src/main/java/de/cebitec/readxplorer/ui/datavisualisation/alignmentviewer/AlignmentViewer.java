@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -29,7 +30,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -41,8 +41,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -53,10 +51,14 @@ import org.openide.util.NbPreferences;
 public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
+
+    /** The default height of an alignment block. */
+    public static final int DEFAULT_BLOCK_HEIGHT = 8;
+
     private final TrackConnector trackConnector;
     private LayoutI layout;
-    private final int blockHeight;
-    private final int layerHeight;
+    private int blockHeight;
+    private int layerHeight;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
     private int maxCoverageInInterval;
@@ -79,9 +81,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         this.trackConnector = trackConnector;
         this.setInDrawingMode( true );
         this.showSequenceBar( true, true );
-        blockHeight = 8;
-        layerHeight = blockHeight + 2;
-        mappingResult = new MappingResult( new ArrayList<Mapping>(), null );
+        mappingResult = new MappingResult( new ArrayList<>(), null );
         this.setHorizontalMargin( 10 );
         this.setActive( false );
         this.setAutomaticCentering( true );
@@ -91,11 +91,11 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
 
     /**
-     * Initializes the base quality option boolean and creates a
-     * PreferenceChangeListener for the base quality option.
+     * Initializes the base quality option boolean and the block height value.
+     * Then creates a PreferenceChangeListener for the base quality option and
+     * the block height value option.
      */
     private void addPreferenceListeners() {
-        final Preferences pref = NbPreferences.forModule( Object.class );
         this.showBaseQualities = pref.getBoolean( Properties.BASE_QUALITY_OPTION, true );
         pref.addPreferenceChangeListener( new PreferenceChangeListener() {
 
@@ -103,6 +103,22 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             public void preferenceChange( PreferenceChangeEvent evt ) {
                 if( evt.getKey().equals( Properties.BASE_QUALITY_OPTION ) ) {
                     showBaseQualities = pref.getBoolean( Properties.BASE_QUALITY_OPTION, true );
+                }
+                showData();
+            }
+
+
+        } );
+
+        blockHeight = pref.getInt( Properties.BLOCK_HEIGHT_OPTION, DEFAULT_BLOCK_HEIGHT );
+        layerHeight = blockHeight + 2;
+        pref.addPreferenceChangeListener( new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange( PreferenceChangeEvent evt ) {
+                if( evt.getKey().equals( Properties.BLOCK_HEIGHT_OPTION ) ) {
+                    blockHeight = pref.getInt( Properties.BLOCK_HEIGHT_OPTION, DEFAULT_BLOCK_HEIGHT );
+                    layerHeight = blockHeight + 2;
                 }
                 showData();
             }
@@ -134,13 +150,13 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      */
     @Override
     public void boundsChangedHook() {
-        if( this.isInMaxZoomLevel() && isActive() ) {
+        if( isActive() ) {
             //  updatePhysicalBounds();
             setInDrawingMode( true );
         } else {
             setInDrawingMode( false );
         }
-        this.setupComponents();
+        setupComponents();
     }
 
 
@@ -149,13 +165,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      */
     private void setupComponents() {
 
-        // at least sufficient horizontal zoom level to show bases
-        if( !this.isInMaxZoomLevel() ) {
-            this.getBoundsInformationManager().zoomLevelUpdated( 1 );
-        }
-
         if( isInDrawingMode() ) { //request the data to show, receiveData method calls draw methods
-            this.requestData( super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight() );
+            requestData( super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight() );
         }
     }
 
@@ -244,11 +255,14 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 //            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
 //            }
-            if( m.isFwdStrand() ) {
-                ++this.fwdMappingsInInterval;
+            if( m.getStart() <= getBoundsInfo().getLogRight() + 2 && m.getStop() >= getBoundsInfo().getLogLeft() - 2 ) {
+                if( m.isFwdStrand() ) {
+                    fwdMappingsInInterval++;
+                } else {
+                    revMappingsInInterval++;
+                }
             }
         }
-        this.revMappingsInInterval = mappings.size() - this.fwdMappingsInInterval;
     }
 
 
@@ -326,7 +340,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         Graphics2D g = (Graphics2D) graphics;
 
         if( isInDrawingMode() ) {
-            g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+            g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
             drawBaseLines( g );
         }
     }
@@ -351,6 +365,11 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     }
 
 
+    /**
+     * Draws the base lines around the sequence bar.
+     * <p>
+     * @param graphics The graphics object to paint on
+     */
     private void drawBaseLines( Graphics2D graphics ) {
         PaintingAreaInfo info = getPaintingAreaInfo();
         graphics.drawLine( info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow() );

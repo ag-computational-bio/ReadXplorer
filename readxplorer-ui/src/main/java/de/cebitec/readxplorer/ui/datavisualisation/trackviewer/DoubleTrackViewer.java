@@ -18,6 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.ComparisonClass;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
@@ -26,9 +29,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.ComparisonClass;
 import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
@@ -247,12 +247,12 @@ public class DoubleTrackViewer extends TrackViewer {
             double diffFwd = Math.abs( covFwd1 - covFwd2 );
             double diffRev = Math.abs( covRev1 - covRev2 );
 
-            this.addToBuilder( sb, ComparisonClass.DIFF_COVERAGE, diffFwd, diffFwdScale, SequenceUtils.STRAND_FWD_STRING );
-            this.addToBuilder( sb, ComparisonClass.DIFF_COVERAGE, diffRev, diffRevScale, SequenceUtils.STRAND_REV_STRING );
-            this.addToBuilder( sb, ComparisonClass.TRACK1_COVERAGE, covFwd1, covFwd1Norm, SequenceUtils.STRAND_FWD_STRING );
-            this.addToBuilder( sb, ComparisonClass.TRACK2_COVERAGE, covFwd2, covFwd2Norm, SequenceUtils.STRAND_FWD_STRING );
-            this.addToBuilder( sb, ComparisonClass.TRACK1_COVERAGE, covRev1, covRev1Norm, SequenceUtils.STRAND_REV_STRING );
-            this.addToBuilder( sb, ComparisonClass.TRACK2_COVERAGE, covRev2, covRev2Norm, SequenceUtils.STRAND_REV_STRING );
+            this.addToBuilder( sb, ComparisonClass.DIFF_COVERAGE, diffFwd, diffFwdScale, Strand.Forward.toString() );
+            this.addToBuilder( sb, ComparisonClass.DIFF_COVERAGE, diffRev, diffRevScale, Strand.Reverse.toString() );
+            this.addToBuilder( sb, ComparisonClass.TRACK1_COVERAGE, covFwd1, covFwd1Norm, Strand.Forward.toString() );
+            this.addToBuilder( sb, ComparisonClass.TRACK2_COVERAGE, covFwd2, covFwd2Norm, Strand.Forward.toString() );
+            this.addToBuilder( sb, ComparisonClass.TRACK1_COVERAGE, covRev1, covRev1Norm, Strand.Reverse.toString() );
+            this.addToBuilder( sb, ComparisonClass.TRACK2_COVERAGE, covRev2, covRev2Norm, Strand.Reverse.toString() );
         }
 
         this.setToolTipText( sb.toString() );
@@ -268,7 +268,7 @@ public class DoubleTrackViewer extends TrackViewer {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage, double coverageNorm, String strandString ) {
-        String classType = classification.getTypeString() + " " + strandString;
+        String classType = classification.toString() + ' ' + strandString;
         if( this.hasNormalizationFactor() ) {
             sb.append( createTableRow( classType, coverage, coverageNorm ) );
         } else {

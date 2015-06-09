@@ -39,9 +39,9 @@ public enum TableType {
      */
     OPERON_DETECTION( "Operon Detection Table" ),
     /**
-     * RPKM analysis table.
+     * TPM and RPKM analysis table.
      */
-    RPKM_ANALYSIS( "RPKM Analysis Table" ),
+    TPM_RPKM_ANALYSIS( "TPM and RPKM Analysis Table" ),
     /**
      * SNP detection table.
      */
@@ -67,9 +67,13 @@ public enum TableType {
      */
     TSS_DETECTION_JR( "TSS Detection Table JR" ),
     /**
-     * Arbitrary table starting with a position column.
+     * Differential gene expression table starting with a position column.
      */
     DIFF_GENE_EXPRESSION( "Differential Gene Expression Table" ),
+    /**
+     * GASV genome rearrangement detection result table.
+     */
+    GASV_TABLE( "GASV Result Table" ),
     /**
      * Arbitrary table starting with a position column.
      */
@@ -99,6 +103,9 @@ public enum TableType {
     }
 
 
+    /**
+     * @return The user-readable String representation of the CsvPreference.
+     */
     @Override
     public String toString() {
         return this.getName();

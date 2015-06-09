@@ -19,12 +19,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-utils</artifactId>
+            <artifactId>readxplorer-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.supercsv</groupId>
-            <artifactId>super-csv</artifactId>
-            <version>2.2.0</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
@@ -55,6 +54,12 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

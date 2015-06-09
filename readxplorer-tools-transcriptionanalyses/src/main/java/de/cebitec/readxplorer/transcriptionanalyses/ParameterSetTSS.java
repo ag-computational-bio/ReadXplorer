@@ -57,12 +57,12 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param maxLeaderlessDistance
      * @param minTranscriptExtensionCov
      * @param isAssociateTss
-     * @param associateTssWindow 
-     * @param readClassParams 
+     * @param associateTssWindow
+     * @param readClassParams
      */
-    ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
+    public ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
                      int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease,
-                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, boolean isAssociateTss, 
+                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, boolean isAssociateTss,
                      int associateTssWindow, ParametersReadClasses readClassParams ) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
@@ -199,7 +199,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         return isAssociateTss;
     }
 
-    
+
     /**
      * @param isAssociateTss <code>true</code>, if TSS within the given window shall
      * be associated, <code>false</code> otherwise.
@@ -208,7 +208,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.isAssociateTss = isAssociateTss;
     }
 
-    
+
     /**
      * @return Bp window to use for associating TSS.
      */
@@ -216,7 +216,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         return associateTssWindow;
     }
 
-    
+
     /**
      * @param associateTssWindow Bp window to use for associating TSS.
      */

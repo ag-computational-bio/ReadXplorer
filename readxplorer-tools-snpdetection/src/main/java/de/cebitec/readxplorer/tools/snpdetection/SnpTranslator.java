@@ -20,15 +20,15 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.databackend.dataobjects.CodonSnp;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
-import de.cebitec.readxplorer.utils.CodonUtilities;
-import de.cebitec.readxplorer.utils.SequenceComparison;
+import de.cebitec.readxplorer.utils.CodonUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class SnpTranslator {
         this.reference = reference;
         this.refLength = chromosome.getLength();
         featIdx = 0;
-        code = CodonUtilities.getGeneticCode();
+        code = CodonUtils.getGeneticCode();
     }
 
 
@@ -163,10 +163,7 @@ public class SnpTranslator {
      * <p>
      * @param featuresFound list of features in the reference genome for current
      *                      position "pos"
-     * @param pos           position of the current snp
-     * @param refSeq        whole reference genome sequence
      * @param snp           complete snp object
-     * @param code          genetic code to retrieve the amino acid translation
      * <p>
      * @return list of CodonSnps for the current snp position "pos"
      */
@@ -198,7 +195,7 @@ public class SnpTranslator {
             boolean fwdStrand = feature.isFwdStrand();
 
             if( feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA ||
-                     feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
+                feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA ) {
                 this.calcFeatureData( feature, pos, FeatureType.CDS );
                 if( !subFeatureFound ) {
                     this.calcFeatureData( feature, pos, FeatureType.EXON );
@@ -327,6 +324,7 @@ public class SnpTranslator {
      * <p>
      * @param feature the feature whose subfeature length and readcount is
      *                needed
+     * @param pos     SNP position
      * @param type    the feature type for which the length sum and total read
      *                count is needed
      */

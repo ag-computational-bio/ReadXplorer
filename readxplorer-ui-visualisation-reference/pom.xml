@@ -19,6 +19,10 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-databackend</artifactId>
         </dependency>
         <dependency>
@@ -28,6 +32,8 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>

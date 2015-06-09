@@ -18,8 +18,10 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
@@ -30,10 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -46,13 +45,12 @@ import javax.swing.table.TableRowSorter;
  * @author Tobias Zimmermann, Rolf Hilker
  * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
+public class ResultPanelCoverageAnalysis extends ResultTablePanel {
 
     public static final String NUMBER_INTERVALS = "Total number of detected intervals";
     public static final String MEAN_INTERVAL_LENGTH = "Mean interval length";
     public static final String MEAN_INTERVAL_COVERAGE = "Global mean interval coverage";
     private static final long serialVersionUID = 1L;
-    private BoundsInfoManager bim;
     private CoverageAnalysisResult coverageAnalysisResult;
     private final Map<String, Integer> coverageStatisticsMap;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -61,8 +59,12 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     /**
      * CoverageIntervalContainer panel for the coverage analysis. It displays
      * the table with all covered or uncovered intervals of the reference.
+     * <p>
+     * @param BoundsInfoManager of the reference on which this analysis was
+     *                          performed.
      */
-    public ResultPanelCoverageAnalysis() {
+    public ResultPanelCoverageAnalysis( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumnIdx = 0;
         final int trackColumnIdx = 2;
@@ -74,15 +76,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         this.coverageStatisticsMap.put( MEAN_INTERVAL_LENGTH, 0 );
         this.coverageStatisticsMap.put( MEAN_INTERVAL_COVERAGE, 0 );
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.coverageAnalysisTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( coverageAnalysisTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
     }
 
 
@@ -211,38 +205,28 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
 
-    /**
-     * @param boundsInformationManager The bounds info manager to update, when a
-     *                                 result is clicked.
-     */
-    public void setBoundsInfoManager( BoundsInfoManager boundsInformationManager ) {
-        this.bim = boundsInformationManager;
-    }
+    @Override
+    public void addResult( ResultTrackAnalysis newResult ) {
 
+        tableFilter.setTrackMap( newResult.getTrackMap() );
 
-    /**
-     * Adds a list of covered or uncovered intervals to this panel.
-     * <p>
-     * @param coverageAnalysisResultNew the new result of intervals to add
-     */
-    public void addCoverageAnalysis( final CoverageAnalysisResult coverageAnalysisResultNew ) {
+        if( newResult instanceof CoverageAnalysisResult ) {
+            CoverageAnalysisResult coverageAnalysisResultNew = (CoverageAnalysisResult) newResult;
+            if( this.coverageAnalysisResult == null ) {
+                this.coverageAnalysisResult = coverageAnalysisResultNew;
+            } else {
+                CoverageIntervalContainer results = coverageAnalysisResult.getResults();
+                List<CoverageInterval> coverageIntervals = new ArrayList<>( results.getCoverageIntervals() );
+                List<CoverageInterval> coverageIntervalsRev = new ArrayList<>( results.getCoverageIntervalsRev() );
+                coverageIntervals.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervals() );
+                coverageIntervalsRev.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervalsRev() );
+                results.setIntervalsSumOrFwd( coverageIntervals );
+                results.setIntervalsRev( coverageIntervalsRev );
+            }
 
-        tableFilter.setTrackMap( coverageAnalysisResultNew.getTrackMap() );
-
-        if( this.coverageAnalysisResult == null ) {
-            this.coverageAnalysisResult = coverageAnalysisResultNew;
-        } else {
-            CoverageIntervalContainer results = coverageAnalysisResult.getResults();
-            List<CoverageInterval> coverageIntervals = new ArrayList<>( results.getCoverageIntervals() );
-            List<CoverageInterval> coverageIntervalsRev = new ArrayList<>( results.getCoverageIntervalsRev() );
-            coverageIntervals.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervals() );
-            coverageIntervalsRev.addAll( coverageAnalysisResultNew.getResults().getCoverageIntervalsRev() );
-            results.setIntervalsSumOrFwd( coverageIntervals );
-            results.setIntervalsRev( coverageIntervalsRev );
+            this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervals() );
+            this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervalsRev() );
         }
-
-        this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervals() );
-        this.createTableEntries( coverageAnalysisResult.getResults().getCoverageIntervalsRev() );
     }
 
 
@@ -303,7 +287,8 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      * @return the number of covered or uncovered intervals during the
      *         associated analysis.
      */
-    public int getResultSize() {
+    @Override
+    public int getDataSize() {
         return coverageStatisticsMap.get( NUMBER_INTERVALS );
     }
 

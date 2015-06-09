@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -30,10 +31,7 @@ import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -63,8 +61,12 @@ public class ResultPanelNormalization extends ResultTablePanel {
     /**
      * Panel showing a result of an analysis filtering for features with a min
      * and max certain readcount.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public ResultPanelNormalization() {
+    public ResultPanelNormalization( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posIdx = 0;
         final int trackIdx = 2;
@@ -76,17 +78,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
         this.normStatsMap.put( TOTAL_MAPPINGS, 0 );
         this.refComp = ReferenceFeatureTopComp.findInstance();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.normalizationTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( normalizationTable, posIdx, chromIdx, getBoundsInfoManager() );
-                refComp.showTableFeature( normalizationTable, 0 );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( normalizationTable, posIdx, chromIdx, getBoundsInfoManager() );
     }
 
 
@@ -253,7 +245,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
                 rowData[i++] = feat.getType();
                 rowData[i++] = normalizationResult.getTrackEntry( normValue.getTrackId(), false );
                 rowData[i++] = normalizationResultNew.getChromosomeMap().get( feat.getChromId() );
-                rowData[i++] = feat.isFwdStrandString();
+                rowData[i++] = feat.getStrandString();
                 rowData[i++] = feat.getStartOnStrand();
                 rowData[i++] = feat.getStopOnStrand();
                 rowData[i++] = feat.getLength();

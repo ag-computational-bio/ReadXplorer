@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -33,8 +35,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -77,6 +77,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private final List<de.cebitec.readxplorer.utils.Observer> observerList = new ArrayList<>();
     private final Set<FeatureType> selectedFeatureTypes;
     private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
+    private final ProcessingLog processingLog;
 
     private int resultsReceivedBack = 0;
     private ReferenceConnector referenceConnector;
@@ -148,8 +149,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      */
     public DeAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID,
                               File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
-                              ParametersReadClasses readClassParams ) {
-        ProcessingLog.getInstance().resetLog();
+                              ParametersReadClasses readClassParams, ProcessingLog processingLog ) {
         this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
@@ -157,6 +157,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
+        this.processingLog = processingLog;
         genomeAnnos = new ArrayList<>();
         results = new ArrayList<>();
         collectCoverageDataInstances = new HashMap<>();
@@ -188,12 +189,12 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
                                                                          currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
-                handler.setDesiredData( Properties.REDUCED_MAPPINGS );
+                handler.setDesiredData( IntervalRequestData.ReducedMappings );
                 handler.registerObserver( collCovData );
                 allHandler.add( handler );
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                ProcessingLog.getInstance().addProperty( "Unresolved track", currentTrack );
+                processingLog.addProperty( "Unresolved track", currentTrack );
                 notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
                 return;
@@ -277,6 +278,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
     public List<ResultDeAnalysis> getResults() {
         return Collections.unmodifiableList( results );
+    }
+
+
+    public ProcessingLog getProcessingLog() {
+        return processingLog;
     }
 
 

@@ -31,9 +31,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>de.cebitec.readxplorer.api.cookies</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.api.objects</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.api</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.api.*</publicPackage>
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>

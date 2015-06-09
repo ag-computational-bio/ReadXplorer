@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
@@ -30,7 +31,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +55,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private static final int MINIMUMINTERVALLENGTH = 90000;
 
     private final Integer rightBound;
-    private byte strand;
+    private Strand strand;
     private boolean canceled = false;
     private final CorrelationResult analysisResult;
     private final ArrayList<CorrelatedInterval> correlationsList;
@@ -90,7 +90,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.analysisParams = analysisParams;
 //        this.ready = false;
         this.currentPosition = 1;
-        this.strand = SequenceUtils.STRAND_FWD;
+        this.strand = Strand.Forward;
         this.correlationsList = new ArrayList<>();
 
         this.trackConnectors = new ArrayList<>();
@@ -123,7 +123,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         tc.open();
         tc.requestActive();
         resultView = CorrelationResultTopComponent.findInstance().openResultTab( referenceViewer );
-        this.resultView.setAnalysisResult( this.analysisResult );
+        resultView.addResult( analysisResult );
         requestNextStep();
     }
 
@@ -156,9 +156,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
 
 
-    private int getCoverageAt( CoverageAndDiffResult coverageResult, int position, byte strand ) {
+    private int getCoverageAt( CoverageAndDiffResult coverageResult, int position, Strand strand ) {
         Coverage coverage = coverageResult.getCovManager().getTotalCoverage( analysisParams.getReadClassParams().getExcludedClasses() );
-        return coverage.getCoverage( position, strand == SequenceUtils.STRAND_FWD );
+        return coverage.getCoverage( position, strand == Strand.Forward );
     }
 
 
@@ -166,7 +166,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * Checks if all coverage results in the currently loaded result list
      * contain zero coverage at the current position
      */
-    private boolean allCoverageEqualZero( byte strand, int position ) {
+    private boolean allCoverageEqualZero( Strand strand, int position ) {
         for( CoverageAndDiffResult result : this.resultList ) {
             if( getCoverageAt( result, position, strand ) != 0 ) {
                 return false;
@@ -179,7 +179,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     /**
      * computes the maximum peak covage from the currently loaded result list
      */
-    private int getPeakCoverage( byte strand, int position ) {
+    private int getPeakCoverage( Strand strand, int position ) {
         int peakCoverage = 0;
         for( CoverageAndDiffResult result : this.resultList ) {
             peakCoverage = Math.max( peakCoverage, getCoverageAt( result, position, strand ) );
@@ -210,7 +210,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * @param to             <p>
      * @return
      */
-    private double[] copyCoverage( CoverageAndDiffResult coverageResult, byte strand, int from, int to ) {
+    private double[] copyCoverage( CoverageAndDiffResult coverageResult, Strand strand, int from, int to ) {
         if( to < from ) {
             throw new IllegalArgumentException( "from value must be less than the to value" );
         }
@@ -230,7 +230,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * <p>
      * @param strand
      */
-    private void computeStep( byte strand ) {
+    private void computeStep( Strand strand ) {
         int maximumCoveredPosition = this.resultList.get( 0 ).getCovManager().getRightBound();
         int chromId = this.resultList.get( 0 ).getRequest().getChromId();
         int track1Id = this.trackConnectors.get( 0 ).getTrackID();
@@ -295,9 +295,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             }
         } else {
 
-            if( strand == SequenceUtils.STRAND_FWD ) {
+            if( strand == Strand.Forward ) {
                 ph.finish();
-                this.strand = SequenceUtils.STRAND_REV;
+                this.strand = Strand.Reverse;
                 this.createProcessHandle( NbBundle.getMessage( CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV" ) );
 
                 //compute again from the beginning with the other strand strand

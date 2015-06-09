@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -36,13 +37,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import static java.util.logging.Level.SEVERE;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
+
+import static java.util.logging.Level.SEVERE;
+import static java.util.regex.Pattern.compile;
 
 
 /**
@@ -52,8 +56,12 @@ import org.openide.util.NbPreferences;
  */
 public final class GeneralUtils {
 
-    private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
+    public static final Pattern COLON_PATTERN = compile( ":" );
+    public static final Pattern HASH_KEY_PATTERN = compile( "#" );
+    public static final Pattern SLASH_PATTERN = compile( "/" );
+    public static final Pattern COLON_HASH_PATTERN = compile( ":|#" );
 
+    private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
     private static final Preferences PREF = NbPreferences.forModule( Object.class );
 
 
@@ -319,7 +327,7 @@ public final class GeneralUtils {
             try {
                 Files.delete( lastWorkFile.toPath() );
                 deleted = true;
-                File indexFile = new File( lastWorkFile.getAbsolutePath().concat( Properties.BAM_INDEX_EXT ) );
+                File indexFile = new File( lastWorkFile.getAbsolutePath().concat( Paths.BAM_INDEX_EXT ) );
                 if( indexFile.canWrite() ) {
                     Files.delete( indexFile.toPath() );
                 }
@@ -475,12 +483,12 @@ public final class GeneralUtils {
         String shortReadName = readName;
         String[] nameArray;
         if( readName.startsWith( "@" ) ) {
-            nameArray = readName.split( ":" );
+            nameArray = COLON_PATTERN.split( readName );
             if( nameArray.length == 5 ) {
                 shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
                 if( shortReadName.contains( "#" ) ) {
-                    nameArray = shortReadName.split( "#" );
-                    shortReadName = nameArray[0] + nameArray[1].split( "/" )[1];
+                    nameArray = HASH_KEY_PATTERN.split( shortReadName );
+                    shortReadName = nameArray[0] + SLASH_PATTERN.split( nameArray[1] )[1];
                 }
             } else if( nameArray.length == 10 ) {
                 shortReadName = nameArray[4] + nameArray[5] + nameArray[6];
@@ -523,7 +531,7 @@ public final class GeneralUtils {
     public static String[] splitReadName( String readName, NameStyle specialStyle ) {
         String[] nameArray;
         if( specialStyle == NameStyle.STYLE_ILLUMINA ) {
-            nameArray = readName.split( ":|#" );
+            nameArray = COLON_HASH_PATTERN.split( readName );
         } else {
             int length = readName.length() / 5 + 1;
             nameArray = new String[length];
@@ -555,7 +563,7 @@ public final class GeneralUtils {
     public static String createEcHtmlLink( String ecNumber ) {
         String ecLink = "<html> </html>";
         if( ecNumber != null && !ecNumber.isEmpty() ) {
-            String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+            String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
             ecLink = "<a href=\"" + dbUrl + ecNumber + "\">" + ecNumber + "</a>";
         }
         return ecLink;
@@ -575,7 +583,7 @@ public final class GeneralUtils {
         UrlWithTitle url = null;
         if( ecNumber != null && !ecNumber.isEmpty() ) {
             try {
-                String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Properties.DB_EXPASY );
+                String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
                 url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
             } catch( MalformedURLException ex ) {
                 LOG.log( SEVERE, ex.getMessage() );

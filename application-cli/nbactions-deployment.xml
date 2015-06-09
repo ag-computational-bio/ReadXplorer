@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>build-with-dependencies</actionName>
+            <reactor>also-make</reactor>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>install</goal>
+                
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-Deploy</actionName>
+            <displayName>Deploy</displayName>
+            <goals>
+                <goal>nbm:build-installers</goal>
+            </goals>
+            <activatedProfiles>
+                <activatedProfile>deployment</activatedProfile>
+            </activatedProfiles>
+        </action>
+    </actions>

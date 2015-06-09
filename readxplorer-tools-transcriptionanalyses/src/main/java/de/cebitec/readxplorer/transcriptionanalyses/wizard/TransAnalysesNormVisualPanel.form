@@ -56,9 +56,6 @@
           <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.minReadCountValueField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="minReadCountValueFieldActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="minRPKMValueLabel">
       <Properties>
@@ -73,9 +70,6 @@
           <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.maxReadCountValueField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="maxReadCountValueFieldActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="maxRPKMValueLabel">
       <Properties>

@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
@@ -27,7 +28,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expre
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTestI;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTestObserver;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expresstest.ExpressTestStatus;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,10 +70,10 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
     public ExpressTestAnalysisHandler( List<PersistentTrack> selectedTracks,
                                        int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
                                        File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset,
-                                       ParametersReadClasses readClassParams, int[] normalizationFeatures ) {
-
-        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
-        expressTestAnalysisData = new ExpressTestAnalysisData( selectedTracks.size(), groupA, groupB, workingWithoutReplicates, normalizationFeatures );
+                                       ParametersReadClasses readClassParams, int[] normalizationFeatures, ProcessingLog processingLog ) {
+        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, processingLog );
+        expressTestAnalysisData = new ExpressTestAnalysisData( selectedTracks.size(), groupA, groupB,
+                                                               workingWithoutReplicates, normalizationFeatures, processingLog );
         expressTestAnalysisData.setSelectedTracks( selectedTracks );
 
     }
@@ -84,7 +84,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
         prepareFeatures( expressTestAnalysisData );
         prepareCountData( expressTestAnalysisData, getAllCountData() );
 
-        ExpressTestI et = new ExpressTest();
+        ExpressTestI et = new ExpressTest(super.getProcessingLog());
 
 
         et.addObserver( this );

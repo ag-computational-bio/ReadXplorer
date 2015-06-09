@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import static java.util.logging.Level.INFO;
 
@@ -243,6 +245,31 @@ public final class TableUtils {
         for( int i = 0; i < noColumns; i++ ) {
             tableRow.add( "" );
         }
+    }
+
+
+    /**
+     * Adds a {@link ListSelectionListener} to the given table which enables
+     * showing the genomic position of the currently selected table row via the
+     * given {@link BoundsInfoManager}.
+     * <p>
+     * @param table       Add the listener to this table
+     * @param posColumn   Table column containing the genomic position
+     * @param chromColumn Table column containing the chromosome
+     * @param bim         BoundsInfoManager whose position has to be updated by
+     *                    the listener
+     */
+    public static void addTableListSelectionListener( JTable table, int posColumn, int chromColumn, BoundsInfoManager bim ) {
+        DefaultListSelectionModel model = (DefaultListSelectionModel) table.getSelectionModel();
+        model.addListSelectionListener( new ListSelectionListener() {
+
+            @Override
+            public void valueChanged( ListSelectionEvent e ) {
+                TableUtils.showPosition( table, posColumn, chromColumn, bim );
+            }
+
+
+        } );
     }
 
 

@@ -18,8 +18,7 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.api.enums.Strand;
 
 
 /**
@@ -33,7 +32,7 @@ public class CoverageInterval {
     private boolean isFwdStrand;
     private int trackId;
     private int chromId;
-    private byte strand;
+    private Strand strand;
     private int start;
     private int stop;
     private int length;
@@ -52,7 +51,7 @@ public class CoverageInterval {
      * @param stop         the stop position of the interval
      * @param meanCoverage the mean coverage of the interval
      */
-    public CoverageInterval( int trackId, int chromId, byte strand, int start, int stop, int meanCoverage ) {
+    public CoverageInterval( int trackId, int chromId, Strand strand, int start, int stop, int meanCoverage ) {
         this.trackId = trackId;
         this.chromId = chromId;
         this.strand = strand;
@@ -60,7 +59,7 @@ public class CoverageInterval {
         this.stop = stop;
         this.length = stop - start;
         this.meanCoverage = meanCoverage;
-        this.isFwdStrand = strand != SequenceUtils.STRAND_REV;
+        this.isFwdStrand = strand != Strand.Reverse;
     }
 
 
@@ -72,7 +71,7 @@ public class CoverageInterval {
      * @param chromId The id of the chromosome to which this interval belongs
      * @param strand  the strand, for which the interval shall be created
      */
-    public CoverageInterval( int trackId, int chromId, byte strand ) {
+    public CoverageInterval( int trackId, int chromId, Strand strand ) {
         this( trackId, chromId, strand, -1, -1, 0 );
     }
 
@@ -89,15 +88,12 @@ public class CoverageInterval {
      * @return The String representing the strand.
      */
     public String getStrandString() {
-        String output = "no strand";
-        if( strand == Properties.STRAND_BOTH ) {
-            output = SequenceUtils.STRAND_BOTH_STRING;
-        } else if( strand == SequenceUtils.STRAND_FWD ) {
-            output = SequenceUtils.STRAND_FWD_STRING;
-        } else if( strand == SequenceUtils.STRAND_REV ) {
-            output = SequenceUtils.STRAND_REV_STRING;
+
+        if( strand == null ) {
+            return "no strand";
+        } else {
+            return strand.toString();
         }
-        return output;
 
     }
 
@@ -169,7 +165,7 @@ public class CoverageInterval {
     /**
      * @param strand the strand of this interval
      */
-    public void setStrand( byte strand ) {
+    public void setStrand( Strand strand ) {
         this.strand = strand;
     }
 

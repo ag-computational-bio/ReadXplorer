@@ -20,9 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.awt.Component;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS;
@@ -73,8 +71,7 @@ public class TransAnalysesNormWizardPanel extends ChangeListeningWizardPanel {
      * wizard for later use, also after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, String.valueOf( component.getMinReadCount() ) );
-        pref.put( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, String.valueOf( component.getMaxReadCount() ) );
+        getPref().put( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, String.valueOf( component.getMinReadCount() ) );
+        getPref().put( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, String.valueOf( component.getMaxReadCount() ) );
     }
 }

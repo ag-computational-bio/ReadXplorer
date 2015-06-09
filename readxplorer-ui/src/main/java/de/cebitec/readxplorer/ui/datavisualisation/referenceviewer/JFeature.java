@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.ui.datavisualisation.referenceviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
-import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -101,7 +101,7 @@ public class JFeature extends JComponent {
         sb.append( "<table>" );
 
         sb.append( createTableRow( "Locus", feature.getLocus() ) );
-        sb.append( createTableRow( "Type", feature.getType().getTypeString() ) );
+        sb.append( createTableRow( "Type", feature.getType().toString() ) );
         sb.append( createTableRow( "Strand", (feature.isFwdStrand() ? "forward" : "reverse") ) );
         sb.append( createTableRow( "Start", String.valueOf( feature.getStart() ) ) );
         sb.append( createTableRow( "Stop", String.valueOf( feature.getStop() ) ) );
@@ -125,7 +125,7 @@ public class JFeature extends JComponent {
 
     public void setSelected( boolean selected ) {
         if( selected ) {
-            color = ColorProperties.SELECTED_FEATURE;
+            color = Colors.SELECTED_FEATURE;
         } else {
             color = this.determineColor( feature );
         }
@@ -141,21 +141,21 @@ public class JFeature extends JComponent {
         g.setColor( color );
         if( feature.getNodeChildren().isEmpty() ) {
             g.fillRect( 0, 0, this.getSize().width, this.height );
-            g.setColor( ColorProperties.EXON_BORDER );
+            g.setColor( Colors.EXON_BORDER );
             g.drawRect( 0, 0, this.getSize().width - 1, this.height - 1 );
             //paint border in feature color, if feature is larger than screen at that border
             g.setColor( color );
             this.overpaintBorder( g, 0, this.height - 1 );
         } else { //features with sub features have a smaller height
             g.fillRect( 0, (NORMAL_HEIGHT - PARENT_FEATURE_HEIGHT) / 2, this.getSize().width, PARENT_FEATURE_HEIGHT );
-            g.setColor( ColorProperties.EXON_BORDER );
+            g.setColor( Colors.EXON_BORDER );
             g.drawRect( 0, (NORMAL_HEIGHT - PARENT_FEATURE_HEIGHT) / 2, this.getSize().width - 1, PARENT_FEATURE_HEIGHT - 1 );
             g.setColor( color );
             this.overpaintBorder( g, (NORMAL_HEIGHT - PARENT_FEATURE_HEIGHT) / 2 + 1, PARENT_FEATURE_HEIGHT );
         }
 
         // draw the locus of the feature inside the rectangle
-        g.setColor( ColorProperties.FEATURE_LABEL );
+        g.setColor( Colors.FEATURE_LABEL );
         g.setFont( font );
         FontMetrics fm = g.getFontMetrics();
 
@@ -218,59 +218,59 @@ public class JFeature extends JComponent {
 
         switch( feature.getType() ) {
             case CDS:
-                c = ColorProperties.CDS;
+                c = Colors.CDS;
                 break;
             case MRNA:
-                c = ColorProperties.MRNA;
+                c = Colors.MRNA;
                 break;
             case MISC_RNA:
-                c = ColorProperties.MISC_RNA;
+                c = Colors.MISC_RNA;
                 break;
             case REPEAT_UNIT:
-                c = ColorProperties.REPEAT_UNIT;
+                c = Colors.REPEAT_UNIT;
                 break;
             case RRNA:
-                c = ColorProperties.RRNA;
+                c = Colors.RRNA;
                 break;
             case SOURCE:
-                c = ColorProperties.SOURCE;
+                c = Colors.SOURCE;
                 break;
             case TRNA:
-                c = ColorProperties.TRNA;
+                c = Colors.TRNA;
                 break;
             case GENE:
-                c = ColorProperties.GENE;
+                c = Colors.GENE;
                 break;
             case MIRNA:
-                c = ColorProperties.MI_RNA;
+                c = Colors.MI_RNA;
                 break;
             case EXON:
-                c = ColorProperties.EXON;
+                c = Colors.EXON;
                 break;
             case UNDEFINED:
-                c = ColorProperties.UNDEF_FEATURE;
+                c = Colors.UNDEF_FEATURE;
                 break;
             case FIVE_UTR:
-                c = ColorProperties.FIVE_UTR;
+                c = Colors.FIVE_UTR;
                 break;
             case THREE_UTR:
-                c = ColorProperties.THREE_UTR;
+                c = Colors.THREE_UTR;
                 break;
             case NC_RNA:
-                c = ColorProperties.NC_RNA;
+                c = Colors.NC_RNA;
                 break;
             case RBS:
-                c = ColorProperties.RBS;
+                c = Colors.RBS;
                 break;
             case MINUS_THIRTYFIVE:
-                c = ColorProperties.MINUS_THIRTYFIVE;
+                c = Colors.MINUS_THIRTYFIVE;
                 break;
             case MINUS_TEN:
-                c = ColorProperties.MINUS_TEN;
+                c = Colors.MINUS_TEN;
                 break;
             default:
                 LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
-                c = ColorProperties.UNDEF_FEATURE;
+                c = Colors.UNDEF_FEATURE;
         }
 
         return c;

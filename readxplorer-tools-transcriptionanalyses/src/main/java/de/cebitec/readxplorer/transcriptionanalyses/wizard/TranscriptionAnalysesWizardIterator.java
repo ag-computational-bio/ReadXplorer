@@ -90,6 +90,7 @@ public final class TranscriptionAnalysesWizardIterator implements
     /**
      * Wizard page iterator for a transcription analyses wizard. In order to use
      * it correctly, the wizard, in which this iterator is used has to be set.
+     * @param referenceId The id of the current reference
      */
     public TranscriptionAnalysesWizardIterator( int referenceId ) {
         this.referenceId = referenceId;
@@ -267,9 +268,6 @@ public final class TranscriptionAnalysesWizardIterator implements
      * @param analysisSelected true, if the analysis is selected, false
      *                         otherwise
      * @param analysisPanel    the analysis panel to add to the list of panels
-     * @param newSteps         the list of steps for this wizard
-     * @param newStep          the new step, which should be added to the step
-     *                         list in case the analysis is selected
      */
     private void updatePanelList( boolean analysisSelected, Panel<WizardDescriptor> analysisPanel ) {
         if( analysisSelected ) {

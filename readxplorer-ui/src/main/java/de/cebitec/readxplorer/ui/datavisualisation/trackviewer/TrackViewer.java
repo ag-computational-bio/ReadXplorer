@@ -18,6 +18,10 @@
 package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.constants.GUI;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
@@ -29,12 +33,8 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
-import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.ColorUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -52,7 +52,6 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JSlider;
-import org.openide.util.NbPreferences;
 
 import static java.util.logging.Level.SEVERE;
 
@@ -70,7 +69,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 572406471;
     private static final int MININTERVALLENGTH = 25000;
 
-    private final Preferences pref = NbPreferences.forModule( Object.class );
     private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
     private final List<Integer> trackIDs;
@@ -82,7 +80,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private final int id2;
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
-    private boolean automaticScaling = pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false );
+    private boolean automaticScaling = pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false );
     private boolean useMinimalIntervalLength = true;
 
     private JSlider verticalSlider = null;
@@ -103,7 +101,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Create a new panel to show coverage information
      * <p>
      * @param boundsManager manager for component bounds
-     * @param basePanel
+     * @param basePanel     The BasePanel on which the viewer is painted.
      * @param refGen        reference genome
      * @param trackCon      database connection to one track, that is displayed
      * @param combineTracks true, if the coverage of the tracks contained in the
@@ -183,9 +181,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     protected Map<Classification, Color> createColors( Preferences pref ) {
         Map<Classification, Color> newClassToColorMap = new HashMap<>();
-        boolean uniformColoration = pref.getBoolean( ColorProperties.UNIFORM_DESIRED, false );
+        boolean uniformColoration = pref.getBoolean(Colors.UNIFORM_DESIRED, false );
         if( uniformColoration ) {
-            String colorRGB = pref.get( ColorProperties.UNIFORM_COLOR_STRING, "" );
+            String colorRGB = pref.get(Colors.UNIFORM_COLOR_STRING, "" );
             if( !colorRGB.isEmpty() ) {
                 for( Classification classType : classList ) {
                     newClassToColorMap.put( classType, new Color( Integer.parseInt( colorRGB ) ) );
@@ -224,7 +222,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.paintCoverage( g );
 
         } else {
-            Color fillcolor = ColorProperties.TITLE_BACKGROUND;
+            Color fillcolor = Colors.TITLE_BACKGROUND;
             g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
             if( loadingIndicator != null ) {
@@ -234,11 +232,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         }
 
         // draw scales
-        g.setColor( ColorProperties.TRACKPANEL_SCALE_LINES );
+        g.setColor(Colors.TRACKPANEL_SCALE_LINES );
         this.createLines( this.scaleLineStep, g );
 
-        // draw black middle line
-        g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+        // draw black middle lines
+        g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
         drawBaseLines( g );
     }
 
@@ -341,7 +339,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     @Override
     public void boundsChangedHook() {
         if( this.covManager == null || this.isNewDataRequestNeeded() ||
-                 !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
+            !this.covManager.coversBounds( getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight() ) ) {
             this.requestCoverage();
         } else {
             // coverage already loaded
@@ -525,7 +523,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     @Override
     public int getMaximalHeight() {
-        return pref.getInt( Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT );
+        return pref.getInt( GUI.VIEWER_HEIGHT, GUI.DEFAULT_HEIGHT );
     }
 
 
@@ -591,11 +589,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param coverage       The coverage value to store in the StringBuilder
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage ) {
-        String classType = classification.getTypeString();
         if( hasNormalizationFactor ) {
-            sb.append( createTableRow( classType, coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
+            sb.append( createTableRow( classification.toString(), coverage, TrackViewer.threeDecAfter( getNormalizedValue( id1, coverage ) ) ) );
         } else {
-            sb.append( createTableRow( classType, coverage ) );
+            sb.append( createTableRow( classification.toString(), coverage ) );
         }
     }
 
@@ -762,6 +759,15 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
 
+    /**
+     * Creates a label for a genomic position. A label will only appear each
+     * 500bp if the current interval is larger than 1000 bp.
+     * <p>
+     * @param logPos position whose label shall be returned
+     * @param step   The scaling step to paint
+     * <p>
+     * @return A label for a genomic position
+     */
     private String getLabel( int logPos, int step ) {
         String label = null;
         if( logPos >= 1000 && step >= 1000 ) {

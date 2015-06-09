@@ -102,13 +102,13 @@ public final class PositionUtils {
      * natural order.
      * <p>
      * @param isFwdOrder The sort order to use for the list
-     * @param codons The list of genomic ranges to sort
+     * @param genomicRanges The list of genomic ranges to sort
      */
-    public static void sortList( boolean isFwdOrder, List<? extends GenomicRange> codons ) {
+    public static void sortList( boolean isFwdOrder, List<? extends GenomicRange> genomicRanges ) {
         if( isFwdOrder ) {
-            Collections.sort( codons ); //start with first
+            Collections.sort( genomicRanges ); //start with first
         } else {
-            Collections.sort( codons, Collections.reverseOrder() ); //start with last
+            Collections.sort( genomicRanges, Collections.<GenomicRange>reverseOrder() ); //start with last
         }
     }
 

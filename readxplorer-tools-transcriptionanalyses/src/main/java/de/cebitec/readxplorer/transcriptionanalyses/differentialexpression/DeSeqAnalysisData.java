@@ -50,8 +50,9 @@ public class DeSeqAnalysisData extends DeAnalysisData {
 
     public DeSeqAnalysisData( int capacity, Map<String, String[]> design,
                               boolean moreThanTwoConditions, List<String> fittingGroupOne,
-                              List<String> fittingGroupTwo, boolean workingWithoutReplicates ) {
-        super( capacity );
+                              List<String> fittingGroupTwo, boolean workingWithoutReplicates,
+                              ProcessingLog processingLog ) {
+        super( capacity, processingLog );
         this.design = design;
         this.fittingGroupOne = fittingGroupOne;
         this.fittingGroupTwo = fittingGroupTwo;

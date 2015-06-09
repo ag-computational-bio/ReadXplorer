@@ -18,6 +18,9 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -30,8 +33,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalyses
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -215,7 +216,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             associateTssWindow = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ASSOCIATE_TSS_WINDOW );
             boolean isFwdAnalysisDirection = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION );
             if( readClassParams.isStrandBothOption() ) {
-                readClassParams.setStrandOption( isFwdAnalysisDirection ? Properties.STRAND_BOTH_FWD : Properties.STRAND_BOTH_REV );
+                readClassParams.setStrandOption( isFwdAnalysisDirection ? Strand.BothForward : Strand.BothReverse );
             }
         }
         if( performOperonAnalysis ) {
@@ -293,21 +294,21 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             }
             covAnalysisHandler.registerObserver( analysisTSS );
             covAnalysisHandler.setCoverageNeeded( true );
-            covAnalysisHandler.setDesiredData( Properties.READ_STARTS );
+            covAnalysisHandler.setDesiredData( IntervalRequestData.ReadStarts );
         }
         if( parametersOperonDet.isPerformOperonAnalysis() ) {
             analysisOperon = new AnalysisOperon( connector, parametersOperonDet );
 
             mappingAnalysisHandler.registerObserver( analysisOperon );
             mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
+            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
         if( parametersNormalization.isPerformNormAnalysis() ) {
             analysisNormalization = new AnalysisNormalization( connector, parametersNormalization );
 
             mappingAnalysisHandler.registerObserver( analysisNormalization );
             mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( Properties.REDUCED_MAPPINGS );
+            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
 
         trackToAnalysisMap.put( connector.getTrackID(), new AnalysisContainer( analysisTSS, analysisOperon, analysisNormalization ) );
@@ -334,9 +335,6 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                 @Override
                 public void run() {
 
-                    //get track name(s) for tab descriptions
-                    String trackNames;
-
                     if( parametersTss.isPerformTSSAnalysis() && dataType.equals( AnalysesHandler.DATA_TYPE_COVERAGE ) ) {
 
                         ++finishedCovAnalyses;
@@ -346,15 +344,14 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         AnalysisTranscriptionStart analysisTSS = trackToAnalysisMap.get( trackId ).getAnalysisTSS();
                         parametersTss = analysisTSS.getParametersTSS(); //if automatic is on, the parameters are different now
                         if( transcriptionStartResultPanel == null ) {
-                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-                            transcriptionStartResultPanel.setReferenceViewer( refViewer );
+                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart( refViewer );
                         }
 
                         TssDetectionResult tssResult = new TssDetectionResult( analysisTSS.getResults(), parametersTss, trackMap, reference, combineTracks, 1, 0 );
                         transcriptionStartResultPanel.addResult( tssResult );
 
                         if( finishedCovAnalyses >= tracks.size() || combineTracks ) {
-                            trackNames = GeneralUtils.generateConcatenatedString( tssResult.getTrackNameList(), 120 );
+                            String trackNames = GeneralUtils.generateConcatenatedString( tssResult.getTrackNameList(), 120 ); // get track name(s) for tab descriptions
                             String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getDataSize() + " hits)";
                             transcAnalysesTopComp.openAnalysisTab( panelName, transcriptionStartResultPanel );
                         }
@@ -365,8 +362,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         if( parametersOperonDet.isPerformOperonAnalysis() ) {
 
                             if( operonResultPanel == null ) {
-                                operonResultPanel = new ResultPanelOperonDetection( parametersOperonDet );
-                                operonResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
+                                operonResultPanel = new ResultPanelOperonDetection( parametersOperonDet, refViewer.getBoundsInformationManager() );
                             }
                             OperonDetectionResult operonDetectionResult = new OperonDetectionResult( trackMap,
                                                                                                      trackToAnalysisMap.get( trackId ).getAnalysisOperon().getResults(), reference, combineTracks, 2, 0 );
@@ -374,7 +370,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                             operonResultPanel.addResult( operonDetectionResult );
 
                             if( finishedMappingAnalyses >= tracks.size() || combineTracks ) {
-                                trackNames = GeneralUtils.generateConcatenatedString( operonDetectionResult.getTrackNameList(), 120 );
+                                String trackNames = GeneralUtils.generateConcatenatedString( operonDetectionResult.getTrackNameList(), 120 ); // get track name(s) for tab descriptions
                                 String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getDataSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab( panelName, operonResultPanel );
                             }
@@ -383,8 +379,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                         if( parametersNormalization.isPerformNormAnalysis() ) {
                             AnalysisNormalization normalizationAnalysis = trackToAnalysisMap.get( trackId ).getAnalysisNorm();
                             if( normalizationResultPanel == null ) {
-                                normalizationResultPanel = new ResultPanelNormalization();
-                                normalizationResultPanel.setBoundsInfoManager( refViewer.getBoundsInformationManager() );
+                                normalizationResultPanel = new ResultPanelNormalization( refViewer.getBoundsInformationManager() );
                             }
                             NormalizationAnalysisResult normAnalysisResult = new NormalizationAnalysisResult( trackMap,
                                                                                                               trackToAnalysisMap.get( trackId ).getAnalysisNorm().getResults(),
@@ -395,7 +390,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                             normalizationResultPanel.addResult( normAnalysisResult );
 
                             if( finishedMappingAnalyses >= tracks.size() || combineTracks ) {
-                                trackNames = GeneralUtils.generateConcatenatedString( normAnalysisResult.getTrackNameList(), 120 );
+                                String trackNames = GeneralUtils.generateConcatenatedString( normAnalysisResult.getTrackNameList(), 120 ); // get track name(s) for tab descriptions
                                 String panelName = "TPM, RPKM & read count values for " + trackNames + " (" + normalizationResultPanel.getDataSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab( panelName, normalizationResultPanel );
                             }
@@ -406,7 +401,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
             } );
         } catch( ClassCastException e ) {
-            LOG.log(Level.INFO, "Unknown data passed to {0}", getClass().getName());
+            LOG.log( Level.INFO, "Unknown data passed to {0}", getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
 

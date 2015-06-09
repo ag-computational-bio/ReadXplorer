@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.dataobjects.TrackChromResultEntry;
 
 
@@ -29,7 +30,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.TrackChromResultEntry;
  */
 public class CorrelatedInterval extends TrackChromResultEntry {
 
-    private byte strand;
+    private Strand strand;
 
     private int from;
     private int to;
@@ -50,7 +51,7 @@ public class CorrelatedInterval extends TrackChromResultEntry {
      * @param correlation
      * @param minPeakCoverage
      */
-    public CorrelatedInterval( byte strand,
+    public CorrelatedInterval( Strand strand,
                                int track1Id, int track2Id, int chromId, int from, int to, double correlation, double minPeakCoverage ) {
         super( track1Id, chromId );
         this.strand = strand;
@@ -64,7 +65,7 @@ public class CorrelatedInterval extends TrackChromResultEntry {
     /**
      * @return the strand
      */
-    public byte getDirection() {
+    public Strand getDirection() {
         return strand;
     }
 
@@ -72,7 +73,7 @@ public class CorrelatedInterval extends TrackChromResultEntry {
     /**
      * @param strand the strand to set
      */
-    public void setDirection( byte strand ) {
+    public void setDirection( Strand strand ) {
         this.strand = strand;
     }
 

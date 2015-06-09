@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.datavisualisation.histogramviewer;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.constants.Colors;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JComponent;
@@ -58,7 +58,7 @@ public class BarComponent extends JComponent {
         graphics.setColor( color );
         graphics.fillRect( 0, 0, width - 1, height - 1 );
 
-        graphics.setColor( ColorProperties.BLOCK_BORDER );
+        graphics.setColor(Colors.BLOCK_BORDER );
         graphics.drawRect( 0, 0, width - 1, height - 1 );
     }
 

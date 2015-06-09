@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.visualisation.track;
 
 
+import de.cebitec.readxplorer.api.enums.MappingClass;
+import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
-import de.cebitec.readxplorer.utils.classification.TotalCoverage;
 import java.util.Map;
 import javax.swing.SwingUtilities;
 
@@ -618,62 +618,62 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     numberReadsAbsLabel.setText( String.valueOf( numReads ) );
                 }
 
-                int numOfPerfectMappings = statsMap.get( MappingClass.PERFECT_MATCH.getTypeString() );
+                int numOfPerfectMappings = statsMap.get( MappingClass.PERFECT_MATCH.toString() );
                 if( numOfPerfectMappings == -1 ) {
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText( String.valueOf( numOfPerfectMappings ) );
 
-                int numOfBestMatchMappings = statsMap.get( MappingClass.BEST_MATCH.getTypeString() );
+                int numOfBestMatchMappings = statsMap.get( MappingClass.BEST_MATCH.toString() );
                 if( numOfBestMatchMappings == -1 ) {
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText( String.valueOf( numOfBestMatchMappings ) );
 
-                int numOfCommonMatchMappings = statsMap.get( MappingClass.COMMON_MATCH.getTypeString() );
+                int numOfCommonMatchMappings = statsMap.get( MappingClass.COMMON_MATCH.toString() );
                 if( numOfCommonMatchMappings == -1 ) {
                     recalculated = true;
                 }
                 commonMappingsAbsLabel.setText( String.valueOf( numOfCommonMatchMappings ) );
 
-                int numOfSPerfectMappings = statsMap.get( MappingClass.SINGLE_PERFECT_MATCH.getTypeString() );
+                int numOfSPerfectMappings = statsMap.get( MappingClass.SINGLE_PERFECT_MATCH.toString() );
                 if( numOfSPerfectMappings == -1 ) {
                     recalculated = true;
                 }
                 singlePerfectAbsLabel.setText( String.valueOf( numOfSPerfectMappings ) );
 
-                int numOfSBestMatchMappings = statsMap.get( MappingClass.SINGLE_BEST_MATCH.getTypeString() );
+                int numOfSBestMatchMappings = statsMap.get( MappingClass.SINGLE_BEST_MATCH.toString() );
                 if( numOfSBestMatchMappings == -1 ) {
                     recalculated = true;
                 }
                 singleBestMatchAbsLabel.setText( String.valueOf( numOfSBestMatchMappings ) );
 
-                double percentagePerfectCovered = (double) statsMap.get( MappingClass.PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
+                double percentagePerfectCovered = (double) statsMap.get( MappingClass.PERFECT_MATCH + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
                 if( percentagePerfectCovered == -1 ) {
                     recalculated = true;
                 }
 
-                double percentageBMCovered = (double) statsMap.get( MappingClass.BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
+                double percentageBMCovered = (double) statsMap.get( MappingClass.BEST_MATCH + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
                 if( percentageBMCovered == -1 ) {
                     recalculated = true;
                 }
 
-                double percentageCommonCovered = (double) statsMap.get( MappingClass.COMMON_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
+                double percentageCommonCovered = (double) statsMap.get( MappingClass.COMMON_MATCH + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
                 if( percentageCommonCovered == -1 ) {
                     recalculated = true;
                 }
 
-                double percentageSPerfectCovered = (double) statsMap.get( MappingClass.SINGLE_PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
+                double percentageSPerfectCovered = (double) statsMap.get( MappingClass.SINGLE_PERFECT_MATCH + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
                 if( percentageSPerfectCovered == -1 ) {
                     recalculated = true;
                 }
 
-                double percentageSBMCovered = (double) statsMap.get( MappingClass.SINGLE_BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
+                double percentageSBMCovered = (double) statsMap.get( MappingClass.SINGLE_BEST_MATCH + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
                 if( percentageSBMCovered == -1 ) {
                     recalculated = true;
                 }
 
-                double percentageTotalCovered = (double) statsMap.get( TotalCoverage.TOTAL_COVERAGE.getTypeString() + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
+                double percentageTotalCovered = (double) statsMap.get( TotalCoverage.TOTAL_COVERAGE + StatsContainer.COVERAGE_STRING ) / genomeLength * 100;
                 if( percentageTotalCovered == -1 ) {
                     recalculated = true;
                 }

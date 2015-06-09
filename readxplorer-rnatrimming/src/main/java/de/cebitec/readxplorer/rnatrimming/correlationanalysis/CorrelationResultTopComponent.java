@@ -197,8 +197,7 @@ public final class CorrelationResultTopComponent extends TopComponentExtended {
      *                        detection should be carried out.
      */
     public CorrelationResultPanel openResultTab( ReferenceViewer referenceViewer ) {
-        CorrelationResultPanel resultView = new CorrelationResultPanel();
-        resultView.setBoundsInfoManager( referenceViewer.getBoundsInformationManager() );
+        CorrelationResultPanel resultView = new CorrelationResultPanel( referenceViewer.getBoundsInformationManager() );
         String title = "Correlation Analysis";
         resultTabs.addTab( title, resultView );
         resultTabs.setTabComponentAt( resultTabs.getTabCount() - 1, new TabWithCloseX( resultTabs ) );

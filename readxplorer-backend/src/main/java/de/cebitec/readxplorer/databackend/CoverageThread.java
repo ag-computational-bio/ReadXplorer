@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
@@ -27,9 +29,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.Difference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.databackend.dataobjects.ReferenceGap;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,8 +229,8 @@ public class CoverageThread extends RequestThread {
                 request.getChromId(),
                 request.getSender(),
                 request.isDiffsAndGapsNeeded(),
-                Properties.NORMAL,
-                CoverageManager.TRACK2,
+                IntervalRequestData.Normal,
+                IntervalRequestData.Track2,
                 request.getReadClassParams() );
         CoverageAndDiffResult result = getCoverageAndDiffsFromFile( newRequest, tracks.get( 0 ) );
 
@@ -242,8 +242,8 @@ public class CoverageThread extends RequestThread {
                 request.getChromId(),
                 request.getSender(),
                 request.isDiffsAndGapsNeeded(),
-                Properties.NORMAL,
-                CoverageManager.TRACK1,
+                IntervalRequestData.Normal,
+                IntervalRequestData.Track1,
                 request.getReadClassParams() );
         result.addCoverageManager( getCoverageAndDiffsFromFile( newRequest, tracks.get( 1 ) ).getCovManager() );
 

@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -76,13 +76,13 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
 
     public DeSeqAnalysisHandler( List<PersistentTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
-                                 List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-                                 File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams ) {
-        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
+                                 List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID,
+                                 boolean workingWithoutReplicates, File saveFile, Set<FeatureType> selectedFeatures, int startOffset,
+                                 int stopOffset, ParametersReadClasses readClassParams, ProcessingLog processingLog ) {
+        super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, processingLog );
         deSeq = new DeSeq();
-        deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(),
-                                                   design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo,
-                                                   workingWithoutReplicates );
+        deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(), design, moreThanTwoConditions, fittingGroupOne,
+                                                   fittingGroupTwo, workingWithoutReplicates, processingLog );
     }
 
 

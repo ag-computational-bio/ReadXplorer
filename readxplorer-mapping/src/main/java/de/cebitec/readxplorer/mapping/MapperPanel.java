@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.mapping;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readxplorer.utils.FileUtils;
-import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -105,7 +105,7 @@ final class MapperPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-        File file = FileUtils.showFileOpenDialogAndChangePrefs( Properties.MAPPER_PATH,
+        File file = FileUtils.showFileOpenDialogAndChangePrefs( Paths.MAPPER_PATH,
                                                                 new FileNameExtensionFilter( "Mapper Script File", "sh" ),
                                                                 mapperTextField, MapperPanel.class, this );
     }//GEN-LAST:event_openButtonActionPerformed
@@ -117,7 +117,7 @@ final class MapperPanel extends javax.swing.JPanel {
 
 
     void store() {
-        pref.put( Properties.MAPPER_PATH, mapperTextField.getText() );
+        pref.put( Paths.MAPPER_PATH, mapperTextField.getText() );
     }
 
 

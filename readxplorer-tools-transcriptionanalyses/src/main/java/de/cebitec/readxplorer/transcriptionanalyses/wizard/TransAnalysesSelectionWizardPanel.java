@@ -19,9 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_NORM_ANALYSIS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS;
@@ -43,7 +41,6 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
      * component from this class, just use getComponent().
      */
     private TransAnalysesSelectionVisualPanel component;
-    private Preferences pref = NbPreferences.forModule( Object.class );
 
 
     /**
@@ -72,9 +69,9 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
     @Override
     public void readSettings( final WizardDescriptor wiz ) {
         super.readSettings( wiz );
-        boolean isTssSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, false );
-        boolean isOperonSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, false );
-        boolean isNormSelected = pref.getBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, false );
+        boolean isTssSelected = getPref().getBoolean( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, false );
+        boolean isOperonSelected = getPref().getBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, false );
+        boolean isNormSelected = getPref().getBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, false );
 
         component.updateAnalysisSelection( isTssSelected, isOperonSelected, isNormSelected );
     }
@@ -97,9 +94,9 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
      * after restarting the software.
      */
     private void storePrefs() {
-        pref.putBoolean( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, component.isTSSAnalysisSelected() );
-        pref.putBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, component.isOperonAnalysisSelected() );
-        pref.putBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, component.isNormAnalysisSelected() );
+        getPref().putBoolean( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, component.isTSSAnalysisSelected() );
+        getPref().putBoolean( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, component.isOperonAnalysisSelected() );
+        getPref().putBoolean( PROP_WIZARD_NAME + PROP_NORM_ANALYSIS, component.isNormAnalysisSelected() );
     }
 
 

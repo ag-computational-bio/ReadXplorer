@@ -29,6 +29,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.event.ActionEvent;
@@ -239,33 +240,21 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                     public void run() {
 
                         if( coverageAnalysisResultPanel == null ) {
-                            coverageAnalysisResultPanel = new ResultPanelCoverageAnalysis();
-                            coverageAnalysisResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
+                            coverageAnalysisResultPanel = new ResultPanelCoverageAnalysis( context.getBoundsInformationManager() );
                         }
-                        coverageAnalysisResultPanel.addCoverageAnalysis( result );
+                        coverageAnalysisResultPanel.addResult( result );
 
                         if( finishedCovAnalyses >= tracks.size() || combineTracks ) {
 
                             //get track name(s) for tab descriptions
-                            String trackNames = "";
-                            if( tracks != null && !tracks.isEmpty() ) {
-                                for( PersistentTrack track : tracks ) {
-                                    trackNames = trackNames.concat( track.getDescription() ).concat( " and " );
-                                }
-                                trackNames = trackNames.substring( 0, trackNames.length() - 5 );
-                                if( trackNames.length() > 120 ) {
-                                    trackNames = trackNames.substring( 0, 120 ).concat( "..." );
-                                }
-                            }
-
-
+                            String trackNames = GeneralUtils.generateConcatenatedString( result.getTrackNameList(), 120 );
                             String title;
                             if( parameters.isDetectCoveredIntervals() ) {
                                 title = "Detected covered intervals for ";
                             } else {
                                 title = "Detected uncovered intervals for ";
                             }
-                            String panelName = title + trackNames + " (" + coverageAnalysisResultPanel.getResultSize() + " hits)";
+                            String panelName = title + trackNames + " (" + coverageAnalysisResultPanel.getDataSize() + " hits)";
                             coveredAnnoAnalysisTopComp.openAnalysisTab( panelName, coverageAnalysisResultPanel );
                         }
                     }

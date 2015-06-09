@@ -41,11 +41,12 @@ public class ExpressTest implements ExpressTestI {
     private final List<Object> colNames;
 //    private final Map<double[], Double> meanCache;
     private int[] normalizationFeatures;
+    private final ProcessingLog processingLog;
     private boolean useHousekeepingGenesForNormalization = false;
 
 
-    public ExpressTest() {
-
+    public ExpressTest( ProcessingLog processingLog ) {
+        this.processingLog = processingLog;
 //        this.meanCache = new HashMap<>( 1024 );
         this.observers = new LinkedList<>();
         this.colNames = Arrays.asList( new Object[]{ "Region", "Start",
@@ -102,14 +103,14 @@ public class ExpressTest implements ExpressTestI {
             if( !zeroFreeValues( meanCountsA ) ) {
                 meanCountContainsZero = true;
                 String msg = "One of the selected house keeping genes has no mapping read under condition A." +
-                         " The default normalization method will be used.";
+                             " The default normalization method will be used.";
                 String title = "Unable to normalize using house keeping genes.";
                 JOptionPane.showMessageDialog( null, msg, title, JOptionPane.INFORMATION_MESSAGE );
             }
             if( !zeroFreeValues( meanCountsB ) ) {
                 meanCountContainsZero = true;
                 String msg = "One of the selected house keeping genes has no mapping read under condition B." +
-                         " The default normalization method will be used.";
+                             " The default normalization method will be used.";
                 String title = "Unable to normalize using house keeping genes.";
                 JOptionPane.showMessageDialog( null, msg, title, JOptionPane.INFORMATION_MESSAGE );
             }
@@ -194,14 +195,13 @@ public class ExpressTest implements ExpressTestI {
 
         rowNames = regionNamesList;
 
-        ProcessingLog log = ProcessingLog.getInstance();
-        log.addProperty( "Average mean counts", averageMeanCounts );
-        log.addProperty( "Use house keeping genes for normalization", useHousekeepingGenesForNormalization );
+        processingLog.addProperty( "Average mean counts", averageMeanCounts );
+        processingLog.addProperty( "Use house keeping genes for normalization", useHousekeepingGenesForNormalization );
         if( useHousekeepingGenesForNormalization ) {
-            log.addProperty( "Used house keeping genes", normalizationFeatures );
+            processingLog.addProperty( "Used house keeping genes", normalizationFeatures );
         }
-        log.addProperty( "Normalization ratios for group A", normalizationRatiosA );
-        log.addProperty( "Normalization ratios for group B", normalizationRatiosB );
+        processingLog.addProperty( "Normalization ratios for group A", normalizationRatiosA );
+        processingLog.addProperty( "Normalization ratios for group B", normalizationRatiosB );
         notifyObservers( ExpressTestStatus.FINISHED );
 
     }
@@ -291,20 +291,13 @@ public class ExpressTest implements ExpressTestI {
             }
 
             mean[j] = mean( rowValues );
-            var[j] = round( variance( rowValues ) );
+            var[j] = Math.round( variance( rowValues ) );
             meanNormalized[j] = mean( rowValuesNormalized );
-            varNormalized[j] = round( variance( rowValuesNormalized ) );
+            varNormalized[j] = Math.round( variance( rowValuesNormalized ) );
 
         }
 
         return new ExpressTest.MeanVarianceGroup( mean, var, meanNormalized, varNormalized );
-
-    }
-
-
-    private static double round( final double d ) {
-
-        return Math.round( d );
 
     }
 

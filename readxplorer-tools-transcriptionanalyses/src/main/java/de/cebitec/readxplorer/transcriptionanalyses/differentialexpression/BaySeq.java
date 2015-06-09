@@ -69,20 +69,20 @@ public class BaySeq {
      * <p>
      * @return a List of RVector. Each RVector represents the results for one
      *         Group. The number of RVectors is always two times the number of
-     *         committed groups because there is always one normalised and one
-     *         not normalised result. Example: If you commited two groups. You
+     *         committed groups because there is always one normalized and one
+     *         not normalized result. Example: If you committed two groups. You
      *         will get four RVectors as an result. The first RVector will
-     *         represent the not normalised result for the first committed
-     *         group. The secound will represent the not normalised result for
-     *         the secound group. The third result will then represent the
-     *         normalised result for group one and the fourth result will
-     *         represent the normalised result for group two. So you will first
-     *         get all not normalised results and then all the normalised ones.
+     *         represent the not normalized result for the first committed
+     *         group. The second will represent the not normalized result for
+     *         the second group. The third result will then represent the
+     *         normalized result for group one and the fourth result will
+     *         represent the normalized result for group two. So you will first
+     *         get all not normalized results and then all the normalized ones.
      */
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile )
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
-        gnuR = GnuR.startRServe();
+        gnuR = GnuR.startRServe(bseqData.getProcessingLog());
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );

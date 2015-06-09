@@ -21,6 +21,8 @@ package de.cebitec.readxplorer.parser.reference;
 import de.cebitec.common.parser.Converter;
 import de.cebitec.common.parser.embl.parsers.EmblSequenceToFastaConverterParser;
 import de.cebitec.common.parser.genbank.parsers.GenbankSequenceToFastaConverterParser;
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedChromosome;
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
@@ -31,8 +33,6 @@ import de.cebitec.readxplorer.utils.ErrorLimit;
 import de.cebitec.readxplorer.utils.FastaUtils;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -64,6 +63,8 @@ import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -182,10 +183,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         final RichFeature richFeature = (RichFeature) feature;
                         Location location = richFeature.getLocation();
 
-                        final int strand;
+                        final Strand strand;
                         final String parsedType = richFeature.getType();
                         try {
-                            strand = richFeature.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                            strand = richFeature.getStrand().equals( StrandedFeature.POSITIVE ) ? Strand.Forward : Strand.Reverse;
                         } catch( IllegalStateException e ) {
                             this.sendMsgIfAllowed( e.getMessage() );
                             continue;
@@ -267,7 +268,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 int subStart = subLocation.getMin();
                                 int subStop = subLocation.getMax();
                                 subFeatures.add( new ParsedFeature( type, subStart, subStop, strand,
-                                        locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null ) );
+                                        locusTag, product, ecNumber, geneName, new ArrayList<>(), null ) );
                                 featAcrossBorder = subStart == 1 && index > 0; //feature across circular chrom start, separate in two features
                                 ++index;
                             }
@@ -277,14 +278,14 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         if( featAcrossBorder ) { //feature across circular chrom start, add each subfeature separately
                             for( ParsedFeature subFeature : subFeatures ) {
                                 if( !featMap.containsKey( type ) ) {
-                                    featMap.put( type, new ArrayList<ParsedFeature>() );
+                                    featMap.put( type, new ArrayList<>() );
                                 }
                                 featMap.get( type ).add( subFeature );
                             }
                         } else {
                             ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
                             if( !featMap.containsKey( type ) ) {
-                                featMap.put( type, new ArrayList<ParsedFeature>() );
+                                featMap.put( type, new ArrayList<>() );
                             }
                             featMap.get( type ).add( currentFeature );
                         }

@@ -49,6 +49,7 @@ import org.openide.util.NbBundle;
 @ActionRegistration(
          displayName = "#CTL_MappingAction" )
 @ActionReference( path = "Menu/Tools", position = 154 )
+@NbBundle.Messages( "CTL_MappingAction=Map reads" )
 public final class MappingAction implements ActionListener {
 
     static final String PROP_SOURCEPATH = "PROP_SOURCEPATH";
@@ -72,9 +73,10 @@ public final class MappingAction implements ActionListener {
 
 
     @Override
+    @NbBundle.Messages( "MSG_BackgroundActivity=There is currently other background activity!" )
     public void actionPerformed( ActionEvent ev ) {
         if( CentralLookup.getDefault().lookup( SwingWorker.class ) != null ) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( MappingAction.class, "MSG_BackgroundActivity" ), NotifyDescriptor.WARNING_MESSAGE );
+            NotifyDescriptor nd = new NotifyDescriptor.Message( Bundle.MSG_BackgroundActivity(), NotifyDescriptor.WARNING_MESSAGE );
             DialogDisplayer.getDefault().notify( nd );
             return;
         }

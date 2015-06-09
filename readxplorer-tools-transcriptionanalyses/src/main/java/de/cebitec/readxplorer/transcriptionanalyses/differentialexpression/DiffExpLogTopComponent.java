@@ -138,7 +138,7 @@ public final class DiffExpLogTopComponent extends TopComponentExtended
             @Override
             public void save( String fileLocation ) {
                 File output = new File( fileLocation );
-                String log = ProcessingLog.getInstance().generateLog();
+                String log = analysisHandler.getProcessingLog().generateLog();
                 FileWriter writer;
                 try {
                     writer = new FileWriter( output );
@@ -169,7 +169,7 @@ public final class DiffExpLogTopComponent extends TopComponentExtended
 
     @Override
     public void componentOpened() {
-        String log = ProcessingLog.getInstance().generateLog();
+        String log = analysisHandler.getProcessingLog().generateLog();
         logTextField.setText( log );
     }
 

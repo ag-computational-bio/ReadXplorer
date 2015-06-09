@@ -33,16 +33,7 @@ public final class Properties {
     // different adapter types for a project and or database
     public static final String ADAPTER_MYSQL = "mysql";
     public static final String ADAPTER_H2 = "h2";
-    public static final String ADAPTER_DIRECT_ACCESS = "direct";
 
-    // protein DB properties
-    public static final String DB_BRENDA = "http://www.brenda-enzymes.org/enzyme.php?ecno=";
-    public static final String DB_EC2PDB = "http://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/enzymes/GetPage.pl?ec_number=";
-    public static final String DB_EXPASY = "http://enzyme.expasy.org/EC/";
-    public static final String DB_INTENZ = "http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec=";
-    public static final String DB_KEGG = "http://www.genome.jp/dbget-bin/www_bget?ec:";
-    public static final String DB_METACYC = "http://biocyc.org/META/substring-search?type=REACTION&object=";
-    public static final String DB_PRIAM = "http://priam.prabi.fr/cgi-bin/PRIAM_profiles_CurrentRelease.pl?EC=";
 
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
@@ -54,201 +45,12 @@ public final class Properties {
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
 
-    // ReadXplorer file chooser properties
-    public static final String READXPLORER_FILECHOOSER_DIRECTORY = "readXplorerFileChooser.Directory";
-    public static final String READXPLORER_DATABASE_DIRECTORY = "readXplorer.Database.Directory";
-
-    //Properties to set different viewers active
-    public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
-    public static final String PROP_HISTOGRAM_VIEWER = "HistogramViewerActive";
-    public static final String PROP_ALIGNMENT_VIEWER = "AlignmentViewerActive";
-    public static final String PROP_READ_PAIR_VIEWER = "ReadPairViewerActive";
-
-    public static final byte NONE = -1;
-    public static final byte BOTH = 0;
-    public static final byte READ_PAIRS = 1;
-    public static final byte SINGLE_MAPPINGS = 2;
-
-    /**
-     * Standard value, if all data is needed (0).
-     */
-    public static final byte NORMAL = 0;
-
-    /**
-     * Value for diffs (5).
-     */
-    public static final byte DIFFS = 5;
-    /**
-     * Value for mappings sorted by id (6).
-     */
-    public static final byte MAPPINGS_DB_BY_ID = 6;
-    /**
-     * Value for mappings without diffs (7).
-     */
-    public static final byte MAPPINGS_WO_DIFFS = 7;
-    /**
-     * kasterm: Value for all reduced mappings (8).
-     */
-    public static final byte REDUCED_MAPPINGS = 8;
-    /**
-     * Value for obtaining read starts instead of coverage (9).
-     */
-    public static final byte READ_STARTS = 9;
-    /**
-     * Value for viewing all mappings as if they came from the fwd. strand (10).
-     * This should only be used in combination with {@link STRAND_BOTH} to
-     * infer, if all mappings shall be treated as if the came from the fwd. or
-     * the rev. strand ()
-     */
-    public static final byte STRAND_FWD_ANALYSIS = 10;
-
-    /**
-     * Value for read start distribution = 5.
-     */
-    public static final byte READ_START_DISTRIBUTION = 5;
-    /**
-     * Value for coverage increase in percent distribution = 6.
-     */
-    public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 6;
-    /**
-     * Value for read length distribution = 3.
-     */
-    public static final byte READ_LENGTH_DISTRIBUTION = 3;
-    /**
-     * Value for seq pair size distribution = 4.
-     */
-    public static final byte READ_PAIR_SIZE_DISTRIBUTION = 4;
-
-    /**
-     * Type value identifying an object as belonging to a "Start".
-     */
-    public static final byte START = 1;
-    /**
-     * Type value identifying an object as belonging to a "Stop".
-     */
-    public static final byte STOP = 2;
-    /**
-     * Type value identifying an object as belonging to a "pattern".
-     */
-    public static final byte PATTERN = 3;
-    /**
-     * Type value identifying an object as belonging to a "CDS" = coding
-     * sequence.
-     */
-    public static final byte CDS = 4;
-    /**
-     * Type value identifying an object as belonging to any of the other types.
-     */
-    public static final byte ALL = 0;
-
-    /**
-     * 'Yc' = Tag for read classification in one of the three readxplorer
-     * classes.
-     */
-    public static final String TAG_READ_CLASS = "Yc";
-    /**
-     * 'Yt' = Tag for number of positions a sequence maps to in a reference.
-     */
-    public static final String TAG_MAP_COUNT = "Yt";
-    /**
-     * 'Yi' = Tag for the read pair id.
-     */
-    public static final String TAG_READ_PAIR_ID = "Yi";
-    /**
-     * 'Ys' = Tag for the read pair type.
-     */
-    public static final String TAG_READ_PAIR_TYPE = "Ys";
-
-    //Supported read pair extensions.
-    /**
-     * / = separator used for read pair tags before Casava 1.8 format.
-     */
-    public static final char EXT_SEPARATOR = '/';
-    /**
-     * 0 = For reads not having a pair tag.
-     */
-    public static final char EXT_UNDEFINED = '0';
-    /**
-     * 1 = Supported extension of read 1.
-     */
-    public static final char EXT_A1 = '1';
-    /**
-     * 2 = Supported extension of read 2.
-     */
-    public static final char EXT_A2 = '2';
-    /**
-     * f = Supported extension of read 1.
-     */
-    public static final char EXT_B1 = 'f';
-    /**
-     * r = Supported extension of read 2.
-     */
-    public static final char EXT_B2 = 'r';
-    /**
-     * 1 = Supported extension of read 1 as String.
-     */
-    public static final String EXT_A1_STRING = String.valueOf( EXT_A1 );
-    /**
-     * 2 = Supported extension of read 2 as String.
-     */
-    public static final String EXT_A2_STRING = String.valueOf( EXT_A2 );
-
-    /**
-     * Temporary directory used for import of data (SAM/BAM/JOK).
-     */
-    public static final String TMP_IMPORT_DIR = "TMP_IMPORT_DIR";
 
     /**
      * Protein database prefix used for creating EC-number links.
      */
     public static final String ENZYME_DB_LINK = "PROTEIN_DB_LINK";
 
-    /**
-     * The CRAN Mirror used by Gnu R to load missing packages.
-     */
-    public static final String CRAN_MIRROR = "CRAN_MIRROR";
-
-    /**
-     * The RServe host we will connect to for GNU R computations.
-     */
-    public static final String RSERVE_HOST = "RSERVE_HOST";
-    /**
-     * The RServe port we will connect to for GNU R computations.
-     */
-    public static final String RSERVE_PORT = "RSERVE_PORT";
-    /**
-     * Use username and password for authentication.
-     */
-    public static final String RSERVE_USE_AUTH = "RSERVE_USE_AUTH";
-    /**
-     * The RServe user we will use for the connection.
-     */
-    public static final String RSERVE_USER = "RSERVE_USER";
-    /**
-     * The RServe password we will use for the connection.
-     */
-    public static final String RSERVE_PASSWORD = "RSERVE_PASSWORD";
-    /**
-     * Holds the full path to the Rserve startup script if manual local setup is
-     * used.
-     */
-    public static final String RSERVE_STARTUP_SCRIPT = "RSERVE_STARTUP_SCRIPT";
-    /**
-     * Is Rserve manually configured to connect to a remote server.
-     */
-    public static final String RSERVE_MANUAL_REMOTE_SETUP = "RSERVE_MANUAL_REMOTE_SETUP";
-    /**
-     * Is Rserve manually configured to connect to a local server with custom
-     * startup script.
-     */
-    public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
-
-    public static final String MAPPER_PATH = "MAPPER_PATH";
-
-    /**
-     * Extension to use for bam index files (".bai").
-     */
-    public static final String BAM_INDEX_EXT = ".bai";
 
     /**
      * '-1' For reference features, which do not have a parent.
@@ -256,65 +58,17 @@ public final class Properties {
     public static final String NO_PARENT_STRING = "-1";
     public static final String MAPPER_PARAMS = "MAPPER_PARAMS";
 
-    /**
-     * Property for the height of data viewers.
-     */
-    public static final String VIEWER_HEIGHT = "VIEWER_HEIGHT";
-    /**
-     * Minimum viewer height = "120" pixels.
-     */
-    public static final int MIN_HEIGHT = 120;
-    /**
-     * Medium/default viewer height = "200" pixels.
-     */
-    public static final int DEFAULT_HEIGHT = 200;
-    /**
-     * Large viewer height = "250" pixels.
-     */
-    public static final int MAX_HEIGHT = 250;
-    /**
-     * Property for auto scaling of viewers.
-     */
-    public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
+
 
     /**
-     * 0 = Combine data of both strands option.
-     */
-    public static final byte STRAND_BOTH = 0;
-    /**
-     * 3 = Combine data of both strands option and treat them as if they were
-     * originating from fwd strand.
-     */
-    public static final byte STRAND_BOTH_FWD = 3;
-    /**
-     * 4 = Combine data of both strands option and treat them as if they were
-     * originating from rev strand.
-     */
-    public static final byte STRAND_BOTH_REV = 4;
-    /**
-     * 1 = Feature/analysis strand option.
-     */
-    public static final byte STRAND_FEATURE = 1;
-    /**
-     * 2 = Opposite strand option.
-     */
-    public static final byte STRAND_OPPOSITE = 2;
-    /**
-     * 0 = Combine data of both strands option string.
-     */
-    public static final String STRAND_BOTH_STRING = String.valueOf( STRAND_BOTH );
-    /**
-     * 1 = Feature/analysis strand option string.
-     */
-    public static final String STRAND_FEATURE_STRING = String.valueOf( STRAND_FEATURE );
-    /**
-     * 2 = Opposite strand option string.
-     */
-    public static final String STRAND_OPPOSITE_STRING = String.valueOf( STRAND_OPPOSITE );
-
-    /**
-     * 2 = Opposite strand option string.
+     * Option for showing base qualities.
      */
     public static final String BASE_QUALITY_OPTION = "BASE_QUALITY_OPTION";
+
+    /**
+     * Option for adjusting the alignment block height.
+     */
+    public static final String BLOCK_HEIGHT_OPTION = "BLOCK_HEIGHT_OPTION";
+
 
 }

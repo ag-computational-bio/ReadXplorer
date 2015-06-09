@@ -19,9 +19,7 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -47,8 +45,6 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
 
     /**
      * The SNP detection wizard main panel.
-     * <p>
-     * @param referenceId reference id
      */
     public SNPWizardPanel() {
         super( "Please enter valid parameters (Only number & percent values. Quality values need to be between 0 & 127)" );
@@ -87,14 +83,13 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
      * use, also after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
-        pref.put( PROP_MIN_PERCENT, String.valueOf( this.component.getMinPercentage() ) );
-        pref.put( PROP_MIN_VARYING_BASES, String.valueOf( this.component.getMinMismatchingBases() ) );
-        pref.put( PROP_USE_MAIN_BASE, this.component.isUseMainBase() ? "1" : "0" );
-        pref.put( PROP_SEL_QUAL_FILTER, this.component.isUseQualFilter() ? "1" : "0" );
-        pref.put( PROP_MIN_BASE_QUAL, String.valueOf( this.component.getMinBaseQuality() ) );
-        pref.put( PROP_MIN_AVERAGE_BASE_QUAL, String.valueOf( this.component.getMinAverageBaseQual() ) );
-        pref.put( PROP_MIN_AVERAGE_MAP_QUAL, String.valueOf( this.component.getMinAverageMappingQual() ) );
+        getPref().put( PROP_MIN_PERCENT, String.valueOf( this.component.getMinPercentage() ) );
+        getPref().put( PROP_MIN_VARYING_BASES, String.valueOf( this.component.getMinMismatchingBases() ) );
+        getPref().put( PROP_USE_MAIN_BASE, this.component.isUseMainBase() ? "1" : "0" );
+        getPref().put( PROP_SEL_QUAL_FILTER, this.component.isUseQualFilter() ? "1" : "0" );
+        getPref().put( PROP_MIN_BASE_QUAL, String.valueOf( this.component.getMinBaseQuality() ) );
+        getPref().put( PROP_MIN_AVERAGE_BASE_QUAL, String.valueOf( this.component.getMinAverageBaseQual() ) );
+        getPref().put( PROP_MIN_AVERAGE_MAP_QUAL, String.valueOf( this.component.getMinAverageMappingQual() ) );
     }
 
 

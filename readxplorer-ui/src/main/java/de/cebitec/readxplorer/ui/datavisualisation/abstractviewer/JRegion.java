@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.RegionType;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -35,25 +35,25 @@ public class JRegion extends JComponent {
 
     private static final long serialVersionUID = 279564654;
 
-    private Color backgroundColor = ColorProperties.START_CODON;
-    private int type = Properties.START;
+    private Color backgroundColor = Colors.START_CODON;
+    private RegionType type = RegionType.Start;
     private final int genomeStart;
     private final int genomeStop;
 
 
-    public JRegion( int length, int height, int type, int genomeStart, int genomeStop ) {
+    public JRegion( int length, int height, RegionType type, int genomeStart, int genomeStop ) {
         super();
         this.setSize( new Dimension( length, height ) );
         this.type = type;
         this.genomeStart = genomeStart;
         this.genomeStop = genomeStop;
 
-        if( type == Properties.PATTERN ) {
-            this.backgroundColor = ColorProperties.PATTERN;
-        } else if( type == Properties.STOP ) {
-            this.backgroundColor = ColorProperties.STOP_CODON;
-        } else if( type == Properties.CDS ) {
-            this.backgroundColor = ColorProperties.HIGHLIGHT_FILL;
+        if( type == RegionType.Pattern ) {
+            this.backgroundColor = Colors.PATTERN;
+        } else if( type == RegionType.Stop ) {
+            this.backgroundColor = Colors.STOP_CODON;
+        } else if( type == RegionType.CDS ) {
+            this.backgroundColor = Colors.HIGHLIGHT_FILL;
         } // else { //currently not needed, because start codon color already set.
     }
 
@@ -76,7 +76,7 @@ public class JRegion extends JComponent {
     }
 
 
-    public int getType() {
+    public RegionType getType() {
         return this.type;
     }
 

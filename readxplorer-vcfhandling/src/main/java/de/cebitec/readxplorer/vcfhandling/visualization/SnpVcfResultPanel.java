@@ -20,15 +20,13 @@ package de.cebitec.readxplorer.vcfhandling.visualization;
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import org.broadinstitute.variant.variantcontext.VariantContext;
 
@@ -57,9 +55,13 @@ public class SnpVcfResultPanel extends ResultTablePanel {
 
 
     /**
-     * Creates new form Snp_VcfResultPanel
+     * Creates new form Snp_VcfResultPanel.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public SnpVcfResultPanel() {
+    public SnpVcfResultPanel( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int sourColumn = 3;
         final int trackColumn = 2;
@@ -68,19 +70,7 @@ public class SnpVcfResultPanel extends ResultTablePanel {
         this.vcfTable.getTableHeader().addMouseListener( tableFilter );
         //ensures number of lines will adapt to number of translations (features) for each snp
 
-
-        DefaultListSelectionModel model = (DefaultListSelectionModel) vcfTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-
-            @Override
-            public void valueChanged( ListSelectionEvent lse ) {
-                TableUtils.showPosition( vcfTable, sourColumn, chromColumn, getBoundsInfoManager() );
-
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( vcfTable, sourColumn, chromColumn, getBoundsInfoManager() );
     }
 
 

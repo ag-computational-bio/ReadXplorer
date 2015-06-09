@@ -23,14 +23,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -157,6 +158,18 @@ public final class FileUtils {
     public static boolean fileExists( String filePathString ) {
         File f = new File( filePathString );
         boolean result = f.exists();
+        return result;
+    }
+
+    /**
+     * check that the given path exists and is readable.
+     * <p>
+     * @param filePathString <p>
+     * @return boolean true if the file exists, false otherwise
+     */
+    public static boolean fileExistsAndIsReadable( String filePathString ) {
+        File f = new File( filePathString );
+        boolean result = f.exists() && f.canRead();
         return result;
     }
 

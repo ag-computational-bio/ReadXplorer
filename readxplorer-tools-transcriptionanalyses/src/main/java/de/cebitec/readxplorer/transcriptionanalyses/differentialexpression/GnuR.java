@@ -18,13 +18,14 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.PasswordStore;
-import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.modules.InstalledFileLocator;
 import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
@@ -74,19 +76,22 @@ public final class GnuR extends RConnection {
 
     private static final Logger LOG = Logger.getLogger( GnuR.class.getName() );
 
+    private final ProcessingLog processingLog;
+
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
      */
-    private GnuR( String host, int port, boolean runningLocal ) throws RserveException {
+    private GnuR( String host, int port, boolean runningLocal, ProcessingLog processingLog ) throws RserveException {
         super( host, port );
         this.runningLocal = runningLocal;
+        this.processingLog = processingLog;
     }
 
 
     /**
-     * Clears up the memory of an runnig R instance. This should the called
-     * every time before a new computation is startet. Doing so you can be sure
+     * Clears up the memory of an running R instance. This should the called
+     * every time before a new computation is started. Doing so you can be sure
      * that no previous result is interfering with the new computation.
      */
     public void clearGnuR() throws RserveException {
@@ -106,12 +111,10 @@ public final class GnuR extends RConnection {
     }
 
 
-    private void setDefaultCranMirror() throws RserveException {
-        cranMirror = NbPreferences.forModule( Object.class ).get( Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
-        this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
-    }
-
-
+//    private void setDefaultCranMirror() throws RserveException {
+//        cranMirror = NbPreferences.forModule( Object.class ).get( Paths.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/" );
+//        this.eval( "{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}" );
+//    }
     /**
      * Loads the specified Gnu R package. If not installed the method will try
      * to download and install the package.
@@ -123,22 +126,15 @@ public final class GnuR extends RConnection {
             this.eval( "library(\"" + packageName + "\")" );
         } catch( RserveException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( Level.WARNING, "{0}: Package {1} is not installed.", new Object[]{ currentTimestamp, packageName } );
-            try {
-                currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.INFO, "{0}: Trying to install package {1}.", new Object[]{ currentTimestamp, packageName } );
-                this.eval( "install.packages(\"" + packageName + "\")" );
-                this.eval( "library(" + packageName + ')' );
-            } catch( RserveException ex1 ) {
-                currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.SEVERE, "{0}: Could not install package {1}. Please install it manually and try again.", new Object[]{ currentTimestamp, packageName } );
-                throw new PackageNotLoadableException( packageName );
-            }
+            LOG.log( Level.WARNING, "{0}: Package {1} is not installed. Please install it manually and try again.", new Object[]{ currentTimestamp, packageName } );
         }
     }
 
 
     public static class PackageNotLoadableException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
 
         public PackageNotLoadableException( String packageName ) {
             super( "The Gnu R package " + packageName + " can't be loaded automatically. Please install it manually!" );
@@ -150,9 +146,12 @@ public final class GnuR extends RConnection {
 
     public static class UnknownGnuRException extends Exception {
 
+        private static final long serialVersionUID = 1L;
+
+
         public UnknownGnuRException( Exception e ) {
             super( "An unknown exception occurred in GNU R while processing your data. " +
-                     "This caused an " + e.getClass().getName() + " on the Java side of the programm.", e );
+                   "This caused an " + e.getClass().getName() + " on the Java side of the programm.", e );
         }
 
 
@@ -174,7 +173,7 @@ public final class GnuR extends RConnection {
 
     @Override
     public REXP eval( String cmd ) throws RserveException {
-        ProcessingLog.getInstance().logGNURinput( cmd );
+        processingLog.logGNURinput( cmd );
         return super.eval( cmd );
     }
 
@@ -249,145 +248,124 @@ public final class GnuR extends RConnection {
     private static int nextFreePort = 6312;
 
 
-    public static GnuR startRServe() throws RserveException, IOException {
+    public static GnuR startRServe( ProcessingLog processingLog ) throws RserveException, IOException {
         GnuR instance;
         String host;
         int port;
-        boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_MANUAL_LOCAL_SETUP, false );
-        boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_MANUAL_REMOTE_SETUP, false );
-        boolean useAuth = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_USE_AUTH, false );
-
-        if( manualRemoteSetup ) {
-            port = NbPreferences.forModule( Object.class ).getInt( Properties.RSERVE_PORT, 6311 );
-            host = NbPreferences.forModule( Object.class ).get( Properties.RSERVE_HOST, "localhost" );
-            instance = new GnuR( host, port, !manualRemoteSetup );
-            if( useAuth ) {
-                String user = NbPreferences.forModule( Object.class ).get( Properties.RSERVE_USER, "" );
-                String password = new String( PasswordStore.read( Properties.RSERVE_PASSWORD ) );
-                instance.login( user, password );
+        boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
+        boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
+        boolean useAuth = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_AUTH, false );
+        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
+        if( cebitecIndicator.exists() ) {
+            String ip;
+            try( FileReader fr = new FileReader( cebitecIndicator ); BufferedReader br = new BufferedReader( fr ) ) {
+                ip = br.readLine();
             }
+            instance = new GnuR( ip, 6311, false, processingLog );
+            instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
         } else {
-            ProcessBuilder pb;
-            final Process rserveProcess;
-            host = "localhost";
-
-            if( manualLocalSetup ) {
-                String os = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
-                port = NbPreferences.forModule( Object.class ).getInt( Properties.RSERVE_PORT, 6311 );
-                if( !((os.contains( "linux" ) || os.contains( "mac" )) && (connectableInstanceRunning > 0)) ) {
-                    File startUpScript = new File( NbPreferences.forModule( Object.class ).get( Properties.RSERVE_STARTUP_SCRIPT, "" ) );
-                    List<String> commands = new ArrayList<>();
-                    commands.add( "/bin/bash" );
-                    commands.add( startUpScript.getAbsolutePath() );
-                    commands.add( String.valueOf( port ) );
-                    pb = new ProcessBuilder( commands );
-                    pb.directory( startUpScript.getParentFile() );
-
-                    rserveProcess = pb.start();
-                    new Thread( new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                BufferedReader reader
-                                        = new BufferedReader( new InputStreamReader( rserveProcess.getInputStream() ) );
-                                String line = null;
-                                while( (line = reader.readLine()) != null ) {
-                                    ProcessingLog.getInstance().logGNURoutput( line );
-                                }
-                            } catch( IOException ex ) {
-                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                                LOG.log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
-                            }
-                        }
-
-
-                    } ).start();
-
-                    new Thread( new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                BufferedReader reader
-                                        = new BufferedReader( new InputStreamReader( rserveProcess.getErrorStream() ) );
-                                String line = null;
-                                while( (line = reader.readLine()) != null ) {
-                                    ProcessingLog.getInstance().logGNURoutput( line );
-                                }
-                            } catch( IOException ex ) {
-                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                                LOG.log( Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
-                            }
-                        }
-
-
-                    } ).start();
-
-                    //Give the Process a moment to start up everything.
-                    try {
-                        rserveProcess.waitFor();
-                        Thread.sleep( 1000 );
-                    } catch( InterruptedException ex ) {
-                        Exceptions.printStackTrace( ex );
-                    }
-                    connectableInstanceRunning++;
-                } else {
-                    rserveProcess = null;
-                }
+            String os = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
+            if( os.contains( "mac" ) ) {
+                port = 6311;
+                final Process rserveProcess;
+                host = "localhost";
+                File rserveBinary = InstalledFileLocator.getDefault().locate( "modules/R/library/Rserve/libs/Rserve", "de.cebitec.readxplorer.transcriptionanalyses", false );
+                rserveBinary.setExecutable( true );
+                File rBinary = InstalledFileLocator.getDefault().locate( "modules/R/bin/R", "de.cebitec.readxplorer.transcriptionanalyses", false );
+                rBinary.setExecutable( true );
+                File startUpScript = InstalledFileLocator.getDefault().locate( "modules/R/startup.sh", "de.cebitec.readxplorer.transcriptionanalyses", false );
+                startUpScript.setExecutable( true );
+                rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
+                connectableInstanceRunning++;
                 if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
-                    instance = new GnuR( host, port, !manualRemoteSetup );
+                    instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
                     if( useAuth ) {
-                        String user = NbPreferences.forModule( Object.class ).get( Properties.RSERVE_USER, "" );
-                        String password = new String( PasswordStore.read( Properties.RSERVE_PASSWORD ) );
+                        String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
+                        String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
                         instance.login( user, password );
                     }
                 } else {
                     throw new IOException( "Could not start Rserve instance!" );
                 }
-            } else {
-                port = nextFreePort++;
-                String bit = System.getProperty( "sun.arch.data.model" );
-                String os = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
-                File userDir = Places.getUserDirectory();
-                File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
-                String password = nextSessionId();
-                String user = "readxplorer";
-                writePasswordFile( user, password, rDir );
-                if( os.contains( "windows" ) ) {
-                    String startupBat = rDir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
-                    File workdir = new File( rDir.getAbsolutePath() + File.separator + "bin" );
-                    String arch = "";
-                    if( bit.equals( "32" ) ) {
-                        arch = "i386";
-                    }
-                    if( bit.equals( "64" ) ) {
-                        arch = "x64";
-                    }
-                    List<String> commands = new ArrayList<>();
-                    commands.add( startupBat );
-                    commands.add( rDir.getAbsolutePath() );
-                    commands.add( arch );
-                    commands.add( String.valueOf( port ) );
-                    pb = new ProcessBuilder( commands );
-                    pb.directory( workdir );
-                    rserveProcess = pb.start();
 
-                    //Give the Process a moment to start up everything.
-                    try {
-                        Thread.sleep( 2000 );
-                    } catch( InterruptedException ex ) {
-                        Exceptions.printStackTrace( ex );
+            } else {
+                if( manualRemoteSetup ) {
+                    port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
+                    host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_HOST, "localhost" );
+                    instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+                    if( useAuth ) {
+                        String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
+                        String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
+                        instance.login( user, password );
                     }
                 } else {
-                    rserveProcess = null;
-                }
-                if( rserveProcess != null && rserveProcess.isAlive() ) {
-                    instance = new GnuR( host, port, !manualRemoteSetup );
-                    instance.login( user, password );
-                    instance.setDefaultCranMirror();
-                } else {
-                    throw new IOException( "Could not start Rserve instance!" );
+                    ProcessBuilder pb;
+                    final Process rserveProcess;
+                    host = "localhost";
+
+                    if( manualLocalSetup ) {
+                        port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
+                        if( !((os.contains( "linux" ) || os.contains( "mac" )) && (connectableInstanceRunning > 0)) ) {
+                            File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
+                            rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
+                            connectableInstanceRunning++;
+                        } else {
+                            rserveProcess = null;
+                        }
+                        if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
+                            instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+                            if( useAuth ) {
+                                String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
+                                String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
+                                instance.login( user, password );
+                            }
+                        } else {
+                            throw new IOException( "Could not start Rserve instance!" );
+                        }
+                    } else {
+                        port = nextFreePort++;
+                        String bit = System.getProperty( "sun.arch.data.model" );
+                        File userDir = Places.getUserDirectory();
+                        File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
+                        String password = nextSessionId();
+                        String user = "readxplorer";
+                        writePasswordFile( user, password, rDir );
+                        if( os.contains( "windows" ) ) {
+                            String startupBat = rDir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+                            File workdir = new File( rDir.getAbsolutePath() + File.separator + "bin" );
+                            String arch = "";
+                            if( bit.equals( "32" ) ) {
+                                arch = "i386";
+                            }
+                            if( bit.equals( "64" ) ) {
+                                arch = "x64";
+                            }
+                            List<String> commands = new ArrayList<>();
+                            commands.add( startupBat );
+                            commands.add( rDir.getAbsolutePath() );
+                            commands.add( arch );
+                            commands.add( String.valueOf( port ) );
+                            pb = new ProcessBuilder( commands );
+                            pb.directory( workdir );
+                            rserveProcess = pb.start();
+
+                            //Give the Process a moment to start up everything.
+                            try {
+                                Thread.sleep( 2000 );
+                            } catch( InterruptedException ex ) {
+                                Exceptions.printStackTrace( ex );
+                            }
+                        } else {
+                            rserveProcess = null;
+                        }
+                        if( rserveProcess != null && rserveProcess.isAlive() ) {
+                            instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+                            instance.login( user, password );
+//                        instance.setDefaultCranMirror();
+                        } else {
+                            throw new IOException( "Could not start Rserve instance!" );
+                        }
+                    }
                 }
             }
         }
@@ -395,16 +373,76 @@ public final class GnuR extends RConnection {
     }
 
 
+    private static Process launchStartUpScript( File startUpScript, int port, ProcessingLog processingLog1 ) throws IOException {
+        ProcessBuilder pb;
+        List<String> commands = new ArrayList<>();
+        commands.add( "/bin/bash" );
+        commands.add( startUpScript.getAbsolutePath() );
+        commands.add( String.valueOf( port ) );
+        pb = new ProcessBuilder( commands );
+        System.out.println( startUpScript.getAbsoluteFile() );
+        pb.directory( startUpScript.getAbsoluteFile().getParentFile() );
+        Process rserveProcess = pb.start();
+        new Thread( new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    BufferedReader reader
+                            = new BufferedReader( new InputStreamReader( rserveProcess.getInputStream() ) );
+                    String line;
+                    while( (line = reader.readLine()) != null ) {
+                        processingLog1.logGNURoutput( line );
+                    }
+                } catch( IOException ex ) {
+                    Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                    LOG.log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
+                }
+            }
+        }).start();
+        new Thread( new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BufferedReader reader
+                            = new BufferedReader( new InputStreamReader( rserveProcess.getErrorStream() ) );
+                    String line;
+                    while( (line = reader.readLine()) != null ) {
+                        processingLog1.logGNURoutput( line );
+                    }
+                } catch( IOException ex ) {
+                    Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                    LOG.log( Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
+                }
+            }
+
+
+        } ).start();
+        //Give the Process a moment to start up everything.
+        try {
+            rserveProcess.waitFor();
+            Thread.sleep( 1000 );
+        } catch( InterruptedException ex ) {
+            Exceptions.printStackTrace( ex );
+        }
+        return rserveProcess;
+    }
+
+
     public static boolean gnuRSetupCorrect() {
-        boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_MANUAL_LOCAL_SETUP, false );
-        boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( Properties.RSERVE_MANUAL_REMOTE_SETUP, false );
+        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
+        String os = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
+        if( cebitecIndicator.exists() || os.contains( "mac" ) ) {
+            return true;
+        }
+        boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
+        boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
 
         if( !(manualLocalSetup || manualRemoteSetup) ) {
             File userDir = Places.getUserDirectory();
             File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
-            String startupBat = rDir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
-            File batFile = new File( startupBat );
-            return (batFile.exists() && batFile.canExecute());
+            File versionIndicator = new File( rDir.getAbsolutePath() + File.separator + "rx_minimal_version_2_1" );
+            return versionIndicator.exists();
         } else {
             return true;
         }

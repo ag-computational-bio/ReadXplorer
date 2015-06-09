@@ -34,10 +34,22 @@ import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
 
+/**
+ * Action for openin a detailed viewer. It consists of the histogram, alignment
+ * and read pair viewer.
+ * <p>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
 public final class OpenDetailedViewer implements ActionListener {
 
 //    private final List<TrackViewer> context;
 
+    /**
+     * Action for openin a detailed viewer. It consists of the histogram,
+     * alignment and read pair viewer.
+     * <p>
+     * @param context The required context to open a DetailedViewer.
+     */
     public OpenDetailedViewer( List<TrackViewer> context ) {
 //        this.context = context;
     }
@@ -51,7 +63,7 @@ public final class OpenDetailedViewer implements ActionListener {
             //Get ViewController from AppPanelTopComponent-Lookup
             ViewController viewCon = parentAppPanel.getLookup().lookup( ViewController.class );
             List<BasePanel> trackPanels = viewCon.getOpenTracks();
-            List<AbstractViewer> openTrackViewers = getTrackViewerList( viewCon.getOpenTracks() );
+            List<AbstractViewer> openTrackViewers = getTrackViewerList( trackPanels );
 
             if( trackPanels.size() > 1 ) {
                 JList<AbstractViewer> trackList = new JList<>( openTrackViewers.toArray( new AbstractViewer[openTrackViewers.size()] ) );
@@ -75,6 +87,11 @@ public final class OpenDetailedViewer implements ActionListener {
     }
 
 
+    /**
+     * Retrieves the list of viewers from the list of BasePanels.
+     * @param openTracks The list of open track base panels
+     * @return The list of viewers obtained from the list
+     */
     private List<AbstractViewer> getTrackViewerList( List<BasePanel> openTracks ) {
         List<AbstractViewer> viewerList = new ArrayList<>( openTracks.size() );
         for( BasePanel basePanel : openTracks ) {

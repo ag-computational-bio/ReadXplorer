@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

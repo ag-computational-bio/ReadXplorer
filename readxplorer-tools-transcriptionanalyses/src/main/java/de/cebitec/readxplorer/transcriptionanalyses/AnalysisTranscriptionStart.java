@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.Distribution;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
@@ -36,9 +38,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.logic.TssLinker;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,7 +69,6 @@ import static java.util.logging.Logger.getLogger;
  * Wahrscheinlichkeitsformel (Binomialverteilung)
  * <p>
  * @author -Rolf Hilker-
- * <p>
  */
 public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
@@ -141,8 +140,12 @@ public class AnalysisTranscriptionStart implements Observer,
         refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackConnector.getRefGenome().getId() );
         chromosomes = refConnector.getChromosomesForGenome();
 
-        this.readStartDistribution = trackConnector.getCountDistribution( Properties.READ_START_DISTRIBUTION );
-        this.covIncPercentDistribution = trackConnector.getCountDistribution( Properties.COVERAGE_INC_PERCENT_DISTRIBUTION );
+        isStrandBothOption = parametersTSS.getReadClassParams().isStrandBothOption();
+        isBothFwdDirection = parametersTSS.getReadClassParams().isStrandBothFwdOption();
+        isFeatureStrand = parametersTSS.getReadClassParams().isStrandFeatureOption();
+
+        this.readStartDistribution = trackConnector.getCountDistribution( getReadStartDistributionType() );
+        this.covIncPercentDistribution = trackConnector.getCountDistribution( getCovIncDistributionType() );
         this.calcCoverageDistributions = this.readStartDistribution.isEmpty() || this.covIncPercentDistribution.isEmpty();
 
         if( this.parametersTSS.isAutoTssParamEstimation() ) {
@@ -195,7 +198,7 @@ public class AnalysisTranscriptionStart implements Observer,
     @Override
     public void update( Object data ) {
         if( data instanceof CoverageAndDiffResult ) {
-            CoverageAndDiffResult result = ((CoverageAndDiffResult) data);
+            CoverageAndDiffResult result = (CoverageAndDiffResult) data;
             this.detectTSSs( result );
 
         } else if( data instanceof Byte && ((Byte) data) == 1 ) {
@@ -231,9 +234,6 @@ public class AnalysisTranscriptionStart implements Observer,
         int chromLength = chromosomes.get( chromId ).getLength();
         List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval( 0, chromLength, chromId );
         currentCoverage = coverage;
-        isStrandBothOption = parametersTSS.getReadClassParams().isStrandBothOption();
-        isBothFwdDirection = parametersTSS.getReadClassParams().isStrandBothFwdOption();
-        isFeatureStrand = parametersTSS.getReadClassParams().isStrandFeatureOption();
 
         int leftBound = currentCoverage.getLeftBound();
         int fixedLeftBound = leftBound <= 0 ? 0 : leftBound - 1;
@@ -250,7 +250,7 @@ public class AnalysisTranscriptionStart implements Observer,
         totalStarts.setFwdCoverage( this.fixLeftCoverageBound( totalStarts.getFwdCov(), 0 ) ); //for read starts the left pos is not important
         totalStarts.setRevCoverage( this.fixLeftCoverageBound( totalStarts.getRevCov(), totalReadStartsLastRevPos ) ); //on fwd strand
 
-        for( int i = fixedLeftBound; i < rightBound; ++i ) {
+        for( int i = fixedLeftBound; i < rightBound; i++ ) {
             this.gatherDataAndDetect( chromId, chromLength, chromFeatures, totalCoverage, totalStarts, i );
         }
 
@@ -280,10 +280,6 @@ public class AnalysisTranscriptionStart implements Observer,
         int[] readStartArrayFwd = readStarts.getFwdCov();
         int[] readStartArrayRev = readStarts.getRevCov();
         int pos = coverage.getInternalPos( refPos );
-        int fwdCov1;
-        int revCov1;
-        int fwdCov2;
-        int revCov2;
         int increaseFwd;
         int increaseRev;
         int readStartsFwd;
@@ -291,10 +287,10 @@ public class AnalysisTranscriptionStart implements Observer,
         int percentIncFwd;
         int percentIncRev;
 
-        fwdCov1 = covArrayFwd[pos];
-        revCov1 = covArrayRev[pos];
-        fwdCov2 = covArrayFwd[pos + 1];
-        revCov2 = covArrayRev[pos + 1];
+        int fwdCov1 = covArrayFwd[pos];
+        int revCov1 = covArrayRev[pos];
+        int fwdCov2 = covArrayFwd[pos + 1];
+        int revCov2 = covArrayRev[pos + 1];
         if( !isStrandBothOption ) { //calc values based on analysis strand selection (4 possibilities)
             if( isFeatureStrand ) { //default increases for correctly stranded libraries
                 increaseFwd = fwdCov2 - fwdCov1;
@@ -362,16 +358,16 @@ public class AnalysisTranscriptionStart implements Observer,
                               int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev ) {
 
         if( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts()) ||
-                 readStartsFwd > parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts()) &&
-                 percentIncreaseFwd > parametersTSS.getMinPercentIncrease() ) {
+             readStartsFwd > parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts()) &&
+            percentIncreaseFwd > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos + 1, chromLength, chromFeatures, true );
             addDetectStart( new TranscriptionStart( pos + 1, true, readStartsFwd,
                                                     percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId ) );
         }
         if( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts()) ||
-                 readStartsRev > parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts()) &&
-                 percentIncreaseRev > parametersTSS.getMinPercentIncrease() ) {
+             readStartsRev > parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts()) &&
+            percentIncreaseRev > parametersTSS.getMinPercentIncrease() ) {
 
             DetectedFeatures detFeatures = this.findNextFeatures( pos, chromLength, chromFeatures, false );
             addDetectStart( new TranscriptionStart( pos, false, readStartsRev,
@@ -418,14 +414,12 @@ public class AnalysisTranscriptionStart implements Observer,
         final int maxFeatureDist = parametersTSS.getMaxFeatureDistance();
         int minStartPos = tssPos - maxFeatureDist < 0 ? 0 : tssPos - maxFeatureDist;
         int maxStartPos = tssPos + maxFeatureDist > chromLength ? chromLength : tssPos + maxFeatureDist;
-        PersistentFeature feature;
         DetectedFeatures detectedFeatures = new DetectedFeatures();
-        int start;
         boolean fstFittingFeature = true;
         if( isFwdStrand ) {
-            for( int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); ++i ) {
-                feature = chromFeatures.get( i );
-                start = feature.getStart();
+            for( int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); i++ ) {
+                PersistentFeature feature = chromFeatures.get( i );
+                int start = feature.getStart();
 
                 /*
                  * We use all features, because also mRNA or rRNA features can
@@ -454,9 +448,9 @@ public class AnalysisTranscriptionStart implements Observer,
                          */
                         PersistentFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
                         if( upstreamAnno != null &&
-                                 feature.getType() == FeatureType.CDS &&
-                                 upstreamAnno.getType() == FeatureType.GENE &&
-                                 upstreamAnno.getStop() >= feature.getStop() ) {
+                            feature.getType() == FeatureType.CDS &&
+                            upstreamAnno.getType() == FeatureType.GENE &&
+                            upstreamAnno.getStop() >= feature.getStop() ) {
 //                            LOG.log( Level.INFO, null, "CDS covered by gene feature Fwd");
                             continue;
                         }
@@ -477,8 +471,8 @@ public class AnalysisTranscriptionStart implements Observer,
                          * gene, starting earlier.
                          */
                         if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size() &&
-                                 feature.getStart() == chromFeatures.get( i + 1 ).getStart() &&
-                                 chromFeatures.get( i + 1 ).getType() == FeatureType.GENE ) {
+                            feature.getStart() == chromFeatures.get( i + 1 ).getStart() &&
+                            chromFeatures.get( i + 1 ).getType() == FeatureType.GENE ) {
                             detectedFeatures.setDownstreamFeature( chromFeatures.get( i + 1 ) );
                             detectedFeatures.setIsLeaderless( isLeaderless( chromFeatures.get( i + 1 ), tssPos ) );
 //                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Fwd");
@@ -500,9 +494,9 @@ public class AnalysisTranscriptionStart implements Observer,
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); ++i ) {
-                feature = chromFeatures.get( i );
-                start = feature.getStop();
+            for( int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); i++ ) {
+                PersistentFeature feature = chromFeatures.get( i );
+                int start = feature.getStop();
 
                 if( start >= minStartPos && feature.isFwdStrand() == isFwdStrand && start <= maxStartPos ) {
 
@@ -523,9 +517,9 @@ public class AnalysisTranscriptionStart implements Observer,
                          */
                         PersistentFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
                         if( upstreamAnno != null &&
-                                 feature.getType() == FeatureType.CDS &&
-                                 start == upstreamAnno.getStop() &&
-                                 upstreamAnno.getType() == FeatureType.GENE ) {
+                            feature.getType() == FeatureType.CDS &&
+                            start == upstreamAnno.getStop() &&
+                            upstreamAnno.getType() == FeatureType.GENE ) {
                             //TODO: this does not work if features start at the same position on rev and fwd strand!
 //                            LOG.log( Level.INFO, null, "CDS covered by gene feature Rev");
                             continue; // we want to keep the gene instead the CDS feature
@@ -544,8 +538,8 @@ public class AnalysisTranscriptionStart implements Observer,
                         //store next upstream feature, translation start is further in gene
 
                         if( feature.getType() == FeatureType.CDS && i + 1 < chromFeatures.size() &&
-                                 chromFeatures.get( i + 1 ).getType() == FeatureType.GENE &&
-                                 chromFeatures.get( i + 1 ).getStart() <= feature.getStart() ) {
+                            chromFeatures.get( i + 1 ).getType() == FeatureType.GENE &&
+                            chromFeatures.get( i + 1 ).getStart() <= feature.getStart() ) {
                             detectedFeatures.setUpstreamFeature( chromFeatures.get( i + 1 ) );
 //                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Rev");
                         } else {
@@ -673,7 +667,7 @@ public class AnalysisTranscriptionStart implements Observer,
 
         int nbTSSs = 0;
         int selectedIndex = 1;
-        for( int i = distributionValues.length - 1; i > 0; --i ) {
+        for( int i = distributionValues.length - 1; i > 0; i-- ) {
             // we use the index which first exceeds maxEstimatedNbOfActiveGenes
             if( nbTSSs < maxEstimatedNbOfActiveGenes ) {
                 nbTSSs += distributionValues[i];
@@ -750,7 +744,7 @@ public class AnalysisTranscriptionStart implements Observer,
         for( TranscriptionStart tss : detectedStarts ) {
 
             if( (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts() ||
-                     tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) // && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
+                 tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) // && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
                     ) {
                 copiedDetectedStarts.remove( tss );
             }
@@ -824,6 +818,52 @@ public class AnalysisTranscriptionStart implements Observer,
         newCovArray[0] = lastCov;
         System.arraycopy( covArray, 0, newCovArray, 1, covArray.length );
         return newCovArray;
+    }
+
+
+    /**
+     * @return The read start distribution type for the selected analysis strand
+     *         option.
+     */
+    private Distribution getReadStartDistributionType() {
+        Distribution distType;
+        if( isStrandBothOption ) {
+            if( isBothFwdDirection ) {
+                distType = Distribution.ReadStartBothFwdStrand;
+            } else {
+                distType = Distribution.ReadStartBothRevStrand;
+            }
+        } else {
+            if( isFeatureStrand ) {
+                distType = Distribution.ReadStartFeatStrand;
+            } else {
+                distType = Distribution.ReadStartOppStrand;
+            }
+        }
+        return distType;
+    }
+
+
+    /**
+     * @return The coverage increase in percent distribution type for the
+     *         selected analysis strand option.
+     */
+    private Distribution getCovIncDistributionType() {
+        Distribution distType;
+        if( isStrandBothOption ) {
+            if( isBothFwdDirection ) {
+                distType = Distribution.CovIncPercentBothFwdStrand;
+            } else {
+                distType = Distribution.CovIncPercentBothRevStrand;
+            }
+        } else {
+            if( isFeatureStrand ) {
+                distType = Distribution.CovIncPercentFeatStrand;
+            } else {
+                distType = Distribution.CovIncPercentOppStrand;
+            }
+        }
+        return distType;
     }
 
 

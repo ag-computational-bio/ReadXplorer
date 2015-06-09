@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.ReadPairType;
 import java.awt.Color;
 
 
@@ -212,11 +212,11 @@ public class ReadPair implements ObjectWithId {
     public static Color determineReadPairColor( ReadPairType type ) {
         Color blockColor;
         if( type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR ) {
-            blockColor = ColorProperties.BLOCK_PERFECT;
+            blockColor = Colors.BLOCK_PERFECT;
         } else if( type == ReadPairType.UNPAIRED_PAIR ) {
-            blockColor = ColorProperties.BLOCK_UNPAIRED;
+            blockColor = Colors.BLOCK_UNPAIRED;
         } else {
-            blockColor = ColorProperties.BLOCK_DIST_SMALL;
+            blockColor = Colors.BLOCK_DIST_SMALL;
         }
         return blockColor;
     }

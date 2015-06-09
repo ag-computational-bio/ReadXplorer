@@ -18,8 +18,9 @@
 package de.cebitec.readxplorer.parser.reference.filter;
 
 
+
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 
 
 /**

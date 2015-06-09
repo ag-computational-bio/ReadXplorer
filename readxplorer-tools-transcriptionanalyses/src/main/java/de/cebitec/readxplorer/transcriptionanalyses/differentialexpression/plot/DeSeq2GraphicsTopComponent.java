@@ -100,14 +100,14 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
 
 
     /**
-     * TopComponent, which displays all graphics available for a DESeq analysis.
+     * TopComponent, which displays all graphics available for a DESeq2 analysis.
      */
     public DeSeq2GraphicsTopComponent() {
     }
 
 
     /**
-     * TopComponent, which displays all graphics available for a DESeq analysis.
+     * TopComponent, which displays all graphics available for a DESeq2 analysis.
      * <p>
      * @param handler The analysis handler containing the results
      */
@@ -364,8 +364,8 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
 
 
     private void setupGraphics() {
-        setName( Bundle.CTL_DeSeqGraphicsTopComponent() );
-        setToolTipText( Bundle.HINT_DeSeqGraphicsTopComponent() );
+        setName( Bundle.CTL_DeSeq2GraphicsTopComponent() );
+        setToolTipText( Bundle.HINT_DeSeq2GraphicsTopComponent() );
         svgCanvas = new JSVGCanvas();
         plotPanel.add( svgCanvas, BorderLayout.CENTER );
         svgCanvasActive = true;

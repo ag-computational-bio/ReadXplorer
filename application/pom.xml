@@ -90,6 +90,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-tools-gasv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-tools-readpairclassifier</artifactId>
         </dependency>
         <dependency>
@@ -171,9 +175,14 @@
                     <installerPack200Enable>false</installerPack200Enable>
                     <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
                     <installDirName>${brandingToken}-cli</installDirName>
+                    <templateFile>${basedir}/installer/template.xml</templateFile>
                     <userSettings>
                         <releaseVersion>${project.version}</releaseVersion>
+                        <configuration.logic.file>${basedir}/installer/ConfigurationLogic.java</configuration.logic.file>
+                        <nbi.stub.buildfile>${basedir}/installer/build.xml</nbi.stub.buildfile>
                     </userSettings>
+                    <installerOsLinux>false</installerOsLinux>
+                    <installerOsWindows>false</installerOsWindows>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->

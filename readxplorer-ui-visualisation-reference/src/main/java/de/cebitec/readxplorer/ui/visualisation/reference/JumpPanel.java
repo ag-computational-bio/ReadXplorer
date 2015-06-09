@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
@@ -35,7 +36,6 @@ import de.cebitec.readxplorer.ui.dialogmenus.StandardMenuEvent;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

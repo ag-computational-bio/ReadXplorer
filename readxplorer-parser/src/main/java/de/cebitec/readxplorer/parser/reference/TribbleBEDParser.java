@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.parser.reference;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedChromosome;
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
@@ -25,14 +26,11 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import static java.util.logging.Level.INFO;
 import java.util.logging.Logger;
 import org.broad.tribble.AbstractFeatureReader;
 import org.broad.tribble.TribbleException;
@@ -41,6 +39,8 @@ import org.broad.tribble.bed.BEDCodec;
 import org.broad.tribble.bed.BEDFeature;
 import org.broad.tribble.bed.FullBEDFeature.Exon;
 import org.broad.tribble.readers.LineIterator;
+
+import static java.util.logging.Level.INFO;
 
 
 /**
@@ -99,7 +99,7 @@ public class TribbleBEDParser implements ReferenceParserI {
 
                         final int start = feat.getStart();
                         final int stop = feat.getEnd();
-                        final int strand = feat.getStrand().equals( Strand.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                        final de.cebitec.readxplorer.api.enums.Strand strand = feat.getStrand().equals( Strand.POSITIVE ) ? de.cebitec.readxplorer.api.enums.Strand.Forward : de.cebitec.readxplorer.api.enums.Strand.Reverse;
                         final String geneName = feat.getName();
                         final String locusTag = feat.getDescription();
                         final String ecNumber = feat.getDescription(); //TODO check this and test it

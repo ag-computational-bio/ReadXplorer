@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.tools.snpdetection;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParameterSetI;
 import de.cebitec.readxplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.Set;
 
 
@@ -30,7 +30,7 @@ import java.util.Set;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
+public class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
         ParameterSetI<ParameterSetSNPs> {
 
     private int minMismatchBases;
@@ -67,7 +67,7 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
      * @param minAverageMappingQual Minimum average phred scaled mapping quality
      *                              or -1 if unknown.
      */
-    ParameterSetSNPs( int minMismatchBases, double minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
+    public ParameterSetSNPs( int minMismatchBases, double minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
                       byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual ) {
         super( selFeatureTypes, readClassParams );
         this.minMismatchBases = minMismatchBases;

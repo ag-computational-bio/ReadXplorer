@@ -18,14 +18,12 @@
 package de.cebitec.readxplorer.ui.dialogmenus;
 
 
-import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
 
 
 /**
@@ -39,7 +37,6 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     public static final String PROP_START_OFFSET = "PropStartOffset";
     public static final String PROP_STOP_OFFSET = "PropStopOffset";
 
-    private static final Preferences PREF = NbPreferences.forModule( Object.class );
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -85,7 +82,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     public void readSettings( final WizardDescriptor wiz ) {
         super.readSettings( wiz );
 
-        String featuresString = PREF.get( analysisName + PROP_SELECTED_FEAT_TYPES, "Gene,CDS" );
+        String featuresString = getPref().get( analysisName + PROP_SELECTED_FEAT_TYPES, "Gene,CDS" );
         String[] featuresArray = featuresString.split( "," );
 
         List<FeatureType> selectedFeatTypes = new ArrayList<>();
@@ -104,8 +101,8 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
             selIndicesArray[i] = selectedInices.get( i );
         }
 
-        String startOffsetString = PREF.get( getPropFeatureStartOffset(), "0" );
-        String stopOffsetString = PREF.get( getPropFeatureStopOffset(), "0" );
+        String startOffsetString = getPref().get( getPropFeatureStartOffset(), "0" );
+        String stopOffsetString = getPref().get( getPropFeatureStopOffset(), "0" );
 
         component.setSelectedFeatureTypes( selIndicesArray );
         component.setFeatureOffsets( startOffsetString, stopOffsetString );
@@ -131,11 +128,11 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
         List<FeatureType> featureTypeList = component.getSelectedFeatureTypes();
         StringBuilder featTypeString = new StringBuilder( 30 );
         for( FeatureType type : featureTypeList ) {
-            featTypeString.append( type.getTypeString() ).append( "," );
+            featTypeString.append( type ).append( ',' );
         }
-        PREF.put( getPropSelectedFeatTypes(), featTypeString.toString() );
-        PREF.put( getPropFeatureStartOffset(), component.getStartOffsetField().getText() );
-        PREF.put( getPropFeatureStopOffset(), component.getStopOffsetField().getText() );
+        getPref().put( getPropSelectedFeatTypes(), featTypeString.toString() );
+        getPref().put( getPropFeatureStartOffset(), component.getStartOffsetField().getText() );
+        getPref().put( getPropFeatureStopOffset(), component.getStopOffsetField().getText() );
     }
 
 

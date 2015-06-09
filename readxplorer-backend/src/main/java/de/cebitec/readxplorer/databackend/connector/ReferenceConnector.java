@@ -18,14 +18,14 @@
 package de.cebitec.readxplorer.databackend.connector;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.FieldNames;
 import de.cebitec.readxplorer.databackend.SQLStatements;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -197,7 +197,7 @@ public class ReferenceConnector {
                 fetch.setLong( 1, chromId );
                 fetch.setInt( 2, from );
                 fetch.setInt( 3, to );
-                fetch.setInt( 4, featureType.getTypeByte() );
+                fetch.setInt( 4, featureType.getType() );
             }
 
             try( final ResultSet rs = fetch.executeQuery() ) {
@@ -210,7 +210,7 @@ public class ReferenceConnector {
                     String product = rs.getString( FieldNames.FEATURE_PRODUCT );
                     int start = rs.getInt( FieldNames.FEATURE_START );
                     int stop = rs.getInt( FieldNames.FEATURE_STOP );
-                    boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == SequenceUtils.STRAND_FWD;
+                    boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == Strand.Forward.getType();
                     FeatureType type = FeatureType.getFeatureType( rs.getInt( FieldNames.FEATURE_TYPE ) );
                     String gene = rs.getString( FieldNames.FEATURE_GENE );
 
@@ -335,7 +335,7 @@ public class ReferenceConnector {
                     String product = rs.getString( FieldNames.FEATURE_PRODUCT );
                     int start = rs.getInt( FieldNames.FEATURE_START );
                     int stop = rs.getInt( FieldNames.FEATURE_STOP );
-                    boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == SequenceUtils.STRAND_FWD;
+                    boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == Strand.Forward.getType();
                     FeatureType type = FeatureType.getFeatureType( rs.getInt( FieldNames.FEATURE_TYPE ) );
                     String gene = rs.getString( FieldNames.FEATURE_GENE );
 
@@ -443,7 +443,7 @@ public class ReferenceConnector {
                 } else {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
                     fetch.setLong( 1, currentID );
-                    fetch.setLong( 2, type.getTypeByte() );
+                    fetch.setLong( 2, type.getType() );
                 }
                 ResultSet rs = fetch.executeQuery();
                 if( rs.next() ) {

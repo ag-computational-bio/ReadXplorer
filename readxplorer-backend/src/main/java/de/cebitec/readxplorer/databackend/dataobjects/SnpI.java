@@ -29,20 +29,20 @@ public interface SnpI extends Comparable<SnpI> {
     /**
      * @return The base of this snp which deviates from the reference sequence.
      */
-    public String getBase();
+    String getBase();
 
 
     /**
      * @return The coverage of this snp which deviates from the reference
      *         sequence.
      */
-    public int getCoverage();
+    int getCoverage();
 
 
     /**
      * @return The position of this snp.
      */
-    public int getPosition();
+    int getPosition();
 
 
 }

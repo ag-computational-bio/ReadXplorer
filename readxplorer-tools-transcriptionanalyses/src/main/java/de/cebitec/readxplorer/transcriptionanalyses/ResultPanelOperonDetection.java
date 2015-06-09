@@ -29,6 +29,7 @@ import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
@@ -37,10 +38,7 @@ import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -70,8 +68,11 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      * contains an export button, which exports the data into an excel file.
      * <p>
      * @param operonDetParameters parameters used for this operon detection
+     * @param bim                 BoundsInfoManager of the reference on which
+     *                            this analysis was performed.
      */
-    public ResultPanelOperonDetection( ParameterSetOperonDet operonDetParameters ) {
+    public ResultPanelOperonDetection( ParameterSetOperonDet operonDetParameters, BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumnIdx = 5;
         final int trackColumnIdx = 2;
@@ -80,16 +81,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         this.operonDetectionTable.getTableHeader().addMouseListener( tableFilter );
         this.initStatsMap();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager() );
     }
 
 
@@ -259,7 +251,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 feat1 = operon.getOperonAdjacencies().get( 0 ).getFeature1();
                 String annoName1 = "";
                 String annoName2 = "";
-                String strand = (feat1.isFwdStrandString()) + "\n";
+                String strand = (feat1.getStrandString()) + "\n";
                 String startAnno1 = "";
                 String startAnno2 = "";
                 String readsAnno1 = "";

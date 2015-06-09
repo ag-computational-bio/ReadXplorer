@@ -76,14 +76,13 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      */
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
-        List<List<List<Object>>> allData = new ArrayList<>();
-        List<List<Object>> exportData = new ArrayList<>();
-        List<Object> exportLine;
 
+        List<List<List<Object>>> allData = new ArrayList<>( 2 );
+        List<List<Object>> exportData = new ArrayList<>( correlationsList.size() );
 
         for( CorrelatedInterval correlation : this.correlationsList ) {
-            exportLine = new ArrayList<>();
 
+            List<Object> exportLine = new ArrayList<>( 6 );
             exportLine.add( correlation.getChromId() );
             exportLine.add( correlation.getDirection() );
             exportLine.add( correlation.getFrom() );
@@ -92,6 +91,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
             exportLine.add( correlation.getMinPeakCoverage() );
 
             exportData.add( exportLine );
+
         }
 
         allData.add( exportData );
@@ -120,9 +120,10 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      */
     @Override
     public List<List<String>> dataColumnDescriptions() {
-        List<List<String>> dataColumnDescriptionsList = new ArrayList<>();
 
-        List<String> dataColumnDescriptions = new ArrayList<>();
+        List<List<String>> dataColumnDescriptionsList = new ArrayList<>( 2 );
+
+        List<String> dataColumnDescriptions = new ArrayList<>( 6 );
 //        dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add( "Chromosome" );
         dataColumnDescriptions.add( "Strand Direction" );
@@ -148,7 +149,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      */
     @Override
     public List<String> dataSheetNames() {
-        List<String> sheetNames = new ArrayList<>();
+        List<String> sheetNames = new ArrayList<>( 2 );
         sheetNames.add( "Correlations" );
         sheetNames.add( "Analysis Statistics" );
         return sheetNames;

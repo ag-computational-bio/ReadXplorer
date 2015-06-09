@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -27,7 +28,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUna
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UrlWithTitle;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -218,7 +218,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add( tss.getPos() );
             tssRow.add( this.getTrackEntry( tss.getTrackId(), true ) );
             tssRow.add( this.getChromosomeMap().get( tss.getChromId() ) );
-            tssRow.add( tss.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING );
+            tssRow.add( tss.isFwdStrand() ? Strand.Forward.toString() : Strand.Reverse.toString() );
             tssRow.add( tss.getReadStartsAtPos() );
             tssRow.add( tss.getCoverageIncrease() );
             tssRow.add( tss.getPercentIncrease() );

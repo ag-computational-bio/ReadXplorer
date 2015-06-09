@@ -29,11 +29,15 @@ import org.openide.util.NbBundle;
 
 /**
  * Class containing general visualization related methods.
- *
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class VisualisationUtils {
 
+    
+    /**
+     * Instantiation not allowed!
+     */
     private VisualisationUtils() {
     }
 
@@ -41,7 +45,7 @@ public final class VisualisationUtils {
     /**
      * Recursive method to get all buttons belonging to a parent component.
      * <p>
-     * @param comp the component whose buttons are needed
+     * @param comp    the component whose buttons are needed
      * @param buttons the list to be filled with the identified buttons
      */
     public static void getButtons( JComponent comp, List<JButton> buttons ) {
@@ -68,7 +72,7 @@ public final class VisualisationUtils {
      * <p>
      * @return the configured wizard panel array
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public static List<WizardDescriptor.Panel<WizardDescriptor>> getWizardPanels( List<WizardDescriptor.Panel<WizardDescriptor>> wizardPanels ) {
 
         String[] steps = new String[wizardPanels.size() + 1];
@@ -90,9 +94,14 @@ public final class VisualisationUtils {
     }
 
 
+    /**
+     * Displays an out of memory error in a JOptionPane.
+     * <p>
+     * @param parentPanel The parent panel causing the error.
+     */
     public static void displayOutOfMemoryError( Component parentPanel ) {
         String msg = NbBundle.getMessage( VisualisationUtils.class, "OOM_Message",
-                "An out of memory error occured during fetching the references. Please restart the software with more memory." );
+                                          "An out of memory error occured during fetching the references. Please restart the software with more memory." );
         String title = NbBundle.getMessage( VisualisationUtils.class, "OOM_Header", "Restart Software" );
         JOptionPane.showMessageDialog( parentPanel, msg, title, JOptionPane.INFORMATION_MESSAGE );
     }

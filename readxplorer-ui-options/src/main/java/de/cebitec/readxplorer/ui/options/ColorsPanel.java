@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.ui.options;
 
 
-import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.api.Classification;
+import de.cebitec.readxplorer.api.constants.Colors;
+import de.cebitec.readxplorer.api.enums.ComparisonClass;
+import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.utils.ColorUtils;
-import de.cebitec.readxplorer.utils.classification.Classification;
-import de.cebitec.readxplorer.utils.classification.ComparisonClass;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,13 +52,13 @@ final class ColorsPanel extends OptionsPanel {
      * An option panel for changing the colors of the coverage and mapping
      * classes in ReadXplorer.
      * <p>
-     * @param controller
+     * @param controller The controller belonging to this panel
      */
     ColorsPanel( ColorsOptionsPanelController controller ) {
         this.controller = controller;
         this.initComponents();
         this.initClassToPanelMap();
-        // TODO listen to changes in form fields and call controller.changed()
+        // could do: listen to changes in form fields and call controller.changed()
     }
 
 
@@ -83,52 +83,66 @@ final class ColorsPanel extends OptionsPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        uniformColorationCheckBox = new javax.swing.JCheckBox();
-        bestMatchLabel = new javax.swing.JLabel();
-        commonColorButton = new javax.swing.JButton();
-        commonMatchLabel = new javax.swing.JLabel();
-        perfectColorButton = new javax.swing.JButton();
-        perfectMatchLabel = new javax.swing.JLabel();
-        uniformColButton = new javax.swing.JButton();
-        bestColorButton = new javax.swing.JButton();
-        generalSeparator = new javax.swing.JSeparator();
-        uniformColorLabel = new javax.swing.JLabel();
-        singlePerfectMatchLabel = new javax.swing.JLabel();
-        singleBestMatchLabel = new javax.swing.JLabel();
-        perfectColorPanel = new javax.swing.JPanel();
-        bestColorPanel = new javax.swing.JPanel();
-        singlePerfectColorButton = new javax.swing.JButton();
-        singlePerfectColorPanel = new javax.swing.JPanel();
-        singleBestColorButton = new javax.swing.JButton();
-        singleBestColorPanel = new javax.swing.JPanel();
-        commonColorPanel = new javax.swing.JPanel();
-        uniformColorPanel = new javax.swing.JPanel();
         resetButton = new javax.swing.JButton();
-        doubleTrackSeparator = new javax.swing.JSeparator();
-        differenceColorButton = new javax.swing.JButton();
-        doubleTrackLabel = new javax.swing.JLabel();
-        diffColorLabel = new javax.swing.JLabel();
-        track1ColorLabel = new javax.swing.JLabel();
-        track1ColorButton = new javax.swing.JButton();
-        track2ColorLabel = new javax.swing.JLabel();
-        track2ColorButton = new javax.swing.JButton();
+        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        singleBestColorPanel = new javax.swing.JPanel();
+        bestMatchLabel = new javax.swing.JLabel();
+        perfectColorButton = new javax.swing.JButton();
+        singleBestColorButton = new javax.swing.JButton();
+        bestColorButton = new javax.swing.JButton();
+        commonMatchLabel = new javax.swing.JLabel();
+        commonColorButton = new javax.swing.JButton();
+        commonColorPanel = new javax.swing.JPanel();
+        perfectMatchLabel = new javax.swing.JLabel();
+        singlePerfectMatchLabel = new javax.swing.JLabel();
+        singlePerfectColorPanel = new javax.swing.JPanel();
+        bestColorPanel = new javax.swing.JPanel();
+        perfectColorPanel = new javax.swing.JPanel();
+        singlePerfectColorButton = new javax.swing.JButton();
+        singleBestMatchLabel = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        uniformColButton = new javax.swing.JButton();
+        uniformColorPanel = new javax.swing.JPanel();
+        uniformColorationCheckBox = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
         differenceColorPanel = new javax.swing.JPanel();
-        track1ColorPanel = new javax.swing.JPanel();
+        track1ColorLabel = new javax.swing.JLabel();
         track2ColorPanel = new javax.swing.JPanel();
+        track2ColorButton = new javax.swing.JButton();
+        differenceColorButton = new javax.swing.JButton();
+        track2ColorLabel = new javax.swing.JLabel();
+        track1ColorButton = new javax.swing.JButton();
+        diffColorLabel = new javax.swing.JLabel();
+        track1ColorPanel = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        backgroundColorButton = new javax.swing.JButton();
+        backgroundColorPanel = new javax.swing.JPanel();
+        backgroundColorLabel = new javax.swing.JLabel();
 
-        org.openide.awt.Mnemonics.setLocalizedText(uniformColorationCheckBox, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.uniformColorationCheckBox.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(bestMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.bestMatchLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(commonColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.commonColorButton.text")); // NOI18N
-        commonColorButton.setToolTipText(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.commonColorButton.toolTipText")); // NOI18N
-        commonColorButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.resetButton.text")); // NOI18N
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                commonColorButtonActionPerformed(evt);
+                resetButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(commonMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.commonMatchLabel.text")); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.jPanel1.border.title"))); // NOI18N
+
+        singleBestColorPanel.setBackground(new java.awt.Color(238, 216, 13));
+        singleBestColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+
+        javax.swing.GroupLayout singleBestColorPanelLayout = new javax.swing.GroupLayout(singleBestColorPanel);
+        singleBestColorPanel.setLayout(singleBestColorPanelLayout);
+        singleBestColorPanelLayout.setHorizontalGroup(
+            singleBestColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        singleBestColorPanelLayout.setVerticalGroup(
+            singleBestColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 29, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(bestMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.bestMatchLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(perfectColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.perfectColorButton.text")); // NOI18N
         perfectColorButton.setToolTipText(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.perfectColorButton.toolTipText")); // NOI18N
@@ -138,12 +152,11 @@ final class ColorsPanel extends OptionsPanel {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(perfectMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.perfectMatchLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(uniformColButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.uniformColButton.text")); // NOI18N
-        uniformColButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(singleBestColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singleBestColorButton.text")); // NOI18N
+        singleBestColorButton.setToolTipText(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singleBestColorButton.toolTipText")); // NOI18N
+        singleBestColorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                uniformColButtonActionPerformed(evt);
+                singleBestColorButtonActionPerformed(evt);
             }
         });
 
@@ -155,24 +168,46 @@ final class ColorsPanel extends OptionsPanel {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(uniformColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.uniformColorLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(commonMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.commonMatchLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(commonColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.commonColorButton.text")); // NOI18N
+        commonColorButton.setToolTipText(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.commonColorButton.toolTipText")); // NOI18N
+        commonColorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                commonColorButtonActionPerformed(evt);
+            }
+        });
+
+        commonColorPanel.setBackground(new java.awt.Color(180, 41, 36));
+        commonColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+
+        javax.swing.GroupLayout commonColorPanelLayout = new javax.swing.GroupLayout(commonColorPanel);
+        commonColorPanel.setLayout(commonColorPanelLayout);
+        commonColorPanelLayout.setHorizontalGroup(
+            commonColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        commonColorPanelLayout.setVerticalGroup(
+            commonColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 29, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(perfectMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.perfectMatchLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(singlePerfectMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singlePerfectMatchLabel.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(singleBestMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singleBestMatchLabel.text")); // NOI18N
+        singlePerfectColorPanel.setBackground(new java.awt.Color(38, 180, 36));
+        singlePerfectColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
 
-        perfectColorPanel.setBackground(new java.awt.Color(115, 226, 112));
-        perfectColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
-
-        javax.swing.GroupLayout perfectColorPanelLayout = new javax.swing.GroupLayout(perfectColorPanel);
-        perfectColorPanel.setLayout(perfectColorPanelLayout);
-        perfectColorPanelLayout.setHorizontalGroup(
-            perfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout singlePerfectColorPanelLayout = new javax.swing.GroupLayout(singlePerfectColorPanel);
+        singlePerfectColorPanel.setLayout(singlePerfectColorPanelLayout);
+        singlePerfectColorPanelLayout.setHorizontalGroup(
+            singlePerfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        perfectColorPanelLayout.setVerticalGroup(
-            perfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        singlePerfectColorPanelLayout.setVerticalGroup(
+            singlePerfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 29, Short.MAX_VALUE)
         );
 
         bestColorPanel.setBackground(new java.awt.Color(255, 250, 28));
@@ -186,7 +221,21 @@ final class ColorsPanel extends OptionsPanel {
         );
         bestColorPanelLayout.setVerticalGroup(
             bestColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 29, Short.MAX_VALUE)
+        );
+
+        perfectColorPanel.setBackground(new java.awt.Color(115, 226, 112));
+        perfectColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+
+        javax.swing.GroupLayout perfectColorPanelLayout = new javax.swing.GroupLayout(perfectColorPanel);
+        perfectColorPanel.setLayout(perfectColorPanelLayout);
+        perfectColorPanelLayout.setHorizontalGroup(
+            perfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+        );
+        perfectColorPanelLayout.setVerticalGroup(
+            perfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 29, Short.MAX_VALUE)
         );
 
         org.openide.awt.Mnemonics.setLocalizedText(singlePerfectColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singlePerfectColorButton.text")); // NOI18N
@@ -197,55 +246,82 @@ final class ColorsPanel extends OptionsPanel {
             }
         });
 
-        singlePerfectColorPanel.setBackground(new java.awt.Color(38, 180, 36));
-        singlePerfectColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+        org.openide.awt.Mnemonics.setLocalizedText(singleBestMatchLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singleBestMatchLabel.text")); // NOI18N
 
-        javax.swing.GroupLayout singlePerfectColorPanelLayout = new javax.swing.GroupLayout(singlePerfectColorPanel);
-        singlePerfectColorPanel.setLayout(singlePerfectColorPanelLayout);
-        singlePerfectColorPanelLayout.setHorizontalGroup(
-            singlePerfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        singlePerfectColorPanelLayout.setVerticalGroup(
-            singlePerfectColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 23, Short.MAX_VALUE)
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(singleBestMatchLabel)
+                    .addComponent(perfectMatchLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bestMatchLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(singlePerfectMatchLabel)
+                    .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(perfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                    .addComponent(bestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                    .addComponent(commonColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                    .addComponent(singlePerfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                    .addComponent(singleBestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(perfectColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bestColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(commonColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(singlePerfectColorButton)
+                    .addComponent(singleBestColorButton))
+                .addContainerGap())
         );
 
-        org.openide.awt.Mnemonics.setLocalizedText(singleBestColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singleBestColorButton.text")); // NOI18N
-        singleBestColorButton.setToolTipText(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.singleBestColorButton.toolTipText")); // NOI18N
-        singleBestColorButton.addActionListener(new java.awt.event.ActionListener() {
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {bestMatchLabel, commonMatchLabel, perfectMatchLabel, singleBestMatchLabel, singlePerfectMatchLabel});
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {bestColorButton, commonColorButton, perfectColorButton, singleBestColorButton, singlePerfectColorButton});
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(perfectMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(perfectColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(perfectColorButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(bestMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bestColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bestColorButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(commonColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(commonColorButton))
+                .addGap(5, 5, 5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(singlePerfectColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(singlePerfectMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(singlePerfectColorButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(singleBestMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(singleBestColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(singleBestColorButton))
+                .addContainerGap())
+        );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {bestColorButton, bestColorPanel, bestMatchLabel, commonColorButton, commonColorPanel, commonMatchLabel, perfectColorButton, perfectColorPanel, perfectMatchLabel, singleBestColorButton, singleBestColorPanel, singleBestMatchLabel, singlePerfectColorButton, singlePerfectColorPanel, singlePerfectMatchLabel});
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.jPanel2.border.title"))); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(uniformColButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.uniformColButton.text")); // NOI18N
+        uniformColButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                singleBestColorButtonActionPerformed(evt);
+                uniformColButtonActionPerformed(evt);
             }
         });
-
-        singleBestColorPanel.setBackground(new java.awt.Color(238, 216, 13));
-        singleBestColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
-
-        javax.swing.GroupLayout singleBestColorPanelLayout = new javax.swing.GroupLayout(singleBestColorPanel);
-        singleBestColorPanel.setLayout(singleBestColorPanelLayout);
-        singleBestColorPanelLayout.setHorizontalGroup(
-            singleBestColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        singleBestColorPanelLayout.setVerticalGroup(
-            singleBestColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
-        commonColorPanel.setBackground(new java.awt.Color(180, 41, 36));
-        commonColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
-
-        javax.swing.GroupLayout commonColorPanelLayout = new javax.swing.GroupLayout(commonColorPanel);
-        commonColorPanel.setLayout(commonColorPanelLayout);
-        commonColorPanelLayout.setHorizontalGroup(
-            commonColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        commonColorPanelLayout.setVerticalGroup(
-            commonColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 23, Short.MAX_VALUE)
-        );
 
         uniformColorPanel.setBackground(new java.awt.Color(51, 51, 255));
         uniformColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
@@ -258,44 +334,38 @@ final class ColorsPanel extends OptionsPanel {
         );
         uniformColorPanelLayout.setVerticalGroup(
             uniformColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 29, Short.MAX_VALUE)
         );
 
-        org.openide.awt.Mnemonics.setLocalizedText(resetButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.resetButton.text")); // NOI18N
-        resetButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resetButtonActionPerformed(evt);
-            }
-        });
+        org.openide.awt.Mnemonics.setLocalizedText(uniformColorationCheckBox, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.uniformColorationCheckBox.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(differenceColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.differenceColorButton.text")); // NOI18N
-        differenceColorButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                differenceColorButtonActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(uniformColorationCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addComponent(uniformColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(uniformColButton)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(uniformColorationCheckBox)
+                    .addComponent(uniformColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uniformColButton))
+                .addContainerGap())
+        );
 
-        org.openide.awt.Mnemonics.setLocalizedText(doubleTrackLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.doubleTrackLabel.text")); // NOI18N
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {uniformColButton, uniformColorPanel, uniformColorationCheckBox});
 
-        org.openide.awt.Mnemonics.setLocalizedText(diffColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.diffColorLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(track1ColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track1ColorLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(track1ColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track1ColorButton.text")); // NOI18N
-        track1ColorButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                track1ColorButtonActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(track2ColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track2ColorLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(track2ColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track2ColorButton.text")); // NOI18N
-        track2ColorButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                track2ColorButtonActionPerformed(evt);
-            }
-        });
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.jPanel3.border.title"))); // NOI18N
 
         differenceColorPanel.setBackground(java.awt.Color.blue);
         differenceColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
@@ -308,22 +378,10 @@ final class ColorsPanel extends OptionsPanel {
         );
         differenceColorPanelLayout.setVerticalGroup(
             differenceColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 23, Short.MAX_VALUE)
+            .addGap(0, 29, Short.MAX_VALUE)
         );
 
-        track1ColorPanel.setBackground(java.awt.Color.cyan);
-        track1ColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
-
-        javax.swing.GroupLayout track1ColorPanelLayout = new javax.swing.GroupLayout(track1ColorPanel);
-        track1ColorPanel.setLayout(track1ColorPanelLayout);
-        track1ColorPanelLayout.setHorizontalGroup(
-            track1ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        track1ColorPanelLayout.setVerticalGroup(
-            track1ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 23, Short.MAX_VALUE)
-        );
+        org.openide.awt.Mnemonics.setLocalizedText(track1ColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track1ColorLabel.text")); // NOI18N
 
         track2ColorPanel.setBackground(new java.awt.Color(255, 117, 48));
         track2ColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
@@ -336,8 +394,149 @@ final class ColorsPanel extends OptionsPanel {
         );
         track2ColorPanelLayout.setVerticalGroup(
             track2ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 23, Short.MAX_VALUE)
+            .addGap(0, 29, Short.MAX_VALUE)
         );
+
+        org.openide.awt.Mnemonics.setLocalizedText(track2ColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track2ColorButton.text")); // NOI18N
+        track2ColorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                track2ColorButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(differenceColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.differenceColorButton.text")); // NOI18N
+        differenceColorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                differenceColorButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(track2ColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track2ColorLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(track1ColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.track1ColorButton.text")); // NOI18N
+        track1ColorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                track1ColorButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(diffColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.diffColorLabel.text")); // NOI18N
+
+        track1ColorPanel.setBackground(java.awt.Color.cyan);
+        track1ColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+
+        javax.swing.GroupLayout track1ColorPanelLayout = new javax.swing.GroupLayout(track1ColorPanel);
+        track1ColorPanel.setLayout(track1ColorPanelLayout);
+        track1ColorPanelLayout.setHorizontalGroup(
+            track1ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        track1ColorPanelLayout.setVerticalGroup(
+            track1ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 29, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(diffColorLabel)
+                    .addComponent(track1ColorLabel)
+                    .addComponent(track2ColorLabel))
+                .addGap(37, 37, 37)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(differenceColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                    .addComponent(track1ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                    .addComponent(track2ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(differenceColorButton)
+                    .addComponent(track1ColorButton)
+                    .addComponent(track2ColorButton))
+                .addContainerGap())
+        );
+
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {differenceColorButton, track1ColorButton, track2ColorButton});
+
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {diffColorLabel, track1ColorLabel, track2ColorLabel});
+
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(diffColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(differenceColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(differenceColorButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(track1ColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(track1ColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(track1ColorButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(track2ColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(track2ColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(track2ColorButton))
+                .addContainerGap())
+        );
+
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {diffColorLabel, differenceColorButton, differenceColorPanel, track1ColorButton, track1ColorLabel, track1ColorPanel, track2ColorButton, track2ColorLabel, track2ColorPanel});
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.jPanel4.border.title"))); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(backgroundColorButton, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.backgroundColorButton.text")); // NOI18N
+        backgroundColorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backgroundColorButtonActionPerformed(evt);
+            }
+        });
+
+        backgroundColorPanel.setBackground( de.cebitec.readxplorer.api.constants.Colors.BACKGROUND_COLOR );
+        backgroundColorPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        backgroundColorPanel.setPreferredSize(new java.awt.Dimension(27, 27));
+
+        javax.swing.GroupLayout backgroundColorPanelLayout = new javax.swing.GroupLayout(backgroundColorPanel);
+        backgroundColorPanel.setLayout(backgroundColorPanelLayout);
+        backgroundColorPanelLayout.setHorizontalGroup(
+            backgroundColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 251, Short.MAX_VALUE)
+        );
+        backgroundColorPanelLayout.setVerticalGroup(
+            backgroundColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(backgroundColorLabel, org.openide.util.NbBundle.getMessage(ColorsPanel.class, "ColorsPanel.backgroundColorLabel.text")); // NOI18N
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(backgroundColorLabel)
+                .addGap(32, 32, 32)
+                .addComponent(backgroundColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(backgroundColorButton)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(backgroundColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(backgroundColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(backgroundColorButton))
+                .addContainerGap())
+        );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {backgroundColorButton, backgroundColorLabel, backgroundColorPanel});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -346,150 +545,27 @@ final class ColorsPanel extends OptionsPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(singleBestMatchLabel)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(perfectMatchLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(bestMatchLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                .addGap(42, 42, 42)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(perfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                    .addComponent(singleBestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                    .addComponent(bestColorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(singlePerfectMatchLabel)
-                                    .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(6, 6, 6)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(singlePerfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                    .addComponent(commonColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(bestColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(perfectColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(commonColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGap(10, 10, 10))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addComponent(singleBestColorButton)
-                                    .addContainerGap()))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(singlePerfectColorButton)
-                                .addContainerGap())))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(generalSeparator, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(doubleTrackSeparator, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(resetButton))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(diffColorLabel)
-                                .addGap(48, 48, 48)
-                                .addComponent(differenceColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(differenceColorButton))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(track1ColorLabel)
-                                .addGap(63, 63, 63)
-                                .addComponent(track1ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(track1ColorButton))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(track2ColorLabel)
-                                .addGap(63, 63, 63)
-                                .addComponent(track2ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(track2ColorButton))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(uniformColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(doubleTrackLabel))
-                                .addGap(0, 331, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(uniformColorationCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(uniformColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(uniformColButton)))
-                        .addContainerGap())))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(resetButton)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(perfectMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bestMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(perfectColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(perfectColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(bestColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(bestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(commonColorButton)
-                    .addComponent(commonColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(singlePerfectColorButton)
-                            .addComponent(singlePerfectColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(singlePerfectMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(singleBestColorButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(singleBestColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                    .addComponent(singleBestMatchLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(generalSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(uniformColorLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(uniformColButton)
-                    .addComponent(uniformColorationCheckBox)
-                    .addComponent(uniformColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(doubleTrackSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(doubleTrackLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(diffColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(differenceColorButton))
-                                    .addComponent(differenceColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(track1ColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(track1ColorButton)))
-                            .addComponent(track1ColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(track2ColorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(track2ColorButton)))
-                    .addComponent(track2ColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(resetButton)
                 .addContainerGap())
         );
@@ -516,15 +592,16 @@ final class ColorsPanel extends OptionsPanel {
     }//GEN-LAST:event_singleBestColorButtonActionPerformed
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
-        perfectColorPanel.setBackground( ColorProperties.PERFECT_MATCH );
-        bestColorPanel.setBackground( ColorProperties.BEST_MATCH );
-        commonColorPanel.setBackground( ColorProperties.COMMON_MATCH );
-        singlePerfectColorPanel.setBackground( ColorProperties.PERFECT_MATCH_SINGLE );
-        singleBestColorPanel.setBackground( ColorProperties.BEST_MATCH_SINGLE );
+        perfectColorPanel.setBackground(Colors.PERFECT_MATCH );
+        bestColorPanel.setBackground(Colors.BEST_MATCH );
+        commonColorPanel.setBackground(Colors.COMMON_MATCH );
+        singlePerfectColorPanel.setBackground(Colors.PERFECT_MATCH_SINGLE );
+        singleBestColorPanel.setBackground(Colors.BEST_MATCH_SINGLE );
         uniformColorPanel.setBackground( Color.BLUE );
-        differenceColorPanel.setBackground( ColorProperties.COV_DIFF_COLOR );
-        track1ColorPanel.setBackground( ColorProperties.TRACK1_COLOR );
-        track2ColorPanel.setBackground( ColorProperties.TRACK2_COLOR );
+        differenceColorPanel.setBackground(Colors.COV_DIFF_COLOR );
+        track1ColorPanel.setBackground(Colors.TRACK1_COLOR );
+        track2ColorPanel.setBackground(Colors.TRACK2_COLOR );
+        backgroundColorPanel.setBackground(Colors.BACKGROUND_COLOR );
     }//GEN-LAST:event_resetButtonActionPerformed
 
     private void differenceColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_differenceColorButtonActionPerformed
@@ -543,6 +620,10 @@ final class ColorsPanel extends OptionsPanel {
         this.displayColorChooser( commonColorPanel );
     }//GEN-LAST:event_commonColorButtonActionPerformed
 
+    private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
+        this.displayColorChooser( backgroundColorPanel );
+    }//GEN-LAST:event_backgroundColorButtonActionPerformed
+
 
     @Override
     void load() {
@@ -552,9 +633,10 @@ final class ColorsPanel extends OptionsPanel {
             classToPanelMap.get( classType ).setBackground( classToColorMap.get( classType ) );
         }
 
-        this.updatePanelColor( ColorProperties.UNIFORM_COLOR_STRING, Color.BLUE, uniformColorPanel );
+        updatePanelColor(Colors.UNIFORM_COLOR_STRING, Color.BLUE, uniformColorPanel );
+        updatePanelColor(Colors.BACKGROUND_COLOR_STRING, Colors.BACKGROUND_COLOR, backgroundColorPanel );
 
-        uniformColorationCheckBox.setSelected( this.pref.getBoolean( ColorProperties.UNIFORM_DESIRED, false ) );
+        uniformColorationCheckBox.setSelected(this.pref.getBoolean(Colors.UNIFORM_DESIRED, false ) );
     }
 
 
@@ -579,8 +661,9 @@ final class ColorsPanel extends OptionsPanel {
     @Override
     void store() {
         // store modified settings
-        this.pref.putBoolean( ColorProperties.UNIFORM_DESIRED, uniformColorationCheckBox.isSelected() );
-        this.pref.put( ColorProperties.UNIFORM_COLOR_STRING, Integer.toString( uniformColorPanel.getBackground().getRGB() ) );
+        this.pref.putBoolean(Colors.UNIFORM_DESIRED, uniformColorationCheckBox.isSelected() );
+        this.pref.put(Colors.UNIFORM_COLOR_STRING, Integer.toString( uniformColorPanel.getBackground().getRGB() ) );
+        this.pref.put(Colors.BACKGROUND_COLOR_STRING, Integer.toString( backgroundColorPanel.getBackground().getRGB() ) );
 
         for( Classification classType : classToPanelMap.keySet() ) {
             this.storeColor( classType );
@@ -596,7 +679,7 @@ final class ColorsPanel extends OptionsPanel {
      */
     private void storeColor( Classification classType ) {
         String colorRGB = Integer.toString( classToPanelMap.get( classType ).getBackground().getRGB() );
-        this.pref.put( classType.getTypeString(), colorRGB );
+        this.pref.put( classType.toString(), colorRGB );
     }
 
 
@@ -616,6 +699,9 @@ final class ColorsPanel extends OptionsPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backgroundColorButton;
+    private javax.swing.JLabel backgroundColorLabel;
+    private javax.swing.JPanel backgroundColorPanel;
     private javax.swing.JButton bestColorButton;
     private javax.swing.JPanel bestColorPanel;
     private javax.swing.JLabel bestMatchLabel;
@@ -625,9 +711,9 @@ final class ColorsPanel extends OptionsPanel {
     private javax.swing.JLabel diffColorLabel;
     private javax.swing.JButton differenceColorButton;
     private javax.swing.JPanel differenceColorPanel;
-    private javax.swing.JLabel doubleTrackLabel;
-    private javax.swing.JSeparator doubleTrackSeparator;
-    private javax.swing.JSeparator generalSeparator;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JButton perfectColorButton;
     private javax.swing.JPanel perfectColorPanel;
     private javax.swing.JLabel perfectMatchLabel;
@@ -645,7 +731,6 @@ final class ColorsPanel extends OptionsPanel {
     private javax.swing.JLabel track2ColorLabel;
     private javax.swing.JPanel track2ColorPanel;
     private javax.swing.JButton uniformColButton;
-    private javax.swing.JLabel uniformColorLabel;
     private javax.swing.JPanel uniformColorPanel;
     private javax.swing.JCheckBox uniformColorationCheckBox;
     // End of variables declaration//GEN-END:variables

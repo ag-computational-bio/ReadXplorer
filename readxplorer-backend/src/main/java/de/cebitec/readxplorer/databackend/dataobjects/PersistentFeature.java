@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.Polytree;
 import de.cebitec.readxplorer.utils.sequence.GenomicRange;
@@ -32,8 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import static java.util.logging.Level.FINE;
+import static java.util.regex.Pattern.compile;
 
 
 /**
@@ -45,6 +47,7 @@ import static java.util.logging.Level.FINE;
 public class PersistentFeature extends Node implements PersistentFeatureI {
 
     private static final Logger LOG = Logger.getLogger( PersistentFeature.class.getName() );
+    private static final Pattern SEMICOLON_PATTERN = compile( ";" );
 
     private final int id;
     private final int chromId;
@@ -107,7 +110,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * @return A list of parent ids.
      */
     private List<Integer> separateParentIds( String parentIds ) {
-        String[] parentIdArray = parentIds.split( ";" );
+        String[] parentIdArray = SEMICOLON_PATTERN.split( parentIds );
         List<Integer> parentIdList = new ArrayList<>( parentIdArray.length );
         for( String parentId : parentIdArray ) {
             try {
@@ -245,8 +248,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * @return SequenceUtils.STRAND_FWD_STRING ("Fwd") or
      *         SequenceUtils.STRAND_REV_STRING ("Rev")
      */
-    public String isFwdStrandString() {
-        return isFwdStrand ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING;
+    public String getStrandString() {
+        return isFwdStrand ? Strand.Forward.toString() : Strand.Reverse.toString();
     }
 
 
@@ -346,13 +349,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      */
     @Override
     public int compareTo( GenomicRange genomicRange ) {
-        int ret = 0;
-        if( this.start < genomicRange.getStart() ) {
-            ret = -1;
-        } else if( this.start > genomicRange.getStart() ) {
-            ret = 1;
-        }
-        return ret;
+        return GenomicRange.Utils.compareTo( this, genomicRange );
     }
 
 

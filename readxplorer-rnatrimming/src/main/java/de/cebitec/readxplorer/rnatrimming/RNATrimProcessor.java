@@ -29,6 +29,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFileWriter;
@@ -45,6 +46,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 import static java.util.logging.Level.SEVERE;
+import static java.util.regex.Pattern.compile;
 
 
 /**
@@ -57,6 +59,7 @@ public class RNATrimProcessor {
 
     private static final Logger LOG = Logger.getLogger( RNATrimProcessor.class.getName() );
     private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
+    private static final Pattern OS_PATTERN = compile( ":os:" );
 
     private RequestProcessor.Task theTask = null;
     private String sourcePath;
@@ -227,7 +230,7 @@ public class RNATrimProcessor {
                     // the readname field will have the form
                     // name:original:fullsequence
                     // so try to split it into two parts
-                    String[] parts = record.getReadName().split( ":os:" );
+                    String[] parts = OS_PATTERN.split( record.getReadName() );
                     if( parts.length == 4 ) {
                         record.setReadName( parts[0] );
                         record.setAttribute( "os", parts[1] ); // os = original sequence

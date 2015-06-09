@@ -17,13 +17,13 @@
 
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersFeatureTypes;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -100,8 +100,7 @@ public class CollectContinuousCoverageData implements Observer{
 
             if( feature.getChromId() == result.getRequest().getChromId() ) {
 
-                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ),
-                    startOffset, stopOffset );
+                ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, stopOffset );
                 int featStart = featTypeParams.calcFeatureStartOffset( feature );
                 int featStop = featTypeParams.calcFeatureStopOffset( feature );
                 boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() :

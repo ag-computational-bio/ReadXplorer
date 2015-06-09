@@ -37,8 +37,8 @@ public class BaySeqAnalysisData extends DeAnalysisData {
     private final int[] replicateStructure;
 
 
-    public BaySeqAnalysisData( int capacity, List<Group> groups, int[] replicateStructure ) {
-        super( capacity );
+    public BaySeqAnalysisData( int capacity, List<Group> groups, int[] replicateStructure, ProcessingLog processingLog ) {
+        super( capacity, processingLog );
         this.groups = groups;
         this.replicateStructure = replicateStructure;
     }
@@ -49,7 +49,7 @@ public class BaySeqAnalysisData extends DeAnalysisData {
 
     /**
      * Returns the next group that has not been returned yet.
-     *
+     * <p>
      * @return the next unreturned group.
      */
     public int[] getNextGroup() {
@@ -65,7 +65,7 @@ public class BaySeqAnalysisData extends DeAnalysisData {
 
     /**
      * Checks if there is still an unreturned group.
-     *
+     * <p>
      * @return true if there is still at least one unreturned group otherwise
      *         false
      */
@@ -76,7 +76,7 @@ public class BaySeqAnalysisData extends DeAnalysisData {
 
     /**
      * Return the replicate structure.
-     *
+     * <p>
      * @return int array representing the replicate structure of the data.
      */
     public int[] getReplicateStructure() {

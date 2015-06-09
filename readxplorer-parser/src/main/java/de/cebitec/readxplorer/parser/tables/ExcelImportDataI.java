@@ -30,7 +30,7 @@ public interface ExcelImportDataI {
     /**
      * @return creates and returns the list of rows belonging to the excel file.
      */
-    public DefaultTableModel dataToDataTableImport();
+    DefaultTableModel dataToDataTableImport();
 
 
 }

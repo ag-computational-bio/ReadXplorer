@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.utils.filechooser;
 
 
-import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.api.constants.Paths;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -79,7 +79,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
             setFileFilter( new FileNameExtensionFilter( fileDescription, fileExtensions ) );
         }
         pref = NbPreferences.forModule( Object.class );
-        directoryProperty = Properties.READXPLORER_FILECHOOSER_DIRECTORY;
+        directoryProperty = Paths.READXPLORER_FILECHOOSER_DIRECTORY;
     }
 
 

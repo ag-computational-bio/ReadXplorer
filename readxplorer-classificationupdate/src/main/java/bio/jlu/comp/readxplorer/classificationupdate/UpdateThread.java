@@ -19,6 +19,8 @@ package bio.jlu.comp.readxplorer.classificationupdate;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.api.enums.MappingClass;
+import de.cebitec.readxplorer.api.enums.TotalCoverage;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
@@ -32,8 +34,6 @@ import de.cebitec.readxplorer.parser.mappings.SamBamStatsParser;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.utils.classification.MappingClass;
-import de.cebitec.readxplorer.utils.classification.TotalCoverage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -107,7 +107,8 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
 
     private void updateTracks() {
-        ProjectConnector projectConnector = ProjectConnector.getInstance();
+
+        final ProjectConnector projectConnector = ProjectConnector.getInstance();
         List<TrackJob> trackJobs = this.getTrackJobs();
         if( !trackJobs.isEmpty() ) {
             workunits = trackJobs.size();
@@ -125,7 +126,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
                     StatsContainer statsContainer = new StatsContainer();
                     statsContainer.prepareForTrack();
                     parser.setStatsContainer( statsContainer );
-                    Boolean success = parser.parseInput( trackJob, chromLengthMap );
+                    boolean success = parser.parseInput( trackJob, chromLengthMap );
                     parser.removeObserver( this );
                     if( success ) {
                         try {
@@ -147,10 +148,10 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
                             List<String> statsKeysToDelete = new ArrayList<>();
                             for( MappingClass mappingClass : MappingClass.values() ) {
-                                statsKeysToDelete.add( mappingClass.getTypeString() );
-                                statsKeysToDelete.add( mappingClass.getTypeString() + StatsContainer.COVERAGE_STRING );
+                                statsKeysToDelete.add( mappingClass.toString());
+                                statsKeysToDelete.add( mappingClass.toString() + StatsContainer.COVERAGE_STRING );
                             }
-                            statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE.getTypeString() + StatsContainer.COVERAGE_STRING );
+                            statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE + StatsContainer.COVERAGE_STRING );
                             statsKeysToDelete.add( StatsContainer.NO_MAPPINGS );
                             statsKeysToDelete.add( StatsContainer.NO_UNIQUE_SEQS );
                             statsKeysToDelete.add( StatsContainer.NO_REPEATED_SEQ );
@@ -239,7 +240,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
     protected void done() {
         super.done();
         ph.finish();
-        if( this.noErrors ) {
+        if( noErrors ) {
             io.getOut().println( "Re-calculation of classification for all tracks finished successfully! (If no error messages were printed!)" );
         } else {
             io.getOut().println( "At least the update of one data set failed (check earlier log messages for more info)" );

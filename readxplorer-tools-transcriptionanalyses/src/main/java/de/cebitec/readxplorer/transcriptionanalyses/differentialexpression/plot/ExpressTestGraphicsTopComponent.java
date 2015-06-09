@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readxplorer.plotting.CreatePlots;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Resul
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;

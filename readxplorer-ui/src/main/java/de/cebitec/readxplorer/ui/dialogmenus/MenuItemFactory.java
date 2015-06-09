@@ -22,7 +22,7 @@ import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.parser.output.OutputWriter;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
-import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.CodonUtils;
 import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
 import de.cebitec.readxplorer.utils.sequence.Region;
 import java.awt.Toolkit;
@@ -118,12 +118,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     public JMenuItem getCopyTranslatedItem( final String dnaSeqToTranslateAndCopy ) {
 
         JMenuItem translationItem = new JMenuItem( NbBundle.getMessage( MenuItemFactory.class, "MenuItem.Translation" ) );
-        translationItem.addActionListener( new ActionListener() {
+        translationItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed( ActionEvent e ) {
 
-                GeneticCode code = CodonUtilities.getGeneticCode();
+                GeneticCode code = CodonUtils.getGeneticCode();
                 String translatedSequence = code.getTranslationForString( dnaSeqToTranslateAndCopy );
                 clipboard.setContents( new StringSelection( translatedSequence ), MenuItemFactory.this );
             }
@@ -167,7 +167,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      *         reference feature in fasta format.
      */
     public JMenuItem getStoreTranslatedFeatureFastaItem( final String dnaSeqToTranslateAndStore, final String refName, final PersistentFeature feature ) {
-        GeneticCode code = CodonUtilities.getGeneticCode();
+        GeneticCode code = CodonUtils.getGeneticCode();
         String translatedSequence = code.getTranslationForString( dnaSeqToTranslateAndStore );
         String title = NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreTranslatedFasta" );
 
@@ -188,7 +188,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @return The JMenuItem for storing a translated sequence in fasta format
      */
     public JMenuItem getStoreTranslatedFastaItem( final String dnaSeqToTranslateAndStore, final String refName, final int seqStart, final int seqStop ) {
-        GeneticCode code = CodonUtilities.getGeneticCode();
+        GeneticCode code = CodonUtils.getGeneticCode();
         String translatedSequence = code.getTranslationForString( dnaSeqToTranslateAndStore );
         String title = NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreTranslatedFasta" );
 

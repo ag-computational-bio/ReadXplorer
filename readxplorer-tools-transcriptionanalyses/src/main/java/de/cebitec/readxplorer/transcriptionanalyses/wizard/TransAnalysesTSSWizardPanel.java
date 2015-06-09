@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.utils.Properties;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
@@ -80,15 +80,16 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void readSettings( final WizardDescriptor wiz ) {
         super.readSettings( wiz );
-        byte strandOption = Byte.valueOf( NbPreferences.forModule( Object.class ).get(
-                PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1" ) );
-        boolean isBothStrandOption = strandOption == Properties.STRAND_BOTH;
+        Strand strandOption = Strand.fromString( NbPreferences.forModule( Object.class ).get(
+                PROP_WIZARD_NAME + PROP_STRAND_OPTION, Strand.Feature.toString() ) );
+        boolean isBothStrandOption = strandOption == Strand.Both;
         component.setDirectionOptionsVisible( isBothStrandOption );
     }
 
 
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
+
         if( isValid() ) {
             wiz.putProperty( PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() );
             wiz.putProperty( PROP_MIN_TOTAL_INCREASE, component.getMinTotalIncrease() );
@@ -104,6 +105,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
             wiz.putProperty( PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() );
             storePrefs();
         }
+
     }
 
 
@@ -112,7 +114,8 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
      * after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule( Object.class );
+
+        Preferences pref = getPref();
         pref.putBoolean( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() );
         pref.put( PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, String.valueOf( component.getMinTotalIncrease() ) );
         pref.put( PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, String.valueOf( component.getMinTotalPercentIncrease() ) );
@@ -125,6 +128,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
         pref.putBoolean(PROP_WIZARD_NAME + PROP_IS_ASSOCIATE_TSS, component.isAssociateTss() );
         pref.put(PROP_WIZARD_NAME + PROP_ASSOCIATE_TSS_WINDOW, String.valueOf( component.getAssociateTssWindow() ) );
         pref.putBoolean( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() );
+
     }
 
 

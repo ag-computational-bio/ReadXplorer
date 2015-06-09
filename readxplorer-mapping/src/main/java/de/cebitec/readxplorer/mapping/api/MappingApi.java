@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.mapping.api;
 
 
+import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.utils.CommandLineUtils;
 import de.cebitec.readxplorer.utils.FileUtils;
 import de.cebitec.readxplorer.utils.Properties;
@@ -55,7 +56,7 @@ public final class MappingApi {
      * @return the full path to the mapping script
      */
     public static String getMapperPath() {
-        String path = NbPreferences.forModule( Object.class ).get( Properties.MAPPER_PATH, "" );
+        String path = NbPreferences.forModule( Object.class ).get( Paths.MAPPER_PATH, "" );
 
         //try to locate bwa_mapper.sh, if we are not on windows (bwa_mapper.sh works only on unix systems)
         if( (path.isEmpty()) && (!System.getProperty( "os.name" ).toLowerCase().contains( "win" )) ) {

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>bio.comp.jlu.readxplorer</groupId>
+        <artifactId>readxplorer</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+
+    <artifactId>readxplorer-cli</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>nbm</packaging>
+    <name>${project.displayname} - CLI</name>
+    <description>This module provides basic command line functionalities for ReadXplorer's CLI version.
+
+Please, have a look at CommandLineProcessor's JavaDoc for further information.</description>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-sendopts</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-databackend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-tools-readpairclassifier</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-tools-transcriptionanalyses</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-tools-snpdetection</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jexcelapi</groupId>
+            <artifactId>jxl</artifactId>
+            <version>2.6.12</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <configuration>
+                            <configLocation>cli-checkstyle.xml</configLocation>
+                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <author>Oliver Schwengers</author>
+                    <licenseName>GPLv3</licenseName>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

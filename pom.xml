@@ -11,13 +11,15 @@
 
 
     <modules>
-        <module>branding</module>
         <module>application</module>
+        <module>application-cli</module>
+        <module>branding</module>
         <module>centrallookup</module>
         <module>readxplorer-api</module>
         <module>readxplorer-backend</module>
         <module>readxplorer-utils</module>
         <module>readxplorer-classificationupdate</module>
+        <module>readxplorer-cli</module>
         <module>readxplorer-dashboard</module>
         <module>readxplorer-exporter</module>
         <module>readxplorer-mapping</module>
@@ -37,6 +39,7 @@
         <module>readxplorer-tools-coverageanalysis</module>
         <module>readxplorer-tools-detailedviewer</module>
         <module>readxplorer-tools-doubletrackviewer</module>
+        <module>readxplorer-tools-gasv</module>
         <module>readxplorer-tools-readpairclassifier</module>
         <module>readxplorer-tools-referenceeditor</module>
         <module>readxplorer-tools-rnafolder</module>
@@ -78,6 +81,11 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-classificationupdate</artifactId>
                 <version>1.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-cli</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -133,6 +141,11 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-doubletrackviewer</artifactId>
                 <version>1.2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-gasv</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -236,7 +249,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.14</version>
+                    <version>2.15</version>
                     <configuration>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>

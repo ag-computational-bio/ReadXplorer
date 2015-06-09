@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
+import de.cebitec.readxplorer.api.enums.SequenceComparison;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.CodonSnp;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.databackend.dataobjects.Snp;
 import de.cebitec.readxplorer.databackend.dataobjects.SnpI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +55,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      *                      generated
      * @param combineTracks <code>true</code>, if the tracks in the list are
      *                      combined, <code>false</code> otherwise
+     * @param trackColumn   Track column in the result table
+     * @param filterColumn  Position column in the result table
      */
     public SnpDetectionResult( List<SnpI> snpList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks,
                                int trackColumn, int filterColumn ) {
@@ -71,12 +73,14 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         return Collections.unmodifiableList( snpList );
     }
 
+
     /**
      * Adds all new SNPs to the current list of SNPs stored in this result.
+     * <p>
      * @param newSnps The list of new SNPs to add
      */
-    public void addAllSnps(List<SnpI> newSnps) {
-        snpList.addAll(newSnps);
+    public void addAllSnps( List<SnpI> newSnps ) {
+        snpList.addAll( newSnps );
     }
 
 
@@ -110,8 +114,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             snpExport.add( snp.getFrequency() );
             snpExport.add( snp.getType().getType() );
 
-            String aminoAcidsSnp = "";
             String aminoAcidsRef = "";
+            String aminoAcidsSnp = "";
             String codonsSNP = "";
             String codonsRef = "";
             String effect = "";
@@ -126,13 +130,13 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                 codons = snp.getCodons();
 
                 if( codons.isEmpty() ) {
-                    aminoAcidsSnp = intergenic;
                     aminoAcidsRef = intergenic;
+                    aminoAcidsSnp = intergenic;
                 }
 
                 for( CodonSnp codon : codons ) {
-                    char aminoSnp = codon.getAminoRef();
-                    char aminoRef = codon.getAminoSnp();
+                    char aminoRef = codon.getAminoRef();
+                    char aminoSnp = codon.getAminoSnp();
                     codonsRef += codon.getTripletRef() + "\n";
                     codonsSNP += codon.getTripletSnp() + "\n";
                     if( aminoRef != '-' ) {

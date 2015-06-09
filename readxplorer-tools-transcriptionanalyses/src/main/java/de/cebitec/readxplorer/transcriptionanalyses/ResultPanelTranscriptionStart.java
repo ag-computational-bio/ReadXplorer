@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -35,11 +36,8 @@ import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -65,8 +63,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     /**
      * This panel is capable of showing a table with transcription start sites
      * and contains an export button, which exports the data into an excel file.
+     * <p>
+     * @param referenceViewer The reference viewer belonging to this analysis
+     *                        and needed for updating the currently shown
+     *                        position and extracting the reference sequence.
      */
-    public ResultPanelTranscriptionStart() {
+    public ResultPanelTranscriptionStart( ReferenceViewer referenceViewer ) {
+        setBoundsInfoManager( referenceViewer.getBoundsInformationManager() );
+        this.referenceViewer = referenceViewer;
         this.initComponents();
         final int posColumnIdx = 0;
         final int trackColumnIdx = 1;
@@ -74,16 +78,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         tableFilter = new TableRightClickFilter<>( UneditableTableModel.class, posColumnIdx, trackColumnIdx );
         this.tSSTable.getTableHeader().addMouseListener( tableFilter );
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager() );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager() );
     }
 
 
@@ -256,21 +251,16 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     final int nbColumns = 21;
 
                     DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
-                    String strand;
-                    int distance;
-                    DetectedFeatures detFeatures;
-                    PersistentFeature feature;
-                    TransStartUnannotated tSSU;
-
                     for( TranscriptionStart tss : tsss ) {
 
+                        final String strand;
                         if( tss.isFwdStrand() ) {
-                            strand = SequenceUtils.STRAND_FWD_STRING;
+                            strand = Strand.Forward.toString();
                         } else {
-                            strand = SequenceUtils.STRAND_REV_STRING;
+                            strand = Strand.Reverse.toString();
                         }
 
-                        Object[] rowData = new Object[nbColumns];
+                        final Object[] rowData = new Object[nbColumns];
                         int i = 0;
                         rowData[i++] = tss.getPos();
                         rowData[i++] = tssResult.getTrackEntry( tss.getTrackId(), false );
@@ -280,8 +270,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         rowData[i++] = tss.getCoverageIncrease();
                         rowData[i++] = tss.getPercentIncrease();
 
-                        detFeatures = tss.getDetFeatures();
-                        feature = detFeatures.getCorrectStartFeature();
+                        DetectedFeatures detFeatures = tss.getDetFeatures();
+                        PersistentFeature feature = detFeatures.getCorrectStartFeature();
                         if( feature != null ) {
                             rowData[i++] = feature.toString();
                         } else {
@@ -298,15 +288,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         feature = detFeatures.getDownstreamFeature();
                         if( feature != null ) {
                             rowData[i++] = feature.toString();
-                            distance = Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) );
-                            rowData[i++] = distance;
+                            rowData[i++] = Math.abs( tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()) );
                         } else {
                             rowData[i++] = "-";
                             rowData[i++] = null;
                         }
 
                         if( tss instanceof TransStartUnannotated ) {
-                            tSSU = (TransStartUnannotated) tss;
+                            TransStartUnannotated tSSU = (TransStartUnannotated) tss;
                             rowData[i++] = true;
                             rowData[i++] = tSSU.getDetectedStop();
                             if( tSSU.hasStartCodon() ) {
@@ -355,19 +344,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
 
     /**
-     * Set the reference viewer needed for updating the currently shown position
-     * and extracting the reference sequence.
-     * <p>
-     * @param referenceViewer the reference viewer belonging to this analysis
-     *                        result
-     */
-    public void setReferenceViewer( ReferenceViewer referenceViewer ) {
-        this.setBoundsInfoManager( referenceViewer.getBoundsInformationManager() );
-        this.referenceViewer = referenceViewer;
-    }
-
-
-    /**
      * @return The number of detected TSS
      */
     @Override
@@ -386,18 +362,17 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
         //get reference sequence for promoter regions
         PersistentReference ref = this.referenceViewer.getReference();
-        String promoter;
 
         //get the promoter region for each TSS
-        int promoterStart;
         int chromLength = ref.getActiveChromosome().getLength();
         for( TranscriptionStart tSS : this.tssResult.getResults() ) {
+            final String promoter;
             if( tSS.isFwdStrand() ) {
-                promoterStart = tSS.getPos() - 70;
+                int promoterStart = tSS.getPos() - 70;
                 promoterStart = promoterStart < 0 ? 0 : promoterStart;
                 promoter = ref.getActiveChromSequence( promoterStart, tSS.getPos() );
             } else {
-                promoterStart = tSS.getPos() + 70;
+                int promoterStart = tSS.getPos() + 70;
                 promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
                 promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( tSS.getPos(), promoterStart ) );
             }

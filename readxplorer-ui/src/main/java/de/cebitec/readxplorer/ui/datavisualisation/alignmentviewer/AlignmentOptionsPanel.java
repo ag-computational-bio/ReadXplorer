@@ -18,16 +18,21 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
+import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.LegendAndOptionsProvider;
-import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.prefs.Preferences;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
@@ -41,13 +46,21 @@ public class AlignmentOptionsPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
+    private static final Preferences PREF = NbPreferences.forModule( Object.class );
+
     private final AlignmentViewer alignmentViewer;
 
 
+    /**
+     * Panel showing general options for an alignment viewer.
+     * <p>
+     * @param alignmentViewer The alignment viewer to which the options panel
+     *                        belongs.
+     */
     public AlignmentOptionsPanel( AlignmentViewer alignmentViewer ) {
         this.alignmentViewer = alignmentViewer;
         this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-        this.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        this.setBackground(Colors.LEGEND_BACKGROUND );
         this.initOtherComponents();
     }
 
@@ -55,16 +68,18 @@ public class AlignmentOptionsPanel extends JPanel {
     @NbBundle.Messages( { "AlignmentOptionsPanel.General=General:",
                           "AlignmentOptionsPanel.Centering=Enable centering sequence bar",
                           "AlignmentOptionsPanel.Qualities=Show base qualities",
-                          "AlignmentOptionsPanel_QualityToolTip=Good quality bases = bright hue, bad quality bases = dark hue" } )
+                          "AlignmentOptionsPanel_QualityToolTip=Good quality bases = bright hue, bad quality bases = dark hue",
+                          "AlignmentOptionsPanel_BlockHeight=Adjust height of alignments:" } )
     private void initOtherComponents() {
         //create header
-        this.add( LegendAndOptionsProvider.createHeader( Bundle.AlignmentOptionsPanel_General() ) );
+        add( LegendAndOptionsProvider.createHeader( Bundle.AlignmentOptionsPanel_General() ) );
         //create mapping filter
         LegendAndOptionsProvider.createMappingQualityFilter( alignmentViewer, this );
-        this.createCenterSeqBarBox();
-        this.createShowBaseQualitiesBox();
+        createCenterSeqBarBox();
+        createShowBaseQualitiesBox();
+        createAdjustAlignmentHeightSpinner();
 
-        this.updateUI();
+        updateUI();
     }
 
 
@@ -88,7 +103,7 @@ public class AlignmentOptionsPanel extends JPanel {
 
         } );
         generalPanel.add( centerBox, BorderLayout.WEST );
-        this.add( generalPanel );
+        add( generalPanel );
     }
 
 
@@ -97,10 +112,9 @@ public class AlignmentOptionsPanel extends JPanel {
      * selected.
      */
     private void createShowBaseQualitiesBox() {
-        Preferences pref = NbPreferences.forModule( Object.class );
         JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
         final JCheckBox qualitiesBox = LegendAndOptionsProvider.createStandardCheckBox( Bundle.AlignmentOptionsPanel_Qualities() );
-        qualitiesBox.setSelected( pref.getBoolean( Properties.BASE_QUALITY_OPTION, true ) );
+        qualitiesBox.setSelected( PREF.getBoolean( Properties.BASE_QUALITY_OPTION, true ) );
         qualitiesBox.setToolTipText( Bundle.AlignmentOptionsPanel_QualityToolTip() );
         generalPanel.add( qualitiesBox, BorderLayout.WEST );
 
@@ -111,13 +125,40 @@ public class AlignmentOptionsPanel extends JPanel {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 JCheckBox scaleBox = (JCheckBox) e.getSource();
-                NbPreferences.forModule( Object.class ).putBoolean( Properties.BASE_QUALITY_OPTION, scaleBox.isSelected() );
+                PREF.putBoolean( Properties.BASE_QUALITY_OPTION, scaleBox.isSelected() );
             }
 
 
         } );
 
-        this.add( generalPanel );
+        add( generalPanel );
+    }
+
+
+    /**
+     * Creates a JSpinner for adjusting the height of alignment blocks.
+     */
+    private void createAdjustAlignmentHeightSpinner() {
+        JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
+        JLabel label = LegendAndOptionsProvider.createLabel( Bundle.AlignmentOptionsPanel_BlockHeight(), Font.PLAIN );
+        int blockHeight = PREF.getInt( Properties.BLOCK_HEIGHT_OPTION, AlignmentViewer.DEFAULT_BLOCK_HEIGHT );
+        JSlider heightSpinner = LegendAndOptionsProvider.createStandardSlider( 1, 10, blockHeight );
+        generalPanel.add( label, BorderLayout.WEST );
+        generalPanel.add( heightSpinner, BorderLayout.EAST );
+
+        heightSpinner.addChangeListener( new ChangeListener() {
+
+
+            @Override
+            public void stateChanged( ChangeEvent e ) {
+                JSlider heightSpinner = (JSlider) e.getSource();
+                PREF.putInt( Properties.BLOCK_HEIGHT_OPTION, (Integer) heightSpinner.getValue() );
+            }
+
+
+        } );
+
+        add( generalPanel );
     }
 
 

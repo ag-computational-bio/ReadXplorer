@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.tools.snpdetection;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -33,7 +34,6 @@ import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -58,8 +58,8 @@ import org.openide.windows.WindowManager;
 
 /**
  * Action for opening a new SNP and DIP detection. It opens a track list
- * containing all tracks of the selected reference and creates a new snp
- * detection setup top component when tracks were selected.
+ * containing all tracks of the selected reference and creates a new SNP and DIP
+ * detection setup wizard, runs the analysis and opens the result TopComponent.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -71,7 +71,7 @@ import org.openide.windows.WindowManager;
     @ActionReference( path = "Menu/Tools", position = 125 ),
     @ActionReference( path = "Toolbars/Tools", position = 100 )
 } )
-@Messages( "CTL_OpenSnpDetectionAction=OpenSnpDetectionAction" )
+@Messages( { "CTL_OpenSnpDetectionAction=OpenSnpDetectionAction", "CTL_OpenSNPDetection=SNP Detection" } )
 public final class OpenSnpDetectionAction implements ActionListener,
                                                      DataVisualisationI {
 
@@ -98,9 +98,12 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
 
     /**
-     * Action for opening a new snp detection. It opens a track list containing
-     * all tracks of the selected reference and creates a new snp detection
-     * setup top component when tracks were selected.
+     * Action for opening a new SNP and DIP detection. It opens a track list
+     * containing all tracks of the selected reference and creates a new SNP and
+     * DIP detection setup wizard, runs the analysis and opens the result
+     * TopComponent.
+     * <p>
+     * @param context The ReferenceViewer for which the analysis is carried out.
      */
     public OpenSnpDetectionAction( ReferenceViewer context ) {
         this.context = context;
@@ -120,16 +123,12 @@ public final class OpenSnpDetectionAction implements ActionListener,
         this.finishedCovAnalyses = 0;
         this.trackToAnalysisMap = new HashMap<>();
 
-        //show track list
         this.runWizardAndSnpDetection();
     }
 
 
     /**
-     * Initializes the setup wizard for the snp detection
-     * <p>
-     * @param trackIds the list of track ids for which the snp detection has to
-     *                 be carried out
+     * Initializes the setup wizard for the snp detection.
      */
     @Messages( { "TTL_SNPWizardTitle=SNP Detection Parameter Wizard",
                  "TITLE_SNPDetectionTopComp=SNP Detection Window",
@@ -186,9 +185,9 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
         this.parametersSNPs = new ParameterSetSNPs( minVaryingBases, minPercentage, useMainBase, selFeatureTypes,
                                                     readClassParams, minBaseQuality, minAverageBaseQual, minAverageMapQual );
-        TrackConnector connector;
         if( !combineTracks ) {
             for( PersistentTrack track : tracks ) {
+                TrackConnector connector;
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
@@ -201,7 +200,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             }
         } else {
             try {
-                connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
+                TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassParams );
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
@@ -214,8 +213,8 @@ public final class OpenSnpDetectionAction implements ActionListener,
     /**
      * Creates the analysis for a TrackConnector.
      * <p>
-     * @param connector         the connector
-     * @param readClassesParams the read class parameters
+     * @param connector       The connector
+     * @param readClassParams The read class parameters
      */
     private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassParams ) {
         AnalysesHandler snpAnalysisHandler = connector.createAnalysisHandler( this,
@@ -258,8 +257,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
                     @Override
                     public void run() {
                         if( snpDetectionResultPanel == null ) {
-                            snpDetectionResultPanel = new SNPDetectionResultPanel();
-                            snpDetectionResultPanel.setBoundsInfoManager( context.getBoundsInformationManager() );
+                            snpDetectionResultPanel = new SNPDetectionResultPanel( context.getBoundsInformationManager() );
                         }
                         snpDetectionResultPanel.setReferenceGenome( context.getReference() );
                         snpDetectionResultPanel.addResult( result );
@@ -278,7 +276,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             }
 
         } catch( ClassCastException e ) {
-            LOG.log(Level.INFO, "Passed wrong data container to {0}", getClass().getName());
+            LOG.log( Level.INFO, "Passed wrong data container to {0}", getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
     }

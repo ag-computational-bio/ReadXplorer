@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
@@ -30,7 +31,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.AssignedMappi
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.UnionFractionMapping;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
@@ -43,12 +43,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static de.cebitec.readxplorer.utils.classification.FeatureType.CDS;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.EXON;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.GENE;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.MRNA;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.RRNA;
-import static de.cebitec.readxplorer.utils.classification.FeatureType.TRNA;
+import static de.cebitec.readxplorer.api.enums.FeatureType.CDS;
+import static de.cebitec.readxplorer.api.enums.FeatureType.EXON;
+import static de.cebitec.readxplorer.api.enums.FeatureType.GENE;
+import static de.cebitec.readxplorer.api.enums.FeatureType.MRNA;
+import static de.cebitec.readxplorer.api.enums.FeatureType.RRNA;
+import static de.cebitec.readxplorer.api.enums.FeatureType.TRNA;
 
 
 /**
@@ -81,7 +81,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
     /**
      * Carries out the logic behind the normalization (TPM and RPKM) anaylsis.
      * <p>
-     * @param trackConnector The trackConnector of the track for this analysis
+     * @param trackConnector      The trackConnector of the track for this
+     *                            analysis
      * @param paramsNormalization The set of selected parameters
      */
     public AnalysisNormalization( TrackConnector trackConnector, ParameterSetNormalization paramsNormalization ) {
@@ -159,8 +160,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
 
 
     /**
-     * Updates the read count for all features in the genomeFeatures list by
-     * all mappings in the mappings list.
+     * Updates the read count for all features in the genomeFeatures list by all
+     * mappings in the mappings list.
      * <p>
      * @param mappingResult the result containing all mappings to add to the
      *                      feature count
@@ -198,14 +199,14 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                         }
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
                             boolean countIt = assignedMapping.checkAssignment( featStart, featStop, feature );
-                            if ( countIt ) {
+                            if( countIt ) {
                                 assignedMapping.checkCountDecrease( featureReadCount );
                                 ++currentCount;
                                 readLengthSum += mapping.getLength();
                             }
                         }
 
-                    //still mappings left, but need next feature
+                        //still mappings left, but need next feature
                     } else if( mapping.getStart() > featStop ) {
                         if( fstFittingMapping ) { //until now no mapping was found for current feature
                             lastMappingIdx = j; //even if next feature starts at same start position no mapping will be found until mapping index j
@@ -231,12 +232,11 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
     }
 
 
-
-
-
     /**
-     * Create an {@link AssignedMapping} for each mapping
+     * Create an {@link AssignedMapping} for each mapping.
+     * <p>
      * @param mappings The list of mappings to process
+     * <p>
      * @return The created list of {@link AssignedMapping}s
      */
     private List<AssignedMapping> createAssignedMappings( List<Mapping> mappings ) {
@@ -260,24 +260,22 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
      */
     private void calculateFeatHierarchyData() {
 
-        /*
-         * Hierarchy to use for nested features:
-         * 1. Gene - use gene, if no other subfeatures are present
-         * - mRNA - complete mRNA, this shall be used for normalization
-         * calculation, if no exons are given
-         * - Exon - use them for normalization if they are available (mostly
-         * only in eukaryotes)
-         * - CDS - real coding region. They do not cover the whole exons, so
-         * this level can be excluded, except when CDS is selected for
-         * output.
-         * In general: We calculate all normalization values for all feature
-         * classes given. BUT: If we analyze a gene, we check for the
-         * subfeatures and output their normalization values. Same for mRNA or
-         * Exon When e.g. only Exon or CDS is selected, we only calculate the
-         * separate normalization values for the single exons and CDS and DO NOT
-         * combine them, as we do for mRNA and Gene! tRNA and rRNA are same
-         * level than mRNA.
-         */
+//        Hierarchy to use for nested features:
+//        1. Gene - use gene, if no other subfeatures are present
+//        - mRNA - complete mRNA, this shall be used for normalization
+//        calculation, if no exons are given
+//        - Exon - use them for normalization if they are available (mostly
+//        only in eukaryotes)
+//        - CDS - real coding region. They do not cover the whole exons, so
+//        this level can be excluded, except when CDS is selected for
+//        output.
+//        In general: We calculate all normalization values for all feature
+//        classes given. BUT: If we analyze a gene, we check for the
+//        subfeatures and output their normalization values. Same for mRNA or
+//        Exon When e.g. only Exon or CDS is selected, we only calculate the
+//        separate normalization values for the single exons and CDS and DO NOT
+//        combine them, as we do for mRNA and Gene! tRNA and rRNA are same
+//        level than mRNA.
 
         for( Integer id : featureReadCount.keySet() ) {
             NormalizedReadCount countObject = featureReadCount.get( id );
@@ -348,20 +346,22 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                     }
                 }
             }
+
+
         } );
     }
 
 
     /**
-     * Calculates the normalized read count values (RPKM and TPM)e for a given
-     * feature/gene according to the formulas given in Mortazavi et al. 2008,
+     * Calculates the normalized read count values (RPKM and TPM)e for all
+     * features/genes according to the formulas given in Mortazavi et al. 2008,
      * Mapping and quantifying mammalian transcriptomes by RNA-Seq for RPKM:
      * <br>
      * <br><b>RPKM = 10^9 * C / (N * L)</b> where
      * <br>C = number of mappable reads for gene
      * <br>N = total number of mappable reads for experiment/data set
      * <br>L = sum of gene base pairs
-     *
+     * <p>
      * and Li et al. 2010: RNA-Seq gene expression estimation with read mapping
      * uncertainty for TPM:
      * <br>
@@ -405,7 +405,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
 
     /**
      * @return The total number of read mappings compatible with genomic
-     * features.
+     *         features.
      */
     public double getTotalMappings() {
         return totalMappedReads;

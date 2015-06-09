@@ -30,24 +30,8 @@ import java.util.Set;
  */
 public final class ProcessingLog {
 
-    private static ProcessingLog instance;
     private StringBuilder gnuRprocessing = new StringBuilder();
     private Map<String, Object> properties = null;
-
-
-    /**
-     * Instantiation not allowed.
-     */
-    private ProcessingLog() {
-    }
-
-
-    public static ProcessingLog getInstance() {
-        if( instance == null ) {
-            instance = new ProcessingLog();
-        }
-        return instance;
-    }
 
 
     public synchronized void logGNURoutput( String output ) {
@@ -69,12 +53,6 @@ public final class ProcessingLog {
 
     public synchronized void addProperty( String key, Object value ) {
         properties.put( key, value );
-    }
-
-
-    public synchronized void resetLog() {
-        properties = null;
-        gnuRprocessing = new StringBuilder();
     }
 
 

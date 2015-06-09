@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.CodonUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
 import java.awt.BorderLayout;
@@ -138,7 +138,7 @@ public class CodonSelector extends javax.swing.JPanel {
         this.removeAll();
         this.setLayout( new BorderLayout() );
 
-        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
+        Pair<String[], String[]> geneticCode = CodonUtils.getGeneticCodeArrays();
         String[] startCodons = geneticCode.getFirst();
         String[] stopCodons = geneticCode.getSecond();
 

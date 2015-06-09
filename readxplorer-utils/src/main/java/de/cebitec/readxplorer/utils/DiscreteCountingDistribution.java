@@ -17,6 +17,9 @@
 
 package de.cebitec.readxplorer.utils;
 
+import de.cebitec.readxplorer.api.enums.Distribution;
+
+
 
 /**
  * Contains the data structure for storing a distribution of count values. The
@@ -33,7 +36,7 @@ public class DiscreteCountingDistribution {
 
     private int[] discreteCountingDistribution;
     private double[] binSteps;
-    private byte type;
+    private Distribution type;
     private int minValue;
     private long maxValue;
     private long totalCount;
@@ -213,7 +216,7 @@ public class DiscreteCountingDistribution {
      * Properties.COVERAGE_INCREASE_DISTRIBUTION or
      * Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
      */
-    public byte getType() {
+    public Distribution getType() {
         return this.type;
     }
 
@@ -221,11 +224,9 @@ public class DiscreteCountingDistribution {
     /**
      * Set the type of this distribution.
      * <p>
-     * @param type of this distribution: Either
-     * Properties.COVERAGE_INCREASE_DISTRIBUTION or
-     * Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
+     * @param type of this distribution
      */
-    public void setType( byte type ) {
+    public void setType( Distribution type ) {
         this.type = type;
     }
 

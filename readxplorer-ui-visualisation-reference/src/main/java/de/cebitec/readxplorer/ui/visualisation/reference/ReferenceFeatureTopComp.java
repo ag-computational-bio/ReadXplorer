@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.JFeature;
@@ -25,7 +26,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceView
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.UrlWithTitle;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.awt.Desktop;
 import java.beans.PropertyChangeEvent;
@@ -474,7 +474,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
             productText.setToolTipText( feat.getProduct() );
             locusField.setText( feat.getLocus() );
             geneField.setText( feat.getName() );
-            typeText.setText( feat.getType().getTypeString() );
+            typeText.setText( feat.getType().toString() );
             parentList.setListData( parentVect );
             subfeatureList.setListData( childrenVect );
 

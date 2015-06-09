@@ -31,7 +31,7 @@ public interface DataVisualisationI {
      * <p>
      * @param data the data object to visualize.
      */
-    public void showData( Object data );
+    void showData( Object data );
 
 
 }

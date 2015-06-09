@@ -18,17 +18,15 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.api.enums.Strand;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JPanel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -40,33 +38,27 @@ import javax.swing.table.TableRowSorter;
  * @author Evgeny Anisiforov, rhilker
  */
 //@TopComponent.Registration(mode = "output", openAtStartup = false)
-public class CorrelationResultPanel extends JPanel {
+public class CorrelationResultPanel extends ResultTablePanel {
 
     private static final long serialVersionUID = 1L;
-    private BoundsInfoManager bim;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
 
 
     /**
-     * Creates new form CorrelationResultPanel
+     * Creates new form CorrelationResultPanel.
+     * <p>
+     * @param bim BoundsInfoManager of the reference on which this analysis was
+     *            performed.
      */
-    public CorrelationResultPanel() {
+    public CorrelationResultPanel( BoundsInfoManager bim ) {
+        setBoundsInfoManager( bim );
         initComponents();
         final int posColumn = 2;
         final int trackColumn = 2;
         final int chromColumn = 3;
         tableFilter = new TableRightClickFilter<>( UneditableTableModel.class, posColumn, trackColumn );
         this.correlationTable.getTableHeader().addMouseListener( tableFilter );
-        DefaultListSelectionModel model = (DefaultListSelectionModel) correlationTable.getSelectionModel();
-        model.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged( ListSelectionEvent e ) {
-                TableUtils.showPosition( correlationTable, posColumn, chromColumn, bim );
-            }
-
-
-        } );
+        TableUtils.addTableListSelectionListener( correlationTable, posColumn, chromColumn, getBoundsInfoManager() );
     }
 
 
@@ -182,8 +174,16 @@ public class CorrelationResultPanel extends JPanel {
     }//GEN-LAST:event_exportButtonActionPerformed
 
 
-    public void setBoundsInfoManager( BoundsInfoManager boundsInformationManager ) {
-        this.bim = boundsInformationManager;
+    @Override
+    public void addResult( ResultTrackAnalysis newResult ) {
+
+        tableFilter.setTrackMap( newResult.getTrackMap() );
+
+        if( newResult instanceof CorrelationResult ) {
+            this.analysisResult = (CorrelationResult) newResult;
+            this.paramsLabel.setText( GeneralUtils.implodeMap( ": ", ", ", analysisResult.getAnalysisParameters() ) );
+            this.tracksLabel.setText( GeneralUtils.implode( ", ", analysisResult.getTrackNameList().toArray() ) );
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -200,14 +200,20 @@ public class CorrelationResultPanel extends JPanel {
     public void addData( CorrelatedInterval data ) {
         DefaultTableModel model = (DefaultTableModel) this.correlationTable.getModel();
         //TODO: get chromosome map and set chromosome correctly
-        String strandString = data.getDirection() == SequenceUtils.STRAND_FWD ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING;
+        String strandString = data.getDirection() == Strand.Forward ? Strand.Forward.toString() : Strand.Reverse.toString();
         model.addRow( new Object[]{ data.getChromId(), strandString, data.getFrom(), data.getTo(), data.getCorrelation(), data.getMinPeakCoverage() } );
+    }
+
+
+    @Override
+    public int getDataSize() {
+        return analysisResult.getCorrelationsList().size();
     }
 
 
     public void ready( CorrelationResult analysisResult ) {
         //correlationTable.setAutoCreateRowSorter(true);
-        this.setAnalysisResult( analysisResult );
+        this.addResult( analysisResult );
         correlationTable.setRowSorter( new TableRowSorter( this.correlationTable.getModel() ) );
     }
 
@@ -217,16 +223,6 @@ public class CorrelationResultPanel extends JPanel {
      */
     public CorrelationResult getAnalysisResult() {
         return analysisResult;
-    }
-
-
-    /**
-     * @param analysisResult the analysisResult to set
-     */
-    public void setAnalysisResult( CorrelationResult analysisResult ) {
-        this.analysisResult = analysisResult;
-        this.paramsLabel.setText( GeneralUtils.implodeMap( ": ", ", ", analysisResult.getAnalysisParameters() ) );
-        this.tracksLabel.setText( GeneralUtils.implode( ", ", analysisResult.getTrackNameList().toArray() ) );
     }
 
 

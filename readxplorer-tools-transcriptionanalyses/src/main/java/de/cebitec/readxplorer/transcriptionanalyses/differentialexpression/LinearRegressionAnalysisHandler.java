@@ -17,6 +17,8 @@
 
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
+import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -27,8 +29,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
-import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -88,10 +88,9 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
      */
     public LinearRegressionAnalysisHandler( List<PersistentTrack> selectedTracks, int[] groupAindex, int[] groupBindex,
                                      int refGenomeID, boolean workingWithoutReplicates, File saveFile, Set<FeatureType> selectedFeatureTypes,
-                                     int startOffset, int stopOffset, ParametersReadClasses readClassParams ) {
+                                     int startOffset, int stopOffset, ParametersReadClasses readClassParams, ProcessingLog log ) {
          
-        super( selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams );
-        ProcessingLog.getInstance().resetLog();
+        super( selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams, log );
         this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
@@ -139,12 +138,12 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
                 AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this,
                     "Collecting coverage data for track " + currentTrack.getDescription() + ".", readClassParams );
                 handler.setMappingsNeeded( true );
-                handler.setDesiredData( Properties.REDUCED_MAPPINGS );
+                handler.setDesiredData( IntervalRequestData.ReducedMappings );
                 handler.registerObserver( collCovData );
                 allHandler.add( handler );
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                ProcessingLog.getInstance().addProperty( "Unresolved track", currentTrack );
+                getProcessingLog().addProperty( "Unresolved track", currentTrack );
                 notifyObservers( DeAnalysisHandler.AnalysisStatus.ERROR );
                 this.interrupt();
                 return;
