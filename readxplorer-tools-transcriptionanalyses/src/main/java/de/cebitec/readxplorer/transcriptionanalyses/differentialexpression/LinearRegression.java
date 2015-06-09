@@ -53,10 +53,14 @@ public class LinearRegression implements LinearRegressionI {
          genesToScoreMap = this.findSimilarity(geneSet1, geneSet2);
     }
 
-    
+    /**
+     * Runs calculation of differential expression for each gene in two conditions.
+     * <p>
+     * @param geneSet1
+     * @param geneSet2
+     */
     private  Map<PersistentFeature, double[]> findSimilarity(Map<PersistentFeature, int[]> geneSet1,
                 Map<PersistentFeature, int[]> geneSet2) {
-        int limit2 = 2;
         Map<PersistentFeature, double[]> result = new HashMap<>();
         for (Map.Entry<PersistentFeature, int[]> gene1 :
             geneSet1.entrySet() ){
@@ -66,31 +70,21 @@ public class LinearRegression implements LinearRegressionI {
                     null : gene1.getKey().equals( gene2.getKey() )) {
                     int [] gene1Values = gene1.getValue();
                     int [] gene2Values = gene2.getValue();
-                    double[] calculation;
-                    if(  coverageFilter( gene1Values, limit2 ) &&
-                        coverageFilter( gene2Values, limit2 ) ) {
-                        CalculatePerpendicular rSqrt = new CalculatePerpendicular();
-                        calculation = rSqrt.calculate( gene1Values, gene2Values );
-                    } else if( coverageFilter( gene1Values, limit2 ) &&
-                       !( coverageFilter( gene2Values, limit2 ) ) ) {
-                        calculation = new double[] { Double.POSITIVE_INFINITY,
-                                                     Double.POSITIVE_INFINITY,
-                                                     Double.POSITIVE_INFINITY };
-                    } else if( !( coverageFilter( gene1Values, limit2 ) ) &&
-                        coverageFilter( gene2Values, limit2 ) ) {
-                        calculation = new double[] { Double.NEGATIVE_INFINITY,
-                                                     Double.NEGATIVE_INFINITY,
-                                                     Double.NEGATIVE_INFINITY };
-                    } else {
-                        continue;
-                    }
-                    result.put(gene1.getKey(), calculation);
+                    double[] calculated = runFilteredRegressionCalculation(
+                             gene1Values, gene2Values);
+                    result.put(gene1.getKey(), calculated);
                 }                            
             }                          
         }
         return result;
     }
 
+    /**
+     * Returns true if all coverage values in gene are larger than limit. 
+     * <p>
+     * @param geneValues
+     * @param limit
+     */
     private boolean coverageFilter(int[] geneValues, int limit){
         
         for( int k = 0; k < geneValues.length; k++ ){
@@ -99,6 +93,37 @@ public class LinearRegression implements LinearRegressionI {
                         }
         }
         return false;
+    }
+    
+    /**
+     * Filters out not proper values.If all values in both conditions are smaller
+     * than 5, samples will be discarded. If one sample has no expression and another 
+     * has 
+     * <p>
+     * @param gene1Values
+     * @param gene2Values
+     */
+    public double[] runFilteredRegressionCalculation(int[] gene1Values, int[] gene2Values){
+        double[] calculated = new double[3];
+        int limitLow = 1;
+        int limitNormal = 7;
+
+        if( coverageFilter( gene1Values, limitNormal ) &&
+            coverageFilter( gene2Values, limitNormal ) ) {        
+            CalculatePerpendicular rSqrt = new CalculatePerpendicular();
+            calculated = rSqrt.calculate( gene1Values, gene2Values );
+        } else if( coverageFilter( gene1Values, limitNormal ) &&
+            !( coverageFilter( gene2Values, limitLow ) ) ) {
+            calculated = new double[] { Double.POSITIVE_INFINITY,
+                                        Double.POSITIVE_INFINITY,
+                                        Double.POSITIVE_INFINITY };
+        } else if( !( coverageFilter( gene1Values, limitLow ) ) &&
+            coverageFilter( gene2Values, limitNormal ) ) {
+            calculated = new double[] { Double.NEGATIVE_INFINITY,
+                                        Double.NEGATIVE_INFINITY,
+                                        Double.NEGATIVE_INFINITY };
+        }
+       return calculated;
     }
      
 }
