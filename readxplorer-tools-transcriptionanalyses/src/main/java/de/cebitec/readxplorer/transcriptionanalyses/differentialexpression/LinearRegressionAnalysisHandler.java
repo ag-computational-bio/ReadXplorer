@@ -276,19 +276,20 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
             Map<PersistentFeature, Double> averagesOfReplicatesForCondition = new HashMap<>(); 
             Map<Integer, Map<PersistentFeature, int[]>> replicatePairs = new HashMap<>(); 
             for( PersistentFeature feature : featureSetForCondition.keySet()) {
-                ArrayList<Double> rSqueareMeans = new ArrayList<>();
+                ArrayList<Double> rCoefMeans = new ArrayList<>();
                  ArrayList<int[]> data = (ArrayList<int[]>) featureSetForCondition.getCollection( feature );
                  for(int i = 0; i<data.size(); i++) {
                     for(int j = i+1; j<data.size(); j++) {
                        int[] firstReplicateData = data.get( i );
                        int[] secondReplicateData = data.get( j );
-                       CalculatePerpendicular calculation = new CalculatePerpendicular();
-                       double[] regCalculation = calculation.calculate( firstReplicateData, secondReplicateData );
-                       double rSquare = regCalculation[2];
-                       rSqueareMeans.add( rSquare );
+                       LinearRegression calculation = new LinearRegression();
+                       double[] regCalculation = calculation.runFilteredRegressionCalculation(
+                               firstReplicateData, secondReplicateData );
+                       double rCoef = regCalculation[2];
+                       rCoefMeans.add( rCoef );
                     }
                  }
-                 double rSquareAverage = averageOfArray( rSqueareMeans );
+                 double rSquareAverage = averageOfArray( rCoefMeans );
                  averagesOfReplicatesForCondition.put( feature, rSquareAverage );
             }
             preparedDataForConditions.put( condition, averagesOfReplicatesForCondition );
@@ -312,12 +313,11 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
     }
     
     /**
-     * Runs linear regression tool after data are collected
-     * determines if data set contains replicates data
+     * Runs linear regression tool after data are collected,
+     * determines if data set contains replicates data.
      * <p>
      * 
-     */
-    
+     */    
     @Override
     protected List<ResultDeAnalysis> processWithTool() {
         Map<Integer, Map<PersistentFeature, int[]>> preparedDataForConditions;
@@ -357,10 +357,14 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
             int tableSize = feature.getValue().length+3; // Plus feature name and  r square of replicates(2 cond)
             final Object[] tmp = new Object[tableSize];
             double[] rSqrt = feature.getValue();
+            boolean allZero = true;
             
             tmp[0] = feature.getKey();
             for(int i = 1; i<tableSize-2; i++ ){
+                if(rSqrt[i-1] != 0){
                     tmp[i] = rSqrt[i-1];
+                    allZero = false;
+                }
             }
             if(replicatesData.isEmpty()) {
                 tmp[tableSize-2] = "There are no replicates";
@@ -369,9 +373,11 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
                 tmp[tableSize-2] = replicatesData.get( indexForConditionA ).get( feature.getKey() );
                 tmp[tableSize-1] = replicatesData.get( indexForConditionB ).get( feature.getKey() );
             }
-                
-            tableContents.add( new Vector( Arrays.asList( tmp ) ) );
-            regionNamesList.add( feature.getKey() );
+            
+             if(!allZero){
+                tableContents.add( new Vector( Arrays.asList( tmp ) ) );
+                regionNamesList.add( feature.getKey() );
+             }
             progressHandle.progress( k );
         }
 
@@ -384,7 +390,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler{
         colNames.add( "R for Replicates (Cond. 2)" );
 
         List<ResultDeAnalysis> result = Collections.singletonList( new ResultDeAnalysis(
-            tableContents, colNames, regionNamesList, "Count Data Table" ) );
+            tableContents, colNames, regionNamesList, "Regression Data Table" ) );
         progressHandle.finish();
         return result;
     }
