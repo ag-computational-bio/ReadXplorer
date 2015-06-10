@@ -72,11 +72,13 @@ public final class ProcessingLog {
                 }
             }
         }
-        log.append( System.getProperty( "line.separator" ) );
-        log.append( "GNU R output during processing: " );
-        log.append( System.getProperty( "line.separator" ) );
 
-        log.append( gnuRprocessing );
+        if( gnuRprocessing.length() > 0 ) {
+            log.append( System.getProperty( "line.separator" ) );
+            log.append( "GNU R output during processing: " );
+            log.append( System.getProperty( "line.separator" ) );
+            log.append( gnuRprocessing );
+        }
 
         return log.toString();
     }
