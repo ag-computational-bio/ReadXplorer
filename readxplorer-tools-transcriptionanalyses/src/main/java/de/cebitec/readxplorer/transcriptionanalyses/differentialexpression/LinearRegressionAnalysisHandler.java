@@ -106,8 +106,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
         genomeAnnos = new ArrayList<>();
         allContinuousCoverageData = new HashMap<>();
         results = new ArrayList<>();
-        linRegForConditions = new LinearRegression(log);
-        linRegForReplicates = new LinearRegression(log);
+        linRegForConditions = new LinearRegression( log );
+        linRegForReplicates = new LinearRegression( log );
     }
 
 
@@ -290,7 +290,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
                     for( int j = i + 1; j < data.size(); j++ ) {
                         int[] firstReplicateData = data.get( i );
                         int[] secondReplicateData = data.get( j );
-                        LinearRegression calculation = new LinearRegression(super.getProcessingLog());
+                        LinearRegression calculation = new LinearRegression( super.getProcessingLog() );
                         double[] regCalculation = calculation.runFilteredRegressionCalculation(
                                 firstReplicateData, secondReplicateData );
                         double rCoef = regCalculation[2];
@@ -396,6 +396,8 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
         colNames.add( "Intercept" );
         colNames.add( "Slope" );
         colNames.add( "Normalized Slope" );
+        colNames.add( "Apache Pearson" );
+        colNames.add( "Apache Spearman" );
         colNames.add( "R for Conditions" );
         colNames.add( "R for Replicates (Cond. 1)" );
         colNames.add( "R for Replicates (Cond. 2)" );

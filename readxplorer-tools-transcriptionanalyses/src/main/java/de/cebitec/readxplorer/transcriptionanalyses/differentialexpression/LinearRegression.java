@@ -95,16 +95,18 @@ public class LinearRegression implements LinearRegressionI {
 
 
     private Map<PersistentFeature, double[]> calculateMeanSlope( Map<PersistentFeature, double[]> genesMap ) {
-        double meanSlopeValue = addedUpSlopeValues / numberOfResults;
-        log.addProperty( "Mean Slope Value", meanSlopeValue);
+        double meanSlopeValue = Math.abs( addedUpSlopeValues / numberOfResults );
+        log.addProperty( "Mean Slope Value", meanSlopeValue );
         Map<PersistentFeature, double[]> ret = new HashMap<>();
         for( PersistentFeature key : genesMap.keySet() ) {
             double[] values = genesMap.get( key );
-            double[] enhancedValues = new double[4];
+            double[] enhancedValues = new double[values.length + 1];
             enhancedValues[0] = values[0];
             enhancedValues[1] = values[1];
             enhancedValues[2] = values[1] / meanSlopeValue;
             enhancedValues[3] = values[2];
+            enhancedValues[4] = values[3];
+            enhancedValues[5] = values[4];
             ret.put( key, enhancedValues );
         }
 
@@ -138,7 +140,7 @@ public class LinearRegression implements LinearRegressionI {
      * @param gene2Values
      */
     public double[] runFilteredRegressionCalculation( int[] gene1Values, int[] gene2Values ) {
-        double[] calculated = new double[3];
+        double[] calculated = new double[5];
         int limitLow = 1;
         int limitNormal = 7;
 
@@ -150,10 +152,14 @@ public class LinearRegression implements LinearRegressionI {
                    !(coverageFilter( gene2Values, limitLow )) ) {
             calculated = new double[]{ Double.POSITIVE_INFINITY,
                                        Double.POSITIVE_INFINITY,
+                                       Double.POSITIVE_INFINITY,
+                                       Double.POSITIVE_INFINITY,
                                        Double.POSITIVE_INFINITY };
         } else if( !(coverageFilter( gene1Values, limitLow )) &&
                    coverageFilter( gene2Values, limitNormal ) ) {
             calculated = new double[]{ Double.NEGATIVE_INFINITY,
+                                       Double.NEGATIVE_INFINITY,
+                                       Double.NEGATIVE_INFINITY,
                                        Double.NEGATIVE_INFINITY,
                                        Double.NEGATIVE_INFINITY };
         }

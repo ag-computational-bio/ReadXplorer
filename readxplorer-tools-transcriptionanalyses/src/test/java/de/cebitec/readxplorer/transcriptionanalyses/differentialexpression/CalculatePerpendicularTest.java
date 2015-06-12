@@ -87,7 +87,7 @@ public class CalculatePerpendicularTest {
         CalculatePerpendicular instance = new CalculatePerpendicular();
         double[] result = instance.calculate( conditionA, conditionB );
         //We only want to test slope here, so we copy the r^2 result.
-        double[] expResult = { result[0], -1d, result[2] };
+        double[] expResult = { result[0], -1d, result[2], result[3], result[4] };
 
         assertArrayEquals( "Wrong result for CalculatePerpendicular", expResult, result, 0 );
     }
@@ -123,7 +123,7 @@ public class CalculatePerpendicularTest {
         CalculatePerpendicular instance = new CalculatePerpendicular();
         double[] result = instance.calculate( conditionB, conditionA );
         //We only want to test slope here, so we copy the r^2 result.
-        double[] expResult = { result[0], -1d, result[2] };
+        double[] expResult = { result[0], -1d, result[2], result[3], result[4] };
 
         assertArrayEquals( "Wrong result for CalculatePerpendicular", expResult, result, 0 );
     }
@@ -142,7 +142,7 @@ public class CalculatePerpendicularTest {
         CalculatePerpendicular instance = new CalculatePerpendicular();
         double[] result = instance.calculate( conditionB, conditionA );
         //We only want to test slope and intercept here, so we copy the r^2 result.
-        double[] expResult = { 11d, -1d, result[2] };
+        double[] expResult = { 11d, -1d, result[2], result[3], result[4] };
 
         assertArrayEquals( "Wrong result for CalculatePerpendicular", expResult, result, 0 );
     }
@@ -160,7 +160,7 @@ public class CalculatePerpendicularTest {
         CalculatePerpendicular instance = new CalculatePerpendicular();
         double[] result = instance.calculate( conditionB, conditionA );
         //All points are equal, hence no line can be drawn.
-        double[] expResult = { NaN, NaN, NaN };
+        double[] expResult = { NaN, NaN, NaN, NaN, NaN };
 
         assertArrayEquals( "Wrong result for CalculatePerpendicular", expResult, result, 0 );
     }
@@ -178,7 +178,7 @@ public class CalculatePerpendicularTest {
         CalculatePerpendicular instance = new CalculatePerpendicular();
         double[] result = instance.calculate( conditionB, conditionA );
         //Perfect linear correlation
-        double[] expResult = { 0d, 1d, 1d };
+        double[] expResult = { 0d, 1d, 1d, 1d, 1d };
 
         assertArrayEquals( "Wrong result for CalculatePerpendicular", expResult, result, 0 );
     }

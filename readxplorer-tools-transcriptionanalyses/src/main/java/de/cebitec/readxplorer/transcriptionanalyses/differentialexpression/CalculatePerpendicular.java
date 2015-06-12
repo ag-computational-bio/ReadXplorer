@@ -17,6 +17,9 @@
 
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
+
 /**
  *
  * @author AM
@@ -26,13 +29,15 @@ public class CalculatePerpendicular implements CoreCalculationI{
     private static int leastSquaresIntercept = 0;
     private static int leastSquaresSlope = 1;
     private static int leastSquaresRSquare = 2;
+    private static int apachePearson = 3;
+    private static int apacheSpearman = 4;
  // public static int least_SQUARES_STDERR = 3;
  // public static int least_SQUARES_SUM_SQUARED_ERROR = 4;
 
     @Override
     public double[] calculate(int[] conditionA, int[] conditionB) 
             throws IllegalArgumentException {
-               double[] result = new double[3];
+               double[] result = new double[5];
 
         if (conditionA.length != conditionB.length) {
             throw new IllegalArgumentException();
@@ -63,6 +68,17 @@ public class CalculatePerpendicular implements CoreCalculationI{
 
         //r <- cor(y,x)
         double r = computePearsonsCorrelationCoefficient(conditionA,conditionB,meanConditionA,meanConditionB);
+        
+        double[] conditionADouble = new double[conditionA.length];
+        double[] conditionBDouble = new double[conditionB.length];
+        
+        for( int i = 0; i < conditionA.length; i++ ) {
+            conditionADouble[i] = conditionA[i];
+            conditionBDouble[i] = conditionB[i];
+        }
+        
+        double correlationApachePearson = new PearsonsCorrelation().correlation( conditionADouble, conditionBDouble );
+        double correlationApacheSpearman = new SpearmansCorrelation().correlation( conditionADouble, conditionBDouble );
      
         
         //slope <- (-b + sqrt(b^2 + 1))
@@ -82,6 +98,8 @@ public class CalculatePerpendicular implements CoreCalculationI{
         result[leastSquaresIntercept] = inter;
         result[leastSquaresSlope] = slope;
         result[leastSquaresRSquare] = r;
+        result[apachePearson] = correlationApachePearson;
+        result[apacheSpearman] = correlationApacheSpearman;
         //result[least_SQUARES_STDERR] = Double.NaN;
 
         return result;
