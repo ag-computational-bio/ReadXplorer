@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.tablevisualization.tablefilter;
 
 
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.GenerateRowSorterList;
 import de.cebitec.readxplorer.utils.ListTableModel;
@@ -133,7 +134,7 @@ public class TableRightClickFilterList<E extends ListTableModel> extends MouseAd
         "Occurrence_Filter_List=Occurrence Filter" } )
     private void init() {
         occurrenceFilter = new JMenuItem( Bundle.OccurrenceItemListTitle() );
-        occurrenceFilter.addActionListener(new ActionListener() {
+        occurrenceFilter.addActionListener( new ActionListener() {
 
             @Override
             public void actionPerformed( ActionEvent e ) {
@@ -170,7 +171,7 @@ public class TableRightClickFilterList<E extends ListTableModel> extends MouseAd
                             occurrenceCount = Integer.parseInt( occurrenceNumberString );
                         }
                         FilterOccurrenceList<E> filter = new FilterOccurrenceList<>( occurrencePanel.getSelectedButton(),
-                                                                             occurrenceCount, TableRightClickFilterList.this, trackColumn, posColumn );
+                                                                                     occurrenceCount, TableRightClickFilterList.this, trackColumn, posColumn );
                         filter.filterTable();
                     }
 
@@ -278,6 +279,11 @@ public class TableRightClickFilterList<E extends ListTableModel> extends MouseAd
                     numberColumnHigherItem.setEnabled( false );
                     stringColumnItem.setEnabled( true );
                 }
+                if( testValue instanceof PersistentFeature ) {
+                    numberColumnLowerItem.setEnabled( false );
+                    numberColumnHigherItem.setEnabled( false );
+                    stringColumnItem.setEnabled( true );
+                }
                 Object trackValue = lastTable.getModel().getValueAt( 0, trackColumn );
                 boolean isValidTrackColumn = trackValue instanceof PersistentTrack;
                 occurrenceFilter.setEnabled( isValidTrackColumn );
@@ -334,8 +340,8 @@ public class TableRightClickFilterList<E extends ListTableModel> extends MouseAd
         E filteredTableModel = patternFilter.filterTable( tm, column, pattern );
         return filteredTableModel;
     }
-
-
+    
+    
     public void setTrackMap( Map<Integer, PersistentTrack> trackMap ) {
         this.trackMap.clear();
         this.trackMap.putAll( trackMap );

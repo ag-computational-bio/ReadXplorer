@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.tablevisualization.tablefilter;
 
 
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.ListTableModel;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,8 +59,18 @@ public class FilterStringsList<T extends ListTableModel> implements FilterListI<
         List<List<Object>> dataVector = tableModel.getDataList();
         for( Iterator<List<Object>> it = dataVector.iterator(); it.hasNext(); ) {
             List<Object> row = it.next();
-            if( ((String) row.get( column )).contains( pattern ) ) {
-                filteredTableModel.addRow( row );
+            Object value = row.get( column );
+            if( value instanceof String ) {
+                if( ((String) value).contains( pattern ) ) {
+                    filteredTableModel.addRow( row );
+                }
+            } else {
+                if( value instanceof PersistentFeature ) {
+                    PersistentFeature f = (PersistentFeature) value;
+                    if( f.toString().contains( pattern ) ) {
+                        filteredTableModel.addRow( row );
+                    }
+                }
             }
         }
         if( filteredTableModel.getRowCount() < 1 ) {
