@@ -17,6 +17,8 @@
 
 package de.cebitec.readxplorer.utils;
 
+import java.util.List;
+
 
 /**
  *
@@ -25,6 +27,36 @@ package de.cebitec.readxplorer.utils;
 public class UneditableListTableModel extends ListTableModel {
 
     private static final long serialVersionUID = 1L;
+
+
+    public UneditableListTableModel() {
+        super();
+    }
+
+
+    public UneditableListTableModel( int rowCount, int columnCount ) {
+        super( rowCount, columnCount );
+    }
+
+
+    public UneditableListTableModel( List<Object> columnNames, int rowCount ) {
+        super( columnNames, rowCount );
+    }
+
+
+    public UneditableListTableModel( Object[] columnNames, int rowCount ) {
+        super( columnNames, rowCount );
+    }
+
+
+    public UneditableListTableModel( List<List<Object>> data, List<Object> columnNames ) {
+        super( data, columnNames );
+    }
+
+
+    public UneditableListTableModel( Object[][] data, Object[] columnNames ) {
+        super( data, columnNames );
+    }
 
 
     @Override

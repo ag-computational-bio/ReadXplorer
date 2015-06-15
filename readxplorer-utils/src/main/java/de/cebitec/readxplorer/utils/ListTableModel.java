@@ -49,8 +49,8 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
 
 
     /**
-     * Constructs a default <code>ListTableModel</code> which is a table of
-     * zero columns and zero rows.
+     * Constructs a default <code>ListTableModel</code> which is a table of zero
+     * columns and zero rows.
      */
     public ListTableModel() {
         this( 0, 0 );
@@ -58,8 +58,8 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
 
 
     /**
-     * Constructs a <code>ListTableModel</code> with <code>rowCount</code>
-     * and <code>columnCount</code> of <code>null</code> object values.
+     * Constructs a <code>ListTableModel</code> with <code>rowCount</code> and
+     * <code>columnCount</code> of <code>null</code> object values.
      * <p>
      * @param rowCount    the number of rows the table holds
      * @param columnCount the number of columns the table holds
@@ -225,9 +225,6 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
         fireTableChanged( event );
     }
 
-//
-// Manipulating rows
-//
 
     private void justifyRows( int from, int to ) {
         for( int i = from; i < to; i++ ) {
@@ -251,9 +248,9 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
      * <p>
      * @see #getDataList
      */
-    public void newRowsAdded( TableModelEvent e ) {
-        justifyRows( e.getFirstRow(), e.getLastRow() + 1 );
-        fireTableChanged( e );
+    public void newRowsAdded( TableModelEvent tme ) {
+        justifyRows( tme.getFirstRow(), tme.getLastRow() + 1 );
+        fireTableChanged( tme );
     }
 
 
@@ -263,8 +260,8 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
      * @param event the change event
      * <p>
      */
-    public void rowsRemoved( TableModelEvent event ) {
-        fireTableChanged( event );
+    public void rowsRemoved( TableModelEvent tme ) {
+        fireTableChanged( tme );
     }
 
 
@@ -273,7 +270,7 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
      * <code>null</code> values unless <code>rowData</code> is specified.
      * Notification of the row being added will be generated.
      * <p>
-     * @param rowData optional data of the row being added
+     * @param rowData data of the row being added
      */
     public void addRow( List<Object> rowData ) {
         insertRow( getRowCount(), rowData );
@@ -285,10 +282,25 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
      * <code>null</code> values unless <code>rowData</code> is specified.
      * Notification of the row being added will be generated.
      * <p>
-     * @param rowData optional data of the row being added
+     * @param rowData data of the row being added
      */
     public void addRow( Object[] rowData ) {
         addRow( ListTableModel.convertToList( rowData ) );
+    }
+
+
+    /**
+     * Adds a all rows to the end of the model. The new row will contain
+     * <code>null</code> values unless <code>rowData</code> is specified.
+     * Notification of the row being added will be generated.
+     * <p>
+     * @param rowsData data of the row being added
+     */
+    public void addAllRows( List<List<Object>> rowsData ) {
+
+        for( List<Object> rowData : rowsData ) {
+            insertRow( getRowCount(), rowData );
+        }
     }
 
 
@@ -352,17 +364,14 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
      * <code>to</code>. This method will send a <code>tableChanged</code>
      * notification message to all the listeners.
      * <p>
-     * <
-     * pre>
-     *  Examples of moves:
-     *
-     *  1. moveRow(1,3,5);
-     *          a|B|C|D|e|f|g|h|i|j|k   - before
-     *          a|e|f|g|h|B|C|D|i|j|k   - after
-     *
-     *  2. moveRow(6,7,1);
-     *          a|b|c|d|e|f|G|H|i|j|k   - before
-     *          a|G|H|b|c|d|e|f|i|j|k   - after
+     * <pre>
+     * Examples of moves:
+     * <p>
+     * 1. moveRow(1,3,5); a|B|C|D|e|f|g|h|i|j|k - before a|e|f|g|h|B|C|D|i|j|k -
+     * after
+     * <p>
+     * 2. moveRow(6,7,1); a|b|c|d|e|f|G|H|i|j|k - before a|G|H|b|c|d|e|f|i|j|k -
+     * after
      * </pre>
      * <p>
      * @param start the starting row index to be moved
@@ -492,7 +501,7 @@ public class ListTableModel extends AbstractTableModel implements Serializable {
             int newColumn = getColumnCount() - 1;
             for( int i = 0; i < columnSize; i++ ) {
                 List<Object> row = dataList.get( i );
-                row.set(newColumn, columnData.get( i ) );
+                row.set( newColumn, columnData.get( i ) );
             }
         } else {
             justifyRows( 0, getRowCount() );

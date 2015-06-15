@@ -30,18 +30,18 @@ import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
-import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
+import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilterList;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
-import de.cebitec.readxplorer.utils.GenerateRowSorter;
+import de.cebitec.readxplorer.utils.GenerateRowSorterList;
+import de.cebitec.readxplorer.utils.ListTableModel;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.UneditableListTableModel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -70,20 +70,20 @@ import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpressio
 
 
 /**
- * Top component which displays the results of differential expression analyses.
+ * Top component which displays the results of differential expression analysis.
  */
 @ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DiffExpResultViewer//EN",
-    autostore = false )
+                      autostore = false )
 @TopComponent.Description( preferredID = "DiffExpResultViewerTopComponent",
-    //iconBase="SET/PATH/TO/ICON/HERE",
-    persistenceType = TopComponent.PERSISTENCE_NEVER )
+                           //iconBase="SET/PATH/TO/ICON/HERE",
+                           persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpResultViewerTopComponent" )
 @ActionReference( path = "Menu/Window" /*
  * , position = 333
  */ )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_DiffExpResultViewerAction",
-    preferredID = "DiffExpResultViewerTopComponent" )
+                                      preferredID = "DiffExpResultViewerTopComponent" )
 @Messages( {
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
     "# {0} - tool",
@@ -100,14 +100,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
     private static final int CHROM_IDX = 1;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
-    private final List<DefaultTableModel> tableModels = new ArrayList<>();
+    private final List<ListTableModel> tableModels = new ArrayList<>();
     private TopComponent graphicsTopComponent;
     private ExpressTestGraphicsTopComponent ptc;
     private TopComponent logTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
     private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Differential Gene Expression Analysis" );
-    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>( UneditableTableModel.class, POS_IDX, TRACK_IDX );
+    private final TableRightClickFilterList<UneditableListTableModel> rktm = new TableRightClickFilterList<>( UneditableListTableModel.class, POS_IDX, TRACK_IDX );
     private ReferenceFeatureTopComp refComp;
 
 
@@ -120,7 +120,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
-        tm = new UneditableTableModel();
+        tm = new UneditableListTableModel();
         cbm = new DefaultComboBoxModel<>();
 
         initComponents();
@@ -156,38 +156,38 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
 
 
     /**
-     * Adds the results of a finished diff. gene expr. analysis to the table of
-     * this top component.
+     * Adds the results of a finished differential gene expression analysis to
+     * the table of this top component.
      */
     private void addResults() {
         if( analysisHandler.getResults() != null ) {
             List<ResultDeAnalysis> results = analysisHandler.getResults();
             List<String> descriptions = new ArrayList<>( results.size() );
             for( final ResultDeAnalysis currentResult : results ) {
-                Vector colNames = new Vector( currentResult.getColnames() );
-                Vector<Vector<Object>> tableContents;
+                List<Object> colNames = currentResult.getColnames();
+                List<List<Object>> tableContents;
                 switch( usedTool ) {
                     case ExportCountTable:
                     //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add( 0, "Feature" );
-                        tableContents = transformData( currentResult.getTableContentsContainingRowNames() );
+                        tableContents = currentResult.getTableContentsContainingRowNames();
                         break;
                     default:
                         colNames.remove( 0 );
                         colNames.add( 0, "Feature" );
-                        tableContents = transformData( currentResult.getTableContents() );
+                        tableContents = currentResult.getTableContents();
                 }
 
-                DefaultTableModel tmpTableModel = new UneditableTableModel( tableContents, colNames );
+                ListTableModel tmpTableModel = new UneditableListTableModel( tableContents, colNames );
                 descriptions.add( currentResult.getDescription() );
                 tableModels.add( tmpTableModel );
             }
 
             resultComboBox.setModel( new DefaultComboBoxModel<>( descriptions.toArray() ) );
-            DefaultTableModel dtm = tableModels.get( 0 );
+            ListTableModel dtm = tableModels.get( 0 );
             topCountsTable.setModel( dtm );
-            TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter( dtm );
+            TableRowSorter<ListTableModel> trs = GenerateRowSorterList.createRowSorter( dtm );
             topCountsTable.setRowSorter( trs );
             if( usedTool == ExpressTest ) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<>();
@@ -204,31 +204,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
             topCountsTable.setEnabled( true );
             jLabel1.setEnabled( true );
         }
-    }
-
-
-    /**
-     * Temporary method in order to workaround the <code>Vector</code> mess
-     * <p>
-     * @param data
-     */
-    private static Vector<Vector<Object>> transformData( List<List<Object>> data ) {
-
-        Vector<Vector<Object>> newData = new Vector<>();
-
-        for( List<Object> innerData : data ) {
-
-            Vector<Object> newInnerData = new Vector<Object>();
-            for( Object innerDatum : innerData ) {
-                newInnerData.add( innerDatum );
-            }
-
-            newData.add( newInnerData );
-
-        }
-
-        return newData;
-
     }
 
 
@@ -377,7 +352,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
 
     @Override
     public void componentOpened() {
-        // TODO add custom code on component opening
     }
 
 
@@ -388,16 +362,11 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
 
 
     void writeProperties( java.util.Properties p ) {
-        // better to version settings since initial version as advocated at
-        // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty( "version", "1.0" );
-        // TODO store your settings
     }
 
 
     void readProperties( java.util.Properties p ) {
-//        String version = p.getProperty("version");
-        // TODO read your settings according to their version
     }
 
 
@@ -442,9 +411,9 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
         int state = e.getStateChange();
         if( state == ItemEvent.SELECTED ) {
             rktm.resetOriginalTableModel();
-            DefaultTableModel dtm = tableModels.get( resultComboBox.getSelectedIndex() );
+            ListTableModel dtm = tableModels.get( resultComboBox.getSelectedIndex() );
             topCountsTable.setModel( dtm );
-            TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter( dtm );
+            TableRowSorter<ListTableModel> trs = GenerateRowSorterList.createRowSorter( dtm );
             topCountsTable.setRowSorter( trs );
             if( usedTool == ExpressTest ) {
                 trs.setSortKeys( Collections.singletonList( new RowSorter.SortKey( 8, SortOrder.DESCENDING ) ) );
