@@ -277,7 +277,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             // import paired-end reads
             importPairedEndReads( readFiles, pairedEndReadFiles, referenceResult, es, ps );
         } else {
-            // import normal reads
+            // import single reads
             importReads( readFiles, referenceResult, es, ps );
         }
 
@@ -376,8 +376,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private File[] getPairedEndReadFiles( final PrintStream ps, File[] readFiles ) throws CommandException {
 
         if( pairedEndArg ) {
+            // paired end reads combined in 1 sam/bam file
             return null;
-        } else if( pairedEndReadsDirArg != null ) {
+        } else if( !pairedEndArg  &&  pairedEndReadsDirArg == null ) {
+            // single reads
+            return null;
+        } else if( !pairedEndArg  &&  pairedEndReadsDirArg != null ) {
+            // paired end reads separated in 2 sam/bam files
 
             File pairedEndReadsDir = new File( pairedEndReadsDirArg );
             pairedEndReadsDir = pairedEndReadsDir.toPath().toAbsolutePath().normalize().toFile();
@@ -411,7 +416,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return pairedEndReadFiles;
 
         } else {
-            throw new CommandException( 1, "No paired-end read files set!" );
+            throw new CommandException( 1, "No paired-end read files set!" ); // never reachable; only for the sake of readability
         }
 
     }
