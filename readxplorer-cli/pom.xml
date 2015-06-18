@@ -104,6 +104,7 @@ Please, have a look at CommandLineProcessor's JavaDoc for further information.</
                     <author>Oliver Schwengers</author>
                     <licenseName>GPLv3</licenseName>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
+                    <cluster>readxplorer-cli</cluster>
                 </configuration>
             </plugin>
 
