@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.exporter.tables.ListTableToExcel;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readxplorer.exporter.tables.TableToExcel;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.BaySeqGraphicsTopComponent;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.DeSeq2GraphicsTopComponent;
@@ -50,7 +50,6 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.api.progress.ProgressHandle;
@@ -330,7 +329,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
         TableExportFileChooser fileChooser = new TableExportFileChooser( TableExportFileChooser.getTableFileExtensions(),
-                                                                         new TableToExcel( resultComboBox.getSelectedItem().toString(), (DefaultTableModel) topCountsTable.getModel() ) );
+                                                                         new ListTableToExcel( resultComboBox.getSelectedItem().toString(), (ListTableModel) topCountsTable.getModel() ) );
     }//GEN-LAST:event_saveTableButtonActionPerformed
 
     private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed
