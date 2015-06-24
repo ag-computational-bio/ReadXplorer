@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
@@ -103,7 +102,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
                 tmp[j] = value;
             }
             if( !allZero ) {
-                tableContents.add( new Vector( Arrays.asList( tmp ) ) );
+                tableContents.add( new ArrayList<>( Arrays.asList( tmp ) ) );
                 regionNamesList.add( feature[i] );
             }
             progressHandle.progress( i );
