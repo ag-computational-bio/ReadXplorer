@@ -205,6 +205,11 @@ public class SamUtils implements Observable {
 //        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
+        //The default value of 500.000 is only working for short reads. When SMRT reads are importet this causes the application to
+        //run out or memory and hence the value needed to be reduced drastically.
+        factory.setMaxRecordsInRam( 10000 );
+        //To improve the performance a little bit, write in parallel.
+        factory.setUseAsyncIo( true );
 //        if (extension.toLowerCase().contains("sam")) {
 //            outputFile = new File(newFileName + newEnding + ".sam");
 //            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
