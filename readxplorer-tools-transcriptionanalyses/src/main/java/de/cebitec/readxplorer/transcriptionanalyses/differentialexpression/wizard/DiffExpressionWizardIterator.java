@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeqAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpResultViewerTopComponent;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExportOnlyAnalysisHandler;
+import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExportOnlyContinuousAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExpressTestAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.LinearRegressionAnalysisHandler;
@@ -169,7 +170,7 @@ public final class DiffExpressionWizardIterator implements
             } else if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
                 handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.LinearRegression ) {
-                 List<Integer> groupAList = (List<Integer>) wiz.getProperty( "groupA" );
+                List<Integer> groupAList = (List<Integer>) wiz.getProperty( "groupA" );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
                 int[] groupA = new int[groupAList.size()];
                 for( int i = 0; i < groupA.length; i++ ) {
@@ -181,9 +182,12 @@ public final class DiffExpressionWizardIterator implements
                 for( int i = 0; i < groupB.length; i++ ) {
                     groupB[i] = groupBList.get( i );
                 }
-                
+
                 handler = new LinearRegressionAnalysisHandler( selectedTracks, groupA, groupB, genomeID, workingWithoutReplicates,
-                    saveFile, featureTypes, startOffset, stopOffset, readClassParams, log );
+                                                               saveFile, featureTypes, startOffset, stopOffset, readClassParams, log );
+            } else if( tool == DeAnalysisHandler.Tool.ExportContinuousCountTable ) {
+                handler = new ExportOnlyContinuousAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes,
+                                                                   startOffset, stopOffset, readClassParams, log );
             }
 
             DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent( handler, tool );
@@ -352,7 +356,8 @@ public final class DiffExpressionWizardIterator implements
                 currentPanels = linearRegressionPanels;
                 contentData = linearRegressionIndex;
             }
-            if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
+            if( tool == DeAnalysisHandler.Tool.ExportCountTable ||
+                tool == DeAnalysisHandler.Tool.ExportContinuousCountTable ) {
                 currentPanels = exportOnlyPanels;
                 contentData = exportOnlyIndex;
             }

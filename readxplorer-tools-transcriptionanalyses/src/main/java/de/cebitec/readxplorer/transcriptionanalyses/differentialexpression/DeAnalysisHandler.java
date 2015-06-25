@@ -91,7 +91,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
         ExpressTest( "Express Test" ), DeSeq( "DESeq" ), DeSeq2( "DESeq2" ),
         BaySeq( "baySeq" ), LinearRegression( "LinearRegression" ),
-        ExportCountTable( "Export only count table" );
+        ExportCountTable( "Export only count table" ), 
+        ExportContinuousCountTable("Export only continuous count table");
 
 
         private Tool( String stringRep ) {
@@ -114,7 +115,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 //If one Tool should not be available to the user return something like :
                 //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
             } else {
-                Tool[] ret = new Tool[]{ ExpressTest, LinearRegression, ExportCountTable };
+                Tool[] ret = new Tool[]{ ExpressTest, LinearRegression, ExportCountTable, ExportContinuousCountTable };
                 return ret;
             }
         }
@@ -263,6 +264,41 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
     public File getSaveFile() {
         return saveFile;
+    }
+
+
+    public List<PersistentFeature> getGenomeAnnos() {
+        return genomeAnnos;
+    }
+
+
+    public List<Observer> getObserverList() {
+        return observerList;
+    }
+
+
+    public ParametersReadClasses getReadClassParams() {
+        return readClassParams;
+    }
+
+
+    public int getResultsReceivedBack() {
+        return resultsReceivedBack;
+    }
+
+
+    public Set<FeatureType> getSelectedFeatureTypes() {
+        return selectedFeatureTypes;
+    }
+
+
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+
+    public int getStopOffset() {
+        return stopOffset;
     }
 
 

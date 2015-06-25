@@ -129,7 +129,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     }
 
 
-    private static int calculateFeatureTypeLength( PersistentFeature feature, FeatureType type ) {
+    public static final int calculateFeatureTypeLength( PersistentFeature feature, FeatureType type ) {
 
         int length = 0;
         for( Node n : feature.getNodeChildren() ) {
