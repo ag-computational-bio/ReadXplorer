@@ -16,7 +16,7 @@
         <module>branding</module>
         <module>centrallookup</module>
         <module>readxplorer-api</module>
-        <module>readxplorer-backend</module>
+        <module>readxplorer-databackend</module>
         <module>readxplorer-utils</module>
         <module>readxplorer-classificationupdate</module>
         <module>readxplorer-cli</module>
