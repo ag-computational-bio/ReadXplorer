@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readxplorer.mapping
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/mapping/Bundle.properties
+

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="File">
+            <file name="de-cebitec-readxplorer-ui-login-LoginWizardAction.instance">
+                <attr name="delegate" newvalue="de.cebitec.readxplorer.ui.login.LoginWizardAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.login.Bundle#CTL_LoginWizardAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/login/login.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="de-cebitec-readxplorer-ui-login-LogoutAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.login.Bundle#CTL_LogoutAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/login/logout.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.login.LogoutAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.api.cookies.LoginCookie"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="File">
+            <file name="de-cebitec-readxplorer-ui-login-LoginWizardAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-readxplorer-ui-login-LoginWizardAction.instance"/>
+                <attr name="position" intvalue="0"/>
+            </file>
+            <file name="de-cebitec-readxplorer-ui-login-LogoutAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-readxplorer-ui-login-LogoutAction.instance"/>
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="org-openide-actions-SaveAction.shadow_hidden"/>
+            <file name="org-openide-actions-SaveAllAction.shadow_hidden"/>
+            <file name="org-openide-actions-SaveAsAction.shadow_hidden"/>
+            <file name="Separator3.instance_hidden"/>
+            <file name="org-netbeans-modules-print-action-PageSetupAction.shadow_hidden"/>
+            <file name="org-netbeans-modules-print-action-PrintAction.shadow_hidden"/>
+            <file name="Separator4.instance_hidden"/>
+        </folder>
+        <folder name="Edit_hidden"/>
+        <folder name="GoTo_hidden"/>
+        <folder name="View_hidden"/>
+        <folder name="Window_hidden"/>
+    </folder>
+    <folder name="Services">
+        <folder name="AutoupdateType">
+            <file name="de_cebitec_readxplorer_ui_update_center.instance">
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.Bundle#Services/AutoupdateType/de_cebitec_readxplorer_ui_update_center.instance"/>
+                <attr name="enabled" boolvalue="true"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
+                <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
+                <attr name="url" bundlevalue="de.cebitec.readxplorer.ui.Bundle#de_cebitec_readxplorer_ui_update_center"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Toolbars">
+        <folder name="File_hidden"/>
+        <folder name="Memory">
+            <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.shadow_hidden"/>
+        </folder>
+        <folder name="UndoRedo_hidden"/>
+        <folder name="Tools">
+            <attr name="position" intvalue="3000"/>
+        </folder>
+    </folder>
+</filesystem>
