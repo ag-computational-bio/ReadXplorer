@@ -30,11 +30,6 @@ public final class Properties {
     }
 
 
-    // different adapter types for a project and or database
-    public static final String ADAPTER_MYSQL = "mysql";
-    public static final String ADAPTER_H2 = "h2";
-
-
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";

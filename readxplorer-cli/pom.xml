@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-cli</artifactId>
-    <version>1.0.0-FINAL</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - CLI</name>
     <description>This module provides basic command line functionalities for ReadXplorer's CLI version.

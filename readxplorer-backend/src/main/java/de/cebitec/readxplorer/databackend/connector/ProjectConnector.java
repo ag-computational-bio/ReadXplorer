@@ -23,7 +23,6 @@ import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.FieldNames;
 import de.cebitec.readxplorer.databackend.GenericSQLQueries;
 import de.cebitec.readxplorer.databackend.H2SQLStatements;
-import de.cebitec.readxplorer.databackend.MySQLStatements;
 import de.cebitec.readxplorer.databackend.SQLStatements;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -34,7 +33,6 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.FastaUtils;
-import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,7 +43,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,12 +69,10 @@ public final class ProjectConnector extends Observable {
 
     private static final Logger LOG = Logger.getLogger( ProjectConnector.class.getName() );
 
-    private static final int BATCH_SIZE = 100000; //TODO test larger batch sizes
-    private static final int FEATURE_BATCH_SIZE = BATCH_SIZE;
+    private static final int FEATURE_BATCH_SIZE = 100000; //TODO test larger batch sizes
     private static final int DB_VERSION_NO = 3;
 
     private static final String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
-    private static final String INT_UNSIGNED = "INT UNSIGNED";
     private static final String VARCHAR400 = "VARCHAR(400)";
     private static final String VARCHAR1000 = "VARCHAR(1000)";
 
@@ -88,9 +83,6 @@ public final class ProjectConnector extends Observable {
     private static ProjectConnector dbConnector;
 
     private String url;
-    private String user;
-    private String password;
-    private String adapter;
     private String dbLocation;
     private Connection con;
 
@@ -170,37 +162,26 @@ public final class ProjectConnector extends Observable {
 
 
     /**
-     * Connects to the adapter used for the current project. Can either be a
-     * database adapter for h2 or mysql or an adapter for direct file access.
+     * Connects to the H2 database used for the current project.
      * <p>
-     * @param adapter         the adapter type to use for the current project
      * @param projectLocation the project location
-     * @param hostname        the hostname, if we connect to a mysql database
-     * @param user            the user name, if we connect to a mysql database
-     * @param password        the password, if we connect to a mysql database
      * <p>
      * @throws SQLException
      * @throws JdbcSQLException
      */
-    public void connect( String adapter, String projectLocation, String hostname, String user, String password ) throws SQLException, JdbcSQLException {
+    public void connect( String projectLocation ) throws SQLException, JdbcSQLException {
 
-        this.adapter = adapter;
         this.dbLocation = projectLocation;
-        if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            this.url = "jdbc:" + adapter + "://" + hostname + "/" + projectLocation;
-            this.user = user;
-            this.password = password;
-            connectMySql( url, user, password );
-            setupMySQLDatabase();
-        } else if( adapter.equalsIgnoreCase( Properties.ADAPTER_H2 ) ) {
-            //CACHE_SIZE is measured in KB
-            this.url = "jdbc:" + adapter + ":" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
-            //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
+        //CACHE_SIZE is measured in KB
+        this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
+        //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
 
-            connectH2DataBase( url );
-            setupDatabaseH2();
+        LOG.info( "Connecting to database" );
+        con = DriverManager.getConnection( url );
+        con.setAutoCommit( true );
+        LOG.info( "Successfully connected to database" );
+        setupDatabase();
 
-        }
         // notify observers about the change of the database
         notifyObserversAbout( "connect" );
 
@@ -208,50 +189,12 @@ public final class ProjectConnector extends Observable {
 
 
     /**
-     * Connects to a MySql DB.
-     * <p>
-     * @param url      the DB url to connect to
-     * @param user     the username to use
-     * @param password the password to use
-     * <p>
-     * @throws SQLException
-     */
-    private void connectMySql( String url, String user, String password ) throws SQLException {
-
-        LOG.info( "Connecting to database" );
-        con = DriverManager.getConnection( url, user, password );
-        con.setAutoCommit( true );
-        LOG.info( "Successfully connected to database" );
-
-    }
-
-
-    /**
-     * Connects to an H2 DB.
-     * <p>
-     * @param url the DB url to connect to
-     * <p>
-     * @throws SQLException
-     * @throws JdbcSQLException
-     */
-    private void connectH2DataBase( String url ) throws SQLException, JdbcSQLException {
-
-        LOG.info( "Connecting to database" );
-        con = DriverManager.getConnection( url );
-        con.setAutoCommit( true );
-        LOG.info( "Successfully connected to database" );
-
-    }
-
-
-    /**
      * Makes sure that an H2 DB is in a correct up-to-date state.
      * Either creates all tables necessary for a ReadXplorer DB or updates them,
-     * if
-     * anything is missing/different. If no changes are necessary nothing is
+     * if anything is missing/different. If no changes are necessary nothing is
      * altered.
      */
-    private void setupDatabaseH2() {
+    private void setupDatabase() {
 
         try {
             LOG.info( "Setting up tables and indices if not existent" );
@@ -277,39 +220,6 @@ public final class ProjectConnector extends Observable {
             con.prepareStatement( H2SQLStatements.INDEX_COUNT_DIST ).executeUpdate();
 
             con.prepareStatement( SQLStatements.SETUP_DB_VERSION_TABLE ).executeUpdate();
-
-            checkDBStructure();
-
-            con.commit();
-            con.setAutoCommit( true );
-            LOG.info( "Finished creating tables and indices if not existent before" );
-
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-    }
-
-
-    /**
-     * Makes sure that a MySql DB is in a correct up-to-date state. Either
-     * creates all tables necessary for a ReadXplorer DB or updates them, if
-     * anything
-     * is missing/different. If no changes are necessary nothing is altered.
-     */
-    private void setupMySQLDatabase() {
-
-        try {
-            LOG.info( "Setting up tables and indices if not existent" );
-
-            con.setAutoCommit( false );
-            //create tables if not exist yet
-            con.prepareStatement( MySQLStatements.SETUP_REFERENCE_GENOME ).executeUpdate();
-            con.prepareStatement( MySQLStatements.SETUP_FEATURES ).executeUpdate();
-            con.prepareStatement( MySQLStatements.SETUP_TRACKS ).execute();
-            con.prepareStatement( SQLStatements.SETUP_STATISTICS ).execute();
-            con.prepareStatement( MySQLStatements.SETUP_COUNT_DISTRIBUTION ).executeUpdate();
-            con.prepareStatement( MySQLStatements.SETUP_CHROMOSOME ).executeUpdate();
 
             checkDBStructure();
 
@@ -410,8 +320,7 @@ public final class ProjectConnector extends Observable {
 
     /**
      * If the current transaction tried to make changes in the DB, these changes
-     * are
-     * rolled back.
+     * are rolled back.
      * <p>
      * @param className name of the class in which the error occured
      * @param ex        the exception, which was thrown
@@ -426,56 +335,12 @@ public final class ProjectConnector extends Observable {
                 LOG.info( "Successfully rolled back" );
             } else {
                 //connection was closed before, open a new one
-                connectMySql( url, user, password );
+                connect( dbLocation );
             }
 
         } catch( SQLException ex1 ) {
             LOG.log( Level.INFO, "Rollback failed", ex1 );
         }
-    }
-
-
-    /**
-     * Unlocks tables in mysql fashion.
-     */
-    private void unlockTables() {
-
-        LOG.info( "start unlocking tables" );
-        try( Statement unlock = con.createStatement() ) {
-            con.setAutoCommit( false );
-            unlock.execute( MySQLStatements.UNLOCK_TABLES );
-            con.commit();
-            con.setAutoCommit( true );
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-        LOG.info( "done unlocking tables" );
-    }
-
-
-    /**
-     * Disables all indices belonging to the domain of genomic references.
-     */
-    private void disableReferenceIndices() {
-
-        LOG.info( "start disabling reference data domain indexing..." );
-        disableDomainIndices( MySQLStatements.DISABLE_REFERENCE_INDICES, null );
-        disableDomainIndices( MySQLStatements.DISABLE_FEATURE_INDICES, null );
-        LOG.info( "...done disabling reference data domain indexing" );
-
-    }
-
-
-    /**
-     * Enables all indices belonging to the domain of genomic references.
-     */
-    private void enableReferenceIndices() {
-
-        LOG.info( "start enabling reference data domain indexing..." );
-        enableDomainIndices( MySQLStatements.ENABLE_REFERENCE_INDICES, null );
-        enableDomainIndices( MySQLStatements.ENABLE_FEATURE_INDICES, null );
-        LOG.info( "...done enabling reference data domain indexing" );
-
     }
 
 
@@ -495,18 +360,8 @@ public final class ProjectConnector extends Observable {
         try {
             con.setAutoCommit( false );
 
-            if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-                lockReferenceDomainTables();
-                disableReferenceIndices();
-            }
-
             storeGenome( reference );
             storeFeatures( reference );
-
-            if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-                enableReferenceIndices();
-                unlockTables();
-            }
 
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
@@ -644,11 +499,6 @@ public final class ProjectConnector extends Observable {
 
         LOG.info( "...done inserting features" );
 
-    }
-
-
-    private void lockReferenceDomainTables() {
-        lockDomainTables( MySQLStatements.LOCK_TABLE_REFERENCE_DOMAIN, "reference" );
     }
 
 
@@ -808,14 +658,6 @@ public final class ProjectConnector extends Observable {
 
 
     /**
-     * Locks all tables involved when adding a track in mysql fashion.
-     */
-    private void lockTrackDomainTables() {
-        lockDomainTables( MySQLStatements.LOCK_TABLE_TRACK_DOMAIN, "track" );
-    }
-
-
-    /**
      * Locks all tables declared by the lock sql statement.
      * <p>
      * @param lockStatement sql statement to lock some tables
@@ -830,74 +672,6 @@ public final class ProjectConnector extends Observable {
             rollbackOnError( ProjectConnector.class.getName(), ex );
         }
         LOG.log( Level.INFO, "...done locking {0} domain tables...", domainName );
-
-    }
-
-
-    private void disableTrackDomainIndices() {
-
-        LOG.info( "started disabling track data domain indices" );
-        disableDomainIndices( MySQLStatements.DISABLE_TRACK_INDICES, null );
-        LOG.info( "finished disabling track data domain indices" );
-
-    }
-
-
-    private void enableTrackDomainIndices() {
-
-        LOG.info( "started enabling track data domain indices" );
-        enableDomainIndices( MySQLStatements.ENABLE_TRACK_INDICES, null );
-        LOG.info( "finished enabling track data domain indices" );
-
-    }
-
-
-    /**
-     * Disables domain indices in mysql fashion.
-     * <p>
-     * @param sqlStatement mysql statement to disable domain indices
-     * @param domainName   name of the domain to disable, if not needed here,
-     *                     pass <code>null</code>
-     */
-    private void disableDomainIndices( String sqlStatement, String domainName ) {
-
-        if( domainName != null ) {
-            LOG.log( Level.INFO, "started disabling {0} data domain indices", domainName );
-        }
-
-        try( PreparedStatement disableDomainIndices = con.prepareStatement( sqlStatement ) ) {
-            disableDomainIndices.execute();
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        if( domainName != null ) {
-            LOG.log( Level.INFO, "finished disabling {0} data domain indices", domainName );
-        }
-    }
-
-
-    /**
-     * Enables domain indices in mysql fashion.
-     * <p>
-     * @param sqlStatement mysql statement to enable domain indices
-     * @param domainName   name of the domain to enable, if not needed here,
-     *                     pass <code>null</code>
-     */
-    private void enableDomainIndices( final String sqlStatement, final String domainName ) {
-
-        if( domainName != null ) {
-            LOG.log( Level.INFO, "started enabling {0} data domain indices", domainName );
-        }
-        try( PreparedStatement enableDomainIndices = con.prepareStatement( sqlStatement ) ) {
-            enableDomainIndices.execute();
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        if( domainName != null ) {
-            LOG.log( Level.INFO, "finished enabling {0} data domain indices", domainName );
-        }
 
     }
 
@@ -1253,14 +1027,6 @@ public final class ProjectConnector extends Observable {
 
 
     /**
-     * @return The database adapter string for this project
-     */
-    public String getAdapter() {
-        return adapter;
-    }
-
-
-    /**
      * Resets the file path of a direct access reference.
      * <p>
      * @param track track whose file path has to be resetted.
@@ -1271,22 +1037,12 @@ public final class ProjectConnector extends Observable {
 
         LOG.info( "Preparing statements for storing track data" );
 
-        if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            lockTrackDomainTables();
-            disableTrackDomainIndices();
-        }
-
         try( PreparedStatement resetTrackPath = con.prepareStatement( SQLStatements.RESET_TRACK_PATH ) ) {
             resetTrackPath.setString( 1, track.getFilePath() );
             resetTrackPath.setLong( 2, track.getId() );
             resetTrackPath.execute();
         } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            enableTrackDomainIndices();
-            unlockTables();
         }
 
         LOG.log( Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription() );
@@ -1306,11 +1062,6 @@ public final class ProjectConnector extends Observable {
 
         LOG.info( "Preparing statements for storing track data" );
 
-        if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            lockReferenceDomainTables();
-            disableReferenceIndices();
-        }
-
         try( PreparedStatement resetRefPath = con.prepareStatement( SQLStatements.RESET_REF_PATH ) ) {
             resetRefPath.setString( 1, fastaFile.getAbsolutePath() );
             resetRefPath.setLong( 2, ref.getId() );
@@ -1318,11 +1069,6 @@ public final class ProjectConnector extends Observable {
             ref.resetFastaPath( fastaFile );
         } catch( SQLException ex ) {
             rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            enableReferenceIndices();
-            unlockTables();
         }
 
         LOG.log( Level.INFO, "Reference file for \"{0}\" has been updated successfully", ref.getName() );

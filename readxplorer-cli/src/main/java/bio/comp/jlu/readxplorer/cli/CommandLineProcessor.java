@@ -49,7 +49,6 @@ import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readxplorer.tools.snpdetection.ParameterSetSNPs;
 import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetTSS;
-import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -446,7 +445,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 dbFile.delete();
             }
             ProjectConnector pc = ProjectConnector.getInstance();
-            pc.connect( Properties.ADAPTER_H2, dbFile.getCanonicalPath(), null, null, null );
+            pc.connect( dbFile.getCanonicalPath() );
 
             printFine( ps, null );
             printFine( ps, "connected to " + dbFile.getCanonicalPath() );

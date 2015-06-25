@@ -98,11 +98,7 @@ public final class LoginWizardAction implements ActionListener {
                     public void run() {
                         try {
                             ProjectConnector.getInstance().connect(
-                                    (String) loginProps.get( LoginWizardPanel.PROP_ADAPTER ),
-                                    (String) loginProps.get( LoginWizardPanel.PROP_DATABASE ),
-                                    (String) loginProps.get( LoginWizardPanel.PROP_HOST ),
-                                    (String) loginProps.get( LoginWizardPanel.PROP_USER ),
-                                    (String) loginProps.get( LoginWizardPanel.PROP_PASSWORD ) );
+                                    (String) loginProps.get( LoginWizardPanel.PROP_DATABASE ) );
                             cl.add( new LoginCookie() {
                                 @Override
                                 public boolean isLoggedIn() {
