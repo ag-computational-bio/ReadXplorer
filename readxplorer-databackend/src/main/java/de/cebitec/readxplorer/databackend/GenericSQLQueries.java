@@ -23,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Logger.getLogger;
@@ -47,31 +46,29 @@ public final class GenericSQLQueries {
     /**
      * Retrieves an integer value from the database defined by the connection
      * object
-     * according to the sqlStatement and trackID passed to this method.
+     * according to the sqlStatement and trackId passed to this method.
      * <p>
      * @param sqlStatement statement to execute on database
      * @param identifier   the identifier of the return value from the database,
      *                     needed to get desired value from ResultSet
      * @param con          connection to the database
-     * @param trackID      ID of the track
+     * @param trackId      ID of the track
      * <p>
      * @return the value calculated for the given sqlStatement
      */
-    public static int getIntegerFromDB( String sqlStatement, String identifier, Connection con, long trackID ) {
-        int num = -1;
+    public static int getIntegerFromDB( String sqlStatement, String identifier, Connection con, long trackId ) throws SQLException {
+
         try( PreparedStatement fetch = con.prepareStatement( sqlStatement ) ) {
-            fetch.setLong( 1, trackID );
+            fetch.setLong( 1, trackId );
 
-            ResultSet rs = fetch.executeQuery();
-            if( rs.next() ) {
-                num = rs.getInt( identifier );
+            try( ResultSet rs = fetch.executeQuery() ) {
+                if( rs.next() ) {
+                    return rs.getInt( identifier );
+                } else {
+                    return -1;
+                }
             }
-            rs.close();
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
         }
-
-        return num;
     }
 
 
@@ -83,7 +80,8 @@ public final class GenericSQLQueries {
      * <p>
      * @return the latest id of the querried table increased by one
      */
-    public static long getLatestIDFromDB( String sqlStmt, Connection con ) {
+    public static long getLatestIDFromDB( String sqlStmt, Connection con ) throws SQLException {
+
         long id = 0;
         try( Statement stmtLatestID = con.createStatement();
              ResultSet rs = stmtLatestID.executeQuery( sqlStmt ) ) {
@@ -91,26 +89,15 @@ public final class GenericSQLQueries {
             if( rs.next() ) {
                 id = rs.getLong( "LATEST_ID" );
             }
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, ex.getMessage(), ex );
         }
+
         return ++id;
+
     }
 
 
-    public static String generateAddColumnString( String table, String column ) {
-        return "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
-               + table
-               + " AND COLUMN_NAME =" + column + ")"
-               + " BEGIN "
-               + "ALTER TABLE "
-               + table
-               + " ADD COLUMN "
-               + column + " BIGINT UNSIGNED "
-               + " END";
-    }
 
-
+    
     /**
      * Adds a new column to the table.
      * <p>

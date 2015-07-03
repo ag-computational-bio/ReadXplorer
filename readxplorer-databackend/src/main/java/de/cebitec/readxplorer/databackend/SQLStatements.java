@@ -38,13 +38,93 @@ public final class SQLStatements {
      */
     public static final String GET_NUM = "NUM";
 
+
     //////////////////  statements for table creation  /////////////////////////
 
-//    public static final String SETUP_PROJECT_FOLDER =
-//            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_PROJECT_FOLDER
-//            + " ("
-//            + FieldNames.PROJECT_FOLDER_PATH + " VARCHAR(400) NOT NULL "
-//            + ") ";
+
+    public static final String SETUP_REFERENCE_GENOME
+            = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REFERENCE
+              + " ("
+              + FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, "
+              + FieldNames.REF_GEN_NAME + " VARCHAR(200) NOT NULL, "
+              + FieldNames.REF_GEN_DESCRIPTION + " VARCHAR(200) NOT NULL,"
+              + FieldNames.REF_GEN_TIMESTAMP + " DATETIME NOT NULL,"
+              + FieldNames.REF_GEN_FASTA_FILE + " VARCHAR(600) NOT NULL"
+              + ") ";
+
+
+    public static final String SETUP_CHROMOSOME
+            = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_CHROMOSOME
+              + " ("
+              + FieldNames.CHROM_ID + " BIGINT PRIMARY KEY, "
+              + FieldNames.CHROM_NUMBER + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.CHROM_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.CHROM_NAME + " VARCHAR(200) NOT NULL, "
+              + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL "
+              + ") ";
+
+
+    public static final String INDEX_CHROMOSOME
+            = "CREATE INDEX IF NOT EXISTS INDEXCHROMOSOM ON " + FieldNames.TABLE_CHROMOSOME
+              + " (" + FieldNames.CHROM_REFERENCE_ID + ") ";
+
+
+    public static final String SETUP_FEATURES
+            = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
+              + " ("
+              + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
+              + FieldNames.FEATURE_CHROMOSOME_ID + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.FEATURE_PARENT_IDS + " VARCHAR (1000) NOT NULL, "
+              + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
+              + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.FEATURE_LOCUS_TAG + " VARCHAR (1000), "
+              + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
+              + FieldNames.FEATURE_EC_NUM + " VARCHAR (20), "
+              + FieldNames.FEATURE_STRAND + " TINYINT NOT NULL, "
+              + FieldNames.FEATURE_GENE + " VARCHAR (20) "
+              + ") ";
+
+
+    public static final String INDEX_FEATURES
+            = "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES
+              + " (" + FieldNames.FEATURE_CHROMOSOME_ID + ") ";
+
+
+    public static final String SETUP_TRACKS
+            = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_TRACK
+              + " ( "
+              + FieldNames.TRACK_ID + " BIGINT UNSIGNED PRIMARY KEY, "
+              + FieldNames.TRACK_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.TRACK_READ_PAIR_ID + " BIGINT UNSIGNED, " //only for paired sequences
+              + FieldNames.TRACK_DESCRIPTION + " VARCHAR (200) NOT NULL, "
+              + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL,  "
+              + FieldNames.TRACK_PATH + " VARCHAR(600) "
+              + ") ";
+
+
+    public static final String INDEX_TRACK_REFID
+            = "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK
+              + " (" + FieldNames.TRACK_REFERENCE_ID + ") ";
+
+
+    public static final String INDEX_TRACK_READ_PAIR_ID
+            = "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK
+              + " (" + FieldNames.TRACK_READ_PAIR_ID + ") ";
+
+
+    public static final String SETUP_COUNT_DISTRIBUTION
+            = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COUNT_DISTRIBUTION + " ( "
+              + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.COUNT_DISTRIBUTION_DISTRIBUTION_TYPE + " TINYINT UNSIGNED NOT NULL, "
+              + FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
+              + FieldNames.COUNT_DISTRIBUTION_BIN_COUNT + " BIGINT UNSIGNED NOT NULL ) ";
+
+    public static final String INDEX_COUNT_DIST
+            = "CREATE INDEX IF NOT EXISTS INDEX_COUNT_DIST ON " + FieldNames.TABLE_COUNT_DISTRIBUTION
+              + " (" + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " ) ";
+
+
     public static final String SETUP_STATISTICS
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
               + "( "
@@ -53,6 +133,7 @@ public final class SQLStatements {
               + FieldNames.STATISTICS_KEY + " VARCHAR(100) NOT NULL, "
               + FieldNames.STATISTICS_VALUE + " BIGINT UNSIGNED NOT NULL "
               + ") ";
+
 
     public static final String SETUP_DB_VERSION_TABLE
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_DB_VERSION
@@ -67,13 +148,18 @@ public final class SQLStatements {
      */
     public static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
+
     /**
      * Only needed as long as older databases are floating around and did not
      * already drop this index which is not necessary anymore.
      */
     public static final String DROP_INDEX = "DROP INDEX IF EXISTS ";
 
-    //////////////////  statements for data insertion  ////////////////////////
+
+
+
+    //////////////////  statements for data insertion  /////////////////////////
+
 
     public static final String INSERT_REFGENOME
             = "INSERT INTO " + FieldNames.TABLE_REFERENCE + " "
@@ -150,6 +236,7 @@ public final class SQLStatements {
               + " SET " + FieldNames.TRACK_READ_PAIR_ID + " = ? "
               + " WHERE " + FieldNames.TRACK_ID + " = ? ";
 
+
     /**
      * Insert statistics data of one track into statistics table.
      */
@@ -162,30 +249,6 @@ public final class SQLStatements {
               + FieldNames.STATISTICS_VALUE + " ) "
               + "VALUES (?,?,?,?)";
 
-    /**
-     * Update exisiting row of track statistics with read pair statistics
-     */
-    public static final String INSERT_READPAIR_STATISTICS
-            = "UPDATE " + FieldNames.TABLE_STATISTICS
-              + " SET "
-              + FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS + " = ?, "
-              + FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS + " = ?, "
-              + FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH + " = ? "
-              + " WHERE "
-              + FieldNames.STATISTICS_TRACK_ID + " = ? ";
 
     /**
      * Insert a new coverage distribution for a track with all 35 distribution
@@ -201,12 +264,14 @@ public final class SQLStatements {
               + " ) "
               + "VALUES (?,?,?,?)";
 
+
     public static final String INSERT_DB_VERSION_NO
             = "INSERT INTO " + FieldNames.TABLE_DB_VERSION
               + " ("
               + FieldNames.DB_VERSION_DB_VERSION_NO
               + " )"
               + " VALUES (?)";
+
 
     public static final String UPDATE_DB_VERSION_NO
             = "UPDATE " + FieldNames.TABLE_DB_VERSION
@@ -226,6 +291,7 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.STATISTICS_TRACK_ID + " = ? ";
 
+
     public static final String DELETE_SPECIFIC_TRACK_STATISTIC
             = "DELETE FROM "
               + FieldNames.TABLE_STATISTICS
@@ -233,11 +299,13 @@ public final class SQLStatements {
               + FieldNames.STATISTICS_TRACK_ID + " = ? and "
               + FieldNames.STATISTICS_KEY + " = ?";
 
+
     public static final String DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK
             = "DELETE FROM "
               + FieldNames.TABLE_COUNT_DISTRIBUTION
               + " WHERE "
               + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " = ? ";
+
 
     /**
      * Delete all genomic features of a chromosome from the feature table.
@@ -248,6 +316,7 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.FEATURE_CHROMOSOME_ID + " = ?";
 
+
     /**
      * Delete a chromosome from the chromosome table.
      */
@@ -256,6 +325,7 @@ public final class SQLStatements {
               + FieldNames.TABLE_CHROMOSOME
               + " WHERE "
               + FieldNames.CHROM_ID + " = ?";
+
 
     /**
      * Delete a reference genome from the reference table.
@@ -267,7 +337,10 @@ public final class SQLStatements {
               + FieldNames.REF_GEN_ID + " = ?";
 
 
+
+
     // statements to fetch data from database
+
     public static final String FETCH_GENOMES
             = "SELECT "
               + "R." + FieldNames.REF_GEN_ID + ", "
@@ -285,6 +358,7 @@ public final class SQLStatements {
               + " FROM "
               + FieldNames.TABLE_DB_VERSION;
 
+
     public static final String FETCH_CHROMOSOMES
             = "SELECT "
               + FieldNames.CHROM_ID + ", "
@@ -296,6 +370,7 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.CHROM_REFERENCE_ID + " = ? ";
 
+
     public static final String FETCH_CHROMOSOME
             = "SELECT "
               + FieldNames.CHROM_NAME + ", "
@@ -306,27 +381,6 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.CHROM_ID + " = ? ";
 
-    /**
-     * Fetch the reference sequence file for a given reference id.
-     */
-    public static final String FETCH_REF_FILE
-            = "SELECT "
-              + FieldNames.REF_GEN_FASTA_FILE
-              + " FROM "
-              + FieldNames.TABLE_REFERENCE
-              + " WHERE "
-              + FieldNames.REF_GEN_ID + " = ?";
-
-    /**
-     * Fetch the number of chromosomes for a reference.
-     */
-    public static final String FETCH_NUMBER_CHROMS_FOR_REF
-            = "SELECT "
-              + "COUNT(" + FieldNames.TABLE_CHROMOSOME + "." + FieldNames.CHROM_ID + ") as NUM "
-              + " FROM "
-              + FieldNames.TABLE_CHROMOSOME
-              + " WHERE "
-              + FieldNames.CHROM_REFERENCE_ID + " = ? ";
 
     /**
      * Updates the reference genome sequence.
@@ -345,6 +399,7 @@ public final class SQLStatements {
               + FieldNames.FEATURE_CHROMOSOME_ID + " = ? "
               + " WHERE "
               + FieldNames.FEATURE_REFGEN_ID + " = ? ";
+
 
     /**
      * Statement for old DBs to fetch the reference sequence, still stored here.
@@ -369,6 +424,7 @@ public final class SQLStatements {
               + "FROM "
               + FieldNames.TABLE_TRACK;
 
+
     public static final String FETCH_TRACK
             = " SELECT * FROM "
               + FieldNames.TABLE_TRACK
@@ -388,6 +444,7 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.REF_GEN_ID + " = ?";
 
+
     //Select ID from first feature belonging to the referece genome
     public static final String CHECK_IF_FEATURES_EXIST
             = "SELECT "
@@ -397,6 +454,7 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.FEATURE_CHROMOSOME_ID + " = ? LIMIT 1";
 
+
     public static final String CHECK_IF_FEATURES_OF_TYPE_EXIST
             = "SELECT "
               + FieldNames.FEATURE_ID
@@ -405,6 +463,7 @@ public final class SQLStatements {
               + " WHERE "
               + FieldNames.FEATURE_CHROMOSOME_ID + " = ? and "
               + FieldNames.FEATURE_TYPE + " = ?";
+
 
     public static final String FETCH_FEATURES_FOR_CHROM_INTERVAL
             = "SELECT "
@@ -426,6 +485,7 @@ public final class SQLStatements {
               + FieldNames.FEATURE_START + " <= ? "
               + " ORDER BY " + FieldNames.FEATURE_START;
 
+
     public static final String FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL
             = "SELECT "
               + FieldNames.FEATURE_ID + ", "
@@ -446,6 +506,7 @@ public final class SQLStatements {
               + FieldNames.FEATURE_START + " <= ? and "
               + FieldNames.FEATURE_TYPE + " = ? "
               + " ORDER BY " + FieldNames.FEATURE_START;
+
 
     public static final String FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL
             = "SELECT "
@@ -483,14 +544,9 @@ public final class SQLStatements {
               + FieldNames.TABLE_STATISTICS;
 
 
-    /////////////////// statistics calculations and queries //////////////////////////
-    public static final String CHECK_FOR_TRACK_IN_STATS_CALCULATE
-            = "SELECT "
-              + "COUNT(S." + FieldNames.STATISTICS_TRACK_ID + ") as NUM "
-              + " FROM "
-              + FieldNames.TABLE_STATISTICS + " as S "
-              + "WHERE "
-              + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+
+
+    /////////////////// statistics calculations and queries ////////////////////
 
 
     public static final String FETCH_STATS_FOR_TRACK
@@ -498,10 +554,6 @@ public final class SQLStatements {
               + FieldNames.TABLE_STATISTICS
               + " WHERE "
               + FieldNames.STATISTICS_TRACK_ID + " = ?";
-
-    public static final String FETCH_ALL_STATS
-            = "SELECT * FROM "
-              + FieldNames.TABLE_STATISTICS;
 
 
     /**
@@ -514,6 +566,7 @@ public final class SQLStatements {
               + FieldNames.TABLE_TRACK + " "
               + "WHERE "
               + FieldNames.TRACK_ID + " = ? ";
+
 
     /**
      * Fetches second track id for read pair tracks.

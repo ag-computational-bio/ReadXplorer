@@ -23,7 +23,6 @@ import de.cebitec.readxplorer.api.FileException;
 import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.FieldNames;
 import de.cebitec.readxplorer.databackend.GenericSQLQueries;
-import de.cebitec.readxplorer.databackend.H2SQLStatements;
 import de.cebitec.readxplorer.databackend.SQLStatements;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -193,22 +192,22 @@ public final class ProjectConnector extends Observable {
         try( Statement stmt = con.createStatement() ) {
 
             //create tables if not exist yet
-            stmt.execute( H2SQLStatements.SETUP_REFERENCE_GENOME );
+            stmt.execute( SQLStatements.SETUP_REFERENCE_GENOME );
 
-            stmt.execute( H2SQLStatements.SETUP_CHROMOSOME );
-            stmt.execute( H2SQLStatements.INDEX_CHROMOSOME );
+            stmt.execute( SQLStatements.SETUP_CHROMOSOME );
+            stmt.execute( SQLStatements.INDEX_CHROMOSOME );
 
-            stmt.execute( H2SQLStatements.SETUP_FEATURES );
-            stmt.execute( H2SQLStatements.INDEX_FEATURES );
+            stmt.execute( SQLStatements.SETUP_FEATURES );
+            stmt.execute( SQLStatements.INDEX_FEATURES );
 
-            stmt.execute( H2SQLStatements.SETUP_TRACKS );
-            stmt.execute( H2SQLStatements.INDEX_TRACK_REFID );
-            stmt.execute( H2SQLStatements.INDEX_TRACK_READ_PAIR_ID );
+            stmt.execute( SQLStatements.SETUP_TRACKS );
+            stmt.execute( SQLStatements.INDEX_TRACK_REFID );
+            stmt.execute( SQLStatements.INDEX_TRACK_READ_PAIR_ID );
 
             stmt.execute( SQLStatements.SETUP_STATISTICS );
 
-            stmt.execute( H2SQLStatements.SETUP_COUNT_DISTRIBUTION );
-            stmt.execute( H2SQLStatements.INDEX_COUNT_DIST );
+            stmt.execute( SQLStatements.SETUP_COUNT_DISTRIBUTION );
+            stmt.execute( SQLStatements.INDEX_COUNT_DIST );
 
             stmt.execute( SQLStatements.SETUP_DB_VERSION_TABLE );
 
