@@ -142,7 +142,7 @@ public class GASVCaller implements Runnable {
     private void createChromosomeNamingFile( PersistentReference reference ) {
         IO.getOut().println( Bundle.ChromFileWritingStart() );
         ProjectConnector projectConnector = ProjectConnector.getInstance();
-        String dbLocation = projectConnector.getDBLocation();
+        String dbLocation = projectConnector.getDbLocation();
         String refName = reference.getName();
         chromNamesFileName = new File( dbLocation ).getParent().concat( "\\" + refName.concat( "-seqNames-gasv.txt" ) );
 

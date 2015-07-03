@@ -20,13 +20,13 @@ package de.cebitec.readxplorer.ui.login;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.ui.dialogmenus.LoadingDialog;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +107,7 @@ public final class LoginWizardAction implements ActionListener {
 
 
                             } );
-                        } catch( SQLException ex ) {
+                        } catch( DatabaseException ex ) {
                             NotifyDescriptor nd = new NotifyDescriptor.Message( ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE );
                             nd.setTitle( NbBundle.getMessage( LoginWizardAction.class, "MSG_LoginWizardAction.sqlError" ) );
                             DialogDisplayer.getDefault().notify( nd );

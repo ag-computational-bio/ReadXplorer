@@ -175,7 +175,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedIn() );
             try {
                 final Map<PersistentReference, List<PersistentTrack>> genomesAndTracks
-                        = ProjectConnector.getInstance().getGenomesAndTracks();
+                        = ProjectConnector.getInstance().getReferencesAndTracks();
 
                 Node rootNode = new AbstractNode( new Children.Keys<PersistentReference>() {
                     @Override
@@ -548,7 +548,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
         this.updateOpenList();
 
-        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
+        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getReferencesAndTracks();
 
         for( Long genomeId : genomesAndTracksToOpen.keySet() ) {
             Set<Long> trackIds = genomesAndTracksToOpen.get( genomeId );

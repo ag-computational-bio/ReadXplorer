@@ -42,8 +42,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -58,12 +59,11 @@ public class TrackConnector {
 
     public static final int FIXED_INTERVAL_LENGTH = 1000;
 
-    private int trackID;
+    private int trackId;
     private CoverageThread coverageThread;
     private MappingThread mappingThread;
     private CoverageThreadAnalyses coverageThreadAnalyses;
     private MappingThreadAnalyses mappingThreadAnalyses;
-    private Connection con;
     private PersistentReference refGenome;
     private List<PersistentTrack> associatedTracks;
 
@@ -123,8 +123,7 @@ public class TrackConnector {
             }
         }
 
-        this.trackID = trackId;
-        con = ProjectConnector.getInstance().getConnection();
+        this.trackId = trackId;
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 associatedTracks.get( 0 ).getRefGenID() );
@@ -231,7 +230,7 @@ public class TrackConnector {
      * @return The complete statistics for the main track of this connector.
      */
     public StatsContainer getTrackStats() {
-        return getTrackStats( trackID );
+        return getTrackStats(trackId );
     }
 
 
@@ -241,13 +240,15 @@ public class TrackConnector {
      * <p>
      * @return The complete statistics for the track specified by the given id.
      */
-    public StatsContainer getTrackStats( final int wantedTrackId ) {
+    public StatsContainer getTrackStats( final int wantedTrackId ) throws DatabaseException {
 
-        StatsContainer statsContainer = new StatsContainer();
-        statsContainer.prepareForTrack();
-        statsContainer.prepareForReadPairTrack();
+        try( Connection con = ProjectConnector.getInstance().getConnection();
+             PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ); ) {
 
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
+            StatsContainer statsContainer = new StatsContainer();
+            statsContainer.prepareForTrack();
+            statsContainer.prepareForReadPairTrack();
+
             fetch.setInt( 1, wantedTrackId );
             try( final ResultSet rs = fetch.executeQuery() ) {
                 while( rs.next() ) {
@@ -256,11 +257,12 @@ public class TrackConnector {
                     statsContainer.increaseValue( statsKey, statsValue );
                 }
             }
+            return statsContainer;
 
-        } catch( SQLException e ) {
-            LOG.log( Level.SEVERE, null, e );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
-        return statsContainer;
 
     }
 
@@ -269,7 +271,7 @@ public class TrackConnector {
      * @return The unique database id of the track.
      */
     public int getTrackID() {
-        return trackID;
+        return trackId;
     }
 
 
@@ -355,8 +357,15 @@ public class TrackConnector {
      *         <code>-1</code> if this the track id is not found in the DB
      *         (which is the case for combined tracks).
      */
-    public Integer getReadPairToTrackID() {
-        return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID );
+    public Integer getReadPairToTrackID() throws DatabaseException  {
+
+        try( Connection con = ProjectConnector.getInstance().getConnection() ) {
+            return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackId );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+        }
+
     }
 
 
@@ -374,23 +383,24 @@ public class TrackConnector {
      * @return the second track id of a read pair beyond this track connectors
      *         track id
      */
-    public int getTrackIdToReadPairId( final int readPairId ) {
+    public int getTrackIdToReadPairId( final int readPairId ) throws DatabaseException {
 
-        int num = 0;
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID ) ) {
-            fetch.setLong( 1, readPairId );
-            fetch.setLong( 2, trackID );
+        try( Connection con = ProjectConnector.getInstance().getConnection();
+             PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID ) ) {
 
-            try( final ResultSet rs = fetch.executeQuery() ) {
+            pStmtFetch.setLong( 1, readPairId );
+            pStmtFetch.setLong( 2, trackId );
+            try( ResultSet rs = pStmtFetch.executeQuery() ) {
                 if( rs.next() ) {
-                    num = rs.getInt( FieldNames.TRACK_ID );
+                    return rs.getInt( FieldNames.TRACK_ID );
+                } else {
+                    return 0;
                 }
             }
         } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
-
-        return num;
 
     }
 
@@ -406,38 +416,39 @@ public class TrackConnector {
      *         desired distribution is not yet stored in the DB, the returned
      *         distribution is empty.
      */
-    public DiscreteCountingDistribution getCountDistribution( final Distribution type ) {
+    public DiscreteCountingDistribution getCountDistribution( final Distribution type ) throws DatabaseException {
 
-        DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
-        countDistribution.setType( type );
+        try( Connection con = ProjectConnector.getInstance().getConnection();
+             PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_COUNT_DISTRIBUTION ) ) {
 
-        for( final PersistentTrack track : associatedTracks ) {
-            try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_COUNT_DISTRIBUTION ) ) {
+            DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
+            countDistribution.setType( type );
 
-                fetch.setInt( 1, track.getId() );
-                fetch.setByte( 2, (byte) type.getType() );
-
-                try( final ResultSet rs = fetch.executeQuery() ) {
+            for( PersistentTrack track : associatedTracks ) {
+                pStmtFetch.setInt( 1, track.getId() );
+                pStmtFetch.setByte( 2, (byte) type.getType() );
+                try( ResultSet rs = pStmtFetch.executeQuery() ) {
                     while( rs.next() ) {
+                        int count      = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
                         int intervalId = rs.getInt( FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID );
-                        int count = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
                         countDistribution.setCountForIndex( intervalId, countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
                     }
                 }
-
-            } catch( SQLException ex ) {
-                LOG.log( Level.SEVERE, null, ex );
             }
-        }
 
-        if( associatedTracks.size() > 1 ) {
-            int[] distribution = countDistribution.getDiscreteCountingDistribution();
-            for( int i = 0; i < distribution.length; ++i ) {
-                distribution[i] = (int) Math.ceil( (double) distribution[i] / associatedTracks.size() );
+            if( associatedTracks.size() > 1 ) {
+                int[] distribution = countDistribution.getDiscreteCountingDistribution();
+                for( int i = 0; i < distribution.length; ++i ) {
+                    distribution[i] = (int) Math.ceil( (double) distribution[i] / associatedTracks.size() );
+                }
             }
-        }
 
-        return countDistribution;
+            return countDistribution;
+
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+        }
 
     }
 

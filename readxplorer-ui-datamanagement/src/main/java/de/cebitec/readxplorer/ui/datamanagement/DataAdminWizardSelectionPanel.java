@@ -92,7 +92,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
 
         try {
 
-            List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+            List<PersistentReference> refs = ProjectConnector.getInstance().getReferences();
             for( PersistentReference ref : refs ) {
                 // File and parser parameter meaningless in this context
                 ReferenceJob rj = new ReferenceJob( ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );

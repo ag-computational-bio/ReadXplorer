@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,23 +76,23 @@ public final class GenericSQLQueries {
 
 
     /**
-     * @param sqlStatement the statement to fetch the latest id of some table
+     * @param sqlStmt the statement to fetch the latest id of some table
      *                     and
      *                     increasing it by one
      * @param con          connection to the database
      * <p>
      * @return the latest id of the querried table increased by one
      */
-    public static long getLatestIDFromDB( String sqlStatement, Connection con ) {
+    public static long getLatestIDFromDB( String sqlStmt, Connection con ) {
         long id = 0;
-        try( PreparedStatement latestID = con.prepareStatement( sqlStatement );
-             ResultSet rs = latestID.executeQuery() ) {
+        try( Statement stmtLatestID = con.createStatement();
+             ResultSet rs = stmtLatestID.executeQuery( sqlStmt ) ) {
 
             if( rs.next() ) {
                 id = rs.getLong( "LATEST_ID" );
             }
         } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, ex.getMessage(), ex );
         }
         return ++id;
     }

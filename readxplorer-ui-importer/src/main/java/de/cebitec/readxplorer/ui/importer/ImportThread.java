@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -127,7 +127,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * <p>
      * @throws StorageException
      */
-    private void storeRefGenome( ParsedReference refGenome, ReferenceJob refGenJob ) throws StorageException {
+    private void storeRefGenome( ParsedReference refGenome, ReferenceJob refGenJob ) throws DatabaseException {
         LOG.log( INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
 
         int refGenID = ProjectConnector.getInstance().addRefGenome( refGenome );
@@ -163,7 +163,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         finish = System.currentTimeMillis();
                         msg = "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
                         io.getOut().println( Benchmark.calculateDuration( start, finish, msg ) );
-                    } catch( StorageException ex ) {
+                    } catch( DatabaseException ex ) {
                         // if something went wrong, mark all dependent track jobs
                         io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                         this.noErrors = false;

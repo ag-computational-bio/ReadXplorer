@@ -28,6 +28,7 @@ import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -63,7 +64,8 @@ public class ConverterSetupCard extends FileSelectionPanel {
         isConnected = ProjectConnector.getInstance().isConnected();
         this.genomesAsArray = new PersistentReference[0];
         if( isConnected ) {
-            genomesAsArray = ProjectConnector.getInstance().getGenomesAsArray();
+            List<PersistentReference> references = ProjectConnector.getInstance().getReferences();
+            genomesAsArray =  references.toArray( new PersistentReference[references.size()] );
         }
         initComponents();
         this.initAdditionalData();

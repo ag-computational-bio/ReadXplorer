@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.databackend;
 
 import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
@@ -182,7 +182,7 @@ public class SaveFileFetcherForGUI {
         String basePath = prefs.get( "ResetTrack.Filepath", "." );
         newTrack = this.checkFileExists( basePath, oldTrackFile, track, connector );
         if( newTrack == null ) {
-            basePath = new File( connector.getDBLocation() ).getParentFile().getAbsolutePath();
+            basePath = new File( connector.getDbLocation() ).getParentFile().getAbsolutePath();
             newTrack = this.checkFileExists( basePath, oldTrackFile, track, connector );
         }
         if( newTrack == null ) {
@@ -214,7 +214,7 @@ public class SaveFileFetcherForGUI {
                 SamBamFileReader reader = new SamBamFileReader( newTrackFile, track.getId(), connector.getRefGenomeConnector( track.getRefGenID() ).getRefGenome() );
                 try {
                     connector.resetTrackPath( newTrack );
-                } catch( StorageException ex ) {
+                } catch( DatabaseException ex ) {
                     JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                 }
             } catch( RuntimeIOException e ) {
@@ -261,7 +261,7 @@ public class SaveFileFetcherForGUI {
                         } catch( FileNotFoundException ex ) {
                             JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                         }
-                    } catch( StorageException ex ) {
+                    } catch( DatabaseException ex ) {
                         JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
                     }
                 } else if( !selectedFile.getName().endsWith( ".bam" ) ) {
@@ -410,7 +410,7 @@ public class SaveFileFetcherForGUI {
         IndexedFastaSequenceFile newFastaFile = null;
         ProjectConnector connector = ProjectConnector.getInstance();
 
-        File newFile = new File( connector.getDBLocation() ).getParentFile();
+        File newFile = new File( connector.getDbLocation() ).getParentFile();
         newFile = new File( newFile.getAbsolutePath() + "/" + ref.getFastaFile().getName() );
 
         if( !newFile.exists() ) {
@@ -426,8 +426,8 @@ public class SaveFileFetcherForGUI {
                     FastaUtils fastaUtils = new FastaUtils();  //TODO observers are empty, add observers!
                     fastaUtils.recreateMissingIndex( newFile );
                 }
-                connector.resetRefPath( newFile, ref );
-            } catch( StorageException ex ) {
+                connector.resetReferencePath( newFile, ref );
+            } catch( DatabaseException ex ) {
                 JOptionPane.showMessageDialog( null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE );
             }
         } else {

@@ -21,8 +21,8 @@ package bio.jlu.comp.readxplorer.classificationupdate;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.TotalCoverage;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
@@ -40,12 +40,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+
+import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -56,6 +59,8 @@ import org.openide.windows.InputOutput;
  */
 public class UpdateThread extends SwingWorker<Object, Object> implements
         Observer {
+
+    private static final Logger LOG = Logger.getLogger( UpdateThread.class.getSimpleName() );
 
     private final InputOutput io;
     private final ProgressHandle ph;
@@ -161,13 +166,13 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
                             projectConnector.deleteSpecificTrackStatistics( statsKeysToDelete, trackJob.getID() );
                             projectConnector.storeTrackStatistics( statsContainer, trackJob.getID() );
-                        } catch( StorageException ex ) {
-                            Exceptions.printStackTrace( ex );
+                        } catch( DatabaseException ex ) {
+                            LOG.log( SEVERE, ex.getMessage(), ex );
                             noErrors = false;
                         }
                     }
                 } catch( ParsingException | OutOfMemoryError ex ) {
-                    Exceptions.printStackTrace( ex );
+                    LOG.log( SEVERE, ex.getMessage(), ex );
                     noErrors = false;
                 }
                 if( noErrors ) {
@@ -188,7 +193,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
         List<TrackJob> trackJobs = new ArrayList<>();
         Map<Integer, ReferenceJob> idToRefMap = new HashMap<>();
 
-        List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+        List<PersistentReference> refs = ProjectConnector.getInstance().getReferences();
         for( PersistentReference ref : refs ) {
             // File and parser parameter meaningless in this context
             ReferenceJob refJob = new ReferenceJob( ref.getId(), ref.getFastaFile(), null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );

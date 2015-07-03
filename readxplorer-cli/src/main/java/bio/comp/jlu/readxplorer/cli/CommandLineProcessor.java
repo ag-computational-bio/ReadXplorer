@@ -37,8 +37,8 @@ import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
@@ -58,7 +58,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.FileSystems;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -451,7 +450,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "connected to " + dbFile.getCanonicalPath() );
             return pc;
 
-        } catch( IOException | SQLException | SecurityException ex ) {
+        } catch( IOException | DatabaseException | SecurityException ex ) {
             LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
@@ -509,7 +508,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printInfo( ps, "imported reference " + referenceFile.getName() );
             return referenceResult;
 
-        } catch( InterruptedException | ExecutionException | StorageException ex ) {
+        } catch( InterruptedException | ExecutionException | DatabaseException ex ) {
             LOG.log( Level.SEVERE, ex.getMessage(), ex );
             printInfo( ps, "import of reference file failed:" );
             printInfo( ps, "reason: "+ ex.getMessage() );

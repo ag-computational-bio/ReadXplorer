@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.databackend.connector;
 
 
 import de.cebitec.common.parser.fasta.FastaLineWriter;
+import de.cebitec.readxplorer.api.FileException;
 import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.databackend.FieldNames;
 import de.cebitec.readxplorer.databackend.GenericSQLQueries;
@@ -39,30 +40,29 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import org.h2.jdbc.JdbcSQLException;
+import org.h2.jdbcx.JdbcConnectionPool;
 import org.openide.util.NbBundle;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
 
 /**
- * Responsible for the connection between user interface and data base.
- * Contains the methods to communicate with the data base.
- *
+ * Responsible for the connection between user interface and data base. Contains
+ * the methods to communicate with the data base.
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public final class ProjectConnector extends Observable {
@@ -84,7 +84,7 @@ public final class ProjectConnector extends Observable {
 
     private String url;
     private String dbLocation;
-    private Connection con;
+    private JdbcConnectionPool connectionPool;
 
 
     /**
@@ -101,20 +101,9 @@ public final class ProjectConnector extends Observable {
 
 
     /**
-     * Clears all track an reference connector lists of this ProjectConnector.
-     */
-    private void cleanUp() {
-
-        trackConnectors.clear();
-        refConnectors.clear();
-
-    }
-
-
-    /**
      * @return The singleton instance of the ProjectConnector
      */
-    public static synchronized ProjectConnector getInstance() {
+    public static ProjectConnector getInstance() {
         if( dbConnector == null ) {
             dbConnector = new ProjectConnector();
         }
@@ -125,14 +114,17 @@ public final class ProjectConnector extends Observable {
     /**
      * @return True, if the project connector is currently connected to a DB,
      *         false otherwise
+     * <p>
+     * @throws de.cebitec.readxplorer.databackend.connector.DatabaseException
      */
-    public boolean isConnected() {
+    public boolean isConnected() throws DatabaseException {
 
-        if( con != null ) {
-            try {
+        if( connectionPool != null ) {
+            try( Connection con = connectionPool.getConnection() ) {
                 return con.isValid( 0 );
-            } catch( SQLException e ) {
-                LOG.log( WARNING, e.getMessage(), e );
+            } catch( SQLException ex ) {
+                LOG.log( WARNING, ex.getMessage(), ex );
+                throw new DatabaseException( "Connection to database could not be established!", ex.getMessage(), ex );
             }
         }
 
@@ -142,93 +134,88 @@ public final class ProjectConnector extends Observable {
 
 
     /**
-     * Disconnects the current DB connection.
-     */
-    public void disconnect() {
-
-        LOG.info( "Closing database connection" );
-        try {
-            con.close();
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
-        } finally {
-            con = null;
-            cleanUp();
-
-            // notify observers about the change of the database
-            notifyObserversAbout( "disconnect" );
-        }
-    }
-
-
-    /**
      * Connects to the H2 database used for the current project.
      * <p>
      * @param projectLocation the project location
      * <p>
+     * @throws de.cebitec.readxplorer.databackend.connector.DatabaseException
      * @throws SQLException
      * @throws JdbcSQLException
      */
-    public void connect( String projectLocation ) throws SQLException, JdbcSQLException {
-
-        this.dbLocation = projectLocation;
-        //CACHE_SIZE is measured in KB
-        this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
-        //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
+    public void connect( String projectLocation ) throws DatabaseException {
 
         LOG.info( "Connecting to database" );
-        con = DriverManager.getConnection( url );
-        con.setAutoCommit( true );
-        LOG.info( "Successfully connected to database" );
-        setupDatabase();
+        try {
 
-        // notify observers about the change of the database
-        notifyObserversAbout( "connect" );
+            this.dbLocation = projectLocation;
+            this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
+
+            connectionPool = JdbcConnectionPool.create( url, "", "" );
+
+            try( Connection con = connectionPool.getConnection(); ) {
+                con.setAutoCommit( false );
+                LOG.info( "Successfully connected to database" );
+                try {
+                    setupDatabase( con );
+                    con.commit();
+                } catch( SQLException ex ) {
+                    try {
+                        con.rollback();
+                    } catch( SQLException exRb ) {
+                        LOG.log( SEVERE, "database setup failed! rollback failed!", exRb );
+                        throw new DatabaseException( "Could not setup the database! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                    }
+                    LOG.log( SEVERE, "database setup failed! rolledbacked!", ex );
+                    throw new DatabaseException( "Could not setup the database!", ex.getMessage(), ex );
+                }
+                con.setAutoCommit( true );
+            }
+
+            // notify observers about the change of the database
+            notifyObserversAbout( "connect" );
+
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+        }
 
     }
 
 
     /**
-     * Makes sure that an H2 DB is in a correct up-to-date state.
-     * Either creates all tables necessary for a ReadXplorer DB or updates them,
-     * if anything is missing/different. If no changes are necessary nothing is
-     * altered.
+     * Makes sure that an H2 DB is in a correct up-to-date state. Either creates
+     * all tables necessary for a ReadXplorer DB or updates them, if anything is
+     * missing/different. If no changes are necessary nothing is altered.
      */
-    private void setupDatabase() {
+    private void setupDatabase( Connection con ) throws SQLException {
 
-        try {
-            LOG.info( "Setting up tables and indices if not existent" );
+        LOG.info( "Setting up tables and indices if not existent" );
+        try( Statement stmt = con.createStatement() ) {
 
-            con.setAutoCommit( false );
             //create tables if not exist yet
+            stmt.execute( H2SQLStatements.SETUP_REFERENCE_GENOME );
 
-            con.prepareStatement( H2SQLStatements.SETUP_REFERENCE_GENOME ).executeUpdate();
+            stmt.execute( H2SQLStatements.SETUP_CHROMOSOME );
+            stmt.execute( H2SQLStatements.INDEX_CHROMOSOME );
 
-            con.prepareStatement( H2SQLStatements.SETUP_CHROMOSOME ).executeUpdate();
-            con.prepareStatement( H2SQLStatements.INDEX_CHROMOSOME ).executeUpdate();
+            stmt.execute( H2SQLStatements.SETUP_FEATURES );
+            stmt.execute( H2SQLStatements.INDEX_FEATURES );
 
-            con.prepareStatement( H2SQLStatements.SETUP_FEATURES ).executeUpdate();
-            con.prepareStatement( H2SQLStatements.INDEX_FEATURES ).executeUpdate();
+            stmt.execute( H2SQLStatements.SETUP_TRACKS );
+            stmt.execute( H2SQLStatements.INDEX_TRACK_REFID );
+            stmt.execute( H2SQLStatements.INDEX_TRACK_READ_PAIR_ID );
 
-            con.prepareStatement( H2SQLStatements.SETUP_TRACKS ).execute();
-            con.prepareStatement( H2SQLStatements.INDEX_TRACK_REFID ).executeUpdate();
-            con.prepareStatement( H2SQLStatements.INDEX_TRACK_READ_PAIR_ID ).executeUpdate();
+            stmt.execute( SQLStatements.SETUP_STATISTICS );
 
-            con.prepareStatement( SQLStatements.SETUP_STATISTICS ).executeUpdate();
+            stmt.execute( H2SQLStatements.SETUP_COUNT_DISTRIBUTION );
+            stmt.execute( H2SQLStatements.INDEX_COUNT_DIST );
 
-            con.prepareStatement( H2SQLStatements.SETUP_COUNT_DISTRIBUTION ).executeUpdate();
-            con.prepareStatement( H2SQLStatements.INDEX_COUNT_DIST ).executeUpdate();
+            stmt.execute( SQLStatements.SETUP_DB_VERSION_TABLE );
 
-            con.prepareStatement( SQLStatements.SETUP_DB_VERSION_TABLE ).executeUpdate();
+            checkDBStructure( con );
 
-            checkDBStructure();
-
-            con.commit();
-            con.setAutoCommit( true );
             LOG.info( "Finished creating tables and indices if not existent before" );
 
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
     }
@@ -237,848 +224,56 @@ public final class ProjectConnector extends Observable {
     /**
      * Any additional columns which were added to existing tables in newer
      * ReadXplorer versions should be checked by this method to ensure correct
-     * database
-     * structure and avoiding errors when SQL statements request one of these
-     * columns, which are not existent in older databases.
+     * database structure and avoiding errors when SQL statements request one of
+     * these columns, which are not existent in older databases.
      */
-    private void checkDBStructure() {
+    private void checkDBStructure( Connection con ) throws SQLException {
 
         LOG.info( "Checking DB structure..." );
+        try( Statement stmt = con.createStatement() ) {
 
-        //remove all old tables not used anymore
-        runSqlStatement( SQLStatements.DROP_TABLE + "STATICS" );
-        runSqlStatement( SQLStatements.DROP_TABLE + "SUBFEATURES" );
-        runSqlStatement( SQLStatements.DROP_TABLE + "COVERAGE_DISTRIBUTION" );
-        runSqlStatement( SQLStatements.DROP_TABLE + "POSITIONS" );
+            //remove all old tables not used anymore
+            stmt.execute( SQLStatements.DROP_TABLE + "STATICS" );
+            stmt.execute( SQLStatements.DROP_TABLE + "SUBFEATURES" );
+            stmt.execute( SQLStatements.DROP_TABLE + "COVERAGE_DISTRIBUTION" );
+            stmt.execute( SQLStatements.DROP_TABLE + "POSITIONS" );
 
-        //add read pair id column in tracks if not existent
-        runSqlStatement( GenericSQLQueries.genAddColumnString(
-                FieldNames.TABLE_TRACK, FieldNames.TRACK_READ_PAIR_ID, BIGINT_UNSIGNED ) );
+            //add read pair id column in tracks if not existent
+            stmt.execute( GenericSQLQueries.genAddColumnString(
+                    FieldNames.TABLE_TRACK, FieldNames.TRACK_READ_PAIR_ID, BIGINT_UNSIGNED ) );
 
-        runSqlStatement( GenericSQLQueries.genAddColumnString(
-                FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE, "VARCHAR (20)" ) );
+            stmt.execute( GenericSQLQueries.genAddColumnString(
+                    FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE, "VARCHAR (20)" ) );
 
-        runSqlStatement( GenericSQLQueries.genAddColumnString(
-                FieldNames.TABLE_TRACK, FieldNames.TRACK_PATH, VARCHAR400 ) );
-
-
-        /**
-         * delete old "RUN_ID" field from the database to avoid problems with
-         * null values in insert statement
-         * an error will be raised by the query, if the field does not exist
-         * (simply ignore the error)
-         */
-        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_TRACK, "RUN_ID" ) );
-
-        //Add column parent id to feature table
-        runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_PARENT_IDS, VARCHAR1000 ) );
-        runSqlStatement( SQLStatements.INIT_FEATURE_PARENT_ID );
-        runSqlStatement( SQLStatements.NOT_NULL_FEATURE_PARENT_ID );
-        //Drop old PARENT_ID column
-        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_FEATURES, "PARENT_ID" ) );
-
-        //Drop unneeded indexes
-        runSqlStatement( SQLStatements.DROP_INDEX + "INDEXPOS" );
-
-        checkDBVersion();
-
-        LOG.info( "Finished checking DB structure." );
-
-    }
+            stmt.execute( GenericSQLQueries.genAddColumnString(
+                    FieldNames.TABLE_TRACK, FieldNames.TRACK_PATH, VARCHAR400 ) );
 
 
-    /**
-     * Runs a single sql statement.
-     * <p>
-     * @param statement sql statement to run
-     */
-    private void runSqlStatement( String statement ) {
+            /**
+             * delete old "RUN_ID" field from the database to avoid problems
+             * with null values in insert statement an error will be raised by
+             * the query, if the field does not exist (simply ignore the error)
+             */
+            stmt.execute( GenericSQLQueries.genRemoveColumnString(
+                    FieldNames.TABLE_TRACK, "RUN_ID" ) );
 
-        try {
-            con.prepareStatement( statement ).executeUpdate();
-        } catch( SQLException ex ) {
-            checkRollback( ex );
+            //Add column parent id to feature table
+            stmt.execute( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_PARENT_IDS, VARCHAR1000 ) );
+            stmt.execute( SQLStatements.INIT_FEATURE_PARENT_ID );
+            stmt.execute( SQLStatements.NOT_NULL_FEATURE_PARENT_ID );
+            //Drop old PARENT_ID column
+            stmt.execute( GenericSQLQueries.genRemoveColumnString(
+                    FieldNames.TABLE_FEATURES, "PARENT_ID" ) );
+
+            //Drop unneeded indexes
+            stmt.execute( SQLStatements.DROP_INDEX + "INDEXPOS" );
+
+            checkDBVersion( con );
+
+            LOG.info( "Finished checking DB structure." );
+
         }
 
-    }
-
-
-    /**
-     * Checks if a rollback is needed or if the SQLException originated from a
-     * duplicate column name error.
-     * <p>
-     * @param ex SQL exception to check
-     */
-    private void checkRollback( SQLException ex ) {
-        if( !ex.getMessage().contains( "Duplicate column name" ) ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-    }
-
-
-    /**
-     * If the current transaction tried to make changes in the DB, these changes
-     * are rolled back.
-     * <p>
-     * @param className name of the class in which the error occured
-     * @param ex        the exception, which was thrown
-     */
-    public void rollbackOnError( String className, Exception ex ) {
-
-        LOG.log( Level.SEVERE, "Error occured. Trying to recover", ex );
-        try {
-            if( !con.isClosed() ) {
-                //connection is still open. try rollback
-                con.rollback();
-                LOG.info( "Successfully rolled back" );
-            } else {
-                //connection was closed before, open a new one
-                connect( dbLocation );
-            }
-
-        } catch( SQLException ex1 ) {
-            LOG.log( Level.INFO, "Rollback failed", ex1 );
-        }
-    }
-
-
-    /**
-     * Adds all data belonging to a reference genome to the database.
-     * <p>
-     * @param reference the reference to store
-     * <p>
-     * @return the reference id
-     * <p>
-     * @throws StorageException
-     */
-    public int addRefGenome( final ParsedReference reference ) throws StorageException {
-
-        LOG.log( Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName() );
-
-        try {
-            con.setAutoCommit( false );
-
-            storeGenome( reference );
-            storeFeatures( reference );
-
-            con.setAutoCommit( true );
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.log( Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName() );
-
-        // notify observers about the change of the database
-        notifyObserversAbout( "addRefGenome" );
-
-        return reference.getID();
-    }
-
-
-    /**
-     * Stores a reference genome in the reference genome table of the db.
-     * <p>
-     * @param reference the reference data to store
-     */
-    private void storeGenome( final ParsedReference reference ) {
-
-        LOG.info( "start storing reference sequence data..." );
-        try( PreparedStatement insertGenome = con.prepareStatement( SQLStatements.INSERT_REFGENOME ) ) {
-
-            int id = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_REFERENCE_ID, con );
-            reference.setID( id );
-
-            // store reference data
-            insertGenome.setLong( 1, reference.getID() );
-            insertGenome.setString( 2, reference.getName() );
-            insertGenome.setString( 3, reference.getDescription() );
-            insertGenome.setTimestamp( 4, reference.getTimestamp() );
-            insertGenome.setString( 5, reference.getFastaFile().toString() );
-            insertGenome.execute();
-
-            List<ParsedChromosome> chromosomes = reference.getChromosomes();
-            for( int i = 0; i < chromosomes.size(); i++ ) {
-                storeChromosome( chromosomes.get( i ), i + 1, reference.getID() );
-            }
-
-            con.commit();
-
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.info( "...done inserting reference sequence data" );
-
-    }
-
-
-    /**
-     * Stores a chromosome in the db.
-     * <p>
-     * @param chromosome  the chromosome to store
-     * @param chromNumber the chromosome number of the new chromosome
-     * @param refID       the reference id of the chromosome
-     */
-    private void storeChromosome( final ParsedChromosome chromosome, final int chromNumber, final int refID ) {
-
-        LOG.info( "start storing chromosome data..." );
-        try( PreparedStatement insertChromosome = con.prepareStatement( SQLStatements.INSERT_CHROMOSOME ) ) {
-
-            int id = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_CHROMOSOME_ID, con );
-            chromosome.setID( id );
-
-            //store chromosome data
-            insertChromosome.setLong( 1, chromosome.getID() );
-            insertChromosome.setLong( 2, chromNumber );
-            insertChromosome.setLong( 3, refID );
-            insertChromosome.setString( 4, chromosome.getName() );
-            insertChromosome.setLong( 5, chromosome.getChromLength() );
-            insertChromosome.execute();
-
-            con.commit();
-
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.info( "...done inserting chromosome data" );
-
-    }
-
-
-    /**
-     * Stores the features of a reference genome in the feature table of the db.
-     * <p>
-     * @param reference the reference containing the features to store
-     */
-    private void storeFeatures( final ParsedReference reference ) {
-
-        LOG.info( "start inserting features..." );
-        try( final PreparedStatement insertFeature = con.prepareStatement( SQLStatements.INSERT_FEATURE ) ) {
-
-            for( final ParsedChromosome chrom : reference.getChromosomes() ) {
-
-                int latestId = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_FEATURE_ID, con );
-
-                chrom.setFeatId( latestId );
-                chrom.distributeFeatureIds();
-
-                int batchCounter = 1;
-                insertFeature.setLong( 2, chrom.getID() );
-                for( ParsedFeature feature : chrom.getFeatures() ) {
-                    batchCounter++;
-                    insertFeature.setLong( 1, feature.getId() );
-                    insertFeature.setString( 3, feature.getParentIdsConcat() );
-                    insertFeature.setInt( 4, feature.getType().getType() );
-                    insertFeature.setInt( 5, feature.getStart() );
-                    insertFeature.setInt( 6, feature.getStop() );
-                    insertFeature.setString( 7, feature.getLocusTag() );
-                    insertFeature.setString( 8, feature.getProduct() );
-                    insertFeature.setString( 9, feature.getEcNumber() );
-                    insertFeature.setInt( 10, feature.getStrand().getType() );
-                    insertFeature.setString( 11, feature.getGeneName() );
-                    insertFeature.addBatch();
-
-                    if( batchCounter == FEATURE_BATCH_SIZE ) {
-                        batchCounter = 1;
-                        insertFeature.executeBatch();
-                    }
-                }
-                insertFeature.executeBatch();
-
-            }
-
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-            LOG.log( Level.SEVERE, ex.getMessage() );
-        } catch( Exception e ) {
-            LOG.log( Level.SEVERE, e.getMessage() );
-        }
-
-        LOG.info( "...done inserting features" );
-
-    }
-
-
-    /**
-     * Adds a track to the database with its file path. This means, it is stored
-     * as a track for direct file access and adds the persistent track id to the
-     * track job.
-     * <p>
-     * @param track the track job containing the track information to store
-     */
-    public void storeBamTrack( final ParsedTrack track ) {
-
-        LOG.info( "start storing bam track data..." );
-
-        try( PreparedStatement insertTrack = con.prepareStatement( SQLStatements.INSERT_TRACK ) ) {
-            insertTrack.setLong( 1, track.getID() );
-            insertTrack.setLong( 2, track.getRefId() );
-            insertTrack.setString( 3, track.getDescription() );
-            insertTrack.setTimestamp( 4, track.getTimestamp() );
-            insertTrack.setString( 5, track.getFile().getAbsolutePath() );
-            insertTrack.execute();
-
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        // notify observers about the change of the database
-        notifyObserversAbout( "storeTrack" );
-
-        LOG.info( "...done storing bam track data" );
-
-    }
-
-
-    /**
-     * Stores the statistics for a track in the db.
-     * <p>
-     * @param statsContainer The container with all statistics for the given
-     *                       track ID
-     * @param trackID        the track id whose data shall be stored
-     */
-    public void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) {
-
-        LOG.info( "Start storing track statistics..." );
-
-        DiscreteCountingDistribution readLengthDistribution = statsContainer.getReadLengthDistribution();
-        if( !readLengthDistribution.isEmpty() ) {
-            insertCountDistribution( readLengthDistribution, trackID );
-            statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_LENGTH, readLengthDistribution.getAverageValue() );
-        }
-        DiscreteCountingDistribution readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
-        if( !readPairLengthDistribution.isEmpty() ) {
-            insertCountDistribution( readPairLengthDistribution, trackID );
-            statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue() );
-        }
-
-        // get latest id for statistic
-        long latestID = GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_STATISTICS_ID, con );
-
-        // TODO check nonsense PreparedStatement fix
-        try( PreparedStatement insertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ); ) {
-            insertStats.setInt( 2, trackID );
-            for( Map.Entry<String, Integer> entry : statsContainer.getStatsMap().entrySet() ) {
-                insertStats.setLong( 1, latestID++ );
-                insertStats.setString( 3, entry.getKey() );
-                insertStats.setInt( 4, entry.getValue() );
-                insertStats.executeUpdate();
-            }
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.info( "...done storing track statistics data" );
-
-    }
-
-
-    /**
-     * Stores the statistics for a track in the db.
-     * <p>
-     * @param keys    the list of statistics key whose values shall be deleted
-     *                for the given track
-     * @param trackID the track id whose data shall be stored
-     */
-    public void deleteSpecificTrackStatistics( List<String> keys, int trackID ) {
-
-        LOG.info( "Start deleting specific track statistics..." );
-
-        try( PreparedStatement deleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
-            deleteStats.setLong( 1, trackID );
-            for( String key : keys ) {
-                deleteStats.setString( 2, key );
-                deleteStats.execute();
-            }
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.info( "...done deleting specific track statistics." );
-
-    }
-
-
-    /**
-     * Sets a count distribution
-     * {@link DiscreteCountingDistribution} for this track.
-     * <p>
-     * @param distribution the count distribution to store
-     * @param trackID      track id of this track
-     */
-    public void insertCountDistribution( final DiscreteCountingDistribution distribution, final int trackID ) {
-
-        int[] countDistribution = distribution.getDiscreteCountingDistribution();
-        try( PreparedStatement insert = con.prepareStatement( SQLStatements.INSERT_COUNT_DISTRIBUTION ) ) {
-            insert.setInt( 1, trackID );
-            insert.setByte( 2, (byte)distribution.getType().getType() );
-            for( int i = 0; i < countDistribution.length; ++i ) {
-                insert.setInt( 3, i );
-                insert.setInt( 4, countDistribution[i] );
-                insert.addBatch();
-            }
-
-            insert.executeBatch();
-
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
-        }
-    }
-
-
-    /**
-     * Sets the read pair id for both tracks belonging to one read pair.
-     * <p>
-     * @param track1Id track id of first track of the pair
-     * @param track2Id track id of second track of the pair
-     */
-    public void setReadPairIdsForTrackIds( final long track1Id, final long track2Id ) {
-
-        try {
-            //not 0, because 0 is the value when a track is not a sequence pair track!
-            int readPairId = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_TRACK_READ_PAIR_ID, con );
-
-            try( PreparedStatement setReadPairIds = con.prepareStatement( SQLStatements.INSERT_TRACK_READ_PAIR_ID ) ) {
-                setReadPairIds.setInt( 1, readPairId );
-                setReadPairIds.setLong( 2, track1Id );
-                setReadPairIds.execute();
-
-                setReadPairIds.setInt( 1, readPairId );
-                setReadPairIds.setLong( 2, track2Id );
-                setReadPairIds.execute();
-            }
-
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-    }
-
-
-    /**
-     * Locks all tables declared by the lock sql statement.
-     * <p>
-     * @param lockStatement sql statement to lock some tables
-     * @param domainName    name of the domain to lock for logging
-     */
-    private void lockDomainTables( final String lockStatement, final String domainName ) {
-
-        LOG.log( Level.INFO, "start locking {0} domain tables...", domainName );
-        try( PreparedStatement lock = con.prepareStatement( lockStatement ) ) {
-            lock.execute();
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-        LOG.log( Level.INFO, "...done locking {0} domain tables...", domainName );
-
-    }
-
-
-    /**
-     * @param refGenID the reference id
-     * <p>
-     * @return The reference genome connector for the given reference id
-     */
-    public ReferenceConnector getRefGenomeConnector( final int refGenID ) {
-
-        // only return new object, if no suitable connector was created before
-        if( !refConnectors.containsKey( refGenID ) ) {
-            refConnectors.put( refGenID, new ReferenceConnector( refGenID ) );
-        }
-        return refConnectors.get( refGenID );
-    }
-
-
-    public TrackConnector getTrackConnector( final PersistentTrack track ) throws FileNotFoundException {
-        // only return new object, if no suitable connector was created before
-        int trackID = track.getId();
-        if( !trackConnectors.containsKey( trackID ) ) {
-            trackConnectors.put( trackID, new TrackConnector( track ) );
-        }
-        return trackConnectors.get( trackID );
-    }
-
-
-    public TrackConnector getTrackConnector( final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException {
-        // makes sure the track id is not already used
-        int id = 9999;
-        for( PersistentTrack track : tracks ) {
-            id += track.getId();
-        }
-        // only return new object, if no suitable connector was created before
-        trackConnectors.put( id, new TrackConnector( id, tracks, combineTracks ) );
-        return trackConnectors.get( id );
-    }
-
-
-    public MultiTrackConnector getMultiTrackConnector( final PersistentTrack track ) throws FileNotFoundException {
-        // only return new object, if no suitable connector was created before
-        int trackID = track.getId();
-        if( !multiTrackConnectors.containsKey( trackID ) ) { //old solution, which does not work anymore
-            multiTrackConnectors.put( trackID, new MultiTrackConnector( track ) );
-        }
-        return multiTrackConnectors.get( trackID );
-    }
-
-
-    public MultiTrackConnector getMultiTrackConnector( final List<PersistentTrack> tracks ) throws FileNotFoundException {
-        // makes sure the track id is not already used
-        int id = 9999;
-        for( PersistentTrack track : tracks ) {
-            id += track.getId();
-        }
-        // only return new object, if no suitable connector was created before
-        multiTrackConnectors.put( id, new MultiTrackConnector( tracks ) );
-        return multiTrackConnectors.get( id );
-    }
-
-
-    /**
-     * Removes the track connector for the given trackId.
-     * <p>
-     * @param trackId track id of the track connector to remove
-     */
-    public void removeTrackConnector( final int trackId ) {
-        if( trackConnectors.containsKey( trackId ) ) {
-            trackConnectors.remove( trackId );
-        }
-    }
-
-
-    /**
-     * Removes the multi track connector for the given trackId.
-     * <p>
-     * @param trackId track id of the multi track connector to remove
-     */
-    public void removeMultiTrackConnector( final int trackId ) {
-        if( multiTrackConnectors.containsKey( trackId ) ) {
-            multiTrackConnectors.remove( trackId );
-        }
-    }
-
-
-    /**
-     * Calculates and returns the names of all currently opened tracks hashed to
-     * their
-     * track id.
-     * <p>
-     * @return the names of all currently opened tracks hashed to their track
-     *         id.
-     */
-    public Map<Integer, String> getOpenedTrackNames() {
-
-        Map<Integer, String> namesList = new HashMap<>( trackConnectors.size() );
-        for( int nextId : trackConnectors.keySet() ) {
-            namesList.put( nextId, trackConnectors.get( nextId ).getAssociatedTrackName() );
-        }
-        return namesList;
-
-    }
-
-
-    public Connection getConnection() {
-        return con;
-    }
-
-
-    /**
-     * @return All references stored in the db with their associated data. All
-     *         references are re-queried from the DB and returned in new, independent
-     *         objects each time the method is called.
-     * <p>
-     * @throws OutOfMemoryError
-     */
-    public List<PersistentReference> getGenomes() {
-
-        LOG.info( "Reading reference genome data from database" );
-        List<PersistentReference> refGens = new ArrayList<>();
-
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES );
-             final ResultSet rs = fetch.executeQuery() ) {
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.REF_GEN_ID );
-                String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
-                String name = rs.getString( FieldNames.REF_GEN_NAME );
-                Timestamp timestamp = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
-                String fileName = rs.getString( FieldNames.REF_GEN_FASTA_FILE ); //special handling for backwards compatibility with old DBs
-                fileName = fileName == null ? "" : fileName;
-                File fastaFile = new File( fileName );
-                refGens.add( new PersistentReference( id, name, description, timestamp, fastaFile ) );
-            }
-        } catch( SQLException e ) {
-            LOG.log( Level.SEVERE, null, e );
-        }
-
-        return refGens;
-    }
-
-
-    /**
-     * Get an array of available genomes from the database. Alternative method
-     * for getGenomes().
-     * <p>
-     * @return Array of genomes
-     */
-    public PersistentReference[] getGenomesAsArray() {
-        List<PersistentReference> references = getGenomes();
-        PersistentReference[] refArray = new PersistentReference[references.size()];
-        return references.toArray( refArray );
-    }
-
-
-    /**
-     * @return A map of all tracks in the connected DB mapped on their
-     *         respective reference.
-     */
-    public Map<PersistentReference, List<PersistentTrack>> getGenomesAndTracks() {
-
-        final List<PersistentReference> genomes = getGenomes();
-        final List<PersistentTrack> tracks = getTracks();
-        final Map<Integer, List<PersistentTrack>> tracksByReferenceId = new HashMap<>( tracks.size() );
-        for( PersistentTrack pt : tracks ) {
-            List<PersistentTrack> list = tracksByReferenceId.get( pt.getRefGenID() );
-            if( list == null ) {
-                list = new ArrayList<>();
-                tracksByReferenceId.put( pt.getRefGenID(), list );
-            }
-            list.add( pt );
-        }
-
-        Map<PersistentReference, List<PersistentTrack>> tracksByReference = new HashMap<>( genomes.size() );
-        for( PersistentReference reference : genomes ) {
-            List<PersistentTrack> currentTrackList = tracksByReferenceId.get( reference.getId() );
-            //if the current reference genome does not have any tracks,
-            //just create an empty list
-            if( currentTrackList == null ) {
-                currentTrackList = new ArrayList<>();
-            }
-            tracksByReference.put( reference, currentTrackList );
-        }
-
-        return tracksByReference;
-    }
-
-
-    /**
-     * @return All tracks stored in the database with all their information. All
-     *         tracks are re-queried from the DB and returned in new, independent
-     *         objects each time the method is called.
-     */
-    public List<PersistentTrack> getTracks() {
-
-        LOG.info( "Reading track data from database" );
-        List<PersistentTrack> tracks = new ArrayList<>();
-
-        try( final PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACKS );
-             final ResultSet rs = fetchTracks.executeQuery(); ) {
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.TRACK_ID );
-                String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
-                Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
-                int refGenID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
-                String filePath = rs.getString( FieldNames.TRACK_PATH );
-                int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
-                tracks.add( new PersistentTrack( id, filePath, description, date, refGenID, -1, readPairId ) );
-            }
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
-        }
-
-        return tracks;
-    }
-
-
-    /**
-     * @param trackID
-     *                <p>
-     * @return The track for the given track id in a fresh track object
-     */
-    public PersistentTrack getTrack( final int trackID ) {
-
-        LOG.info( "Reading track data from database" );
-        PersistentTrack track = null;
-
-        try( final PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK ); ) {
-            fetchTracks.setInt( 1, trackID );
-            try( final ResultSet rs = fetchTracks.executeQuery(); ) {
-                while( rs.next() ) {
-                    int id = rs.getInt( FieldNames.TRACK_ID );
-                    String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
-                    Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
-                    int refGenID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
-                    String filePath = rs.getString( FieldNames.TRACK_PATH );
-                    int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
-                    track = new PersistentTrack( id, filePath, description, date, refGenID, readPairId );
-                }
-            }
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
-        }
-
-        return track;
-
-    }
-
-
-    /**
-     * @return the latest track id used in the database + 1 = the next id to
-     *         use.
-     */
-    public int getLatestTrackId() {
-        return (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_TRACK_ID, con );
-    }
-
-
-    /**
-     * Deletes all data associated with the given track id.
-     * <p>
-     * @param trackID the track id whose data shall be delete from the DB
-     * <p>
-     * @throws StorageException
-     */
-    public void deleteTrack( final int trackID ) throws StorageException {
-
-        LOG.log( Level.INFO, "Starting deletion of track with id \"{0}\"", trackID );
-        try( PreparedStatement deleteStatistics = con.prepareStatement( SQLStatements.DELETE_STATISTIC_FROM_TRACK );
-             PreparedStatement deleteCountDistributions = con.prepareStatement( SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK );
-             PreparedStatement deleteTrack = con.prepareStatement( SQLStatements.DELETE_TRACK ); ) {
-
-            con.setAutoCommit( false );
-
-            deleteStatistics.setInt( 1, trackID );
-            deleteCountDistributions.setInt( 1, trackID );
-            deleteTrack.setInt( 1, trackID );
-
-            LOG.info( "Deleting Statistics..." );
-            deleteStatistics.execute();
-            LOG.info( "Deleting Count Distributions..." );
-            deleteCountDistributions.execute();
-            LOG.info( "Deleting Track..." );
-            deleteTrack.execute();
-
-            con.commit();
-
-            con.setAutoCommit( true );
-            trackConnectors.remove( trackID );
-
-        } catch( SQLException ex ) {
-            throw new StorageException( ex );
-        }
-
-        // notify observers about the change of the database
-        notifyObserversAbout( "deleteTrack" );
-
-        LOG.log( Level.INFO, "Finished deletion of track \"{0}\"", trackID );
-
-    }
-
-
-    /**
-     * Deletes all data associated with the given reference id.
-     * <p>
-     * @param refGenID the reference id whose data shall be delete from the DB
-     * <p>
-     * @throws StorageException
-     */
-    public void deleteGenome( final int refGenID ) throws StorageException {
-
-        LOG.log( Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID );
-        ReferenceConnector refCon = getRefGenomeConnector( refGenID );
-        try( PreparedStatement deleteFeatures = con.prepareStatement( SQLStatements.DELETE_FEATURES_FROM_CHROMOSOME );
-             PreparedStatement deleteChrom = con.prepareStatement( SQLStatements.DELETE_CHROMOSOME );
-             PreparedStatement deleteGenome = con.prepareStatement( SQLStatements.DELETE_GENOME ); ) {
-
-            con.setAutoCommit( false );
-
-            Map<Integer, PersistentChromosome> chroms = refCon.getChromosomesForGenome();
-            for( PersistentChromosome chrom : chroms.values() ) {
-
-                deleteFeatures.setLong( 1, chrom.getId() );
-                deleteChrom.setInt( 1, chrom.getId() );
-
-                LOG.log( Level.INFO, "Deleting features for chromosome {0}...", chrom.getName() );
-                deleteFeatures.execute();
-
-                LOG.log( Level.INFO, "Deleting chromosome {0}...", chrom.getName() );
-                deleteChrom.execute();
-
-            }
-
-            deleteGenome.setLong( 1, refGenID );
-            LOG.log( Level.INFO, "Deleting Genome {0}...", refCon.getRefGenome().getName() );
-            deleteGenome.execute();
-
-            con.commit();
-            con.setAutoCommit( true );
-            refConnectors.remove( refGenID );
-
-        } catch( SQLException ex ) {
-            throw new StorageException( ex );
-        }
-
-        // notify observers about the change of the database
-        notifyObserversAbout( "deleteGenomes" );
-
-        LOG.log( Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID );
-
-    }
-
-
-    /**
-     * Resets the file path of a direct access reference.
-     * <p>
-     * @param track track whose file path has to be resetted.
-     * <p>
-     * @throws StorageException
-     */
-    public void resetTrackPath( final PersistentTrack track ) throws StorageException {
-
-        LOG.info( "Preparing statements for storing track data" );
-
-        try( PreparedStatement resetTrackPath = con.prepareStatement( SQLStatements.RESET_TRACK_PATH ) ) {
-            resetTrackPath.setString( 1, track.getFilePath() );
-            resetTrackPath.setLong( 2, track.getId() );
-            resetTrackPath.execute();
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.log( Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription() );
-
-    }
-
-
-    /**
-     * Resets the fasta file path of a direct access reference.
-     * <p>
-     * @param fastaFile fasta file to reset for the current reference.
-     * @param ref       The reference genome, whose file shall be updated
-     * <p>
-     * @throws StorageException
-     */
-    public void resetRefPath( final File fastaFile, final PersistentReference ref ) throws StorageException {
-
-        LOG.info( "Preparing statements for storing track data" );
-
-        try( PreparedStatement resetRefPath = con.prepareStatement( SQLStatements.RESET_REF_PATH ) ) {
-            resetRefPath.setString( 1, fastaFile.getAbsolutePath() );
-            resetRefPath.setLong( 2, ref.getId() );
-            resetRefPath.execute();
-            ref.resetFastaPath( fastaFile );
-        } catch( SQLException ex ) {
-            rollbackOnError( ProjectConnector.class.getName(), ex );
-        }
-
-        LOG.log( Level.INFO, "Reference file for \"{0}\" has been updated successfully", ref.getName() );
-
-    }
-
-
-    private void notifyObserversAbout( final String message ) {
-        setChanged();
-        notifyObservers( message );
     }
 
 
@@ -1087,12 +282,11 @@ public final class ProjectConnector extends Observable {
      * given version number. If an update was performed, the current DB version
      * number will be set after a successful update.
      */
-    private void checkDBVersion() {
+    private void checkDBVersion( Connection con ) throws SQLException {
 
         LOG.info( "Checking DB version..." );
-
-        try( final PreparedStatement fetchDBVersion = con.prepareStatement( SQLStatements.FETCH_DB_VERSION );
-             final ResultSet rs = fetchDBVersion.executeQuery(); ) {
+        try( final Statement stmt = con.createStatement();
+             final ResultSet rs = stmt.executeQuery( SQLStatements.FETCH_DB_VERSION ); ) {
 
             boolean updateNeeded = false;
             int dbVersion = 0;
@@ -1103,7 +297,7 @@ public final class ProjectConnector extends Observable {
             //restructure statistics table
             if( dbVersion < 3 ) {
                 updateNeeded = true;
-                restructureStatisticsTable();
+                restructureStatisticsTable( con );
             }
 
             ResultSet fileColumn = con.getMetaData().getColumns( con.getCatalog(), "PUBLIC", FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE );
@@ -1112,7 +306,7 @@ public final class ProjectConnector extends Observable {
             //move references to chromosome table
             if( dbVersion < 2 || columnFastafileMissing ) {
                 updateNeeded = true;
-                createChromsFromRefs();
+                createChromsFromRefs( con );
             }
 
             if( updateNeeded ) {
@@ -1126,11 +320,9 @@ public final class ProjectConnector extends Observable {
                     updateDBVersion.executeUpdate();
                 }
             }
+            LOG.info( "Done checking DB version and updated to latest version" );
 
-        } catch( SQLException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
         }
-        LOG.info( "Done checking DB version and updated to latest version" );
 
     }
 
@@ -1140,27 +332,123 @@ public final class ProjectConnector extends Observable {
      * 1. Reads stats content into one StatsContainer per track<br>
      * 2. Drops old table<br>
      * 3. Creates new table with 4 columns<br>
-     * 4. Inserts the data of all StatsContainers in the new table
-     * This method is intended for DBs < version 3.
+     * 4. Inserts the data of all StatsContainers in the new table This method
+     * is intended for DBs < version 3.
      */
     @NbBundle.Messages( { "TITLE_FileReset=Reset track file path",
                           "MSG_FileReset=If you do not reset the track file location, it cannot be opened" } )
-    private void restructureStatisticsTable() throws SQLException {
+    private static void restructureStatisticsTable( Connection con ) throws SQLException {
+
         Map<Integer, StatsContainer> trackIdToStatsMap = new HashMap<>();
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         List<PersistentTrack> tracks = projectConnector.getTracks();
         for( PersistentTrack track : tracks ) {
-            trackIdToStatsMap.put( track.getId(), projectConnector.getTrackStats( track.getId() ) );
+            trackIdToStatsMap.put( track.getId(), projectConnector.getTrackStats( con, track.getId() ) );
         }
 
-        runSqlStatement( SQLStatements.DROP_TABLE + "STATISTICS" );
-        con.prepareStatement( SQLStatements.SETUP_STATISTICS ).executeUpdate();
+        try( Statement stmt = con.createStatement() ) {
+            stmt.execute( SQLStatements.DROP_TABLE + "STATISTICS" );
+            stmt.execute( SQLStatements.SETUP_STATISTICS );
+        }
 
         for( PersistentTrack track : tracks ) {
             if( trackIdToStatsMap.containsKey( track.getId() ) ) {
                 StatsContainer statsContainer = trackIdToStatsMap.get( track.getId() );
                 projectConnector.storeTrackStatistics( statsContainer, track.getId() );
             }
+        }
+
+    }
+
+
+    /**
+     * Moves all reference sequences, still stored in the reference table into
+     * the chromosome table and creates corresponding ids and chromosome names.
+     * It also sets the corresponding chromosome id for all genomic features in
+     * the feature table and removes the reference sequence column from the
+     * reference table. This method is intended for DBs < version 2.
+     */
+    private void createChromsFromRefs( Connection con ) throws SQLException {
+
+        try( final Statement stmt = con.createStatement();
+             final PreparedStatement pStmtFetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ) ) {
+
+            //Add column fastafile to reference table
+            stmt.execute( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE, "VARCHAR(600)" ) );
+            //add column chromosome id to features
+            stmt.execute( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED ) );
+
+            for( final PersistentReference ref : getReferences() ) {
+                pStmtFetchRefSeq.setInt( 1, ref.getId() );
+                try( final ResultSet rs = pStmtFetchRefSeq.executeQuery() ) {
+
+                    if( rs.next() ) {
+                        String refSeq = rs.getString( FieldNames.REF_GEN_SEQUENCE );
+                        String chromName = rs.getString( FieldNames.REF_GEN_NAME );
+
+                        String preparedRefName = ref.getName()
+                                .replace( ':', '-' )
+                                .replace( '/', '-' )
+                                .replace( '\\', '-' )
+                                .replace( '*', '-' )
+                                .replace( '?', '-' )
+                                .replace( '|', '-' )
+                                .replace( '<', '-' )
+                                .replace( '>', '-' )
+                                .replace( '"', '_' )
+                                .replace( ' ', '_' );
+                        String pathString = new File( dbLocation ).getParent().concat( "\\" + preparedRefName.concat( ".fasta" ) );
+                        Path fastaPath = new File( pathString ).toPath();
+                        try( final FastaLineWriter fastaWriter = FastaLineWriter.fileWriter( fastaPath ) ) {
+                            fastaWriter.writeHeader( ref.getName() );
+                            fastaWriter.appendSequence( refSeq );
+                            try( PreparedStatement pStmtUpdateRefFile = con.prepareStatement( SQLStatements.UPDATE_REF_FILE ) ) {
+                                pStmtUpdateRefFile.setString( 1, pathString );
+                                pStmtUpdateRefFile.setInt( 2, ref.getId() );
+                                pStmtUpdateRefFile.execute();
+                            }
+                            FastaUtils fastaUtils = new FastaUtils();
+                            fastaUtils.getIndexedFasta( fastaPath.toFile() );
+                        } catch( IOException ex ) {
+                            LOG.log( SEVERE, "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!", ex );
+                            throw new FileException( "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!", ex.getMessage(), ex );
+                        }
+
+                        ParsedChromosome newChrom = new ParsedChromosome();
+                        newChrom.setName( chromName );
+                        newChrom.setChromLength( refSeq.length() );
+
+                        storeChromosome( con, newChrom, 1, ref.getId() );
+
+                        //Update chromosome ids of the features for this reference
+                        //Since there is exactly one chrom for the current genome, we can query it as follows:
+                        PersistentChromosome chrom = getRefGenomeConnector( ref.getId() ).getChromosomesForGenome().values().iterator().next();
+
+                        PreparedStatement updateFeatureTable = con.prepareStatement( SQLStatements.UPDATE_FEATURE_TABLE );
+                        updateFeatureTable.setInt( 1, chrom.getId() );
+                        updateFeatureTable.setInt( 2, ref.getId() );
+                        updateFeatureTable.executeUpdate();
+                    }
+
+                }
+
+                //set default value for references without file and set column not null
+                stmt.execute( SQLStatements.INIT_FASTAFILE );
+                stmt.execute( SQLStatements.NOT_NULL_FASTAFILE );
+
+                //after setting all chromosome ids of the features, now we can delete the REFERENCE_ID
+                stmt.execute( SQLStatements.NOT_NULL_CHROMOSOME_ID );
+                //Drop old REFERENCE_ID column
+                stmt.execute( GenericSQLQueries.genRemoveColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_REFGEN_ID ) );
+                //Drop old ref seq column for this DB
+                stmt.execute( GenericSQLQueries.genRemoveColumnString( FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE ) );
+
+            }
+
+        } catch( SQLException ex ) {
+            String msg = "reading reference genome data failed!";
+            LOG.log( SEVERE, msg, ex );
+            throw new SQLException( msg, ex );
         }
 
     }
@@ -1174,15 +462,15 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @return The complete statistics for the track specified by the given id.
      */
-    private StatsContainer getTrackStats( final int wantedTrackId ) {
+    private static StatsContainer getTrackStats( Connection con, int wantedTrackId ) throws SQLException {
 
-        StatsContainer statsContainer = new StatsContainer();
-        statsContainer.prepareForTrack();
-        statsContainer.prepareForReadPairTrack();
+        try( PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
+             pStmtFetch.setInt( 1, wantedTrackId );
 
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
-            fetch.setInt( 1, wantedTrackId );
-            try( final ResultSet rs = fetch.executeQuery(); ) {
+            StatsContainer statsContainer = new StatsContainer();
+            statsContainer.prepareForTrack();
+            statsContainer.prepareForReadPairTrack();
+            try( ResultSet rs = pStmtFetch.executeQuery() ) {
                 while( rs.next() ) {
                     //General data
                     statsContainer.increaseValue( MappingClass.PERFECT_MATCH.toString(), rs.getInt( FieldNames.STATISTICS_NUMBER_PERFECT_MAPPINGS ) );
@@ -1215,149 +503,919 @@ public final class ProjectConnector extends Observable {
                     statsContainer.increaseValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt( FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH ) );
                 }
             }
+            return statsContainer;
 
-        } catch( SQLException e ) {
-            LOG.log( Level.SEVERE, null, e );
-            JOptionPane.showMessageDialog( new JPanel(), "Unfortunately, the Statistics table seems to be broken. In this case the DB has to be re-created"
-                                                         + " to get the correct statistics entries for each track again.",
-                                           "Statistics table format error", JOptionPane.ERROR_MESSAGE );
+        } catch( SQLException ex ) {
+            String msg = "Unfortunately, the Statistics table seems to be broken. In this case the DB has to be re-created" +
+                     " to get the correct statistics entries for each track again." +
+                     " Statistics table format error";
+            LOG.log( SEVERE, msg, ex );
+            throw new SQLException( msg, ex );
         }
-        return statsContainer;
 
     }
 
 
-    /**
-     * Moves all reference sequences, still stored in the reference table into
-     * the chromosome table and creates corresponding ids and chromosome names.
-     * It also sets the corresponding chromosome id for all genomic features in
-     * the feature table and removes the reference sequence column from the
-     * reference table.
-     * This method is intended for DBs < version 2.
-     */
-    private void createChromsFromRefs() throws SQLException {
-
-        //Add column fastafile to reference table
-        runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE, "VARCHAR(600)" ) );
-        //add column chromosome id to features
-        runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED ) );
-
-        for( final PersistentReference ref : getGenomesDbUpgrade() ) {
-            try( final PreparedStatement fetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ); ) {
-
-                fetchRefSeq.setInt( 1, ref.getId() );
-                try( final ResultSet rs = fetchRefSeq.executeQuery(); ) {
-                    if( rs.next() ) {
-
-                        String refSeq = rs.getString( FieldNames.REF_GEN_SEQUENCE );
-                        String chromName = rs.getString( FieldNames.REF_GEN_NAME );
-
-                        String preparedRefName = ref.getName()
-                                .replace( ':', '-' )
-                                .replace( '/', '-' )
-                                .replace( '\\', '-' )
-                                .replace( '*', '-' )
-                                .replace( '?', '-' )
-                                .replace( '|', '-' )
-                                .replace( '<', '-' )
-                                .replace( '>', '-' )
-                                .replace( '"', '_' )
-                                .replace( " ", "_" );
-                        String pathString = new File( dbLocation ).getParent().concat( "\\" + preparedRefName.concat( ".fasta" ) );
-                        Path fastaPath = new File( pathString ).toPath();
-                        try( final FastaLineWriter fastaWriter = FastaLineWriter.fileWriter( fastaPath ) ) {
-                            fastaWriter.writeHeader( ref.getName() );
-                            fastaWriter.appendSequence( refSeq );
-                            PreparedStatement updateRefFile = con.prepareStatement( SQLStatements.UPDATE_REF_FILE );
-                            updateRefFile.setString( 1, pathString );
-                            updateRefFile.setInt( 2, ref.getId() );
-                            updateRefFile.execute();
-                            FastaUtils fastaUtils = new FastaUtils();
-                            fastaUtils.getIndexedFasta( fastaPath.toFile() );
-                        } catch( IOException ex ) {
-                            JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!",
-                                                           "Reference fasta cannot be written to DB folder", JOptionPane.ERROR_MESSAGE );
-                            throw new SQLException( "Cannot update reference table, since fasta file is missing. Please retry after changing the permissions in the DB folder!" );
-                        }
-
-                        ParsedChromosome newChrom = new ParsedChromosome();
-                        newChrom.setName( chromName );
-                        newChrom.setChromLength( refSeq.length() );
-
-                        storeChromosome( newChrom, 1, ref.getId() );
-
-                        //Update chromosome ids of the features for this reference
-                        //Since there is exactly one chrom for the current genome, we can query it as follows:
-                        PersistentChromosome chrom = getRefGenomeConnector( ref.getId() ).getChromosomesForGenome().values().iterator().next();
-
-                        PreparedStatement updateFeatureTable = con.prepareStatement( SQLStatements.UPDATE_FEATURE_TABLE );
-                        updateFeatureTable.setInt( 1, chrom.getId() );
-                        updateFeatureTable.setInt( 2, ref.getId() );
-                        updateFeatureTable.executeUpdate();
-                    }
-                }
-            } catch( SQLException e ) {
-                JOptionPane.showMessageDialog( new JPanel(), "Unfortunately, the DB seems to have a broken reference table. In this case the DB has to be re-created.",
-                                               "Reference table format error", JOptionPane.ERROR_MESSAGE );
-            }
-
-        }
-
-        //set default value for references without file and set column not null
-        runSqlStatement( SQLStatements.INIT_FASTAFILE );
-        runSqlStatement( SQLStatements.NOT_NULL_FASTAFILE );
-
-        //after setting all chromosome ids of the features, now we can delete the REFERENCE_ID
-        runSqlStatement( SQLStatements.NOT_NULL_CHROMOSOME_ID );
-        //Drop old REFERENCE_ID column
-        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_FEATURES, FieldNames.FEATURE_REFGEN_ID ) );
-        //Drop old ref seq column for this DB
-        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE ) );
-
-    }
-
-
-    /**
-     * @return All references stored in the db with their associated data. All
-     *         references are re-queried from the DB and returned in new, independent
-     *         objects each time the method is called. No check of fasta files is
-     *         performed
-     * <p>
-     * @throws OutOfMemoryError
-     */
-    public List<PersistentReference> getGenomesDbUpgrade() throws OutOfMemoryError {
-
-        LOG.info( "Reading reference genome data from database" );
-        List<PersistentReference> refGens = new ArrayList<>();
-
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES );
-             final ResultSet rs = fetch.executeQuery(); ) {
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.REF_GEN_ID );
-                String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
-                String name = rs.getString( FieldNames.REF_GEN_NAME );
-                Timestamp timestamp = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
-                String fileName = rs.getString( FieldNames.REF_GEN_FASTA_FILE ); //special handling for backwards compatibility with old DBs
-                fileName = fileName == null ? "" : fileName;
-                File fastaFile = new File( fileName );
-                refGens.add( new PersistentReference( id, 1, name, description, timestamp, fastaFile, false ) );
-            }
-        } catch( SQLException e ) {
-            LOG.log( Level.SEVERE, null, e );
-        }
-
-        return refGens;
-
+    public Connection getConnection() throws SQLException {
+        return connectionPool.getConnection();
     }
 
 
     /**
      * @return The location of the database
      */
-    public String getDBLocation() {
+    public String getDbLocation() {
         return dbLocation;
+    }
+
+
+    /**
+     * Disconnects the current DB connection.
+     * <p>
+     * @throws de.cebitec.readxplorer.databackend.connector.DatabaseException
+     */
+    public void disconnect() {
+
+        LOG.info( "Closing database connection" );
+        connectionPool.dispose();
+        connectionPool = null;
+        trackConnectors.clear();
+        refConnectors.clear();
+
+        // notify observers about the change of the database
+        notifyObserversAbout( "disconnect" );
+
+    }
+
+
+    /**
+     * Adds all data belonging to a reference genome to the database.
+     * <p>
+     * @param reference the reference to store
+     * <p>
+     * @return the reference id
+     * <p>
+     * @throws DatabaseException
+     */
+    public int addRefGenome( final ParsedReference reference ) throws DatabaseException {
+
+        LOG.log( INFO, "Start storing reference sequence  \"{0}\"", reference.getName() );
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            try {
+
+                storeGenome( con, reference );
+                storeFeatures( con, reference );
+                con.commit();
+                con.setAutoCommit( true );
+
+                LOG.log( INFO, "finished storing reference sequence \"{0}\"", reference.getName() );
+                // notify observers about the change of the database
+                notifyObserversAbout( "addRefGenome" );
+
+                return reference.getID();
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( SQLException exRb ) {
+                    LOG.log( SEVERE, "adding reference genome failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Adding reference genome failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "adding reference genome failed! rolledbacked!", ex );
+                throw new DatabaseException( "Adding reference genome failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Stores a reference genome in the reference genome table of the db.
+     * <p>
+     * @param reference the reference data to store
+     */
+    private static void storeGenome( Connection con, ParsedReference reference ) throws SQLException {
+
+        LOG.info( "start storing reference sequence data..." );
+        try( PreparedStatement insertGenome = con.prepareStatement( SQLStatements.INSERT_REFGENOME ) ) {
+
+            int id = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_REFERENCE_ID, con );
+            reference.setID( id );
+
+            // store reference data
+            insertGenome.setLong( 1, reference.getID() );
+            insertGenome.setString( 2, reference.getName() );
+            insertGenome.setString( 3, reference.getDescription() );
+            insertGenome.setTimestamp( 4, reference.getTimestamp() );
+            insertGenome.setString( 5, reference.getFastaFile().toString() );
+            insertGenome.execute();
+
+            List<ParsedChromosome> chromosomes = reference.getChromosomes();
+            for( int i = 0; i < chromosomes.size(); i++ ) {
+                storeChromosome( con, chromosomes.get( i ), i + 1, reference.getID() );
+            }
+
+        } catch( SQLException ex ) {
+            String msg = "storing genome failed!";
+            LOG.log( SEVERE, msg, ex );
+            throw new SQLException( msg, ex );
+        }
+
+        LOG.info( "...done inserting reference sequence data" );
+
+    }
+
+
+    /**
+     * Stores a chromosome in the db.
+     * <p>
+     * @param chromosome  the chromosome to store
+     * @param chromNumber the chromosome number of the new chromosome
+     * @param refID       the reference id of the chromosome
+     */
+    private static void storeChromosome( Connection con, ParsedChromosome chromosome, int chromNumber, int refID ) throws SQLException {
+
+        LOG.info( "start storing chromosome data..." );
+        try( PreparedStatement insertChromosome = con.prepareStatement( SQLStatements.INSERT_CHROMOSOME ) ) {
+
+            int id = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_CHROMOSOME_ID, con );
+            chromosome.setID( id );
+
+            //store chromosome data
+            insertChromosome.setLong( 1, chromosome.getID() );
+            insertChromosome.setLong( 2, chromNumber );
+            insertChromosome.setLong( 3, refID );
+            insertChromosome.setString( 4, chromosome.getName() );
+            insertChromosome.setLong( 5, chromosome.getChromLength() );
+            insertChromosome.execute();
+
+        } catch( SQLException ex ) {
+            String msg = "storing chromosome failed!";
+            LOG.log( SEVERE, msg, ex );
+            throw new SQLException( msg, ex );
+        }
+
+        LOG.info( "...done inserting chromosome data" );
+
+    }
+
+
+    /**
+     * Stores the features of a reference genome in the feature table of the db.
+     * <p>
+     * @param reference the reference containing the features to store
+     */
+    private static void storeFeatures( Connection con, ParsedReference reference ) throws SQLException {
+
+        LOG.info( "start inserting features..." );
+        try( final PreparedStatement insertFeature = con.prepareStatement( SQLStatements.INSERT_FEATURE ) ) {
+
+            for( final ParsedChromosome chrom : reference.getChromosomes() ) {
+
+                int latestId = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_FEATURE_ID, con );
+
+                chrom.setFeatId( latestId );
+                chrom.distributeFeatureIds();
+
+                int batchCounter = 0;
+                insertFeature.setLong( 2, chrom.getID() );
+                for( ParsedFeature feature : chrom.getFeatures() ) {
+                    batchCounter++;
+                    insertFeature.setLong( 1, feature.getId() );
+                    insertFeature.setString( 3, feature.getParentIdsConcat() );
+                    insertFeature.setInt( 4, feature.getType().getType() );
+                    insertFeature.setInt( 5, feature.getStart() );
+                    insertFeature.setInt( 6, feature.getStop() );
+                    insertFeature.setString( 7, feature.getLocusTag() );
+                    insertFeature.setString( 8, feature.getProduct() );
+                    insertFeature.setString( 9, feature.getEcNumber() );
+                    insertFeature.setInt( 10, feature.getStrand().getType() );
+                    insertFeature.setString( 11, feature.getGeneName() );
+                    insertFeature.addBatch();
+
+                    if( batchCounter == FEATURE_BATCH_SIZE ) {
+                        batchCounter = 0;
+                        insertFeature.executeBatch();
+                    }
+                }
+                insertFeature.executeBatch();
+
+            }
+
+        } catch( SQLException ex ) {
+            String msg = "storing features failed!";
+            LOG.log( SEVERE, msg, ex );
+            throw new SQLException( msg, ex );
+        }
+
+        LOG.info( "...done inserting features" );
+
+    }
+
+
+    /**
+     * Adds a track to the database with its file path. This means, it is stored
+     * as a track for direct file access and adds the persistent track id to the
+     * track job.
+     * <p>
+     * @param track the track job containing the track information to store
+     */
+    public void storeBamTrack( final ParsedTrack track ) throws DatabaseException {
+
+        LOG.info( "start storing bam track data..." );
+        try( Connection con = connectionPool.getConnection() ) {
+            try( PreparedStatement pStmtInsertTrack = con.prepareStatement( SQLStatements.INSERT_TRACK ) ) {
+
+                pStmtInsertTrack.setLong( 1, track.getID() );
+                pStmtInsertTrack.setLong( 2, track.getRefId() );
+                pStmtInsertTrack.setString( 3, track.getDescription() );
+                pStmtInsertTrack.setTimestamp( 4, track.getTimestamp() );
+                pStmtInsertTrack.setString( 5, track.getFile().getAbsolutePath() );
+                pStmtInsertTrack.execute();
+
+                // notify observers about the change of the database
+                notifyObserversAbout( "storeTrack" );
+                LOG.info( "...done storing bam track data" );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "adding track failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Adding track failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "adding track failed! rolledbacked!", ex );
+                throw new DatabaseException( "Adding track failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Stores the statistics for a track in the db.
+     * <p>
+     * @param statsContainer The container with all statistics for the given
+     *                       track ID
+     * @param trackID        the track id whose data shall be stored
+     */
+    public void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) throws DatabaseException {
+
+        LOG.info( "Start storing track statistics..." );
+
+        DiscreteCountingDistribution readLengthDistribution = statsContainer.getReadLengthDistribution();
+        if( !readLengthDistribution.isEmpty() ) {
+            insertCountDistribution( readLengthDistribution, trackID );
+            statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_LENGTH, readLengthDistribution.getAverageValue() );
+        }
+        DiscreteCountingDistribution readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
+        if( !readPairLengthDistribution.isEmpty() ) {
+            insertCountDistribution( readPairLengthDistribution, trackID );
+            statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue() );
+        }
+
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            // get latest id for statistic
+            long latestID = GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_STATISTICS_ID, con );
+            try( PreparedStatement pStmtInsertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ) ) {
+
+                int batchCounter = 0;
+                pStmtInsertStats.setInt( 2, trackID );
+                for( Map.Entry<String, Integer> entry : statsContainer.getStatsMap().entrySet() ) {
+                    batchCounter++;
+                    pStmtInsertStats.setLong( 1, latestID++ );
+                    pStmtInsertStats.setString( 3, entry.getKey() );
+                    pStmtInsertStats.setInt( 4, entry.getValue() );
+                    pStmtInsertStats.addBatch();
+                    if( batchCounter == FEATURE_BATCH_SIZE ) {
+                        batchCounter = 0;
+                        pStmtInsertStats.executeBatch();
+                    }
+                }
+                con.commit();
+                LOG.info( "...done storing track statistics data" );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "storing track statistics failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Storing track statistics failed failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "storing track statistics failed! rolledbacked!", ex );
+                throw new DatabaseException( "Storing track statistics failed failed!", ex.getMessage(), ex );
+            }
+            con.setAutoCommit( true );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Stores the statistics for a track in the db.
+     * <p>
+     * @param keys    the list of statistics key whose values shall be deleted
+     *                for the given track
+     * @param trackId the track id whose data shall be stored
+     */
+    public void deleteSpecificTrackStatistics( List<String> keys, int trackId ) throws DatabaseException {
+
+        LOG.info( "Start deleting specific track statistics..." );
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            try( PreparedStatement pStmtDeleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
+
+                pStmtDeleteStats.setLong( 1, trackId );
+                for( String key : keys ) {
+                    pStmtDeleteStats.setString( 2, key );
+                    pStmtDeleteStats.execute();
+                }
+                con.commit();
+                LOG.info( "...done deleting specific track statistics." );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "deleting specific track statistics failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Deleting specific track statistics failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "deleting specific track statistics failed! rolledbacked!", ex );
+                throw new DatabaseException( "Deleting specific track statistics failed!", ex.getMessage(), ex );
+            }
+            con.setAutoCommit( true );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Sets a count distribution {@link DiscreteCountingDistribution} for this
+     * track.
+     * <p>
+     * @param distribution the count distribution to store
+     * @param trackId      track id of this track
+     */
+    public void insertCountDistribution( DiscreteCountingDistribution distribution, final int trackId ) throws DatabaseException {
+
+        int[] countDistribution = distribution.getDiscreteCountingDistribution();
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            try( PreparedStatement pStmtInsert = con.prepareStatement( SQLStatements.INSERT_COUNT_DISTRIBUTION ) ) {
+
+                pStmtInsert.setInt( 1, trackId );
+                pStmtInsert.setByte( 2, (byte) distribution.getType().getType() );
+                for( int i = 0; i < countDistribution.length; ++i ) {
+                    pStmtInsert.setInt( 3, i );
+                    pStmtInsert.setInt( 4, countDistribution[i] );
+                    pStmtInsert.addBatch();
+                }
+                pStmtInsert.executeBatch();
+                con.commit();
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "inserting count distribution failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Inserting count distribution failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "inserting count distribution failed! rolledbacked!", ex );
+                throw new DatabaseException( "Inserting count distribution failed!", ex.getMessage(), ex );
+            }
+            con.setAutoCommit( true );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Sets the read pair id for both tracks belonging to one read pair.
+     * <p>
+     * @param track1Id track id of first track of the pair
+     * @param track2Id track id of second track of the pair
+     */
+    public void setReadPairIdsForTrackIds( long track1Id, long track2Id ) throws DatabaseException {
+
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            try {
+                //not 0, because 0 is the value when a track is not a sequence pair track!
+                int readPairId = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_TRACK_READ_PAIR_ID, con );
+                try( PreparedStatement pStmtSetReadPairIds = con.prepareStatement( SQLStatements.INSERT_TRACK_READ_PAIR_ID ) ) {
+                    pStmtSetReadPairIds.setInt( 1, readPairId );
+                    pStmtSetReadPairIds.setLong( 2, track1Id );
+                    pStmtSetReadPairIds.execute();
+
+                    pStmtSetReadPairIds.setInt( 1, readPairId );
+                    pStmtSetReadPairIds.setLong( 2, track2Id );
+                    pStmtSetReadPairIds.execute();
+                    con.commit();
+                }
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "setting read pair ids failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Setting read pair ids failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "setting read pair ids failed! rolledbacked!", ex );
+                throw new DatabaseException( "Setting read pair ids failed!", ex.getMessage(), ex );
+            }
+            con.setAutoCommit( true );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * @param refId the reference id
+     * <p>
+     * @return The reference genome connector for the given reference id
+     */
+    public ReferenceConnector getRefGenomeConnector( int refId ) {
+
+        // only return new object, if no suitable connector was created before
+        if( !refConnectors.containsKey( refId ) ) {
+            refConnectors.put( refId, new ReferenceConnector( refId ) );
+        }
+
+        return refConnectors.get( refId );
+
+    }
+
+
+    public TrackConnector getTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+
+        // only return new object, if no suitable connector was created before
+        int trackId = track.getId();
+        if( !trackConnectors.containsKey( trackId ) ) {
+            trackConnectors.put( trackId, new TrackConnector( track ) );
+        }
+
+        return trackConnectors.get( trackId );
+
+    }
+
+
+    public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws FileNotFoundException {
+
+        // makes sure the track id is not already used
+        int id = 9999;
+        for( PersistentTrack track : tracks ) {
+            id += track.getId();
+        }
+        // only return new object, if no suitable connector was created before
+        trackConnectors.put( id, new TrackConnector( id, tracks, combineTracks ) );
+
+        return trackConnectors.get( id );
+
+    }
+
+
+    public MultiTrackConnector getMultiTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+
+        // only return new object, if no suitable connector was created before
+        int trackID = track.getId();
+        if( !multiTrackConnectors.containsKey( trackID ) ) { //old solution, which does not work anymore
+            multiTrackConnectors.put( trackID, new MultiTrackConnector( track ) );
+        }
+
+        return multiTrackConnectors.get( trackID );
+
+    }
+
+
+    public MultiTrackConnector getMultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException {
+
+        // makes sure the track id is not already used
+        int id = 9999;
+        for( PersistentTrack track : tracks ) {
+            id += track.getId();
+        }
+        // only return new object, if no suitable connector was created before
+        multiTrackConnectors.put( id, new MultiTrackConnector( tracks ) );
+
+        return multiTrackConnectors.get( id );
+
+    }
+
+
+    /**
+     * Removes the track connector for the given trackId.
+     * <p>
+     * @param trackId track id of the track connector to remove
+     */
+    public void removeTrackConnector( int trackId ) {
+        if( trackConnectors.containsKey( trackId ) ) {
+            trackConnectors.remove( trackId );
+        }
+    }
+
+
+    /**
+     * Removes the multi track connector for the given trackId.
+     * <p>
+     * @param trackId track id of the multi track connector to remove
+     */
+    public void removeMultiTrackConnector( int trackId ) {
+        if( multiTrackConnectors.containsKey( trackId ) ) {
+            multiTrackConnectors.remove( trackId );
+        }
+    }
+
+
+    /**
+     * @return All references stored in the db with their associated data. All
+     *         references are re-queried from the DB and returned in new,
+     *         independent objects each time the method is called.
+     * <p>
+     * @throws OutOfMemoryError
+     */
+    public List<PersistentReference> getReferences() throws DatabaseException {
+
+        LOG.info( "Reading reference genome data from database" );
+        try( Connection con = connectionPool.getConnection() ) {
+            try( final Statement stmtFetchRefs = con.createStatement();
+                 final ResultSet rs = stmtFetchRefs.executeQuery( SQLStatements.FETCH_GENOMES ) ) {
+
+                List<PersistentReference> refGens = new ArrayList<>();
+                while( rs.next() ) {
+                    int     id = rs.getInt( FieldNames.REF_GEN_ID );
+                    String  description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
+                    String  name = rs.getString( FieldNames.REF_GEN_NAME );
+                    String  fileName = rs.getString( FieldNames.REF_GEN_FASTA_FILE ); //special handling for backwards compatibility with old DBs
+                    fileName = fileName == null ? "" : fileName;
+                    Timestamp timestamp = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
+                    File fastaFile = new File( fileName );
+                    refGens.add( new PersistentReference( id, name, description, timestamp, fastaFile ) );
+                }
+                return refGens;
+
+            } catch( SQLException ex ) {
+                LOG.log( SEVERE, "reading reference genome data failed! rolledbacked!", ex );
+                throw new DatabaseException( "Reading reference genome data failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Resets the fasta file path of a direct access reference.
+     * <p>
+     * @param fastaFile fasta file to reset for the current reference.
+     * @param ref       The reference genome, whose file shall be updated
+     * <p>
+     * @throws DatabaseException
+     */
+    public void resetReferencePath( final File fastaFile, final PersistentReference ref ) throws DatabaseException {
+
+        LOG.info( "Preparing statements for storing track data" );
+        try( Connection con = connectionPool.getConnection() ) {
+            try( PreparedStatement resetRefPath = con.prepareStatement( SQLStatements.RESET_REF_PATH ) ) {
+
+                resetRefPath.setString( 1, fastaFile.getAbsolutePath() );
+                resetRefPath.setLong( 2, ref.getId() );
+                resetRefPath.execute();
+                ref.resetFastaPath( fastaFile );
+                LOG.log( INFO, "Reference file for \"{0}\" has been updated successfully", ref.getName() );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "setting reference path failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Setting reference path failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "setting reference path failed! rolledbacked!", ex );
+                throw new DatabaseException( "Setting reference path failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Deletes all data associated with the given reference id.
+     * <p>
+     * @param refId the reference id whose data shall be delete from the DB
+     * <p>
+     * @throws DatabaseException
+     */
+    public void deleteReference( final int refId ) throws DatabaseException {
+
+        LOG.log( INFO, "Starting deletion of reference with id \"{0}\"", refId );
+        ReferenceConnector refCon = getRefGenomeConnector( refId );
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            try( PreparedStatement pStmtDeleteFeatures = con.prepareStatement( SQLStatements.DELETE_FEATURES_FROM_CHROMOSOME );
+                 PreparedStatement pStmtDeleteChrom = con.prepareStatement( SQLStatements.DELETE_CHROMOSOME );
+                 PreparedStatement pStmtDeleteGenome = con.prepareStatement( SQLStatements.DELETE_GENOME ); ) {
+
+                for( PersistentChromosome chrom : refCon.getChromosomesForGenome().values() ) {
+                    LOG.log( INFO, "Deleting features for chromosome {0}...", chrom.getName() );
+                    pStmtDeleteFeatures.setLong( 1, chrom.getId() );
+                    pStmtDeleteFeatures.execute();
+                    LOG.log( INFO, "Deleting chromosome {0}...", chrom.getName() );
+                    pStmtDeleteChrom.setInt( 1, chrom.getId() );
+                    pStmtDeleteChrom.execute();
+                }
+
+                LOG.log( INFO, "Deleting Genome {0}...", refCon.getRefGenome().getName() );
+                pStmtDeleteGenome.setLong( 1, refId );
+                pStmtDeleteGenome.execute();
+
+                con.commit();
+                refConnectors.remove( refId );
+
+                // notify observers about the change of the database
+                notifyObserversAbout( "deleteGenomes" );
+                LOG.log( INFO, "Finished deletion of reference genome with id \"{0}\"", refId );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "deleting reference failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Deleting reference failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "deleting reference failed! rolledbacked!", ex );
+                throw new DatabaseException( "Deleting reference failed!", ex.getMessage(), ex );
+            }
+            con.setAutoCommit( true );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * @return A map of all tracks in the connected DB mapped on their
+     *         respective reference.
+     */
+    public Map<PersistentReference, List<PersistentTrack>> getReferencesAndTracks() throws DatabaseException {
+
+        final List<PersistentReference> genomes = getReferences();
+        final List<PersistentTrack> tracks = getTracks();
+        final Map<Integer, List<PersistentTrack>> tracksByReferenceId = new HashMap<>( tracks.size() );
+        for( PersistentTrack pt : tracks ) {
+            List<PersistentTrack> list = tracksByReferenceId.get( pt.getRefGenID() );
+            if( list == null ) {
+                list = new ArrayList<>();
+                tracksByReferenceId.put( pt.getRefGenID(), list );
+            }
+            list.add( pt );
+        }
+
+        Map<PersistentReference, List<PersistentTrack>> tracksByReference = new HashMap<>( genomes.size() );
+        for( PersistentReference reference : genomes ) {
+            List<PersistentTrack> currentTrackList = tracksByReferenceId.get( reference.getId() );
+            //if the current reference genome does not have any tracks,
+            //just create an empty list
+            if( currentTrackList == null ) {
+                currentTrackList = new ArrayList<>();
+            }
+            tracksByReference.put( reference, currentTrackList );
+        }
+
+        return tracksByReference;
+
+    }
+
+
+    /**
+     * Calculates and returns the names of all currently opened tracks hashed to
+     * their track id.
+     * <p>
+     * @return the names of all currently opened tracks hashed to their track
+     *         id.
+     */
+    public Map<Integer, String> getOpenedTrackNames() {
+
+        Map<Integer, String> namesList = new HashMap<>( trackConnectors.size() );
+        for( int nextId : trackConnectors.keySet() ) {
+            namesList.put( nextId, trackConnectors.get( nextId ).getAssociatedTrackName() );
+        }
+        return namesList;
+
+    }
+
+
+    /**
+     * @return All tracks stored in the database with all their information. All
+     *         tracks are re-queried from the DB and returned in new,
+     *         independent objects each time the method is called.
+     */
+    public List<PersistentTrack> getTracks() throws DatabaseException {
+
+        LOG.info( "Reading track data from database" );
+        try( Connection con = connectionPool.getConnection() ) {
+            try( Statement stmtFetch = con.createStatement();
+                 ResultSet rs = stmtFetch.executeQuery( SQLStatements.FETCH_TRACKS ); ) {
+
+                List<PersistentTrack> tracks = new ArrayList<>();
+                while( rs.next() ) {
+                    int id         = rs.getInt( FieldNames.TRACK_ID );
+                    int refGenID   = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
+                    int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
+                    String filePath    = rs.getString( FieldNames.TRACK_PATH );
+                    String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
+                    Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
+                    tracks.add( new PersistentTrack( id, filePath, description, date, refGenID, -1, readPairId ) );
+                }
+                return tracks;
+
+            } catch( SQLException ex ) {
+                LOG.log( SEVERE, "reading tracks data failed! rolledbacked!", ex );
+                throw new DatabaseException( "Reading tracks data failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * @param trackID
+     * <p>
+     * @return The track for the given track id in a fresh track object
+     */
+    public PersistentTrack getTrack( final int trackID ) throws DatabaseException {
+
+        LOG.info( "Reading track data from database" );
+        try( Connection con = connectionPool.getConnection() ) {
+            try( final PreparedStatement pStmtFetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK ); ) {
+                pStmtFetchTracks.setInt( 1, trackID );
+                try( final ResultSet rs = pStmtFetchTracks.executeQuery(); ) {
+
+                    if( rs.getFetchSize() == 1 ) {
+                        rs.next();
+                        int id         = rs.getInt( FieldNames.TRACK_ID );
+                        int refId      = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
+                        int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
+                        String filePath    = rs.getString( FieldNames.TRACK_PATH );
+                        String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
+                        Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
+                        return new PersistentTrack( id, filePath, description, date, refId, readPairId );
+                    } else {
+                        return null;
+                    }
+
+                }
+
+            } catch( SQLException ex ) {
+                LOG.log( SEVERE, "reading tracks data failed! rolledbacked!", ex );
+                throw new DatabaseException( "Reading tracks data failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * @return the latest track id used in the database + 1 = the next id to
+     *         use.
+     */
+    public int getLatestTrackId() throws DatabaseException {
+
+        try( Connection con = connectionPool.getConnection() ) {
+            return (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_TRACK_ID, con );
+        } catch( Exception ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Resets the file path of a direct access reference.
+     * <p>
+     * @param track track whose file path has to be resetted.
+     * <p>
+     * @throws DatabaseException
+     */
+    public void resetTrackPath( final PersistentTrack track ) throws DatabaseException {
+
+        LOG.info( "Preparing statements for storing track data" );
+        try( Connection con = connectionPool.getConnection() ) {
+            try( PreparedStatement resetTrackPath = con.prepareStatement( SQLStatements.RESET_TRACK_PATH ) ) {
+
+                resetTrackPath.setString( 1, track.getFilePath() );
+                resetTrackPath.setLong( 2, track.getId() );
+                resetTrackPath.execute();
+                LOG.log( INFO, "Track \"{0}\" has been updated successfully", track.getDescription() );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "setting track path failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Setting track path failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "setting track path failed! rolledbacked!", ex );
+                throw new DatabaseException( "Setting track path failed!", ex.getMessage(), ex );
+            }
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    /**
+     * Deletes all data associated with the given track id.
+     * <p>
+     * @param trackId the track id whose data shall be delete from the DB
+     * <p>
+     * @throws DatabaseException
+     */
+    public void deleteTrack( final int trackId ) throws DatabaseException {
+
+        LOG.log( INFO, "Starting deletion of track with id \"{0}\"", trackId );
+        try( Connection con = connectionPool.getConnection() ) {
+            con.setAutoCommit( false );
+            try( PreparedStatement pStmtDeleteStats = con.prepareStatement( SQLStatements.DELETE_STATISTIC_FROM_TRACK );
+                 PreparedStatement pStmtDeleteCountDistributions = con.prepareStatement( SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK );
+                 PreparedStatement pStmtDeleteTrack = con.prepareStatement( SQLStatements.DELETE_TRACK ); ) {
+
+                LOG.info( "Deleting Statistics..." );
+                pStmtDeleteStats.setInt( 1, trackId );
+                pStmtDeleteStats.execute();
+
+                LOG.info( "Deleting Count Distributions..." );
+                pStmtDeleteCountDistributions.setInt( 1, trackId );
+                pStmtDeleteCountDistributions.execute();
+
+                LOG.info( "Deleting Track..." );
+                pStmtDeleteTrack.setInt( 1, trackId );
+                pStmtDeleteTrack.execute();
+
+                con.commit();
+
+                trackConnectors.remove( trackId );
+                // notify observers about the change of the database
+                notifyObserversAbout( "deleteTrack" );
+                LOG.log( INFO, "Finished deletion of track \"{0}\"", trackId );
+
+            } catch( SQLException ex ) {
+                try {
+                    con.rollback();
+                } catch( Exception exRb ) {
+                    LOG.log( SEVERE, "deleting track failed! rollback failed!", exRb );
+                    throw new DatabaseException( "Deleting track failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
+                }
+                LOG.log( SEVERE, "deleting track failed! rolledbacked!", ex );
+                throw new DatabaseException( "Deleting track failed!", ex.getMessage(), ex );
+            }
+            con.setAutoCommit( true );
+        } catch( SQLException ex ) {
+            LOG.log( SEVERE, "no connection to db!", ex );
+            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        }
+
+    }
+
+
+    private void notifyObserversAbout( final String message ) {
+        setChanged();
+        notifyObservers( message );
     }
 
 
@@ -1377,5 +1435,26 @@ public final class ProjectConnector extends Observable {
 
     }
 
+
+
+
+    /*
+     * Legacy Code
+     *
+     * Just for temporary archiving and debugging
+     */
+
+
+    /**
+     * Checks if a rollback is needed or if the SQLException originated from a
+     * duplicate column name error.
+     * <p>
+     * @param ex SQL exception to check
+     */
+//    private void checkRollback( SQLException ex ) throws SQLException {
+//        if( !ex.getMessage().contains( "Duplicate column name" ) ) {
+//            rollbackOnError( ex );
+//        }
+//    }
 
 }

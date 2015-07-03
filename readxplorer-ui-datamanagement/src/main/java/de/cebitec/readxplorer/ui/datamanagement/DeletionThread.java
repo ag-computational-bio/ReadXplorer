@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
 import java.io.IOException;
@@ -101,7 +101,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     ProjectConnector.getInstance().deleteTrack( t.getID() );
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
 
-                } catch( StorageException ex ) {
+                } catch( DatabaseException ex ) {
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                     //  invalidRuns.add(t.getRunJob());
@@ -121,9 +121,9 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.after" ) );
                 } else {
                     try {
-                        ProjectConnector.getInstance().deleteGenome( r.getID() );
+                        ProjectConnector.getInstance().deleteReference( r.getID() );
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
-                    } catch( StorageException ex ) {
+                    } catch( DatabaseException ex ) {
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
                         LOG.log( SEVERE, null, ex );
                     }

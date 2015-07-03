@@ -162,7 +162,7 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(new DefaultComboBoxModel&lt;&gt;(refArray))"/>
-        <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[0];&#xa;refArray = ProjectConnector.getInstance().getGenomes().toArray(refArray);"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[0];&#xa;refArray = ProjectConnector.getInstance().getReferences().toArray(refArray);"/>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataobjects.PersistentReference&gt;"/>
       </AuxValues>
     </Component>

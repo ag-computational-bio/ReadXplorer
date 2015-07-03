@@ -83,7 +83,7 @@ public final class ImportTableVisualPanel extends JobPanel {
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
         de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataobjects.PersistentReference[0];
-        refArray = ProjectConnector.getInstance().getGenomes().toArray(refArray);
+        refArray = ProjectConnector.getInstance().getReferences().toArray(refArray);
         refComboBox = new javax.swing.JComboBox<>(new DefaultComboBoxModel<>(refArray));
         tableLabel = new javax.swing.JLabel();
         fileLabel = new javax.swing.JLabel();
