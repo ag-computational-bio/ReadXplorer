@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readxplorer.tools.doubletrackviewer
+OpenIDE-Module-Layer: de/cebitec/readxplorer/tools/doubletrackviewer/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/tools/doubletrackviewer/Bundle.properties
+

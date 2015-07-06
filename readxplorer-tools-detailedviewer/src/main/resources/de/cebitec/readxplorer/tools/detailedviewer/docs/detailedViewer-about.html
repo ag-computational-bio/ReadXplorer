@@ -1,0 +1,41 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Detailed Viewer (Histogram, Alignment, Read Pair Viewer)</title>
+        <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Detailed Viewer:</strong></span></p>
+        <p style="text-align: justify;">The Detailed Viewer (see <i><a href="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/view-about.html">Main Window a)</a></i>) can be accessed via the respective toolbar icon or "<span style="text-decoration: underline;">Tools -&gt; Detailed Viewer</span>". It offers three different views on the mapping data: the Histogram Viewer, the Alignment Viewer and the Read Pair Viewer. For details about these viewers have a look below.</p>
+        <p></p>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Histogram Viewer: <br /></strong></span></p>
+        <p style="text-align: justify;">The Histogram Viewer is part of the Detailed Viewer (see <i><a href="nbdocs://de.cebitec.readxplorer.tools.detailedViewer/de/cebitec/readxplorer/tools/detailedviewer/docs/detailedViewer-about.html">Detailed Viewer</a></i>) and supplies intuitive exploration of position specific coverage information as histogram. The match coverage is shown in green and all mismatches and gaps are displayed in a base specific color, which is explained in the legend. In this viewer, the bases on the sequence bar in the middle are also colored according to their respective base. The checkbox "<span style="text-decoration: underline;">Color Histogram</span>" switches the coloring of the match coverage from green to the base specific color. The tooltip displays the actual base count values at the hovered position.</p>
+        <p></p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.thumbnail/de/cebitec/readxplorer/tools/detailedviewer/docs/histogram-viewer.jpg" alt="histogram-viewer"/></p>
+        <p></p>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Alignment Viewer:<br data-mce-bogus="1" /></strong></span></p>
+        <p style="text-align: justify;">The interactive alignment viewer is part of the Detailed Viewer (see <i><a href="nbdocs://de.cebitec.readxplorer.tools.detailedViewer/de/cebitec/readxplorer/tools/detailedviewer/docs/detailedViewer-about.html">Detailed Viewer</a></i>) and displays each computed read alignment and colors the mappings according to their mapping classification. The coloring is the same as in the Track Viewer (see <i><a href="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/classification-about.html">Read Classification</a></i>). All mismatches and gaps are displayed for each alignment and reference gaps are inserted in the sequence bar in the middle, if a mapping contains insertions. The tooltip always displays the properties of the currently hovered alignment. With a right click on an alignment, the corresponding reference sequence can be copied or the secondary structure of the corresponding sequence can be calculated. The <b>options panel</b> (inlet) enables centering the viewer on the sequence bar when scrolling and coloring the alignments by base qualities (Good quality bases are shown in bright colors, while darker positions indicate worse base quality).</p>
+        <p></p>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.thumbnail/de/cebitec/readxplorer/tools/detailedviewer/docs/alignment-viewer.jpg" alt="alignment-viewer" /></span></p>
+        <p></p>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Read Pair Viewer:<br data-mce-bogus="1" /></strong></span></p>
+        <p style="text-align: justify;"><span>For paired end or mate pair data, the Read Pair Viewer shows the pair configuration of all aligned reads (see <i><a href="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/classification-about.html">Read Pair Classification</a></i>). It <span>is part of the Detailed Viewer (see <i><a href="nbdocs://de.cebitec.readxplorer.tools.detailedViewer/de/cebitec/readxplorer/tools/detailedviewer/docs/detailedViewer-about.html">Detailed Viewer</a></i>). </span>The reads of a pair are connected via a dark grey line on a light grey background. Perfect pairs are displayed in green, while distorted pairs are yellow and single mappings are red. This coloring allows for easy identification of possible rearrangements, repetitive regions or other variation in the data. Detailed information about each read pair can be obtained by clicking on one of the reads of the pair, as shown on the screenshot below. </span></p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.thumbnail/de/cebitec/readxplorer/tools/detailedviewer/docs/read-pair-viewer.jpg" alt="read-pair-viewer" /></p>
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

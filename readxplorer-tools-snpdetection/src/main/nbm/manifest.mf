@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readxplorer.tools.snpdetection
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/tools/snpdetection/Bundle.properties
+
