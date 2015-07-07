@@ -6,12 +6,12 @@
     <parent>
         <groupId>bio.comp.jlu.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>2.1.1-SNAPSHOT</version>
     </parent>
 
 
     <artifactId>readxplorer-cli</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-FINAL</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - CLI</name>
     <description>This module provides basic command line functionalities for ReadXplorer's CLI version.
@@ -104,6 +104,7 @@ Please, have a look at CommandLineProcessor's JavaDoc for further information.</
                     <author>Oliver Schwengers</author>
                     <licenseName>GPLv3</licenseName>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
+                    <cluster>readxplorer-cli</cluster>
                 </configuration>
             </plugin>
 

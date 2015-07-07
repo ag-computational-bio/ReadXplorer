@@ -146,15 +146,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Mandatory options
      */
     @Arg( longName = "ref" )
-    @Description( shortDescription = "Reference genome to import / analysis." )
+    @Description( shortDescription = "Reference genome to import." )
     public String referenceArg;
 
     @Arg( longName = "reads" )
-    @Description( shortDescription = "Directory with SAM/BAM read files to import / analysis." )
+    @Description( shortDescription = "Directory with SAM/BAM read files to import [and analyse]." )
     public String readsDirArg;
 
     @Arg( longName = "per" )
-    @Description( shortDescription = "Directory with SAM/BAM paired-end read files to import / analysis." )
+    @Description( shortDescription = "Directory with SAM/BAM paired-end read files to import [and analyse]." )
     public String pairedEndReadsDirArg;
 
 
@@ -162,7 +162,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Optional options
      */
     @Arg( longName = "threads" )
-    @Description( shortDescription = "Specifies the number of available worker threads. Take care on multi user systems!" )
+    @Description( shortDescription = "Specifies the number of available worker threads. Please, take care on multi user systems!" )
     public String threadAmountArg;
 
     @Arg( longName = "db" )
@@ -241,15 +241,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // print optional arguments...
         final PrintStream ps = env.getOutputStream();
-        printFine( ps, "\nrun parameters: " );
-        printFine( ps, "\tverbosity: " + (verboseArg ? "on" : "off") );
-        printFine( ps, "\tpaired end: " + ((pairedEndArg  ||  pairedEndReadsDirArg!=null) ? "yes" : "no") );
-        printFine( ps, "\tthreading: " + (threadAmountArg != null ? threadAmountArg : "1") );
-        printFine( ps, "\tdb file: " + (dbFileArg != null ? dbFileArg : "default") );
-        printFine( ps, "\tproperty file: " + (propsFileArg != null ? propsFileArg : "default") );
+        try {
+            String dbFilePath = (new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + (dbFileArg!=null?dbFileArg:DEFAULT_DATABASE_NAME) + H2_FILE_SUFFIX ))
+                    .getCanonicalPath();
+            printFine( ps, "\nrun parameters: " );
+            printFine( ps, "\tverbosity: " + (verboseArg ? "on" : "off") );
+            printFine( ps, "\tpaired end: " + ((pairedEndArg  ||  pairedEndReadsDirArg!=null) ? "yes" : "no") );
+            printFine( ps, "\tthreading: " + (threadAmountArg != null ? threadAmountArg : "1") );
+            printFine( ps, "\tdb file: " + dbFilePath );
+            printFine( ps, "\tproperty file: " + (propsFileArg != null ? propsFileArg : "default") );
+        } catch( IOException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            CommandException ce = new CommandException( 1 );
+            ce.initCause( ex );
+            throw ce;
+        }
 
 
-        printFine( ps, null );
         // test reference file
         final File referenceFile = getReferenceFile( ps );
 
@@ -277,7 +285,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             // import paired-end reads
             importPairedEndReads( readFiles, pairedEndReadFiles, referenceResult, es, ps );
         } else {
-            // import normal reads
+            // import single reads
             importReads( readFiles, referenceResult, es, ps );
         }
 
@@ -287,7 +295,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
 
         // print information
-        ps.println();
+        printInfo( ps, null );
         printInfo( ps, "reference genome:" );
         printFine( ps, "\tname: " + pr.getName() );
         String desc = pr.getDescription();
@@ -326,6 +334,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             if( !referenceFile.canRead() ) {
                 throw new CommandException( 1, "Cannot access reference file ("+ referenceArg +")!" );
             }
+            printFine( ps, null );
             printFine( ps, "reference file to import: " + referenceFile.getName() );
 
             return referenceFile;
@@ -354,6 +363,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             File[] readFiles = readsDir.listFiles( new ReadsFileFilter() );
             Arrays.sort( readFiles );
 
+            printFine( ps, null );
             printFine( ps, "read files to import: ("+ readFiles.length +")" );
             for( int i = 0; i < readFiles.length; i++ ) {
 
@@ -376,8 +386,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private File[] getPairedEndReadFiles( final PrintStream ps, File[] readFiles ) throws CommandException {
 
         if( pairedEndArg ) {
+            // paired end reads combined in 1 sam/bam file
             return null;
-        } else if( pairedEndReadsDirArg != null ) {
+        } else if( !pairedEndArg  &&  pairedEndReadsDirArg == null ) {
+            // single reads
+            return null;
+        } else if( !pairedEndArg  &&  pairedEndReadsDirArg != null ) {
+            // paired end reads separated in 2 sam/bam files
 
             File pairedEndReadsDir = new File( pairedEndReadsDirArg );
             pairedEndReadsDir = pairedEndReadsDir.toPath().toAbsolutePath().normalize().toFile();
@@ -396,6 +411,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 throw new CommandException( 1, "Number of paired-end files (" + pairedEndReadFiles.length + ") does not match number of read files (" + readFiles.length + ")!" );
             }
 
+            printFine( ps, null );
             printFine( ps, "paired-end read files to import: ("+ pairedEndReadFiles.length +")" );
             for( int i = 0; i < pairedEndReadFiles.length; i++ ) {
 
@@ -411,7 +427,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return pairedEndReadFiles;
 
         } else {
-            throw new CommandException( 1, "No paired-end read files set!" );
+            throw new CommandException( 1, "No paired-end read files set!" ); // never reachable; only for the sake of readability
         }
 
     }
@@ -420,8 +436,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private ProjectConnector setupProjectConnector( final PrintStream ps ) throws CommandException {
 
         try {
-
-            printFine( ps, null );
 
             if( dbFileArg == null ) {
                 dbFileArg = DEFAULT_DATABASE_NAME;
@@ -432,11 +446,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 dbFile.delete();
             }
             ProjectConnector pc = ProjectConnector.getInstance();
-            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-            printFine( ps, "connected to " + dbFileArg );
+            pc.connect( Properties.ADAPTER_H2, dbFile.getCanonicalPath(), null, null, null );
+
+            printFine( ps, null );
+            printFine( ps, "connected to " + dbFile.getCanonicalPath() );
             return pc;
 
-        } catch( SQLException | SecurityException ex ) {
+        } catch( IOException | SQLException | SecurityException ex ) {
             LOG.log( SEVERE, ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
@@ -477,6 +493,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         try {
 
+            printInfo( ps, null );
             printFine( ps, "parse and store reference... " );
             Future<ImportReferenceResult> refFuture = es.submit( new ImportReferenceCallable( referenceFile ) );
             ImportReferenceResult referenceResult = refFuture.get();
@@ -507,7 +524,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private void importReads( final File[] trackFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws CommandException {
 
-        printFine( ps, null );
+        printInfo( ps, null );
         printFine( ps, "submitted jobs to import read files..." );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
@@ -531,7 +548,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         // store parsed tracks sequently to db
-        printInfo( ps, null );
         printInfo( ps, "imported read files:" );
         try {
 
@@ -572,7 +588,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
     private void importPairedEndReads( final File[] trackFiles, final File[] pairedEndFiles, final ImportReferenceResult referenceResult, final ExecutorService es, final PrintStream ps ) throws CommandException {
 
-        printFine( ps, null );
+        printInfo( ps, null );
         printFine( ps, "submitted jobs to import paired-end read files..." );
 
         // submit parse reads jobs for (concurrent) execution
@@ -614,7 +630,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
         // store parsed reads sequently to db
-        printInfo( ps, null );
         printInfo( ps, "imported paired-end read files:" );
         try {
 
@@ -660,7 +675,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private int runAnalyses( final ExecutorService es, final PrintStream ps ) throws CommandException {
 
 
-        printInfo( ps, null );
+        printFine( ps, null );
         printFine( ps, "submitted analyses:" );
         int runAnalyses = 0;
         final ProjectConnector pc = ProjectConnector.getInstance();
@@ -695,10 +710,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
 
             // create necessary parameter objects for all analyses
-            boolean useMainBases = Boolean.parseBoolean( getProperty( SNPConstants.SNP_COUNT_MAIN_BASES ) );
-            byte minBaseQuality    = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_BASE_QUALITY ) );
-            byte minAvrBaseQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
-            byte minMappingQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_MAPPING_QUALITY ) );
+            boolean useMainBases     = Boolean.parseBoolean( getProperty( SNPConstants.SNP_COUNT_MAIN_BASES ) );
+            byte minBaseQuality      = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_BASE_QUALITY ) );
+            byte minAvrBaseQuality   = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
+            byte minMappingQuality   = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_MAPPING_QUALITY ) );
             int minVaryingBases      = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_MISMATCH_BASES ) );
             int minAvrMappingQuality = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
             double minPercVariation  = Double.parseDouble( getProperty( SNPConstants.SNP_MIN_VARIATION ) );
@@ -720,23 +735,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
             runAnalyses++;
             printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
 
-            boolean autoTssParamEstimation     = Boolean.parseBoolean( getProperty( TSSConstants.TSS_PARAMETER_ESTIMATION ) );
-            boolean associateTSS               = Boolean.parseBoolean( getProperty( TSSConstants.TSS_ASSOCIATE ) );
-            boolean performUnannotatedTransDet = Boolean.parseBoolean( getProperty( TSSConstants.TSS_UNANNOTATED_DETECTION ) );
-            byte minMappingQuality             = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
-            Strand strandUsage                 = Strand.fromType( Integer.parseInt( getProperty( TSSConstants.TSS_STRAND_USAGE ) ) );
+            boolean autoTssParamEstimation        = Boolean.parseBoolean( getProperty( TSSConstants.TSS_PARAMETER_ESTIMATION ) );
+            boolean associateTSS                  = Boolean.parseBoolean( getProperty( TSSConstants.TSS_ASSOCIATE ) );
+            boolean performUnannotatedTransDet    = Boolean.parseBoolean( getProperty( TSSConstants.TSS_UNANNOTATED_DETECTION ) );
+            byte minMappingQuality                = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
+            Strand strandUsage                    = Strand.fromType( Integer.parseInt( getProperty( TSSConstants.TSS_STRAND_USAGE ) ) );
             ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( TSSConstants.TSS_MAPPING_CLASSES ), minMappingQuality, strandUsage );
                 readClassParams.setStrandOption( Strand.BothForward );
-            int minIncreaseTotal             = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_TOTAL ) );
-            int minIncreasePercent           = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_PERCENT ) );
-            int maxFeatureDistance           = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_FEATURE_DISTANCE ) );
-            int maxLeaderlessFeatureDistance = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
-            int associateTssWindow           = Integer.parseInt( getProperty( TSSConstants.TSS_ASSOCIATE_WINDOW ) );
-            int maxLowCovInitCount           = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LOW_COVERAGE_INIT ) );
-            int minLowCovIncrease            = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
-            int minTransExtensionCov         = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
+            int minIncreaseTotal                  = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_TOTAL ) );
+            int minIncreasePercent                = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_PERCENT ) );
+            int maxFeatureDistance                = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_FEATURE_DISTANCE ) );
+            int maxLeaderlessFeatureDistance      = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
+            int associateTssWindow                = Integer.parseInt( getProperty( TSSConstants.TSS_ASSOCIATE_WINDOW ) );
+            int maxLowCovInitCount                = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LOW_COVERAGE_INIT ) );
+            int minLowCovIncrease                 = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
+            int minTransExtensionCov              = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
 
-            final ParameterSetTSS parameterSet = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
+            final ParameterSetTSS parameterSet    = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
                                                  minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,
                                                  maxLeaderlessFeatureDistance, maxFeatureDistance, associateTSS, associateTssWindow, readClassParams );
 

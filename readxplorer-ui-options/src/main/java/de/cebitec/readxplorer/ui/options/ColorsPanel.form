@@ -21,11 +21,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel4" alignment="0" max="32767" attributes="0"/>
                   <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
-                  <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
                   <Component id="jPanel3" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="resetButton" linkSize="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="resetButton" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -36,16 +35,14 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" max="32767" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="resetButton" min="-2" max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="resetButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -65,7 +62,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Match Colors">
+            <TitledBorder title="Read Classification Colors">
               <ResourceString PropertyName="titleX" bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="ColorsPanel.jPanel1.border.title" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
@@ -82,40 +79,63 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="singleBestMatchLabel" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="perfectMatchLabel" linkSize="1" alignment="0" max="32767" attributes="1"/>
-                      <Component id="bestMatchLabel" linkSize="1" alignment="0" max="32767" attributes="0"/>
-                      <Component id="singlePerfectMatchLabel" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
-                      <Component id="commonMatchLabel" linkSize="1" alignment="0" min="-2" pref="120" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="singleBestMatchLabel" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="perfectMatchLabel" linkSize="1" alignment="0" max="32767" attributes="1"/>
+                              <Component id="bestMatchLabel" linkSize="1" alignment="0" max="32767" attributes="0"/>
+                              <Component id="singlePerfectMatchLabel" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
+                              <Component id="commonMatchLabel" linkSize="1" alignment="0" min="-2" pref="120" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="perfectColorPanel" alignment="0" pref="286" max="32767" attributes="0"/>
+                              <Component id="bestColorPanel" alignment="0" pref="286" max="32767" attributes="0"/>
+                              <Component id="commonColorPanel" alignment="0" pref="286" max="32767" attributes="0"/>
+                              <Component id="singlePerfectColorPanel" alignment="0" pref="286" max="32767" attributes="0"/>
+                              <Component id="singleBestColorPanel" alignment="0" pref="286" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="perfectColorButton" linkSize="3" alignment="0" max="32767" attributes="0"/>
+                              <Component id="bestColorButton" linkSize="3" alignment="0" max="32767" attributes="0"/>
+                              <Component id="commonColorButton" linkSize="3" alignment="0" max="32767" attributes="0"/>
+                              <Component id="singlePerfectColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="singleBestColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="uniformColorationCheckBox" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                          <Component id="uniformColorPanel" pref="285" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                          <Component id="uniformColButton" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="perfectColorPanel" alignment="0" pref="256" max="32767" attributes="0"/>
-                      <Component id="bestColorPanel" alignment="0" pref="256" max="32767" attributes="0"/>
-                      <Component id="commonColorPanel" alignment="0" pref="256" max="32767" attributes="0"/>
-                      <Component id="singlePerfectColorPanel" alignment="0" pref="256" max="32767" attributes="0"/>
-                      <Component id="singleBestColorPanel" alignment="0" pref="256" max="32767" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="perfectColorButton" linkSize="3" alignment="0" max="32767" attributes="0"/>
-                      <Component id="bestColorButton" linkSize="3" alignment="0" max="32767" attributes="0"/>
-                      <Component id="commonColorButton" linkSize="3" alignment="0" max="32767" attributes="0"/>
-                      <Component id="singlePerfectColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="singleBestColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="2" attributes="0">
+                      <Component id="singlePerfectColorPanel" linkSize="5" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="singlePerfectMatchLabel" linkSize="5" alignment="2" min="-2" pref="23" max="-2" attributes="0"/>
+                      <Component id="singlePerfectColorButton" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
                       <Component id="perfectMatchLabel" linkSize="5" alignment="2" min="-2" pref="23" max="-2" attributes="0"/>
                       <Component id="perfectColorPanel" linkSize="5" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="perfectColorButton" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="2" attributes="0">
+                      <Component id="singleBestMatchLabel" linkSize="5" alignment="2" min="-2" pref="18" max="-2" attributes="0"/>
+                      <Component id="singleBestColorPanel" linkSize="5" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="singleBestColorButton" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
@@ -129,19 +149,13 @@
                       <Component id="commonColorPanel" linkSize="5" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="commonColorButton" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="singlePerfectColorPanel" linkSize="5" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="singlePerfectMatchLabel" linkSize="5" alignment="2" min="-2" pref="23" max="-2" attributes="0"/>
-                      <Component id="singlePerfectColorButton" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="uniformColorPanel" linkSize="6" alignment="0" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="uniformColButton" linkSize="6" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="uniformColorationCheckBox" linkSize="6" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="singleBestMatchLabel" linkSize="5" alignment="2" min="-2" pref="18" max="-2" attributes="0"/>
-                      <Component id="singleBestColorPanel" linkSize="5" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="singleBestColorButton" linkSize="5" alignment="2" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -362,57 +376,12 @@
             </Property>
           </Properties>
         </Component>
-      </SubComponents>
-    </Container>
-    <Container class="javax.swing.JPanel" name="jPanel2">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Uniform Color">
-              <ResourceString PropertyName="titleX" bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="ColorsPanel.jPanel2.border.title" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-            </TitledBorder>
-          </Border>
-        </Property>
-      </Properties>
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="uniformColorationCheckBox" linkSize="1" min="-2" pref="123" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-                  <Component id="uniformColorPanel" pref="258" max="32767" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="uniformColButton" linkSize="3" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="uniformColorationCheckBox" linkSize="6" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="uniformColorPanel" linkSize="6" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
-                      <Component id="uniformColButton" linkSize="6" alignment="2" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Component class="javax.swing.JButton" name="uniformColButton">
+        <Component class="javax.swing.JCheckBox" name="uniformColorationCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="ColorsPanel.uniformColButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="ColorsPanel.uniformColorationCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="uniformColButtonActionPerformed"/>
-          </Events>
         </Component>
         <Container class="javax.swing.JPanel" name="uniformColorPanel">
           <Properties>
@@ -437,12 +406,15 @@
             </DimensionLayout>
           </Layout>
         </Container>
-        <Component class="javax.swing.JCheckBox" name="uniformColorationCheckBox">
+        <Component class="javax.swing.JButton" name="uniformColButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="ColorsPanel.uniformColorationCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/ui/options/Bundle.properties" key="ColorsPanel.uniformColButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="uniformColButtonActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -467,19 +439,19 @@
                       <Component id="track1ColorLabel" linkSize="4" min="-2" max="-2" attributes="0"/>
                       <Component id="track2ColorLabel" linkSize="4" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="differenceColorPanel" alignment="0" pref="259" max="32767" attributes="0"/>
-                      <Component id="track1ColorPanel" alignment="0" pref="259" max="32767" attributes="0"/>
-                      <Component id="track2ColorPanel" alignment="0" pref="259" max="32767" attributes="0"/>
+                      <Component id="track1ColorPanel" alignment="1" pref="288" max="32767" attributes="0"/>
+                      <Component id="track2ColorPanel" pref="288" max="32767" attributes="0"/>
+                      <Component id="differenceColorPanel" alignment="1" pref="288" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="differenceColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="track1ColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="track2ColorButton" linkSize="3" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="differenceColorButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="track1ColorButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="track2ColorButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -648,25 +620,25 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="backgroundColorLabel" linkSize="1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-                  <Component id="backgroundColorPanel" pref="255" max="32767" attributes="0"/>
+                  <Component id="backgroundColorLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
+                  <Component id="backgroundColorPanel" pref="287" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                  <Component id="backgroundColorButton" linkSize="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="backgroundColorButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
                       <Component id="backgroundColorLabel" linkSize="8" alignment="2" min="-2" pref="24" max="-2" attributes="0"/>
                       <Component id="backgroundColorPanel" linkSize="8" alignment="2" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="backgroundColorButton" linkSize="8" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -700,7 +672,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="251" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="283" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
