@@ -81,6 +81,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false );
+    private boolean sameStrand = pref.getBoolean( GUI.VIEWER_SAME_STRAND, false );
     private boolean useMinimalIntervalLength = true;
 
     private JSlider verticalSlider = null;
@@ -461,7 +462,17 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      *         position.
      */
     protected double getCoverageValue( boolean isFwdStrand, Classification classType, int absPos ) {
-        double value = this.calcCoverageValue( isFwdStrand, classType, absPos );
+        double value;
+
+        if( sameStrand ) {
+            if( isFwdStrand ) {
+                value = this.calcCoverageValue( true, classType, absPos ) + this.calcCoverageValue( false, classType, absPos );
+            } else {
+                return 0;
+            }
+        } else {
+            value = this.calcCoverageValue( isFwdStrand, classType, absPos );
+        }
 
         if( value > this.covManager.getHighestCoverage() ) {
             this.covManager.setHighestCoverage( (int) Math.ceil( value ) );
@@ -890,6 +901,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void setAutomaticScaling( boolean automaticScaling ) {
         this.automaticScaling = automaticScaling;
         this.computeAutomaticScaling();
+    }
+    
+    
+    public void setSameStrand( boolean sameStrand ) {
+        this.sameStrand = sameStrand;
+        this.boundsChangedHook();
+        this.repaint();
     }
 
 
