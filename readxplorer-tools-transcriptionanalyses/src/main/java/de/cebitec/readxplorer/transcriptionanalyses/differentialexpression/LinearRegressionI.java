@@ -42,6 +42,6 @@ public interface LinearRegressionI {
      * @return A Map containing gene names as key and the similarity score as value.
      * @throws IllegalStateException If the method is called before the calculation is finished.
      */
-    Map<PersistentFeature, double[]> getResults() throws IllegalStateException;
+    Map<PersistentFeature, LinearRegressionResult> getResults() throws IllegalStateException;
 
 }

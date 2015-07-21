@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class LinearRegression implements LinearRegressionI {
 
-    private Map<PersistentFeature, double[]> genesToScoreMap = new HashMap<>();
+    private Map<PersistentFeature, LinearRegressionResult> genesToScoreMap = new HashMap<>();
     private double numberOfResults = 0;
     private double addedUpSlopeValues = 0;
     private ProcessingLog log;
@@ -41,7 +41,7 @@ public class LinearRegression implements LinearRegressionI {
 
 
     @Override
-    public Map<PersistentFeature, double[]> getResults() throws IllegalStateException {
+    public Map<PersistentFeature, LinearRegressionResult> getResults() throws IllegalStateException {
         return genesToScoreMap;
     }
 
@@ -57,7 +57,7 @@ public class LinearRegression implements LinearRegressionI {
                 = countData.get( conditionsArray[1] );
 
         genesToScoreMap = this.findSimilarity( geneSet1, geneSet2 );
-        genesToScoreMap = this.calculateMeanSlope( genesToScoreMap );
+        calculateMeanSlope();
     }
 
 
@@ -68,9 +68,9 @@ public class LinearRegression implements LinearRegressionI {
      * @param geneSet1
      * @param geneSet2
      */
-    private Map<PersistentFeature, double[]> findSimilarity( Map<PersistentFeature, int[]> geneSet1,
-                                                             Map<PersistentFeature, int[]> geneSet2 ) {
-        Map<PersistentFeature, double[]> result = new HashMap<>();
+    private Map<PersistentFeature, LinearRegressionResult> findSimilarity( Map<PersistentFeature, int[]> geneSet1,
+                                                                           Map<PersistentFeature, int[]> geneSet2 ) {
+        Map<PersistentFeature, LinearRegressionResult> result = new HashMap<>();
         for( Map.Entry<PersistentFeature, int[]> gene1
              : geneSet1.entrySet() ) {
             for( Map.Entry<PersistentFeature, int[]> gene2
@@ -79,9 +79,9 @@ public class LinearRegression implements LinearRegressionI {
                                              null : gene1.getKey().equals( gene2.getKey() ) ) {
                     int[] gene1Values = gene1.getValue();
                     int[] gene2Values = gene2.getValue();
-                    double[] calculated = runFilteredRegressionCalculation(
+                    LinearRegressionResult calculated = runFilteredRegressionCalculation(
                             gene1Values, gene2Values );
-                    Double slopeValue = calculated[1];
+                    Double slopeValue = calculated.getPearsonSlope();
                     if( !(slopeValue.isInfinite() || slopeValue.isNaN()) ) {
                         numberOfResults++;
                         addedUpSlopeValues += slopeValue;
@@ -94,23 +94,15 @@ public class LinearRegression implements LinearRegressionI {
     }
 
 
-    private Map<PersistentFeature, double[]> calculateMeanSlope( Map<PersistentFeature, double[]> genesMap ) {
+    private void calculateMeanSlope() {
         double meanSlopeValue = Math.abs( addedUpSlopeValues / numberOfResults );
-        log.addProperty( "Mean Slope Value", meanSlopeValue );
-        Map<PersistentFeature, double[]> ret = new HashMap<>();
-        for( PersistentFeature key : genesMap.keySet() ) {
-            double[] values = genesMap.get( key );
-            double[] enhancedValues = new double[values.length + 1];
-            enhancedValues[0] = values[0];
-            enhancedValues[1] = values[1];
-            enhancedValues[2] = values[1] / meanSlopeValue;
-            enhancedValues[3] = values[2];
-            enhancedValues[4] = values[3];
-            enhancedValues[5] = values[4];
-            ret.put( key, enhancedValues );
+        log.addProperty( "Mean slope value", meanSlopeValue );
+        log.addProperty( "Added up slope values", addedUpSlopeValues );
+        log.addProperty( "Number of results", numberOfResults );
+        for( PersistentFeature key : genesToScoreMap.keySet() ) {
+            LinearRegressionResult values = genesToScoreMap.get( key );
+            values.setNormalizedSlope( (values.getPearsonSlope()/ meanSlopeValue) );
         }
-
-        return ret;
     }
 
 
@@ -131,6 +123,23 @@ public class LinearRegression implements LinearRegressionI {
     }
 
 
+    private boolean combinedCoverageFilter( int[] geneValuesA, int[] geneValuesB, int limit ) {
+        int maxCoverageA = 0;
+        int maxCoverageB = 0;
+
+
+        for( int k = 0; k < geneValuesA.length; k++ ) {
+            if( geneValuesA[k] > maxCoverageA ) {
+                maxCoverageA = geneValuesA[k];
+            }
+            if( geneValuesB[k] > maxCoverageB ) {
+                maxCoverageB = geneValuesB[k];
+            }
+        }
+        return ((maxCoverageA + maxCoverageB) >= limit);
+    }
+
+
     /**
      * Filters out not proper values.If all values in both conditions are
      * smaller than 5, samples will be discarded. If one sample has no
@@ -139,29 +148,33 @@ public class LinearRegression implements LinearRegressionI {
      * @param gene1Values
      * @param gene2Values
      */
-    public double[] runFilteredRegressionCalculation( int[] gene1Values, int[] gene2Values ) {
-        double[] calculated = new double[5];
+    public LinearRegressionResult runFilteredRegressionCalculation( int[] gene1Values, int[] gene2Values ) {
+        LinearRegressionResult calculated = new LinearRegressionResult();
         int limitLow = 1;
         int limitNormal = 7;
+        int combinedLimit = 16;
 
-        if( coverageFilter( gene1Values, limitNormal ) &&
-            coverageFilter( gene2Values, limitNormal ) ) {
+        if( combinedCoverageFilter( gene1Values, gene2Values, combinedLimit ) ) {
             CalculatePerpendicular rSqrt = new CalculatePerpendicular();
             calculated = rSqrt.calculate( gene1Values, gene2Values );
         } else if( coverageFilter( gene1Values, limitNormal ) &&
                    !(coverageFilter( gene2Values, limitLow )) ) {
-            calculated = new double[]{ Double.POSITIVE_INFINITY,
-                                       Double.POSITIVE_INFINITY,
-                                       Double.POSITIVE_INFINITY,
-                                       Double.POSITIVE_INFINITY,
-                                       Double.POSITIVE_INFINITY };
+            calculated = new LinearRegressionResult( Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY,
+                                                     Double.POSITIVE_INFINITY );
         } else if( !(coverageFilter( gene1Values, limitLow )) &&
                    coverageFilter( gene2Values, limitNormal ) ) {
-            calculated = new double[]{ Double.NEGATIVE_INFINITY,
-                                       Double.NEGATIVE_INFINITY,
-                                       Double.NEGATIVE_INFINITY,
-                                       Double.NEGATIVE_INFINITY,
-                                       Double.NEGATIVE_INFINITY };
+            calculated = new LinearRegressionResult( Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY,
+                                                     Double.NEGATIVE_INFINITY );
         }
         return calculated;
     }

@@ -60,8 +60,8 @@ public class CollectContinuousCoverageData implements Observer{
     /**
      * Adjusts how many bases upstream from the stop position of a feature a
      * mapping should still be considered a hit. The features in the database
-     * are sometimes CDS positions. So it is normales that some mappings are not
-     * located exactly indside the feature positions.
+     * are sometimes CDS positions. So it is normal that some mappings are not
+     * located exactly inside the feature positions.
      */
     private final int stopOffset;
     private final ParametersReadClasses readClassParams;

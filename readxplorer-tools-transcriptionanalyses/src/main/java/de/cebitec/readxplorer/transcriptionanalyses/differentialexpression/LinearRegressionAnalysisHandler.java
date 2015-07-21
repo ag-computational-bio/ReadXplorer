@@ -32,7 +32,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +41,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
 import org.apache.commons.collections4.map.MultiValueMap;
 import org.netbeans.api.progress.ProgressHandle;
@@ -291,9 +289,9 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
                         int[] firstReplicateData = data.get( i );
                         int[] secondReplicateData = data.get( j );
                         LinearRegression calculation = new LinearRegression( super.getProcessingLog() );
-                        double[] regCalculation = calculation.runFilteredRegressionCalculation(
+                        LinearRegressionResult regCalculation = calculation.runFilteredRegressionCalculation(
                                 firstReplicateData, secondReplicateData );
-                        double rCoef = regCalculation[2];
+                        double rCoef = regCalculation.getR();
                         rCoefMeans.add( rCoef );
                     }
                 }
@@ -342,7 +340,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
             calculatedForReplicates = calculateAverageRSquareOfReplicates( sortedDataForConditions );
         }
         linRegForConditions.process( preparedDataForConditions );
-        Map<PersistentFeature, double[]> calculatedForConditions = linRegForConditions.getResults();
+        Map<PersistentFeature, LinearRegressionResult> calculatedForConditions = linRegForConditions.getResults();
         results = prepareResults( calculatedForConditions, calculatedForReplicates );
         return results;
     }
@@ -353,7 +351,7 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
      * <p>
      * @param calculated data calculated using linear regression
      */
-    private List<ResultDeAnalysis> prepareResults( Map<PersistentFeature, double[]> calculated,
+    private List<ResultDeAnalysis> prepareResults( Map<PersistentFeature, LinearRegressionResult> calculated,
                                                    Map<Integer, Map<PersistentFeature, Double>> replicatesData ) {
         final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Continuous Count Data Table" );
         progressHandle.start( calculated.size() );
@@ -362,33 +360,51 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
         List<List<Object>> tableContents = new ArrayList<>();
 
         int k = 0;
-        for( Map.Entry<PersistentFeature, double[]> feature : calculated.entrySet() ) {
-            k++;
-            int tableSize = feature.getValue().length + 3; // Plus feature name and  r square of replicates(2 cond)
-            final Object[] tmp = new Object[tableSize];
-            double[] rSqrt = feature.getValue();
-            boolean allZero = true;
+        for( Map.Entry<PersistentFeature, LinearRegressionResult> feature : calculated.entrySet() ) {
+            final List<Object> tmp = new ArrayList<>();
+            LinearRegressionResult currentResult = feature.getValue();
+            if( !currentResult.allValuesZero() ) {
 
-            tmp[0] = feature.getKey();
-            for( int i = 1; i < tableSize - 2; i++ ) {
-                if( rSqrt[i - 1] != 0 ) {
-                    tmp[i] = rSqrt[i - 1];
-                    allZero = false;
+                tmp.add( feature.getKey() );
+                tmp.add( currentResult.getIntercept() );
+                tmp.add( currentResult.getSlope() );
+                tmp.add( currentResult.getNormalizedSlope() );
+                tmp.add( currentResult.getPearsonCorrelation() );
+                tmp.add( currentResult.getPearsonSlope() );
+                tmp.add( currentResult.getPearsonIntercept() );
+                tmp.add( currentResult.getSpearmanCorrelation() );
+                tmp.add( currentResult.getR() );
+
+                Double rRepA;
+                Double rRepB;
+                if( replicatesData.isEmpty() ) {
+                    tmp.add( "There are no replicates" );
+                    tmp.add( "There are no replicates" );
+                    rRepA = 1d;
+                    rRepB = 1d;
+                } else {
+                    rRepA = replicatesData.get( indexForConditionA ).get( feature.getKey() );
+                    rRepB = replicatesData.get( indexForConditionB ).get( feature.getKey() );
+                    tmp.add( rRepA );
+                    tmp.add( rRepB );
                 }
-            }
-            if( replicatesData.isEmpty() ) {
-                tmp[tableSize - 2] = "There are no replicates";
-                tmp[tableSize - 1] = "There are no replicates";
-            } else {
-                tmp[tableSize - 2] = replicatesData.get( indexForConditionA ).get( feature.getKey() );
-                tmp[tableSize - 1] = replicatesData.get( indexForConditionB ).get( feature.getKey() );
-            }
+                
+                double slope = currentResult.getPearsonSlope();
+                if(slope < 1){
+                    slope *= (1/slope);
+                }
+                
+                Double ranking = (Math.abs( slope ) * Math.abs( rRepA ) * Math.abs( rRepB )) / Math.abs( currentResult.getR() );
+                
+                if( ranking.isNaN() ) {
+                    ranking = 0d;
+                }
+                tmp.add( ranking );
 
-            if( !allZero ) {
-                tableContents.add( new Vector( Arrays.asList( tmp ) ) );
+                tableContents.add( tmp );
                 regionNamesList.add( feature.getKey() );
             }
-            progressHandle.progress( k );
+            progressHandle.progress( k++ );
         }
 
         List<Object> colNames = new ArrayList<>();
@@ -397,10 +413,13 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
         colNames.add( "Slope" );
         colNames.add( "Normalized Slope" );
         colNames.add( "Apache Pearson" );
+        colNames.add( "Apache Pearson Slope" );
+        colNames.add( "Apache Pearson Intercept" );
         colNames.add( "Apache Spearman" );
         colNames.add( "R for Conditions" );
         colNames.add( "R for Replicates (Cond. 1)" );
         colNames.add( "R for Replicates (Cond. 2)" );
+        colNames.add( "Ranking" );
 
         List<ResultDeAnalysis> result = Collections.singletonList( new ResultDeAnalysis(
                 tableContents, colNames, regionNamesList, "Regression Data Table" ) );

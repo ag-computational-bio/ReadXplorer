@@ -17,20 +17,30 @@
 
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
+
 /**
  *
- * @author Kai Bernd Stadermann
+ * @author kstaderm
  */
-public interface CoreCalculationI {
-    
-    /**
-     * Calculates the regression for one gene.
-     * 
-     * @param conditionA Per position count data under condition A.
-     * @param conditionB Per position count data under condition B.
-     * @return The regression coefficient between A and B.
-     * @throws IllegalArgumentException if the input arrays have different length.
-     */
-    LinearRegressionResult calculate(int[] conditionA, int[] conditionB) throws IllegalArgumentException;
-    
+public class MovingAverage {
+
+    private MovingAverage() {
+    }
+
+
+    public static int[] calculateMovingAverage( int[] numbers, int windowSize ) {
+        int[] ret = new int[numbers.length];
+
+        if(windowSize < 2){
+            throw new IllegalArgumentException("Window size must be greater one!");
+        }
+        
+        for( int i = 0; i <= numbers.length - windowSize; i++ ) {
+            
+        }
+
+        return ret;
+    }
+
+
 }
