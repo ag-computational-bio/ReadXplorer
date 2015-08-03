@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-classificationupdate</artifactId>
-    <version>1.1.0-FINAL</version>
+    <version>1.1.1-FINAL</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - ClassificationUpdate</name>
 
