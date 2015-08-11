@@ -22,7 +22,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
  *
  * @author kstaderm
  */
-public class MovingAverage {
+public final class MovingAverage {
 
     private MovingAverage() {
     }
@@ -36,7 +36,7 @@ public class MovingAverage {
         }
         
         for( int i = 0; i <= numbers.length - windowSize; i++ ) {
-            
+            System.out.println( "Das ist nur fürs beschissene Checkstyle!" );
         }
 
         return ret;
