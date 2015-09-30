@@ -75,6 +75,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     private final List<String> promotorRegions;
     private final ParameterSetTSS tssParameters;
 
+    private int bp = 70;
+
 
     /**
      * Container for all data belonging to a transcription start site detection
@@ -97,6 +99,14 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.calcStats( results );
         promotorRegions = new ArrayList<>();
 
+    }
+
+
+    /**
+     * @param bp the number of base pairs to export upstream of a TSS
+     */
+    public void setPromoterLength( int bp ) {
+        this.bp = bp;
     }
 
 
@@ -186,7 +196,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         if( tssParameters.isAssociateTss() ) {
             dataColumnDescriptions.add( "Associated TSS" );
         }
-        dataColumnDescriptions.add( "70bp Upstream of Start" );
+        dataColumnDescriptions.add( bp + " bp Upstream of Start" );
 
 
 

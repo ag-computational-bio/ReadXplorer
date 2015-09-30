@@ -169,8 +169,10 @@ public final class DiffExpLogTopComponent extends TopComponentExtended
 
     @Override
     public void componentOpened() {
-        String log = analysisHandler.getProcessingLog().generateLog();
-        logTextField.setText( log );
+        if( analysisHandler != null ) {
+            String log = analysisHandler.getProcessingLog().generateLog();
+            logTextField.setText( log );
+        }
     }
 
 
