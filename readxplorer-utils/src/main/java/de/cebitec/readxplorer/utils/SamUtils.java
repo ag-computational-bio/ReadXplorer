@@ -195,28 +195,48 @@ public class SamUtils implements Observable {
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter( File oldFile, SAMFileHeader header, boolean presorted, String newEnding ) {
 
-// commented out part: we currently don't allow to write sam files, only bam! (more efficient)
-//        String extension;
-//        try {
-//            extension = nameParts[nameParts.length - 1];
-//        } catch (ArrayIndexOutOfBoundsException e) {
-//            extension = "bam";
-//        }
-//        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
-        //The default value of 500.000 is only working for short reads. When SMRT reads are importet this causes the application to
-        //run out or memory and hence the value needed to be reduced drastically.
-        factory.setMaxRecordsInRam( 10000 );
+        factory.setMaxRecordsInRam( SamUtils.determineMaxRecordsInRam( oldFile ) );
         //To improve the performance a little bit, write in parallel.
         factory.setUseAsyncIo( true );
-//        if (extension.toLowerCase().contains("sam")) {
-//            outputFile = new File(newFileName + newEnding + ".sam");
-//            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
-//        } else {
         File outputFile = SamUtils.getFileWithBamExtension( oldFile, newEnding );
         return new Pair<>( factory.makeBAMWriter( header, presorted, outputFile ), outputFile );
-//        }
+    }
+
+
+    /**
+     * Determines the maximum number of records allowed in the RAM by estimating
+     * it from the first 75000 mappings in the file. The default value of
+     * 500.000 is only working for short reads. When SMRT reads are importet
+     * this causes the application to run out of memory and hence the value
+     * needs to be adapted dynamically, depending on the average read length.
+     * <p>
+     * @param file SAM/BAM file for which the maximum number of records in ram
+     *             has to be estimated
+     * <p>
+     * @return The maximum number of records allowed in the RAM for the given
+     *         file.
+     */
+    private static int determineMaxRecordsInRam( File file ) {
+        int maxRecordsInRam;
+        SamReadLengthEstimator readLengthEstimator = new SamReadLengthEstimator();
+        int meanReadLength = readLengthEstimator.estimateReadLength( file, 75000 );
+        if( meanReadLength < 200 ) {
+            maxRecordsInRam = 500000;
+        } else if( meanReadLength < 400 ) {
+            maxRecordsInRam = 300000;
+        } else if( meanReadLength < 600 ) {
+            maxRecordsInRam = 200000;
+        } else if( meanReadLength < 1000 ) {
+            maxRecordsInRam = 100000;
+        } else if( meanReadLength < 5000 ) {
+            maxRecordsInRam = 50000;
+        } else {
+            maxRecordsInRam = 10000;
+        }
+
+        return maxRecordsInRam;
     }
 
 
