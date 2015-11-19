@@ -249,7 +249,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
                 rowData[i++] = feat.getStartOnStrand();
                 rowData[i++] = feat.getStopOnStrand();
                 rowData[i++] = feat.getLength();
-                rowData[i++] = normValue.getEffectiveFeatureLength();
+                rowData[i++] = normValue.getFeatureLength();
                 rowData[i++] = normValue.getTPM();
                 rowData[i++] = normValue.getRPKM();
                 rowData[i++] = normValue.getReadCount();

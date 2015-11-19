@@ -66,10 +66,10 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
      *                      column for normalization analysis)
      */
     public NormalizationAnalysisResult( Map<Integer, PersistentTrack> trackMap, List<NormalizedReadCount> normResults,
-                                                                                PersistentReference reference,
-                                                                                boolean combineTracks,
-                                                                                int trackColumn,
-                                                                                int filterColumn ) {
+                                        PersistentReference reference,
+                                        boolean combineTracks,
+                                        int trackColumn,
+                                        int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
         this.normalizationResults = new ArrayList<>( normResults );
     }
@@ -90,7 +90,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
      * <p>
      * @param newNormValues Normalization values to add to the current result
      */
-    public void addAllToResult(List<NormalizedReadCount> newNormValues) {
+    public void addAllToResult( List<NormalizedReadCount> newNormValues ) {
         normalizationResults.addAll( newNormValues );
     }
 
@@ -160,7 +160,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
             normRow.add( feat.getStartOnStrand() );
             normRow.add( feat.getStopOnStrand() );
             normRow.add( feat.getLength() );
-            normRow.add( normValue.getEffectiveFeatureLength() );
+            normRow.add( normValue.getFeatureLength() );
             normRow.add( normValue.getTPM() );
             normRow.add( normValue.getRPKM() );
             normRow.add( normValue.getReadCount() );
