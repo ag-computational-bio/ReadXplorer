@@ -82,8 +82,7 @@ public final class GeneralUtils {
     public static int calculatePercentageIncrease( int value1, int value2 ) {
         int percentDiff;
         if( value1 == 0 ) {
-            int absoluteDiff = value2 - value1;
-            percentDiff = (int) (absoluteDiff * 1.5); //weight factor
+            percentDiff = (int) (value2 * 1.5); //weight factor
         } else {
             percentDiff = (int) Math.ceil( ((double) value2 / (double) value1) * 100.0 ) - 100;
         }

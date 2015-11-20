@@ -166,7 +166,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(parametersLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 568, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 449, Short.MAX_VALUE)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(histogramButton)
@@ -237,6 +237,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
             DefaultTableModel model = (DefaultTableModel) normalizationTable.getModel();
 
             PersistentFeature feat;
+            ParameterSetNormalization normParams = (ParameterSetNormalization) normalizationResult.getParameters();
             for( NormalizedReadCount normValue : normalizationResult.getResults() ) {
                 feat = normValue.getFeature();
                 Object[] rowData = new Object[nbColumns];
@@ -249,7 +250,7 @@ public class ResultPanelNormalization extends ResultTablePanel {
                 rowData[i++] = feat.getStartOnStrand();
                 rowData[i++] = feat.getStopOnStrand();
                 rowData[i++] = feat.getLength();
-                rowData[i++] = normValue.getFeatureLength();
+                rowData[i++] = normParams.isUseEffectiveLength() ? normValue.getFeatureLength() : -1;
                 rowData[i++] = normValue.getTPM();
                 rowData[i++] = normValue.getRPKM();
                 rowData[i++] = normValue.getReadCount();
@@ -261,11 +262,11 @@ public class ResultPanelNormalization extends ResultTablePanel {
             normalizationTable.setRowSorter( sorter );
             sorter.setModel( model );
 
-            ParameterSetNormalization normParams = (ParameterSetNormalization) normalizationResult.getParameters();
             parametersLabel.setText( org.openide.util.NbBundle.getMessage( ResultPanelNormalization.class,
                                                                            "ResultPanelNormalization.parametersLabel.text_1",
                                                                            normParams.getMinReadCount(),
-                                                                           normParams.getMaxReadCount() ) );
+                                                                           normParams.getMaxReadCount(),
+                                                                           normParams.isUseEffectiveLength() ? "yes" : "no" ) );
 
             normStatsMap.put( RETURNED_FEATURES, normStatsMap.get( RETURNED_FEATURES ) + normalizationResultNew.getResults().size() );
             normStatsMap.put( TOTAL_MAPPINGS, normStatsMap.get( TOTAL_MAPPINGS ) + (int) Math.ceil( normalizationResultNew.getTotalMappings() ) );
