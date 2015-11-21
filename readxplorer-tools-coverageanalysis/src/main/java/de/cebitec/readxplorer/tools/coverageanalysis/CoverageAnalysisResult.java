@@ -114,6 +114,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         List<List<Object>> statisticsExportData = new ArrayList<>( 10 );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( coveredString + " interval analysis statistics for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createRxVersionRow() );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 

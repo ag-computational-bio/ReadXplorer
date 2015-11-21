@@ -176,6 +176,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "TPM, RPKM and raw read count calculation for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createRxVersionRow() );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 

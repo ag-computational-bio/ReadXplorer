@@ -101,6 +101,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Correlation analysis for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createRxVersionRow() );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 
