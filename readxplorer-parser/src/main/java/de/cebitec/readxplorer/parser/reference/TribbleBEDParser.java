@@ -26,19 +26,19 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
+import htsjdk.tribble.AbstractFeatureReader;
+import htsjdk.tribble.TribbleException;
+import htsjdk.tribble.annotation.Strand;
+import htsjdk.tribble.bed.BEDCodec;
+import htsjdk.tribble.bed.BEDFeature;
+import htsjdk.tribble.bed.FullBEDFeature.Exon;
+import htsjdk.tribble.readers.LineIterator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.broad.tribble.AbstractFeatureReader;
-import org.broad.tribble.TribbleException;
-import org.broad.tribble.annotation.Strand;
-import org.broad.tribble.bed.BEDCodec;
-import org.broad.tribble.bed.BEDFeature;
-import org.broad.tribble.bed.FullBEDFeature.Exon;
-import org.broad.tribble.readers.LineIterator;
 
 import static java.util.logging.Level.INFO;
 

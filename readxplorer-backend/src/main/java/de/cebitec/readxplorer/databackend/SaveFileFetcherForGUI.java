@@ -25,6 +25,8 @@ import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.FastaUtils;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.util.RuntimeIOException;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,10 +38,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import net.sf.picard.PicardException;
-import net.sf.picard.reference.IndexedFastaSequenceFile;
-import net.sf.samtools.util.RuntimeIOException;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle.Messages;
@@ -379,9 +377,7 @@ public class SaveFileFetcherForGUI {
                 IndexedFastaSequenceFile indexedFastaSequenceFile = new IndexedFastaSequenceFile( fastaFile );
             } catch( FileNotFoundException e ) {
                 fastaUtils.recreateMissingIndex( fastaFile );
-            } catch( PicardException e ) { //should not occur, since we test existence of fasta before
-                JOptionPane.showMessageDialog( new JPanel(), Bundle.MSG_FastaMissing( fastaFile.getAbsolutePath() ), Bundle.TITLE_FastaMissing(), JOptionPane.ERROR_MESSAGE );
-            }
+            } 
             indexedRefFile = fastaUtils.getIndexedFasta( fastaFile );
         } else {
             indexedRefFile = this.resetRefFile( ref );

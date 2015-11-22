@@ -19,22 +19,24 @@ package de.cebitec.readxplorer.utils;
 
 
 import de.cebitec.readxplorer.api.constants.Paths;
+import htsjdk.samtools.BAMIndexer;
+import htsjdk.samtools.Cigar;
+import htsjdk.samtools.CigarElement;
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFileWriterFactory;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.BAMIndexer;
-import net.sf.samtools.Cigar;
-import net.sf.samtools.CigarElement;
-import net.sf.samtools.SAMException;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFileWriterFactory;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.NbPreferences;
+
 
 /*
  * The MIT License
@@ -59,7 +61,6 @@ import org.openide.util.NbPreferences;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 /**
  * Contains some utils for sam and bam files.
  * <p>
@@ -166,7 +167,7 @@ public class SamUtils implements Observable {
     public static boolean createBamIndex( File bamFile, Observer observer ) {
         boolean success = false;
         try( SAMFileReader samReader = new SAMFileReader( bamFile ) ) { //close is performed by try statement
-            samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samReader.setValidationStringency( ValidationStringency.LENIENT );
             SamUtils utils = new SamUtils();
             utils.registerObserver( observer );
             success = utils.createIndex( samReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
@@ -202,6 +203,28 @@ public class SamUtils implements Observable {
         factory.setUseAsyncIo( true );
         File outputFile = SamUtils.getFileWithBamExtension( oldFile, newEnding );
         return new Pair<>( factory.makeBAMWriter( header, presorted, outputFile ), outputFile );
+    }
+
+
+    /**
+     * Creates a bam file writer.
+     * <p>
+     * @param file      the file (if data is not stored in a file, just create a
+     *                  file with a name of your choice
+     * @param header    the header of the new file
+     * @param presorted if true, SAMRecords must be added to the SAMFileWriter
+     *                  in order that agrees with header.sortOrder.
+     * <p>
+     * @return the sam or bam file writer ready for writing
+     */
+    public static SAMFileWriter createBamWriter( File file, SAMFileHeader header, boolean presorted ) {
+
+        SAMFileWriterFactory factory = new SAMFileWriterFactory();
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
+        factory.setMaxRecordsInRam( SamUtils.determineMaxRecordsInRam( file ) );
+        //To improve the performance a little bit, write in parallel.
+        factory.setUseAsyncIo( true );
+        return factory.makeBAMWriter( header, presorted, file );
     }
 
 

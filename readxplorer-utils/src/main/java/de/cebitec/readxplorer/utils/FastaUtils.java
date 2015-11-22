@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.utils;
 import de.cebitec.common.parser.fasta.FastaIndexEntry;
 import de.cebitec.common.parser.fasta.FastaIndexWriter;
 import de.cebitec.common.parser.fasta.FastaIndexer;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,8 +35,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import net.sf.picard.PicardException;
-import net.sf.picard.reference.IndexedFastaSequenceFile;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
@@ -93,10 +92,6 @@ public final class FastaUtils implements Observable {
                 LOG.log( SEVERE, ex.getMessage(), ex );
                 this.notifyObservers( ex.getMessage() );
             }
-        } catch( PicardException pe ) {
-            LOG.log( SEVERE, pe.getMessage(), pe );
-            String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + fastaFileToIndex.getAbsolutePath();
-            JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
         }
 
         for( Observer observer : observers ) {

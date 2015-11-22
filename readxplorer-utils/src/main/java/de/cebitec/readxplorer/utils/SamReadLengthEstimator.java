@@ -18,13 +18,14 @@
 package de.cebitec.readxplorer.utils;
 
 
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
 
 
 /**
@@ -60,7 +61,7 @@ public class SamReadLengthEstimator implements Observable {
 
         try( SAMFileReader samBamReader = new SAMFileReader( file ) ) {
             SAMRecordIterator samItor = samBamReader.iterator();
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
             int count = 1;
             int readLengthSum = 0;
             while( samItor.hasNext() && count <= numMappings ) {

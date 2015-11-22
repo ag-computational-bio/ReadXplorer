@@ -27,6 +27,11 @@ import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SamUtils;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SAMSequenceRecord;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -34,11 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.sf.samtools.BAMFileWriter;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
 import org.openide.util.NbBundle;
 
 import static java.util.regex.Pattern.compile;
@@ -135,18 +135,18 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
                 this.notifyObservers( NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.Start", fileName ) );
                 String outFileName;
-                try( BufferedReader br = new BufferedReader( new FileReader( currentFile ) ) ) {
-                    outputFile = SamUtils.getFileWithBamExtension( currentFile, "" );
-                    outFileName = outputFile.getName();
-                    final BAMFileWriter bamFileWriter = new BAMFileWriter( outputFile );
-                    bamFileWriter.setSortOrder( SAMFileHeader.SortOrder.coordinate, false );
-                    final SAMFileHeader fileHeader = new SAMFileHeader();
-                    List<SAMSequenceRecord> samRecords = new ArrayList<>();
-                    final SAMSequenceRecord seqRecord = new SAMSequenceRecord( refSeqName, refSeqLength );
-                    samRecords.add( seqRecord );
-                    fileHeader.setTextHeader( "@HD VN:1.4 SO:coordinate" );
-                    fileHeader.setSequenceDictionary( new SAMSequenceDictionary( samRecords ) );
-                    bamFileWriter.setHeader( fileHeader );
+                outputFile = SamUtils.getFileWithBamExtension( currentFile, "" );
+                outFileName = outputFile.getName();
+                final SAMFileHeader fileHeader = new SAMFileHeader();
+                List<SAMSequenceRecord> samRecords = new ArrayList<>();
+                final SAMSequenceRecord seqRecord = new SAMSequenceRecord( refSeqName, refSeqLength );
+                samRecords.add( seqRecord );
+                fileHeader.setTextHeader( "@HD VN:1.4 SO:coordinate" );
+                fileHeader.setSequenceDictionary( new SAMSequenceDictionary( samRecords ) );
+
+                try( BufferedReader br = new BufferedReader( new FileReader( currentFile ) );
+                     SAMFileWriter bamFileWriter = SamUtils.createBamWriter( outputFile, fileHeader, false ); ) {
+
                     int lineNo = 0;
 //                    int counter = 0;
 //                    int emtpy = 0;
@@ -168,13 +168,13 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                             } catch( NumberFormatException e ) { //
                                 if( !tokens[1].equals( "*" ) ) {
                                     this.sendMsgIfAllowed( "Value for current start position in " +
-                                             outFileName + " line " + lineNo + " is not a number or *. " +
-                                             "Found start: " + tokens[1] );
+                                                           outFileName + " line " + lineNo + " is not a number or *. " +
+                                                           "Found start: " + tokens[1] );
                                 }
                                 if( !tokens[2].equals( "*" ) ) {
                                     this.sendMsgIfAllowed( "Value for current stop position in " +
-                                             outFileName + " line " + lineNo + " is not a number or *. " +
-                                             "Found stop: " + tokens[2] );
+                                                           outFileName + " line " + lineNo + " is not a number or *. " +
+                                                           "Found stop: " + tokens[2] );
                                 }
                                 continue; //*'s are ignored = unmapped read
                             }
@@ -289,17 +289,15 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
             byte currentBase;
             if( readSeq.charAt( i ) == refSeq.charAt( i ) ) { //match
                 currentBase = 7;
-            } else {
-                if( refSeq.charAt( i ) != '_' ) { //a base in the genome, most frequent case
-                    char base = readSeq.charAt( i );
-                    if( base != '_' ) { //ACGT or N in the read as well
-                        currentBase = 8;
-                    } else {//a gap in the read
-                        currentBase = 2;
-                    }
-                } else {// a gap in genome
-                    currentBase = 1;
+            } else if( refSeq.charAt( i ) != '_' ) { //a base in the genome, most frequent case
+                char base = readSeq.charAt( i );
+                if( base != '_' ) { //ACGT or N in the read as well
+                    currentBase = 8;
+                } else {//a gap in the read
+                    currentBase = 2;
                 }
+            } else {// a gap in genome
+                currentBase = 1;
             }
 
             if( lastBase != currentBase && i > 0 ) {
