@@ -31,19 +31,20 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -205,7 +206,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         int noReads = 0;
         int noSkippedReads = 0;
         try( final SAMFileReader samReader = new SAMFileReader( fileSortedByReadName ) ) {
-            samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samReader.setValidationStringency( ValidationStringency.LENIENT );
             SAMFileHeader.SortOrder sortOrder = samReader.getFileHeader().getSortOrder();
             SAMRecordIterator samItor = samReader.iterator();
 

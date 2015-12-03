@@ -129,7 +129,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
             List<PersistentFeature> chromFeatures = refConnector.getFeaturesForRegionInclParents( 0, chromLength, usedFeatureTypes, chrom.getId() );
 
             for( PersistentFeature feature : chromFeatures ) {
-                featureReadCount.put( feature.getId(), new NormalizedReadCount( feature, 0, 0, 0, trackConnector.getTrackID() ) );
+                featureReadCount.put( feature.getId(), new NormalizedReadCount( feature, 0, 0, 0, trackConnector.getTrackID(), paramsNormalization ) );
             }
             genomeFeatures.addAll( chromFeatures );
             Collections.sort( genomeFeatures );
@@ -310,8 +310,13 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                     if( geneExonLength > 0 ) { //we have multi exon/cds genes only in this case
                         countObject.setReadCount( noFeatureReads ); //not needed for most prokaryotes
                         countObject.setReadLengthSum( readLengthSum );
-                        double effectiveLength = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
-                        countObject.storeEffectiveFeatureLength( effectiveLength );
+                        double length;
+                        if( paramsNormalization.isUseEffectiveLength() ) {
+                            length = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
+                        } else {
+                            length = geneExonLength;
+                        }
+                        countObject.storeEffectiveFeatureLength( length );
                     }
                 }
                 //sum all read counts assigned to any features
@@ -380,15 +385,15 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
             if( readCount >= paramsNormalization.getMinReadCount() && readCount <= paramsNormalization.getMaxReadCount() &&
                 paramsNormalization.getSelFeatureTypes().contains( feature.getType() ) ) {
 
-                double effectiveFeatureLength = countObject.getEffectiveFeatureLength();
+                double featureLength = countObject.getFeatureLength();
                 double rpkm = 0;
                 double tpm = 0;
                 if( readCount > 0 ) {
-                    rpkm = NormalizationFormulas.calculateRpkm( readCount, totalMappedReads, effectiveFeatureLength );
+                    rpkm = NormalizationFormulas.calculateRpkm( readCount, totalMappedReads, featureLength );
                     double normSum = normalizationSumMap.get( feature.getType() );
-                    tpm = NormalizationFormulas.calculateTpm( readCount, effectiveFeatureLength, normSum );
+                    tpm = NormalizationFormulas.calculateTpm( readCount, featureLength, normSum );
                 }
-                normValues.add( new NormalizedReadCount( feature, rpkm, tpm, readCount, effectiveFeatureLength, trackConnector.getTrackID() ) );
+                normValues.add( new NormalizedReadCount( feature, rpkm, tpm, readCount, featureLength, trackConnector.getTrackID(), paramsNormalization ) );
             }
         }
     }

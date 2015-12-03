@@ -21,8 +21,8 @@ package gasv.bamtogasv;
  * gasv. If not, see <http://www.gnu.org/licenses/>.
  * <p>
  */
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
 
 
 public class GASVPair {

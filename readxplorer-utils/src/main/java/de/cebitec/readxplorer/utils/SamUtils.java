@@ -19,22 +19,24 @@ package de.cebitec.readxplorer.utils;
 
 
 import de.cebitec.readxplorer.api.constants.Paths;
+import htsjdk.samtools.BAMIndexer;
+import htsjdk.samtools.Cigar;
+import htsjdk.samtools.CigarElement;
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFileWriterFactory;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.BAMIndexer;
-import net.sf.samtools.Cigar;
-import net.sf.samtools.CigarElement;
-import net.sf.samtools.SAMException;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFileWriterFactory;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.NbPreferences;
+
 
 /*
  * The MIT License
@@ -59,7 +61,6 @@ import org.openide.util.NbPreferences;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 /**
  * Contains some utils for sam and bam files.
  * <p>
@@ -166,7 +167,7 @@ public class SamUtils implements Observable {
     public static boolean createBamIndex( File bamFile, Observer observer ) {
         boolean success = false;
         try( SAMFileReader samReader = new SAMFileReader( bamFile ) ) { //close is performed by try statement
-            samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samReader.setValidationStringency( ValidationStringency.LENIENT );
             SamUtils utils = new SamUtils();
             utils.registerObserver( observer );
             success = utils.createIndex( samReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
@@ -195,28 +196,70 @@ public class SamUtils implements Observable {
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter( File oldFile, SAMFileHeader header, boolean presorted, String newEnding ) {
 
-// commented out part: we currently don't allow to write sam files, only bam! (more efficient)
-//        String extension;
-//        try {
-//            extension = nameParts[nameParts.length - 1];
-//        } catch (ArrayIndexOutOfBoundsException e) {
-//            extension = "bam";
-//        }
-//        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
-        //The default value of 500.000 is only working for short reads. When SMRT reads are importet this causes the application to
-        //run out or memory and hence the value needed to be reduced drastically.
-        factory.setMaxRecordsInRam( 10000 );
+        factory.setMaxRecordsInRam( SamUtils.determineMaxRecordsInRam( oldFile ) );
         //To improve the performance a little bit, write in parallel.
         factory.setUseAsyncIo( true );
-//        if (extension.toLowerCase().contains("sam")) {
-//            outputFile = new File(newFileName + newEnding + ".sam");
-//            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
-//        } else {
         File outputFile = SamUtils.getFileWithBamExtension( oldFile, newEnding );
         return new Pair<>( factory.makeBAMWriter( header, presorted, outputFile ), outputFile );
-//        }
+    }
+
+
+    /**
+     * Creates a bam file writer.
+     * <p>
+     * @param file      the file (if data is not stored in a file, just create a
+     *                  file with a name of your choice
+     * @param header    the header of the new file
+     * @param presorted if true, SAMRecords must be added to the SAMFileWriter
+     *                  in order that agrees with header.sortOrder.
+     * <p>
+     * @return the sam or bam file writer ready for writing
+     */
+    public static SAMFileWriter createBamWriter( File file, SAMFileHeader header, boolean presorted ) {
+
+        SAMFileWriterFactory factory = new SAMFileWriterFactory();
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
+        factory.setMaxRecordsInRam( SamUtils.determineMaxRecordsInRam( file ) );
+        //To improve the performance a little bit, write in parallel.
+        factory.setUseAsyncIo( true );
+        return factory.makeBAMWriter( header, presorted, file );
+    }
+
+
+    /**
+     * Determines the maximum number of records allowed in the RAM by estimating
+     * it from the first 75000 mappings in the file. The default value of
+     * 500.000 is only working for short reads. When SMRT reads are importet
+     * this causes the application to run out of memory and hence the value
+     * needs to be adapted dynamically, depending on the average read length.
+     * <p>
+     * @param file SAM/BAM file for which the maximum number of records in ram
+     *             has to be estimated
+     * <p>
+     * @return The maximum number of records allowed in the RAM for the given
+     *         file.
+     */
+    private static int determineMaxRecordsInRam( File file ) {
+        int maxRecordsInRam;
+        SamReadLengthEstimator readLengthEstimator = new SamReadLengthEstimator();
+        int meanReadLength = readLengthEstimator.estimateReadLength( file, 75000 );
+        if( meanReadLength < 200 ) {
+            maxRecordsInRam = 500000;
+        } else if( meanReadLength < 400 ) {
+            maxRecordsInRam = 300000;
+        } else if( meanReadLength < 600 ) {
+            maxRecordsInRam = 200000;
+        } else if( meanReadLength < 1000 ) {
+            maxRecordsInRam = 100000;
+        } else if( meanReadLength < 5000 ) {
+            maxRecordsInRam = 50000;
+        } else {
+            maxRecordsInRam = 10000;
+        }
+
+        return maxRecordsInRam;
     }
 
 

@@ -42,7 +42,7 @@ import org.openide.windows.WindowManager;
  */
 public class Installer extends ModuleInstall {
 
-    public static final String READXLORER_VERSION = "2.1.0";
+    public static final String READXPLORER_VERSION = "2.1.0";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 
@@ -50,7 +50,7 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         //set version number
-        System.setProperty( "netbeans.buildnumber", READXLORER_VERSION );
+        System.setProperty( "netbeans.buildnumber", READXPLORER_VERSION );
 
 
         // redirect systemouts to internal netbeans platform outputwindow
@@ -80,8 +80,7 @@ public class Installer extends ModuleInstall {
          * //For each instance (should ony be one) call actionPerformed() for
          * (Action action : foundActions) { logger.log(Level.FINE,
          * "LOG_FoundAction", action); action.actionPerformed(null); } } else {
-         * logger.log(Level.FINE, "LOG_WindowClosed", OUTPUT_ID); } }
-         }); */
+         * logger.log(Level.FINE, "LOG_WindowClosed", OUTPUT_ID); } } }); */
     }
 
 

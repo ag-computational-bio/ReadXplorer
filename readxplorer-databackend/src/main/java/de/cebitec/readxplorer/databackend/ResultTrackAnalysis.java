@@ -59,8 +59,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @param trackMap      the map of track ids to the tracks for which the
      *                      analysis
      * @param combineTracks <code>true</code>, if the tracks in the list are
-     *                      combined, <code>false</code> otherwise
-     *                      generated
+     *                      combined, <code>false</code> otherwise generated
      * @param trackColumn   column of the track id in result tables
      * @param filterColumn  column of the position or genomic feature in result
      *                      tables
@@ -108,8 +107,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * to 20 characters.
      * <p>
      * @param fullLength <code>true</code>, if the track names shall appear in
-     *                   full
-     *                   length, <code>false</code> otherwise
+     *                   full length, <code>false</code> otherwise
      * <p>
      * @return The concatenated String containing all track names.
      */
@@ -144,8 +142,9 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     /**
      * @param trackId          the track id of the track whose entry is needed
      * @param getFullengthName true, if the concated names shall be returned for
-     *                         combined tracks, false, if shortened concated names shall be returned for
-     *                         combined tracks. For single tracks, this option does not have an
+     *                         combined tracks, false, if shortened concated
+     *                         names shall be returned for combined tracks. For
+     *                         single tracks, this option does not have an
      *                         influence.
      * <p>
      * @return Either a Track entry for a single track or a String of the track
@@ -306,6 +305,15 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         for( String id : statsMap.keySet() ) {
             statisticsExportData.add( createStatisticTableRow( id ) );
         }
+    }
+
+
+    /**
+     * @return A table row (= object list) containing the current ReadXplorer
+     * version.
+     */
+    public static List<Object> createRxVersionRow() {
+        return createTableRow( "ReadXplorer version", System.getProperty( "netbeans.buildnumber") );
     }
 
 

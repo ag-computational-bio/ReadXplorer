@@ -38,6 +38,12 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeIOException;
 import java.awt.Dialog;
 import java.io.File;
 import java.nio.BufferUnderflowException;
@@ -49,11 +55,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
-import net.sf.samtools.SAMException;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeIOException;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
@@ -118,7 +119,7 @@ public class SamBamFileReader implements Observable, Observer {
      */
     private void initializeReader() {
         samFileReader = new SAMFileReader( dataFile );
-        samFileReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+        samFileReader.setValidationStringency( ValidationStringency.LENIENT );
 //        header = samFileReader.getFileHeader().getTextHeader();
         checkIndex();
     }

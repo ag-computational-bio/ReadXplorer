@@ -43,9 +43,9 @@
             <version>0.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.external.picard</groupId>
-            <artifactId>picard</artifactId>
-            <version>1.110</version>
+            <groupId>com.github.samtools</groupId>
+            <artifactId>htsjdk</artifactId>
+            <version>1.141</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.java.contract</groupId>
@@ -157,8 +157,8 @@
                         <publicPackage>de.cebitec.readxplorer.utils.polytree</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.sequence</publicPackage>
                         <publicPackage>de.cebitec.common.*</publicPackage>
+                        <publicPackage>htsjdk.*</publicPackage>
                         <publicPackage>net.sf.picard.*</publicPackage>
-                        <publicPackage>net.sf.samtools.*</publicPackage>
                         <publicPackage>org.broad.tribble.*</publicPackage>
                         <publicPackage>org.broadinstitute.*</publicPackage>
                         <publicPackage>org.apache.commons.logging.*</publicPackage>

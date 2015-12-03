@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: bio.jlu.comp.readxplorer.classificationupdate
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module-Localizing-Bundle: bio/comp/jlu/readxplorer/classificationupdate/Bundle.properties
+OpenIDE-Module-Localizing-Bundle: bio/jlu/comp/readxplorer/classificationupdate/Bundle.properties
 

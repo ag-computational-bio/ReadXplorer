@@ -66,10 +66,10 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
      *                      column for normalization analysis)
      */
     public NormalizationAnalysisResult( Map<Integer, PersistentTrack> trackMap, List<NormalizedReadCount> normResults,
-                                                                                PersistentReference reference,
-                                                                                boolean combineTracks,
-                                                                                int trackColumn,
-                                                                                int filterColumn ) {
+                                        PersistentReference reference,
+                                        boolean combineTracks,
+                                        int trackColumn,
+                                        int filterColumn ) {
         super( reference, trackMap, combineTracks, trackColumn, filterColumn );
         this.normalizationResults = new ArrayList<>( normResults );
     }
@@ -90,7 +90,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
      * <p>
      * @param newNormValues Normalization values to add to the current result
      */
-    public void addAllToResult(List<NormalizedReadCount> newNormValues) {
+    public void addAllToResult( List<NormalizedReadCount> newNormValues ) {
         normalizationResults.addAll( newNormValues );
     }
 
@@ -143,6 +143,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
         List<List<List<Object>>> exportData = new ArrayList<>();
         List<List<Object>> normResultRows = new ArrayList<>();
         PersistentFeature feat;
+        ParameterSetNormalization normalizationParameters = (ParameterSetNormalization) this.getParameters();
 
         for( NormalizedReadCount normValue : normalizationResults ) {
             List<Object> normRow = new ArrayList<>();
@@ -160,7 +161,7 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
             normRow.add( feat.getStartOnStrand() );
             normRow.add( feat.getStopOnStrand() );
             normRow.add( feat.getLength() );
-            normRow.add( normValue.getEffectiveFeatureLength() );
+            normRow.add( normalizationParameters.isUseEffectiveLength() ? normValue.getFeatureLength() : "-" );
             normRow.add( normValue.getTPM() );
             normRow.add( normValue.getRPKM() );
             normRow.add( normValue.getReadCount() );
@@ -171,20 +172,22 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
         exportData.add( normResultRows );
 
         //create statistics sheet
-        ParameterSetNormalization normCalculationParameters = (ParameterSetNormalization) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "TPM, RPKM and raw read count calculation for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createRxVersionRow() );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "TPM, RPKM and read count calculation parameters:" ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Min read count value of a feature to be shown in the results:",
-                                                                      normCalculationParameters.getMinReadCount() ) );
+                                                                      normalizationParameters.getMinReadCount() ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Max read count value of a feature to be shown in the results:",
-                                                                      normCalculationParameters.getMaxReadCount() ) );
-        normCalculationParameters.getReadClassParams().addReadClassParamsToStats( statisticsExportData );
+                                                                      normalizationParameters.getMaxReadCount() ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Use effective genomic feature length:",
+                                                                      normalizationParameters.isUseEffectiveLength() ? "yes" : "no" ) );
+        normalizationParameters.getReadClassParams().addReadClassParamsToStats( statisticsExportData );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 

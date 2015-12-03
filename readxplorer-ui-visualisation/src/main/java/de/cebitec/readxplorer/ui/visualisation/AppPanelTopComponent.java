@@ -98,7 +98,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
     private final InstanceContent content = new InstanceContent();
     private final Lookup localLookup;
     private ReferenceViewer referenceViewer;
-    private final ArrayList<TrackViewer> trackViewerList;
+    private final List<TrackViewer> trackViewerList;
     private JScrollPane trackScrollPane;
     private JScrollPane basePanelScrollPane;
     private final JPanel tracksPanel;

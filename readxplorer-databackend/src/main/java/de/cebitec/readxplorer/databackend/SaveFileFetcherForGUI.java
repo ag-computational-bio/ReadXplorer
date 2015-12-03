@@ -22,12 +22,17 @@ import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.FastaUtils;
+import htsjdk.samtools.SAMException;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
+import htsjdk.samtools.util.RuntimeIOException;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -36,10 +41,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import net.sf.picard.PicardException;
-import net.sf.picard.reference.IndexedFastaSequenceFile;
-import net.sf.samtools.util.RuntimeIOException;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle.Messages;
@@ -73,9 +74,8 @@ public class SaveFileFetcherForGUI {
 
     /**
      * Returns the Persistent^Connector for the given track. If the track is
-     * stored in
-     * a sam/bam file and the path to this file has changed, the method will
-     * open a window and ask for the new file path.
+     * stored in a sam/bam file and the path to this file has changed, the
+     * method will open a window and ask for the new file path.
      * <p>
      * @throws UserCanceledTrackPathUpdateException if the no track path could
      *                                              be resolved.
@@ -117,10 +117,9 @@ public class SaveFileFetcherForGUI {
      *                      for.
      * @param combineTracks boolean if the Tracks should be combined or not.
      * <p>
-     * @return TrackConnector for the list of Tracks handed over.
-     *         CAUTION:
-     *         tracks are removed if their path cannot be resolved and the user refuses
-     *         to set a new one.
+     * @return TrackConnector for the list of Tracks handed over. CAUTION:
+     *         tracks are removed if their path cannot be resolved and the user
+     *         refuses to set a new one.
      */
     public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws UserCanceledTrackPathUpdateException {
         TrackConnector tc = null;
@@ -375,14 +374,29 @@ public class SaveFileFetcherForGUI {
         IndexedFastaSequenceFile indexedRefFile;
         FastaUtils fastaUtils = new FastaUtils(); //TODO observers are empty, add observers!
         if( fastaFile.exists() && fastaFile.isFile() ) {
-            try { //check for index and recreate it with notificaiton, if necessary
-                IndexedFastaSequenceFile indexedFastaSequenceFile = new IndexedFastaSequenceFile( fastaFile );
+            try( IndexedFastaSequenceFile testRefIndexFile = new IndexedFastaSequenceFile( fastaFile ) ) { //check for index and recreate it with notification, if necessary
+                indexedRefFile = testRefIndexFile;
+                try { //check if all entries in the file are valid, otherwise delete and recreate index
+                    for( PersistentChromosome chrom : ref.getChromosomes().values() ) {
+                        //just iterate them to see if they exist
+                        indexedRefFile.getSubsequenceAt( chrom.getName(), 1, 2 );
+                    }
+                } catch( SAMException | NullPointerException e ) {
+                    try {
+                        indexedRefFile.close();
+                        fastaUtils.deleteIndexFile( fastaFile );
+                        fastaUtils.recreateMissingIndex( fastaFile );
+                    } catch( IOException ex ) {
+                        LOG.log( SEVERE, "'{'0'}': Unable to delete erroneous fasta index file. Please delete it manually and restart ReadXplorer.", fastaFile.getAbsolutePath() );
+                    }
+                }
             } catch( FileNotFoundException e ) {
                 fastaUtils.recreateMissingIndex( fastaFile );
-            } catch( PicardException e ) { //should not occur, since we test existence of fasta before
-                JOptionPane.showMessageDialog( new JPanel(), Bundle.MSG_FastaMissing( fastaFile.getAbsolutePath() ), Bundle.TITLE_FastaMissing(), JOptionPane.ERROR_MESSAGE );
+            } catch( IOException e ) {
+                LOG.log( SEVERE, "'{'0'}': Unable to close fasta index file.", fastaFile.getAbsolutePath() );
             }
             indexedRefFile = fastaUtils.getIndexedFasta( fastaFile );
+
         } else {
             indexedRefFile = this.resetRefFile( ref );
         }
