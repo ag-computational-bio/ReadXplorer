@@ -34,6 +34,8 @@ import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickF
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -41,6 +43,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.openide.DialogDisplayer;
+import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 
 
@@ -358,6 +362,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
      */
     private void processResultForExport() {
         //Generating promoter regions for the TSS
+        int promoterSeqLength = queryPromoterSeqLength();
         this.promoterRegions = new ArrayList<>();
 
         //get reference sequence for promoter regions
@@ -368,17 +373,45 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         for( TranscriptionStart tSS : this.tssResult.getResults() ) {
             final String promoter;
             if( tSS.isFwdStrand() ) {
-                int promoterStart = tSS.getPos() - 70;
+                int promoterStart = tSS.getPos() - promoterSeqLength;
                 promoterStart = promoterStart < 0 ? 0 : promoterStart;
                 promoter = ref.getActiveChromSequence( promoterStart, tSS.getPos() );
             } else {
-                int promoterStart = tSS.getPos() + 70;
+                int promoterStart = tSS.getPos() + promoterSeqLength;
                 promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
                 promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( tSS.getPos(), promoterStart ) );
             }
             this.promoterRegions.add( promoter );
         }
         tssResult.setPromoterRegions( promoterRegions );
+    }
+
+
+    /**
+     * Queries the promoter sequence length desired by the user. The selected
+     * number of bases is exported upstream of each TSS.
+     * <p>
+     * @return The length of the putative promoter sequences.
+     */
+    @NbBundle.Messages( "PromoterSeqLengthWiz_Title=Promoter Sequence Length Selection" )
+    private int queryPromoterSeqLength() {
+        int promoterLength = 70;
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        PromoterSeqLengthWizardPanel seqLengthPanel = new PromoterSeqLengthWizardPanel();
+        panels.add( seqLengthPanel );
+        WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( Bundle.PromoterSeqLengthWiz_Title() );
+
+        //action to perform after successfully finishing the wizard
+        boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
+        if( !cancelled ) {
+            promoterLength = (int) wiz.getProperty( PromoterSeqLengthWizardPanel.PROMOTER_LENGTH );
+        }
+        tssResult.setPromoterLength( promoterLength );
+
+        return promoterLength;
     }
 
 

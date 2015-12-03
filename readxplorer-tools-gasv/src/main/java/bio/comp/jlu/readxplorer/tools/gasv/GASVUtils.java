@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecord;
 
 import static java.util.regex.Pattern.compile;
 

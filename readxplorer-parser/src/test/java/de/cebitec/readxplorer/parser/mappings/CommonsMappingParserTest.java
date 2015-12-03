@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.parser.mappings;
 
 import de.cebitec.readxplorer.api.enums.ReadPairExtensions;
 import de.cebitec.readxplorer.utils.Pair;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMRecord;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

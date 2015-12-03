@@ -187,6 +187,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         int associateTssWindow = 0;
         int minNumberReads = 0;
         int maxNumberReads = 0;
+        boolean useEffectiveLength = false;
         boolean autoOperonParamEstimation = false;
         int minSpanningReads = 0;
         Set<FeatureType> selNormFeatureTypes = new HashSet<>();
@@ -227,6 +228,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         if( performNormAnalysis ) {
             minNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS );
             maxNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS );
+            useEffectiveLength = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_USE_EFFECTIVE_LENGTH );
             selNormFeatureTypes = (Set<FeatureType>) wiz.getProperty( selNormFeatureTypesPropString );
             normFeatureStartOffset = (int) wiz.getProperty( propStringNormFeatureStartOffset );
             normFeatureStopOffset = (int) wiz.getProperty( propStringNormFeatureStopOffset );
@@ -236,7 +238,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                              minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov,
                                              maxLeaderlessDistance, maxFeatureDistance, isAssociateTss, associateTssWindow, readClassParams );
         parametersOperonDet = new ParameterSetOperonDet( performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams );
-        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads,
+        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads, useEffectiveLength,
                                                                  normFeatureStartOffset, normFeatureStopOffset,
                                                                  selNormFeatureTypes, readClassParams );
 

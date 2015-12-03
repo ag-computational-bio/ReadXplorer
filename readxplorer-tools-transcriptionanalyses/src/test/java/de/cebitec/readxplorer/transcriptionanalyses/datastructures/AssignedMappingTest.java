@@ -19,9 +19,12 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
 import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetNormalization;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -31,7 +34,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 
 
 /**
@@ -65,6 +67,9 @@ public class AssignedMappingTest {
 
     @BeforeClass
     public static void setUpClass() {
+
+        ParameterSetNormalization params = new ParameterSetNormalization( true, 1, 1000000, true, 0, 0, new HashSet<>(), new ParametersReadClasses() );
+
         mapping2 = new Mapping( 1500, 1600, false );
 
         feature4 = new PersistentFeature( 4, 1, "", "", "", "", 1200, 1550, false, FeatureType.CDS, "feat4" );
@@ -72,10 +77,10 @@ public class AssignedMappingTest {
         feature6 = new PersistentFeature( 6, 1, "", "", "", "", 1490, 1650, false, FeatureType.CDS, "feat6" );
         feature9 = new PersistentFeature( 9, 1, "", "", "", "", 1499, 1850, false, FeatureType.CDS, "feat9" );
 
-        normaReadCount2 = new NormalizedReadCount( feature4, 0, 0, 200, 1 );
-        normaReadCount3 = new NormalizedReadCount( feature5, 0, 0, 800, 1 );
-        normaReadCount4 = new NormalizedReadCount( feature6, 0, 0, 400, 1 );
-        normaReadCount5 = new NormalizedReadCount( feature9, 0, 0, 900, 1 );
+        normaReadCount2 = new NormalizedReadCount( feature4, 0, 0, 200, 1, params );
+        normaReadCount3 = new NormalizedReadCount( feature5, 0, 0, 800, 1, params );
+        normaReadCount4 = new NormalizedReadCount( feature6, 0, 0, 400, 1, params );
+        normaReadCount5 = new NormalizedReadCount( feature9, 0, 0, 900, 1, params );
 
         featureReadCount = new HashMap<>();
 

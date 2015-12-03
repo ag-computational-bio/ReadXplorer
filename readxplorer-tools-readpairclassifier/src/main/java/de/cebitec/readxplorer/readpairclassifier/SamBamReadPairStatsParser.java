@@ -31,11 +31,12 @@ import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
 import java.util.Map;
 import java.util.logging.Logger;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
 
 import static java.util.logging.Level.INFO;
@@ -95,7 +96,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
             int lineNo = 0;
             notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
 
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
             SAMRecordIterator samItor = samBamReader.iterator();
 
             while( samItor.hasNext() ) {

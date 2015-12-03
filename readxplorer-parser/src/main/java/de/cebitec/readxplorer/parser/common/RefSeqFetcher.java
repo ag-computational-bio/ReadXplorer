@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.parser.common;
 
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
@@ -28,8 +29,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import net.sf.picard.PicardException;
-import net.sf.picard.reference.IndexedFastaSequenceFile;
 import org.openide.util.Exceptions;
 
 import static java.util.logging.Level.SEVERE;
@@ -66,7 +65,7 @@ public class RefSeqFetcher implements Observable {
             LOG.log( SEVERE, fnfe.getMessage(), fnfe );
             this.notifyObservers( "Fasta reference index file not found. Please make sure it exist." );
             this.notifyObservers( fnfe.getMessage() );
-        } catch( PicardException pe ) {
+        } catch( Exception pe ) {
             LOG.log( SEVERE, pe.getMessage(), pe );
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + indexedFastaFile.getAbsolutePath();
             JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
@@ -90,7 +89,7 @@ public class RefSeqFetcher implements Observable {
         String refSeq = "";
         try {
             refSeq = new String( refFile.getSubsequenceAt( refName, start, stop ).getBases(), Charset.forName( "UTF-8" ) ).toUpperCase();
-        } catch( PicardException pe ) {
+        } catch( Exception pe ) {
             LOG.log( SEVERE, pe.getMessage(), pe );
             String msg = "Mapping and reference data are out of sync for reference " + refName + ". One of the queried positions is out of reach!"
                     + "Reimport the correct reference or fix the mapping data!";
