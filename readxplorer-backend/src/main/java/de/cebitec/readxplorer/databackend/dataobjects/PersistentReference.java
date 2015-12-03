@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
@@ -32,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import net.sf.picard.PicardException;
-import net.sf.picard.reference.IndexedFastaSequenceFile;
 
 
 /**
@@ -140,7 +139,7 @@ public class PersistentReference implements Observable {
             }
             try {
                 this.getChromSequence( activeChromID, 1, 1 );
-            } catch( PicardException | NullPointerException e ) {
+            } catch( NullPointerException e ) {
                 if( e.getMessage() != null && e.getMessage().contains( "Unable to find entry for contig" ) ) {
                     String msg = "The fasta file \n" + fastaFile.getAbsolutePath()
                                  + "\ndoes not contain the expected sequence:\n" + e.getMessage();

@@ -21,10 +21,12 @@ package de.cebitec.readxplorer.utils;
 import de.cebitec.common.parser.fasta.FastaIndexEntry;
 import de.cebitec.common.parser.fasta.FastaIndexWriter;
 import de.cebitec.common.parser.fasta.FastaIndexer;
+import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,8 +36,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import net.sf.picard.PicardException;
-import net.sf.picard.reference.IndexedFastaSequenceFile;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
@@ -67,21 +67,34 @@ public final class FastaUtils implements Observable {
 
 
     /**
+     * Deletes a fasta .fai index file (e.g. useful if it is corrupted).
+     *
+     * @param fastaFile The fasta file whose index file shall be deleted
+     *
+     * @throws IOException
+     */
+    public void deleteIndexFile( File fastaFile ) throws IOException {
+        Path indexFile = Paths.get( fastaFile.getAbsolutePath() + ".fai" );
+        Files.delete( indexFile );
+    }
+
+
+    /**
      * Generates a Fasta index file for an input Fasta file, if the index does
      * not already exist.
      * <p>
      * @param fastaFileToIndex The fasta file for which an index shall be
-     * created, if it not existent already.
-     * @param observers List of observers, which shall be updated in case of
-     * errors.
+     *                         created, if it not existent already.
+     * @param observers        List of observers, which shall be updated in case
+     *                         of errors.
      */
     public void indexFasta( File fastaFileToIndex, List<Observer> observers ) {
         for( Observer observer : observers ) {
             this.registerObserver( observer );
         }
 
-        try {
-            IndexedFastaSequenceFile fastaFile = new IndexedFastaSequenceFile( fastaFileToIndex );
+        try( IndexedFastaSequenceFile fastaFile = new IndexedFastaSequenceFile( fastaFileToIndex ) ) {
+            fastaFile.close();
         } catch( FileNotFoundException fnfe ) {
             try {
                 FastaIndexer indexer = new FastaIndexer();
@@ -89,14 +102,13 @@ public final class FastaUtils implements Observable {
                 FastaIndexWriter idxWriter = new FastaIndexWriter();
                 Path indexFile = Paths.get( fastaFileToIndex.getAbsolutePath() + ".fai" );
                 idxWriter.writeIndex( indexFile, sequences );
-            } catch( IOException | IllegalStateException ex ) {
+            } catch( IOException ex ) {
                 LOG.log( SEVERE, ex.getMessage(), ex );
                 this.notifyObservers( ex.getMessage() );
             }
-        } catch( PicardException pe ) {
-            LOG.log( SEVERE, pe.getMessage(), pe );
-            String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + fastaFileToIndex.getAbsolutePath();
-            JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
+        } catch( IOException | IllegalStateException ex ) {
+            LOG.log( SEVERE, ex.getMessage(), ex );
+            this.notifyObservers( ex.getMessage() );
         }
 
         for( Observer observer : observers ) {
@@ -127,7 +139,7 @@ public final class FastaUtils implements Observable {
 
     /**
      * @param fastaFile A fasta file, which shall be checked for an existing
-     * index file.
+     *                  index file.
      * <p>
      * @return The indexed fasta file, if it could be created, null otherwise.
      */
@@ -145,7 +157,7 @@ public final class FastaUtils implements Observable {
                 }
             } else {
                 JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file is missing or cannot be read! Restore the reference fasta file!",
-                        "File not found exception", JOptionPane.ERROR_MESSAGE );
+                                               "File not found exception", JOptionPane.ERROR_MESSAGE );
             }
         } catch( NoSuchElementException nsex ) { //can occur if the index file is corrupted
             LOG.log( SEVERE, nsex.getMessage(), nsex );
@@ -184,7 +196,7 @@ public final class FastaUtils implements Observable {
 
         } );
         indexThread.start();
-        DialogDescriptor dialogDescriptor = new DialogDescriptor( indexPanel, "Fasta index missing!", true, new JButton[]{okButton}, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null );
+        DialogDescriptor dialogDescriptor = new DialogDescriptor( indexPanel, "Fasta index missing!", true, new JButton[]{ okButton }, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null );
         Dialog indexDialog = DialogDisplayer.getDefault().createDialog( dialogDescriptor );
         indexDialog.setVisible( true );
     }
