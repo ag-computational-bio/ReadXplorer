@@ -45,7 +45,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -59,8 +60,6 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-
-import static java.util.logging.Level.WARNING;
 
 
 /**
@@ -91,7 +90,7 @@ import static java.util.logging.Level.WARNING;
 public final class DashboardWindowTopComponent extends TopComponentExtended
         implements ExplorerManager.Provider {
 
-    private static final Logger LOG = Logger.getLogger( DashboardWindowTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DashboardWindowTopComponent.class.getName() );
 
 
     private static final long serialVersionUID = 1L;
@@ -143,7 +142,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
                             } );
                         } catch( Exception e ) {
-                            LOG.log( WARNING, e.getMessage() );
+                            LOG.warn( e.getMessage() );
                         }
                     }
 
@@ -482,10 +481,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     private void initAdditionalComponents() {
 
         String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - " +
-                 "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
-                 "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
-                 "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
-                 "toolbar buttons or \"Tools\" menu)</p></html>";
+                       "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
+                       "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
+                       "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
+                       "toolbar buttons or \"Tools\" menu)</p></html>";
         quickstartLabel.setText( sText );
 
         Border paddingBorder = BorderFactory.createEmptyBorder( 50, 100, 100, 100 );
@@ -523,12 +522,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
-                        } else {
-                            if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
-                                dbItem.setSelected( true );
-                            } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
-                                dbItem.setSelected( true );
-                            }
+                        } else if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
+                            dbItem.setSelected( true );
+                        } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
+                            dbItem.setSelected( true );
                         }
                     }
                 }

@@ -31,10 +31,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.compile;
 
 
@@ -46,7 +46,7 @@ import static java.util.regex.Pattern.compile;
  */
 public class PersistentFeature extends Node implements PersistentFeatureI {
 
-    private static final Logger LOG = Logger.getLogger( PersistentFeature.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PersistentFeature.class.getName() );
     private static final Pattern SEMICOLON_PATTERN = compile( ";" );
 
     private final int id;
@@ -68,8 +68,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
      * @param id          id of the feature in db
      * @param chromId     Chromosome id of the feature
      * @param parentIds   The string containing all ids of the parents of this
-     *                    feature separated by ";", if it has at least one. If not this string is
-     *                    empty.
+     *                    feature separated by ";", if it has at least one. If
+     *                    not this string is empty.
      * @param type        FeatureType.CDS, FeatureType.REPEAT_UNIT,
      *                    FeatureType.R_RNA, FeatureType.SOURCE,
      *                    FeatureType.T_RNA, FeatureType.MISC_RNA,
@@ -119,7 +119,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
                 }
             } catch( NumberFormatException e ) {
                 //ignore and continue
-                LOG.log( FINE, e.getMessage(), e );
+                LOG.trace( e.getMessage(), e );
             }
         }
         return parentIdList;
@@ -152,7 +152,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
 
     /**
      * @return The id of the parent of this feature, if it has one. If not "0"
-     *         has to be used to signal that this feature is a top level feature.
+     *         has to be used to signal that this feature is a top level
+     *         feature.
      */
     public List<Integer> getParentIds() {
         return Collections.unmodifiableList( parentIds );
@@ -160,8 +161,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
 
 
     /**
-     * @return <code>true</code>, if the feature has a locus,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code>, if the feature has a locus, <code>false</code>
+     *         otherwise.
      */
     public boolean hasLocus() {
         return this.locus != null;
@@ -281,8 +282,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
     /**
      * Retrieves the best possible string representation of the feature. First
      * it checks the feature name, then the locus information, then the EC
-     * number and if all are not given it returns "Feature with start: x,
-     * stop: y".
+     * number and if all are not given it returns "Feature with start: x, stop:
+     * y".
      * <p>
      * @return the best possible name for the feature.
      */
@@ -464,7 +465,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
          * addParentFeature()" with a map and feature list parameters.
          * <p>
          * @param featuresSorted the sorted list of features who shall be added
-         *                       in their correct hierarchy by increasing start position
+         *                       in their correct hierarchy by increasing start
+         *                       position
          */
         public static void addParentFeatures( List<PersistentFeature> featuresSorted ) {
             Map<Integer, PersistentFeature> featMap = PersistentFeature.Utils.getFeatureMap( featuresSorted );
@@ -477,8 +479,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
          * features list.
          * <p>
          * @param features       the map of features, to which the subfeatures
-         *                       are
-         *                       added
+         *                       are added
          * @param featuresSorted the sorted list of features to add to their
          *                       parents by increasing start position
          */
@@ -503,7 +504,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI {
          * <p>
          * @param featuresToFilter     the list of features to filter
          * @param selectedFeatureTypes the set of feature types, which shall be
-         *                             contained in the returned list of features
+         *                             contained in the returned list of
+         *                             features
          * <p>
          * @return the filtered list of features. Only features of a type from
          *         the <code>selectedFeatureTypes</code> are returned

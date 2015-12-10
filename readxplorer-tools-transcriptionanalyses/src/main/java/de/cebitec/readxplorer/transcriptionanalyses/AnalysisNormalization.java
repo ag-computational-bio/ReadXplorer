@@ -41,7 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.cebitec.readxplorer.api.enums.FeatureType.CDS;
 import static de.cebitec.readxplorer.api.enums.FeatureType.EXON;
@@ -58,7 +59,7 @@ import static de.cebitec.readxplorer.api.enums.FeatureType.TRNA;
  */
 public class AnalysisNormalization implements Observer, AnalysisI<List<NormalizedReadCount>> {
 
-    private static final Logger LOG = Logger.getLogger( AnalysisNormalization.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisNormalization.class.getName() );
 
     private final TrackConnector trackConnector;
     private final List<NormalizedReadCount> normValues;

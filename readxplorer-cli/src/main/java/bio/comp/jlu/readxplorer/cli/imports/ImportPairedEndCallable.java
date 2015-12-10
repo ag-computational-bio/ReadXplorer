@@ -39,23 +39,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * Paired-End CLI Importer.
- * The <code>ImportPairedEndCallable</code> class is responsible for the parallelised
- * import of read file pairs in the CLI version.
+ * Paired-End CLI Importer. The <code>ImportPairedEndCallable</code> class is
+ * responsible for the parallelised import of read file pairs in the CLI
+ * version.
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
 public final class ImportPairedEndCallable implements Callable<ImportPairedEndResults> {
 
-    private static final Logger LOG = Logger.getLogger( ImportPairedEndCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportPairedEndCallable.class.getName() );
 
     private final ImportReferenceResult referenceResult;
     private final ReadPairJobContainer rpjc;
@@ -65,7 +63,8 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
      * Paired-End CLI Importer
      *
      * @param referenceResult imported reference genome as mapping target
-     * @param rpjc <code>ReadPairJobContainer</code> with import information
+     * @param rpjc            <code>ReadPairJobContainer</code> with import
+     *                        information
      */
     public ImportPairedEndCallable( ImportReferenceResult referenceResult, ReadPairJobContainer rpjc ) {
 
@@ -92,7 +91,7 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
              * already sorted by coordinate & classification in file)
              */
 
-            LOG.log( Level.FINE, "create import objects..." );
+            LOG.trace( "create import objects..." );
             result.addOutput( "create import objects..." );
             final TrackJob trackJob1 = rpjc.getTrackJob1();
             final TrackJob trackJob2 = rpjc.getTrackJob2();
@@ -110,10 +109,10 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
 
 
             // executes any conversion before other calculations, if the parser supports any
-            LOG.log( Level.FINE, "convert read file(s): {0}...", readFile1.getName() );
+            LOG.trace( "convert read file(s): {0}...", readFile1.getName() );
             result.addOutput( "convert file(s)..." );
             if( !trackJob1.getParser().convert( trackJob1, chromLengthMap ) ) {
-                LOG.log( SEVERE, "Conversion of {0} failed!", readFile1.getName() );
+                LOG.error( "Conversion of {0} failed!", readFile1.getName() );
                 result.addOutput( "Error: Conversion of " + readFile1.getName() + " failed!" );
                 return result;
             }
@@ -125,17 +124,17 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
                 boolean success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
                 File lastWorkFile2 = trackJob2.getFile();
                 if( !success ) {
-                    LOG.log( SEVERE, "Conversion of {0} failed!", trackJob2.getName() );
+                    LOG.error( "Conversion of {0} failed!", trackJob2.getName() );
                     result.addOutput( "Error: Conversion of " + trackJob1.getName() + " failed!" );
                     return result;
                 }
 
                 // combine both tracks and continue with trackJob1, they are unsorted now
-                LOG.log( Level.FINE, "combine read files: {0} and {1}", new Object[]{ readFile1.getName(), readFile2.getName() } );
+                LOG.trace( "combine read files: {0} and {1}", new Object[]{ readFile1.getName(), readFile2.getName() } );
                 result.addOutput( "combine files..." );
                 SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
                 if( !combiner.combineData() ) {
-                    LOG.log( SEVERE, "Combination of {0} and {1} failed!", new Object[]{ readFile1.getName(), readFile2.getName() } );
+                    LOG.error( "Combination of {0} and {1} failed!", new Object[]{ readFile1.getName(), readFile2.getName() } );
                     result.addOutput( "Error: Combination of " + readFile1.getName() + " and " + readFile2.getName() + " failed!" );
                     return result;
                 }
@@ -146,7 +145,7 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
             }
 
             // extension for both classification and read pair info
-            LOG.log( Level.FINE, "create classification statistics..." );
+            LOG.trace( "create classification statistics..." );
             result.addOutput( "create statistics..." );
             SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier( rpjc, chromLengthMap );
             samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
@@ -161,16 +160,16 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
             statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
 
-            LOG.log( Level.FINE, "parsed read file: {0}", readFile1.getName() );
+            LOG.trace( "parsed read file: {0}", readFile1.getName() );
             result.addOutput( "parsed read file " + readFile1.getName() );
             result.setParsedTrack( track );
             result.setSuccessful( true );
 
         } catch( IOException | ParsingException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.error( null, ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ex ) {
-            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             CommandException ce = new CommandException( 1, "ran out of memory!" );
             ce.initCause( ex );
             throw ce;
@@ -182,8 +181,7 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
 
 
     /**
-     * Result Class.
-     * Contains all available result and import information.
+     * Result Class. Contains all available result and import information.
      */
     public final class ImportPairedEndResults {
 

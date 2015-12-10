@@ -24,12 +24,13 @@ import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.TabWithCloseX;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.JTabbedPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,7 +41,7 @@ import org.openide.windows.WindowManager;
                       autostore = false )
 public final class RNAFolderTopComponent extends TopComponentExtended {
 
-    private static final Logger LOG = Logger.getLogger( RNAFolderTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RNAFolderTopComponent.class.getName() );
 
     private static RNAFolderTopComponent instance;
     /**
@@ -136,13 +137,13 @@ public final class RNAFolderTopComponent extends TopComponentExtended {
     public static synchronized RNAFolderTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warn( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof RNAFolderTopComponent ) {
             return (RNAFolderTopComponent) win;
         }
-        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID +
+        LOG.warn( "There seem to be multiple components with the '" + PREFERRED_ID +
                  "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }

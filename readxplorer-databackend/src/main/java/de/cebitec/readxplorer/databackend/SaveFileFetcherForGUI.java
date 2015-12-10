@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -38,18 +38,15 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
-import static java.util.logging.Logger.getLogger;
 
 
 /**
@@ -62,7 +59,7 @@ import static java.util.logging.Logger.getLogger;
              "MSG_FileReset_StorageError=An error occured during storage of the new file path. Please try again" } )
 public class SaveFileFetcherForGUI {
 
-    private static final Logger LOG = getLogger( SaveFileFetcherForGUI.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SaveFileFetcherForGUI.class.getName() );
 
 
     /**
@@ -95,7 +92,7 @@ public class SaveFileFetcherForGUI {
                     tc = connector.getTrackConnector( newTrack );
                 } catch( FileNotFoundException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                    LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
+                    LOG.error( "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
                 }
             } else {
                 //If the new path is not set by the user throw exception notifying about this
@@ -152,7 +149,7 @@ public class SaveFileFetcherForGUI {
                 tc = connector.getTrackConnector( tracks, combineTracks );
             } catch( FileNotFoundException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
+                LOG.error( "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
             }
         }
         return tc;
@@ -218,7 +215,7 @@ public class SaveFileFetcherForGUI {
                 }
             } catch( RuntimeIOException e ) {
                 //nothing to do, we return a null track
-                LOG.log( FINE, e.getMessage(), e );
+                LOG.trace( e.getMessage(), e );
             }
         }
         return newTrack;
@@ -287,7 +284,7 @@ public class SaveFileFetcherForGUI {
                     mtc = connector.getMultiTrackConnector( newTrack );
                 } catch( FileNotFoundException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                    LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
+                    LOG.error( "{0}: Unable to open data associated with track: " + track.getId(), currentTimestamp );
                 }
             } else {
                 //If the new path is not set by the user throw exception notifying about this
@@ -340,7 +337,7 @@ public class SaveFileFetcherForGUI {
                 mtc = connector.getMultiTrackConnector( tracks );
             } catch( FileNotFoundException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
+                LOG.error( "{0}: Unable to open data associated with track: " + tracks.toString(), currentTimestamp );
             }
         }
         return mtc;
@@ -387,13 +384,13 @@ public class SaveFileFetcherForGUI {
                         fastaUtils.deleteIndexFile( fastaFile );
                         fastaUtils.recreateMissingIndex( fastaFile );
                     } catch( IOException ex ) {
-                        LOG.log( SEVERE, "'{'0'}': Unable to delete erroneous fasta index file. Please delete it manually and restart ReadXplorer.", fastaFile.getAbsolutePath() );
+                        LOG.error( "'{'0'}': Unable to delete erroneous fasta index file. Please delete it manually and restart ReadXplorer.", fastaFile.getAbsolutePath() );
                     }
                 }
             } catch( FileNotFoundException e ) {
                 fastaUtils.recreateMissingIndex( fastaFile );
             } catch( IOException e ) {
-                LOG.log( SEVERE, "'{'0'}': Unable to close fasta index file.", fastaFile.getAbsolutePath() );
+                LOG.error( "'{'0'}': Unable to close fasta index file.", fastaFile.getAbsolutePath() );
             }
             indexedRefFile = fastaUtils.getIndexedFasta( fastaFile );
 
@@ -519,7 +516,7 @@ public class SaveFileFetcherForGUI {
         public UserCanceledTrackPathUpdateException() {
             super( ERROR_MSG );
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( WARNING, "{0}: " + ERROR_MSG, currentTimestamp );
+            LOG.warn( "{0}: " + ERROR_MSG, currentTimestamp );
         }
 
 

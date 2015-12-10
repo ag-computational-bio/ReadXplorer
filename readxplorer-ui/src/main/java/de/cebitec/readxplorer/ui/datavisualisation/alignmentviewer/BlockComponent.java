@@ -49,13 +49,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer.PROP_MOUSEPOSITION_CHANGED;
-import static java.util.logging.Level.SEVERE;
 
 
 /**
@@ -66,7 +66,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class BlockComponent extends JComponent {
 
-    private static final Logger LOG = Logger.getLogger( BlockComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( BlockComponent.class.getName() );
 
 
     private static final long serialVersionUID = 1324672345;
@@ -392,7 +392,7 @@ public class BlockComponent extends JComponent {
         graphics2D.setFont( new Font( Font.MONOSPACED, Font.BOLD, 11 ) );
 
         // paint this block's background
-        graphics2D.setColor(Colors.BLOCK_BACKGROUND );
+        graphics2D.setColor( Colors.BLOCK_BACKGROUND );
         graphics2D.fillRect( 0, 0, length, height );
 
         //paint SamAlignmentBlocks (for split read mappings)
@@ -408,7 +408,7 @@ public class BlockComponent extends JComponent {
             if( parentViewer.isInMaxZoomLevel() && height >= AlignmentViewer.DEFAULT_BLOCK_HEIGHT ) {
                 int labelWidth = graphics.getFontMetrics().stringWidth( brick.toString() );
                 int labelX = brick.getLabelCenter() - labelWidth / 2;
-                graphics2D.setColor(Colors.BRICK_LABEL );
+                graphics2D.setColor( Colors.BRICK_LABEL );
                 graphics2D.drawString( brick.toString(), labelX, height );
             }
         }
@@ -556,11 +556,11 @@ public class BlockComponent extends JComponent {
                 break;
             case UNDEF:
                 c = Colors.MISMATCH_BACKGROUND;
-                LOG.log( SEVERE, "found unknown brick type {0}", brick );
+                LOG.error( "found unknown brick type {0}", brick );
                 break;
             default:
                 c = Colors.MISMATCH_BACKGROUND;
-                LOG.log( SEVERE, "found unknown brick type {0}", brick );
+                LOG.error( "found unknown brick type {0}", brick );
         }
 
         return c;

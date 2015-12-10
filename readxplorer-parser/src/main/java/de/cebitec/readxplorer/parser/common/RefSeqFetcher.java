@@ -26,12 +26,11 @@ import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,7 +41,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class RefSeqFetcher implements Observable {
 
-    private static final Logger LOG = Logger.getLogger( RefSeqFetcher.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RefSeqFetcher.class.getName() );
 
     private List<Observer> observers;
     private IndexedFastaSequenceFile refFile = null;
@@ -53,8 +52,8 @@ public class RefSeqFetcher implements Observable {
      * file.
      * <p>
      * @param indexedFastaFile The indexed fasta file from which the data shall
-     * be read.
-     * @param observer The observer for receiving error messages
+     *                         be read.
+     * @param observer         The observer for receiving error messages
      */
     public RefSeqFetcher( File indexedFastaFile, Observer observer ) {
         this.observers = new ArrayList<>();
@@ -62,11 +61,11 @@ public class RefSeqFetcher implements Observable {
         try {
             refFile = new IndexedFastaSequenceFile( indexedFastaFile );
         } catch( FileNotFoundException fnfe ) {
-            LOG.log( SEVERE, fnfe.getMessage(), fnfe );
+            LOG.error( fnfe.getMessage(), fnfe );
             this.notifyObservers( "Fasta reference index file not found. Please make sure it exist." );
             this.notifyObservers( fnfe.getMessage() );
         } catch( Exception pe ) {
-            LOG.log( SEVERE, pe.getMessage(), pe );
+            LOG.error( pe.getMessage(), pe );
             String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + indexedFastaFile.getAbsolutePath();
             JOptionPane.showMessageDialog( new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE );
         }
@@ -78,21 +77,21 @@ public class RefSeqFetcher implements Observable {
      * the reference file stored in this object.
      * <p>
      * @param refName name of the reference from which the sequence shall be
-     * retrieved
-     * @param start start position of the interval of interest
-     * @param stop stop position of the interval of interest
+     *                retrieved
+     * @param start   start position of the interval of interest
+     * @param stop    stop position of the interval of interest
      * <p>
      * @return The subsequence defined by start, stop and a reference name from
-     * the reference file stored in this object.
+     *         the reference file stored in this object.
      */
     public String getSubSequence( String refName, int start, int stop ) {
         String refSeq = "";
         try {
             refSeq = new String( refFile.getSubsequenceAt( refName, start, stop ).getBases(), Charset.forName( "UTF-8" ) ).toUpperCase();
         } catch( Exception pe ) {
-            LOG.log( SEVERE, pe.getMessage(), pe );
-            String msg = "Mapping and reference data are out of sync for reference " + refName + ". One of the queried positions is out of reach!"
-                    + "Reimport the correct reference or fix the mapping data!";
+            LOG.error( pe.getMessage(), pe );
+            String msg = "Mapping and reference data are out of sync for reference " + refName + ". One of the queried positions is out of reach!" +
+                     "Reimport the correct reference or fix the mapping data!";
             JOptionPane.showMessageDialog( new JPanel(), msg, "Reference sequence error", JOptionPane.ERROR_MESSAGE );
             Exceptions.printStackTrace( pe );
         }

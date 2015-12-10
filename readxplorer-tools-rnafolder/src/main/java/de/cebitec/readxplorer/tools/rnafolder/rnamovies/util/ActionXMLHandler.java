@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.tools.rnafolder.rnamovies.util;
 
 import java.lang.reflect.Constructor;
 import java.util.Stack;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
@@ -29,6 +28,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -38,7 +39,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class ActionXMLHandler implements ContentHandler {
 
-    private static final Logger LOG = Logger.getLogger( ActionXMLHandler.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ActionXMLHandler.class.getName() );
 
     private JMenuBar jmb;
     private JToolBar jtb;
@@ -127,7 +128,7 @@ public class ActionXMLHandler implements ContentHandler {
                             KeyStroke accelerator = KeyStroke.getKeyStroke( key.charAt( 0 ), modifier );
                             item.setAccelerator( accelerator );
                         } catch( NumberFormatException e ) {
-                            LOG.warning( e.getMessage().concat( " is not a valid int." ) );
+                            LOG.warn( e.getMessage().concat( " is not a valid int." ) );
                         }
                     }
                     menuPath.peek().add( item );
@@ -135,19 +136,19 @@ public class ActionXMLHandler implements ContentHandler {
 
                 String toolBar;
                 if( (toolBar = atts.getValue( "toolBar" )) != null &&
-                         (Boolean.valueOf( toolBar )) &&
-                         obj_ instanceof AbstractAction ) {
+                    (Boolean.valueOf( toolBar )) &&
+                    obj_ instanceof AbstractAction ) {
                     jtb.add( (Action) obj_ );
                 }
 
             } catch( NoSuchMethodException e ) {
-                LOG.warning( "Could not find Constructor: ".concat( e.getMessage() ) );
+                LOG.warn( "Could not find Constructor: ".concat( e.getMessage() ) );
             } catch( InstantiationException e ) {
-                LOG.warning( "Could not instantiate: ".concat( e.getMessage() ) );
+                LOG.warn( "Could not instantiate: ".concat( e.getMessage() ) );
             } catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
-                LOG.warning( e.getMessage() );
+                LOG.warn( e.getMessage() );
             } catch( ClassNotFoundException e ) {
-                LOG.warning( "Could not find class: ".concat( e.getMessage() ) );
+                LOG.warn( "Could not find class: ".concat( e.getMessage() ) );
             }
         }
     }

@@ -38,10 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,7 +50,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class ReferenceConnector {
 
-    private static final Logger LOG = Logger.getLogger( ReferenceConnector.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ReferenceConnector.class.getName() );
 
     private final int refId;
     private final List<PersistentTrack> associatedTracks;
@@ -74,12 +72,12 @@ public class ReferenceConnector {
 
     /**
      * @return Fetches the reference genome of the reference associated with
-     *         this connector. If it was called once, it is kept in memory and does not
-     *         need to be fetched from the DB again.
+     *         this connector. If it was called once, it is kept in memory and
+     *         does not need to be fetched from the DB again.
      */
     public PersistentReference getRefGenome() throws DatabaseException {
 
-        LOG.log( INFO, "Loading reference genome with id  \"{0}\" from database", refId );
+        LOG.info( "Loading reference genome with id " + refId + " from database" );
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
             try( final PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_SINGLE_GENOME ) ) {
                 pStmtFetch.setLong( 1, refId );
@@ -97,11 +95,11 @@ public class ReferenceConnector {
                 }
 
             } catch( SQLException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
                 throw new DatabaseException( "Could not fetch reference!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -113,7 +111,7 @@ public class ReferenceConnector {
      */
     public Map<Integer, PersistentChromosome> getChromosomesForGenome() throws DatabaseException {
 
-        LOG.log( INFO, "Loading chromosomes for reference with id  \"{0}\" from database", refId );
+        LOG.info( "Loading chromosomes for reference with id " + refId + " from database", refId );
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
             try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOMES ) ) {
                 fetch.setLong( 1, refId );
@@ -131,11 +129,11 @@ public class ReferenceConnector {
                 }
 
             } catch( SQLException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
                 throw new DatabaseException( "Could not fetch chromosomes!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -149,7 +147,7 @@ public class ReferenceConnector {
      */
     public PersistentChromosome getChromosomeForGenome( final int chromId ) throws DatabaseException {
 
-        LOG.log( INFO, "Loading chromosome for reference with id  \"{0}\" from database", refId );
+        LOG.info( "Loading chromosome for reference with id " + refId + " from database", refId );
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
             try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOME ) ) {
                 fetch.setLong( 1, chromId );
@@ -165,11 +163,11 @@ public class ReferenceConnector {
                 }
 
             } catch( SQLException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
                 throw new DatabaseException( "Could not fetch chromosome!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -225,11 +223,11 @@ public class ReferenceConnector {
                 return features;
 
             } catch( SQLException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
                 throw new DatabaseException( "Could not fetch features for reagion!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -351,11 +349,11 @@ public class ReferenceConnector {
                 }
                 return features;
             } catch( SQLException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
                 throw new DatabaseException( "Could not fetch features for closed interval!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -389,7 +387,7 @@ public class ReferenceConnector {
             associatedTracks.addAll( tmpAssociatedTracks );
 
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -470,12 +468,12 @@ public class ReferenceConnector {
                         }
                     }
                 } catch( SQLException ex ) {
-                    LOG.log( SEVERE, ex.getMessage(), ex );
+                    LOG.error( ex.getMessage(), ex );
                     throw new DatabaseException( "Check for feature has failed!", ex.getMessage(), ex );
                 }
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 

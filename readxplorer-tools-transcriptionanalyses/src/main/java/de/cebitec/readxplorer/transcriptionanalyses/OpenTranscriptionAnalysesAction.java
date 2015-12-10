@@ -41,8 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
@@ -54,6 +52,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -75,7 +75,7 @@ import org.openide.windows.WindowManager;
 public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                                               DataVisualisationI {
 
-    private static final Logger LOG = Logger.getLogger( OpenTranscriptionAnalysesAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( OpenTranscriptionAnalysesAction.class.getName() );
 
     private final TranscriptionAnalysesTopComponent transcAnalysesTopComp;
     private final ReferenceViewer refViewer;
@@ -403,7 +403,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
             } );
         } catch( ClassCastException e ) {
-            LOG.log( Level.INFO, "Unknown data passed to {0}", getClass().getName() );
+            LOG.info( "Unknown data passed to {0}", getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
 

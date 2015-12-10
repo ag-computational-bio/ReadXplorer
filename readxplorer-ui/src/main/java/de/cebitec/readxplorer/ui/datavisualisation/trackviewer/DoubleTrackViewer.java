@@ -35,10 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,7 +47,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class DoubleTrackViewer extends TrackViewer {
 
-    private static final Logger LOG = Logger.getLogger( DoubleTrackViewer.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DoubleTrackViewer.class.getName() );
 
 
     private static final long serialVersionUID = 572406471;
@@ -195,7 +194,7 @@ public class DoubleTrackViewer extends TrackViewer {
             } else if( classType == ComparisonClass.TRACK1_COVERAGE ) {
                 value = this.getNormalizedValue( id1, cov1.getCoverage( absPos, isFwdStrand ) );
             } else {
-                LOG.log( SEVERE, "found unknown coverage type!" );
+                LOG.error( "found unknown coverage type!" );
             }
         } else {
             throw new IllegalArgumentException( "The size of the coverage manager list is not equal to 2." );

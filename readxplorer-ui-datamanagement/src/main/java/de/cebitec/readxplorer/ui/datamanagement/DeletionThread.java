@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -36,9 +34,8 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,7 +45,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class DeletionThread extends SwingWorker<Object, Object> {
 
-    private static final Logger LOG = Logger.getLogger( DeletionThread.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DeletionThread.class.getName() );
 
     private final List<ReferenceJob> references;
     private final List<TrackJob> tracks;
@@ -90,7 +87,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         ph.start( workunits == 1 ? 2 : workunits );
         workunits = 0;
 
-        LOG.log( INFO, "Starting deletion of data" );
+        LOG.info( "Starting deletion of data" );
 
         if( !tracks.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.track" ) + ":" );
@@ -106,7 +103,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                     //  invalidRuns.add(t.getRunJob());
                     invalidGens.add( t.getRefGen() );
-                    LOG.log( SEVERE, null, ex );
+                    LOG.error( null, ex );
                 }
             }
             io.getOut().println( "" );
@@ -125,14 +122,14 @@ public class DeletionThread extends SwingWorker<Object, Object> {
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
                     } catch( DatabaseException ex ) {
                         io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
-                        LOG.log( SEVERE, null, ex );
+                        LOG.error( null, ex );
                     }
                 }
             }
             io.getOut().println( "" );
         }
 
-        Logger.getLogger( DeletionThread.class.getName() ).log( Level.INFO, "Completed Deletion of Data" );
+        LoggerFactory.getLogger( DeletionThread.class.getName() ).info( "Completed Deletion of Data" );
 
         return null;
     }

@@ -36,10 +36,9 @@ import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
 import htsjdk.samtools.ValidationStringency;
 import java.util.Map;
-import java.util.logging.Logger;
 import org.openide.util.NbBundle;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,7 +50,7 @@ import static java.util.logging.Level.INFO;
  */
 public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
-    private static final Logger LOG = Logger.getLogger( SamBamReadPairStatsParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SamBamReadPairStatsParser.class.getName() );
 
     //TODO: identify when pair goes across end of genome but only if circular reference genome
     private final TrackJob trackJob;
@@ -154,7 +153,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
         } catch( Exception e ) {
             this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Error", e.getMessage() ) );
-            LOG.log( INFO, e.getMessage() );
+            LOG.info( e.getMessage() );
         }
 
         return new ParsedReadPairContainer();

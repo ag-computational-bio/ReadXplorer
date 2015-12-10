@@ -23,22 +23,20 @@ import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * This coverage thread should be used for analyses, but not for visualizing
- * data. The thread carries out the queries to receive coverage for a
- * certain interval.
+ * data. The thread carries out the queries to receive coverage for a certain
+ * interval.
  *
  * @author -Rolf Hilker-
  */
 public class CoverageThreadAnalyses extends CoverageThread {
 
-    private static final Logger LOG = getLogger( CoverageThreadAnalyses.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CoverageThreadAnalyses.class.getName() );
 
 
     /**
@@ -76,7 +74,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
                 try {
                     Thread.sleep( 10 );
                 } catch( InterruptedException ex ) {
-                    LOG.log( Level.SEVERE, null, ex );
+                    LOG.error( null, ex );
                 }
             }
 

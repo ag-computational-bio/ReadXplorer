@@ -62,7 +62,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
-            <version>1.1.1-FINAL</version>
         </dependency>
     </dependencies>
 

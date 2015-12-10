@@ -23,9 +23,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Logger.getLogger;
+
 
 
 /**
@@ -35,7 +36,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public final class GenericSQLQueries {
 
-    private static final Logger LOG = getLogger( GenericSQLQueries.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GenericSQLQueries.class.getName() );
 
 
     private GenericSQLQueries() {

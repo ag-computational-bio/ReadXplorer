@@ -42,9 +42,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -55,7 +54,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class TrackConnector {
 
-    private static final Logger LOG = Logger.getLogger( TrackConnector.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackConnector.class.getName() );
 
     public static final int FIXED_INTERVAL_LENGTH = 1000;
 
@@ -230,7 +229,7 @@ public class TrackConnector {
      * @return The complete statistics for the main track of this connector.
      */
     public StatsContainer getTrackStats() {
-        return getTrackStats(trackId );
+        return getTrackStats( trackId );
     }
 
 
@@ -260,7 +259,7 @@ public class TrackConnector {
             return statsContainer;
 
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -357,12 +356,12 @@ public class TrackConnector {
      *         <code>-1</code> if this the track id is not found in the DB
      *         (which is the case for combined tracks).
      */
-    public Integer getReadPairToTrackID() throws DatabaseException  {
+    public Integer getReadPairToTrackID() throws DatabaseException {
 
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
             return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackId );
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -398,7 +397,7 @@ public class TrackConnector {
                 }
             }
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 
@@ -429,7 +428,7 @@ public class TrackConnector {
                 pStmtFetch.setByte( 2, (byte) type.getType() );
                 try( ResultSet rs = pStmtFetch.executeQuery() ) {
                     while( rs.next() ) {
-                        int count      = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
+                        int count = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
                         int intervalId = rs.getInt( FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID );
                         countDistribution.setCountForIndex( intervalId, countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
                     }
@@ -446,7 +445,7 @@ public class TrackConnector {
             return countDistribution;
 
         } catch( SQLException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
 

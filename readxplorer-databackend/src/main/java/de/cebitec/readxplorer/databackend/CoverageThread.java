@@ -34,11 +34,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Logger.getLogger;
+
 
 
 /**
@@ -48,7 +48,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public class CoverageThread extends RequestThread {
 
-    private static final Logger LOG = getLogger( CoverageThread.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CoverageThread.class.getName() );
 
     private long trackID;
     private long trackID2;
@@ -380,7 +380,7 @@ public class CoverageThread extends RequestThread {
         try {
             Thread.sleep( msToSleep );
         } catch( InterruptedException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.error( null, ex );
         }
     }
 

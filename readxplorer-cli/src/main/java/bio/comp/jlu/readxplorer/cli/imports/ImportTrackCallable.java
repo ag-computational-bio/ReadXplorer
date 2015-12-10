@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,7 +51,7 @@ import org.netbeans.api.sendopts.CommandException;
  */
 public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
-    private static final Logger LOG = Logger.getLogger( ImportTrackCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportTrackCallable.class.getName() );
 
     private final ImportReferenceResult referenceResult;
     private final TrackJob trackJob;
@@ -78,7 +78,7 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
         try {
 
             // create necessary objects
-            LOG.log( Level.FINE, "create import objects..." );
+            LOG.trace( "create import objects..." );
             result.addOutput( "create import objects..." );
             final File trackFile = trackJob.getFile();
             final MappingParserI mappingParser = trackJob.getParser();
@@ -93,7 +93,7 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
 
             // executes any conversion before other calculations, if the parser supports any
-            LOG.log( Level.FINE, "convert read file: {0}...", trackFile.getName() );
+            LOG.trace( "convert read file: {0}...", trackFile.getName() );
             result.addOutput( "convert file..." );
             trackFile.setReadOnly(); // prevents changes or deletion of original file!
             boolean success = mappingParser.convert( trackJob, chromLengthMap );
@@ -101,7 +101,7 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
 
 
             // generate classification data in file sorted by read sequence
-            LOG.log( Level.FINE, "parse read file: {0}...", trackFile.getName() );
+            LOG.trace( "parse read file: {0}...", trackFile.getName() );
             result.addOutput( "parse..." );
             mappingParser.setStatsContainer( statsContainer );
             mappingParser.parseInput( trackJob, chromLengthMap );
@@ -111,22 +111,22 @@ public final class ImportTrackCallable implements Callable<ImportTrackResults> {
             trackFile.setWritable( true );
 
             // file needs to be sorted by coordinate for efficient calculation
-            LOG.log( Level.FINE, "create classification statistics..." );
+            LOG.trace( "create classification statistics..." );
             result.addOutput( "create statistics..." );
             SamBamStatsParser statsParser = new SamBamStatsParser();
             statsParser.setStatsContainer( statsContainer );
             ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
 
-            LOG.log( Level.FINE, "parsed read file: {0}", trackFile.getName() );
+            LOG.trace( "parsed read file: {0}", trackFile.getName() );
             result.addOutput( "parsed read file " + trackFile.getName() );
             result.setParsedTrack( track );
             result.setSuccessful( true );
 
         } catch( ParsingException | IOException ex ) {
-            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ex ) {
-            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             CommandException ce = new CommandException( 1, "ran out of memory!" );
             ce.initCause( ex );
             throw ce;

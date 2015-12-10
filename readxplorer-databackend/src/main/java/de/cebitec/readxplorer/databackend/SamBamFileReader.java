@@ -52,13 +52,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -68,7 +68,7 @@ import org.openide.DialogDisplayer;
  */
 public class SamBamFileReader implements Observable, Observer {
 
-    private static final Logger LOG = Logger.getLogger( SamBamFileReader.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SamBamFileReader.class.getName() );
 
     /**
      * 0 = Default mapping quality value, if it is unknown.
@@ -246,7 +246,7 @@ public class SamBamFileReader implements Observable, Observer {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
             //do nothing
-            LOG.log( Level.FINE, e.getMessage(), e );
+            LOG.trace( e.getMessage(), e );
         }
 
         return mappings;
@@ -312,7 +312,7 @@ public class SamBamFileReader implements Observable, Observer {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
             //do nothing
-            LOG.log( Level.FINE, e.getMessage(), e );
+            LOG.trace( e.getMessage(), e );
         }
 
         return mappings;
@@ -399,7 +399,7 @@ public class SamBamFileReader implements Observable, Observer {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
             //do nothing
-            LOG.log( Level.FINE, e.getMessage(), e );
+            LOG.trace( e.getMessage(), e );
         }
 
         return readPairGroups;
@@ -483,7 +483,7 @@ public class SamBamFileReader implements Observable, Observer {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
             //do nothing
-            LOG.log( Level.FINE, e.getMessage(), e );
+            LOG.trace( e.getMessage(), e );
         }
 
         return result;
@@ -577,7 +577,7 @@ public class SamBamFileReader implements Observable, Observer {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
             //do nothing
-            LOG.log( Level.FINE, e.getMessage(), e );
+            LOG.trace( e.getMessage(), e );
         }
 
         return result;
@@ -645,7 +645,7 @@ public class SamBamFileReader implements Observable, Observer {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
             //do nothing
-            LOG.log( Level.FINE, e.getMessage(), e );
+            LOG.trace( e.getMessage(), e );
         }
 //        finish = System.currentTimeMillis(); //for performance testing
 //        System.out.println(Benchmark.calculateDuration(startTime, finish, "get coverage "));

@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
@@ -54,8 +53,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -78,7 +77,7 @@ import static java.util.logging.Level.SEVERE;
 public final class OpenCoveredFeaturesAction implements ActionListener,
                                                         DataVisualisationI {
 
-    private static final Logger LOG = Logger.getLogger( OpenCoveredFeaturesAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( OpenCoveredFeaturesAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
 
     private final ReferenceViewer context;
@@ -293,7 +292,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
             }
 
         } catch( ClassCastException e ) {
-            LOG.log( SEVERE, "Unknown data received in " + this.getClass().getName() );
+            LOG.error( "Unknown data received in " + this.getClass().getName() );
         }
     }
 

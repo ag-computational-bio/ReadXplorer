@@ -36,10 +36,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,7 +49,7 @@ import static java.util.logging.Level.INFO;
  */
 public class MappingThread extends RequestThread {
 
-    private static final Logger LOG = Logger.getLogger( MappingThread.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MappingThread.class.getName() );
 
 
     private static final int FIXED_INTERVAL_LENGTH = 1000;
@@ -104,7 +102,7 @@ public class MappingThread extends RequestThread {
         if( request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0 ) {
 
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( INFO, "{0}: Reading mapping data from file...", currentTimestamp );
+            LOG.info( "{0}: Reading mapping data from file...", currentTimestamp );
 
             mappingList.ensureCapacity( tracks.size() );
             for( final PersistentTrack track : tracks ) {
@@ -118,7 +116,7 @@ public class MappingThread extends RequestThread {
             }
 
             currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
+            LOG.info( "{0}: Done reading mapping data from file...", currentTimestamp );
 
         }
         return mappingList;
@@ -137,7 +135,7 @@ public class MappingThread extends RequestThread {
     public List<Mapping> loadReducedMappings( final IntervalRequest request ) {
 
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Reading mapping data from file...", currentTimestamp );
+        LOG.info( "{0}: Reading mapping data from file...", currentTimestamp );
 
         List<Mapping> mappings = new ArrayList<>( tracks.size() );
         for( final PersistentTrack track : tracks ) {
@@ -151,7 +149,7 @@ public class MappingThread extends RequestThread {
         }
 
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
+        LOG.info( "{0}: Done reading mapping data from file...", currentTimestamp );
 
         return mappings;
     }
@@ -162,8 +160,8 @@ public class MappingThread extends RequestThread {
      * <p>
      * @param request The request for which the data shall be gathered
      * <p>
-     * @return the collection of read pair mappings for the given interval
-     *         and typeFlag
+     * @return the collection of read pair mappings for the given interval and
+     *         typeFlag
      */
     public Collection<ReadPairGroup> getReadPairMappings( final IntervalRequest request ) {
         ArrayList<ReadPairGroup> readPairs = new ArrayList<>();
@@ -212,7 +210,7 @@ public class MappingThread extends RequestThread {
                 try {
                     Thread.sleep( 10 );
                 } catch( InterruptedException ex ) {
-                    LOG.log( Level.SEVERE, null, ex );
+                    LOG.error( null, ex );
                 }
             }
 

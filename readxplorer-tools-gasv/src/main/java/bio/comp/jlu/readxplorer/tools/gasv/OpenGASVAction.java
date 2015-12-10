@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
@@ -57,6 +55,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.prefs.CsvPreference;
 
 import static de.cebitec.readxplorer.parser.tables.TableType.GASV_TABLE;
@@ -85,7 +85,7 @@ import static de.cebitec.readxplorer.parser.tables.TableType.GASV_TABLE;
 @Messages( "CTL_OpenGASVAction=Run GASV" )
 public final class OpenGASVAction implements ActionListener, DataVisualisationI {
 
-    private static final Logger LOG = Logger.getLogger( OpenGASVAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( OpenGASVAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "GASV_Wizard";
 
     private final ReferenceViewer context;
@@ -260,7 +260,7 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
                     }
                 } catch( ParsingException ex ) {
                     GASVCaller.IO.getOut().println( "An error occurred during parsing of the mapping data:\\n" + ex.getMessage() );
-                    LOG.log( Level.SEVERE, "An error occurred during parsing of the mapping data:\\n{0}", ex.getMessage() );
+                    LOG.error( "An error occurred during parsing of the mapping data:\\n{0}", ex.getMessage() );
                 }
 
             }

@@ -33,13 +33,14 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,7 +52,7 @@ import org.openide.util.NbBundle;
 public class ImportSetupCard extends JPanel {
 
     private static final long serialVersionUID = 127732323;
-    private static final Logger LOG = Logger.getLogger( ImportSetupCard.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportSetupCard.class.getName() );
     private boolean canImport;
     public static final String PROP_HAS_JOBS = "hasJobs";
     public static final String PROP_JOB_SELECTED = "jobSelected";
@@ -345,7 +346,7 @@ public class ImportSetupCard extends JPanel {
         }
 
         readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,
-                                                                  readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation() ) );
+                                                             readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation() ) );
     }
 
 

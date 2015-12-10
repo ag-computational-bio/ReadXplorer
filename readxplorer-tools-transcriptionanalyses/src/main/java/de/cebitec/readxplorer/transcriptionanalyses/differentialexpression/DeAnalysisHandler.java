@@ -46,14 +46,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import org.rosuda.REngine.Rserve.RserveException;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -67,7 +64,7 @@ import static java.util.logging.Level.WARNING;
 public abstract class DeAnalysisHandler extends Thread implements Observable,
                                                                   DataVisualisationI {
 
-    private static final Logger LOG = Logger.getLogger( DeAnalysisHandler.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DeAnalysisHandler.class.getName() );
 
     private final int refGenomeID;
     private final int startOffset;
@@ -169,7 +166,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private void startAnalysis() {
         collectCoverageDataInstances.clear();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
+        LOG.info( "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos.clear();
@@ -346,23 +343,23 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 notifyObservers( AnalysisStatus.FINISHED );
             } catch( PackageNotLoadableException | UnknownGnuRException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 notifyObservers( AnalysisStatus.ERROR );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
                 this.interrupt();
             } catch( IllegalStateException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.warn( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             } catch( RserveException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
                 notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
             } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
                 notifyObservers( AnalysisStatus.ERROR );
             }

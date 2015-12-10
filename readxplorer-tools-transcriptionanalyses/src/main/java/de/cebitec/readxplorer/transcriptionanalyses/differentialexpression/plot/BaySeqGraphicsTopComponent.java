@@ -44,8 +44,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -66,6 +64,8 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -89,7 +89,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( BaySeqGraphicsTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( BaySeqGraphicsTopComponent.class.getName() );
 
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
@@ -368,7 +368,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                         NotificationDisplayer.getDefault().notify( Bundle.BaySeqSuccessHeader(), new ImageIcon(), Bundle.BaySeqSuccessMsg() + outputFile.toString(), null );
                     } catch( IOException ex ) {
                         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                        LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                        LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                         JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                     }
                 }
@@ -404,18 +404,14 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 int currentInteger = integerRep[i];
                 if( currentInteger == integerGroupA ) {
                     sampleA.add( i );
+                } else if( integerGroupB == null ) {
+                    integerGroupB = currentInteger;
+                    sampleB.add( i );
+                } else if( integerGroupB == currentInteger ) {
+                    sampleB.add( i );
                 } else {
-                    if( integerGroupB == null ) {
-                        integerGroupB = currentInteger;
-                        sampleB.add( i );
-                    } else {
-                        if( integerGroupB == currentInteger ) {
-                            sampleB.add( i );
-                        } else {
-                            messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
-                            break;
-                        }
-                    }
+                    messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
+                    break;
                 }
             }
             if( sampleB.isEmpty() || (sampleA.size() + sampleB.size()) != integerRep.length ) {
@@ -452,17 +448,17 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 svgCanvas.repaint();
             } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             } catch( BaySeq.SamplesNotValidException ex ) {
                 messages.setText( "Samples A and B must not be the same!" );
             } catch( GnuR.PackageNotLoadableException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             } catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
             } finally {
                 progressHandle.switchToDeterminate( 100 );
@@ -545,7 +541,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     public void itemStateChanged( ItemEvent e ) {
         BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
         if( item == BaySeqAnalysisHandler.Plot.Priors ||
-                 item == BaySeqAnalysisHandler.Plot.MACD ) {
+            item == BaySeqAnalysisHandler.Plot.MACD ) {
             samplesAList.setEnabled( false );
             samplesALabel.setEnabled( false );
             samplesBList.setEnabled( false );

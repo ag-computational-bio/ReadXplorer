@@ -40,15 +40,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -60,7 +59,7 @@ import static java.util.logging.Level.SEVERE;
 public class UpdateThread extends SwingWorker<Object, Object> implements
         Observer {
 
-    private static final Logger LOG = Logger.getLogger( UpdateThread.class.getSimpleName() );
+    private static final Logger LOG = LoggerFactory.getLogger( UpdateThread.class.getSimpleName() );
 
     private final InputOutput io;
     private final ProgressHandle ph;
@@ -153,7 +152,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
                             List<String> statsKeysToDelete = new ArrayList<>();
                             for( MappingClass mappingClass : MappingClass.values() ) {
-                                statsKeysToDelete.add( mappingClass.toString());
+                                statsKeysToDelete.add( mappingClass.toString() );
                                 statsKeysToDelete.add( mappingClass.toString() + StatsContainer.COVERAGE_STRING );
                             }
                             statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE + StatsContainer.COVERAGE_STRING );
@@ -167,12 +166,12 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
                             projectConnector.deleteSpecificTrackStatistics( statsKeysToDelete, trackJob.getID() );
                             projectConnector.storeTrackStatistics( statsContainer, trackJob.getID() );
                         } catch( DatabaseException ex ) {
-                            LOG.log( SEVERE, ex.getMessage(), ex );
+                            LOG.error( ex.getMessage(), ex );
                             noErrors = false;
                         }
                     }
                 } catch( ParsingException | OutOfMemoryError ex ) {
-                    LOG.log( SEVERE, ex.getMessage(), ex );
+                    LOG.error( ex.getMessage(), ex );
                     noErrors = false;
                 }
                 if( noErrors ) {

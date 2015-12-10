@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.write.Label;
@@ -40,20 +39,21 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.Thread.sleep;
-import static java.util.logging.Level.SEVERE;
 
 
 /**
- * Base Class for all Analysis Implementations.
- * Provides common objects and logic for all CLI analysis implementations.
+ * Base Class for all Analysis Implementations. Provides common objects and
+ * logic for all CLI analysis implementations.
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
 public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
-    private static final Logger LOG = Logger.getLogger( AnalysisCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisCallable.class.getName() );
 
     private static final String TABLE_DOUBLE = "DOUBLE";
     private static final String TABLE_FLOAT = "FLOAT";
@@ -72,7 +72,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
      * Super Constructor for all Analysis Implementations.
      *
      * @param verbosity is verbosity required?
-     * @param anaylsis type of analysis
+     * @param anaylsis  type of analysis
      */
     protected AnalysisCallable( boolean verbosity, CLIAnalyses anaylsis ) {
 
@@ -104,6 +104,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
             output.add( msg );
         }
 
+
         public List<String> getOutput() {
             return output;
         }
@@ -117,6 +118,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         protected void setResultFile( File resultFile ) {
             this.resultFile = resultFile;
         }
+
 
     }
 
@@ -138,7 +140,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
                 try {
                     sleep( 100 );
                 } catch( InterruptedException ie ) {
-                    LOG.log( SEVERE, ie.getMessage(), ie );
+                    LOG.error( ie.getMessage(), ie );
                 }
             }
 
@@ -152,9 +154,6 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
 
 
     }
-
-
-
 
 
     protected static final void writeFile( File file, List<String> sheetNames, List<List<String>> headers, List<List<List<Object>>> exportData ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {

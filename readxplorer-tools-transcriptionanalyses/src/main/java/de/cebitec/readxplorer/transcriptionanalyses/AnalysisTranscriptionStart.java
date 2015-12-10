@@ -44,10 +44,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -73,7 +71,7 @@ import static java.util.logging.Logger.getLogger;
 public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
 
-    private static final Logger LOG = getLogger( AnalysisTranscriptionStart.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisTranscriptionStart.class.getName() );
 
     private final TrackConnector trackConnector;
     private ReferenceConnector refConnector;
@@ -451,7 +449,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             feature.getType() == FeatureType.CDS &&
                             upstreamAnno.getType() == FeatureType.GENE &&
                             upstreamAnno.getStop() >= feature.getStop() ) {
-//                            LOG.log( Level.INFO, null, "CDS covered by gene feature Fwd");
+//                            LOG.info( null, "CDS covered by gene feature Fwd");
                             continue;
                         }
 
@@ -475,7 +473,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             chromFeatures.get( i + 1 ).getType() == FeatureType.GENE ) {
                             detectedFeatures.setDownstreamFeature( chromFeatures.get( i + 1 ) );
                             detectedFeatures.setIsLeaderless( isLeaderless( chromFeatures.get( i + 1 ), tssPos ) );
-//                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Fwd");
+//                            LOG.info( null, "Gene covers CDS with same annotated TSS Fwd");
 
                         } else {
                             detectedFeatures.setDownstreamFeature( feature );
@@ -521,7 +519,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             start == upstreamAnno.getStop() &&
                             upstreamAnno.getType() == FeatureType.GENE ) {
                             //TODO: this does not work if features start at the same position on rev and fwd strand!
-//                            LOG.log( Level.INFO, null, "CDS covered by gene feature Rev");
+//                            LOG.info( null, "CDS covered by gene feature Rev");
                             continue; // we want to keep the gene instead the CDS feature
                         }
 
@@ -541,7 +539,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             chromFeatures.get( i + 1 ).getType() == FeatureType.GENE &&
                             chromFeatures.get( i + 1 ).getStart() <= feature.getStart() ) {
                             detectedFeatures.setUpstreamFeature( chromFeatures.get( i + 1 ) );
-//                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Rev");
+//                            LOG.info( null, "Gene covers CDS with same annotated TSS Rev");
                         } else {
                             detectedFeatures.setUpstreamFeature( feature );
                         }
@@ -637,8 +635,8 @@ public class AnalysisTranscriptionStart implements Observer,
      * the threshold of more than 2 genes per 1KB genome size for the first time
      * for this track is calculated.<br>
      * In prokaryotic genomes gene density is approx 1 per 1kb and max 1,16 in
-     * Sulfolobus solfataricus according to I. B. Rogozin, et al., “Congruent
-     * evolution of different classes of non-coding DNA in prokaryotic genomes,”
+     * Sulfolobus solfataricus according to I. B. Rogozin, et al., "Congruent
+     * evolution of different classes of non-coding DNA in prokaryotic genomes",
      * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
      * <p>
      * In this case we allow for 2 genes per kb, because we use two
@@ -679,8 +677,8 @@ public class AnalysisTranscriptionStart implements Observer,
         /*
          * number of active genes in the current genome in prokaryotic genomes
          * gene density approx 1 per 1000bp, max 1,16 in Sulfolobus solfataricus
-         * according to I. B. Rogozin, et al., “Congruent evolution of different
-         * classes of non-coding DNA in prokaryotic genomes,” Nucleic Acids Res,
+         * according to I. B. Rogozin, et al., "Congruent evolution of different
+         * classes of non-coding DNA in prokaryotic genomes", Nucleic Acids Res,
          * vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
          */
         return distribution.getMinValueForIndex( selectedIndex );
@@ -734,8 +732,8 @@ public class AnalysisTranscriptionStart implements Observer,
     private void correctResult() {
 
         //estimate exact cutoff for readcount increase of 0,25%
-        LOG.log( Level.INFO, "old threshold read count: {0}", parametersTSS.getMinNoReadStarts() );
-        LOG.log( Level.INFO, "old threshold percent: {0}", parametersTSS.getMinPercentIncrease() );
+        LOG.info( "old threshold read count: {0}", parametersTSS.getMinNoReadStarts() );
+        LOG.info( "old threshold percent: {0}", parametersTSS.getMinPercentIncrease() );
         parametersTSS.setMinNoReadStarts( getNewThreshold( exactReadStartDist, 0 ) );//(int) (this.genomeSize * 0.0005));
         parametersTSS.setMinPercentIncrease( getNewThreshold( exactCovIncPercDist, 0 ) );//(int) (this.genomeSize * 0.0005));
 

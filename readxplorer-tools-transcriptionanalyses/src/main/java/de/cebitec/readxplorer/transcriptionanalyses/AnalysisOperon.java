@@ -38,9 +38,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,7 +49,7 @@ import static java.util.logging.Level.INFO;
  */
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
-    private static final Logger LOG = Logger.getLogger( AnalysisOperon.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisOperon.class.getName() );
 
     private final TrackConnector trackConnector;
     private final List<Operon> operonList; //final result list of OperonAdjacencies
@@ -164,7 +163,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      */
     public void finish() {
         Date currentTimestamp = new java.sql.Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Detecting operons", currentTimestamp );
+        LOG.info( "{0}: Detecting operons", currentTimestamp );
         this.findOperons();
     }
 
@@ -295,7 +294,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             } else if( feature2.getStart() - feature1.getStop() > averageReadLength &&
                        internalReads > operonDetParameters.getMinSpanningReads() ) {
                 //TODO: think about creating an operon
-                LOG.log( INFO, "found case {0}", ++count );
+                LOG.info( "found case {0}", ++count );
             }
         }
         if( !operonAdjacencies.isEmpty() ) {

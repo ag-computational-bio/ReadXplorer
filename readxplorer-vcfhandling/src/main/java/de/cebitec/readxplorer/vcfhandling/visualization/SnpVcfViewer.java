@@ -36,12 +36,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JSlider;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,7 +52,7 @@ import org.openide.util.NbPreferences;
 public class SnpVcfViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( SnpVcfViewer.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SnpVcfViewer.class.getName() );
 
     private List<VariantContext> snpVcfList;
 

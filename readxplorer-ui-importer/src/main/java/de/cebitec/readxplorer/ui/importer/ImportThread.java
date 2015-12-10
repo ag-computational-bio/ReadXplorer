@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -54,9 +53,8 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -67,7 +65,7 @@ import static java.util.logging.Level.SEVERE;
 public class ImportThread extends SwingWorker<Object, Object> implements
         Observer {
 
-    private static final Logger LOG = Logger.getLogger( ImportThread.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportThread.class.getName() );
 
     private final InputOutput io;
     private final List<ReferenceJob> referenceJobs;
@@ -105,7 +103,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
 
     private ParsedReference parseRefJob( ReferenceJob refGenJob ) throws ParsingException, OutOfMemoryError {
-        LOG.log( INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
 
         ReferenceParserI parser = refGenJob.getParser();
         parser.registerObserver( this );
@@ -113,7 +111,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         filter.addBlacklistRule( new FilterRuleSource() );
         ParsedReference refGenome = parser.parseReference( refGenJob, filter );
 
-        LOG.log( INFO, "Finished parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Finished parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
         return refGenome;
     }
 
@@ -128,13 +126,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * @throws StorageException
      */
     private void storeRefGenome( ParsedReference refGenome, ReferenceJob refGenJob ) throws DatabaseException {
-        LOG.log( INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
 
         int refGenID = ProjectConnector.getInstance().addRefGenome( refGenome );
         refGenJob.setPersistent( refGenID );
         refGenJob.setFile( refGenome.getFastaFile() );
 
-        LOG.log( INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
     }
 
 
@@ -167,14 +165,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         // if something went wrong, mark all dependent track jobs
                         io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                         this.noErrors = false;
-                        LOG.log( SEVERE, null, ex );
+                        LOG.error( null, ex );
                     }
 
                 } catch( ParsingException ex ) {
                     // if something went wrong, mark all dependent track jobs
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                     this.noErrors = false;
-                    LOG.log( INFO, null, ex );
+                    LOG.info( null, ex );
                 } catch( OutOfMemoryError ex ) {
                     io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
                 }

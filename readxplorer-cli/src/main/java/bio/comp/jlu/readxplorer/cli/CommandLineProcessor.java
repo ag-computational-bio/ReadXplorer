@@ -68,8 +68,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
@@ -84,15 +82,16 @@ import org.netbeans.spi.sendopts.Arg;
 import org.netbeans.spi.sendopts.ArgsProcessor;
 import org.netbeans.spi.sendopts.Description;
 import org.netbeans.spi.sendopts.Env;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.SNP;
 import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.TSS;
-import static java.util.logging.Level.SEVERE;
 
 
 /**
- * Entry Point of ReadXplorer's CLI Version.
- * The <code>CommandLineProcessor</code> is responsible of:
+ * Entry Point of ReadXplorer's CLI Version. The
+ * <code>CommandLineProcessor</code> is responsible of:
  * <ol>
  * <li>option and argument handling</li>
  * <li>orchestration of import and analysis threads</li>
@@ -113,7 +112,8 @@ import static java.util.logging.Level.SEVERE;
  * <li>--db {name}: name of newly created H2 database file</li>
  * <li>--props {file}: a customised property file</li>
  * <li>--threads {n}: enables multithreading with {n} worker threads</li>
- * <li>-p / --pairedend: files stored in -r/--reads dir are combined paired-end files</li>
+ * <li>-p / --pairedend: files stored in -r/--reads dir are combined paired-end
+ * files</li>
  * <li>-v / --verbose: enables verbose output</li>
  * <li>-h / --help: prints a usage to STD out</li>
  * </ul>
@@ -126,14 +126,9 @@ import static java.util.logging.Level.SEVERE;
  */
 public final class CommandLineProcessor implements ArgsProcessor {
 
-    private static final Logger LOG = Logger.getLogger( CommandLineProcessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommandLineProcessor.class.getName() );
     private static final String DEFAULT_DATABASE_NAME = "readxplorer-db";
     private static final String H2_FILE_SUFFIX = ".h2.db";
-
-
-    static {
-        LOG.setLevel( Level.ALL );
-    }
 
 
     private final java.util.Properties props;
@@ -164,7 +159,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     public String threadAmountArg;
 
     @Arg( longName = "db" )
-    @Description( shortDescription = "Set a database name to persistently store imported data (default: "+DEFAULT_DATABASE_NAME+"). ATTENTION! Existing databases will be deleted!" )
+    @Description( shortDescription = "Set a database name to persistently store imported data (default: " + DEFAULT_DATABASE_NAME + "). ATTENTION! Existing databases will be deleted!" )
     public String dbFileArg;
 
     @Arg( longName = "props" )
@@ -188,19 +183,19 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Analysis options
      */
     /**
-    @Arg( longName = "cvrg" )
-    @Description( shortDescription = "Perform coverage analyses on all tracks." )
-    public boolean cvrgAnalysis;
-
-    @Arg( longName = "opdt" )
-    @Description( shortDescription = "Perform operon detection analyses on all tracks." )
-    public boolean opdnAnalysis;
-
-    @Arg( longName = "rpkm" )
-    @Description( shortDescription = "Perform reads per kilobase of transcript per million (RPKM) analyses on all tracks." )
-    public boolean rpkmAnalysis;
-    */
-
+     * @Arg( longName = "cvrg" )
+     * @Description( shortDescription = "Perform coverage analyses on all
+     * tracks." ) public boolean cvrgAnalysis;
+     *
+     * @Arg( longName = "opdt" )
+     * @Description( shortDescription = "Perform operon detection analyses on
+     * all tracks." ) public boolean opdnAnalysis;
+     *
+     * @Arg( longName = "rpkm" )
+     * @Description( shortDescription = "Perform reads per kilobase of
+     * transcript per million (RPKM) analyses on all tracks." ) public boolean
+     * rpkmAnalysis;
+     */
     @Arg( longName = "snp" )
     @Description( shortDescription = "Perform single nucleotide polymorphism (SNP) analyses on all tracks." )
     public boolean snpAnalysis;
@@ -216,7 +211,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             props = loadProperties();
             defaultProps = loadDefaultProperties();
         } catch( IOException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
             throw ce;
@@ -240,16 +235,16 @@ public final class CommandLineProcessor implements ArgsProcessor {
         // print optional arguments...
         final PrintStream ps = env.getOutputStream();
         try {
-            String dbFilePath = (new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + (dbFileArg!=null?dbFileArg:DEFAULT_DATABASE_NAME) + H2_FILE_SUFFIX ))
+            String dbFilePath = (new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + (dbFileArg != null ? dbFileArg : DEFAULT_DATABASE_NAME) + H2_FILE_SUFFIX ))
                     .getCanonicalPath();
             printFine( ps, "\nrun parameters: " );
             printFine( ps, "\tverbosity: " + (verboseArg ? "on" : "off") );
-            printFine( ps, "\tpaired end: " + ((pairedEndArg  ||  pairedEndReadsDirArg!=null) ? "yes" : "no") );
+            printFine( ps, "\tpaired end: " + ((pairedEndArg || pairedEndReadsDirArg != null) ? "yes" : "no") );
             printFine( ps, "\tthreading: " + (threadAmountArg != null ? threadAmountArg : "1") );
             printFine( ps, "\tdb file: " + dbFilePath );
             printFine( ps, "\tproperty file: " + (propsFileArg != null ? propsFileArg : "default") );
         } catch( IOException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
             throw ce;
@@ -297,7 +292,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printInfo( ps, "reference genome:" );
         printFine( ps, "\tname: " + pr.getName() );
         String desc = pr.getDescription();
-        if( desc != null  &&  !desc.isEmpty() ) {
+        if( desc != null && !desc.isEmpty() ) {
             printFine( ps, "\tdescription: " + desc );
         }
         printFine( ps, "\tfasta file: " + pr.getFastaFile().getName() );
@@ -311,7 +306,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printFine( ps, null );
             printFine( ps, "disconnected from " + dbFileArg );
         } catch( Exception ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
             throw ce;
@@ -322,15 +317,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-
-
     private File getReferenceFile( final PrintStream ps ) throws CommandException {
 
         if( referenceArg != null ) {
 
             File referenceFile = new File( referenceArg );
             if( !referenceFile.canRead() ) {
-                throw new CommandException( 1, "Cannot access reference file ("+ referenceArg +")!" );
+                throw new CommandException( 1, "Cannot access reference file (" + referenceArg + ")!" );
             }
             printFine( ps, null );
             printFine( ps, "reference file to import: " + referenceFile.getName() );
@@ -353,7 +346,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             if( !readsDir.isDirectory() ) {
                 throw new CommandException( 1, readsDirArg + " is not a directory!" );
             }
-            if( !readsDir.canRead()) {
+            if( !readsDir.canRead() ) {
                 throw new CommandException( 1, "directory " + readsDirArg + " is not readable!" );
             }
 
@@ -362,12 +355,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
             Arrays.sort( readFiles );
 
             printFine( ps, null );
-            printFine( ps, "read files to import: ("+ readFiles.length +")" );
+            printFine( ps, "read files to import: (" + readFiles.length + ")" );
             for( int i = 0; i < readFiles.length; i++ ) {
 
                 File readFile = readFiles[i];
                 if( !readFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access read file " + (i+1) + '(' + readFile.getName() + ")!" );
+                    throw new CommandException( 1, "Cannot access read file " + (i + 1) + '(' + readFile.getName() + ")!" );
                 }
                 printFine( ps, "\t- " + readFile.getName() );
 
@@ -386,10 +379,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
         if( pairedEndArg ) {
             // paired end reads combined in 1 sam/bam file
             return null;
-        } else if( !pairedEndArg  &&  pairedEndReadsDirArg == null ) {
+        } else if( !pairedEndArg && pairedEndReadsDirArg == null ) {
             // single reads
             return null;
-        } else if( !pairedEndArg  &&  pairedEndReadsDirArg != null ) {
+        } else if( !pairedEndArg && pairedEndReadsDirArg != null ) {
             // paired end reads separated in 2 sam/bam files
 
             File pairedEndReadsDir = new File( pairedEndReadsDirArg );
@@ -397,7 +390,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             if( !pairedEndReadsDir.isDirectory() ) {
                 throw new CommandException( 1, pairedEndReadsDirArg + " is not a directory!" );
             }
-            if( !pairedEndReadsDir.canRead()) {
+            if( !pairedEndReadsDir.canRead() ) {
                 throw new CommandException( 1, "directory " + pairedEndReadsDirArg + " is not readable!" );
             }
 
@@ -410,12 +403,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
             }
 
             printFine( ps, null );
-            printFine( ps, "paired-end read files to import: ("+ pairedEndReadFiles.length +")" );
+            printFine( ps, "paired-end read files to import: (" + pairedEndReadFiles.length + ")" );
             for( int i = 0; i < pairedEndReadFiles.length; i++ ) {
 
                 File pairedEndReadFile = pairedEndReadFiles[i];
                 if( !pairedEndReadFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access paired-end file " + (i+1) + "(" + pairedEndReadFile.getName() + ")!" );
+                    throw new CommandException( 1, "Cannot access paired-end file " + (i + 1) + "(" + pairedEndReadFile.getName() + ")!" );
                 }
 
                 printFine( ps, "\t- " + pairedEndReadFile.getName() );
@@ -451,7 +444,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return pc;
 
         } catch( IOException | DatabaseException | SecurityException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             CommandException ce = new CommandException( 1 );
             ce.initCause( ex );
             throw ce;
@@ -471,7 +464,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             try {
                 noThreads = Integer.parseInt( threadAmountArg );
             } catch( NumberFormatException nfe ) {
-                LOG.log( SEVERE, nfe.getMessage(), nfe );
+                LOG.error( nfe.getMessage(), nfe );
                 CommandException ce = new CommandException( 1, "Threads argument not parsable as integer \"" + threadAmountArg + "\"!" );
                 ce.initCause( nfe );
                 throw ce;
@@ -483,8 +476,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
         return Executors.newFixedThreadPool( noThreads, new ReadXplorerCliThreadFactory() );
 
     }
-
-
 
 
     private ImportReferenceResult importReference( final File referenceFile, final ExecutorService es, final PrintStream ps ) throws CommandException {
@@ -509,9 +500,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return referenceResult;
 
         } catch( InterruptedException | ExecutionException | DatabaseException ex ) {
-            LOG.log( Level.SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of reference file failed:" );
-            printInfo( ps, "reason: "+ ex.getMessage() );
+            printInfo( ps, "reason: " + ex.getMessage() );
             CommandException ce = new CommandException( 1, "reference import failed!" );
             ce.initCause( ex );
             throw ce;
@@ -541,7 +532,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             latestTrackId++;
 
             futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
-            printFine( ps, "\t" + (i+1) + ": " + trackFile );
+            printFine( ps, "\t" + (i + 1) + ": " + trackFile );
 
         }
 
@@ -559,12 +550,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
                 // print result information
                 if( result.isSuccessful() ) {
-                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() );
+                    printInfo( ps, "\t" + (i + 1) + " " + result.getFileName() );
                     for( String msg : result.getOutput() ) {
                         printFine( ps, "\t\t" + msg );
                     }
                 } else {
-                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() + " crashed!" );
+                    printInfo( ps, "\t" + (i + 1) + " " + result.getFileName() + " crashed!" );
                     for( String msg : result.getOutput() ) {
                         printInfo( ps, "\t\t" + msg );
                     }
@@ -573,9 +564,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
             }
 
         } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of read file failed:" );
-            printInfo( ps, "reason: "+ ex.getMessage() );
+            printInfo( ps, "reason: " + ex.getMessage() );
             CommandException ce = new CommandException( 1, "track import failed!" );
             ce.initCause( ex );
             throw ce;
@@ -623,7 +614,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
             futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
-            printFine( ps, "\t" + (i+1) + ": " + trackFile );
+            printFine( ps, "\t" + (i + 1) + ": " + trackFile );
 
         }
 
@@ -645,12 +636,12 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
                 // print result information
                 if( result.isSuccessful() ) {
-                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() );
+                    printInfo( ps, "\t" + (i + 1) + " " + result.getFileName() );
                     for( String msg : result.getOutput() ) {
                         printFine( ps, "\t\t" + msg );
                     }
                 } else {
-                    printInfo( ps, "\t" + (i+1) + " " + result.getFileName() + " crashed!" );
+                    printInfo( ps, "\t" + (i + 1) + " " + result.getFileName() + " crashed!" );
                     for( String msg : result.getOutput() ) {
                         printInfo( ps, "\t\t" + msg );
                     }
@@ -659,9 +650,9 @@ public final class CommandLineProcessor implements ArgsProcessor {
             }
 
         } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of paired-end read file failed:" );
-            printInfo( ps, "reason: "+ ex.getMessage() );
+            printInfo( ps, "reason: " + ex.getMessage() );
             CommandException ce = new CommandException( 1, "track import failed!" );
             ce.initCause( ex );
             throw ce;
@@ -681,45 +672,39 @@ public final class CommandLineProcessor implements ArgsProcessor {
         final List<Future<AnalysisResult>> futures = new ArrayList<>();
 
         /**
-        if( cvrgAnalysis ) {
-            runAnalyses++;
-            printFine( ps, "\t"+ runAnalyses +": coverage analysis" );
-            CoverageAnalysisCallable cvrgAnalysisCallable = new CoverageAnalysisCallable( verboseArg );
-            futures.add( es.submit( cvrgAnalysisCallable ) );
-        }
-
-        if( opdnAnalysis ) {
-            runAnalyses++;
-            printFine( ps, "\t"+ runAnalyses +": operon detection analysis" );
-            OperonDetectionAnalysisCallable opdnAnalysisCallable = new OperonDetectionAnalysisCallable( verboseArg );
-            futures.add( es.submit( opdnAnalysisCallable ) );
-        }
-
-        if( rpkmAnalysis ) {
-            runAnalyses++;
-            printFine( ps, "\t"+ runAnalyses +": RPKM analysis" );
-            RPKMAnalysisCallable rpkmAnalysisCallable = new RPKMAnalysisCallable( verboseArg );
-            futures.add( es.submit( rpkmAnalysisCallable ) );
-        }
-        */
+         * if( cvrgAnalysis ) { runAnalyses++; printFine( ps, "\t"+ runAnalyses
+         * +": coverage analysis" ); CoverageAnalysisCallable
+         * cvrgAnalysisCallable = new CoverageAnalysisCallable( verboseArg );
+         * futures.add( es.submit( cvrgAnalysisCallable ) ); }
+         * <p>
+         * if( opdnAnalysis ) { runAnalyses++; printFine( ps, "\t"+ runAnalyses
+         * +": operon detection analysis" ); OperonDetectionAnalysisCallable
+         * opdnAnalysisCallable = new OperonDetectionAnalysisCallable(
+         * verboseArg ); futures.add( es.submit( opdnAnalysisCallable ) ); }
+         * <p>
+         * if( rpkmAnalysis ) { runAnalyses++; printFine( ps, "\t"+ runAnalyses
+         * +": RPKM analysis" ); RPKMAnalysisCallable rpkmAnalysisCallable = new
+         * RPKMAnalysisCallable( verboseArg ); futures.add( es.submit(
+         * rpkmAnalysisCallable ) ); }
+         */
 
         if( snpAnalysis ) {
             runAnalyses++;
-            printFine( ps, "\t"+ runAnalyses +": SNP analysis" );
+            printFine( ps, "\t" + runAnalyses + ": SNP analysis" );
 
             // create necessary parameter objects for all analyses
-            boolean useMainBases     = Boolean.parseBoolean( getProperty( SNPConstants.SNP_COUNT_MAIN_BASES ) );
-            byte minBaseQuality      = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_BASE_QUALITY ) );
-            byte minAvrBaseQuality   = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
-            byte minMappingQuality   = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_MAPPING_QUALITY ) );
-            int minVaryingBases      = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_MISMATCH_BASES ) );
+            boolean useMainBases = Boolean.parseBoolean( getProperty( SNPConstants.SNP_COUNT_MAIN_BASES ) );
+            byte minBaseQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_BASE_QUALITY ) );
+            byte minAvrBaseQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_AVERAGE_BASE_QUALITY ) );
+            byte minMappingQuality = Byte.parseByte( getProperty( SNPConstants.SNP_MIN_MAPPING_QUALITY ) );
+            int minVaryingBases = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_MISMATCH_BASES ) );
             int minAvrMappingQuality = Integer.parseInt( getProperty( SNPConstants.SNP_MIN_AVERAGE_MAPPING_QUALITY ) );
-            double minPercVariation  = Double.parseDouble( getProperty( SNPConstants.SNP_MIN_VARIATION ) );
-            Set<FeatureType> selFeatureTypes      = getSelectedFeatureTypes( getProperty( SNPConstants.SNP_FEATURE_TYPES ) );
+            double minPercVariation = Double.parseDouble( getProperty( SNPConstants.SNP_MIN_VARIATION ) );
+            Set<FeatureType> selFeatureTypes = getSelectedFeatureTypes( getProperty( SNPConstants.SNP_FEATURE_TYPES ) );
             ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( SNPConstants.SNP_MAPPING_CLASSES ), minMappingQuality, Strand.Feature );
 
             final ParameterSetSNPs parameterSet = new ParameterSetSNPs( minVaryingBases, minPercVariation, useMainBases, selFeatureTypes,
-                                                    readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
+                                                                        readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
 
             for( PersistentTrack persistentTrack : pc.getTracks() ) {
                 SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack, parameterSet );
@@ -731,27 +716,27 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         if( tssAnalysis ) {
             runAnalyses++;
-            printFine( ps, "\t"+ runAnalyses +": TSS analysis" );
+            printFine( ps, "\t" + runAnalyses + ": TSS analysis" );
 
-            boolean autoTssParamEstimation        = Boolean.parseBoolean( getProperty( TSSConstants.TSS_PARAMETER_ESTIMATION ) );
-            boolean associateTSS                  = Boolean.parseBoolean( getProperty( TSSConstants.TSS_ASSOCIATE ) );
-            boolean performUnannotatedTransDet    = Boolean.parseBoolean( getProperty( TSSConstants.TSS_UNANNOTATED_DETECTION ) );
-            byte minMappingQuality                = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
-            Strand strandUsage                    = Strand.fromType( Integer.parseInt( getProperty( TSSConstants.TSS_STRAND_USAGE ) ) );
+            boolean autoTssParamEstimation = Boolean.parseBoolean( getProperty( TSSConstants.TSS_PARAMETER_ESTIMATION ) );
+            boolean associateTSS = Boolean.parseBoolean( getProperty( TSSConstants.TSS_ASSOCIATE ) );
+            boolean performUnannotatedTransDet = Boolean.parseBoolean( getProperty( TSSConstants.TSS_UNANNOTATED_DETECTION ) );
+            byte minMappingQuality = Byte.parseByte( getProperty( TSSConstants.TSS_MIN_MAPPING_QUALITY ) );
+            Strand strandUsage = Strand.fromType( Integer.parseInt( getProperty( TSSConstants.TSS_STRAND_USAGE ) ) );
             ParametersReadClasses readClassParams = getParametersReadClasses( getProperty( TSSConstants.TSS_MAPPING_CLASSES ), minMappingQuality, strandUsage );
-                readClassParams.setStrandOption( Strand.BothForward );
-            int minIncreaseTotal                  = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_TOTAL ) );
-            int minIncreasePercent                = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_PERCENT ) );
-            int maxFeatureDistance                = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_FEATURE_DISTANCE ) );
-            int maxLeaderlessFeatureDistance      = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
-            int associateTssWindow                = Integer.parseInt( getProperty( TSSConstants.TSS_ASSOCIATE_WINDOW ) );
-            int maxLowCovInitCount                = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LOW_COVERAGE_INIT ) );
-            int minLowCovIncrease                 = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
-            int minTransExtensionCov              = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
+            readClassParams.setStrandOption( Strand.BothForward );
+            int minIncreaseTotal = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_TOTAL ) );
+            int minIncreasePercent = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_INCREASE_PERCENT ) );
+            int maxFeatureDistance = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_FEATURE_DISTANCE ) );
+            int maxLeaderlessFeatureDistance = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LEADERLESS_FEATURE_DISTANCE ) );
+            int associateTssWindow = Integer.parseInt( getProperty( TSSConstants.TSS_ASSOCIATE_WINDOW ) );
+            int maxLowCovInitCount = Integer.parseInt( getProperty( TSSConstants.TSS_MAX_LOW_COVERAGE_INIT ) );
+            int minLowCovIncrease = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_LOW_COVERAGE_INCREASE ) );
+            int minTransExtensionCov = Integer.parseInt( getProperty( TSSConstants.TSS_MIN_TRANSCRIPT_EXTENSION_COVERAGE ) );
 
-            final ParameterSetTSS parameterSet    = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
-                                                 minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,
-                                                 maxLeaderlessFeatureDistance, maxFeatureDistance, associateTSS, associateTssWindow, readClassParams );
+            final ParameterSetTSS parameterSet = new ParameterSetTSS( true, autoTssParamEstimation, performUnannotatedTransDet,
+                                                                      minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,
+                                                                      maxLeaderlessFeatureDistance, maxFeatureDistance, associateTSS, associateTssWindow, readClassParams );
 
             for( PersistentTrack persistentTrack : pc.getTracks() ) {
                 TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg, persistentTrack, parameterSet );
@@ -772,23 +757,23 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 AnalysisResult analysisResult = future.get();
                 File resultFile = analysisResult.getResultFile();
                 if( resultFile != null ) { // successful run
-                    printInfo( ps, "\t"+ (i+1) +" "+ analysisResult.getType() + "\tresult file: " + resultFile );
+                    printInfo( ps, "\t" + (i + 1) + " " + analysisResult.getType() + "\tresult file: " + resultFile );
                     for( String msg : analysisResult.getOutput() ) {
-                        printFine( ps, "\t\t"+msg );
+                        printFine( ps, "\t\t" + msg );
                     }
                 } else { // something went wrong during this analysis, other runs are not compromised
-                    printInfo( ps, "\t"+ (i+1) +" "+ analysisResult.getType() + " crashed:" );
+                    printInfo( ps, "\t" + (i + 1) + " " + analysisResult.getType() + " crashed:" );
                     for( String msg : analysisResult.getOutput() ) {
-                        printInfo( ps, "\t\t"+msg );
+                        printInfo( ps, "\t\t" + msg );
                     }
                 }
 
             }
 
         } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             printInfo( ps, "analysis failed:" );
-            printInfo( ps, "reason: "+ ex.getMessage() );
+            printInfo( ps, "reason: " + ex.getMessage() );
             CommandException ce = new CommandException( 1, "analysis failed!" );
             ce.initCause( ex );
             throw ce;
@@ -808,8 +793,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-
-
     private void printRuntime( long startTime, final PrintStream ps ) {
 
         long endTime = System.currentTimeMillis();
@@ -818,10 +801,10 @@ public final class CommandLineProcessor implements ArgsProcessor {
         int hours = runTime / (60 * 60 * 1000);
         runTime -= hours * 60 * 60 * 1000;
 
-        int mins  = runTime / (60 * 1000);
+        int mins = runTime / (60 * 1000);
         runTime -= mins * 60 * 1000;
 
-        int secs  = runTime / 1000;
+        int secs = runTime / 1000;
 
         printFine( ps, "total run time: " + hours + "h " + mins + "m " + secs + "s" );
 
@@ -831,7 +814,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private void printFine( final PrintStream ps, final String msg ) {
 
         if( msg != null ) {
-            LOG.fine( msg );
+            LOG.trace( msg );
         }
         if( verboseArg ) {
             ps.println( msg != null ? msg : "" );
@@ -850,8 +833,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
     }
-
-
 
 
     /**
@@ -938,15 +919,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
-
-
     private static void mergeAnlaysisFiles( final PrintStream ps, final String analysisType, final FileFilter fileFilter ) throws CommandException {
 
         try {
             File analysesFile = new File( analysisType + "-analyses.xls" );
             WritableWorkbook wwb = Workbook.createWorkbook( analysesFile );
             int idxSheet = 0;
-            for( File analysisFile : (new File(".")).getCanonicalFile().listFiles( fileFilter ) ) {
+            for( File analysisFile : (new File( "." )).getCanonicalFile().listFiles( fileFilter ) ) {
                 Workbook wb = Workbook.getWorkbook( analysisFile );
                 String analysisName = analysisFile.getName().replace( analysisType + "-", "" ).replace( ".xls", "" );
                 if( idxSheet == 0 ) { // copy analysis statistics
@@ -964,7 +943,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             printInfo( ps, "\t" + analysisType + ": " + analysesFile.getName() );
 
         } catch( IOException | BiffException | IndexOutOfBoundsException | WriteException ex ) {
-            LOG.log( SEVERE, "ERROR: merge " + analysisType + " analysis files: " + ex.getMessage(), ex );
+            LOG.error( "ERROR: merge " + analysisType + " analysis files: " + ex.getMessage(), ex );
             CommandException ce = new CommandException( 1, "merge of " + analysisType + " analysis files failed!" );
             ce.initCause( ex );
             throw ce;
@@ -1042,8 +1021,6 @@ public final class CommandLineProcessor implements ArgsProcessor {
         return new ParametersReadClasses( excludedFeatureTypes, minMappingQuality, strandUsage );
 
     }
-
-
 
 
     private static MappingParserI selectParser( final File trackFile ) {

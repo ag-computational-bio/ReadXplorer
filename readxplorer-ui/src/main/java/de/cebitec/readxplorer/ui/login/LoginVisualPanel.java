@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
@@ -32,9 +31,8 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,7 +40,7 @@ import static java.util.logging.Level.WARNING;
  */
 public final class LoginVisualPanel extends JPanel {
 
-    private static final Logger LOG = Logger.getLogger( LoginVisualPanel.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( LoginVisualPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -67,7 +65,7 @@ public final class LoginVisualPanel extends JPanel {
 
     private void setLoginData() {
         Preferences prefs = Preferences.userNodeForPackage( LoginProperties.class );
-        defaultDb = prefs.get(LoginProperties.LOGIN_DATABASE, null );
+        defaultDb = prefs.get( LoginProperties.LOGIN_DATABASE, null );
     }
 
 
@@ -94,11 +92,11 @@ public final class LoginVisualPanel extends JPanel {
     private void saveLoginData( Map<String, String> loginData ) {
         Preferences prefs = Preferences.userNodeForPackage( LoginVisualPanel.class );
 
-        prefs.put(LoginProperties.LOGIN_DATABASE, saveDataCheckBox.isSelected() ? loginData.get( LoginWizardPanel.PROP_DATABASE ) : "" );
+        prefs.put( LoginProperties.LOGIN_DATABASE, saveDataCheckBox.isSelected() ? loginData.get( LoginWizardPanel.PROP_DATABASE ) : "" );
         try {
             prefs.flush();
         } catch( BackingStoreException ex ) {
-            LOG.log( SEVERE, null, ex );
+            LOG.error( null, ex );
         }
 
     }
@@ -183,7 +181,7 @@ public final class LoginVisualPanel extends JPanel {
                 try { //store current directory
                     NbPreferences.forModule( Object.class ).put( Paths.READXPLORER_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
                 } catch( IOException ex ) {
-                    LOG.log( WARNING, Paths.READXPLORER_DATABASE_DIRECTORY + " could not be stored" );
+                    LOG.warn( Paths.READXPLORER_DATABASE_DIRECTORY + " could not be stored" );
                 }
                 databaseField.setText( fileLocation );
             }
@@ -193,7 +191,7 @@ public final class LoginVisualPanel extends JPanel {
         fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Paths.READXPLORER_DATABASE_DIRECTORY, null ) );
 
         Preferences prefs2 = Preferences.userNodeForPackage( LoginVisualPanel.class );
-        String path = prefs2.get(LoginProperties.LOGIN_DATABASE, null );
+        String path = prefs2.get( LoginProperties.LOGIN_DATABASE, null );
         if( path != null ) {
             fileChooser.setCurrentDirectory( new File( path ) );
         }

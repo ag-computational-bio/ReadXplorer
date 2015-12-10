@@ -37,8 +37,8 @@ import htsjdk.samtools.util.RuntimeIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  */
 public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
-    private static final Logger LOG = Logger.getLogger( AnalysisSNPs.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisSNPs.class.getName() );
 
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
@@ -172,7 +172,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         char base;
         for( Difference diff : diffs ) {
             if( diff.getPosition() >= coverage.getLeftBound() && diff.getPosition() < coverage.getRightBound() &&
-                     (diff.getBaseQuality() > analysisParams.getMinBaseQuality() || diff.getBaseQuality() == -1) ) {
+                (diff.getBaseQuality() > analysisParams.getMinBaseQuality() || diff.getBaseQuality() == -1) ) {
                 base = diff.isForwardStrand() ? diff.getBase() : SequenceUtils.getDnaComplement( diff.getBase() );
                 int baseIdx = this.getBaseInt( base );
                 int pos = diff.getPosition() - coverage.getLeftBound();
@@ -183,7 +183,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                     hasBaseQualities = false;
                 }
                 if( diff.getMappingQuality() != SamBamFileReader.UNKNOWN_MAP_QUAL ||
-                         diff.getMappingQuality() != SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL ) {
+                    diff.getMappingQuality() != SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL ) {
                     baseArray[pos][baseIdx][MAP_QUAL_IDX] += diff.getMappingQuality();
                 } else {
                     hasMappingQualities = false; //TODO: check before analysis for a track, if it supports base and mapping qualities - could lead to errors when stored in DB or takes a while
@@ -193,7 +193,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
         for( ReferenceGap gap : gaps ) {
             if( gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound() &&
-                     (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality()) ) {
+                (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality()) ) {
                 int relativeGapPos = gap.getPosition() - coverage.getLeftBound();
                 if( gapCounts[relativeGapPos] == null ) {
                     gapCounts[relativeGapPos] = new GapCount();
@@ -203,7 +203,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                     hasBaseQualities = false;
                 }
                 if( gap.getMappingQuality() == SamBamFileReader.UNKNOWN_MAP_QUAL ||
-                         gap.getMappingQuality() == SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL ) {
+                    gap.getMappingQuality() == SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL ) {
                     hasMappingQualities = false;
                 }
             }
@@ -233,18 +233,18 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 }
 
                 if( maxCount > 0 && !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases() ||
-                         analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases() ) {
+                    analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases() ) {
 
                     int averageBaseQual = baseCounts[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
                     int averageMappingQual = baseCounts[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
 
                     if( (!this.hasBaseQualities || averageBaseQual >= analysisParams.getMinAverageBaseQual()) &&
-                             (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual()) ) {
+                        (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual()) ) {
 
                         int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                         if( cov == 0 ) {
                             ++cov;
-                            LOG.log( Level.SEVERE, "found uncovered position in diffs: {0}", absPos );
+                            LOG.error( "found uncovered position in diffs: {0}", absPos );
                         }
                         double frequency = (diffCount * 100.0) / cov;
 
@@ -307,18 +307,18 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                         }
 
                         if( !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases() ||
-                                 analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases() ) {
+                            analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases() ) {
 
                             int averageBaseQual = gapCountArray[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
                             int averageMappingQual = gapCountArray[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
 
                             if( (!this.hasBaseQualities || averageBaseQual >= analysisParams.getMinAverageBaseQual()) &&
-                                     (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual()) ) {
+                                (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual()) ) {
 
                                 int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                                 if( cov == 0 ) {
                                     ++cov;
-                                    LOG.log( Level.SEVERE, "found uncovered position in gaps: {0}", absPos );
+                                    LOG.error( "found uncovered position in gaps: {0}", absPos );
                                 }
                                 double frequency = (diffCount * 100.0) / cov;
 
@@ -350,7 +350,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 }
             }
         } catch( RuntimeIOException e ) {
-            LOG.log( Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackFile() );
+            LOG.error( "Could not read data from track file: {0}", trackConnector.getTrackFile() );
         }
     }
 
@@ -369,8 +369,8 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         } else if( typeInt == 5 ) {
             type = SequenceComparison.DELETION;
         } else {
-            LOG.log( Level.SEVERE, "found unknown diff type" );
-}
+            LOG.error( "found unknown diff type" );
+        }
 
         return type;
 
@@ -406,7 +406,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 base = '-';
                 break;
             default:
-                LOG.log( Level.SEVERE, "found unknown snp type" );
+                LOG.error( "found unknown snp type" );
         }
 
         return base;
@@ -441,7 +441,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 baseInt = BASE_GAP;
                 break;
             default:
-                LOG.severe( "Analysis SNPs: Encountered unknown nucleotide character!" );
+                LOG.error( "Analysis SNPs: Encountered unknown nucleotide character!" );
         }
 
         return baseInt;

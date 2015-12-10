@@ -23,10 +23,8 @@ import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -38,7 +36,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public class MappingThreadAnalyses extends MappingThread {
 
-    private static final Logger LOG = getLogger( MappingThreadAnalyses.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MappingThreadAnalyses.class.getName() );
 
 
     /**
@@ -74,7 +72,7 @@ public class MappingThreadAnalyses extends MappingThread {
                 try {
                     Thread.sleep( 10 );
                 } catch( InterruptedException ex ) {
-                    LOG.log( SEVERE, null, ex );
+                    LOG.error( null, ex );
                 }
             }
 
