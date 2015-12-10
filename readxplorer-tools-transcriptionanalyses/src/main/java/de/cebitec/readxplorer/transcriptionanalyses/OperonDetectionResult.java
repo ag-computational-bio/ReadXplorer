@@ -143,12 +143,12 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
                 readsAnno2 += opAdj.getReadsFeature2() + "\n";
                 internalReads += opAdj.getInternalReads() + "\n";
                 spanningReads += opAdj.getSpanningReads() + "\n";
-                anno1Locus += opAdj.getFeature1().getLocus();
-                anno1Product += opAdj.getFeature1().getProduct();
-                anno1EcNumber += opAdj.getFeature1().getEcNumber();
-                anno2Locus += opAdj.getFeature2().getLocus();
-                anno2Product += opAdj.getFeature2().getProduct();
-                anno2EcNumber += opAdj.getFeature2().getEcNumber();
+                anno1Locus += opAdj.getFeature1().getLocus() + "\n";
+                anno1Product += opAdj.getFeature1().getProduct() + "\n";
+                anno1EcNumber += opAdj.getFeature1().getEcNumber() + "\n";
+                anno2Locus += opAdj.getFeature2().getLocus() + "\n";
+                anno2Product += opAdj.getFeature2().getProduct() + "\n";
+                anno2EcNumber += opAdj.getFeature2().getEcNumber() + "\n";
 
             }
             List<Object> operonsRow = new ArrayList<>();
