@@ -196,7 +196,6 @@ public final class OpenSnpDetectionAction implements ActionListener,
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 } catch( DatabaseException e ) {
-                    LOG.error( e.getMessage(), e );
                     ErrorHelper.getHandler().handle( e );
                 }
             }
@@ -208,7 +207,6 @@ public final class OpenSnpDetectionAction implements ActionListener,
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             } catch( DatabaseException e ) {
-                LOG.error( e.getMessage(), e );
                 ErrorHelper.getHandler().handle( e );
             }
         }

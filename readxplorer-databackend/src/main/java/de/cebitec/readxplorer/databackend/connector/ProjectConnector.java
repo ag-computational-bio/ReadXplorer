@@ -846,7 +846,8 @@ public final class ProjectConnector implements Observable {
      * @param distribution the count distribution to store
      * @param trackId      track id of this track
      *
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
     public void insertCountDistribution( DiscreteCountingDistribution distribution, final int trackId ) throws DatabaseException {
 
@@ -935,7 +936,8 @@ public final class ProjectConnector implements Observable {
      * @return The track connector for the given track
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     public TrackConnector getTrackConnector( PersistentTrack track ) throws FileNotFoundException, DatabaseException {
 
@@ -958,7 +960,8 @@ public final class ProjectConnector implements Observable {
      * @return The track connector for the given tracks
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws FileNotFoundException, DatabaseException {
 
@@ -980,7 +983,8 @@ public final class ProjectConnector implements Observable {
      * @return The multi track connector for the given track
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     public MultiTrackConnector getMultiTrackConnector( PersistentTrack track ) throws FileNotFoundException, DatabaseException {
 
@@ -1000,7 +1004,8 @@ public final class ProjectConnector implements Observable {
      * @return The track connector for the given tracks
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     public MultiTrackConnector getMultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException, DatabaseException {
 
@@ -1070,6 +1075,7 @@ public final class ProjectConnector implements Observable {
             LOG.error( "reading reference genome data failed! rolled back!", ex );
             ErrorHelper.getHandler().handle( ex, "Reading reference genome data failed!" );
         } catch( DatabaseException ex ) {
+            LOG.error( ex.getMessage(), ex );
             ErrorHelper.getHandler().handle( ex );
         }
 
@@ -1083,7 +1089,8 @@ public final class ProjectConnector implements Observable {
      * @param fastaFile fasta file to reset for the current reference.
      * @param ref       The reference genome, whose file shall be updated
      * <p>
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
     public void resetReferencePath( final File fastaFile, final PersistentReference ref ) throws DatabaseException {
 
@@ -1278,7 +1285,8 @@ public final class ProjectConnector implements Observable {
      * @return the latest track id used in the database + 1 = the next id to
      *         use.
      *
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
     public int getLatestTrackId() throws DatabaseException {
 
@@ -1296,7 +1304,8 @@ public final class ProjectConnector implements Observable {
      * <p>
      * @param track track whose file path has to be resetted.
      * <p>
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
     public void resetTrackPath( final PersistentTrack track ) throws DatabaseException {
 
@@ -1310,6 +1319,7 @@ public final class ProjectConnector implements Observable {
             LOG.info( "Track " + track.getDescription() + " has been updated successfully" );
 
         } catch( SQLException ex ) {
+            LOG.error( ex.getMessage(), ex );
             rollback( ex, con, "An error occurred during storage of the new file path! Please try again!" );
         }
     }

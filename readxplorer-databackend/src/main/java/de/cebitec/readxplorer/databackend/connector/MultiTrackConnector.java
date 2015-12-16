@@ -37,7 +37,8 @@ public class MultiTrackConnector extends TrackConnector {
      * @param track the single initial track for which this connector is created
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     MultiTrackConnector( PersistentTrack track ) throws FileNotFoundException, DatabaseException {
         super( track );
@@ -55,7 +56,8 @@ public class MultiTrackConnector extends TrackConnector {
      *                      false if it should be kept separated
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     MultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException, DatabaseException {
         super( 9999, tracks, false );

@@ -317,7 +317,6 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             return null;
         } catch( DatabaseException e ) {
-            LOG.error( e.getMessage(), e );
             ErrorHelper.getHandler().handle( e );
             return null;
         }
@@ -748,7 +747,6 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 return null; //cannot occur, since both tracks are already open in the thumbnail viewer
             } catch( DatabaseException e ) {
-                LOG.error( e.getMessage(), e );
                 ErrorHelper.getHandler().handle( e );
                 return null;
             }

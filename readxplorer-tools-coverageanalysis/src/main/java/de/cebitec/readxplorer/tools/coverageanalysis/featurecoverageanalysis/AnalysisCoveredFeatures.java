@@ -21,7 +21,6 @@ package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
-import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -60,11 +59,8 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * @param trackConnector            the track connector for which the
      *                                  analyses should be carried out
      * @param featureCoverageParameters All parameters needed for the analysis.
-     *
-     * @throws DatabaseException An exception during data queries
      */
-    public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters )
-            throws DatabaseException {
+    public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters ) {
         this.trackConnector = trackConnector;
         this.analysisParams = featureCoverageParameters;
         this.detectedFeatures = new ArrayList<>();
@@ -79,10 +75,8 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
     /**
      * Initializes the initial data structures needed for filtering features by
      * read count.
-     *
-     * @throws DatabaseException An exception during data queries
      */
-    private void initDatastructures() throws DatabaseException {
+    private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackConnector.getRefGenome().getId() );
         for( PersistentChromosome chrom : refConnector.getChromosomesForGenome().values() ) {
             this.genomeFeatures.addAll( refConnector.getFeaturesForRegionInclParents( 0, chrom.getLength(),

@@ -197,7 +197,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                     interrupt();
                     return;
                 } catch( DatabaseException e ) {
-                    LOG.error( e.getMessage(), e );
                     processingLog.addProperty( "Unresolved track", currentTrack );
                     notifyObservers( AnalysisStatus.ERROR );
                     interrupt();

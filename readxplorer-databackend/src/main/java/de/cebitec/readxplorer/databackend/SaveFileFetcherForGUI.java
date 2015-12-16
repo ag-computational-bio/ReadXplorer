@@ -87,7 +87,8 @@ public class SaveFileFetcherForGUI {
      * @throws UserCanceledTrackPathUpdateException if the no track path could
      *                                              be resolved.
      * @throws DatabaseException                    An exception during data
-     *                                              queries
+     *                                              queries. It has already been
+     *                                              logged.
      */
     public TrackConnector getTrackConnector( PersistentTrack track ) throws UserCanceledTrackPathUpdateException, DatabaseException {
         TrackConnector tc = null;
@@ -128,7 +129,8 @@ public class SaveFileFetcherForGUI {
      * @throws UserCanceledTrackPathUpdateException if the no track path could
      *                                              be resolved.
      * @throws DatabaseException                    An exception during data
-     *                                              queries
+     *                                              queries. It has already been
+     *                                              logged.
      */
     public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws UserCanceledTrackPathUpdateException, DatabaseException {
         TrackConnector tc = null;
@@ -263,17 +265,20 @@ public class SaveFileFetcherForGUI {
                         try {
                             TrackConnector trackConnector = CONNECTOR.getTrackConnector( newTrack );
                         } catch( FileNotFoundException ex ) {
+                            LOG.error( ex.getMessage(), ex );
                             ErrorHelper.getHandler().handle( new FileNotFoundException( MSG_FileReset() ), TITLE_FileReset() );
                         }
                     } catch( DatabaseException ex ) {
                         ErrorHelper.getHandler().handle( ex, TITLE_FileReset() );
                     }
                 } else if( !selectedFile.getName().endsWith( ".bam" ) ) {
+                    LOG.warn( MSG_WrongTrackFileChosen() );
                     ErrorHelper.getHandler().handle( new IllegalArgumentException( MSG_WrongTrackFileChosen() ), TITLE_FileReset() );
                     this.openResetFilePathDialog( track );
                 }
             }
         } else {
+            LOG.warn( MSG_FileReset() );
             ErrorHelper.getHandler().handle( new FileException( MSG_FileReset(), null ), TITLE_FileReset() );
         }
         return newTrack;
@@ -293,7 +298,8 @@ public class SaveFileFetcherForGUI {
      *                                              be resolved.
      *
      * @throws DatabaseException                    An exception during data
-     *                                              queries
+     *                                              queries. It has already been
+     *                                              logged.
      */
     public MultiTrackConnector getMultiTrackConnector( PersistentTrack track ) throws UserCanceledTrackPathUpdateException, DatabaseException {
         MultiTrackConnector mtc = null;
@@ -329,7 +335,8 @@ public class SaveFileFetcherForGUI {
      * @throws UserCanceledTrackPathUpdateException if the no track path could
      *                                              be resolved.
      * @throws DatabaseException                    An exception during data
-     *                                              queries
+     *                                              queries. It has already been
+     *                                              logged.
      */
     public MultiTrackConnector getMultiTrackConnector( List<PersistentTrack> tracks ) throws UserCanceledTrackPathUpdateException, DatabaseException {
         MultiTrackConnector mtc = null;
@@ -471,7 +478,6 @@ public class SaveFileFetcherForGUI {
                 CONNECTOR.resetReferencePath( newFile, ref );
             } catch( DatabaseException ex ) {
                 ErrorHelper.getHandler().handle( ex, TITLE_FileReset() );
-                LOG.error( ex.getMessage(), ex );
             }
         } else {
             ErrorHelper.getHandler().handle( new FileException( MSG_FileReset(), null ), TITLE_FileReset() );

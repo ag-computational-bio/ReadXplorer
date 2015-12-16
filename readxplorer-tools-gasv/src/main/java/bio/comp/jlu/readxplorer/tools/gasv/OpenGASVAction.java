@@ -194,7 +194,6 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 } catch( DatabaseException e ) {
-                    LOG.error( e.getMessage(), e );
                     ErrorHelper.getHandler().handle( e );
                     continue;
                 }

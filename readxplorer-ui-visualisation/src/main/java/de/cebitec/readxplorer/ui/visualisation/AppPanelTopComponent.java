@@ -527,6 +527,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
         try {
             super.paint( g );
         } catch( OutOfMemoryError e ) {
+            LOG.error( e.getMessage(), e );
             VisualisationUtils.displayOutOfMemoryError();
         }
     }

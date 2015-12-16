@@ -178,7 +178,6 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 } catch( DatabaseException e ) {
-                    LOG.error( e.getMessage(), e );
                     ErrorHelper.getHandler().handle( e );
                 }
             }
@@ -190,7 +189,6 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             } catch( DatabaseException e ) {
-                LOG.error( e.getMessage(), e );
                 ErrorHelper.getHandler().handle( e );
             }
         }
@@ -205,7 +203,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
      */
     private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassesParams ) {
         AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler( this,
-                                                                              NbBundle.getMessage( OpenCoverageAnalysisAction.class, "MSG_AnalysesWorker.progress.name" ), readClassesParams );
+                                                                              NbBundle.getMessage( OpenCoverageAnalysisAction.class, "MSG_AnalysesWorker.progress.name" ),
+                                                                              readClassesParams );
 
         AnalysisCoverage analysisCoverage = new AnalysisCoverage( connector, parameters );
         covAnalysisHandler.registerObserver( analysisCoverage );

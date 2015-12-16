@@ -157,7 +157,6 @@ public class PersistentReference implements Observable {
         } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
             String msg = "If the missing fasta file is not replaced, the reference cannot be shown and analyses for this reference cannot be run.";
             ErrorHelper.getHandler().handle( new FileException( msg, ex ), "Sequence missing error" );
-            LOG.error( msg, ex );
         }
     }
 

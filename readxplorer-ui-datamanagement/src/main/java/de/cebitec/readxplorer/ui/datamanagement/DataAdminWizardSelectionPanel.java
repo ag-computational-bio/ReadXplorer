@@ -34,10 +34,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.openide.WizardDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPanel {
 
+    private static final Logger LOG = LoggerFactory.getLogger( DataAdminWizardSelectionPanel.class.getName() );
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -114,6 +117,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
             }
 
         } catch( OutOfMemoryError e ) {
+            LOG.error( e.getMessage(), e );
             VisualisationUtils.displayOutOfMemoryError();
         }
 

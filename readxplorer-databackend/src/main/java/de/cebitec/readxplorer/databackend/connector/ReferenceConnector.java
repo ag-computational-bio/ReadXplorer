@@ -76,7 +76,8 @@ public class ReferenceConnector {
      *         this connector. If it was called once, it is kept in memory and
      *         does not need to be fetched from the DB again.
      *
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
     public PersistentReference getRefGenome() throws DatabaseException {
 
@@ -143,7 +144,9 @@ public class ReferenceConnector {
      * <p>
      * @return One chromosome of this reference without its sequence.
      *
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. An exception
+     *                           during data queries. It has already been
+     *                           logged.
      */
     public PersistentChromosome getChromosomeForGenome( final int chromId ) throws DatabaseException {
 
@@ -159,6 +162,7 @@ public class ReferenceConnector {
                     String name = rs.getString( FieldNames.CHROM_NAME );
                     return new PersistentChromosome( chromId, chromNumber, refId, name, chromLength );
                 } else {
+                    LOG.error( "Could not find chromosome in database!" );
                     throw new DatabaseException( "Could not find chromosome in database!", new RuntimeException() );
                 }
             }

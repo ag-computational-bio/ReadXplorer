@@ -75,7 +75,8 @@ public class TrackConnector {
      * @param track the track for which this connector is created
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException, DatabaseException {
 
@@ -97,7 +98,8 @@ public class TrackConnector {
      *                      false if it should be kept separated
      * <p>
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     protected TrackConnector( final int id, final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException, DatabaseException {
 
@@ -118,7 +120,8 @@ public class TrackConnector {
      *                      false if it should be kept separated
      *
      * @throws FileNotFoundException
-     * @throws DatabaseException     An exception during data queries
+     * @throws DatabaseException     An exception during data queries. It has
+     *                               already been logged.
      */
     private void initTrackConnector( final int trackId, final boolean combineTracks ) throws FileNotFoundException, DatabaseException {
 
@@ -441,7 +444,7 @@ public class TrackConnector {
                     while( rs.next() ) {
                         int count = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
                         int intervalId = rs.getInt( FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID );
-                        countDistribution.setCountForIndex( intervalId, 
+                        countDistribution.setCountForIndex( intervalId,
                                                             countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
                     }
                 }

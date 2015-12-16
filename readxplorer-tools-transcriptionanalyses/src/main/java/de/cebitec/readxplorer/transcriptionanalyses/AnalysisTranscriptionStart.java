@@ -718,7 +718,8 @@ public class AnalysisTranscriptionStart implements Observer,
      * corrects the result list with the new estimated parameters, if the
      * tssAutomatic was chosen.
      *
-     * @throws DatabaseException An exception during data queries
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
     private void storeDistributions() throws DatabaseException {
         if( this.calcCoverageDistributions && this.trackConnector.getAssociatedTrackNames().size() == 1 ) {

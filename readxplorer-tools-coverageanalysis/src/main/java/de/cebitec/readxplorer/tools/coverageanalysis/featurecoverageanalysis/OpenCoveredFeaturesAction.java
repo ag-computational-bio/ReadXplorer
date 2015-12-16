@@ -197,7 +197,6 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 } catch( DatabaseException e ) {
-                    LOG.error( e.getMessage(), e );
                     ErrorHelper.getHandler().handle( e );
                 }
             }
@@ -209,7 +208,6 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             } catch( DatabaseException e ) {
-                LOG.error( e.getMessage(), e );
                 ErrorHelper.getHandler().handle( e );
             }
         }
@@ -223,7 +221,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
      * @param readClassesParams the read class parameters
      */
     @Messages( "MSG_AnalysesWorker.progress.name=Running Feature Coverage Analysis..." )
-    private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassesParams ) throws DatabaseException {
+    private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassesParams ) {
 
         AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler( this, //every track has its own analysis handlers
                                                                               MSG_AnalysesWorker_progress_name(),

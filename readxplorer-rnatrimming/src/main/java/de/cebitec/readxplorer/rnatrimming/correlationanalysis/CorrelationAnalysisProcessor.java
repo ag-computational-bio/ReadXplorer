@@ -108,7 +108,6 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 continue;
             } catch( DatabaseException ex ) {
-                LOG.error( ex.getMessage(), ex );
                 ErrorHelper.getHandler().handle( ex );
                 continue;
             }

@@ -312,6 +312,7 @@ public class CoverageThread extends RequestThread {
                 }
             }
         } catch( OutOfMemoryError e ) {
+            LOG.error( e.getMessage(), e );
             VisualisationUtils.displayOutOfMemoryError();
             this.interrupt();
         }

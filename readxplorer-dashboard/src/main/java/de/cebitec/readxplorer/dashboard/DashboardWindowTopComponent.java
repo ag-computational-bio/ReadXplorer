@@ -577,7 +577,6 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
                 //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
             } catch( DatabaseException ex ) {
-                LOG.error( ex.getMessage(), ex );
                 ErrorHelper.getHandler().handle( ex );
             }
         }
