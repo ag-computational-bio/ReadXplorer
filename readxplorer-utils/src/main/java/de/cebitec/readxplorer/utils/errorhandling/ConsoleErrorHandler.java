@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.utils.errorhandling;
 
 import de.cebitec.readxplorer.api.ErrorHandler;
 import java.io.PrintStream;
+import org.openide.LifecycleManager;
 
 
 /**
@@ -63,7 +64,12 @@ public class ConsoleErrorHandler implements ErrorHandler {
      * Appropriately handles a throwable. This includes showing the Throwable
      * message to the user. The header is useful to display additional
      * information in the line above the Throwable message. By default, the
-     * Throwable type is printed in that line.
+     * Throwable type is printed in that line.<br>
+     * This implementation also closes the Netbeans platform, because the
+     * command line version cannot continue or recover from severe errors.
+     * Therefore, the method should only be used for severe errors. The only
+     * exception is to use this method with a <code>null</code> throwable. In
+     * this case, the software is allowed to continue.
      *
      * @param t      Throwable to handle
      * @param header Header for displaying different information in the line
@@ -78,6 +84,10 @@ public class ConsoleErrorHandler implements ErrorHandler {
         } else {
             System.out.println( header );
             System.out.println( msg );
+        }
+        if( t != null ) {
+            //exit the whole netbeans platform - the command line version cannot continue or recover from severe errors
+            LifecycleManager.getDefault().exit( 1 );
         }
     }
 
