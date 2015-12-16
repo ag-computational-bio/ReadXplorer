@@ -146,7 +146,7 @@ public class PersistentReference implements Observable {
             }
             try {
                 this.getChromSequence( activeChromID, 1, 1 );
-            } catch( NullPointerException e ) {
+            } catch( SAMException | NullPointerException e ) {
                 if( e.getMessage() != null && e.getMessage().contains( "Unable to find entry for contig" ) ) {
                     String msg = "The fasta file \n" + fastaFile.getAbsolutePath() +
                                  "\ndoes not contain the expected sequence:\n" + e.getMessage();
