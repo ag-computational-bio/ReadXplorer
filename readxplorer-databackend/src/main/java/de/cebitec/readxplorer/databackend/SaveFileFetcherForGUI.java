@@ -406,13 +406,14 @@ public class SaveFileFetcherForGUI {
                     }
                 } catch( SAMException | NullPointerException e ) {
                     try {
+                        LOG.info( "Reference fasta index " + ref.getName() + " corrupted. Will be recreated..." );
                         indexedRefFile.close();
                         fastaUtils.deleteIndexFile( fastaFile );
                         fastaUtils.recreateMissingIndex( fastaFile );
                     } catch( IOException ex ) {
                         String msg = fastaFile.getAbsolutePath() + "Unable to delete erroneous fasta index file. " +
                                      "Please delete it manually and restart ReadXplorer.";
-                        LOG.error( msg );
+                        LOG.error( msg, ex );
                         ErrorHelper.getHandler().handle( new IOException( msg ) );
                     }
                 }
@@ -463,15 +464,18 @@ public class SaveFileFetcherForGUI {
                 try {
                     newFastaFile = new IndexedFastaSequenceFile( newFile );
                 } catch( FileNotFoundException ex ) { // we know the file exists, so only the index can be missing
+                    LOG.info( "Reference fasta index " + ref.getName() + " missing. Will be recreated..." );
                     FastaUtils fastaUtils = new FastaUtils();  //TODO observers are empty, add observers!
                     fastaUtils.recreateMissingIndex( newFile );
                 }
                 CONNECTOR.resetReferencePath( newFile, ref );
             } catch( DatabaseException ex ) {
                 ErrorHelper.getHandler().handle( ex, TITLE_FileReset() );
+                LOG.error( ex.getMessage(), ex );
             }
         } else {
             ErrorHelper.getHandler().handle( new FileException( MSG_FileReset(), null ), TITLE_FileReset() );
+            LOG.error( MSG_FileReset() );
         }
 
         return newFastaFile;
@@ -519,10 +523,12 @@ public class SaveFileFetcherForGUI {
                     msg = MSG_WrongFileChosen( "correct" );
                 }
                 ErrorHelper.getHandler().handle( new IllegalArgumentException( msg ), TITLE_FileReset() );
+                LOG.warn( msg );
                 newFile = this.openResetFilePathDialog( oldFile, fileEndings );
             }
         } else {
             ErrorHelper.getHandler().handle( new FileException( MSG_FileReset(), null ), TITLE_FileReset() );
+            LOG.error( MSG_FileReset() );
         }
         return newFile;
     }

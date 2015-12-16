@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
+import htsjdk.samtools.SAMException;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -33,6 +34,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -44,6 +47,8 @@ import java.util.Map;
  */
 public class PersistentReference implements Observable {
 
+    private static final Logger LOG = LoggerFactory.getLogger( PersistentReference.class.getName() );
+    
     private int id;
     private int activeChromID;
     private String name;
@@ -146,11 +151,13 @@ public class PersistentReference implements Observable {
                     String msg = "The fasta file \n" + fastaFile.getAbsolutePath() +
                                  "\ndoes not contain the expected sequence:\n" + e.getMessage();
                     ErrorHelper.getHandler().handle( new NullPointerException( msg ), "Sequence missing error" );
+                    LOG.error( msg, e );
                 }
             }
         } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
             String msg = "If the missing fasta file is not replaced, the reference cannot be shown and analyses for this reference cannot be run.";
             ErrorHelper.getHandler().handle( new FileException( msg, ex ), "Sequence missing error" );
+            LOG.error( msg, ex );
         }
     }
 

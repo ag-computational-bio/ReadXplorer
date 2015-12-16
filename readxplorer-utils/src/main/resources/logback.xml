@@ -3,7 +3,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
 
-        <file>${PROJECT_PATH}/readxplorer.log</file>
+        <file>readxplorer.log</file>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{35} : %msg%n</pattern>
         </encoder>
