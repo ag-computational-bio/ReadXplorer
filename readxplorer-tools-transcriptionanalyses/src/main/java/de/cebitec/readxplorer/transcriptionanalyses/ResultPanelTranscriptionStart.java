@@ -362,24 +362,30 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
      */
     private void processResultForExport() {
         //Generating promoter regions for the TSS
-        int promoterSeqLength = queryPromoterSeqLength();
+        queryPromoterSeqLength();
+        int promoterUpstreamLength = tssResult.getBpUpstream();
+        int promoterDownstreamLength = tssResult.getBpDownstream();
         this.promoterRegions = new ArrayList<>();
 
         //get reference sequence for promoter regions
-        PersistentReference ref = this.referenceViewer.getReference();
+        PersistentReference ref = referenceViewer.getReference();
 
         //get the promoter region for each TSS
         int chromLength = ref.getActiveChromosome().getLength();
-        for( TranscriptionStart tSS : this.tssResult.getResults() ) {
+        for( TranscriptionStart tSS : tssResult.getResults() ) {
             final String promoter;
             if( tSS.isFwdStrand() ) {
-                int promoterStart = tSS.getPos() - promoterSeqLength;
+                int promoterStart = tSS.getPos() - promoterUpstreamLength;
+                int promoterEnd = tSS.getPos() + promoterDownstreamLength;
                 promoterStart = promoterStart < 0 ? 0 : promoterStart;
-                promoter = ref.getActiveChromSequence( promoterStart, tSS.getPos() );
+                promoterEnd = promoterEnd > chromLength ? chromLength : promoterEnd;
+                promoter = ref.getActiveChromSequence( promoterStart, promoterEnd );
             } else {
-                int promoterStart = tSS.getPos() + promoterSeqLength;
+                int promoterStart = tSS.getPos() + promoterUpstreamLength;
+                int promoterEnd = tSS.getPos() - promoterDownstreamLength;
                 promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
-                promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( tSS.getPos(), promoterStart ) );
+                promoterEnd = promoterEnd < 0 ? 0 : promoterEnd;
+                promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( promoterEnd, promoterStart ) );
             }
             this.promoterRegions.add( promoter );
         }
@@ -394,8 +400,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
      * @return The length of the putative promoter sequences.
      */
     @NbBundle.Messages( "PromoterSeqLengthWiz_Title=Promoter Sequence Length Selection" )
-    private int queryPromoterSeqLength() {
+    private void queryPromoterSeqLength() {
         int promoterLength = 70;
+        int promoterDownstreamLength = 0;
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         PromoterSeqLengthWizardPanel seqLengthPanel = new PromoterSeqLengthWizardPanel();
         panels.add( seqLengthPanel );
@@ -408,10 +415,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
         if( !cancelled ) {
             promoterLength = (int) wiz.getProperty( PromoterSeqLengthWizardPanel.PROMOTER_LENGTH );
+            promoterDownstreamLength = (int) wiz.getProperty( PromoterSeqLengthWizardPanel.PROMOTER_DOWN_LENGTH );
         }
-        tssResult.setPromoterLength( promoterLength );
-
-        return promoterLength;
+        tssResult.setPromoterLength( promoterLength, promoterDownstreamLength );
     }
 
 

@@ -30,6 +30,7 @@ import org.openide.WizardDescriptor;
 public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
 
     public static final String PROMOTER_LENGTH = "PROMOTER_LENGTH";
+    public static final String PROMOTER_DOWN_LENGTH = "PROMOTER_DOWN_LENGTH";
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -43,7 +44,7 @@ public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
      * promoter sequences.
      */
     public PromoterSeqLengthWizardPanel() {
-        super( "Please only input positive integer values!" );
+        super( "Only positive integer values and 0 for bp downstream are allowed!" );
     }
 
 
@@ -64,6 +65,7 @@ public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
             wiz.putProperty( PROMOTER_LENGTH, this.component.getPromoterLength() );
+            wiz.putProperty( PROMOTER_DOWN_LENGTH, this.component.getPromoterDownstreamLength() );
             this.storePrefs();
         }
     }
@@ -75,6 +77,7 @@ public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
      */
     private void storePrefs() {
         getPref().putInt( PROMOTER_LENGTH, this.component.getPromoterLength() );
+        getPref().putInt( PROMOTER_DOWN_LENGTH, this.component.getPromoterDownstreamLength() );
     }
 
 

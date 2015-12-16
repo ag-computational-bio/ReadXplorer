@@ -120,5 +120,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classMemberInsertionPoint>ORDERED_IN_CATEGORY</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classMemberInsertionPoint>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.keepGettersAndSettersTogether>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.keepGettersAndSettersTogether>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesBeforePackage>1</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesBeforePackage>
+        <org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_jdk_2e_mapreduce_2e_ForLoopToFunctionalHint.enabled>false</org-netbeans-spi-editor-hints-projects.text.x-java.org_2e_netbeans_2e_modules_2e_java_2e_hints_2e_jdk_2e_mapreduce_2e_ForLoopToFunctionalHint.enabled>
     </properties>
 </project-shared-configuration>

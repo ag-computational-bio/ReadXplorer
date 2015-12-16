@@ -34,6 +34,7 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
 
     private static final long serialVersionUID = 1L;
     private int promoterLength;
+    private int promoterDownstreamLength;
 
 
     /** Visual panel allowing the configuration of the length of exported
@@ -43,6 +44,7 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
         initAdditionalComponents();
     }
 
+
     /**
      * Initializes all additional stuff and components of this panel needed at
      * startup.
@@ -51,6 +53,8 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
         loadLastParameterSelection();
         promoterLengthField.setText( String.valueOf( promoterLength ) );
         promoterLengthField.getDocument().addDocumentListener( createDocumentListener() );
+        promoterDownLengthField.setText( String.valueOf( promoterDownstreamLength ) );
+        promoterDownLengthField.getDocument().addDocumentListener( createDocumentListener() );
     }
 
 
@@ -69,14 +73,23 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
 
         promoterLengthLabel = new javax.swing.JLabel();
         promoterLengthField = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        promoterLabel = new javax.swing.JLabel();
+        promoterDownLengthField = new javax.swing.JTextField();
+        promoterDownLabel = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(promoterLengthLabel, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterLengthLabel.text")); // NOI18N
 
         promoterLengthField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         promoterLengthField.setText(org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterLengthField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(promoterLabel, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterLabel.text")); // NOI18N
+
+        promoterDownLengthField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        promoterDownLengthField.setText(org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterDownLengthField.text")); // NOI18N
+        promoterDownLengthField.setToolTipText(org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterDownLengthField.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(promoterDownLabel, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterDownLabel.text")); // NOI18N
+        promoterDownLabel.setToolTipText(org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterDownLabel.toolTipText")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -89,7 +102,11 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(promoterLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel1)))
+                        .addComponent(promoterLabel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(promoterDownLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(promoterDownLabel)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -100,14 +117,20 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(promoterLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(promoterLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(promoterDownLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(promoterDownLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel promoterDownLabel;
+    private javax.swing.JTextField promoterDownLengthField;
+    private javax.swing.JLabel promoterLabel;
     private javax.swing.JTextField promoterLengthField;
     private javax.swing.JLabel promoterLengthLabel;
     // End of variables declaration//GEN-END:variables
@@ -121,11 +144,24 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
     }
 
 
+    /**
+     * @return The downstream promoter sequence length set by the user.
+     */
+    public int getPromoterDownstreamLength() {
+        return promoterDownstreamLength;
+    }
+
+
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
         if( GeneralUtils.isValidPositiveIntegerInput( promoterLengthField.getText() ) ) {
             promoterLength = Integer.parseInt( promoterLengthField.getText() );
+        } else {
+            isValidated = false;
+        }
+        if( GeneralUtils.isValidIntegerInput( promoterDownLengthField.getText() ) ) {
+            promoterDownstreamLength = Integer.parseInt( promoterDownLengthField.getText() );
         } else {
             isValidated = false;
         }
@@ -142,6 +178,7 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
     private void loadLastParameterSelection() {
         Preferences pref = NbPreferences.forModule( Object.class );
         promoterLength = pref.getInt( PromoterSeqLengthWizardPanel.PROMOTER_LENGTH, 70 );
+        promoterDownstreamLength = pref.getInt( PromoterSeqLengthWizardPanel.PROMOTER_DOWN_LENGTH, 0 );
     }
 
 
