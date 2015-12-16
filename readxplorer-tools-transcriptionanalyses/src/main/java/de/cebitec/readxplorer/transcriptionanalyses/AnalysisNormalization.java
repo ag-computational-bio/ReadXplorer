@@ -348,8 +348,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                     }
                 }
             }
-
-
         } );
     }
 

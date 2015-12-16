@@ -192,7 +192,8 @@ public class NormalizationAnalysisResult extends ResultTrackAnalysis<ParameterSe
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "TPM, RPKM and read count calculation statistics:" ) );
-        statisticsExportData.add( ResultTrackAnalysis.createTableRow( ResultPanelNormalization.TOTAL_MAPPINGS,
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( ResultPanelNormalization.TOTAL_MAPPINGS + 
+                                                                      " including counts of filtered features",
                                                                       getStatsMap().get( ResultPanelNormalization.TOTAL_MAPPINGS ) ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( ResultPanelNormalization.RETURNED_FEATURES,
                                                                       getStatsMap().get( ResultPanelNormalization.RETURNED_FEATURES ) ) );
