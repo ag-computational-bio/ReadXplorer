@@ -22,11 +22,12 @@ import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
+import htsjdk.samtools.SAMRecord;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import htsjdk.samtools.SAMRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.regex.Pattern.compile;
 
@@ -40,7 +41,7 @@ public final class GASVUtils {
 
     public static final Pattern COMMA_PATTERN = compile( "," );
 
-    private static final Logger LOG = Logger.getLogger( GASVUtils.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GASVUtils.class.getName() );
 
 
     /**

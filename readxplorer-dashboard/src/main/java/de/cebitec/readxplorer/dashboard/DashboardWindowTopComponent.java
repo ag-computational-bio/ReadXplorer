@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.dashboard;
 
 
 import de.cebitec.readxplorer.databackend.TrackStatisticsGenerator;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -31,7 +32,9 @@ import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
 import de.cebitec.readxplorer.ui.login.LoginWizardAction;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,10 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -59,8 +59,8 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -91,7 +91,7 @@ import static java.util.logging.Level.WARNING;
 public final class DashboardWindowTopComponent extends TopComponentExtended
         implements ExplorerManager.Provider {
 
-    private static final Logger LOG = Logger.getLogger( DashboardWindowTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DashboardWindowTopComponent.class.getName() );
 
 
     private static final long serialVersionUID = 1L;
@@ -116,11 +116,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         putClientProperty( TopComponent.PROP_UNDOCKING_DISABLED, Boolean.FALSE );
 
         this.refreshData();
-        ProjectConnector.getInstance().addObserver( new Observer() {
+        ProjectConnector.getInstance().registerObserver( new Observer() {
             @Override
-            public void update( Observable o, Object arg ) {
+            public void update( Object arg ) {
 
-                //dirty fix for a bug in h2 database, that is occuring, when trying
+                //dirty fix for a bug in h2 database, that is occurring, when trying
                 //to delete two or more references
                 //the code waits 200ms before updating the dashboard to ensure
                 //that the reference data has been fully deleted
@@ -143,7 +143,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
                             } );
                         } catch( Exception e ) {
-                            LOG.log( WARNING, e.getMessage() );
+                            LOG.warn( e.getMessage() );
                         }
                     }
 
@@ -175,7 +175,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedIn() );
             try {
                 final Map<PersistentReference, List<PersistentTrack>> genomesAndTracks
-                        = ProjectConnector.getInstance().getGenomesAndTracks();
+                        = ProjectConnector.getInstance().getReferencesAndTracks();
 
                 Node rootNode = new AbstractNode( new Children.Keys<PersistentReference>() {
                     @Override
@@ -218,7 +218,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
 
             } catch( OutOfMemoryError e ) {
-                VisualisationUtils.displayOutOfMemoryError( this );
+                LOG.error( e.getMessage(), e );
+                VisualisationUtils.displayOutOfMemoryError();
             }
         }
         this.repaint();
@@ -242,11 +243,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             if( item != null ) {
                 if( item.getChild() == DBItem.Child.GENOME ) {
                     if( !genomesAndTracksToOpen.containsKey( item.getID() ) ) {
-                        genomesAndTracksToOpen.put( item.getID(), new HashSet<Long>() );
+                        genomesAndTracksToOpen.put( item.getID(), new HashSet<>() );
                     }
                 } else {
                     if( !genomesAndTracksToOpen.containsKey( item.getRefID() ) ) {
-                        genomesAndTracksToOpen.put( item.getRefID(), new HashSet<Long>() );
+                        genomesAndTracksToOpen.put( item.getRefID(), new HashSet<>() );
                         DBItem parentItem = this.getItemForNode( n.getParentNode() );
                         if( parentItem != null ) {
                             parentItem.setSelected( true );
@@ -482,10 +483,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     private void initAdditionalComponents() {
 
         String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - " +
-                 "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
-                 "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
-                 "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
-                 "toolbar buttons or \"Tools\" menu)</p></html>";
+                       "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
+                       "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
+                       "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
+                       "toolbar buttons or \"Tools\" menu)</p></html>";
         quickstartLabel.setText( sText );
 
         Border paddingBorder = BorderFactory.createEmptyBorder( 50, 100, 100, 100 );
@@ -523,12 +524,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
-                        } else {
-                            if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
-                                dbItem.setSelected( true );
-                            } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
-                                dbItem.setSelected( true );
-                            }
+                        } else if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
+                            dbItem.setSelected( true );
+                        } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
+                            dbItem.setSelected( true );
                         }
                     }
                 }
@@ -548,35 +547,39 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
         this.updateOpenList();
 
-        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
+        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getReferencesAndTracks();
 
         for( Long genomeId : genomesAndTracksToOpen.keySet() ) {
             Set<Long> trackIds = genomesAndTracksToOpen.get( genomeId );
 
             ReferenceConnector rc = ProjectConnector.getInstance().getRefGenomeConnector( genomeId.intValue() );
-            PersistentReference genome = rc.getRefGenome();
+            try {
+                PersistentReference genome = rc.getRefGenome();
 
-            //open reference genome now
-            AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
-            appPanelTopComponent.open();
-            appPanelTopComponent.getLookup().lookup( ViewController.class ).openGenome( genome );
-            appPanelTopComponent.setName( appPanelTopComponent.getLookup().lookup( ViewController.class ).getDisplayName() );
-            appPanelTopComponent.requestActive();
+                //open reference genome now
+                AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
+                appPanelTopComponent.open();
+                appPanelTopComponent.getLookup().lookup( ViewController.class ).openGenome( genome );
+                appPanelTopComponent.setName( appPanelTopComponent.getLookup().lookup( ViewController.class ).getDisplayName() );
+                appPanelTopComponent.requestActive();
 
 
-            //open tracks for this genome now
-            List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
-            List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
-            for( PersistentTrack track : allTracksForThisGenome ) {
-                if( trackIds.contains( (long) track.getId() ) ) {
-                    tracksToShow.add( track );
+                //open tracks for this genome now
+                List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
+                List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
+                for( PersistentTrack track : allTracksForThisGenome ) {
+                    if( trackIds.contains( (long) track.getId() ) ) {
+                        tracksToShow.add( track );
+                    }
                 }
+
+                appPanelTopComponent.getLookup().lookup( ViewController.class ).openTracksOnCurrentGenome( tracksToShow );
+
+                //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
+            } catch( DatabaseException ex ) {
+                ErrorHelper.getHandler().handle( ex );
             }
-
-            appPanelTopComponent.getLookup().lookup( ViewController.class ).openTracksOnCurrentGenome( tracksToShow );
-
         }
-        //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
 
     }//GEN-LAST:event_openButtonActionPerformed
 

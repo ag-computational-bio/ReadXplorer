@@ -19,13 +19,14 @@ package de.cebitec.readxplorer.tools.rnafolder.rnamovies.configuration;
 
 
 import java.lang.reflect.Field;
-import java.util.logging.Logger;
 import javax.swing.BoundedRangeModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class FieldAdapter implements ConfigListener {
 
-    private static final Logger LOG = Logger.getLogger( FieldAdapter.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( FieldAdapter.class.getName() );
 
     private final Object configurable;
 
@@ -58,9 +59,9 @@ public class FieldAdapter implements ConfigListener {
                 field.set( configurable, value );
             }
         } catch( NoSuchFieldException ex ) {
-            LOG.severe( "No such field: ".concat( ex.getMessage() ) );
+            LOG.error( "No such field: ".concat( ex.getMessage() ) );
         } catch( IllegalAccessException ex ) {
-            LOG.severe( ex.getMessage() );
+            LOG.error( ex.getMessage() );
         }
     }
 

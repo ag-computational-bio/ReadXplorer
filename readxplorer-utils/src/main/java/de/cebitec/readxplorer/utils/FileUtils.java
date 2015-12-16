@@ -23,15 +23,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -42,7 +40,7 @@ import static java.util.logging.Level.WARNING;
 public final class FileUtils {
 
 
-    private static final Logger LOG = Logger.getLogger( FileUtils.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( FileUtils.class.getName() );
 
 
     private FileUtils() {
@@ -82,8 +80,7 @@ public final class FileUtils {
     /**
      * count lines in a file equivalent of wc -l in unix
      * <p>
-     * @param file
-     * <p>
+     * @param file <p>
      * @return number of lines or 0 if an error occured during reading
      */
     public static int countLinesInFile( File file ) {
@@ -111,12 +108,11 @@ public final class FileUtils {
      * @param fileNameExtensionFilter
      * @param textField
      * @param forClass
-     * @param parent
-     * <p>
+     * @param parent                  <p>
      * @return
      */
     public static File showFileOpenDialogAndChangePrefs( String prefName, FileNameExtensionFilter fileNameExtensionFilter,
-            JTextField textField, Class<?> forClass, Component parent ) {
+                                                         JTextField textField, Class<?> forClass, Component parent ) {
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter( fileNameExtensionFilter );
         Preferences prefs2 = Preferences.userNodeForPackage( forClass );
@@ -137,11 +133,11 @@ public final class FileUtils {
                 try {
                     prefs.flush();
                 } catch( BackingStoreException ex ) {
-                    LOG.log( SEVERE, null, ex );
+                    LOG.error( null, ex );
                 }
                 return file;
             } else {
-                LOG.log( WARNING, "Could not read file" );
+                LOG.warn( "Could not read file {0}", file.getAbsolutePath() );
             }
         }
         return null;
@@ -151,8 +147,7 @@ public final class FileUtils {
     /**
      * check that the given path exists
      * <p>
-     * @param filePathString
-     * <p>
+     * @param filePathString <p>
      * @return boolean true if the file exists
      */
     public static boolean fileExists( String filePathString ) {
@@ -160,6 +155,7 @@ public final class FileUtils {
         boolean result = f.exists();
         return result;
     }
+
 
     /**
      * check that the given path exists and is readable.
@@ -177,8 +173,7 @@ public final class FileUtils {
     /**
      * check that the given path exists, is readable and can be executed
      * <p>
-     * @param filePathString
-     * <p>
+     * @param filePathString <p>
      * @return boolean true if the file can be executed
      */
     public static boolean fileExistsAndIsExecutable( String filePathString ) {

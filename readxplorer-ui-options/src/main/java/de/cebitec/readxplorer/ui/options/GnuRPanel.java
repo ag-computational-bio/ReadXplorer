@@ -36,7 +36,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -49,14 +48,13 @@ import javax.swing.SwingUtilities;
 import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 final class GnuRPanel extends OptionsPanel implements Observer {
 
-    private static final Logger LOG = Logger.getLogger( GnuRPanel.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GnuRPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -445,17 +443,15 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 manualLocalButton.setEnabled( false );
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-            } else {
-                if( OS.contains( "mac" ) ) {
+            } else if( OS.contains( "mac" ) ) {
                 messages.setText( "Rserve is bundled with the Mac installation and hence no configuration is needed." );
                 autoButton.setEnabled( false );
                 manualLocalButton.setEnabled( false );
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-                } else {
-                    messages.setText( "Auto installation is only supported under Windows 7 & 8." );
-                    autoButton.setEnabled( false );
-                }
+            } else {
+                messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+                autoButton.setEnabled( false );
             }
         }
         rServePort.setInputVerifier( new PortInputVerifier() );
@@ -753,7 +749,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 th.start();
             } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: Could not create temporary file.", currentTimestamp );
+                LOG.error( "{0}: Could not create temporary file.", currentTimestamp );
             }
         }
     }//GEN-LAST:event_installButtonActionPerformed
@@ -765,7 +761,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 desk.browse( new URI( cranMirror.getText() + SOURCE_URI ) );
             } catch( URISyntaxException | IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( WARNING, "{0}: Could not open URI to GNU R source file.", currentTimestamp );
+                LOG.warn( "{0}: Could not open URI to GNU R source file.", currentTimestamp );
             }
         }
     }//GEN-LAST:event_sourceFileTextFieldMouseReleased

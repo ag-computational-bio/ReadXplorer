@@ -19,26 +19,22 @@ package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,7 +44,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class DeletionThread extends SwingWorker<Object, Object> {
 
-    private static final Logger LOG = Logger.getLogger( DeletionThread.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DeletionThread.class.getName() );
 
     private final List<ReferenceJob> references;
     private final List<TrackJob> tracks;
@@ -70,8 +66,8 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         this.tracks = tracks;
         invalidGens = new HashSet<>();
 
-        this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( DeletionThread.class, "DeletionThread.ouptut.name" ), false );
-        this.ph = ProgressHandleFactory.createHandle( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.name" ) );
+        this.io = IOProvider.getDefault().getIO( getBundleString( "DeletionThread.ouptut.name" ), false );
+        this.ph = ProgressHandleFactory.createHandle( getBundleString( "MSG_DeletionThread.progress.name" ) );
         this.workunits = this.references.size() + this.tracks.size();
     }
 
@@ -82,7 +78,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         try {
             io.getOut().reset();
         } catch( IOException ex ) {
-            Exceptions.printStackTrace( ex );
+            LOG.error( ex.getMessage(), ex );
         }
         io.select();
 
@@ -90,49 +86,49 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         ph.start( workunits == 1 ? 2 : workunits );
         workunits = 0;
 
-        LOG.log( INFO, "Starting deletion of data" );
+        LOG.info( "Starting deletion of data" );
 
         if( !tracks.isEmpty() ) {
-            io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.track" ) + ":" );
-            ph.progress( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.track" ), workunits );
+            printAndLog( getBundleString( "MSG_DeletionThread.deletion.start.track" ) + ":" );
+            ph.progress( getBundleString( "MSG_DeletionThread.progress.track" ), workunits );
             for( TrackJob t : tracks ) {
                 ph.progress( ++workunits );
                 try {
                     ProjectConnector.getInstance().deleteTrack( t.getID() );
-                    io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
+                    printAndLog( getBundleString( "MSG_DeletionThread.deletion.completed.before" ) + " \"" + t.getDescription() + "\" " + getBundleString( "MSG_DeletionThread.deletion.completed.after" ) );
 
-                } catch( StorageException ex ) {
-                    io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + t.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
+                } catch( DatabaseException ex ) {
+                    printAndLogError( getBundleString( "MSG_DeletionThread.deletion.failed.before" ) + " \"" + t.getDescription() + "\" " + getBundleString( "MSG_DeletionThread.deletion.failed.after" ) );
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                     //  invalidRuns.add(t.getRunJob());
                     invalidGens.add( t.getRefGen() );
-                    LOG.log( SEVERE, null, ex );
+                    LOG.error( ex.getMessage(), ex );
                 }
             }
-            io.getOut().println( "" );
+            printAndLog( "" );
         }
 
         if( !references.isEmpty() ) {
-            io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.ref" ) + ":" );
-            ph.progress( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.ref" ), workunits );
+            printAndLog( getBundleString( "MSG_DeletionThread.deletion.start.ref" ) + ":" );
+            ph.progress( getBundleString( "MSG_DeletionThread.progress.ref" ), workunits );
             for( ReferenceJob r : references ) {
                 ph.progress( ++workunits );
                 if( invalidGens.contains( r ) ) {
-                    io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.after" ) );
+                    printAndLogError( getBundleString( "MSG_DeletionThread.deletion.error.before" ) + " \"" + r.getDescription() + "\" " + getBundleString( "MSG_DeletionThread.deletion.error.after" ) );
                 } else {
                     try {
-                        ProjectConnector.getInstance().deleteGenome( r.getID() );
-                        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.completed.after" ) );
-                    } catch( StorageException ex ) {
-                        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.failed.after" ) );
-                        LOG.log( SEVERE, null, ex );
+                        ProjectConnector.getInstance().deleteReference( r.getID() );
+                        printAndLog( getBundleString( "MSG_DeletionThread.deletion.completed.before" ) + " \"" + r.getDescription() + "\" " + getBundleString( "MSG_DeletionThread.deletion.completed.after" ) );
+                    } catch( DatabaseException ex ) {
+                        printAndLogError( getBundleString( "MSG_DeletionThread.deletion.failed.before" ) + " \"" + r.getDescription() + "\" " + getBundleString( "MSG_DeletionThread.deletion.failed.after" ) );
+                        LOG.error( ex.getMessage(), ex );
                     }
                 }
             }
-            io.getOut().println( "" );
+            printAndLog( "" );
         }
 
-        Logger.getLogger( DeletionThread.class.getName() ).log( Level.INFO, "Completed Deletion of Data" );
+        LOG.info( "Completed Deletion of Data" );
 
         return null;
     }
@@ -142,11 +138,44 @@ public class DeletionThread extends SwingWorker<Object, Object> {
     protected void done() {
         super.done();
         ph.progress( workunits );
-        io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.finished" ) );
+        printAndLog( getBundleString( "MSG_DeletionThread.deletion.finished" ) );
         io.getOut().close();
         ph.finish();
 
         CentralLookup.getDefault().remove( this );
+    }
+    
+    /**
+     * @param name the name of the bundle string to return (found in
+     *             Bundle.properties)
+     * <p>
+     * @return the string associated in the Bundle.properties with the given
+     *         name.
+     */
+    private String getBundleString( String name ) {
+        return NbBundle.getMessage( DeletionThread.class, name );
+    }
+
+
+    /**
+     * Prints the given message to the io stream and the logger at info level.
+     *
+     * @param msg The message to print
+     */
+    private void printAndLog( String msg ) {
+        io.getOut().println( msg );
+        LOG.info( msg );
+    }
+
+
+    /**
+     * Prints the given message to the io stream and the logger at error level.
+     *
+     * @param msg The message to print
+     */
+    private void printAndLogError( String msg ) {
+        io.getOut().println( msg );
+        LOG.error( msg );
     }
 
 

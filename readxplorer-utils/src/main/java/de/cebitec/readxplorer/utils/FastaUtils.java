@@ -32,7 +32,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,9 +39,8 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,7 +50,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public final class FastaUtils implements Observable {
 
-    private static final Logger LOG = getLogger( FastaUtils.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( FastaUtils.class.getName() );
 
 
     private final List<Observer> observers;
@@ -103,11 +101,11 @@ public final class FastaUtils implements Observable {
                 Path indexFile = Paths.get( fastaFileToIndex.getAbsolutePath() + ".fai" );
                 idxWriter.writeIndex( indexFile, sequences );
             } catch( IOException ex ) {
-                LOG.log( SEVERE, ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
                 this.notifyObservers( ex.getMessage() );
             }
         } catch( IOException | IllegalStateException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+            LOG.error( ex.getMessage(), ex );
             this.notifyObservers( ex.getMessage() );
         }
 
@@ -151,7 +149,7 @@ public final class FastaUtils implements Observable {
                 try {
                     indexedFasta = new IndexedFastaSequenceFile( fastaFile ); //Does only work, if index exists
                 } catch( FileNotFoundException fnfe ) {
-                    LOG.log( SEVERE, fnfe.getMessage(), fnfe );
+                    LOG.error( fnfe.getMessage(), fnfe );
                     this.indexFasta( fastaFile, this.observers );
                     indexedFasta = this.getIndexedFasta( fastaFile );
                 }
@@ -160,7 +158,7 @@ public final class FastaUtils implements Observable {
                                                "File not found exception", JOptionPane.ERROR_MESSAGE );
             }
         } catch( NoSuchElementException nsex ) { //can occur if the index file is corrupted
-            LOG.log( SEVERE, nsex.getMessage(), nsex );
+            LOG.error( nsex.getMessage(), nsex );
             this.indexFasta( fastaFile, this.observers );
             indexedFasta = this.getIndexedFasta( fastaFile );
         }

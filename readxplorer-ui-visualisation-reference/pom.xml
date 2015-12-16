@@ -57,7 +57,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
-            <version>1.2.0-FINAL</version>
         </dependency>
     </dependencies>
 

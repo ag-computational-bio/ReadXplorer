@@ -35,22 +35,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Reference CLI Importer.
- *
+ * <p>
  * The <code>ImportReferenceCallable</code> class is responsible for the import
  * of a reference genome in the cli version.
- * 
+ *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
 public final class ImportReferenceCallable implements Callable<ImportReferenceResult> {
 
-    private static final Logger LOG = Logger.getLogger( ImportReferenceCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportReferenceCallable.class.getName() );
 
     private final File referenceFile;
 
@@ -69,7 +69,7 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
 
             // create necessary (mockup) objects
             final ImportReferenceResult result = new ImportReferenceResult();
-            LOG.log( Level.FINE, "create import objects..." );
+            LOG.trace( "create import objects..." );
             result.addOutput( "create import objects..." );
 
             final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) + 1 ) );
@@ -78,24 +78,24 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             result.setReferenceJob( referenceJob );
 
             // parse reference genome
-            LOG.log( Level.FINE, "parse reference file: {0}...", referenceFile.getName() );
+            LOG.trace( "parse reference file: {0}...", referenceFile.getName() );
             result.addOutput( "parse reference file: " + referenceFile.getName() + "..." );
             FeatureFilter filter = new FeatureFilter();
             filter.addBlacklistRule( new FilterRuleSource() );
             ParsedReference parsedRefGenome = refParser.parseReference( referenceJob, filter );
             result.setParsedReference( parsedRefGenome );
-            LOG.log( Level.FINE, "parsed reference file: {0}", referenceFile.getName() );
+            LOG.trace( "parsed reference file: {0}", referenceFile.getName() );
             result.addOutput( "parsed reference file " + referenceFile.getName() );
 
             return result;
 
         } catch( ParsingException ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.error( null, ex );
             CommandException ce = new CommandException( 1, "import failed!" );
             ce.initCause( ex );
             throw ce;
         } catch( OutOfMemoryError ex ) {
-            LOG.log( Level.SEVERE, null, ex );
+            LOG.error( null, ex );
             CommandException ce = new CommandException( 1, "out of memory!" );
             ce.initCause( ex );
             throw ce;
