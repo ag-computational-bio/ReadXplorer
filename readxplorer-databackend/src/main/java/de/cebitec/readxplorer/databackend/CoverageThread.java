@@ -20,8 +20,6 @@ package de.cebitec.readxplorer.databackend;
 
 import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
-import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
@@ -34,11 +32,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 
 
 /**
@@ -62,16 +57,18 @@ public class CoverageThread extends RequestThread {
      * Thread for carrying out the requests for receiving coverage from a bam
      * file.
      * <p>
-     * @param tracks        the tracks handled here
-     * @param combineTracks true, if more than one track is added and their
-     *                      coverage should be combined in the results
+     * @param tracks          the tracks handled here
+     * @param referenceGenome the reference genome
+     * @param combineTracks   true, if more than one track is added and their
+     *                        coverage should be combined in the results
      */
-    public CoverageThread( List<PersistentTrack> tracks, boolean combineTracks ) {
+    public CoverageThread( List<PersistentTrack> tracks, PersistentReference referenceGenome, boolean combineTracks ) {
         super();
         this.requestQueue = new ConcurrentLinkedQueue<>();
 
         // do id specific stuff
         this.tracks = tracks;
+        this.referenceGenome = referenceGenome;
         if( tracks.size() == 1 ) {
             singleCoverageThread( tracks.get( 0 ).getId() );
         } else if( tracks.size() == 2 && !combineTracks ) {
@@ -105,6 +102,9 @@ public class CoverageThread extends RequestThread {
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void addRequest( IntervalRequest request ) {
         setLatestRequest( request );
@@ -123,10 +123,6 @@ public class CoverageThread extends RequestThread {
      */
     CoverageAndDiffResult getCoverageAndDiffsFromFile( IntervalRequest request, PersistentTrack track ) {
         File file = new File( track.getFilePath() );
-        if( referenceGenome == null ) {
-            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( track.getRefGenID() );
-            referenceGenome = refConnector.getRefGenome();
-        }
         SamBamFileReader externalDataReader = new SamBamFileReader( file, track.getId(), referenceGenome );
         CoverageAndDiffResult result = externalDataReader.getCoverageFromBam( request );
         externalDataReader.close();
@@ -145,32 +141,23 @@ public class CoverageThread extends RequestThread {
      *         coverage and no diffs and gaps
      */
     CoverageAndDiffResult getCoverageAndReadStartsFromFile( IntervalRequest request, PersistentTrack track ) {
-        CoverageAndDiffResult result;
         File file = new File( track.getFilePath() );
-        if( referenceGenome == null ) {
-            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( track.getRefGenID() );
-            referenceGenome = refConnector.getRefGenome();
-        }
 
         SamBamFileReader externalDataReader = new SamBamFileReader( file, track.getId(), referenceGenome );
-        result = externalDataReader.getCoverageAndReadStartsFromBam( request );
+        CoverageAndDiffResult result = externalDataReader.getCoverageAndReadStartsFromBam( request );
         externalDataReader.close();
         return result;
     }
 
 
     /**
-     * Fetches the read starts and the coverage from a bam file
-     * for multiple tracks and combines all the data.
+     * Fetches the read starts and the coverage from a bam file for multiple
+     * tracks and combines all the data.
      * <p>
      * @param request the request for which the read starts are needed
      * <p>
      * @return the coverage and diff result containing the read starts, the
      *         coverage and no diffs and gaps
-     * <p>
-     * @param request
-     *                <p>
-     * @return
      */
     CoverageAndDiffResult loadReadStartsAndCoverageMultiple( IntervalRequest request ) {
 
@@ -207,10 +194,8 @@ public class CoverageThread extends RequestThread {
      * @param request the genome request for two tracks.
      * <p>
      * @return CoverageManager of the interval of both tracks, also containing
-     *         the coverage difference for all positions, which are covered in both
-     *         tracks.
-     * <p>
-     * @throws SQLException
+     *         the coverage difference for all positions, which are covered in
+     *         both tracks.
      */
     CoverageAndDiffResult loadCoverageDouble( IntervalRequest request ) {
         int from = request.getTotalFrom();
@@ -219,7 +204,7 @@ public class CoverageThread extends RequestThread {
         CoverageManager cov2 = new CoverageManager( from, to );
         cov1.incArraysToIntervalSize();
         cov2.incArraysToIntervalSize();
-//        cov.setTwoTracks(true); //TODO check if not needed
+//        cov1.setTwoTracks(true); //TODO check if not needed
 
         IntervalRequest newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -309,11 +294,10 @@ public class CoverageThread extends RequestThread {
                             currentCov = this.loadCoverageDouble( request );
                         } else if( this.trackID != 0 || this.canQueryCoverage() ) {
                             currentCov = this.loadCoverageMultiple( request );
+//                        } else {
+//                            skippedCounter++;
+//                            request.getSender().notifySkipped();
                         }
-                        /*else {
-                         skippedCounter++;
-                         request.getSender().notifySkipped();
-                         }*/
                     }
 
                     if( this.doesNotMatchLatestRequestBounds( request ) ) {
@@ -328,7 +312,7 @@ public class CoverageThread extends RequestThread {
                 }
             }
         } catch( OutOfMemoryError e ) {
-            VisualisationUtils.displayOutOfMemoryError( JOptionPane.getRootFrame() );
+            VisualisationUtils.displayOutOfMemoryError();
             this.interrupt();
         }
     }

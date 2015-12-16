@@ -30,12 +30,34 @@ import java.util.List;
  */
 public class MultiTrackConnector extends TrackConnector {
 
-    MultiTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+    /**
+     * A track connector for multiple tracks. It handles all data requests for
+     * these tracks.
+     * <p>
+     * @param track the single initial track for which this connector is created
+     * <p>
+     * @throws FileNotFoundException
+     * @throws DatabaseException
+     */
+    MultiTrackConnector( PersistentTrack track ) throws FileNotFoundException, DatabaseException {
         super( track );
     }
 
 
-    MultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException {
+    /**
+     * A multi track connector for a list of tracks. It handles all data
+     * requests for these tracks.
+     * <p>
+     * @param id            id of the track
+     * @param tracks        the list of tracks for which this connector is
+     *                      created
+     * @param combineTracks true, if the data of these tracks is to be combined,
+     *                      false if it should be kept separated
+     * <p>
+     * @throws FileNotFoundException
+     * @throws DatabaseException
+     */
+    MultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException, DatabaseException {
         super( 9999, tracks, false );
     }
 

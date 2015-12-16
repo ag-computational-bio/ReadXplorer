@@ -96,7 +96,8 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
             final TrackJob trackJob1 = rpjc.getTrackJob1();
             final TrackJob trackJob2 = rpjc.getTrackJob2();
             final Map<String, Integer> chromLengthMap = new HashMap<>();
-            Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( referenceResult.getParsedReference().getID() ).getRefGenome().getChromosomes();
+            Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector(
+                    referenceResult.getParsedReference().getID() ).getChromosomesForGenome();
             for( PersistentChromosome chrom : chromIdMap.values() ) {
                 chromLengthMap.put( chrom.getName(), chrom.getLength() );
             }
@@ -109,10 +110,10 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
 
 
             // executes any conversion before other calculations, if the parser supports any
-            LOG.trace( "convert read file(s): {0}...", readFile1.getName() );
+            LOG.trace( "convert read file(s): " + readFile1.getName() + "..." );
             result.addOutput( "convert file(s)..." );
             if( !trackJob1.getParser().convert( trackJob1, chromLengthMap ) ) {
-                LOG.error( "Conversion of {0} failed!", readFile1.getName() );
+                LOG.error( "Conversion of " + readFile1.getName() + " failed!" );
                 result.addOutput( "Error: Conversion of " + readFile1.getName() + " failed!" );
                 return result;
             }
@@ -124,17 +125,17 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
                 boolean success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
                 File lastWorkFile2 = trackJob2.getFile();
                 if( !success ) {
-                    LOG.error( "Conversion of {0} failed!", trackJob2.getName() );
+                    LOG.error( "Conversion of " + trackJob2.getName() + " failed!" );
                     result.addOutput( "Error: Conversion of " + trackJob1.getName() + " failed!" );
                     return result;
                 }
 
                 // combine both tracks and continue with trackJob1, they are unsorted now
-                LOG.trace( "combine read files: {0} and {1}", new Object[]{ readFile1.getName(), readFile2.getName() } );
+                LOG.trace( "combine read files: " + readFile1.getName() + " and " + readFile2.getName() );
                 result.addOutput( "combine files..." );
                 SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
                 if( !combiner.combineData() ) {
-                    LOG.error( "Combination of {0} and {1} failed!", new Object[]{ readFile1.getName(), readFile2.getName() } );
+                    LOG.error( "Combination of " + readFile1.getName() + " and " + readFile2.getName() + " failed!" );
                     result.addOutput( "Error: Combination of " + readFile1.getName() + " and " + readFile2.getName() + " failed!" );
                     return result;
                 }
@@ -166,7 +167,7 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
             result.setSuccessful( true );
 
         } catch( IOException | ParsingException ex ) {
-            LOG.error( null, ex );
+            LOG.error( ex.getMessage(), ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ex ) {
             LOG.error( ex.getMessage(), ex );
@@ -176,7 +177,6 @@ public final class ImportPairedEndCallable implements Callable<ImportPairedEndRe
         }
 
         return result;
-
     }
 
 

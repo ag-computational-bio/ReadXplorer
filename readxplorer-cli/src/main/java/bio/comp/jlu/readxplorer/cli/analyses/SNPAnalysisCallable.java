@@ -20,6 +20,7 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 
 import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -86,7 +87,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             File trackFile = new File( persistentTrack.getFilePath() );
             final String trackFileName = trackFile.getName();
 
-            LOG.trace( "start SNP analysis for {0}...", trackFileName );
+            LOG.trace( "start SNP analysis for " + trackFileName + "..." );
             result.addOutput( "start analysis..." );
             final ProjectConnector pc = ProjectConnector.getInstance();
             final TrackConnector trackConnector = pc.getTrackConnector( persistentTrack );
@@ -108,14 +109,14 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             snpDetectionResult.setParameters( parameterSet );
 
 
-            LOG.trace( "store SNP results for {0}...", trackFileName );
+            LOG.trace( "store SNP results for " + trackFileName + "..." );
             result.addOutput( "store results..." );
             File resultFile = new File( "snp-" + trackFileName + '.' + AnalysisFileFilter.SUFFIX );
             writeFile( resultFile, snpDetectionResult.dataSheetNames(), snpDetectionResult.dataColumnDescriptions(), snpDetectionResult.dataToExcelExportList() );
 
             result.setResultFile( resultFile );
 
-        } catch( IOException | WriteException | InterruptedException ex ) {
+        } catch( IOException | WriteException | InterruptedException | DatabaseException ex ) {
             LOG.error( ex.getMessage(), ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ome ) {

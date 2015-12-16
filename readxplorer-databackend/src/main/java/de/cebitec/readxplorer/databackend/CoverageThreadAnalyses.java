@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.databackend;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
 import org.slf4j.Logger;
@@ -43,12 +44,13 @@ public class CoverageThreadAnalyses extends CoverageThread {
      * Thread for retrieving the coverage for a list of tracks from their
      * mapping files.
      * <p>
-     * @param tracks        the tracks handled here
-     * @param combineTracks true, if more than one track is added and their
-     *                      coverage should be combined in the results
+     * @param tracks          the tracks handled here
+     * @param referenceGenome The reference genome
+     * @param combineTracks   true, if more than one track is added and their
+     *                        coverage should be combined in the results
      */
-    public CoverageThreadAnalyses( List<PersistentTrack> tracks, boolean combineTracks ) {
-        super( tracks, combineTracks );
+    public CoverageThreadAnalyses( List<PersistentTrack> tracks, PersistentReference referenceGenome, boolean combineTracks ) {
+        super( tracks, referenceGenome, combineTracks );
     }
 
 

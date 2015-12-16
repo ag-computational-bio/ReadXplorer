@@ -18,10 +18,12 @@
 package de.cebitec.readxplorer.databackend.dataobjects;
 
 
+import de.cebitec.readxplorer.api.FileException;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import htsjdk.samtools.reference.IndexedFastaSequenceFile;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -31,8 +33,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 
 /**
@@ -104,7 +104,9 @@ public class PersistentReference implements Observable {
      * @param checkFile     true, if the reference file shall be checked for
      *                      validitiy, false otherwise
      */
-    public PersistentReference( int id, int activeChromId, String name, String description, Timestamp timestamp, File fastaFile, boolean checkFile ) {
+    public PersistentReference( int id, int activeChromId, String name, String description, Timestamp timestamp,
+                                File fastaFile,
+                                boolean checkFile ) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -141,14 +143,14 @@ public class PersistentReference implements Observable {
                 this.getChromSequence( activeChromID, 1, 1 );
             } catch( NullPointerException e ) {
                 if( e.getMessage() != null && e.getMessage().contains( "Unable to find entry for contig" ) ) {
-                    String msg = "The fasta file \n" + fastaFile.getAbsolutePath()
-                                 + "\ndoes not contain the expected sequence:\n" + e.getMessage();
-                    JOptionPane.showMessageDialog( new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE );
+                    String msg = "The fasta file \n" + fastaFile.getAbsolutePath() +
+                                 "\ndoes not contain the expected sequence:\n" + e.getMessage();
+                    ErrorHelper.getHandler().handle( new NullPointerException( msg ), "Sequence missing error" );
                 }
             }
         } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
             String msg = "If the missing fasta file is not replaced, the reference cannot be shown and analyses for this reference cannot be run.";
-            JOptionPane.showMessageDialog( new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE );
+            ErrorHelper.getHandler().handle( new FileException( msg, ex ), "Sequence missing error" );
         }
     }
 
@@ -278,13 +280,12 @@ public class PersistentReference implements Observable {
         return this.getName();
     }
 
-    /*
-     * Need this to use PersistentReference class as key for HashMap
-     * @see http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
-     * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
 
+    /*
+     * Need this to use PersistentReference class as key for HashMap @see
+     * http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+     * (non-Javadoc) @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         return id;
@@ -301,11 +302,11 @@ public class PersistentReference implements Observable {
 
         if( o instanceof PersistentReference ) {
             PersistentReference ogenome = (PersistentReference) o;
-            return (ogenome.getDescription().equals( this.description )
-                    && ogenome.getName().equals( this.name )
-                    && (ogenome.getId() == this.id)
-                    && (ogenome.getNoChromosomes() == this.getNoChromosomes())
-                    && ogenome.getTimeStamp().equals( this.timestamp ) //for current purposes we do not need to compare the sequence,
+            return (ogenome.getDescription().equals( this.description ) &&
+                    ogenome.getName().equals( this.name ) &&
+                    (ogenome.getId() == this.id) &&
+                    (ogenome.getNoChromosomes() == this.getNoChromosomes()) &&
+                    ogenome.getTimeStamp().equals( this.timestamp ) //for current purposes we do not need to compare the sequence,
                     //in most cases the id should be enough
                     //&& ogenome.getSequence().equals(this.sequence);
                     );

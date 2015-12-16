@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.api.ReadXplorerException;
 /**
  * A ReadXplorer specific RuntimeException indicating H2/SQL errors.
  *
- * @author Oliver Schwenger
+ * @author Oliver Schwengers
  */
 public class DatabaseException extends ReadXplorerException {
 
@@ -34,6 +34,11 @@ public class DatabaseException extends ReadXplorerException {
     /**
      * Creates a new instance of <code>DatabaseException</code> without detail
      * message.
+     *
+     * @param cause the cause (which is saved for later retrieval by the
+     *              {@link #getCause()} method). (A <tt>null</tt> value is
+     *              permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      */
     public DatabaseException( Throwable cause ) {
         super( Type.Database, cause );
@@ -44,13 +49,28 @@ public class DatabaseException extends ReadXplorerException {
      * Constructs an instance of <code>DatabaseException</code> with the
      * specified detail message.
      * <p>
-     * @param msg the detail message.
+     * @param msg   the detail message.
+     * @param cause the cause (which is saved for later retrieval by the
+     *              {@link #getCause()} method). (A <tt>null</tt> value is
+     *              permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      */
     public DatabaseException( String msg, Throwable cause ) {
         super( msg, Type.Database, cause );
     }
 
 
+    /**
+     * Constructs an instance of <code>DatabaseException</code> with the
+     * specified detail message.
+     * <p>
+     * @param userMsg Message to display to the user.
+     * @param errMsg  the detail message.
+     * @param cause   the cause (which is saved for later retrieval by the
+     *                {@link #getCause()} method). (A <tt>null</tt> value is
+     *                permitted, and indicates that the cause is nonexistent or
+     *                unknown.)
+     */
     public DatabaseException( String userMsg, String errMsg, Throwable cause ) {
         super( userMsg, errMsg, Type.Database, cause );
     }

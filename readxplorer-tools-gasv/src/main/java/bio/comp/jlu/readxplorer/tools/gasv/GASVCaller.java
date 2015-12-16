@@ -17,11 +17,13 @@
 
 package bio.comp.jlu.readxplorer.tools.gasv;
 
+import de.cebitec.readxplorer.api.FileException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import gasv.bamtogasv.BAMToGASV;
 import gasv.main.GASVMain;
 import java.awt.HeadlessException;
@@ -34,14 +36,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static bio.comp.jlu.readxplorer.tools.gasv.Bundle.ChromFileWritingFinished;
+import static bio.comp.jlu.readxplorer.tools.gasv.Bundle.ErrorPairedTrack;
+import static bio.comp.jlu.readxplorer.tools.gasv.Bundle.SuccessHeader;
+import static bio.comp.jlu.readxplorer.tools.gasv.Bundle.SuccessMsg;
 
 
 /**
@@ -53,6 +60,7 @@ import org.openide.windows.InputOutput;
 @NbBundle.Messages( "GASV.output.name=GASV output" )
 public class GASVCaller implements Runnable {
 
+    private static final Logger LOG = LoggerFactory.getLogger( GASVCaller.class.getName() );
     public static final InputOutput IO = IOProvider.getDefault().getIO( Bundle.GASV_output_name(), false );
 
     private final PersistentReference reference;
@@ -119,10 +127,10 @@ public class GASVCaller implements Runnable {
             runBamToGASV( trackConnector.getTrackFile() );
             runGASVMain( trackConnector.getTrackFile().getAbsolutePath() + ".gasv.in" );
         } else {
-            IO.getOut().println( Bundle.ErrorPairedTrack( trackConnector.getTrackFile().getName() ) );
+            LOG.warn( ErrorPairedTrack( trackConnector.getTrackFile().getName() ) );
+            IO.getOut().println( ErrorPairedTrack( trackConnector.getTrackFile().getName() ) );
             parent.showData( "noReadPairTrack" );
         }
-
     }
 
 
@@ -152,13 +160,14 @@ public class GASVCaller implements Runnable {
         //Note that file is overwritten every time!
         try( final BufferedWriter outputWriter = new BufferedWriter( new FileWriter( chromNamesFileName ) ); ) {
             outputWriter.write( chromNamesString );
-            NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(),
-                                                       Bundle.SuccessMsg() + chromNamesFileName, null );
+            NotificationDisplayer.getDefault().notify( SuccessHeader(), new ImageIcon(),
+                                                       SuccessMsg() + chromNamesFileName, null );
         } catch( IOException | MissingResourceException | HeadlessException e ) {
-            JOptionPane.showMessageDialog( new JPanel(), Bundle.Error() + e.getMessage() );
+            LOG.error( e.getMessage(), e );
+            ErrorHelper.getHandler().handle( new FileException( Bundle.Error() + e.getMessage(), e ) );
         }
         storeChromsProgressHandle.finish();
-        IO.getOut().println( Bundle.ChromFileWritingFinished() );
+        IO.getOut().println( ChromFileWritingFinished() );
     }
 
 
@@ -306,6 +315,7 @@ public class GASVCaller implements Runnable {
         try {
             GASVMain.main( gasvArgsList.toArray( gasvArgs ) );
         } catch( IOException | CloneNotSupportedException | NullPointerException ex ) {
+            LOG.error( ex.getMessage(), ex );
             IO.getOut().println( ex.getMessage() );
         }
 

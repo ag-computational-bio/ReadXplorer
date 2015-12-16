@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.api;
 /**
  * A ReadXplorer specific RuntimeException indicating H2/SQL errors.
  *
- * @author Oliver Schwenger
+ * @author Oliver Schwengers
  */
 public class FileException extends ReadXplorerException {
 
@@ -29,8 +29,13 @@ public class FileException extends ReadXplorerException {
 
 
     /**
-     * Creates a new instance of <code>DatabaseException</code> without detail
+     * Creates a new instance of <code>FileException</code> without detail
      * message.
+     * <p>
+     * @param cause the cause (which is saved for later retrieval by the
+     *              {@link #getCause()} method). (A <tt>null</tt> value is
+     *              permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      */
     public FileException( Throwable cause ) {
         super( Type.File, cause );
@@ -38,16 +43,31 @@ public class FileException extends ReadXplorerException {
 
 
     /**
-     * Constructs an instance of <code>DatabaseException</code> with the
+     * Constructs an instance of <code>FileException</code> with the
      * specified detail message.
      * <p>
-     * @param msg the detail message.
+     * @param msg   the detail message.
+     * @param cause the cause (which is saved for later retrieval by the
+     *              {@link #getCause()} method). (A <tt>null</tt> value is
+     *              permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      */
     public FileException( String msg, Throwable cause ) {
         super( msg, Type.File, cause );
     }
 
 
+    /**
+     * Constructs an instance of <code>FileException</code> with the
+     * specified detail message.
+     * <p>
+     * @param userMsg A message to display to the user.
+     * @param errMsg  The detail message.
+     * @param cause   The cause (which is saved for later retrieval by the
+     *                {@link #getCause()} method). (A <tt>null</tt> value is
+     *                permitted, and indicates that the cause is nonexistent or
+     *                unknown.)
+     */
     public FileException( String userMsg, String errMsg, Throwable cause ) {
         super( userMsg, errMsg, Type.File, cause );
     }

@@ -22,6 +22,7 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
@@ -42,6 +43,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.DoubleTrackViewer
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -313,6 +315,10 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             tc = fetcher.getMultiTrackConnector( track );
         } catch( UserCanceledTrackPathUpdateException ex ) {
             SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+            return null;
+        } catch( DatabaseException e ) {
+            LOG.error( e.getMessage(), e );
+            ErrorHelper.getHandler().handle( e );
             return null;
         }
 
@@ -614,16 +620,17 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * @param refCon
      */
     private void addFeatureToView( PersistentFeature feature, ReferenceConnector refCon ) {
+        List<PersistentTrack> associatedTracks = refCon.getAssociatedTracks();
         this.currentFeature = feature;
         //Create LayoutWidget to layout all Tracks for a feature in GridLayout
         Widget layoutWidg = new Widget( activeTopComp.getScene() );
-        layoutWidg.setLayout( new ThumbGridLayout( (refCon.getAssociatedTracks().size()) ) );
+        layoutWidg.setLayout( new ThumbGridLayout( (associatedTracks.size()) ) );
         featureToLayoutWidget.put( feature, layoutWidg );
 
         //Save all BasePanels for feature in List to put into HashMap
         List<BasePanel> bps = new ArrayList<>( 10 );
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
-        for( PersistentTrack track : refCon.getAssociatedTracks() ) {
+        for( PersistentTrack track : associatedTracks ) {
             BasePanel trackPanel = createTrackPanel( track, controller, cbListener );
             if( trackPanel != null ) {
                 bps.add( trackPanel );
@@ -740,6 +747,10 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             } catch( UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 return null; //cannot occur, since both tracks are already open in the thumbnail viewer
+            } catch( DatabaseException e ) {
+                LOG.error( e.getMessage(), e );
+                ErrorHelper.getHandler().handle( e );
+                return null;
             }
             DoubleTrackViewer trackV = new DoubleTrackViewer( boundsManager, b, controller.getCurrentRefGen(), trackCon );
             trackV.setUseMinimalIntervalLength( false );

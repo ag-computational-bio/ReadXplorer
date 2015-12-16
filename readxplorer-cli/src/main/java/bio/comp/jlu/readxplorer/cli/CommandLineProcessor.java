@@ -225,7 +225,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         final long startTime = System.currentTimeMillis();
 
-        // check if help/usgae is requested
+        // check if help/usage is requested
         if( helpArg ) {
             env.usage();
             return;
@@ -517,28 +517,28 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printFine( ps, "submitted jobs to import read files..." );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
-        int latestTrackId = pc.getLatestTrackId();
-        // submit track parse jobs for (concurrent) execution
-        List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
-        for( int i = 0; i < trackFiles.length; i++ ) {
-
-            File trackFile = trackFiles[i];
-            TrackJob trackJob = new TrackJob( latestTrackId, trackFile,
-                                              trackFile.getName(),
-                                              referenceResult.getReferenceJob(),
-                                              selectParser( trackFile ),
-                                              false,
-                                              new Timestamp( System.currentTimeMillis() ) );
-            latestTrackId++;
-
-            futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
-            printFine( ps, "\t" + (i + 1) + ": " + trackFile );
-
-        }
-
-        // store parsed tracks sequently to db
-        printInfo( ps, "imported read files:" );
         try {
+            int latestTrackId = pc.getLatestTrackId();
+            // submit track parse jobs for (concurrent) execution
+            List<Future<ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
+            for( int i = 0; i < trackFiles.length; i++ ) {
+
+                File trackFile = trackFiles[i];
+                TrackJob trackJob = new TrackJob( latestTrackId, trackFile,
+                                                  trackFile.getName(),
+                                                  referenceResult.getReferenceJob(),
+                                                  selectParser( trackFile ),
+                                                  false,
+                                                  new Timestamp( System.currentTimeMillis() ) );
+                latestTrackId++;
+
+                futures.add( es.submit( new ImportTrackCallable( referenceResult, trackJob ) ) );
+                printFine( ps, "\t" + (i + 1) + ": " + trackFile );
+
+            }
+
+            // store parsed tracks sequently to db
+            printInfo( ps, "imported read files:" );
 
             for( int i = 0; i < futures.size(); i++ ) {
                 ImportTrackResults result = futures.get( i ).get();
@@ -563,7 +563,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             }
 
-        } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
+        } catch( InterruptedException | ExecutionException | DatabaseException ex ) { // something severe happened, stop everything!
             LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of read file failed:" );
             printInfo( ps, "reason: " + ex.getMessage() );
@@ -586,41 +586,41 @@ public final class CommandLineProcessor implements ArgsProcessor {
         final short deviation = (short) Integer.parseInt( getProperty( PairedEndConstants.PER_DEVIATION ) );
 
         final ProjectConnector pc = ProjectConnector.getInstance();
-        int latestTrackId = pc.getLatestTrackId();
+        try {
+            int latestTrackId = pc.getLatestTrackId();
 
-        final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
-        for( int i = 0; i < trackFiles.length; i++ ) {
+            final List<Future<ImportPairedEndResults>> futures = new ArrayList<>( trackFiles.length );
+            for( int i = 0; i < trackFiles.length; i++ ) {
 
-            File trackFile = trackFiles[i];
-            Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
-            TrackJob trackJob1 = new TrackJob( latestTrackId, trackFile,
-                                               trackFile.getName(),
-                                               referenceResult.getReferenceJob(),
-                                               selectParser( trackFile ),
-                                               false,
-                                               timestamp );
-            latestTrackId++;
-            TrackJob trackJob2 = null;
-            if( pairedEndFiles != null ) { // if no pairedEndFiles are available, this is a paired end track within a combined read file!
-                File pairedEndFile = pairedEndFiles[i];
-                trackJob2 = new TrackJob( latestTrackId, pairedEndFile,
-                                          pairedEndFile.getName(),
-                                          referenceResult.getReferenceJob(),
-                                          selectParser( pairedEndFile ),
-                                          false,
-                                          timestamp );
+                File trackFile = trackFiles[i];
+                Timestamp timestamp = new Timestamp( System.currentTimeMillis() );
+                TrackJob trackJob1 = new TrackJob( latestTrackId, trackFile,
+                                                   trackFile.getName(),
+                                                   referenceResult.getReferenceJob(),
+                                                   selectParser( trackFile ),
+                                                   false,
+                                                   timestamp );
                 latestTrackId++;
+                TrackJob trackJob2 = null;
+                if( pairedEndFiles != null ) { // if no pairedEndFiles are available, this is a paired end track within a combined read file!
+                    File pairedEndFile = pairedEndFiles[i];
+                    trackJob2 = new TrackJob( latestTrackId, pairedEndFile,
+                                              pairedEndFile.getName(),
+                                              referenceResult.getReferenceJob(),
+                                              selectParser( pairedEndFile ),
+                                              false,
+                                              timestamp );
+                    latestTrackId++;
+                }
+
+                ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
+                futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
+                printFine( ps, "\t" + (i + 1) + ": " + trackFile );
+
             }
 
-            ReadPairJobContainer rpjc = new ReadPairJobContainer( trackJob1, trackJob2, distance, deviation, orientation );
-            futures.add( es.submit( new ImportPairedEndCallable( referenceResult, rpjc ) ) );
-            printFine( ps, "\t" + (i + 1) + ": " + trackFile );
-
-        }
-
-        // store parsed reads sequently to db
-        printInfo( ps, "imported paired-end read files:" );
-        try {
+            // store parsed reads sequently to db
+            printInfo( ps, "imported paired-end read files:" );
 
             for( int i = 0; i < futures.size(); i++ ) {
 
@@ -649,7 +649,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             }
 
-        } catch( InterruptedException | ExecutionException ex ) { // something severe happened, stop everything!
+        } catch( InterruptedException | ExecutionException | DatabaseException ex ) { // something severe happened, stop everything!
             LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of paired-end read file failed:" );
             printInfo( ps, "reason: " + ex.getMessage() );
@@ -668,7 +668,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         printFine( ps, "submitted analyses:" );
         int runAnalyses = 0;
         final ProjectConnector pc = ProjectConnector.getInstance();
-
+        final List<PersistentTrack> tracks = pc.getTracks();
         final List<Future<AnalysisResult>> futures = new ArrayList<>();
 
         /**
@@ -706,7 +706,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             final ParameterSetSNPs parameterSet = new ParameterSetSNPs( minVaryingBases, minPercVariation, useMainBases, selFeatureTypes,
                                                                         readClassParams, minBaseQuality, minAvrBaseQuality, minAvrMappingQuality );
 
-            for( PersistentTrack persistentTrack : pc.getTracks() ) {
+            for( PersistentTrack persistentTrack : tracks ) {
                 SNPAnalysisCallable snpAnalysisCallable = new SNPAnalysisCallable( verboseArg, persistentTrack, parameterSet );
                 futures.add( es.submit( snpAnalysisCallable ) );
                 File trackFile = new File( persistentTrack.getFilePath() );
@@ -738,7 +738,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
                                                                       minIncreaseTotal, minIncreasePercent, maxLowCovInitCount, minLowCovIncrease, minTransExtensionCov,
                                                                       maxLeaderlessFeatureDistance, maxFeatureDistance, associateTSS, associateTssWindow, readClassParams );
 
-            for( PersistentTrack persistentTrack : pc.getTracks() ) {
+            for( PersistentTrack persistentTrack : tracks ) {
                 TSSAnalysisCallable tssAnalysisCallable = new TSSAnalysisCallable( verboseArg, persistentTrack, parameterSet );
                 futures.add( es.submit( tssAnalysisCallable ) );
                 File trackFile = new File( persistentTrack.getFilePath() );

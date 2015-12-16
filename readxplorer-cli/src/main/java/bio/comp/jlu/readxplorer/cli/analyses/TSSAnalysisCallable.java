@@ -21,6 +21,7 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -128,7 +129,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             writeFile( resultFile, tssResult.dataSheetNames(), tssResult.dataColumnDescriptions(), tssResult.dataToExcelExportList() );
             result.setResultFile( resultFile );
 
-        } catch( IOException | WriteException | InterruptedException ex ) {
+        } catch( IOException | WriteException | InterruptedException | DatabaseException ex ) {
             LOG.error( ex.getMessage(), ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ome ) {
@@ -143,7 +144,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
     }
 
 
-    private void processResultForExport( TssDetectionResult tssResult, int refGenomeId ) {
+    private void processResultForExport( TssDetectionResult tssResult, int refGenomeId ) throws DatabaseException {
 
         //Generating promoter regions for the TSS
         List<String> promoterRegions = new ArrayList<>();

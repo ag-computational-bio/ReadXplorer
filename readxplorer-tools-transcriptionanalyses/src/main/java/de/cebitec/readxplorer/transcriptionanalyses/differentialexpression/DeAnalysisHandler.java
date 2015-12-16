@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -35,6 +36,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -166,37 +168,49 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private void startAnalysis() {
         collectCoverageDataInstances.clear();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.info( "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
+        LOG.info( currentTimestamp + ": Starting to collect the necessary data for the differential gene expression analysis." );
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos.clear();
 
-        for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
-            genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
-        }
-
-        for( PersistentTrack currentTrack : selectedTracks ) {
-            try {
-                TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
-
-                CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
-                collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
-                AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
-                                                                         currentTrack.getDescription() + ".", readClassParams );
-                handler.setMappingsNeeded( true );
-                handler.setDesiredData( IntervalRequestData.ReducedMappings );
-                handler.registerObserver( collCovData );
-                allHandler.add( handler );
-            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
-                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                processingLog.addProperty( "Unresolved track", currentTrack );
-                notifyObservers( AnalysisStatus.ERROR );
-                this.interrupt();
-                return;
+        try {
+            for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
+                genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
             }
-        }
-        for( AnalysesHandler handler : allHandler ) {
-            handler.startAnalysis();
+
+            for( PersistentTrack currentTrack : selectedTracks ) {
+                try {
+                    TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
+
+                    CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
+                    collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
+                    AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
+                                                                             currentTrack.getDescription() + ".", readClassParams );
+                    handler.setMappingsNeeded( true );
+                    handler.setDesiredData( IntervalRequestData.ReducedMappings );
+                    handler.registerObserver( collCovData );
+                    allHandler.add( handler );
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+                    processingLog.addProperty( "Unresolved track", currentTrack );
+                    notifyObservers( AnalysisStatus.ERROR );
+                    interrupt();
+                    return;
+                } catch( DatabaseException e ) {
+                    LOG.error( e.getMessage(), e );
+                    processingLog.addProperty( "Unresolved track", currentTrack );
+                    notifyObservers( AnalysisStatus.ERROR );
+                    interrupt();
+                    ErrorHelper.getHandler().handle( e );
+                }
+            }
+            for( AnalysesHandler handler : allHandler ) {
+                handler.startAnalysis();
+            }
+        } catch( DatabaseException e ) {
+            LOG.error( e.getMessage(), e );
+            notifyObservers( AnalysisStatus.ERROR );
+            interrupt();
         }
     }
 
@@ -343,23 +357,23 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 notifyObservers( AnalysisStatus.FINISHED );
             } catch( PackageNotLoadableException | UnknownGnuRException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( currentTimestamp + ": " + ex.getMessage() );
                 notifyObservers( AnalysisStatus.ERROR );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
                 this.interrupt();
             } catch( IllegalStateException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.warn( "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.warn( currentTimestamp + ": " + ex.getMessage() );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             } catch( RserveException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( currentTimestamp + ": " + ex.getMessage() );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
                 notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
             } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
+                LOG.error( currentTimestamp + ": " + ex.getMessage() );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
                 notifyObservers( AnalysisStatus.ERROR );
             }

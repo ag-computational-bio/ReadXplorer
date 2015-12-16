@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 import de.cebitec.readxplorer.api.Classification;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -40,8 +41,7 @@ import java.util.List;
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class AnalysisCoveredFeatures implements Observer,
-                                                AnalysisI<List<CoveredFeature>> {
+public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<CoveredFeature>> {
 
     private final TrackConnector trackConnector;
     private final ParameterSetCoveredFeatures analysisParams;
@@ -57,22 +57,14 @@ public class AnalysisCoveredFeatures implements Observer,
      * Carries out the logic behind the covered features analysis. Both
      * parameters are mandatory.
      * <p>
-     * @param trackViewer        the track viewer for which the analyses should
-     *                           be carried out
-     * @param getCoveredFeatures <code>true</code> if the covered features
-     *                           should be returned, <code>false</code> if the
-     *                           uncovered features should be returned
-     * @param minCoveragePercent minimum percentage of an feature which has to
-     *                           be classified as covered, in order to detect it
-     *                           as 'present' in the analysis
-     * @param minCountedCoverage minimum coverage at a certain position to be
-     *                           taken into account for the analysis
-     * @param whateverStrand     <tt>true</tt>, if the strand does not matter
-     *                           for this analysis, false, if only mappings on
-     *                           the strand of the respective feature should be
-     *                           considered.
+     * @param trackConnector            the track connector for which the
+     *                                  analyses should be carried out
+     * @param featureCoverageParameters All parameters needed for the analysis.
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters ) {
+    public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters )
+            throws DatabaseException {
         this.trackConnector = trackConnector;
         this.analysisParams = featureCoverageParameters;
         this.detectedFeatures = new ArrayList<>();
@@ -87,8 +79,10 @@ public class AnalysisCoveredFeatures implements Observer,
     /**
      * Initializes the initial data structures needed for filtering features by
      * read count.
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    private void initDatastructures() {
+    private void initDatastructures() throws DatabaseException {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackConnector.getRefGenome().getId() );
         for( PersistentChromosome chrom : refConnector.getChromosomesForGenome().values() ) {
             this.genomeFeatures.addAll( refConnector.getFeaturesForRegionInclParents( 0, chrom.getLength(),

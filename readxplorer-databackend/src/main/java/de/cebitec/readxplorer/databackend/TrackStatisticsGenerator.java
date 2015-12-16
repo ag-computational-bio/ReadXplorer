@@ -18,15 +18,17 @@
 package de.cebitec.readxplorer.databackend;
 
 
+import de.cebitec.readxplorer.api.FileException;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JOptionPane;
 
 
 /**
@@ -84,8 +86,8 @@ public class TrackStatisticsGenerator implements ExportDataI {
 
     /**
      * Fetches the track statistics of all tracks and creates the data structure
-     * to store them in a table. The statistics include both, the single end
-     * and read pair statistics. If a statistics value is lacking, it is set to
+     * to store them in a table. The statistics include both, the single end and
+     * read pair statistics. If a statistics value is lacking, it is set to
      * "-1".
      * <p>
      * @return The statistics table data
@@ -94,20 +96,24 @@ public class TrackStatisticsGenerator implements ExportDataI {
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> allData = new ArrayList<>();
         List<List<Object>> statsData = new ArrayList<>();
+        try {
+            List<PersistentTrack> tracks = projectConnector.getTracks();
+            for( PersistentTrack track : tracks ) {
+                SaveFileFetcherForGUI fileFetcher = new SaveFileFetcherForGUI();
+                try {
 
-        List<PersistentTrack> tracks = projectConnector.getTracks();
-        for( PersistentTrack track : tracks ) {
-            SaveFileFetcherForGUI fileFetcher = new SaveFileFetcherForGUI();
-            try {
+                    TrackConnector trackConnector = fileFetcher.getTrackConnector( track );
+                    StatsContainer trackStats = trackConnector.getTrackStats();
+                    statsData.add( statsToList( track, trackStats ) );
 
-                TrackConnector trackConnector = fileFetcher.getTrackConnector( track );
-                StatsContainer trackStats = trackConnector.getTrackStats();
-                statsData.add( statsToList( track, trackStats ) );
-
-            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
-                JOptionPane.showMessageDialog( null, "You did not complete the track path selection. The track statistics cannot be stored for this track.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE );
-                //skipping track
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                    String msg = "You did not complete the track path selection. The track statistics cannot be stored for this track.";
+                    ErrorHelper.getHandler().handle( new FileException( msg, ex ), "Error resolving path to track" );
+                    //skipping track
+                }
             }
+        } catch( DatabaseException e ) {
+            ErrorHelper.getHandler().handle( e );
         }
 
         allData.add( statsData );
@@ -117,8 +123,8 @@ public class TrackStatisticsGenerator implements ExportDataI {
 
 
     /**
-     * Creates a statistics list from the given track and track statistics
-     * data. The order of the elements is always the same as declared in the
+     * Creates a statistics list from the given track and track statistics data.
+     * The order of the elements is always the same as declared in the
      * StatsContainer for all statistics. Both, track statistics and read pair
      * track statistics are stored. All missing statistics fields are filled
      * with "-1".
@@ -127,8 +133,10 @@ public class TrackStatisticsGenerator implements ExportDataI {
      * @param trackStats The StatsContainer with all track statistics
      * <p>
      * @return The ready-to-use statistics list
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    private List<Object> statsToList( PersistentTrack track, StatsContainer trackStats ) {
+    private List<Object> statsToList( PersistentTrack track, StatsContainer trackStats ) throws DatabaseException {
 
         List<Object> trackStatsList = new ArrayList<>();
 

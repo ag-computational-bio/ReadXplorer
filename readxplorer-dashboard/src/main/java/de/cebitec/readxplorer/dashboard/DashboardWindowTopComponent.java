@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.dashboard;
 
 
 import de.cebitec.readxplorer.databackend.TrackStatisticsGenerator;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -31,7 +32,9 @@ import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
 import de.cebitec.readxplorer.ui.login.LoginWizardAction;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,11 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -60,6 +59,8 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -115,11 +116,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         putClientProperty( TopComponent.PROP_UNDOCKING_DISABLED, Boolean.FALSE );
 
         this.refreshData();
-        ProjectConnector.getInstance().addObserver( new Observer() {
+        ProjectConnector.getInstance().registerObserver( new Observer() {
             @Override
-            public void update( Observable o, Object arg ) {
+            public void update( Object arg ) {
 
-                //dirty fix for a bug in h2 database, that is occuring, when trying
+                //dirty fix for a bug in h2 database, that is occurring, when trying
                 //to delete two or more references
                 //the code waits 200ms before updating the dashboard to ensure
                 //that the reference data has been fully deleted
@@ -217,7 +218,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
 
             } catch( OutOfMemoryError e ) {
-                VisualisationUtils.displayOutOfMemoryError( this );
+                LOG.error( e.getMessage(), e );
+                VisualisationUtils.displayOutOfMemoryError();
             }
         }
         this.repaint();
@@ -241,11 +243,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             if( item != null ) {
                 if( item.getChild() == DBItem.Child.GENOME ) {
                     if( !genomesAndTracksToOpen.containsKey( item.getID() ) ) {
-                        genomesAndTracksToOpen.put( item.getID(), new HashSet<Long>() );
+                        genomesAndTracksToOpen.put( item.getID(), new HashSet<>() );
                     }
                 } else {
                     if( !genomesAndTracksToOpen.containsKey( item.getRefID() ) ) {
-                        genomesAndTracksToOpen.put( item.getRefID(), new HashSet<Long>() );
+                        genomesAndTracksToOpen.put( item.getRefID(), new HashSet<>() );
                         DBItem parentItem = this.getItemForNode( n.getParentNode() );
                         if( parentItem != null ) {
                             parentItem.setSelected( true );
@@ -551,29 +553,34 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             Set<Long> trackIds = genomesAndTracksToOpen.get( genomeId );
 
             ReferenceConnector rc = ProjectConnector.getInstance().getRefGenomeConnector( genomeId.intValue() );
-            PersistentReference genome = rc.getRefGenome();
+            try {
+                PersistentReference genome = rc.getRefGenome();
 
-            //open reference genome now
-            AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
-            appPanelTopComponent.open();
-            appPanelTopComponent.getLookup().lookup( ViewController.class ).openGenome( genome );
-            appPanelTopComponent.setName( appPanelTopComponent.getLookup().lookup( ViewController.class ).getDisplayName() );
-            appPanelTopComponent.requestActive();
+                //open reference genome now
+                AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
+                appPanelTopComponent.open();
+                appPanelTopComponent.getLookup().lookup( ViewController.class ).openGenome( genome );
+                appPanelTopComponent.setName( appPanelTopComponent.getLookup().lookup( ViewController.class ).getDisplayName() );
+                appPanelTopComponent.requestActive();
 
 
-            //open tracks for this genome now
-            List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
-            List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
-            for( PersistentTrack track : allTracksForThisGenome ) {
-                if( trackIds.contains( (long) track.getId() ) ) {
-                    tracksToShow.add( track );
+                //open tracks for this genome now
+                List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
+                List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
+                for( PersistentTrack track : allTracksForThisGenome ) {
+                    if( trackIds.contains( (long) track.getId() ) ) {
+                        tracksToShow.add( track );
+                    }
                 }
+
+                appPanelTopComponent.getLookup().lookup( ViewController.class ).openTracksOnCurrentGenome( tracksToShow );
+
+                //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
+            } catch( DatabaseException ex ) {
+                LOG.error( ex.getMessage(), ex );
+                ErrorHelper.getHandler().handle( ex );
             }
-
-            appPanelTopComponent.getLookup().lookup( ViewController.class ).openTracksOnCurrentGenome( tracksToShow );
-
         }
-        //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
 
     }//GEN-LAST:event_openButtonActionPerformed
 

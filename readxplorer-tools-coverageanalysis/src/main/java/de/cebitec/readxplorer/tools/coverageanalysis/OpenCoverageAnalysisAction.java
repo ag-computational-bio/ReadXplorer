@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -32,6 +33,7 @@ import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -167,25 +169,29 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
 
         parameters = new ParameterSetCoverageAnalysis( minCoverageCount, isSumCoverage, detectCoveredIntervals, readClassesParams );
 
-        TrackConnector connector;
         if( !combineTracks ) {
             for( PersistentTrack track : this.tracks ) {
                 try {
-                    connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    this.createAnalysis( connector, readClassesParams );
+
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                    continue;
+                } catch( DatabaseException e ) {
+                    LOG.error( e.getMessage(), e );
+                    ErrorHelper.getHandler().handle( e );
                 }
-
-                this.createAnalysis( connector, readClassesParams );
             }
         } else {
             try {
-                connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
+                TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassesParams );
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+            } catch( DatabaseException e ) {
+                LOG.error( e.getMessage(), e );
+                ErrorHelper.getHandler().handle( e );
             }
         }
     }

@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -26,6 +27,7 @@ import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
 import de.cebitec.readxplorer.ui.dialogmenus.ImportTrackBasePanel;
 import de.cebitec.readxplorer.ui.importer.actions.ImportWizardAction;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.beans.PropertyChangeEvent;
@@ -68,7 +70,12 @@ public class ImportSetupCard extends JPanel {
         refJobView.addPropertyChangeListener( this.getJobPropListener() );
         trackJobView.addPropertyChangeListener( this.getJobPropListener() );
         readPairTrackJobsView.addPropertyChangeListener( this.getJobPropListener() );
-        trackID = ProjectConnector.getInstance().getLatestTrackId();
+        try {
+            trackID = ProjectConnector.getInstance().getLatestTrackId();
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( new DatabaseException( ex.getMessage() + "Restart software before import, " +
+                                                                    "otherwise existing tracks might be overwritten!", ex ) );
+        }
     }
 
 

@@ -19,8 +19,6 @@ package de.cebitec.readxplorer.databackend;
 
 
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
-import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -51,8 +49,6 @@ public class MappingThread extends RequestThread {
 
     private static final Logger LOG = LoggerFactory.getLogger( MappingThread.class.getName() );
 
-
-    private static final int FIXED_INTERVAL_LENGTH = 1000;
     private final List<PersistentTrack> tracks;
     private List<Mapping> currentMappings;
     private Collection<ReadPairGroup> currentReadPairs;
@@ -65,16 +61,14 @@ public class MappingThread extends RequestThread {
      * database or a file.
      * <p>
      * @param tracks the track for which this mapping thread is created
+     * @param referenceGenome The reference genome
      */
-    public MappingThread( List<PersistentTrack> tracks ) {
+    public MappingThread( List<PersistentTrack> tracks, PersistentReference referenceGenome ) {
         super();
         // do general stuff
         this.requestQueue = new ConcurrentLinkedQueue<>();
         this.tracks = tracks;
-        if( this.canQueryData() ) {
-            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( tracks.get( 0 ).getRefGenID() );
-            this.refGenome = refConnector.getRefGenome();
-        }
+        this.refGenome = referenceGenome;
     }
 
 
@@ -102,7 +96,7 @@ public class MappingThread extends RequestThread {
         if( request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0 ) {
 
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.info( "{0}: Reading mapping data from file...", currentTimestamp );
+            LOG.info( currentTimestamp + ": Reading mapping data from file..." );
 
             mappingList.ensureCapacity( tracks.size() );
             for( final PersistentTrack track : tracks ) {
@@ -116,7 +110,7 @@ public class MappingThread extends RequestThread {
             }
 
             currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.info( "{0}: Done reading mapping data from file...", currentTimestamp );
+            LOG.info( currentTimestamp + ": Done reading mapping data from file..." );
 
         }
         return mappingList;
@@ -135,7 +129,7 @@ public class MappingThread extends RequestThread {
     public List<Mapping> loadReducedMappings( final IntervalRequest request ) {
 
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.info( "{0}: Reading mapping data from file...", currentTimestamp );
+        LOG.info( currentTimestamp + ": Reading mapping data from file..." );
 
         List<Mapping> mappings = new ArrayList<>( tracks.size() );
         for( final PersistentTrack track : tracks ) {
@@ -149,7 +143,7 @@ public class MappingThread extends RequestThread {
         }
 
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.info( "{0}: Done reading mapping data from file...", currentTimestamp );
+        LOG.info( currentTimestamp + ": Done reading mapping data from file..." );
 
         return mappings;
     }
@@ -215,14 +209,6 @@ public class MappingThread extends RequestThread {
             }
 
         }
-    }
-
-
-    /**
-     * @return true, if the tracklist is not null or empty, false otherwise
-     */
-    protected boolean canQueryData() {
-        return this.tracks != null && !this.tracks.isEmpty();
     }
 
 

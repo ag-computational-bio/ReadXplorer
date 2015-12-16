@@ -104,8 +104,8 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
             for( PersistentTrack dbTrack : dbTracks ) {
                 // File and parser, refgenjob, runjob parameters meaningless in this context
                 TrackJob tj = new TrackJob( dbTrack.getId(), new File( dbTrack.getFilePath() ),
-                                           dbTrack.getDescription(), indexedRefs.get( dbTrack.getRefGenID() ),
-                                           null, false, dbTrack.getTimestamp() );
+                                            dbTrack.getDescription(), indexedRefs.get( dbTrack.getRefGenID() ),
+                                            null, false, dbTrack.getTimestamp() );
 
                 // register dependent tracks at genome and run
                 ReferenceJob gen = indexedRefs.get( dbTrack.getRefGenID() );
@@ -114,7 +114,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
             }
 
         } catch( OutOfMemoryError e ) {
-            VisualisationUtils.displayOutOfMemoryError( this.component );
+            VisualisationUtils.displayOutOfMemoryError();
         }
 
         // fill result map

@@ -174,7 +174,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             if( diff.getPosition() >= coverage.getLeftBound() && diff.getPosition() < coverage.getRightBound() &&
                 (diff.getBaseQuality() > analysisParams.getMinBaseQuality() || diff.getBaseQuality() == -1) ) {
                 base = diff.isForwardStrand() ? diff.getBase() : SequenceUtils.getDnaComplement( diff.getBase() );
-                int baseIdx = this.getBaseInt( base );
+                int baseIdx = getBaseInt( base );
                 int pos = diff.getPosition() - coverage.getLeftBound();
                 baseArray[pos][baseIdx][COUNT_IDX] += diff.getCount();
                 if( diff.getBaseQuality() > -1 ) { //can be -1 if unknown
@@ -244,7 +244,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                         int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                         if( cov == 0 ) {
                             ++cov;
-                            LOG.error( "found uncovered position in diffs: {0}", absPos );
+                            LOG.error( "found uncovered position in diffs: " + absPos );
                         }
                         double frequency = (diffCount * 100.0) / cov;
 
@@ -318,7 +318,7 @@ public class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                 int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                                 if( cov == 0 ) {
                                     ++cov;
-                                    LOG.error( "found uncovered position in gaps: {0}", absPos );
+                                    LOG.error( "found uncovered position in gaps: " + absPos );
                                 }
                                 double frequency = (diffCount * 100.0) / cov;
 

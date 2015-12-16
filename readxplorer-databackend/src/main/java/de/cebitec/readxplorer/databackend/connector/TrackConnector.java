@@ -34,6 +34,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
@@ -74,8 +75,9 @@ public class TrackConnector {
      * @param track the track for which this connector is created
      * <p>
      * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
      */
-    protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException {
+    protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException, DatabaseException {
 
         associatedTracks = new ArrayList<>();
         associatedTracks.add( track );
@@ -95,8 +97,9 @@ public class TrackConnector {
      *                      false if it should be kept separated
      * <p>
      * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
      */
-    protected TrackConnector( final int id, final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException {
+    protected TrackConnector( final int id, final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException, DatabaseException {
 
         if( tracks.size() > 2 && !combineTracks ) {
             throw new UnsupportedOperationException( "More than two tracks not supported yet." );
@@ -113,8 +116,11 @@ public class TrackConnector {
      * @param trackId       the track id to use
      * @param combineTracks true, if the data of these tracks is to be combined,
      *                      false if it should be kept separated
+     *
+     * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
      */
-    private void initTrackConnector( final int trackId, final boolean combineTracks ) throws FileNotFoundException {
+    private void initTrackConnector( final int trackId, final boolean combineTracks ) throws FileNotFoundException, DatabaseException {
 
         for( final PersistentTrack track : associatedTracks ) {
             if( !new File( track.getFilePath() ).exists() ) {
@@ -143,10 +149,10 @@ public class TrackConnector {
      */
     private void startDataThreads( final boolean combineTracks ) {
 
-        mappingThread = new MappingThread( associatedTracks );
-        coverageThread = new CoverageThread( associatedTracks, combineTracks );
-        mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks );
-        coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, combineTracks );
+        mappingThread = new MappingThread( associatedTracks, refGenome );
+        coverageThread = new CoverageThread( associatedTracks, refGenome, combineTracks );
+        mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks, refGenome );
+        coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, refGenome, combineTracks );
         coverageThread.start();
         coverageThreadAnalyses.start();
         mappingThread.start();
@@ -239,14 +245,14 @@ public class TrackConnector {
      * <p>
      * @return The complete statistics for the track specified by the given id.
      */
-    public StatsContainer getTrackStats( final int wantedTrackId ) throws DatabaseException {
+    public StatsContainer getTrackStats( final int wantedTrackId ) {
+
+        StatsContainer statsContainer = new StatsContainer();
+        statsContainer.prepareForTrack();
+        statsContainer.prepareForReadPairTrack();
 
         try( Connection con = ProjectConnector.getInstance().getConnection();
-             PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ); ) {
-
-            StatsContainer statsContainer = new StatsContainer();
-            statsContainer.prepareForTrack();
-            statsContainer.prepareForReadPairTrack();
+             PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
 
             fetch.setInt( 1, wantedTrackId );
             try( final ResultSet rs = fetch.executeQuery() ) {
@@ -256,13 +262,14 @@ public class TrackConnector {
                     statsContainer.increaseValue( statsKey, statsValue );
                 }
             }
-            return statsContainer;
 
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not get track stats from the database!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
-
+        return statsContainer;
     }
 
 
@@ -356,15 +363,18 @@ public class TrackConnector {
      *         <code>-1</code> if this the track id is not found in the DB
      *         (which is the case for combined tracks).
      */
-    public Integer getReadPairToTrackID() throws DatabaseException {
+    public Integer getReadPairToTrackID() {
+        int id = -1;
 
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
-            return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackId );
+            id = GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackId );
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch read pair id from the database!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
-
+        return id;
     }
 
 
@@ -382,7 +392,7 @@ public class TrackConnector {
      * @return the second track id of a read pair beyond this track connectors
      *         track id
      */
-    public int getTrackIdToReadPairId( final int readPairId ) throws DatabaseException {
+    public int getTrackIdToReadPairId( final int readPairId ) {
 
         try( Connection con = ProjectConnector.getInstance().getConnection();
              PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID ) ) {
@@ -392,15 +402,16 @@ public class TrackConnector {
             try( ResultSet rs = pStmtFetch.executeQuery() ) {
                 if( rs.next() ) {
                     return rs.getInt( FieldNames.TRACK_ID );
-                } else {
-                    return 0;
                 }
             }
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch track id to read pair id from the database!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
 
+        return 0;
     }
 
 
@@ -415,13 +426,13 @@ public class TrackConnector {
      *         desired distribution is not yet stored in the DB, the returned
      *         distribution is empty.
      */
-    public DiscreteCountingDistribution getCountDistribution( final Distribution type ) throws DatabaseException {
+    public DiscreteCountingDistribution getCountDistribution( final Distribution type ) {
+
+        DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
+        countDistribution.setType( type );
 
         try( Connection con = ProjectConnector.getInstance().getConnection();
              PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_COUNT_DISTRIBUTION ) ) {
-
-            DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
-            countDistribution.setType( type );
 
             for( PersistentTrack track : associatedTracks ) {
                 pStmtFetch.setInt( 1, track.getId() );
@@ -430,7 +441,8 @@ public class TrackConnector {
                     while( rs.next() ) {
                         int count = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
                         int intervalId = rs.getInt( FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID );
-                        countDistribution.setCountForIndex( intervalId, countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
+                        countDistribution.setCountForIndex( intervalId, 
+                                                            countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
                     }
                 }
             }
@@ -442,13 +454,14 @@ public class TrackConnector {
                 }
             }
 
-            return countDistribution;
-
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch count distribution from the database!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
 
+        return countDistribution;
     }
 
 

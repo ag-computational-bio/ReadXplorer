@@ -26,6 +26,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -74,33 +75,32 @@ public class ReferenceConnector {
      * @return Fetches the reference genome of the reference associated with
      *         this connector. If it was called once, it is kept in memory and
      *         does not need to be fetched from the DB again.
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public PersistentReference getRefGenome() throws DatabaseException {
 
         LOG.info( "Loading reference genome with id " + refId + " from database" );
-        try( Connection con = ProjectConnector.getInstance().getConnection() ) {
-            try( final PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_SINGLE_GENOME ) ) {
-                pStmtFetch.setLong( 1, refId );
 
-                try( final ResultSet rs = pStmtFetch.executeQuery() ) {
-                    if( rs.next() ) {
-                        String name = rs.getString( FieldNames.REF_GEN_NAME );
-                        String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
-                        Timestamp time = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
-                        File fastaFile = new File( rs.getString( FieldNames.REF_GEN_FASTA_FILE ) );
-                        return new PersistentReference( refId, name, description, time, fastaFile );
-                    } else {
-                        return null;
-                    }
+        try( Connection con = ProjectConnector.getInstance().getConnection();
+             final PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_SINGLE_GENOME ) ) {
+            pStmtFetch.setLong( 1, refId );
+
+            try( final ResultSet rs = pStmtFetch.executeQuery() ) {
+                if( rs.next() ) {
+                    String name = rs.getString( FieldNames.REF_GEN_NAME );
+                    String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
+                    Timestamp time = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
+                    File fastaFile = new File( rs.getString( FieldNames.REF_GEN_FASTA_FILE ) );
+                    return new PersistentReference( refId, name, description, time, fastaFile );
+                } else {
+                    return null;
                 }
-
-            } catch( SQLException ex ) {
-                LOG.error( ex.getMessage(), ex );
-                throw new DatabaseException( "Could not fetch reference!", ex.getMessage(), ex );
             }
+
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            throw new DatabaseException( "Could not fetch reference!", ex.getMessage(), ex );
         }
 
     }
@@ -109,34 +109,32 @@ public class ReferenceConnector {
     /**
      * @return All chromosomes of this reference without their sequence.
      */
-    public Map<Integer, PersistentChromosome> getChromosomesForGenome() throws DatabaseException {
+    public Map<Integer, PersistentChromosome> getChromosomesForGenome() {
 
         LOG.info( "Loading chromosomes for reference with id " + refId + " from database", refId );
-        try( Connection con = ProjectConnector.getInstance().getConnection() ) {
-            try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOMES ) ) {
-                fetch.setLong( 1, refId );
-                try( final ResultSet rs = fetch.executeQuery() ) {
-                    Map<Integer, PersistentChromosome> chromosomes = new HashMap<>();
-                    while( rs.next() ) {
-                        int id = rs.getInt( FieldNames.CHROM_ID );
-                        int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
-                        String name = rs.getString( FieldNames.CHROM_NAME );
-                        int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
+        Map<Integer, PersistentChromosome> chromosomes = new HashMap<>();
+        try( Connection con = ProjectConnector.getInstance().getConnection();
+             final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOMES ) ) {
+            fetch.setLong( 1, refId );
+            try( final ResultSet rs = fetch.executeQuery() ) {
 
-                        chromosomes.put( id, new PersistentChromosome( id, chromNumber, refId, name, chromLength ) );
-                    }
-                    return chromosomes;
+                while( rs.next() ) {
+                    int id = rs.getInt( FieldNames.CHROM_ID );
+                    int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
+                    String name = rs.getString( FieldNames.CHROM_NAME );
+                    int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
+
+                    chromosomes.put( id, new PersistentChromosome( id, chromNumber, refId, name, chromLength ) );
                 }
-
-            } catch( SQLException ex ) {
-                LOG.error( ex.getMessage(), ex );
-                throw new DatabaseException( "Could not fetch chromosomes!", ex.getMessage(), ex );
             }
+
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch chromosomes!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
-
+        return chromosomes;
     }
 
 
@@ -144,33 +142,31 @@ public class ReferenceConnector {
      * @param chromId the id of the chromosome to fetch
      * <p>
      * @return One chromosome of this reference without its sequence.
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public PersistentChromosome getChromosomeForGenome( final int chromId ) throws DatabaseException {
 
         LOG.info( "Loading chromosome for reference with id " + refId + " from database", refId );
-        try( Connection con = ProjectConnector.getInstance().getConnection() ) {
-            try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOME ) ) {
-                fetch.setLong( 1, chromId );
-                try( final ResultSet rs = fetch.executeQuery() ) {
-                    if( rs.next() ) {
-                        int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
-                        int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
-                        String name = rs.getString( FieldNames.CHROM_NAME );
-                        return new PersistentChromosome( chromId, chromNumber, refId, name, chromLength );
-                    } else {
-                        return null;
-                    }
-                }
+        try( Connection con = ProjectConnector.getInstance().getConnection();
+             final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOME ) ) {
 
-            } catch( SQLException ex ) {
-                LOG.error( ex.getMessage(), ex );
-                throw new DatabaseException( "Could not fetch chromosome!", ex.getMessage(), ex );
+            fetch.setLong( 1, chromId );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                if( rs.next() ) {
+                    int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
+                    int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
+                    String name = rs.getString( FieldNames.CHROM_NAME );
+                    return new PersistentChromosome( chromId, chromNumber, refId, name, chromLength );
+                } else {
+                    throw new DatabaseException( "Could not find chromosome in database!", new RuntimeException() );
+                }
             }
+
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            throw new DatabaseException( "Could not fetch chromosome!", ex.getMessage(), ex );
         }
-
     }
 
 
@@ -186,8 +182,9 @@ public class ReferenceConnector {
      * <p>
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistentFeature> getFeaturesForRegion( final int from, final int to, final FeatureType featureType, final int chromId ) throws DatabaseException {
+    public List<PersistentFeature> getFeaturesForRegion( final int from, final int to, final FeatureType featureType, final int chromId ) {
 
+        List<PersistentFeature> features = new ArrayList<>();
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
             final PreparedStatement pStmtFetchFeatures;
             if( featureType == FeatureType.ANY ) {
@@ -204,7 +201,6 @@ public class ReferenceConnector {
             }
 
             try( final ResultSet rs = pStmtFetchFeatures.executeQuery() ) {
-                List<PersistentFeature> features = new ArrayList<>();
                 while( rs.next() ) {
                     int id = rs.getInt( FieldNames.FEATURE_ID );
                     String parentIds = rs.getString( FieldNames.FEATURE_PARENT_IDS );
@@ -220,17 +216,17 @@ public class ReferenceConnector {
 
                     features.add( new PersistentFeature( id, chromId, parentIds, ecnum, locus, product, start, stop, isFwdStrand, type, gene ) );
                 }
-                return features;
-
-            } catch( SQLException ex ) {
-                LOG.error( ex.getMessage(), ex );
-                throw new DatabaseException( "Could not fetch features for reagion!", ex.getMessage(), ex );
             }
+            pStmtFetchFeatures.close();
+
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch features for reagion!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
 
+        return features;
     }
 
 
@@ -274,7 +270,9 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      *         including their parent and children relationships
      */
-    public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to, final FeatureType featureType, final int chromId ) {
+    public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to,
+                                                                    final FeatureType featureType,
+                                                                    final int chromId ) {
 
         List<PersistentFeature> features = getFeaturesForRegion( from, to, FeatureType.ANY, chromId );
         PersistentFeature.Utils.addParentFeatures( features );
@@ -300,7 +298,9 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      *         including their parent and children relationships
      */
-    public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to, final Set<FeatureType> featureTypes, final int chromId ) {
+    public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to,
+                                                                    final Set<FeatureType> featureTypes,
+                                                                    final int chromId ) {
 
         List<PersistentFeature> features = new ArrayList<>();
         for( FeatureType featureType : featureTypes ) {
@@ -321,10 +321,11 @@ public class ReferenceConnector {
      * <p>
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistentFeature> getFeaturesForClosedInterval( final int left, final int right, final int chromId ) throws DatabaseException {
+    public List<PersistentFeature> getFeaturesForClosedInterval( final int left, final int right, final int chromId ) {
 
+        List<PersistentFeature> features = new ArrayList<>();
         try( Connection con = ProjectConnector.getInstance().getConnection();
-             PreparedStatement pStmtFetchFeatures = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL ); ) {
+             PreparedStatement pStmtFetchFeatures = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL ) ) {
 
             pStmtFetchFeatures.setInt( 1, chromId );
             pStmtFetchFeatures.setInt( 2, left );
@@ -333,7 +334,6 @@ public class ReferenceConnector {
             pStmtFetchFeatures.setInt( 5, right );
 
             try( final ResultSet rs = pStmtFetchFeatures.executeQuery() ) {
-                List<PersistentFeature> features = new ArrayList<>();
                 while( rs.next() ) {
                     int id = rs.getInt( FieldNames.FEATURE_ID );
                     String parentIds = rs.getString( FieldNames.FEATURE_PARENT_IDS );
@@ -347,23 +347,22 @@ public class ReferenceConnector {
                     String gene = rs.getString( FieldNames.FEATURE_GENE );
                     features.add( new PersistentFeature( id, chromId, parentIds, ecnum, locus, product, start, stop, isFwdStrand, type, gene ) );
                 }
-                return features;
-            } catch( SQLException ex ) {
-                LOG.error( ex.getMessage(), ex );
-                throw new DatabaseException( "Could not fetch features for closed interval!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch features for closed interval!" );
+        } catch( DatabaseException e ) {
+            ErrorHelper.getHandler().handle( e );
         }
 
+        return features;
     }
 
 
     /**
      * @return the tracks associated to this reference connector.
      */
-    public List<PersistentTrack> getAssociatedTracks() throws DatabaseException {
+    public List<PersistentTrack> getAssociatedTracks() {
 
         try( Connection con = ProjectConnector.getInstance().getConnection();
              PreparedStatement pStmtFetch = con.prepareStatement( SQLStatements.FETCH_TRACKS_FOR_GENOME ) ) {
@@ -388,7 +387,9 @@ public class ReferenceConnector {
 
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Could not fetch tracks from the database!" );
+        } catch( DatabaseException e ) {
+            ErrorHelper.getHandler().handle( e );
         }
 
         return Collections.unmodifiableList( associatedTracks );
@@ -446,40 +447,37 @@ public class ReferenceConnector {
      * @return true, if this reference genome has at least one feature of the
      *         given type, false otherwise
      */
-    public boolean hasFeatures( final FeatureType type ) throws DatabaseException {
+    public boolean hasFeatures( final FeatureType type ) {
 
         try( Connection con = ProjectConnector.getInstance().getConnection() ) {
             for( PersistentChromosome chromosome : getChromosomesForGenome().values() ) {
 
                 int chromId = chromosome.getId();
-                try {
-                    final PreparedStatement pStmtFetch;
-                    if( type == FeatureType.ANY ) {
-                        pStmtFetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_EXIST );
-                        pStmtFetch.setLong( 1, chromId );
-                    } else {
-                        pStmtFetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
-                        pStmtFetch.setLong( 1, chromId );
-                        pStmtFetch.setLong( 2, type.getType() );
+                final PreparedStatement pStmtFetch;
+                if( type == FeatureType.ANY ) {
+                    pStmtFetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_EXIST );
+                    pStmtFetch.setLong( 1, chromId );
+                } else {
+                    pStmtFetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
+                    pStmtFetch.setLong( 1, chromId );
+                    pStmtFetch.setLong( 2, type.getType() );
+                }
+                try( ResultSet rs = pStmtFetch.executeQuery() ) {
+                    pStmtFetch.close();
+                    if( rs.next() ) { // if at least one entry exists we can exit early.
+                        return true;
                     }
-                    try( ResultSet rs = pStmtFetch.executeQuery() ) {
-                        if( rs.next() ) { // if at least one entry exists we can exit early.
-                            return true;
-                        }
-                    }
-                } catch( SQLException ex ) {
-                    LOG.error( ex.getMessage(), ex );
-                    throw new DatabaseException( "Check for feature has failed!", ex.getMessage(), ex );
                 }
             }
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
-            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+            ErrorHelper.getHandler().handle( ex, "Check for feature has failed!" );
+        } catch( DatabaseException e ) {
+            ErrorHelper.getHandler().handle( e );
         }
 
-        //Tried all chromosomes, no entry found
+        //Tried all chromosomes, no entry found or exception occurred
         return false;
-
     }
 
 

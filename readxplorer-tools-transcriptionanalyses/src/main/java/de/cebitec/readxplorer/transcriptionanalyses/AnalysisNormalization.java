@@ -66,7 +66,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
     private final List<PersistentFeature> genomeFeatures;
     private final Map<Integer, NormalizedReadCount> featureReadCount;
     private double totalMappedReads = 0;
-    private boolean notInitialized;
 
     private double geneExonLength;
     private int noFeatureReads;
@@ -94,7 +93,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         normalizationSumMap = new HashMap<>();
         genomeFeatures = new ArrayList<>();
         usedFeatureTypes = new HashSet<>( paramsNormalization.getSelFeatureTypes() );
-        notInitialized = true;
+
+        initDatastructures();
     }
 
 
@@ -103,10 +103,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         MappingResult mappingResult = new MappingResult( null, null );
 
         if( data.getClass() == mappingResult.getClass() ) {
-            if( notInitialized ) {
-                initDatastructures();
-                notInitialized = false;
-            }
             MappingResult mappings = (MappingResult) data;
             updateReadCountForFeatures( mappings );
 

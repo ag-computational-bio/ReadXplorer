@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -34,6 +35,7 @@ import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -187,16 +189,16 @@ public final class OpenSnpDetectionAction implements ActionListener,
                                                     readClassParams, minBaseQuality, minAverageBaseQual, minAverageMapQual );
         if( !combineTracks ) {
             for( PersistentTrack track : tracks ) {
-                TrackConnector connector;
-                try {
-                    connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                try { //every track has its own analysis handlers
+                    TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    this.createAnalysis( connector, readClassParams );
+
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                    continue;
+                } catch( DatabaseException e ) {
+                    LOG.error( e.getMessage(), e );
+                    ErrorHelper.getHandler().handle( e );
                 }
-
-                //every track has its own analysis handlers
-                this.createAnalysis( connector, readClassParams );
             }
         } else {
             try {
@@ -205,6 +207,9 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+            } catch( DatabaseException e ) {
+                LOG.error( e.getMessage(), e );
+                ErrorHelper.getHandler().handle( e );
             }
         }
     }

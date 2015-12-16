@@ -89,7 +89,7 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
                 refJobList.add( new ReferenceJob( r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp() ) );
             }
         } catch( OutOfMemoryError e ) {
-            VisualisationUtils.displayOutOfMemoryError( this );
+            VisualisationUtils.displayOutOfMemoryError();
         }
         return refJobList;
     }

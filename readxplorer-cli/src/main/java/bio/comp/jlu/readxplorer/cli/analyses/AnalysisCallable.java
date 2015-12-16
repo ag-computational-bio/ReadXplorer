@@ -191,7 +191,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
     }
 
 
-    private static final boolean fillSheet( WritableSheet sheet, List<List<Object>> sheetData, List<String> headerRow ) throws OutOfMemoryError, WriteException {
+    private static boolean fillSheet( WritableSheet sheet, List<List<Object>> sheetData, List<String> headerRow ) throws OutOfMemoryError, WriteException {
 
         boolean dataLeft = false;
         int row = 0;
@@ -232,7 +232,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
     }
 
 
-    private static final String getObjectType( Object entry ) {
+    private static String getObjectType( Object entry ) {
 
         if( entry instanceof Integer || entry instanceof Byte || entry instanceof Long ) {
             return TABLE_INTEGER;
@@ -251,7 +251,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
     }
 
 
-    private static final void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
+    private static void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
 
         if( cellvalue == null ) {
             sheet.addCell( new Label( column, row, "n/a" ) );

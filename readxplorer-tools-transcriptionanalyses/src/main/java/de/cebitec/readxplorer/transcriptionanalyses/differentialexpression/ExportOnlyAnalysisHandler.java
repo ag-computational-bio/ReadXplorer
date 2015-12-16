@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.polytree.Node;
@@ -29,9 +30,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +43,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
  * @author kstaderm
  */
 public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger( ExportOnlyAnalysisHandler.class.getName() );
 
     private DeAnalysisData data;
     private List<ResultDeAnalysis> results;
@@ -72,6 +78,8 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         List<List<Object>> tableContents = new ArrayList<>();
 
         final ReferenceConnector referenceConnector = getReferenceConnector();
+        Map<Integer, PersistentChromosome> chromosomesForGenome = referenceConnector.getChromosomesForGenome();
+
         for( i = 0; i < data.getFeatures().length; i++ ) {
 
             boolean allZero = true;
@@ -79,7 +87,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             // Here the additional fields are added. If something is added don't
             // forget to also enter a additional colum name further down.
             tmp.add( feature[i].getLocus() );
-            tmp.add( referenceConnector.getChromosomeForGenome( feature[i].getChromId() ) );
+            tmp.add( chromosomesForGenome.get( feature[i].getChromId() ) );
             if( feature[i].isFwdStrand() ) {
                 tmp.add( "fw" );
             } else {

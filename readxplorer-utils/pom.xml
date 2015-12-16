@@ -163,7 +163,7 @@
                 <configuration>
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.utils</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.classification</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.utils.errorhandling</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.filechooser</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.polytree</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.sequence</publicPackage>

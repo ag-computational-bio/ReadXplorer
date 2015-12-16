@@ -191,8 +191,10 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * <p>
      * @param trackJob The track job for which the chromosome sequences and
      *                 lengths are needed.
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    private void setChromLengthMap( TrackJob trackJob ) {
+    private void setChromLengthMap( TrackJob trackJob ) throws DatabaseException {
         chromLengthMap = new HashMap<>();
         int id = trackJob.getRefGen().getID();
         Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( id ).getRefGenome().getChromosomes();
@@ -247,16 +249,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
                     TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
                     TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
-                    this.setChromLengthMap( trackJob1 );
-                    File inputFile1 = trackJob1.getFile();
-                    inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                    StatsContainer statsContainer = new StatsContainer();
-                    statsContainer.prepareForTrack();
-                    statsContainer.prepareForReadPairTrack();
+                    try {
+                        this.setChromLengthMap( trackJob1 );
+                        File inputFile1 = trackJob1.getFile();
+                        inputFile1.setReadOnly(); //prevents changes or deletion of original file!
+                        StatsContainer statsContainer = new StatsContainer();
+                        statsContainer.prepareForTrack();
+                        statsContainer.prepareForReadPairTrack();
 
-                    if( !trackJob1.isAlreadyImported() ) {
+                        if( !trackJob1.isAlreadyImported() ) {
 
-                        try {
                             //executes any conversion before other calculations, if the parser supports any
                             trackJob1.getParser().registerObserver( this );
                             Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
@@ -307,55 +309,44 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
                             //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
                             GeneralUtils.deleteOldWorkFile( lastWorkFile );
+                            ph.progress( ++workunits );
 
-                        } catch( OutOfMemoryError ex ) {
-                            this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
-                            this.noErrors = false;
-                            continue;
-
-                        } catch( Exception ex ) {
-                            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
-                            Exceptions.printStackTrace( ex );
-                            this.noErrors = false;
-                            continue;
-                        }
-                        ph.progress( ++workunits );
-
-                    } else { //else case with 2 already imported tracks is prohibited
-                        //we have to calculate the stats
-                        SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
-                        statsParser.setStatsContainer( statsContainer );
-                        try {
+                        } else { //else case with 2 already imported tracks is prohibited
+                            //we have to calculate the stats
+                            SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
+                            statsParser.setStatsContainer( statsContainer );
                             statsParser.registerObserver( this );
                             statsParser.classifyReadPairs();
 
-                        } catch( OutOfMemoryError ex ) {
-                            this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
-                            this.noErrors = false;
-                            continue;
-
-                        } catch( Exception ex ) {
-                            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
-                            Exceptions.printStackTrace( ex );
-                            this.noErrors = false;
-                            continue;
+                            ph.progress( ++workunits );
                         }
-                        ph.progress( ++workunits );
+
+                        //create general track stats
+                        SamBamStatsParser statsParser = new SamBamStatsParser();
+                        statsParser.setStatsContainer( statsContainer );
+                        statsParser.registerObserver( this );
+                        ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
+                        statsParser.removeObserver( this );
+
+                        this.storeBamTrack( track ); // store track entry in db
+                        trackId1 = trackJob1.getID();
+                        inputFile1.setWritable( true );
+
+                        //read pair ids have to be set in track entry
+                        ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
+
+                    } catch( OutOfMemoryError ex ) {
+                        this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
+                        LOG.error( ex.getMessage(), ex );
+                        this.noErrors = false;
+                        continue;
+
+                    } catch( DatabaseException | ParsingException | IOException ex ) {
+                        this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
+                        LOG.error( ex.getMessage(), ex );
+                        this.noErrors = false;
+                        continue;
                     }
-
-                    //create general track stats
-                    SamBamStatsParser statsParser = new SamBamStatsParser();
-                    statsParser.setStatsContainer( statsContainer );
-                    statsParser.registerObserver( this );
-                    ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
-                    statsParser.removeObserver( this );
-
-                    this.storeBamTrack( track ); // store track entry in db
-                    trackId1 = trackJob1.getID();
-                    inputFile1.setWritable( true );
-
-                    //read pair ids have to be set in track entry
-                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
 
                 } else { //if (distance <= 0)
                     this.showMsg( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.error" ) );
@@ -383,17 +374,17 @@ public class ImportThread extends SwingWorker<Object, Object> implements
          * sorted by coordinate & classification in file)
          */
 
-        this.setChromLengthMap( trackJob );
-        boolean success;
-        StatsContainer statsContainer = new StatsContainer();
-        statsContainer.prepareForTrack();
+        try {
+            setChromLengthMap( trackJob );
+            boolean success;
+            StatsContainer statsContainer = new StatsContainer();
+            statsContainer.prepareForTrack();
 
-        //only extend, if data is not already stored in it
-        if( !trackJob.isAlreadyImported() ) {
-            File inputFile = trackJob.getFile();
-            MappingParserI mappingParser = trackJob.getParser();
-            inputFile.setReadOnly(); //prevents changes or deletion of original file!
-            try {
+            //only extend, if data is not already stored in it
+            if( !trackJob.isAlreadyImported() ) {
+                File inputFile = trackJob.getFile();
+                MappingParserI mappingParser = trackJob.getParser();
+                inputFile.setReadOnly(); //prevents changes or deletion of original file!
                 //executes any conversion before other calculations, if the parser supports any
                 success = trackJob.getParser().convert( trackJob, chromLengthMap );
                 File lastWorkFile = trackJob.getFile();
@@ -407,30 +398,28 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 if( success ) {
                     GeneralUtils.deleteOldWorkFile( lastWorkFile );
                 } //only when we reach this line without exceptions and conversion was successful
-
-            } catch( OutOfMemoryError ex ) {
-                this.showMsg( "Out of memory error during parsing of bam track: " + ex.getMessage() );
-                this.noErrors = false;
-                return;
-            } catch( Exception ex ) {
-                this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
-                Exceptions.printStackTrace( ex ); //TODO: remove this error handling
-                this.noErrors = false;
-                return;
+                ph.progress( ++workunits );
+                inputFile.setWritable( true );
+                mappingParser.removeObserver( this );
             }
-            ph.progress( ++workunits );
-            inputFile.setWritable( true );
-            mappingParser.removeObserver( this );
+
+            //file needs to be sorted by coordinate for efficient calculation
+            SamBamStatsParser statsParser = new SamBamStatsParser();
+            statsParser.setStatsContainer( statsContainer );
+            statsParser.registerObserver( this );
+            ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
+            statsParser.removeObserver( this );
+
+            this.storeBamTrack( track );
+
+        } catch( OutOfMemoryError ex ) {
+            this.showMsg( "Out of memory error during parsing of bam track: " + ex.getMessage() );
+            this.noErrors = false;
+        } catch( DatabaseException | ParsingException | IOException ex ) {
+            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
+            LOG.error( ex.getMessage(), ex );
+            this.noErrors = false;
         }
-
-        //file needs to be sorted by coordinate for efficient calculation
-        SamBamStatsParser statsParser = new SamBamStatsParser();
-        statsParser.setStatsContainer( statsContainer );
-        statsParser.registerObserver( this );
-        ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
-        statsParser.removeObserver( this );
-
-        this.storeBamTrack( track );
     }
 
 
@@ -515,13 +504,15 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     private void storeBamTrack( ParsedTrack track ) {
         try {
-            io.getOut().println( track.getTrackName() + ": " + this.getBundleString( "MSG_ImportThread.import.start.trackdirect" ) );
+            io.getOut().println( track.getTrackName() + ": " + getBundleString( "MSG_ImportThread.import.start.trackdirect" ) );
             ProjectConnector.getInstance().storeBamTrack( track );
             ProjectConnector.getInstance().storeTrackStatistics( track.getStatsContainer(), track.getID() );
-            io.getOut().println( this.getBundleString( "MSG_ImportThread.import.success.trackdirect" ) );
+            io.getOut().println( getBundleString( "MSG_ImportThread.import.success.trackdirect" ) );
 
         } catch( OutOfMemoryError e ) {
-            io.getOut().println( this.getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
+            io.getOut().println( getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
+        } catch( DatabaseException e ) {
+            io.getOut().println( getBundleString( "Database exception occurred" ) + "!" );
         }
     }
 

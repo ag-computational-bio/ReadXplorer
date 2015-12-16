@@ -33,7 +33,10 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.FastaUtils;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,11 +51,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -61,7 +63,7 @@ import org.openide.util.NbBundle;
  * <p>
  * @author ddoppmeier, rhilker
  */
-public final class ProjectConnector extends Observable {
+public final class ProjectConnector implements Observable {
 
     private static final Logger LOG = LoggerFactory.getLogger( ProjectConnector.class.getName() );
 
@@ -75,6 +77,7 @@ public final class ProjectConnector extends Observable {
     private final Map<Integer, TrackConnector> trackConnectors;
     private final Map<Integer, MultiTrackConnector> multiTrackConnectors;
     private final Map<Integer, ReferenceConnector> refConnectors;
+    private final List<Observer> observers;
 
     private static ProjectConnector dbConnector;
 
@@ -88,11 +91,10 @@ public final class ProjectConnector extends Observable {
      * Contains the methods to communicate with the data base.
      */
     private ProjectConnector() {
-
         trackConnectors = new HashMap<>();
         multiTrackConnectors = new HashMap<>();
         refConnectors = new HashMap<>();
-
+        observers = new ArrayList<>();
     }
 
 
@@ -110,22 +112,19 @@ public final class ProjectConnector extends Observable {
     /**
      * @return True, if the project connector is currently connected to a DB,
      *         false otherwise
-     * <p>
-     * @throws de.cebitec.readxplorer.databackend.connector.DatabaseException
      */
-    public boolean isConnected() throws DatabaseException {
+    public boolean isConnected() {
 
         if( connectionPool != null ) {
             try( Connection con = connectionPool.getConnection() ) {
                 return con.isValid( 0 );
             } catch( SQLException ex ) {
-                LOG.warn( ex.getMessage(), ex );
-                throw new DatabaseException( "Connection to database could not be established!", ex.getMessage(), ex );
+                LOG.error( ex.getMessage(), ex );
+                ErrorHelper.getHandler().handle( ex, "Connection to database could not be established!" );
             }
         }
 
         return false;
-
     }
 
 
@@ -134,47 +133,35 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @param projectLocation the project location
      * <p>
-     * @throws de.cebitec.readxplorer.databackend.connector.DatabaseException
-     * @throws SQLException
-     * @throws JdbcSQLException
+     * @throws DatabaseException An exception during data queries
      */
     public void connect( String projectLocation ) throws DatabaseException {
 
         LOG.info( "Connecting to database" );
-        try {
 
-            this.dbLocation = projectLocation;
-            this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
+        this.dbLocation = projectLocation;
+        this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
 
-            connectionPool = JdbcConnectionPool.create( url, "", "" );
+        connectionPool = JdbcConnectionPool.create( url, "", "" );
 
-            try( Connection con = connectionPool.getConnection(); ) {
-                con.setAutoCommit( false );
-                LOG.info( "Successfully connected to database" );
-                try {
-                    setupDatabase( con );
-                    con.commit();
-                } catch( SQLException ex ) {
-                    try {
-                        con.rollback();
-                    } catch( SQLException exRb ) {
-                        LOG.error( "database setup failed! rollback failed!", exRb );
-                        throw new DatabaseException( "Could not setup the database! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                    }
-                    LOG.error( "database setup failed! rolledbacked!", ex );
-                    throw new DatabaseException( "Could not setup the database!", ex.getMessage(), ex );
-                }
-                con.setAutoCommit( true );
+        try( Connection con = getConnection(); ) {
+            con.setAutoCommit( false );
+            LOG.info( "Successfully connected to database" );
+            try {
+                setupDatabase( con );
+                con.commit();
+            } catch( SQLException | FileException ex ) {
+                rollback( ex, con, "Database setup failed!" );
             }
+            con.setAutoCommit( true );
 
             // notify observers about the change of the database
-            notifyObserversAbout( "connect" );
+            notifyObservers( "connect" );
 
         } catch( SQLException ex ) {
             LOG.error( ex.getMessage(), ex );
             throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
         }
-
     }
 
 
@@ -182,8 +169,14 @@ public final class ProjectConnector extends Observable {
      * Makes sure that an H2 DB is in a correct up-to-date state. Either creates
      * all tables necessary for a ReadXplorer DB or updates them, if anything is
      * missing/different. If no changes are necessary nothing is altered.
+     *
+     * @param con db connection
+     *
+     * @throws SQLException
+     * @throws DatabaseException An exception during data queries
+     * @throws FileException
      */
-    private void setupDatabase( Connection con ) throws SQLException {
+    private void setupDatabase( Connection con ) throws SQLException, DatabaseException, FileException {
 
         LOG.info( "Setting up tables and indices if not existent" );
         try( Statement stmt = con.createStatement() ) {
@@ -211,9 +204,7 @@ public final class ProjectConnector extends Observable {
             checkDBStructure( con );
 
             LOG.info( "Finished creating tables and indices if not existent before" );
-
         }
-
     }
 
 
@@ -222,8 +213,14 @@ public final class ProjectConnector extends Observable {
      * ReadXplorer versions should be checked by this method to ensure correct
      * database structure and avoiding errors when SQL statements request one of
      * these columns, which are not existent in older databases.
+     *
+     * @param con db connection
+     *
+     * @throws SQLException
+     * @throws DatabaseException An exception during data queries
+     * @throws FileException
      */
-    private void checkDBStructure( Connection con ) throws SQLException {
+    private void checkDBStructure( Connection con ) throws SQLException, DatabaseException, FileException {
 
         LOG.info( "Checking DB structure..." );
         try( Statement stmt = con.createStatement() ) {
@@ -267,9 +264,7 @@ public final class ProjectConnector extends Observable {
             checkDBVersion( con );
 
             LOG.info( "Finished checking DB structure." );
-
         }
-
     }
 
 
@@ -277,8 +272,14 @@ public final class ProjectConnector extends Observable {
      * Checks the DB version and executes appropriate handling according to the
      * given version number. If an update was performed, the current DB version
      * number will be set after a successful update.
+     *
+     * @param con db connection
+     *
+     * @throws SQLException
+     * @throws DatabaseException An exception during data queries
+     * @throws FileException
      */
-    private void checkDBVersion( Connection con ) throws SQLException {
+    private void checkDBVersion( Connection con ) throws SQLException, DatabaseException, FileException {
 
         LOG.info( "Checking DB version..." );
         try( final Statement stmt = con.createStatement();
@@ -317,9 +318,7 @@ public final class ProjectConnector extends Observable {
                 }
             }
             LOG.info( "Done checking DB version and updated to latest version" );
-
         }
-
     }
 
 
@@ -329,17 +328,22 @@ public final class ProjectConnector extends Observable {
      * 2. Drops old table<br>
      * 3. Creates new table with 4 columns<br>
      * 4. Inserts the data of all StatsContainers in the new table This method
-     * is intended for DBs < version 3.
+     * is intended for DBs {@literal <} version 3.
+     * <p>
+     * @param con db connection
+     *
+     * @throws DatabaseException An exception during data queries
      */
     @NbBundle.Messages( { "TITLE_FileReset=Reset track file path",
                           "MSG_FileReset=If you do not reset the track file location, it cannot be opened" } )
-    private static void restructureStatisticsTable( Connection con ) throws SQLException {
+    private static void restructureStatisticsTable( Connection con ) throws SQLException, DatabaseException {
 
+        LOG.info( "Restructuring statistics table..." );
         Map<Integer, StatsContainer> trackIdToStatsMap = new HashMap<>();
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         List<PersistentTrack> tracks = projectConnector.getTracks();
         for( PersistentTrack track : tracks ) {
-            trackIdToStatsMap.put( track.getId(), projectConnector.getTrackStats( con, track.getId() ) );
+            trackIdToStatsMap.put( track.getId(), getTrackStats( con, track.getId() ) );
         }
 
         try( Statement stmt = con.createStatement() ) {
@@ -353,7 +357,7 @@ public final class ProjectConnector extends Observable {
                 projectConnector.storeTrackStatistics( statsContainer, track.getId() );
             }
         }
-
+        LOG.info( "Done restructuring statistics table" );
     }
 
 
@@ -362,10 +366,17 @@ public final class ProjectConnector extends Observable {
      * the chromosome table and creates corresponding ids and chromosome names.
      * It also sets the corresponding chromosome id for all genomic features in
      * the feature table and removes the reference sequence column from the
-     * reference table. This method is intended for DBs < version 2.
+     * reference table. This method is intended for DBs {@literal <} version 2.
+     * <p>
+     * @param con db connection
+     *
+     * @throws SQLException
+     * @throws DatabaseException An exception during data queries
+     * @throws FileException
      */
-    private void createChromsFromRefs( Connection con ) throws SQLException {
+    private void createChromsFromRefs( Connection con ) throws SQLException, DatabaseException, FileException {
 
+        LOG.info( "Creating chromosome table entry from each reference and resructuring reference data..." );
         try( final Statement stmt = con.createStatement();
              final PreparedStatement pStmtFetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ) ) {
 
@@ -447,6 +458,7 @@ public final class ProjectConnector extends Observable {
             throw new SQLException( msg, ex );
         }
 
+        LOG.info( "Done creating chromosome table entry from each reference and resructuring reference data" );
     }
 
 
@@ -457,6 +469,8 @@ public final class ProjectConnector extends Observable {
      * @param wantedTrackId the id of the track, whose statistics are needed.
      * <p>
      * @return The complete statistics for the track specified by the given id.
+     *
+     * @throws SQLException
      */
     private static StatsContainer getTrackStats( Connection con, int wantedTrackId ) throws SQLException {
 
@@ -508,17 +522,27 @@ public final class ProjectConnector extends Observable {
             LOG.error( msg, ex );
             throw new SQLException( msg, ex );
         }
-
-    }
-
-
-    public Connection getConnection() throws SQLException {
-        return connectionPool.getConnection();
     }
 
 
     /**
-     * @return The location of the database
+     * @return The h2 database connection.
+     *
+     * @throws DatabaseException An exception during data queries. A log message
+     *                           is already printed by this method
+     */
+    public Connection getConnection() throws DatabaseException {
+        try {
+            return connectionPool.getConnection();
+        } catch( SQLException ex ) {
+            LOG.error( ex.getMessage(), ex );
+            throw new DatabaseException( "Could not connect to the database!", ex.getMessage(), ex );
+        }
+    }
+
+
+    /**
+     * @return The location (path) of the database.
      */
     public String getDbLocation() {
         return dbLocation;
@@ -527,8 +551,6 @@ public final class ProjectConnector extends Observable {
 
     /**
      * Disconnects the current DB connection.
-     * <p>
-     * @throws de.cebitec.readxplorer.databackend.connector.DatabaseException
      */
     public void disconnect() {
 
@@ -539,8 +561,7 @@ public final class ProjectConnector extends Observable {
         refConnectors.clear();
 
         // notify observers about the change of the database
-        notifyObserversAbout( "disconnect" );
-
+        notifyObservers( "disconnect" );
     }
 
 
@@ -551,12 +572,12 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @return the reference id
      * <p>
-     * @throws DatabaseException
+     * @throws DatabaseException An exception during data queries
      */
     public int addRefGenome( final ParsedReference reference ) throws DatabaseException {
 
         LOG.info( "Start storing reference sequence " + reference.getName() );
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             try {
 
@@ -567,25 +588,17 @@ public final class ProjectConnector extends Observable {
 
                 LOG.info( "finished storing reference sequence " + reference.getName() );
                 // notify observers about the change of the database
-                notifyObserversAbout( "addRefGenome" );
-
-                return reference.getID();
+                notifyObservers( "addRefGenome" );
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( SQLException exRb ) {
-                    LOG.error( "adding reference genome failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Adding reference genome failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "adding reference genome failed! rolledbacked!", ex );
-                throw new DatabaseException( "Adding reference genome failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Adding reference genome failed!" );
             }
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
 
+        return reference.getID();
     }
 
 
@@ -614,15 +627,8 @@ public final class ProjectConnector extends Observable {
             for( int i = 0; i < chromosomes.size(); i++ ) {
                 storeChromosome( con, chromosomes.get( i ), i + 1, reference.getID() );
             }
-
-        } catch( SQLException ex ) {
-            String msg = "storing genome failed!";
-            LOG.error( msg, ex );
-            throw new SQLException( msg, ex );
         }
-
         LOG.info( "...done inserting reference sequence data" );
-
     }
 
 
@@ -650,13 +656,11 @@ public final class ProjectConnector extends Observable {
             insertChromosome.execute();
 
         } catch( SQLException ex ) {
-            String msg = "storing chromosome failed!";
+            String msg = "storing chromosome " + chromosome.getName() + " failed!";
             LOG.error( msg, ex );
             throw new SQLException( msg, ex );
         }
-
         LOG.info( "...done inserting chromosome data" );
-
     }
 
 
@@ -703,13 +707,11 @@ public final class ProjectConnector extends Observable {
             }
 
         } catch( SQLException ex ) {
-            String msg = "storing features failed!";
+            String msg = "storing features of " + reference.getName() + " failed!";
             LOG.error( msg, ex );
             throw new SQLException( msg, ex );
         }
-
         LOG.info( "...done inserting features" );
-
     }
 
 
@@ -719,39 +721,29 @@ public final class ProjectConnector extends Observable {
      * track job.
      * <p>
      * @param track the track job containing the track information to store
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public void storeBamTrack( final ParsedTrack track ) throws DatabaseException {
 
         LOG.info( "start storing bam track data..." );
-        try( Connection con = connectionPool.getConnection() ) {
-            try( PreparedStatement pStmtInsertTrack = con.prepareStatement( SQLStatements.INSERT_TRACK ) ) {
+        Connection con = getConnection();
+        try( PreparedStatement pStmtInsertTrack = con.prepareStatement( SQLStatements.INSERT_TRACK ) ) {
 
-                pStmtInsertTrack.setLong( 1, track.getID() );
-                pStmtInsertTrack.setLong( 2, track.getRefId() );
-                pStmtInsertTrack.setString( 3, track.getDescription() );
-                pStmtInsertTrack.setTimestamp( 4, track.getTimestamp() );
-                pStmtInsertTrack.setString( 5, track.getFile().getAbsolutePath() );
-                pStmtInsertTrack.execute();
+            pStmtInsertTrack.setLong( 1, track.getID() );
+            pStmtInsertTrack.setLong( 2, track.getRefId() );
+            pStmtInsertTrack.setString( 3, track.getDescription() );
+            pStmtInsertTrack.setTimestamp( 4, track.getTimestamp() );
+            pStmtInsertTrack.setString( 5, track.getFile().getAbsolutePath() );
+            pStmtInsertTrack.execute();
 
-                // notify observers about the change of the database
-                notifyObserversAbout( "storeTrack" );
-                LOG.info( "...done storing bam track data" );
+            // notify observers about the change of the database
+            notifyObservers( "storeTrack" );
+            LOG.info( "...done storing bam track data" );
 
-            } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "adding track failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Adding track failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "adding track failed! rolledbacked!", ex );
-                throw new DatabaseException( "Adding track failed!", ex.getMessage(), ex );
-            }
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+            rollback( ex, con, "Adding track failed!" );
         }
-
     }
 
 
@@ -761,10 +753,12 @@ public final class ProjectConnector extends Observable {
      * @param statsContainer The container with all statistics for the given
      *                       track ID
      * @param trackID        the track id whose data shall be stored
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) throws DatabaseException {
 
-        LOG.info( "Start storing track statistics..." );
+        LOG.info( "Start storing track statistics for track with id " + trackID + "..." );
 
         DiscreteCountingDistribution readLengthDistribution = statsContainer.getReadLengthDistribution();
         if( !readLengthDistribution.isEmpty() ) {
@@ -777,7 +771,7 @@ public final class ProjectConnector extends Observable {
             statsContainer.addStatsValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue() );
         }
 
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             // get latest id for statistic
             long latestID = GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_STATISTICS_ID, con );
@@ -797,38 +791,32 @@ public final class ProjectConnector extends Observable {
                     }
                 }
                 con.commit();
-                LOG.info( "...done storing track statistics data" );
+                LOG.info( "...done storing track statistics data for track with id " + trackID );
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "storing track statistics failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Storing track statistics failed failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "storing track statistics failed! rolledbacked!", ex );
-                throw new DatabaseException( "Storing track statistics failed failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Storing track statistics for track with id " + trackID + " failed!" );
             }
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
-
     }
 
 
     /**
-     * Stores the statistics for a track in the db.
+     * Deletes the statistics for a track in the db.
      * <p>
      * @param keys    the list of statistics key whose values shall be deleted
      *                for the given track
      * @param trackId the track id whose data shall be stored
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public void deleteSpecificTrackStatistics( List<String> keys, int trackId ) throws DatabaseException {
 
-        LOG.info( "Start deleting specific track statistics..." );
-        try( Connection con = connectionPool.getConnection() ) {
+        LOG.info( "Start deleting track statistics of track with id " + trackId + "..." );
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             try( PreparedStatement pStmtDeleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
 
@@ -838,24 +826,16 @@ public final class ProjectConnector extends Observable {
                     pStmtDeleteStats.execute();
                 }
                 con.commit();
-                LOG.info( "...done deleting specific track statistics." );
+                LOG.info( "...done deleting track statistics of track with id " + trackId );
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "deleting specific track statistics failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Deleting specific track statistics failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "deleting specific track statistics failed! rolledbacked!", ex );
-                throw new DatabaseException( "Deleting specific track statistics failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Deleting specific track statistics of track with id " + trackId + " failed!" );
             }
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
-
     }
 
 
@@ -865,11 +845,13 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @param distribution the count distribution to store
      * @param trackId      track id of this track
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public void insertCountDistribution( DiscreteCountingDistribution distribution, final int trackId ) throws DatabaseException {
 
         int[] countDistribution = distribution.getDiscreteCountingDistribution();
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             try( PreparedStatement pStmtInsert = con.prepareStatement( SQLStatements.INSERT_COUNT_DISTRIBUTION ) ) {
 
@@ -884,21 +866,13 @@ public final class ProjectConnector extends Observable {
                 con.commit();
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "inserting count distribution failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Inserting count distribution failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "inserting count distribution failed! rolledbacked!", ex );
-                throw new DatabaseException( "Inserting count distribution failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Inserting count distribution failed!" );
             }
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
-
     }
 
 
@@ -907,10 +881,12 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @param track1Id track id of first track of the pair
      * @param track2Id track id of second track of the pair
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public void setReadPairIdsForTrackIds( long track1Id, long track2Id ) throws DatabaseException {
 
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             try {
                 //not 0, because 0 is the value when a track is not a sequence pair track!
@@ -927,21 +903,13 @@ public final class ProjectConnector extends Observable {
                 }
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "setting read pair ids failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Setting read pair ids failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "setting read pair ids failed! rolledbacked!", ex );
-                throw new DatabaseException( "Setting read pair ids failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Setting read pair ids failed!" );
             }
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
-
     }
 
 
@@ -958,11 +926,18 @@ public final class ProjectConnector extends Observable {
         }
 
         return refConnectors.get( refId );
-
     }
 
 
-    public TrackConnector getTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+    /**
+     * @param track the track whose connector is needed
+     * <p>
+     * @return The track connector for the given track
+     * <p>
+     * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
+     */
+    public TrackConnector getTrackConnector( PersistentTrack track ) throws FileNotFoundException, DatabaseException {
 
         // only return new object, if no suitable connector was created before
         int trackId = track.getId();
@@ -971,11 +946,21 @@ public final class ProjectConnector extends Observable {
         }
 
         return trackConnectors.get( trackId );
-
     }
 
 
-    public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws FileNotFoundException {
+    /**
+     * @param tracks        the list of tracks for which a track connector is
+     *                      needed
+     * <p>
+     * @param combineTracks true, if the track shall be combined
+     *
+     * @return The track connector for the given tracks
+     * <p>
+     * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
+     */
+    public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws FileNotFoundException, DatabaseException {
 
         // makes sure the track id is not already used
         int id = 9999;
@@ -986,11 +971,18 @@ public final class ProjectConnector extends Observable {
         trackConnectors.put( id, new TrackConnector( id, tracks, combineTracks ) );
 
         return trackConnectors.get( id );
-
     }
 
 
-    public MultiTrackConnector getMultiTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+    /**
+     * @param track the track for which a multi track connector is needed
+     * <p>
+     * @return The multi track connector for the given track
+     * <p>
+     * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
+     */
+    public MultiTrackConnector getMultiTrackConnector( PersistentTrack track ) throws FileNotFoundException, DatabaseException {
 
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
@@ -999,11 +991,18 @@ public final class ProjectConnector extends Observable {
         }
 
         return multiTrackConnectors.get( trackID );
-
     }
 
 
-    public MultiTrackConnector getMultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException {
+    /**
+     * @param tracks the list of tracks for which a track connector is needed
+     * <p>
+     * @return The track connector for the given tracks
+     * <p>
+     * @throws FileNotFoundException
+     * @throws DatabaseException     An exception during data queries
+     */
+    public MultiTrackConnector getMultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException, DatabaseException {
 
         // makes sure the track id is not already used
         int id = 9999;
@@ -1014,7 +1013,6 @@ public final class ProjectConnector extends Observable {
         multiTrackConnectors.put( id, new MultiTrackConnector( tracks ) );
 
         return multiTrackConnectors.get( id );
-
     }
 
 
@@ -1046,38 +1044,36 @@ public final class ProjectConnector extends Observable {
      * @return All references stored in the db with their associated data. All
      *         references are re-queried from the DB and returned in new,
      *         independent objects each time the method is called.
-     * <p>
-     * @throws OutOfMemoryError
      */
-    public List<PersistentReference> getReferences() throws DatabaseException {
+    public List<PersistentReference> getReferences() {
 
-        LOG.info( "Reading reference genome data from database" );
-        try( Connection con = connectionPool.getConnection() ) {
-            try( final Statement stmtFetchRefs = con.createStatement();
-                 final ResultSet rs = stmtFetchRefs.executeQuery( SQLStatements.FETCH_GENOMES ) ) {
+        LOG.info( "Reading reference genome data from database..." );
+        List<PersistentReference> refGens = new ArrayList<>();
 
-                List<PersistentReference> refGens = new ArrayList<>();
-                while( rs.next() ) {
-                    int id = rs.getInt( FieldNames.REF_GEN_ID );
-                    String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
-                    String name = rs.getString( FieldNames.REF_GEN_NAME );
-                    String fileName = rs.getString( FieldNames.REF_GEN_FASTA_FILE ); //special handling for backwards compatibility with old DBs
-                    fileName = fileName == null ? "" : fileName;
-                    Timestamp timestamp = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
-                    File fastaFile = new File( fileName );
-                    refGens.add( new PersistentReference( id, name, description, timestamp, fastaFile ) );
-                }
-                return refGens;
+        try( Connection con = getConnection();
+             final Statement stmtFetchRefs = con.createStatement();
+             final ResultSet rs = stmtFetchRefs.executeQuery( SQLStatements.FETCH_GENOMES ) ) {
 
-            } catch( SQLException ex ) {
-                LOG.error( "reading reference genome data failed! rolledbacked!", ex );
-                throw new DatabaseException( "Reading reference genome data failed!", ex.getMessage(), ex );
+            while( rs.next() ) {
+                int id = rs.getInt( FieldNames.REF_GEN_ID );
+                String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
+                String name = rs.getString( FieldNames.REF_GEN_NAME );
+                String fileName = rs.getString( FieldNames.REF_GEN_FASTA_FILE ); //special handling for backwards compatibility with old DBs
+                fileName = fileName == null ? "" : fileName;
+                Timestamp timestamp = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
+                File fastaFile = new File( fileName );
+                refGens.add( new PersistentReference( id, name, description, timestamp, fastaFile ) );
             }
+            LOG.info( "...done reading reference genome data from database" );
+
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+            LOG.error( "reading reference genome data failed! rolled back!", ex );
+            ErrorHelper.getHandler().handle( ex, "Reading reference genome data failed!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
 
+        return refGens;
     }
 
 
@@ -1087,35 +1083,23 @@ public final class ProjectConnector extends Observable {
      * @param fastaFile fasta file to reset for the current reference.
      * @param ref       The reference genome, whose file shall be updated
      * <p>
-     * @throws DatabaseException
+     * @throws DatabaseException An exception during data queries
      */
     public void resetReferencePath( final File fastaFile, final PersistentReference ref ) throws DatabaseException {
 
-        LOG.info( "Preparing statements for storing track data" );
-        try( Connection con = connectionPool.getConnection() ) {
-            try( PreparedStatement resetRefPath = con.prepareStatement( SQLStatements.RESET_REF_PATH ) ) {
+        LOG.info( "Preparing statements for resetting the reference file path..." );
+        Connection con = getConnection();
+        try( PreparedStatement resetRefPath = con.prepareStatement( SQLStatements.RESET_REF_PATH ) ) {
 
-                resetRefPath.setString( 1, fastaFile.getAbsolutePath() );
-                resetRefPath.setLong( 2, ref.getId() );
-                resetRefPath.execute();
-                ref.resetFastaPath( fastaFile );
-                LOG.info( "Reference file for " + ref.getName() + " has been updated successfully" );
+            resetRefPath.setString( 1, fastaFile.getAbsolutePath() );
+            resetRefPath.setLong( 2, ref.getId() );
+            resetRefPath.execute();
+            ref.resetFastaPath( fastaFile );
+            LOG.info( "...reference file for " + ref.getName() + " has been updated successfully" );
 
-            } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "setting reference path failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Setting reference path failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "setting reference path failed! rolledbacked!", ex );
-                throw new DatabaseException( "Setting reference path failed!", ex.getMessage(), ex );
-            }
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+            rollback( ex, con, "Setting reference path failed!" );
         }
-
     }
 
 
@@ -1124,13 +1108,13 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @param refId the reference id whose data shall be delete from the DB
      * <p>
-     * @throws DatabaseException
+     * @throws DatabaseException An exception during data queries
      */
     public void deleteReference( final int refId ) throws DatabaseException {
 
         LOG.info( "Starting deletion of reference with id " + refId );
         ReferenceConnector refCon = getRefGenomeConnector( refId );
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             try( PreparedStatement pStmtDeleteFeatures = con.prepareStatement( SQLStatements.DELETE_FEATURES_FROM_CHROMOSOME );
                  PreparedStatement pStmtDeleteChrom = con.prepareStatement( SQLStatements.DELETE_CHROMOSOME );
@@ -1153,25 +1137,17 @@ public final class ProjectConnector extends Observable {
                 refConnectors.remove( refId );
 
                 // notify observers about the change of the database
-                notifyObserversAbout( "deleteGenomes" );
+                notifyObservers( "deleteGenomes" );
                 LOG.info( "Finished deletion of reference genome with id " + refId );
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "deleting reference failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Deleting reference failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "deleting reference failed! rolledbacked!", ex );
-                throw new DatabaseException( "Deleting reference failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Deleting reference with id " + refId + " failed!" );
             }
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
-
     }
 
 
@@ -1179,7 +1155,7 @@ public final class ProjectConnector extends Observable {
      * @return A map of all tracks in the connected DB mapped on their
      *         respective reference.
      */
-    public Map<PersistentReference, List<PersistentTrack>> getReferencesAndTracks() throws DatabaseException {
+    public Map<PersistentReference, List<PersistentTrack>> getReferencesAndTracks() {
 
         final List<PersistentReference> genomes = getReferences();
         final List<PersistentTrack> tracks = getTracks();
@@ -1205,7 +1181,6 @@ public final class ProjectConnector extends Observable {
         }
 
         return tracksByReference;
-
     }
 
 
@@ -1223,7 +1198,6 @@ public final class ProjectConnector extends Observable {
             namesList.put( nextId, trackConnectors.get( nextId ).getAssociatedTrackName() );
         }
         return namesList;
-
     }
 
 
@@ -1232,14 +1206,14 @@ public final class ProjectConnector extends Observable {
      *         tracks are re-queried from the DB and returned in new,
      *         independent objects each time the method is called.
      */
-    public List<PersistentTrack> getTracks() throws DatabaseException {
+    public List<PersistentTrack> getTracks() {
 
-        LOG.info( "Reading track data from database" );
-        try( Connection con = connectionPool.getConnection() ) {
+        LOG.info( "Reading tracks from database" );
+        List<PersistentTrack> tracks = new ArrayList<>();
+        try( Connection con = getConnection() ) {
             try( Statement stmtFetch = con.createStatement();
-                 ResultSet rs = stmtFetch.executeQuery( SQLStatements.FETCH_TRACKS ); ) {
+                 ResultSet rs = stmtFetch.executeQuery( SQLStatements.FETCH_TRACKS ) ) {
 
-                List<PersistentTrack> tracks = new ArrayList<>();
                 while( rs.next() ) {
                     int id = rs.getInt( FieldNames.TRACK_ID );
                     int refGenID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
@@ -1249,72 +1223,71 @@ public final class ProjectConnector extends Observable {
                     Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
                     tracks.add( new PersistentTrack( id, filePath, description, date, refGenID, -1, readPairId ) );
                 }
-                return tracks;
 
             } catch( SQLException ex ) {
-                LOG.error( "reading tracks data failed! rolledbacked!", ex );
-                throw new DatabaseException( "Reading tracks data failed!", ex.getMessage(), ex );
+                LOG.error( "reading tracks failed! rolled back!", ex );
+                ErrorHelper.getHandler().handle( ex, "Reading tracks from database failed!" );
             }
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
+            ErrorHelper.getHandler().handle( ex, "Couldn't connect to database!" );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
         }
 
+        return tracks;
     }
 
 
     /**
-     * @param trackID <p>
+     * @param trackID id of the track
+     * <p>
      * @return The track for the given track id in a fresh track object
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public PersistentTrack getTrack( final int trackID ) throws DatabaseException {
 
-        LOG.info( "Reading track data from database" );
-        try( Connection con = connectionPool.getConnection() ) {
-            try( final PreparedStatement pStmtFetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK ); ) {
-                pStmtFetchTracks.setInt( 1, trackID );
-                try( final ResultSet rs = pStmtFetchTracks.executeQuery(); ) {
+        LOG.info( "Reading data for track with id " + trackID + " from database" );
+        Connection con = getConnection();
+        try( final PreparedStatement pStmtFetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK ); ) {
+            pStmtFetchTracks.setInt( 1, trackID );
+            try( final ResultSet rs = pStmtFetchTracks.executeQuery(); ) {
 
-                    if( rs.getFetchSize() == 1 ) {
-                        rs.next();
-                        int id = rs.getInt( FieldNames.TRACK_ID );
-                        int refId = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
-                        int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
-                        String filePath = rs.getString( FieldNames.TRACK_PATH );
-                        String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
-                        Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
-                        return new PersistentTrack( id, filePath, description, date, refId, readPairId );
-                    } else {
-                        return null;
-                    }
-
+                if( rs.getFetchSize() == 1 ) {
+                    rs.next();
+                    int id = rs.getInt( FieldNames.TRACK_ID );
+                    int refId = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
+                    int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
+                    String filePath = rs.getString( FieldNames.TRACK_PATH );
+                    String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
+                    Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
+                    return new PersistentTrack( id, filePath, description, date, refId, readPairId );
+                } else {
+                    return null;
                 }
-
-            } catch( SQLException ex ) {
-                LOG.error( "reading tracks data failed! rolledbacked!", ex );
-                throw new DatabaseException( "Reading tracks data failed!", ex.getMessage(), ex );
             }
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+            LOG.error( "reading data for track with id " + trackID + " failed! rolled back!", ex );
+            throw new DatabaseException( "Reading data for track with id " + trackID + " failed!", ex.getMessage(), ex );
         }
-
     }
 
 
     /**
      * @return the latest track id used in the database + 1 = the next id to
      *         use.
+     *
+     * @throws DatabaseException An exception during data queries
      */
     public int getLatestTrackId() throws DatabaseException {
 
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             return (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_TRACK_ID, con );
-        } catch( Exception ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+        } catch( SQLException ex ) {
+            LOG.error( "Fetching the latest track id from the DB failed!", ex );
+            throw new DatabaseException( "Fetching the latest track id from the DB failed!", "DB query error!", ex );
         }
-
     }
 
 
@@ -1323,34 +1296,22 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @param track track whose file path has to be resetted.
      * <p>
-     * @throws DatabaseException
+     * @throws DatabaseException An exception during data queries
      */
     public void resetTrackPath( final PersistentTrack track ) throws DatabaseException {
 
         LOG.info( "Preparing statements for storing track data" );
-        try( Connection con = connectionPool.getConnection() ) {
-            try( PreparedStatement resetTrackPath = con.prepareStatement( SQLStatements.RESET_TRACK_PATH ) ) {
+        Connection con = getConnection();
+        try( PreparedStatement resetTrackPath = con.prepareStatement( SQLStatements.RESET_TRACK_PATH ) ) {
 
-                resetTrackPath.setString( 1, track.getFilePath() );
-                resetTrackPath.setLong( 2, track.getId() );
-                resetTrackPath.execute();
-                LOG.info( "Track " + track.getDescription() + " has been updated successfully" );
+            resetTrackPath.setString( 1, track.getFilePath() );
+            resetTrackPath.setLong( 2, track.getId() );
+            resetTrackPath.execute();
+            LOG.info( "Track " + track.getDescription() + " has been updated successfully" );
 
-            } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "setting track path failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Setting track path failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "setting track path failed! rolledbacked!", ex );
-                throw new DatabaseException( "Setting track path failed!", ex.getMessage(), ex );
-            }
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
-            throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
+            rollback( ex, con, "An error occurred during storage of the new file path! Please try again!" );
         }
-
     }
 
 
@@ -1359,12 +1320,12 @@ public final class ProjectConnector extends Observable {
      * <p>
      * @param trackId the track id whose data shall be delete from the DB
      * <p>
-     * @throws DatabaseException
+     * @throws DatabaseException An exception during data queries
      */
     public void deleteTrack( final int trackId ) throws DatabaseException {
 
         LOG.info( "Starting deletion of track with id " + trackId );
-        try( Connection con = connectionPool.getConnection() ) {
+        try( Connection con = getConnection() ) {
             con.setAutoCommit( false );
             try( PreparedStatement pStmtDeleteStats = con.prepareStatement( SQLStatements.DELETE_STATISTIC_FROM_TRACK );
                  PreparedStatement pStmtDeleteCountDistributions = con.prepareStatement( SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK );
@@ -1386,31 +1347,58 @@ public final class ProjectConnector extends Observable {
 
                 trackConnectors.remove( trackId );
                 // notify observers about the change of the database
-                notifyObserversAbout( "deleteTrack" );
+                notifyObservers( "deleteTrack" );
                 LOG.info( "Finished deletion of track " + trackId );
 
             } catch( SQLException ex ) {
-                try {
-                    con.rollback();
-                } catch( Exception exRb ) {
-                    LOG.error( "deleting track failed! rollback failed!", exRb );
-                    throw new DatabaseException( "Deleting track failed! No rolledback! Database could be compromised!", exRb.getMessage(), exRb );
-                }
-                LOG.error( "deleting track failed! rolledbacked!", ex );
-                throw new DatabaseException( "Deleting track failed!", ex.getMessage(), ex );
+                rollback( ex, con, "Deleting track with id " + trackId + " failed!" );
             }
             con.setAutoCommit( true );
         } catch( SQLException ex ) {
-            LOG.error( "no connection to db!", ex );
+            LOG.error( "Couldn't connect to database!", ex );
             throw new DatabaseException( "Couldn't connect to database!", "db connection error!", ex );
         }
-
     }
 
 
-    private void notifyObserversAbout( final String message ) {
-        setChanged();
-        notifyObservers( message );
+    /**
+     * Rollback and pass messages accordingly.
+     *
+     * @param ex  Previously observed exception
+     * @param con connection to rollback
+     * @param msg message in case errors occur
+     *
+     * @throws DatabaseException An exception during data queries
+     */
+    private void rollback( Exception ex, Connection con, String msg ) throws DatabaseException {
+        try {
+            con.rollback();
+        } catch( SQLException exRb ) {
+            LOG.error( msg + " rollback failed!", exRb );
+            throw new DatabaseException( msg + " No rollback! Database could be compromised!", exRb.getMessage(), exRb );
+        }
+        LOG.error( msg + " rolled back!", ex );
+        throw new DatabaseException( msg, ex.getMessage(), ex );
+    }
+
+
+    @Override
+    public void registerObserver( Observer observer ) {
+        this.observers.add( observer );
+    }
+
+
+    @Override
+    public void removeObserver( Observer observer ) {
+        this.observers.remove( observer );
+    }
+
+
+    @Override
+    public void notifyObservers( Object data ) {
+        for( Observer observer : this.observers ) {
+            observer.update( data );
+        }
     }
 
 
@@ -1427,24 +1415,7 @@ public final class ProjectConnector extends Observable {
             trackMap.put( track.getId(), track );
         }
         return trackMap;
-
     }
 
 
-    /*
-     * Legacy Code
-     *
-     * Just for temporary archiving and debugging
-     */
-    /**
-     * Checks if a rollback is needed or if the SQLException originated from a
-     * duplicate column name error.
-     * <p>
-     * @param ex SQL exception to check
-     */
-//    private void checkRollback( SQLException ex ) throws SQLException {
-//        if( !ex.getMessage().contains( "Duplicate column name" ) ) {
-//            rollbackOnError( ex );
-//        }
-//    }
 }

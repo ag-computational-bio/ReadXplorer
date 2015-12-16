@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -39,6 +40,7 @@ import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -210,9 +212,14 @@ public class AnalysisTranscriptionStart implements Observer,
      * distributions and corrects the results for automatic mode.
      */
     public void finish() {
-        storeDistributions();
-        if( parametersTSS.isAutoTssParamEstimation() ) {
-            correctResult();
+        try {
+            storeDistributions();
+            if( parametersTSS.isAutoTssParamEstimation() ) {
+                correctResult();
+            }
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( new DatabaseException( ex.getMessage() +
+                                                                    " TSS detection result parameters are not corrected!", ex ) );
         }
         linkTssInSameRegion();
     }
@@ -306,23 +313,21 @@ public class AnalysisTranscriptionStart implements Observer,
                 readStartsFwd = readStartArrayRev[pos];
                 readStartsRev = readStartArrayFwd[pos + 1];
             }
-        } else {
-            if( isBothFwdDirection ) { //TODO: Strand options disrupt distributions! calculate one for each strand option!
-                increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
-                increaseRev = 0;
-                percentIncFwd = GeneralUtils.calculatePercentageIncrease( fwdCov1 + revCov1, fwdCov2 + revCov2 );
-                percentIncRev = GeneralUtils.calculatePercentageIncrease( 0, 0 );
-                readStartsFwd = readStartArrayFwd[pos + 1] + readStartArrayRev[pos + 1];
-                readStartsRev = 0;
+        } else if( isBothFwdDirection ) { //TODO: Strand options disrupt distributions! calculate one for each strand option!
+            increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
+            increaseRev = 0;
+            percentIncFwd = GeneralUtils.calculatePercentageIncrease( fwdCov1 + revCov1, fwdCov2 + revCov2 );
+            percentIncRev = GeneralUtils.calculatePercentageIncrease( 0, 0 );
+            readStartsFwd = readStartArrayFwd[pos + 1] + readStartArrayRev[pos + 1];
+            readStartsRev = 0;
 
-            } else {
-                increaseFwd = 0;
-                increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
-                percentIncFwd = GeneralUtils.calculatePercentageIncrease( 0, 0 );
-                percentIncRev = GeneralUtils.calculatePercentageIncrease( revCov2 + fwdCov2, revCov1 + fwdCov1 );
-                readStartsFwd = 0;
-                readStartsRev = readStartArrayFwd[pos] + readStartArrayRev[pos];
-            }
+        } else {
+            increaseFwd = 0;
+            increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
+            percentIncFwd = GeneralUtils.calculatePercentageIncrease( 0, 0 );
+            percentIncRev = GeneralUtils.calculatePercentageIncrease( revCov2 + fwdCov2, revCov1 + fwdCov1 );
+            readStartsFwd = 0;
+            readStartsRev = readStartArrayFwd[pos] + readStartArrayRev[pos];
         }
 
         if( this.calcCoverageDistributions ) {
@@ -712,8 +717,10 @@ public class AnalysisTranscriptionStart implements Observer,
      * If a new distribution was calculated, this method stores it in the DB and
      * corrects the result list with the new estimated parameters, if the
      * tssAutomatic was chosen.
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    private void storeDistributions() {
+    private void storeDistributions() throws DatabaseException {
         if( this.calcCoverageDistributions && this.trackConnector.getAssociatedTrackNames().size() == 1 ) {
             ProjectConnector.getInstance().insertCountDistribution( readStartDistribution, this.trackConnector.getTrackID() );
             ProjectConnector.getInstance().insertCountDistribution( covIncPercentDistribution, this.trackConnector.getTrackID() );
@@ -831,12 +838,10 @@ public class AnalysisTranscriptionStart implements Observer,
             } else {
                 distType = Distribution.ReadStartBothRevStrand;
             }
+        } else if( isFeatureStrand ) {
+            distType = Distribution.ReadStartFeatStrand;
         } else {
-            if( isFeatureStrand ) {
-                distType = Distribution.ReadStartFeatStrand;
-            } else {
-                distType = Distribution.ReadStartOppStrand;
-            }
+            distType = Distribution.ReadStartOppStrand;
         }
         return distType;
     }
@@ -854,12 +859,10 @@ public class AnalysisTranscriptionStart implements Observer,
             } else {
                 distType = Distribution.CovIncPercentBothRevStrand;
             }
+        } else if( isFeatureStrand ) {
+            distType = Distribution.CovIncPercentFeatStrand;
         } else {
-            if( isFeatureStrand ) {
-                distType = Distribution.CovIncPercentFeatStrand;
-            } else {
-                distType = Distribution.CovIncPercentOppStrand;
-            }
+            distType = Distribution.CovIncPercentOppStrand;
         }
         return distType;
     }

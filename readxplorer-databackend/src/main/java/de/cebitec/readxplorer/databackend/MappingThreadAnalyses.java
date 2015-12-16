@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.databackend;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import java.util.List;
 import org.slf4j.Logger;
@@ -43,10 +44,12 @@ public class MappingThreadAnalyses extends MappingThread {
      * Creates a new mapping thread for carrying out mapping request either to a
      * file.
      * <p>
-     * @param tracks the list of tracks for which this mapping thread is created
+     * @param tracks          the list of tracks for which this mapping thread
+     *                        is created
+     * @param referenceGenome Tne reference genome
      */
-    public MappingThreadAnalyses( List<PersistentTrack> tracks ) {
-        super( tracks );
+    public MappingThreadAnalyses( List<PersistentTrack> tracks, PersistentReference referenceGenome ) {
+        super( tracks, referenceGenome );
     }
 
 
@@ -75,7 +78,6 @@ public class MappingThreadAnalyses extends MappingThread {
                     LOG.error( null, ex );
                 }
             }
-
         }
     }
 

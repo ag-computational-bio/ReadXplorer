@@ -20,6 +20,7 @@ package bio.comp.jlu.readxplorer.tools.gasv;
 import bio.comp.jlu.readxplorer.tools.gasv.wizard.BamToGASVWizardPanel;
 import bio.comp.jlu.readxplorer.tools.gasv.wizard.GASVMainWizardPanel;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -34,6 +35,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.visualisation.TableVisualizationHelper;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -190,6 +192,10 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+                    continue;
+                } catch( DatabaseException e ) {
+                    LOG.error( e.getMessage(), e );
+                    ErrorHelper.getHandler().handle( e );
                     continue;
                 }
 

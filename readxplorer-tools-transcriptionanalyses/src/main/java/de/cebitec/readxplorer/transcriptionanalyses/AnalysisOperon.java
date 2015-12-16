@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.api.objects.AnalysisI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -30,6 +31,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -163,7 +165,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      */
     public void finish() {
         Date currentTimestamp = new java.sql.Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.info( "{0}: Detecting operons", currentTimestamp );
+        LOG.info( currentTimestamp + ": Detecting operons" );
         this.findOperons();
     }
 
@@ -176,67 +178,75 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      */
     public void sumReadCounts( MappingResult mappingResult ) {
 
-        List<Mapping> mappings = mappingResult.getMappings();
-        PersistentChromosome chrom = refConnector.getChromosomeForGenome( mappingResult.getRequest().getChromId() );
-        int chromLength = chrom.getLength();
-        boolean isStrandBothOption = operonDetParameters.getReadClassParams().isStrandBothOption();
-        boolean isFeatureStrand = operonDetParameters.getReadClassParams().isStrandFeatureOption();
+        try {
 
-        List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval( 0, chromLength, chrom.getId() );
-        for( int i = 0; i < chromFeatures.size(); ++i ) {
-            PersistentFeature feature1 = chromFeatures.get( i );
-            int id1 = feature1.getId();
+            List<Mapping> mappings = mappingResult.getMappings();
+            PersistentChromosome chrom = refConnector.getChromosomeForGenome( mappingResult.getRequest().getChromId() );
+            int chromLength = chrom.getLength();
+            boolean isStrandBothOption = operonDetParameters.getReadClassParams().isStrandBothOption();
+            boolean isFeatureStrand = operonDetParameters.getReadClassParams().isStrandFeatureOption();
 
-            //we can already neglect all features not forming a putative operon
-            if( this.featureToPutativeOperonMap.containsKey( id1 ) ) {
-                boolean fstFittingMapping = true;
-                boolean analysisStrand = isFeatureStrand ? feature1.isFwdStrand() : !feature1.isFwdStrand();
-                PersistentFeature feature2 = this.featureToPutativeOperonMap.get( id1 ).getFeature2();
+            List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval( 0, chromLength, chrom.getId() );
+            for( int i = 0; i < chromFeatures.size(); ++i ) {
+                PersistentFeature feature1 = chromFeatures.get( i );
+                int id1 = feature1.getId();
 
-                this.readsFeature1 = 0;
-                this.readsFeature2 = 0;
-                this.spanningReads = 0;
-                this.internalReads = 0;
+                //we can already neglect all features not forming a putative operon
+                if( this.featureToPutativeOperonMap.containsKey( id1 ) ) {
+                    boolean fstFittingMapping = true;
+                    boolean analysisStrand = isFeatureStrand ? feature1.isFwdStrand() : !feature1.isFwdStrand();
+                    PersistentFeature feature2 = this.featureToPutativeOperonMap.get( id1 ).getFeature2();
 
-                int feature1Stop = feature1.getStop();
-                int feature2Start = feature2.getStart();
-                int feature2Stop = feature2.getStop();
+                    this.readsFeature1 = 0;
+                    this.readsFeature2 = 0;
+                    this.spanningReads = 0;
+                    this.internalReads = 0;
 
-                for( int j = this.lastMappingIdx; j < mappings.size(); ++j ) {
-                    Mapping mapping = mappings.get( j );
+                    int feature1Stop = feature1.getStop();
+                    int feature2Start = feature2.getStart();
+                    int feature2Stop = feature2.getStop();
 
-                    if( mapping.getStart() > feature2Stop ) {
-                        if( fstFittingMapping ) { //until now no mapping was found for current feature
-                            lastMappingIdx = j; //even if next feature starts at same start position no mapping will be found until mapping index j
+                    for( int j = this.lastMappingIdx; j < mappings.size(); ++j ) {
+                        Mapping mapping = mappings.get( j );
+
+                        if( mapping.getStart() > feature2Stop ) {
+                            if( fstFittingMapping ) { //until now no mapping was found for current feature
+                                lastMappingIdx = j; //even if next feature starts at same start position no mapping will be found until mapping index j
+                            }
+                            break; //since the mappings are sorted by start position
+                        } else if( !isStrandBothOption && (mapping.isFwdStrand() != analysisStrand || mapping.getStop() < feature1Stop) ) {
+                            continue;
                         }
-                        break; //since the mappings are sorted by start position
-                    } else if( !isStrandBothOption && (mapping.isFwdStrand() != analysisStrand || mapping.getStop() < feature1Stop) ) {
-                        continue;
+
+                        //mappings identified between both features
+                        if( mapping.getStart() <= feature1Stop && mapping.getStop() > feature1Stop && mapping.getStop() < feature2Start ) {
+                            ++readsFeature1;
+                        } else if( mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start ) {
+                            ++readsFeature2;
+                        } else if( mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start ) {
+                            ++spanningReads;
+                        } else if( mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start ) {
+                            ++internalReads;
+                        }
+
+                        if( fstFittingMapping && mapping.getStop() >= feature1.getStart() && mapping.getStart() <= feature2Stop ) {
+                            this.lastMappingIdx = j;
+                            fstFittingMapping = false;
+                        }
                     }
 
-                    //mappings identified between both features
-                    if( mapping.getStart() <= feature1Stop && mapping.getStop() > feature1Stop && mapping.getStop() < feature2Start ) {
-                        ++readsFeature1;
-                    } else if( mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start ) {
-                        ++readsFeature2;
-                    } else if( mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start ) {
-                        ++spanningReads;
-                    } else if( mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start ) {
-                        ++internalReads;
-                    }
-
-                    if( fstFittingMapping && mapping.getStop() >= feature1.getStart() && mapping.getStart() <= feature2Stop ) {
-                        this.lastMappingIdx = j;
-                        fstFittingMapping = false;
-                    }
+                    OperonAdjacency putativeOperon = featureToPutativeOperonMap.get( id1 );
+                    putativeOperon.setReadsFeature1( putativeOperon.getReadsFeature1() + readsFeature1 );
+                    putativeOperon.setReadsFeature2( putativeOperon.getReadsFeature2() + readsFeature2 );
+                    putativeOperon.setSpanningReads( putativeOperon.getSpanningReads() + spanningReads );
+                    putativeOperon.setInternalReads( putativeOperon.getInternalReads() + internalReads );
                 }
-
-                OperonAdjacency putativeOperon = featureToPutativeOperonMap.get( id1 );
-                putativeOperon.setReadsFeature1( putativeOperon.getReadsFeature1() + readsFeature1 );
-                putativeOperon.setReadsFeature2( putativeOperon.getReadsFeature2() + readsFeature2 );
-                putativeOperon.setSpanningReads( putativeOperon.getSpanningReads() + spanningReads );
-                putativeOperon.setInternalReads( putativeOperon.getInternalReads() + internalReads );
             }
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( new DatabaseException( "The chromosome with id " +
+                                                                    mappingResult.getRequest().getChromId() +
+                                                                    " could not be read from the DB. The operon " +
+                                                                    "detection result will not contain its features.", ex ) );
         }
         this.lastMappingIdx = 0;
     }
