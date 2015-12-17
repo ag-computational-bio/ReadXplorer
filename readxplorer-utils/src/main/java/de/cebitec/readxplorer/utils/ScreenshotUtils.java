@@ -22,8 +22,10 @@ import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -89,9 +91,14 @@ public final class ScreenshotUtils {
                 if( screenSize.width < compDim.width ) {
                     screenSize.width = compDim.width;
                 }
+                
+                //create buffered image with content and paint it on the svg generator
+                BufferedImage img = new BufferedImage( (int) screenSize.getWidth(), (int) screenSize.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE );
+                Graphics g = img.getGraphics();
                 container.setBounds( new Rectangle( screenSize ) );
-                container.paintAll( svgGenerator );
-
+                container.paintAll( g );
+                svgGenerator.drawImage( img, 0, 0, container );
+                
                 ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{ SVG }, SVG ) {
 
                     private static final long serialVersionUID = 1L;
