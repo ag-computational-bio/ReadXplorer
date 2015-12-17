@@ -42,7 +42,8 @@ public final class ErrorHelper {
      */
     public static ErrorHandler getHandler() {
         if( errorHandler == null ) {
-            if( System.getProperty( "guienv" ).equals( "true" ) ) {
+            String guienvProp = System.getProperty( "guienv" );
+            if( guienvProp == null || guienvProp.equals( "true" ) ) {
                 errorHandler = new GuiErrorHandler();
             } else {
                 errorHandler = new ConsoleErrorHandler();
