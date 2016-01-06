@@ -31,13 +31,12 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,7 +47,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class JFeature extends JComponent {
 
-    private static final Logger LOG = Logger.getLogger( JFeature.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( JFeature.class.getName() );
 
     private static final long serialVersionUID = 347348234;
     public static final int NORMAL_HEIGHT = 12;
@@ -269,7 +268,7 @@ public class JFeature extends JComponent {
                 c = Colors.MINUS_TEN;
                 break;
             default:
-                LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
+                LOG.error( "Found unknown type for feature {0}", feature.getType() );
                 c = Colors.UNDEF_FEATURE;
         }
 

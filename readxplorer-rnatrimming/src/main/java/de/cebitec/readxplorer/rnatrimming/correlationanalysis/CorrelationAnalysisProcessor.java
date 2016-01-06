@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import de.cebitec.readxplorer.databackend.ThreadListener;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.Coverage;
 import de.cebitec.readxplorer.databackend.dataobjects.CoverageAndDiffResult;
@@ -31,6 +32,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,6 +56,7 @@ import org.openide.util.NbBundle;
  */
 public class CorrelationAnalysisProcessor implements ThreadListener {
 
+    private static final Logger LOG = LoggerFactory.getLogger( CorrelationAnalysisProcessor.class.getName() );
     private static final int MINIMUMINTERVALLENGTH = 90000;
 
     private final Integer rightBound;
@@ -102,6 +107,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             } catch( UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 continue;
+            } catch( DatabaseException ex ) {
+                ErrorHelper.getHandler().handle( ex );
+                continue;
             }
             trackMap.put( track.getId(), track );
         }
@@ -131,13 +139,13 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private void createProcessHandle( String title ) {
         this.ph = ProgressHandleFactory.createHandle( title, new Cancellable() {
 
-            @Override
-            public boolean cancel() {
-                return handleCancel();
-            }
+                                                  @Override
+                                                  public boolean cancel() {
+                                                      return handleCancel();
+                                                  }
 
 
-        } );
+                                              } );
         ph.start();
         ph.switchToDeterminate( this.rightBound );
     }
@@ -293,20 +301,16 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             } else {
                 requestNextStep();
             }
+        } else if( strand == Strand.Forward ) {
+            ph.finish();
+            this.strand = Strand.Reverse;
+            this.createProcessHandle( NbBundle.getMessage( CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV" ) );
+
+            //compute again from the beginning with the other strand strand
+            this.currentPosition = 1;
+            requestNextStep();
         } else {
-
-            if( strand == Strand.Forward ) {
-                ph.finish();
-                this.strand = Strand.Reverse;
-                this.createProcessHandle( NbBundle.getMessage( CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV" ) );
-
-                //compute again from the beginning with the other strand strand
-                this.currentPosition = 1;
-                requestNextStep();
-            } else {
-                this.finish();
-            }
-
+            this.finish();
         }
     }
 

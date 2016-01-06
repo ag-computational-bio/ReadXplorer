@@ -18,61 +18,53 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient.PEARSON;
+import static de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient.SPEARMAN;
+import static de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT;
+import static de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.PROP_INTERVALLENGTH;
+import static de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.PROP_MINCORRELATION;
+import static de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE;
 
 
 /**
  * GUI Card for selection of the parameters for the correlation analysis
  * <p>
- * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>, rhilker
  */
-public class ParameterSelectionCard extends javax.swing.JPanel {
+public class ParameterSelectionCard extends JobPanel {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
-     * Creates new form TrimSelectionCard
+     * GUI Card for selection of the parameters for the correlation analysis.
      */
     public ParameterSelectionCard() {
         initComponents();
+        loadLastParameterSelection();
 
-        this.intervalLengthSlider.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent e ) {
-                firePropertyChange( CorrelationAnalysisAction.PROP_INTERVALLENGTH, e.getOldValue(), e.getNewValue() );
-            }
+        intervalLengthSlider.addPropertyChangeListener( createPropertyChangeListener() );
+        minimumCorrelationSlider.addPropertyChangeListener( createPropertyChangeListener() );
 
-
-        } );
-
-        this.minimumCorrelationSlider.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent e ) {
-                firePropertyChange( CorrelationAnalysisAction.PROP_MINCORRELATION, e.getOldValue(), e.getNewValue() );
-            }
+    }
 
 
-        } );
+    @Override
+    public boolean isRequiredInfoSet() {
+        boolean isValidated = true;
+        if( intervalLengthSlider.getValue() <= 2 || minimumCorrelationSlider.getValue() <= 0 ) {
+            isValidated = false;
+        }
 
-        this.minimumPeakCoverageSlider.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent e ) {
-                firePropertyChange( CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE, e.getOldValue(), e.getNewValue() );
-            }
-
-
-        } );
-
-        this.correlationMethodCombo.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent e ) {
-                firePropertyChange( CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT, e.getOldValue(), e.getNewValue() );
-            }
-
-
-        } );
-
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
+        return isValidated;
     }
 
 
@@ -184,9 +176,36 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
     }
 
 
+    public Integer getMinimumPeakCoverage() {
+        return this.minimumPeakCoverageSlider.getValue();
+    }
+
+
+    public Object getCorrelationMethod() {
+        return this.correlationMethodCombo.getSelectedItem();
+    }
+
+
     @Override
     public String getName() {
         return NbBundle.getMessage( ParameterSelectionCard.class, "CTL_ParameterSelectionCard.name" );
+    }
+
+
+    /**
+     * Loads the last selected parameters into the component.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        String corrMethodString = pref.get( PROP_CORRELATIONCOEFFICIENT, SPEARMAN.toString() );
+        String pearson = PEARSON.toString();
+        CorrelationCoefficient corrCoefficient = corrMethodString.equals( pearson ) ? PEARSON : SPEARMAN;
+
+        intervalLengthSlider.setValue( pref.getInt( PROP_INTERVALLENGTH, intervalLengthSlider.getValue() ) );
+        minimumCorrelationSlider.setValue( pref.getInt( PROP_MINCORRELATION, minimumCorrelationSlider.getValue() ) );
+        minimumPeakCoverageSlider.setValue( pref.getInt( PROP_MINPEAKCOVERAGE, minimumPeakCoverageSlider.getValue() ) );
+        correlationMethodCombo.setSelectedItem( corrCoefficient );
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -199,16 +218,5 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
     private javax.swing.JLabel minimumPeakCoverageLabel;
     private javax.swing.JSlider minimumPeakCoverageSlider;
     // End of variables declaration//GEN-END:variables
-
-
-    public Integer getMinimumPeakCoverage() {
-        return this.minimumPeakCoverageSlider.getValue();
-    }
-
-
-    public Object getCorrelationMethod() {
-        return this.correlationMethodCombo.getSelectedItem();
-    }
-
 
 }

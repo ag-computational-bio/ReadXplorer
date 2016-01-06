@@ -21,8 +21,8 @@ package bio.jlu.comp.readxplorer.classificationupdate;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.TotalCoverage;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
@@ -46,6 +46,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -56,6 +58,8 @@ import org.openide.windows.InputOutput;
  */
 public class UpdateThread extends SwingWorker<Object, Object> implements
         Observer {
+
+    private static final Logger LOG = LoggerFactory.getLogger( UpdateThread.class.getSimpleName() );
 
     private final InputOutput io;
     private final ProgressHandle ph;
@@ -109,86 +113,91 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
     private void updateTracks() {
 
         final ProjectConnector projectConnector = ProjectConnector.getInstance();
-        List<TrackJob> trackJobs = this.getTrackJobs();
-        if( !trackJobs.isEmpty() ) {
-            workunits = trackJobs.size();
-            ph.start( workunits );
-            workunits = 0;
+        try {
+            List<TrackJob> trackJobs = this.getTrackJobs();
+            if( !trackJobs.isEmpty() ) {
+                workunits = trackJobs.size();
+                ph.start( workunits );
+                workunits = 0;
 
-            io.getOut().println( "Starting update of read mapping classification for all tracks in the current database:" );
-            for( TrackJob trackJob : trackJobs ) {
-                try {
-                    ph.progress( "Re-calculate classification of track " + trackJob.getName(), workunits );
-                    io.getOut().println( "Re-calculate classification of track " + trackJob.getName() );
-                    SamBamParser parser = new SamBamParser();
-                    parser.registerObserver( this );
-                    Map<String, Integer> chromLengthMap = this.getChromLengthMap( trackJob );
-                    StatsContainer statsContainer = new StatsContainer();
-                    statsContainer.prepareForTrack();
-                    parser.setStatsContainer( statsContainer );
-                    boolean success = parser.parseInput( trackJob, chromLengthMap );
-                    parser.removeObserver( this );
-                    if( success ) {
-                        try {
-                            projectConnector.resetTrackPath(
-                                    new PersistentTrack(
-                                            trackJob.getID(),
-                                            trackJob.getFile().getAbsolutePath(),
-                                            trackJob.getDescription(),
-                                            trackJob.getTimestamp(),
-                                            trackJob.getRefGen().getID(),
-                                            1 ) );
+                io.getOut().println( "Starting update of read mapping classification for all tracks in the current database:" );
+                for( TrackJob trackJob : trackJobs ) {
+                    try {
+                        ph.progress( "Re-calculate classification of track " + trackJob.getName(), workunits );
+                        io.getOut().println( "Re-calculate classification of track " + trackJob.getName() );
+                        SamBamParser parser = new SamBamParser();
+                        parser.registerObserver( this );
+                        Map<String, Integer> chromLengthMap = this.getChromLengthMap( trackJob );
+                        StatsContainer statsContainer = new StatsContainer();
+                        statsContainer.prepareForTrack();
+                        parser.setStatsContainer( statsContainer );
+                        boolean success = parser.parseInput( trackJob, chromLengthMap );
+                        parser.removeObserver( this );
+                        if( success ) {
+                            try {
+                                projectConnector.resetTrackPath(
+                                        new PersistentTrack(
+                                                trackJob.getID(),
+                                                trackJob.getFile().getAbsolutePath(),
+                                                trackJob.getDescription(),
+                                                trackJob.getTimestamp(),
+                                                trackJob.getRefGen().getID(),
+                                                1 ) );
 
-                            //file needs to be sorted by coordinate for efficient calculation
-                            SamBamStatsParser statsParser = new SamBamStatsParser();
-                            statsParser.setStatsContainer( statsContainer );
-                            statsParser.registerObserver( this );
-                            statsParser.createTrackStats( trackJob, chromLengthMap );
-                            statsParser.removeObserver( this );
+                                //file needs to be sorted by coordinate for efficient calculation
+                                SamBamStatsParser statsParser = new SamBamStatsParser();
+                                statsParser.setStatsContainer( statsContainer );
+                                statsParser.registerObserver( this );
+                                statsParser.createTrackStats( trackJob, chromLengthMap );
+                                statsParser.removeObserver( this );
 
-                            List<String> statsKeysToDelete = new ArrayList<>();
-                            for( MappingClass mappingClass : MappingClass.values() ) {
-                                statsKeysToDelete.add( mappingClass.toString());
-                                statsKeysToDelete.add( mappingClass.toString() + StatsContainer.COVERAGE_STRING );
+                                List<String> statsKeysToDelete = new ArrayList<>();
+                                for( MappingClass mappingClass : MappingClass.values() ) {
+                                    statsKeysToDelete.add( mappingClass.toString() );
+                                    statsKeysToDelete.add( mappingClass.toString() + StatsContainer.COVERAGE_STRING );
+                                }
+                                statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE + StatsContainer.COVERAGE_STRING );
+                                statsKeysToDelete.add( StatsContainer.NO_MAPPINGS );
+                                statsKeysToDelete.add( StatsContainer.NO_UNIQUE_SEQS );
+                                statsKeysToDelete.add( StatsContainer.NO_REPEATED_SEQ );
+                                statsKeysToDelete.add( StatsContainer.NO_UNIQ_MAPPINGS );
+                                statsKeysToDelete.add( StatsContainer.NO_READS );
+                                statsKeysToDelete.add( StatsContainer.AVERAGE_READ_LENGTH );
+
+                                projectConnector.deleteSpecificTrackStatistics( statsKeysToDelete, trackJob.getID() );
+                                projectConnector.storeTrackStatistics( statsContainer, trackJob.getID() );
+                            } catch( DatabaseException ex ) {
+                                LOG.error( ex.getMessage(), ex );
+                                noErrors = false;
                             }
-                            statsKeysToDelete.add( TotalCoverage.TOTAL_COVERAGE + StatsContainer.COVERAGE_STRING );
-                            statsKeysToDelete.add( StatsContainer.NO_MAPPINGS );
-                            statsKeysToDelete.add( StatsContainer.NO_UNIQUE_SEQS );
-                            statsKeysToDelete.add( StatsContainer.NO_REPEATED_SEQ );
-                            statsKeysToDelete.add( StatsContainer.NO_UNIQ_MAPPINGS );
-                            statsKeysToDelete.add( StatsContainer.NO_READS );
-                            statsKeysToDelete.add( StatsContainer.AVERAGE_READ_LENGTH );
-
-                            projectConnector.deleteSpecificTrackStatistics( statsKeysToDelete, trackJob.getID() );
-                            projectConnector.storeTrackStatistics( statsContainer, trackJob.getID() );
-                        } catch( StorageException ex ) {
-                            Exceptions.printStackTrace( ex );
-                            noErrors = false;
                         }
+                    } catch( ParsingException | OutOfMemoryError ex ) {
+                        LOG.error( ex.getMessage(), ex );
+                        noErrors = false;
                     }
-                } catch( ParsingException | OutOfMemoryError ex ) {
-                    Exceptions.printStackTrace( ex );
-                    noErrors = false;
+                    if( noErrors ) {
+                        io.getOut().println( "Re-calculation of classification for track " + trackJob.getName() + " finished successfully!" );
+                    } else {
+                        io.getOut().println( "Re-calculation of classification for track " + trackJob.getName() + " failed!" );
+                    }
+                    ph.progress( "Re-calculate classification of track " + trackJob.getName(), ++workunits );
+                    noErrors = true;
                 }
-                if( noErrors ) {
-                    io.getOut().println( "Re-calculation of classification for track " + trackJob.getName() + " finished successfully!" );
-                } else {
-                    io.getOut().println( "Re-calculation of classification for track " + trackJob.getName() + " failed!" );
-                }
-                ph.progress( "Re-calculate classification of track " + trackJob.getName(), ++workunits );
-                noErrors = true;
             }
+        } catch( DatabaseException ex ) {
+            LOG.error( ex.getMessage(), ex );
+            io.getOut().println( ex.getMessage() + "\n" + ex );
         }
     }
 
 
-    private List<TrackJob> getTrackJobs() {
+    private List<TrackJob> getTrackJobs() throws DatabaseException {
+        List<TrackJob> trackJobs = new ArrayList<>();
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         List<PersistentTrack> tracks = projectConnector.getTracks();
-        List<TrackJob> trackJobs = new ArrayList<>();
         Map<Integer, ReferenceJob> idToRefMap = new HashMap<>();
 
-        List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+        List<PersistentReference> refs = ProjectConnector.getInstance().getReferences();
         for( PersistentReference ref : refs ) {
             // File and parser parameter meaningless in this context
             ReferenceJob refJob = new ReferenceJob( ref.getId(), ref.getFastaFile(), null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );
@@ -213,8 +222,10 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
      * <p>
      * @param trackJob The track job for which the chromosome sequences and
      *                 lengths are needed.
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    private Map<String, Integer> getChromLengthMap( TrackJob trackJob ) {
+    private Map<String, Integer> getChromLengthMap( TrackJob trackJob ) throws DatabaseException {
         Map<String, Integer> chromLengthMap = new HashMap<>();
         int id = trackJob.getRefGen().getID();
         Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( id ).getRefGenome().getChromosomes();

@@ -31,9 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,11 +47,11 @@ import static java.util.logging.Level.INFO;
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
-    private static final Logger LOG = Logger.getLogger( FastaReferenceParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( FastaReferenceParser.class.getName() );
 
 
     private static final String PARSER_NAME = "Fasta file";
-    private static final String[] FILE_EXTENSION = new String[]{"fas", "fasta", "fna", "fa"};
+    private static final String[] FILE_EXTENSION = new String[]{ "fas", "fasta", "fna", "fa" };
     private static final String FILE_DESCRIPTION = "Fasta File";
 
     private final List<Observer> observers = new ArrayList<>();
@@ -80,11 +79,11 @@ public class FastaReferenceParser implements ReferenceParserI {
      * sequence.
      * <p>
      * @param referenceJob the reference job, for which the data shall be parsed
-     * @param filter the feature filter to use for this reference. Not needed
-     * for fasta, since it does not have features.
+     * @param filter       the feature filter to use for this reference. Not
+     *                     needed for fasta, since it does not have features.
      * <p>
      * @return returns the object parsedReference with the name, description and
-     * chromosomes for the reference genome
+     *         chromosomes for the reference genome
      * <p>
      * @throws de.cebitec.readxplorer.parser.common.ParsingException
      */
@@ -93,7 +92,7 @@ public class FastaReferenceParser implements ReferenceParserI {
 
         final ParsedReference refGenome = new ParsedReference();
         int chromCounter = 0;
-        LOG.log( INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
+        LOG.info( "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
 
             refGenome.setDescription( referenceJob.getDescription() );
@@ -118,7 +117,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             this.notifyObservers( ex.getMessage() );
         }
 
-        LOG.log( INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{referenceJob.getFile(), chromCounter} );
+        LOG.info( "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{ referenceJob.getFile(), chromCounter } );
         return refGenome;
 
     }
@@ -134,6 +133,7 @@ public class FastaReferenceParser implements ReferenceParserI {
         ParsedChromosome chrom = new ParsedChromosome( chromName, chromLength, false );
         reference.addChromosome( chrom );
     }
+
 
     /*
      * get the name of the used parser

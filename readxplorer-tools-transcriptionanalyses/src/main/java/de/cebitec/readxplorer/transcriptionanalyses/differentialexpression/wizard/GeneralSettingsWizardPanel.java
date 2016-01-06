@@ -131,12 +131,10 @@ public class GeneralSettingsWizardPanel implements
         List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         if( usedFeatures.isEmpty() ) {
             throw new WizardValidationException( null, "Please select at least one type of annotation.", null );
-        } else {
-            if( usedFeatures.size() < FeatureType.SELECTABLE_FEATURE_TYPES.length ) {
-                ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( genomeID );
-                if( !referenceConnector.hasFeatures( usedFeatures ) ) {
-                    throw new WizardValidationException( null, "The selected reference genome does not contain annotations of the selected type(s).", null );
-                }
+        } else if( usedFeatures.size() < FeatureType.SELECTABLE_FEATURE_TYPES.length ) {
+            ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( genomeID );
+            if( !referenceConnector.hasFeatures( usedFeatures ) ) {
+                throw new WizardValidationException( null, "The selected reference genome does not contain annotations of the selected type(s).", null );
             }
         }
     }

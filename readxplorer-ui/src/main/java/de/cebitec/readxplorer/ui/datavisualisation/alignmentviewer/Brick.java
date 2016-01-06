@@ -18,9 +18,8 @@
 package de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer;
 
 
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -47,7 +46,7 @@ public enum Brick {
     SKIPPED( Brick.SKIPPED_STRING ),
     TRIMMED( Brick.TRIMMED_STRING );
 
-    private static final Logger LOG = Logger.getLogger( Brick.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( Brick.class.getName() );
 
     private static final String READGAP_STRING = "-";
     private static final String FOREIGN_GENOMEGAP_STRING = "";
@@ -136,7 +135,7 @@ public enum Brick {
                 break;
             default:
                 type = Brick.UNDEF;
-                LOG.log( SEVERE, "found unknown brick type {0}", c );
+                LOG.error( "found unknown brick type {0}", c );
         }
         return type;
 
@@ -171,7 +170,7 @@ public enum Brick {
                 break;
             default:
                 type = Brick.UNDEF;
-                LOG.log( SEVERE, "found unknown brick type {0}", c );
+                LOG.error( "found unknown brick type {0}", c );
         }
         return type;
 

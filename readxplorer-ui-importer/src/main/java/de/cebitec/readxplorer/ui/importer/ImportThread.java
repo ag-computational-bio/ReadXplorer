@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -46,17 +46,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -67,7 +64,7 @@ import static java.util.logging.Level.SEVERE;
 public class ImportThread extends SwingWorker<Object, Object> implements
         Observer {
 
-    private static final Logger LOG = Logger.getLogger( ImportThread.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportThread.class.getName() );
 
     private final InputOutput io;
     private final List<ReferenceJob> referenceJobs;
@@ -88,11 +85,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     public ImportThread( List<ReferenceJob> refJobs, List<TrackJob> trackJobs, List<ReadPairJobContainer> readPairJobs ) {
         super();
-        this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( ImportThread.class, "ImportThread.output.name" ), false );
+        this.io = IOProvider.getDefault().getIO( getBundleString( "ImportThread.output.name" ), false );
         this.tracksJobs = trackJobs;
         this.referenceJobs = refJobs;
         this.readPairJobs = readPairJobs;
-        this.ph = ProgressHandleFactory.createHandle( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.progress.name" ) );
+        this.ph = ProgressHandleFactory.createHandle( getBundleString( "MSG_ImportThread.progress.name" ) );
 
         this.workunits = refJobs.size();
         for( TrackJob trackJob : trackJobs ) {
@@ -105,7 +102,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
 
     private ParsedReference parseRefJob( ReferenceJob refGenJob ) throws ParsingException, OutOfMemoryError {
-        LOG.log( INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Start parsing reference genome from file: " + refGenJob.getFile().getAbsolutePath() );
 
         ReferenceParserI parser = refGenJob.getParser();
         parser.registerObserver( this );
@@ -113,7 +110,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         filter.addBlacklistRule( new FilterRuleSource() );
         ParsedReference refGenome = parser.parseReference( refGenJob, filter );
 
-        LOG.log( INFO, "Finished parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Finished parsing reference genome from file: " + refGenJob.getFile().getAbsolutePath() );
         return refGenome;
     }
 
@@ -125,16 +122,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * @param refGenJob the corresponding reference job, whose id will be
      *                  updated
      * <p>
-     * @throws StorageException
+     * @throws DatabaseException
      */
-    private void storeRefGenome( ParsedReference refGenome, ReferenceJob refGenJob ) throws StorageException {
-        LOG.log( INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+    private void storeRefGenome( ParsedReference refGenome, ReferenceJob refGenJob ) throws DatabaseException {
+        LOG.info( "Start storing reference genome from file: " + refGenJob.getFile().getAbsolutePath() );
 
         int refGenID = ProjectConnector.getInstance().addRefGenome( refGenome );
         refGenJob.setPersistent( refGenID );
         refGenJob.setFile( refGenome.getFastaFile() );
 
-        LOG.log( INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath() );
+        LOG.info( "Finished storing reference genome from file: " + refGenJob.getFile().getAbsolutePath() );
     }
 
 
@@ -143,46 +140,44 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     private void processRefGenomeJobs() {
         if( !referenceJobs.isEmpty() ) {
-            io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.ref" ) + ":" );
-            long start;
-            long finish;
-            String msg;
+            printAndLog( getBundleString( "MSG_ImportThread.import.start.ref" ) + ":" );
 
             for( Iterator<ReferenceJob> it = referenceJobs.iterator(); it.hasNext(); ) {
-                start = System.currentTimeMillis();
+                long start = System.currentTimeMillis();
                 ReferenceJob r = it.next();
 
                 try {
                     // parsing
                     ParsedReference refGen = this.parseRefJob( r );
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.parsed" ) );
+                    printAndLog( "\"" + r.getName() + "\" " + getBundleString( "MSG_ImportThread.import.parsed" ) );
 
                     // storing
                     try {
                         storeRefGenome( refGen, r );
-                        finish = System.currentTimeMillis();
-                        msg = "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
-                        io.getOut().println( Benchmark.calculateDuration( start, finish, msg ) );
-                    } catch( StorageException ex ) {
+                        long finish = System.currentTimeMillis();
+                        String msg = "\"" + r.getName() + "\" " + getBundleString( "MSG_ImportThread.import.stored" );
+                        printAndLog( Benchmark.calculateDuration( start, finish, msg ) );
+                    } catch( DatabaseException ex ) {
                         // if something went wrong, mark all dependent track jobs
-                        io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
+                        printAndLogError( "\"" + r.getName() + "\" " + getBundleString( "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                         this.noErrors = false;
-                        LOG.log( SEVERE, null, ex );
+                        LOG.error( ex.getMessage(), ex );
                     }
 
                 } catch( ParsingException ex ) {
                     // if something went wrong, mark all dependent track jobs
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
+                    printAndLogError( "\"" + r.getName() + "\" " + getBundleString( "MSG_ImportThread.import.failed" ) + ": " + ex.getMessage() );
                     this.noErrors = false;
-                    LOG.log( INFO, null, ex );
+                    LOG.error( ex.getMessage(), ex );
                 } catch( OutOfMemoryError ex ) {
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
+                    printAndLogError( "\"" + r.getName() + "\" " + getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
+                    LOG.error( ex.getMessage(), ex );
                 }
 
                 ph.progress( ++workunits );
             }
 
-            io.getOut().println( "" );
+            printAndLog( "" );
         }
     }
 
@@ -193,8 +188,10 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      * <p>
      * @param trackJob The track job for which the chromosome sequences and
      *                 lengths are needed.
+     *
+     * @throws DatabaseException An exception during data queries
      */
-    private void setChromLengthMap( TrackJob trackJob ) {
+    private void setChromLengthMap( TrackJob trackJob ) throws DatabaseException {
         chromLengthMap = new HashMap<>();
         int id = trackJob.getRefGen().getID();
         Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( id ).getRefGenome().getChromosomes();
@@ -209,7 +206,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     private void processTrackJobs() {
         if( !tracksJobs.isEmpty() ) {
-            io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.track" ) + ":" );
+            printAndLog( getBundleString( "MSG_ImportThread.import.start.track" ) + ":" );
 
             for( TrackJob trackJob : tracksJobs ) {
                 this.parseBamTrack( trackJob );
@@ -223,10 +220,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements
     private void processReadPairJobs() {
         if( !readPairJobs.isEmpty() ) {
 
-            io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.readPairs" ) + ":" );
+            printAndLog( getBundleString( "MSG_ImportThread.import.start.readPairs" ) + ":" );
 
             for( Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext(); ) {
-                long start = System.currentTimeMillis();
                 ReadPairJobContainer readPairJobContainer = it.next();
 
                 int distance = readPairJobContainer.getDistance();
@@ -249,23 +245,23 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
                     TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
                     TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
-                    this.setChromLengthMap( trackJob1 );
-                    File inputFile1 = trackJob1.getFile();
-                    inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                    StatsContainer statsContainer = new StatsContainer();
-                    statsContainer.prepareForTrack();
-                    statsContainer.prepareForReadPairTrack();
+                    try {
+                        this.setChromLengthMap( trackJob1 );
+                        File inputFile1 = trackJob1.getFile();
+                        inputFile1.setReadOnly(); //prevents changes or deletion of original file!
+                        StatsContainer statsContainer = new StatsContainer();
+                        statsContainer.prepareForTrack();
+                        statsContainer.prepareForReadPairTrack();
 
-                    if( !trackJob1.isAlreadyImported() ) {
+                        if( !trackJob1.isAlreadyImported() ) {
 
-                        try {
                             //executes any conversion before other calculations, if the parser supports any
                             trackJob1.getParser().registerObserver( this );
                             Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
                             trackJob1.getParser().removeObserver( this );
                             if( !success ) {
                                 this.noErrors = false;
-                                this.showMsg( "Conversion of " + trackJob1.getName() + " failed!" );
+                                printAndLogError( "Conversion of " + trackJob1.getName() + " failed!" );
                                 continue;
                             }
                             File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
@@ -279,7 +275,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 File lastWorkFile2 = trackJob2.getFile();
                                 if( !success ) {
                                     this.noErrors = false;
-                                    this.showMsg( "Conversion of " + trackJob2.getName() + " failed!" );
+                                    printAndLogError( "Conversion of " + trackJob2.getName() + " failed!" );
                                     continue;
                                 }
 
@@ -289,7 +285,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 success = combiner.combineData();
                                 if( !success ) {
                                     this.noErrors = false;
-                                    this.showMsg( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
+                                    printAndLogError( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
                                     continue;
                                 }
                                 GeneralUtils.deleteOldWorkFile( lastWorkFile ); //either were converted or are write protected
@@ -309,58 +305,47 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
                             //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
                             GeneralUtils.deleteOldWorkFile( lastWorkFile );
+                            ph.progress( ++workunits );
 
-                        } catch( OutOfMemoryError ex ) {
-                            this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
-                            this.noErrors = false;
-                            continue;
-
-                        } catch( Exception ex ) {
-                            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
-                            Exceptions.printStackTrace( ex );
-                            this.noErrors = false;
-                            continue;
-                        }
-                        ph.progress( ++workunits );
-
-                    } else { //else case with 2 already imported tracks is prohibited
-                        //we have to calculate the stats
-                        SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
-                        statsParser.setStatsContainer( statsContainer );
-                        try {
+                        } else { //else case with 2 already imported tracks is prohibited
+                            //we have to calculate the stats
+                            SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
+                            statsParser.setStatsContainer( statsContainer );
                             statsParser.registerObserver( this );
                             statsParser.classifyReadPairs();
 
-                        } catch( OutOfMemoryError ex ) {
-                            this.showMsg( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
-                            this.noErrors = false;
-                            continue;
-
-                        } catch( Exception ex ) {
-                            this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
-                            Exceptions.printStackTrace( ex );
-                            this.noErrors = false;
-                            continue;
+                            ph.progress( ++workunits );
                         }
-                        ph.progress( ++workunits );
+
+                        //create general track stats
+                        SamBamStatsParser statsParser = new SamBamStatsParser();
+                        statsParser.setStatsContainer( statsContainer );
+                        statsParser.registerObserver( this );
+                        ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
+                        statsParser.removeObserver( this );
+
+                        this.storeBamTrack( track ); // store track entry in db
+                        trackId1 = trackJob1.getID();
+                        inputFile1.setWritable( true );
+
+                        //read pair ids have to be set in track entry
+                        ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
+
+                    } catch( OutOfMemoryError ex ) {
+                        printAndLogError( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
+                        LOG.error( ex.getMessage(), ex );
+                        this.noErrors = false;
+                        continue;
+
+                    } catch( DatabaseException | ParsingException | IOException ex ) {
+                        printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
+                        LOG.error( ex.getMessage(), ex );
+                        this.noErrors = false;
+                        continue;
                     }
 
-                    //create general track stats
-                    SamBamStatsParser statsParser = new SamBamStatsParser();
-                    statsParser.setStatsContainer( statsContainer );
-                    statsParser.registerObserver( this );
-                    ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
-                    statsParser.removeObserver( this );
-
-                    this.storeBamTrack( track ); // store track entry in db
-                    trackId1 = trackJob1.getID();
-                    inputFile1.setWritable( true );
-
-                    //read pair ids have to be set in track entry
-                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
-
                 } else { //if (distance <= 0)
-                    this.showMsg( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.error" ) );
+                    printAndLogError( getBundleString( "MSG_ImportThread.import.error" ) );
                     this.noErrors = false;
                 }
 
@@ -385,17 +370,17 @@ public class ImportThread extends SwingWorker<Object, Object> implements
          * sorted by coordinate & classification in file)
          */
 
-        this.setChromLengthMap( trackJob );
-        boolean success;
-        StatsContainer statsContainer = new StatsContainer();
-        statsContainer.prepareForTrack();
+        try {
+            setChromLengthMap( trackJob );
+            boolean success;
+            StatsContainer statsContainer = new StatsContainer();
+            statsContainer.prepareForTrack();
 
-        //only extend, if data is not already stored in it
-        if( !trackJob.isAlreadyImported() ) {
-            File inputFile = trackJob.getFile();
-            MappingParserI mappingParser = trackJob.getParser();
-            inputFile.setReadOnly(); //prevents changes or deletion of original file!
-            try {
+            //only extend, if data is not already stored in it
+            if( !trackJob.isAlreadyImported() ) {
+                File inputFile = trackJob.getFile();
+                MappingParserI mappingParser = trackJob.getParser();
+                inputFile.setReadOnly(); //prevents changes or deletion of original file!
                 //executes any conversion before other calculations, if the parser supports any
                 success = trackJob.getParser().convert( trackJob, chromLengthMap );
                 File lastWorkFile = trackJob.getFile();
@@ -409,30 +394,28 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 if( success ) {
                     GeneralUtils.deleteOldWorkFile( lastWorkFile );
                 } //only when we reach this line without exceptions and conversion was successful
-
-            } catch( OutOfMemoryError ex ) {
-                this.showMsg( "Out of memory error during parsing of bam track: " + ex.getMessage() );
-                this.noErrors = false;
-                return;
-            } catch( Exception ex ) {
-                this.showMsg( "Error during parsing of bam track: " + ex.getMessage() );
-                Exceptions.printStackTrace( ex ); //TODO: remove this error handling
-                this.noErrors = false;
-                return;
+                ph.progress( ++workunits );
+                inputFile.setWritable( true );
+                mappingParser.removeObserver( this );
             }
-            ph.progress( ++workunits );
-            inputFile.setWritable( true );
-            mappingParser.removeObserver( this );
+
+            //file needs to be sorted by coordinate for efficient calculation
+            SamBamStatsParser statsParser = new SamBamStatsParser();
+            statsParser.setStatsContainer( statsContainer );
+            statsParser.registerObserver( this );
+            ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
+            statsParser.removeObserver( this );
+
+            this.storeBamTrack( track );
+
+        } catch( OutOfMemoryError ex ) {
+            printAndLogError( "Out of memory error during parsing of bam track: " + ex.getMessage() );
+            this.noErrors = false;
+        } catch( DatabaseException | ParsingException | IOException ex ) {
+            printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
+            LOG.error( ex.getMessage(), ex );
+            this.noErrors = false;
         }
-
-        //file needs to be sorted by coordinate for efficient calculation
-        SamBamStatsParser statsParser = new SamBamStatsParser();
-        statsParser.setStatsContainer( statsContainer );
-        statsParser.registerObserver( this );
-        ParsedTrack track = statsParser.createTrackStats( trackJob, chromLengthMap );
-        statsParser.removeObserver( this );
-
-        this.storeBamTrack( track );
     }
 
 
@@ -442,30 +425,30 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         try {
             io.getOut().reset();
         } catch( IOException ex ) {
-            Exceptions.printStackTrace( ex );
+            LOG.error( ex.getMessage(), ex );
         }
         io.select();
 
         ph.start( workunits );
         workunits = 0;
 
-        ph.progress( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.progress.ref" ) + "...", workunits );
+        ph.progress( getBundleString( "MSG_ImportThread.progress.ref" ) + "...", workunits );
         this.processRefGenomeJobs();
 
         // track jobs have to be imported last, because they may depend upon previously imported genomes, runs
-        ph.progress( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.progress.track" ) + "...", workunits );
+        ph.progress( getBundleString( "MSG_ImportThread.progress.track" ) + "...", workunits );
 
         //get system JVM info:
         Runtime rt = Runtime.getRuntime();
 
-        this.showMsg( "Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
-        this.showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
-        this.showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully." );
-        this.showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
-        this.showMsg( "" );
+        printAndLog( "Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
+        printAndLog( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
+        printAndLog( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully." );
+        printAndLog( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
+        printAndLog( "" );
 
-        this.processTrackJobs();
-        this.processReadPairJobs();
+        processTrackJobs();
+        processReadPairJobs();
 
         return null;
     }
@@ -476,9 +459,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         super.done();
         ph.progress( workunits );
         if( this.noErrors ) {
-            io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.finished" ) );
+            printAndLog( getBundleString( "MSG_ImportThread.import.finished" ) );
         } else {
-            io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.partFailed" ) );
+            printAndLog( getBundleString( "MSG_ImportThread.import.partFailed" ) );
         }
         io.getOut().close();
         ph.finish();
@@ -492,21 +475,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         if( data.toString().contains( "processed" ) || data.toString().contains( "converted" ) || data.toString().contains( "indexed" ) ) {
             this.ph.progress( data.toString() );
         } else {
-            this.showMsg( data.toString() );
+            printAndLog( data.toString() );
             this.ph.progress( "" );
         }
-    }
-
-
-    /**
-     * If any message should be printed to the console, this method is used. If
-     * an error occured during the run of the parser, which does not interrupt
-     * the parsing process, this method prints the error to the program console.
-     * <p>
-     * @param msg the msg to print
-     */
-    private void showMsg( String msg ) {
-        this.io.getOut().println( "\"" + msg );
     }
 
 
@@ -517,13 +488,17 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     private void storeBamTrack( ParsedTrack track ) {
         try {
-            io.getOut().println( track.getTrackName() + ": " + this.getBundleString( "MSG_ImportThread.import.start.trackdirect" ) );
+            printAndLog( track.getTrackName() + ": " + getBundleString( "MSG_ImportThread.import.start.trackdirect" ) );
             ProjectConnector.getInstance().storeBamTrack( track );
             ProjectConnector.getInstance().storeTrackStatistics( track.getStatsContainer(), track.getID() );
-            io.getOut().println( this.getBundleString( "MSG_ImportThread.import.success.trackdirect" ) );
+            printAndLog( getBundleString( "MSG_ImportThread.import.success.trackdirect" ) );
 
         } catch( OutOfMemoryError e ) {
-            io.getOut().println( this.getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
+            printAndLogError( getBundleString( "MSG_ImportThread.import.outOfMemory" ) + "!" );
+            LOG.error( e.getMessage(), e );
+        } catch( DatabaseException e ) {
+            printAndLogError( getBundleString( "Database exception occurred" ) + "!" );
+            LOG.error( e.getMessage(), e );
         }
     }
 
@@ -537,6 +512,28 @@ public class ImportThread extends SwingWorker<Object, Object> implements
      */
     private String getBundleString( String name ) {
         return NbBundle.getMessage( ImportThread.class, name );
+    }
+
+
+    /**
+     * Prints the given message to the io stream and the logger at info level.
+     *
+     * @param msg The message to print
+     */
+    private void printAndLog( String msg ) {
+        io.getOut().println( msg );
+        LOG.info( msg );
+    }
+
+
+    /**
+     * Prints the given message to the io stream and the logger at error level.
+     *
+     * @param msg The message to print
+     */
+    private void printAndLogError( String msg ) {
+        io.getOut().println( msg );
+        LOG.error( msg );
     }
 
 

@@ -28,7 +28,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
@@ -38,6 +37,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -47,7 +48,7 @@ import org.openide.windows.WindowManager;
 public final class ReferenceIntervalTopComp extends TopComponentExtended
         implements LookupListener, MousePositionListener {
 
-    private static final Logger LOG = Logger.getLogger( ReferenceIntervalTopComp.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ReferenceIntervalTopComp.class.getName() );
 
     private static final long serialVersionUID = 1L;
     private static ReferenceIntervalTopComp instance;
@@ -209,14 +210,14 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
     public static synchronized ReferenceIntervalTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warn( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof ReferenceIntervalTopComp ) {
             return (ReferenceIntervalTopComp) win;
         }
-        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID +
-                     "' ID. That is a potential source of errors and unexpected behavior." );
+        LOG.warn( "There seem to be multiple components with the '" + PREFERRED_ID +
+                  "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
 
@@ -250,38 +251,38 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
             // register listeners so every change occurs
             referenceViewer.addPropertyChangeListener( ReferenceViewer.PROP_FEATURE_STATS_CHANGED, new PropertyChangeListener() {
 
-                @Override
-                public void propertyChange( PropertyChangeEvent evt ) {
-                    // update visible feature list
-                    @SuppressWarnings( "unchecked" )
-                    Map<FeatureType, Integer> featureStats = (Map<FeatureType, Integer>) evt.getNewValue();
-                    ReferenceIntervalTopComp.this.showFeatureStatsForInterval( featureStats );
+                                                   @Override
+                                                   public void propertyChange( PropertyChangeEvent evt ) {
+                                                       // update visible feature list
+                                                       @SuppressWarnings( "unchecked" )
+                                                       Map<FeatureType, Integer> featureStats = (Map<FeatureType, Integer>) evt.getNewValue();
+                                                       ReferenceIntervalTopComp.this.showFeatureStatsForInterval( featureStats );
 
-                    // update intervall
-                    BoundsInfo boundsInfo = ((AbstractViewer) evt.getSource()).getBoundsInfo();
-                    setInterval( boundsInfo.getLogLeft(), boundsInfo.getLogRight() );
-                }
+                                                       // update intervall
+                                                       BoundsInfo boundsInfo = ((AbstractViewer) evt.getSource()).getBoundsInfo();
+                                                       setInterval( boundsInfo.getLogLeft(), boundsInfo.getLogRight() );
+                                                   }
 
 
-            } );
+                                               } );
             referenceViewer.addPropertyChangeListener( ReferenceViewer.PROP_MOUSEPOSITION_CHANGED, new PropertyChangeListener() {
 
-                @Override
-                public void propertyChange( PropertyChangeEvent evt ) {
-                    setCurrentMousePosition( (Integer) evt.getNewValue() );
-                }
+                                                   @Override
+                                                   public void propertyChange( PropertyChangeEvent evt ) {
+                                                       setCurrentMousePosition( (Integer) evt.getNewValue() );
+                                                   }
 
 
-            } );
+                                               } );
             referenceViewer.addPropertyChangeListener( ReferenceViewer.PROP_MOUSEOVER_REQUESTED, new PropertyChangeListener() {
 
-                @Override
-                public void propertyChange( PropertyChangeEvent evt ) {
-                    setMouseOverPaintingRequested( (Boolean) evt.getNewValue() );
-                }
+                                                   @Override
+                                                   public void propertyChange( PropertyChangeEvent evt ) {
+                                                       setMouseOverPaintingRequested( (Boolean) evt.getNewValue() );
+                                                   }
 
 
-            } );
+                                               } );
         }
     }
 

@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
@@ -55,6 +54,8 @@ import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -93,12 +94,12 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "AppPanelTopComponent";
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( AppPanelTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AppPanelTopComponent.class.getName() );
     private static AppPanelTopComponent instance;
     private final InstanceContent content = new InstanceContent();
     private final Lookup localLookup;
     private ReferenceViewer referenceViewer;
-    private final ArrayList<TrackViewer> trackViewerList;
+    private final List<TrackViewer> trackViewerList;
     private JScrollPane trackScrollPane;
     private JScrollPane basePanelScrollPane;
     private final JPanel tracksPanel;
@@ -526,7 +527,8 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
         try {
             super.paint( g );
         } catch( OutOfMemoryError e ) {
-            VisualisationUtils.displayOutOfMemoryError( this );
+            LOG.error( e.getMessage(), e );
+            VisualisationUtils.displayOutOfMemoryError();
         }
     }
 

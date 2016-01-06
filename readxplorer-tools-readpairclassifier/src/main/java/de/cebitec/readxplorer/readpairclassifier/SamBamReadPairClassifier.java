@@ -43,6 +43,14 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,19 +58,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.logging.Logger;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -80,7 +80,7 @@ import static java.util.logging.Level.INFO;
 public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                                  Observable, MessageSenderI {
 
-    private static final Logger LOG = Logger.getLogger( SamBamReadPairClassifier.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SamBamReadPairClassifier.class.getName() );
 
     private final ErrorLimit errorLimit;
     private final List<Observer> observers;
@@ -193,7 +193,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             int lineNo = 0;
             int noSkippedReads = 0;
             SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() );
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
             SAMRecordIterator samItor = samBamReader.iterator();
 
             SAMFileHeader header = samBamReader.getFileHeader();
@@ -309,7 +309,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             notifyObservers( "Last read in the file is incomplete, ignoring it." );
         } catch( MissingResourceException | IOException e ) {
             notifyObservers( Bundle.Classifier_Error( e.getMessage() ) );
-            LOG.log( INFO, e.getMessage() );
+            LOG.info( e.getMessage() );
         }
 
         return new ParsedReadPairContainer();
@@ -352,9 +352,9 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                 //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
 
                 boolean case1 = direction == orient1 && start1 <= start2;
-                if( (case1 || direction.getType() == -orient1.getType()
-                    && start2 <= start1)
-                    && direction.getType() == dir.getType() * direction2.getType() ) {
+                if( (case1 || direction.getType() == -orient1.getType() &&
+                      start2 <= start1) &&
+                         direction.getType() == dir.getType() * direction2.getType() ) {
 
                     int currDist = calcDistance( case1, start1, stop2, start2, stop1 );
 
@@ -417,8 +417,8 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
                                     boolean case1 = direction == orient1 && start1 < start2;
-                                    if( (case1 || direction.getType() == -orient1.getType() && start2 < start1)
-                                        && direction.getType() == dir.getType() * direction2.getType() ) {
+                                    if( (case1 || direction.getType() == -orient1.getType() && start2 < start1) &&
+                                             direction.getType() == dir.getType() * direction2.getType() ) {
                                         int currDist = calcDistance( case1, start1, stop2, start2, stop1 );
                                         if( currDist <= this.maxDist && currDist >= this.minDist ) { //distance fits
                                             ///////////////////////////// found a perfect pair! /////////////////////////////////
@@ -431,17 +431,19 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                                 potPairList.add( readPair );
                                             }
                                         } else //////////////// distance too small, potential pair //////////////////////////
-                                        if( currDist < this.minDist ) {
-                                            ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.DIST_SMALL_PAIR, currDist );
-                                            if( largestSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //best mappings
-                                                largestSmallerDist = currDist;
-                                                potSmallPairList.add( readPair );
-                                            } else if( largestPotSmallerDist < currDist ) { //at least one common mapping in potential pair
-                                                largestPotSmallerDist = currDist; //replace even smaller pair with this one (more likely)
-                                                potPotSmallPairList.add( readPair );
-                                            }
+                                        {
+                                            if( currDist < this.minDist ) {
+                                                ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.DIST_SMALL_PAIR, currDist );
+                                                if( largestSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //best mappings
+                                                    largestSmallerDist = currDist;
+                                                    potSmallPairList.add( readPair );
+                                                } else if( largestPotSmallerDist < currDist ) { //at least one common mapping in potential pair
+                                                    largestPotSmallerDist = currDist; //replace even smaller pair with this one (more likely)
+                                                    potPotSmallPairList.add( readPair );
+                                                }
 //                                        } else {//////////////// distance too large //////////////////////////
 //                                            //currently nothing to do if dist too large
+                                            }
                                         }
                                     } else { //////////////////////////// inversion of one read ////////////////////////////////
                                         int currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
@@ -513,7 +515,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     this.addPairedRecord( pairMapping, omitList );
                 }
 
-                 //potential large unoriented pairs are excluded currently
+                //potential large unoriented pairs are excluded currently
 
                 SAMRecord mateRecord;
                 for( SAMRecord record : diffMap1.keySet() ) {
@@ -546,11 +548,13 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 
     /**
      * Determine insert size between both reads.
+     *
      * @param case1
      * @param start1 start of mapping 1
-     * @param stop2 stop of mapping 1
+     * @param stop2  stop of mapping 1
      * @param start2 start of mapping 2
-     * @param stop1 stop of mapping 1
+     * @param stop1  stop of mapping 1
+     *
      * @return insert size between both reads
      */
     private int calcDistance( boolean case1, int start1, int stop2, int start2, int stop1 ) {

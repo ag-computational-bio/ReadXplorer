@@ -41,7 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.cebitec.readxplorer.api.enums.FeatureType.CDS;
 import static de.cebitec.readxplorer.api.enums.FeatureType.EXON;
@@ -58,14 +59,13 @@ import static de.cebitec.readxplorer.api.enums.FeatureType.TRNA;
  */
 public class AnalysisNormalization implements Observer, AnalysisI<List<NormalizedReadCount>> {
 
-    private static final Logger LOG = Logger.getLogger( AnalysisNormalization.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisNormalization.class.getName() );
 
     private final TrackConnector trackConnector;
     private final List<NormalizedReadCount> normValues;
     private final List<PersistentFeature> genomeFeatures;
     private final Map<Integer, NormalizedReadCount> featureReadCount;
     private double totalMappedReads = 0;
-    private boolean notInitialized;
 
     private double geneExonLength;
     private int noFeatureReads;
@@ -93,7 +93,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         normalizationSumMap = new HashMap<>();
         genomeFeatures = new ArrayList<>();
         usedFeatureTypes = new HashSet<>( paramsNormalization.getSelFeatureTypes() );
-        notInitialized = true;
+
+        initDatastructures();
     }
 
 
@@ -102,10 +103,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
         MappingResult mappingResult = new MappingResult( null, null );
 
         if( data.getClass() == mappingResult.getClass() ) {
-            if( notInitialized ) {
-                initDatastructures();
-                notInitialized = false;
-            }
             MappingResult mappings = (MappingResult) data;
             updateReadCountForFeatures( mappings );
 
@@ -129,7 +126,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
             List<PersistentFeature> chromFeatures = refConnector.getFeaturesForRegionInclParents( 0, chromLength, usedFeatureTypes, chrom.getId() );
 
             for( PersistentFeature feature : chromFeatures ) {
-                featureReadCount.put( feature.getId(), new NormalizedReadCount( feature, 0, 0, 0, trackConnector.getTrackID() ) );
+                featureReadCount.put( feature.getId(), new NormalizedReadCount( feature, 0, 0, 0, trackConnector.getTrackID(), paramsNormalization ) );
             }
             genomeFeatures.addAll( chromFeatures );
             Collections.sort( genomeFeatures );
@@ -310,8 +307,13 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                     if( geneExonLength > 0 ) { //we have multi exon/cds genes only in this case
                         countObject.setReadCount( noFeatureReads ); //not needed for most prokaryotes
                         countObject.setReadLengthSum( readLengthSum );
-                        double effectiveLength = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
-                        countObject.storeEffectiveFeatureLength( effectiveLength );
+                        double length;
+                        if( paramsNormalization.isUseEffectiveLength() ) {
+                            length = NormalizedReadCount.Utils.calcEffectiveFeatureLength( geneExonLength, countObject.getReadLengthMean() );
+                        } else {
+                            length = geneExonLength;
+                        }
+                        countObject.storeEffectiveFeatureLength( length );
                     }
                 }
                 //sum all read counts assigned to any features
@@ -346,8 +348,6 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                     }
                 }
             }
-
-
         } );
     }
 
@@ -380,15 +380,15 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
             if( readCount >= paramsNormalization.getMinReadCount() && readCount <= paramsNormalization.getMaxReadCount() &&
                 paramsNormalization.getSelFeatureTypes().contains( feature.getType() ) ) {
 
-                double effectiveFeatureLength = countObject.getEffectiveFeatureLength();
+                double featureLength = countObject.getFeatureLength();
                 double rpkm = 0;
                 double tpm = 0;
                 if( readCount > 0 ) {
-                    rpkm = NormalizationFormulas.calculateRpkm( readCount, totalMappedReads, effectiveFeatureLength );
+                    rpkm = NormalizationFormulas.calculateRpkm( readCount, totalMappedReads, featureLength );
                     double normSum = normalizationSumMap.get( feature.getType() );
-                    tpm = NormalizationFormulas.calculateTpm( readCount, effectiveFeatureLength, normSum );
+                    tpm = NormalizationFormulas.calculateTpm( readCount, featureLength, normSum );
                 }
-                normValues.add( new NormalizedReadCount( feature, rpkm, tpm, readCount, effectiveFeatureLength, trackConnector.getTrackID() ) );
+                normValues.add( new NormalizedReadCount( feature, rpkm, tpm, readCount, featureLength, trackConnector.getTrackID(), paramsNormalization ) );
             }
         }
     }

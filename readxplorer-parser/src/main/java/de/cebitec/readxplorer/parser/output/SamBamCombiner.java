@@ -25,16 +25,17 @@ import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.NbBundle;
 
 
@@ -101,7 +102,7 @@ public class SamBamCombiner implements CombinerI {
             this.notifyObservers( NbBundle.getMessage( SamBamCombiner.class, "Combiner.Combine.Start", fileName + " and " + file2.getName() ) );
 
             SAMFileReader samBamReader = new SAMFileReader( fileToExtend );
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
             SAMRecordIterator samBamItor = samBamReader.iterator();
             SAMFileHeader header = samBamReader.getFileHeader();
             if( sortCoordinate ) {

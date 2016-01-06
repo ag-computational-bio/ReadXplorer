@@ -26,7 +26,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanelFactory;
 import de.cebitec.readxplorer.ui.datavisualisation.histogramviewer.HistogramViewer;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.awt.CardLayout;
-import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -34,6 +33,8 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.cebitec.readxplorer.tools.detailedviewer.Bundle.CTL_DetailedViewerTopComponent;
 
@@ -64,7 +65,7 @@ import static de.cebitec.readxplorer.tools.detailedviewer.Bundle.CTL_DetailedVie
 } )
 public final class DetailedViewerTopComponent extends TopComponentExtended {
 
-    private static final Logger LOG = Logger.getLogger( DetailedViewerTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DetailedViewerTopComponent.class.getName() );
 
     private static final long serialVersionUID = 1L;
     private static final String PREFERRED_ID = "DetailedViewerTopComponent";
@@ -266,14 +267,14 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     public static synchronized DetailedViewerTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warn( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof DetailedViewerTopComponent ) {
             return (DetailedViewerTopComponent) win;
         }
-        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID +
-                     "' ID. That is a potential source of errors and unexpected behavior." );
+        LOG.warn( "There seem to be multiple components with the '" + PREFERRED_ID +
+                  "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
 

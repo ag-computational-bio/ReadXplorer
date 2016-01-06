@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.biojava.bio.BioException;
@@ -63,8 +62,8 @@ import org.biojavax.bio.seq.io.GenbankFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -75,7 +74,7 @@ import static java.util.logging.Level.INFO;
  */
 public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
-    private static final Logger LOG = Logger.getLogger( BioJavaParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( BioJavaParser.class.getName() );
 
 
     /**
@@ -87,8 +86,8 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      */
     public static final int GENBANK = 2;
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] FILE_EXTENSION_EMBL = new String[]{"embl", "EMBL"};
-    private static final String[] FILE_EXTENSION_GBK = new String[]{"gbk", "gb", "genbank", "GBK", "GB", "GENBANK"};
+    private static final String[] FILE_EXTENSION_EMBL = new String[]{ "embl", "EMBL" };
+    private static final String[] FILE_EXTENSION_GBK = new String[]{ "gbk", "gb", "genbank", "GBK", "GB", "GENBANK" };
     // name of this parser for use in ComboBoxes
     private static final String PARSER_NAME_EMBL = "EMBL file";
     private static final String PARSER_NAME_GBK = "GenBank file";
@@ -107,7 +106,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * parses them into a ParsedReference object.
      *
      * @param type the type of the parser, either BioJavaParser.EMBL or
-     * BioJavaParser.GENBANK
+     *             BioJavaParser.GENBANK
      */
     public BioJavaParser( int type ) {
 
@@ -129,7 +128,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public ParsedReference parseReference( final ReferenceJob refGenJob, final FeatureFilter filter ) throws ParsingException {
 
         final ParsedReference refGenome = new ParsedReference();
@@ -137,7 +136,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
         //at first store all exons in one data structure and add them to the ref genome at the end
         final Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
-        LOG.log( INFO, "Start reading file  \"{0}\"", refGenJob.getFile() );
+        LOG.info( "Start reading file  \"{0}\"", refGenJob.getFile() );
         try( final BufferedReader br = new BufferedReader( new FileReader( refGenJob.getFile() ) ) ) {
 
             final Namespace ns = RichObjectFactory.getDefaultNamespace();
@@ -222,22 +221,22 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         }
 
                         /*
-                         * If the type of the feature is unknown to readxplorer (see below),
-                         * an undefined type is used.
+                         * If the type of the feature is unknown to readxplorer
+                         * (see below), an undefined type is used.
                          */
                         FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
-                            this.sendMsgIfAllowed( refGenJob.getFile().getName()
-                                    + ": Using unknown feature type for " + parsedType );
+                            this.sendMsgIfAllowed( refGenJob.getFile().getName() +
+                                     ": Using unknown feature type for " + parsedType );
                         }
 
 
                         /*
-                         * for eukaryotic organism its important to see the single cds/exons
-                         * to exclude introns
-                         * if we choose min and max we get the first pos of the first cds/exon
-                         * of one gene and the last position of the last cds/exon and we can't
-                         * see exon intron structure
+                         * for eukaryotic organism its important to see the
+                         * single cds/exons to exclude introns if we choose min
+                         * and max we get the first pos of the first cds/exon of
+                         * one gene and the last position of the last cds/exon
+                         * and we can't see exon intron structure
                          */
                         //check feature for subfeatures
                         //it seems that features() is never used by biojava parsers
@@ -268,7 +267,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 int subStart = subLocation.getMin();
                                 int subStop = subLocation.getMax();
                                 subFeatures.add( new ParsedFeature( type, subStart, subStop, strand,
-                                        locusTag, product, ecNumber, geneName, new ArrayList<>(), null ) );
+                                                                    locusTag, product, ecNumber, geneName, new ArrayList<>(), null ) );
                                 featAcrossBorder = subStart == 1 && index > 0; //feature across circular chrom start, separate in two features
                                 ++index;
                             }
@@ -290,14 +289,14 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                             featMap.get( type ).add( currentFeature );
                         }
                     }
-                    LOG.log( INFO, "Sequence successfully read" );
+                    LOG.info( "Sequence successfully read" );
 
                     chrom.addAllFeatures( this.createFeatureHierarchy( featMap ) );
                     refGenome.addChromosome( chrom );
 
                 } catch( BioException | NoSuchElementException e ) {
                     JOptionPane.showMessageDialog( new JPanel(), "One of the imported chromosomes does not contain any sequence data or is in corrupted format!",
-                            "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE );
+                                                   "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE );
                     throw new ParsingException( e );
                 }
             }
@@ -381,10 +380,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * feature has no parent, it is added to the return list of features.
      * <p>
      * @param subFeatures The subfeatures to add to their parents
-     * @param features The feature list containing the parents
+     * @param features    The feature list containing the parents
      * <p>
      * @return The feature list with the parents, now knowing their children and
-     * all features without a parent
+     *         all features without a parent
      */
     private List<ParsedFeature> addSubfeatures( final List<ParsedFeature> subFeatures, final List<ParsedFeature> features ) {
 
@@ -397,9 +396,9 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             //since the features are sorted in this.features we can do this in linear time
             for( int i = lastIndex; i < features.size(); ++i ) {
                 final ParsedFeature feature = features.get( i );
-                if( feature.getStrand() == subFeature.getStrand()
-                        && feature.getStart() <= subFeature.getStart()
-                        && feature.getStop() >= subFeature.getStop() ) {
+                if( feature.getStrand() == subFeature.getStrand() &&
+                         feature.getStart() <= subFeature.getStart() &&
+                         feature.getStop() >= subFeature.getStop() ) {
 
                     feature.addSubFeature( subFeature );
                     added = true;

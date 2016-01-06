@@ -30,21 +30,21 @@ import java.util.Set;
 
 
 /**
- * An assigned mapping implementation. It is a mapping knowing to which
-     * genomic features it has been added to determine their read count. Based
-     * on a union and fraction model.
-     * <br>Features have to be added in sorted order from the first to the last
-     * position of a reference sequence. Since features on the reverse strand
-     * appear in the opposite order, the class also offers methods to remove
-     * assigned features from the reverse strand again.
-     * <br>Model explanation:
-     * <br>Mapping: ____(--------)________
-     * <br>CDS1: ___[---------------]_____
-     * <br>CDS1 is added
-     * <br>CDS2: ____[--------------]_____
-     * <br>CDS2 is added -> fraction is calculated later: RC - 1/2
-     * <br>CDS3: ___________[-----------]_
-     * <br>CDS3 is not added
+ * An assigned mapping implementation. It is a mapping knowing to which genomic
+ * features it has been added to determine their read count. Based on a union
+ * and fraction model.
+ * <br>Features have to be added in sorted order from the first to the last
+ * position of a reference sequence. Since features on the reverse strand appear
+ * in the opposite order, the class also offers methods to remove assigned
+ * features from the reverse strand again.
+ * <br>Model explanation:
+ * <br>Mapping: ____(--------)________
+ * <br>CDS1: ___[---------------]_____
+ * <br>CDS1 is added
+ * <br>CDS2: ____[--------------]_____
+ * <br>CDS2 is added -> fraction is calculated later: RC - 1/2
+ * <br>CDS3: ___________[-----------]_
+ * <br>CDS3 is not added
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
@@ -74,6 +74,7 @@ public class UnionFractionMapping extends AssignedMapping {
         super( mapping );
     }
 
+
     /**
      * Checks if the mapping should be counted for the given feature. Mainly
      * important when a mapping overlaps multiple genomic features of the same
@@ -100,16 +101,17 @@ public class UnionFractionMapping extends AssignedMapping {
         if( !assignedFeatures.isEmpty() ) {
             //fwd strand: only do not count when encounter second feature of same type which is not totally covering the mapping
             //rev strand: only do not count when encounter second feature of same type where first feature is not totally covering the mapping
+            //if two features of the same type start at the same position, then the fraction of the mapping is counted for both
             for( PersistentFeature assignedFeature : assignedFeatures ) {
                 if( assignedFeature.getType().equals( feature.getType() ) ) {
                     if( feature.isFwdStrand() ) {
-                        if( getMapping().getStart() < featStart ) {
+                        if( getMapping().getStart() < featStart && featStart != assignedFeature.getStart() ) {
                             countIt = false;
                         } else {
                             addToFractionMap( feature, assignedFeature );
                         }
                     } else if( !feature.isFwdStrand() ) {  //since they arrive in sorted order!
-                        if( getMapping().getStop() > assignedFeature.getStop() ) {
+                        if( getMapping().getStop() > assignedFeature.getStop() && feature.getStop() != assignedFeature.getStop() ) {
                             //means delete read count of other feature!
                             removeList.add( assignedFeature );
                             //either read count map must be known here or this has to be implemented in analysis class...
@@ -161,7 +163,8 @@ public class UnionFractionMapping extends AssignedMapping {
      * features in the list).
      * <p>
      * @param featureReadCount A map of feature id to normalized read count in
-     * which the read count should be adapted according to the fractions
+     *                         which the read count should be adapted according
+     *                         to the fractions
      */
     @Override
     public void fractionAssignmentCheck( Map<Integer, NormalizedReadCount> featureReadCount ) {
@@ -176,5 +179,6 @@ public class UnionFractionMapping extends AssignedMapping {
             }
         }
     }
+
 
 }

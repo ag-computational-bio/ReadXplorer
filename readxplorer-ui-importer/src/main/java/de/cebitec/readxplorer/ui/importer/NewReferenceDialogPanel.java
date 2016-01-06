@@ -30,7 +30,6 @@ import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultListCellRenderer;
@@ -38,9 +37,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,7 +48,7 @@ import static java.util.logging.Level.WARNING;
  */
 public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 
-    private static final Logger LOG = Logger.getLogger( NewReferenceDialogPanel.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( NewReferenceDialogPanel.class.getName() );
 
     private static final long serialVersionUID = 8362375;
     private File refSeqFile = null;
@@ -267,7 +265,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
                           "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)" } )
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
         ReferenceParserI usedParser = currentParser instanceof BioJavaGff3Parser ||
-                 currentParser instanceof BioJavaGff2Parser ? new FastaReferenceParser() : currentParser;
+                                      currentParser instanceof BioJavaGff2Parser ? new FastaReferenceParser() : currentParser;
         ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser( usedParser.getFileExtensions(), usedParser.getInputFileDescription() ) {
             private static final long serialVersionUID = 1L;
 
@@ -293,7 +291,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
                     try {
                         prefs.flush();
                     } catch( BackingStoreException ex ) {
-                        LOG.log( SEVERE, null, ex );
+                        LOG.error( null, ex );
                     }
                 } else {
                     JOptionPane.showMessageDialog( this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE );
@@ -329,10 +327,10 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
                     try {
                         prefs.flush();
                     } catch( BackingStoreException ex ) {
-                        LOG.log( SEVERE, null, ex );
+                        LOG.error( null, ex );
                     }
                 } else {
-                    LOG.log( WARNING, "Could not read file" );
+                    LOG.warn( "Could not read file" );
                 }
             }
 

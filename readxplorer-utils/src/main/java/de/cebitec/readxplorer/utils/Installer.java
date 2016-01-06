@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
-import net.sf.picard.reference.ReferenceSequenceFileFactory;
+import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
 import org.openide.modules.ModuleInstall;
 
 

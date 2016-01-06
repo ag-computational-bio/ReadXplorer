@@ -25,12 +25,13 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,7 +41,7 @@ import org.openide.util.NbPreferences;
  */
 final class LocationsPanel extends OptionsPanel {
 
-    private static final Logger LOG = Logger.getLogger( LocationsPanel.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( LocationsPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -51,6 +52,7 @@ final class LocationsPanel extends OptionsPanel {
 
     /**
      * A panel displaying options for important locations needed by ReadXplorer.
+     *
      * @param controller The controller
      */
     LocationsPanel( LocationsOptionsPanelController controller ) {
@@ -77,12 +79,14 @@ final class LocationsPanel extends OptionsPanel {
                 selectedDbLink = dbOwnTextField.getText();
                 dbOwnRadioButton.setSelected( true );
                 boolean isValid = valid();
-                if ( !isValid ) {
+                if( !isValid ) {
                     JOptionPane.showMessageDialog( new JPanel(), "The entered text is not a valid URL!",
                                                    "URL parsing error", JOptionPane.ERROR_MESSAGE );
                 }
             }
-        });
+
+
+        } );
     }
 
 
@@ -335,19 +339,19 @@ final class LocationsPanel extends OptionsPanel {
 
     private void validateUrlButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validateUrlButtonActionPerformed
         boolean isValid = valid();
-        if ( isValid ) {
+        if( isValid ) {
             validateUrlTextField.setBackground( Color.GREEN );
         } else {
             validateUrlTextField.setBackground( Color.RED );
         }
-        validateUrlTextField.setText( isValid ? "The currently selected URL is valid!" : "The currently selected URL is NOT valid!");
+        validateUrlTextField.setText( isValid ? "The currently selected URL is valid!" : "The currently selected URL is NOT valid!" );
     }//GEN-LAST:event_validateUrlButtonActionPerformed
 
 
     @Override
     void load() {
         tempImportDirField.setText( pref.get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) );
-        selectedDbLink = pref.get(Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
+        selectedDbLink = pref.get( Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
         setDbButtonSelected();
     }
 
@@ -364,7 +368,7 @@ final class LocationsPanel extends OptionsPanel {
         dbKeggRadioButton.setSelected( Paths.DB_KEGG.equals( selectedDbLink ) );
         dbMetaCycRadioButton.setSelected( Paths.DB_METACYC.equals( selectedDbLink ) );
         dbPriamRadioButton.setSelected( Paths.DB_PRIAM.equals( selectedDbLink ) );
-        if (dbButtonGroup.getSelection() == null) {
+        if( dbButtonGroup.getSelection() == null ) {
             dbOwnRadioButton.setSelected( true );
             dbOwnTextField.setText( selectedDbLink );
         }
@@ -373,7 +377,7 @@ final class LocationsPanel extends OptionsPanel {
 
     @Override
     void store() {
-        if (dbOwnRadioButton.isSelected()) {
+        if( dbOwnRadioButton.isSelected() ) {
             selectedDbLink = dbOwnTextField.getText();
         }
 

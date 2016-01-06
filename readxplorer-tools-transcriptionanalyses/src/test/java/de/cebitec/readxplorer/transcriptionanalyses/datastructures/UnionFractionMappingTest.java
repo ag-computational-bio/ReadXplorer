@@ -19,9 +19,12 @@ package de.cebitec.readxplorer.transcriptionanalyses.datastructures;
 
 
 import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetNormalization;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -61,6 +64,7 @@ public class UnionFractionMappingTest {
 
     private static Map<Integer, NormalizedReadCount> featureReadCount;
 
+
     /**
      * Tests the utility methods of the {@link UnionFractionMapping} class.
      */
@@ -70,6 +74,9 @@ public class UnionFractionMappingTest {
 
     @BeforeClass
     public static void setUpClass() {
+
+        ParameterSetNormalization params = new ParameterSetNormalization( true, 1, 1000000, true, 0, 0, new HashSet<>(), new ParametersReadClasses() );
+
         mapping1 = new Mapping( 500, 600, true );
         mapping2 = new Mapping( 1500, 1600, false );
 
@@ -83,11 +90,11 @@ public class UnionFractionMappingTest {
         feature8 = new PersistentFeature( 8, 1, "", "", "", "", 1400, 1800, false, FeatureType.GENE, "feat8" );
         feature9 = new PersistentFeature( 9, 1, "", "", "", "", 1499, 1850, false, FeatureType.CDS, "feat9" );
 
-        normaReadCount = new NormalizedReadCount( feature1, 0, 0, 500, 1 );
-        normaReadCount2 = new NormalizedReadCount( feature3, 0, 0, 700, 1 );
-        normaReadCount3 = new NormalizedReadCount( feature5, 0, 0, 800, 1 );
-        normaReadCount4 = new NormalizedReadCount( feature6, 0, 0, 400, 1 );
-        normaReadCount5 = new NormalizedReadCount( feature9, 0, 0, 900, 1 );
+        normaReadCount = new NormalizedReadCount( feature1, 0, 0, 500, 1, params );
+        normaReadCount2 = new NormalizedReadCount( feature3, 0, 0, 700, 1, params );
+        normaReadCount3 = new NormalizedReadCount( feature5, 0, 0, 800, 1, params );
+        normaReadCount4 = new NormalizedReadCount( feature6, 0, 0, 400, 1, params );
+        normaReadCount5 = new NormalizedReadCount( feature9, 0, 0, 900, 1, params );
 
         featureReadCount = new HashMap<>();
 

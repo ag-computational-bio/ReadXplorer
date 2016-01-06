@@ -47,13 +47,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JSlider;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -63,7 +62,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class TrackViewer extends AbstractViewer implements ThreadListener {
 
-    private static final Logger LOG = Logger.getLogger( TrackViewer.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackViewer.class.getName() );
 
 
     private static final long serialVersionUID = 572406471;
@@ -182,9 +181,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     protected Map<Classification, Color> createColors( Preferences pref ) {
         Map<Classification, Color> newClassToColorMap = new HashMap<>();
-        boolean uniformColoration = pref.getBoolean(Colors.UNIFORM_DESIRED, false );
+        boolean uniformColoration = pref.getBoolean( Colors.UNIFORM_DESIRED, false );
         if( uniformColoration ) {
-            String colorRGB = pref.get(Colors.UNIFORM_COLOR_STRING, "" );
+            String colorRGB = pref.get( Colors.UNIFORM_COLOR_STRING, "" );
             if( !colorRGB.isEmpty() ) {
                 for( Classification classType : classList ) {
                     newClassToColorMap.put( classType, new Color( Integer.parseInt( colorRGB ) ) );
@@ -233,11 +232,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         }
 
         // draw scales
-        g.setColor(Colors.TRACKPANEL_SCALE_LINES );
+        g.setColor( Colors.TRACKPANEL_SCALE_LINES );
         this.createLines( this.scaleLineStep, g );
 
         // draw black middle lines
-        g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
+        g.setColor( Colors.TRACKPANEL_MIDDLE_LINE );
         drawBaseLines( g );
     }
 
@@ -503,7 +502,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         try {
             value = covManager.getCoverage( classType ).getCoverage( absPos, isFwdStrand );
         } catch( IllegalArgumentException e ) {
-            LOG.log( SEVERE, "found unknown mapping classification type!" );
+            LOG.error( "found unknown mapping classification type!" );
         }
         value = getNormalizedValue( id1, value );
 

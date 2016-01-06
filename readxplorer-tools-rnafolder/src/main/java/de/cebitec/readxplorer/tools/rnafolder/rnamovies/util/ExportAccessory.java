@@ -25,7 +25,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -37,6 +36,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.text.JTextComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,7 +50,7 @@ import javax.swing.text.JTextComponent;
 public class ExportAccessory extends JPanel implements PropertyChangeListener {
 
     /* create a private instance of a Logger */
-    private static final Logger LOG = Logger.getLogger( ExportAccessory.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ExportAccessory.class.getName() );
 
     private final JSpinner zoom;
 
@@ -231,7 +232,7 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
                     trans.setEnabled( true );
                 }
             } catch( NullPointerException e ) {
-                LOG.severe( "A NullPointerException occurred during evaluate the PropertyChangeEvent!" );
+                LOG.error( "A NullPointerException occurred during evaluate the PropertyChangeEvent!" );
             }
 
 

@@ -89,8 +89,8 @@ public class PatternFilter implements RegionFilterI {
 
 
     /**
-     * @return Identifies the currently set pattern in the given interval of
-     *         the currently set reference according to the current filter
+     * @return Identifies the currently set pattern in the given interval of the
+     *         currently set reference according to the current filter
      *         configuration.
      */
     @Override
@@ -306,7 +306,8 @@ public class PatternFilter implements RegionFilterI {
     /**
      * @return A value among {@link SequenceUtils#STRAND_FWD},
      * {@link SequenceUtils#STRAND_REV} and 0 to indicate using both strands. 0
-     *         is also the default value, thus does not have to be set explictly.
+     *         is also the default value, thus does not have to be set
+     *         explictly.
      */
     public Strand getAnalysisStrand() {
         return analysisStrand;
@@ -360,10 +361,10 @@ public class PatternFilter implements RegionFilterI {
 
     /**
      * @return <code>true</code> if an offset of the pattern length should be
-     *         added to the start and stop positions of the search interval. This is
-     *         useful when hits partly overlapping the actual interval borders have to
-     *         be identified as well. <code>false</code> if the interval borders are
-     *         used as is.
+     *         added to the start and stop positions of the search interval.
+     *         This is useful when hits partly overlapping the actual interval
+     *         borders have to be identified as well. <code>false</code> if the
+     *         interval borders are used as is.
      */
     public boolean isAddOffset() {
         return addOffset;
@@ -541,9 +542,9 @@ public class PatternFilter implements RegionFilterI {
 
 
         /**
-         * Performing extra calculations. This class checks if already a
-         * pattern hit has been identified. If so, the scanning process can be
-         * stopped and the result is ready.
+         * Performing extra calculations. This class checks if already a pattern
+         * hit has been identified. If so, the scanning process can be stopped
+         * and the result is ready.
          */
         @Override
         void performExtraCalculations() {

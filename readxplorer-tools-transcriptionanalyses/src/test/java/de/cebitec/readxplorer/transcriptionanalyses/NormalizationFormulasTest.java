@@ -19,10 +19,12 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.api.enums.FeatureType;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.NormalizedReadCount;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.junit.After;
@@ -71,13 +73,14 @@ public class NormalizationFormulasTest {
         FEAT_LENGTH_LIST.add( 1777 );
         int start = 1;
         int featSpacing = 500;
+        ParameterSetNormalization params = new ParameterSetNormalization( true, 1, 1000000, true, 0, 0, new HashSet<>(), new ParametersReadClasses() );
         for( int i = 0; i < FEATURE_READ_LIST.size(); i++ ) {
             double readCount = FEATURE_READ_LIST.get( i );
             int length = FEAT_LENGTH_LIST.get( i );
             EFF_FEAT_LENGTH_LIST.add( length - meanReadLength );
             int stop = start + length - 1;
             FEAT_LIST.add( new PersistentFeature( i, 1, "", "", "", "", start, stop, true, FeatureType.CDS, "feat" + i ) );
-            NORMALIZED_RC_LIST.add( new NormalizedReadCount( FEAT_LIST.get( i ), 0, 0, (int) readCount, 1 ) );
+            NORMALIZED_RC_LIST.add( new NormalizedReadCount( FEAT_LIST.get( i ), 0, 0, (int) readCount, 1, params ) );
             NORMALIZED_RC_LIST.get( i ).storeEffectiveFeatureLength( EFF_FEAT_LENGTH_LIST.get( i ) );
             start += stop + featSpacing;
         }
@@ -146,7 +149,8 @@ public class NormalizationFormulasTest {
 
 
     /**
-     * Test of calculateNormalizationSums method, of class NormalizationFormulas.
+     * Test of calculateNormalizationSums method, of class
+     * NormalizationFormulas.
      */
     @Test
     public void testCalculateNormalizationSums() {
@@ -161,7 +165,8 @@ public class NormalizationFormulasTest {
         double expNormalizationSum = 13.36577793;
         NormalizationFormulas.calculateNormalizationSums( featureReadCount, normalizationSumMap );
 
-        assertEquals( expNormalizationSum, normalizationSumMap.get( FeatureType.CDS), 0.0001);
+        assertEquals( expNormalizationSum, normalizationSumMap.get( FeatureType.CDS ), 0.0001 );
     }
+
 
 }

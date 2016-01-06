@@ -34,14 +34,15 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -116,7 +117,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
         try( final SAMFileReader sam = new SAMFileReader( trackJob.getFile() ) ) {
 
-            sam.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            sam.setValidationStringency( ValidationStringency.LENIENT );
             final SAMRecordIterator samItor = sam.iterator();
 
             int lineNo = 0;

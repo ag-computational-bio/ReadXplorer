@@ -29,9 +29,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,7 +39,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class Downloader implements Runnable, Observable {
 
-    private static final Logger LOG = Logger.getLogger( Downloader.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( Downloader.class.getName() );
 
     private final List<Observer> observers = new ArrayList<>();
     private final String from;
@@ -72,7 +71,7 @@ public class Downloader implements Runnable, Observable {
             }
         } catch( IOException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( SEVERE, "{0}: Downloading file failed.", currentTimestamp );
+            LOG.error( "{0}: Downloading file failed.", currentTimestamp );
             notifyObservers( Downloader.Status.FAILED );
         }
         notifyObservers( Downloader.Status.FINISHED );

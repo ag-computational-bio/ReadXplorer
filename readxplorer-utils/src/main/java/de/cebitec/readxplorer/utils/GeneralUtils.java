@@ -37,15 +37,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Level.SEVERE;
 import static java.util.regex.Pattern.compile;
 
 
@@ -61,7 +61,7 @@ public final class GeneralUtils {
     public static final Pattern SLASH_PATTERN = compile( "/" );
     public static final Pattern COLON_HASH_PATTERN = compile( ":|#" );
 
-    private static final Logger LOG = Logger.getLogger( GeneralUtils.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GeneralUtils.class.getName() );
     private static final Preferences PREF = NbPreferences.forModule( Object.class );
 
 
@@ -82,8 +82,7 @@ public final class GeneralUtils {
     public static int calculatePercentageIncrease( int value1, int value2 ) {
         int percentDiff;
         if( value1 == 0 ) {
-            int absoluteDiff = value2 - value1;
-            percentDiff = (int) (absoluteDiff * 1.5); //weight factor
+            percentDiff = (int) (value2 * 1.5); //weight factor
         } else {
             percentDiff = (int) Math.ceil( ((double) value2 / (double) value1) * 100.0 ) - 100;
         }
@@ -95,14 +94,14 @@ public final class GeneralUtils {
      * @param parent the parent component
      * <p>
      * @return Any text found in the clipboard. If none is found, an empty
-     * String is returned.
+     *         String is returned.
      */
     public static String getClipboardContents( Component parent ) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         String result = "";
         Transferable contents = clipboard.getContents( null );
-        final boolean hasTransferableText = (contents != null)
-                && contents.isDataFlavorSupported( DataFlavor.stringFlavor );
+        final boolean hasTransferableText = (contents != null) &&
+                                            contents.isDataFlavorSupported( DataFlavor.stringFlavor );
         if( hasTransferableText ) {
             try {
                 result = (String) contents.getTransferData( DataFlavor.stringFlavor );
@@ -122,7 +121,7 @@ public final class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidPositiveIntegerInput( String input ) {
         try {
@@ -139,7 +138,7 @@ public final class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidPositiveDoubleInput( String input ) {
         try {
@@ -156,7 +155,7 @@ public final class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidIntegerInput( String input ) {
         try {
@@ -172,10 +171,10 @@ public final class GeneralUtils {
      * given maximum position.
      * <p>
      * @param input input string to check
-     * @param max maximum position value for the input
+     * @param max   maximum position value for the input
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidPositionInput( String input, int max ) {
         return GeneralUtils.isValidRangeInput( input, 1, max );
@@ -187,11 +186,11 @@ public final class GeneralUtils {
      * interval.
      * <p>
      * @param input input string to check
-     * @param min minimum position value for the input
-     * @param max maximum position value for the input
+     * @param min   minimum position value for the input
+     * @param max   maximum position value for the input
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidRangeInput( String input, int min, int max ) {
         try {
@@ -209,7 +208,7 @@ public final class GeneralUtils {
      * @param text input string to check
      * <p>
      * @return <code>true</code> if it is a valid input string,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidByteInput( String text ) {
         try {
@@ -227,7 +226,7 @@ public final class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid percentage value,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidIntegerPercentage( String input ) {
         if( GeneralUtils.isValidPositiveIntegerInput( input ) ) {
@@ -247,7 +246,7 @@ public final class GeneralUtils {
      * @param input input string to check
      * <p>
      * @return <code>true</code> if it is a valid percentage value,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public static boolean isValidDoublePercentage( String input ) {
         if( GeneralUtils.isValidPositiveDoubleInput( input ) ) {
@@ -294,13 +293,13 @@ public final class GeneralUtils {
      * Generates a string, which concatenates the list of strings for user
      * friendly displaying in the gui with an " and ".
      * <p>
-     * @param strings the list of strings, which should be concatenated
+     * @param strings   the list of strings, which should be concatenated
      * @param maxLength maximum length of the string to return or 0, if no
-     * restriction of the length is desired
+     *                  restriction of the length is desired
      * <p>
      * @return the string containing all strings concatenated with "and". If the
-     * string is too long it is cut at the maxLength position and "..." is
-     * appended.
+     *         string is too long it is cut at the maxLength position and "..."
+     *         is appended.
      */
     public static String generateConcatenatedString( List<String> strings, int maxLength ) {
         String concatString = implode( " and ", strings.toArray() );
@@ -369,7 +368,7 @@ public final class GeneralUtils {
      * <p>
      * @param valueDelim Delimiter between key and value of an element
      * @param entryDelim Delimiter between each Entry element
-     * @param map a map of elements
+     * @param map        a map of elements
      * <p>
      * @return String
      */
@@ -399,9 +398,9 @@ public final class GeneralUtils {
      * Converts a given number into a number of the given classType. If this is
      * not possible, it throws a ClassCastException
      * <p>
-     * @param <T> one of the classes derived from Number
+     * @param <T>       one of the classes derived from Number
      * @param classType the type to convert the number into
-     * @param number the number to convert
+     * @param number    the number to convert
      * <p>
      * @return The converted number
      */
@@ -432,8 +431,7 @@ public final class GeneralUtils {
     /**
      * format a number to show it to the user
      * <p>
-     * @param number
-     * <p>
+     * @param number <p>
      * @return a good readable string representation of the given number
      */
     public static String formatNumber( Number number ) {
@@ -445,7 +443,7 @@ public final class GeneralUtils {
      * @param number A number to convert into a percent value
      * <p>
      * @return The percent representation of the given value in the format of
-     * the Java virtual machine's Locale.
+     *         the Java virtual machine's Locale.
      */
     public static String formatNumberAsPercent( Number number ) {
         Locale locale = Locale.getDefault();
@@ -477,7 +475,7 @@ public final class GeneralUtils {
      * @param readName the read name to enshorten
      * <p>
      * @return the short read name, if it was possible to shorten it. Otherwise
-     * the original read name is returned
+     *         the original read name is returned
      */
     public static String enshortenReadName( String readName ) {
         String shortReadName = readName;
@@ -523,7 +521,7 @@ public final class GeneralUtils {
     /**
      * Splits the given readname by the given style.
      * <p>
-     * @param readName The readname to split
+     * @param readName     The readname to split
      * @param specialStyle The style to use for splitting
      * <p>
      * @return The splitted read name array
@@ -586,7 +584,7 @@ public final class GeneralUtils {
                 String dbUrl = PREF.get( Properties.ENZYME_DB_LINK, Paths.DB_EXPASY );
                 url = new UrlWithTitle( ecNumber, new URL( dbUrl + ecNumber ) );
             } catch( MalformedURLException ex ) {
-                LOG.log( SEVERE, ex.getMessage() );
+                LOG.error( ex.getMessage() );
             }
         }
         return url;

@@ -26,6 +26,7 @@ import org.openide.util.NbPreferences;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_USE_EFFECTIVE_LENGTH;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
 
@@ -40,6 +41,7 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
     private static final long serialVersionUID = 1L;
     private int minReadCountValue;
     private int maxReadCountValue;
+    private boolean useEffectiveLength;
 
 
     /**
@@ -71,6 +73,7 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
         minRPKMValueLabel = new javax.swing.JLabel();
         maxReadCountValueField = new javax.swing.JTextField();
         maxRPKMValueLabel = new javax.swing.JLabel();
+        useEffectiveLengthBox = new javax.swing.JCheckBox();
 
         minReadCountValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.minReadCountValueField.text")); // NOI18N
 
@@ -80,19 +83,29 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(maxRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.maxRPKMValueLabel.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(useEffectiveLengthBox, org.openide.util.NbBundle.getMessage(TransAnalysesNormVisualPanel.class, "TransAnalysesNormVisualPanel.useEffectiveLengthBox.text")); // NOI18N
+        useEffectiveLengthBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useEffectiveLengthBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(maxReadCountValueField, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                    .addComponent(minReadCountValueField))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(maxRPKMValueLabel)
-                    .addComponent(minRPKMValueLabel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(maxReadCountValueField, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                            .addComponent(minReadCountValueField))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(maxRPKMValueLabel)
+                            .addComponent(minRPKMValueLabel)))
+                    .addComponent(useEffectiveLengthBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -106,15 +119,22 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(maxReadCountValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(maxRPKMValueLabel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(useEffectiveLengthBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(95, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void useEffectiveLengthBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useEffectiveLengthBoxActionPerformed
+        useEffectiveLength = useEffectiveLengthBox.isSelected();
+    }//GEN-LAST:event_useEffectiveLengthBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel maxRPKMValueLabel;
     private javax.swing.JTextField maxReadCountValueField;
     private javax.swing.JLabel minRPKMValueLabel;
     private javax.swing.JTextField minReadCountValueField;
+    private javax.swing.JCheckBox useEffectiveLengthBox;
     // End of variables declaration//GEN-END:variables
 
 
@@ -128,6 +148,7 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
         loadLastParameterSelection();
     }
 
+
     /**
      * Loads the last selected parameters into the component.
      */
@@ -135,9 +156,11 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
         Preferences pref = NbPreferences.forModule( Object.class );
         String minNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, minReadCountValueField.getText() );
         String maxNoReadsString = pref.get( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, maxReadCountValueField.getText() );
+        useEffectiveLength = pref.getBoolean( PROP_WIZARD_NAME + PROP_USE_EFFECTIVE_LENGTH, false );
 
         minReadCountValueField.setText( minNoReadsString );
         maxReadCountValueField.setText( maxNoReadsString );
+        useEffectiveLengthBox.setSelected( useEffectiveLength );
 
     }
 
@@ -167,7 +190,7 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
 
     /**
      * @return Maximum number of read counts for features to be listed in the
-     * result.
+     *         result.
      */
     public int getMaxReadCount() {
         return maxReadCountValue;
@@ -180,6 +203,15 @@ public class TransAnalysesNormVisualPanel extends JobPanel {
      */
     public int getMinReadCount() {
         return minReadCountValue;
+    }
+
+
+    /**
+     * @return true, if the effective feature length should be used, false if
+     *         the total feature length should be used
+     */
+    public boolean isUseEffectiveLength() {
+        return useEffectiveLength;
     }
 
 
