@@ -377,8 +377,7 @@ public final class ProjectConnector implements Observable {
     private void createChromsFromRefs( Connection con ) throws SQLException, DatabaseException, FileException {
 
         LOG.info( "Creating chromosome table entry from each reference and resructuring reference data..." );
-        try( final Statement stmt = con.createStatement();
-             final PreparedStatement pStmtFetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ) ) {
+        try( final Statement stmt = con.createStatement() ) {
 
             //Add column fastafile to reference table
             stmt.execute( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE, "VARCHAR(600)" ) );
@@ -386,57 +385,60 @@ public final class ProjectConnector implements Observable {
             stmt.execute( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED ) );
 
             for( final PersistentReference ref : getReferences() ) {
-                pStmtFetchRefSeq.setInt( 1, ref.getId() );
-                try( final ResultSet rs = pStmtFetchRefSeq.executeQuery() ) {
+                try( PreparedStatement pStmtFetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ) ) {
 
-                    if( rs.next() ) {
-                        String refSeq = rs.getString( FieldNames.REF_GEN_SEQUENCE );
-                        String chromName = rs.getString( FieldNames.REF_GEN_NAME );
-
-                        String preparedRefName = ref.getName()
-                                .replace( ':', '-' )
-                                .replace( '/', '-' )
-                                .replace( '\\', '-' )
-                                .replace( '*', '-' )
-                                .replace( '?', '-' )
-                                .replace( '|', '-' )
-                                .replace( '<', '-' )
-                                .replace( '>', '-' )
-                                .replace( '"', '_' )
-                                .replace( ' ', '_' );
-                        String pathString = new File( dbLocation ).getParent().concat( "\\" + preparedRefName.concat( ".fasta" ) );
-                        Path fastaPath = new File( pathString ).toPath();
-                        try( final FastaLineWriter fastaWriter = FastaLineWriter.fileWriter( fastaPath ) ) {
-                            fastaWriter.writeHeader( ref.getName() );
-                            fastaWriter.appendSequence( refSeq );
-                            try( PreparedStatement pStmtUpdateRefFile = con.prepareStatement( SQLStatements.UPDATE_REF_FILE ) ) {
-                                pStmtUpdateRefFile.setString( 1, pathString );
-                                pStmtUpdateRefFile.setInt( 2, ref.getId() );
-                                pStmtUpdateRefFile.execute();
+                    pStmtFetchRefSeq.setInt( 1, ref.getId() );
+                    try( final ResultSet rs = pStmtFetchRefSeq.executeQuery() ) {
+                        
+                        if( rs.next() ) {
+                            String refSeq = rs.getString( FieldNames.REF_GEN_SEQUENCE );
+                            String chromName = rs.getString( FieldNames.REF_GEN_NAME );
+                            
+                            String preparedRefName = ref.getName()
+                                    .replace( ':', '-' )
+                                    .replace( '/', '-' )
+                                    .replace( '\\', '-' )
+                                    .replace( '*', '-' )
+                                    .replace( '?', '-' )
+                                    .replace( '|', '-' )
+                                    .replace( '<', '-' )
+                                    .replace( '>', '-' )
+                                    .replace( '"', '_' )
+                                    .replace( ' ', '_' );
+                            String pathString = new File( dbLocation ).getParent().concat( "\\" + preparedRefName.concat( ".fasta" ) );
+                            Path fastaPath = new File( pathString ).toPath();
+                            try( final FastaLineWriter fastaWriter = FastaLineWriter.fileWriter( fastaPath ) ) {
+                                fastaWriter.writeHeader( ref.getName() );
+                                fastaWriter.appendSequence( refSeq );
+                                try( PreparedStatement pStmtUpdateRefFile = con.prepareStatement( SQLStatements.UPDATE_REF_FILE ) ) {
+                                    pStmtUpdateRefFile.setString( 1, pathString );
+                                    pStmtUpdateRefFile.setInt( 2, ref.getId() );
+                                    pStmtUpdateRefFile.execute();
+                                }
+                                FastaUtils fastaUtils = new FastaUtils();
+                                fastaUtils.getIndexedFasta( fastaPath.toFile() );
+                            } catch( IOException ex ) {
+                                LOG.error( "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!", ex );
+                                throw new FileException( "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!", ex.getMessage(), ex );
                             }
-                            FastaUtils fastaUtils = new FastaUtils();
-                            fastaUtils.getIndexedFasta( fastaPath.toFile() );
-                        } catch( IOException ex ) {
-                            LOG.error( "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!", ex );
-                            throw new FileException( "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!", ex.getMessage(), ex );
+                            
+                            ParsedChromosome newChrom = new ParsedChromosome();
+                            newChrom.setName( chromName );
+                            newChrom.setChromLength( refSeq.length() );
+                            
+                            storeChromosome( con, newChrom, 1, ref.getId() );
+                            
+                            //Update chromosome ids of the features for this reference
+                            //Since there is exactly one chrom for the current genome, we can query it as follows:
+                            PersistentChromosome chrom = getRefGenomeConnector( ref.getId() ).getChromosomesForGenome().values().iterator().next();
+                            
+                            PreparedStatement updateFeatureTable = con.prepareStatement( SQLStatements.UPDATE_FEATURE_TABLE );
+                            updateFeatureTable.setInt( 1, chrom.getId() );
+                            updateFeatureTable.setInt( 2, ref.getId() );
+                            updateFeatureTable.executeUpdate();
                         }
 
-                        ParsedChromosome newChrom = new ParsedChromosome();
-                        newChrom.setName( chromName );
-                        newChrom.setChromLength( refSeq.length() );
-
-                        storeChromosome( con, newChrom, 1, ref.getId() );
-
-                        //Update chromosome ids of the features for this reference
-                        //Since there is exactly one chrom for the current genome, we can query it as follows:
-                        PersistentChromosome chrom = getRefGenomeConnector( ref.getId() ).getChromosomesForGenome().values().iterator().next();
-
-                        PreparedStatement updateFeatureTable = con.prepareStatement( SQLStatements.UPDATE_FEATURE_TABLE );
-                        updateFeatureTable.setInt( 1, chrom.getId() );
-                        updateFeatureTable.setInt( 2, ref.getId() );
-                        updateFeatureTable.executeUpdate();
                     }
-
                 }
 
                 //set default value for references without file and set column not null
