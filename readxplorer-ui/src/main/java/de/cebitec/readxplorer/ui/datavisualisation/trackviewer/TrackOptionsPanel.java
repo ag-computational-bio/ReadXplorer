@@ -69,7 +69,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     public TrackOptionsPanel( TrackViewer parentTrackViewer ) {
         this.trackViewer = parentTrackViewer;
         this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-        this.setBackground(Colors.LEGEND_BACKGROUND );
+        this.setBackground( Colors.LEGEND_BACKGROUND );
         this.initOtherComponents();
 
     }
@@ -107,6 +107,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         LegendAndOptionsProvider.createHeader( "General:" );
         this.createQualityFilter();
         this.createScalingOption();
+        this.createStrandOption();
         this.createNormalizationOption();
 
         this.updateUI();
@@ -155,6 +156,39 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
         } );
         generalPanel.add( scaleBox, BorderLayout.WEST );
+        this.add( generalPanel );
+    }
+
+
+    private void createStrandOption() {
+        JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
+        final JCheckBox strandBox = LegendAndOptionsProvider.createStandardCheckBox( "All reads on fw strand" );
+        strandBox.setSelected( pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false ) );
+
+        //automatic scaling enabled event
+        strandBox.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                JCheckBox scaleBox = (JCheckBox) e.getSource();
+                trackViewer.setSameStrand(scaleBox.isSelected() );
+            }
+
+
+        } );
+        //preference change listener for updating the check box
+        pref.addPreferenceChangeListener( new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange( PreferenceChangeEvent evt ) {
+                if( evt.getKey().equals( GUI.VIEWER_SAME_STRAND ) ) {
+                    strandBox.setSelected( pref.getBoolean( GUI.VIEWER_SAME_STRAND, false ) );
+                }
+            }
+
+
+        } );
+        generalPanel.add( strandBox, BorderLayout.WEST );
         this.add( generalPanel );
     }
 

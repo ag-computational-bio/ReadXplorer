@@ -50,5 +50,10 @@ public final class GUI {
      * Property for auto scaling of viewers.
      */
     public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
+    
+        /**
+     * Property for showing all reads on fw strand.
+     */
+    public static final String VIEWER_SAME_STRAND = "VIEWER_SAME_STRAND";
 
 }
