@@ -45,8 +45,8 @@ public class PosTablePanel extends TablePanel {
 
 
     /**
-     * Creates a new position table panel. A position table starts with a column
-     * containing the position.
+     * Creates a new position table panel. A position table contains a genome
+     * position column.
      * <p>
      * @param tableData The data to display in this panel's table.
      * @param tableType The type of data table.
@@ -56,12 +56,17 @@ public class PosTablePanel extends TablePanel {
         posColumn = 0;
         int trackColumn = 0;
         switch( tableType ) {
-            case COVERAGE_ANALYSIS: //fallthrough
-            case TPM_RPKM_ANALYSIS: //fallthrough
-            case SNP_DETECTION: //fallthrough
             case OPERON_DETECTION:
+                posColumn = 5; //fallthrough
+            case COVERAGE_ANALYSIS: //fallthrough
+            case SNP_DETECTION: //fallthrough
                 trackColumn = 2;
                 chromColumn = 3;
+                break;
+            case TPM_RPKM_ANALYSIS:
+                trackColumn = 5;
+                chromColumn = 6;
+                posColumn = 8;
                 break;
             case DIFF_GENE_EXPRESSION:
                 chromColumn = 1;
@@ -71,7 +76,13 @@ public class PosTablePanel extends TablePanel {
                 chromColumn = 1;
                 posColumn = 2;
                 break;
-            case FEATURE_COVERAGE_ANALYSIS: //fallthrough
+            case FEATURE_COVERAGE_ANALYSIS:
+                trackColumn = 1;
+                chromColumn = 2;
+                posColumn = 4;
+                break;
+            case CORRELATION_TABLE:
+                posColumn = 2; //fallthrough
             case TSS_DETECTION: //fallthrough
             default:
                 trackColumn = 1;

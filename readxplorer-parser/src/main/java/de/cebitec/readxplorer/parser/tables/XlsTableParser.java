@@ -29,7 +29,8 @@ import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
-import org.openide.util.Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +40,8 @@ import org.openide.util.Exceptions;
  */
 public class XlsTableParser implements TableParserI {
 
+    private static final Logger LOG = LoggerFactory.getLogger( XlsTableParser.class.getName() );
+    
     private static final String NAME = "Xls Table Parser";
     private static final String[] FILE_EXTENSIONS = new String[]{"xls", "XLS", "Xls"};
     private static final String FILE_DESCRIPTION = "Xls table";
@@ -95,7 +98,7 @@ public class XlsTableParser implements TableParserI {
                 }
             }
         } catch( IOException | BiffException ex ) {
-            Exceptions.printStackTrace( ex );
+            LOG.error( ex.getMessage(), ex );
         }
 
         return tableData;

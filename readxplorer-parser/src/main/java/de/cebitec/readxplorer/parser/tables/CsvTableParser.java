@@ -20,14 +20,12 @@ package de.cebitec.readxplorer.parser.tables;
 
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
-import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.ParseBool;
@@ -57,6 +55,9 @@ public class CsvTableParser implements CsvParserI {
     //different CellProcessors for different tables
     public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
     public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
+    public static final CellProcessor[] FEAT_COV_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, new ParseInt() };
+    public static final CellProcessor[] OPERON_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, null, new ParseInt() };
+    public static final CellProcessor[] NORM_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, null, null, null, null, new ParseInt() };
 
     private CellProcessor[] tableProcessor;
     private TableType tableModel;
@@ -109,7 +110,7 @@ public class CsvTableParser implements CsvParserI {
 
             if( tableData == null ) {
                 throw new ParsingException( "Table is not in a readable format and cannot be imported.\n" +
-                         "Either choose the correct delimiter and line end characters or try autodetection of delimiter and line end character!" );
+                                            "Either choose the correct delimiter and line end characters or try autodetection of delimiter and line end character!" );
             }
         }
 
@@ -135,12 +136,19 @@ public class CsvTableParser implements CsvParserI {
             final String[] header = listReader.getHeader( true );
             tableData.add( Arrays.asList( header ) );
 
+            //TODO: DGE table: only name of annotation given - either store pos or reassign feature to feature id, operon csv table fails
             CellProcessor[] generalProcessors;
             if( tableModel == TableType.COVERAGE_ANALYSIS ||
-                     tableModel == TableType.POS_TABLE ||
-                     tableModel == TableType.SNP_DETECTION ||
-                     tableModel == TableType.TSS_DETECTION ) {
+                tableModel == TableType.POS_TABLE ||
+                tableModel == TableType.SNP_DETECTION ||
+                tableModel == TableType.TSS_DETECTION ) {
                 generalProcessors = POS_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.FEATURE_COVERAGE_ANALYSIS ) {
+                generalProcessors = FEAT_COV_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.OPERON_DETECTION ) {
+                generalProcessors = OPERON_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.TPM_RPKM_ANALYSIS ) {
+                generalProcessors = NORM_TABLE_PROCESSOR;
             } else if( tableModel == TableType.TSS_DETECTION_JR ) {
                 generalProcessors = getTssCellProcessor();
             } else if( tableModel == TableType.OPERON_DETECTION_JR ) {
@@ -166,14 +174,12 @@ public class CsvTableParser implements CsvParserI {
                         tableData.add( rowData );
                     } else {
                         throw new ParsingException( "It seems that the wrong delimiter or table format has been chosen. " +
-                                 "The number of columns (" + length + ") in a row does not correspond to the expected number of columns (" + processors.length + ")!" );
+                                                    "The number of columns (" + length + ") in a row does not correspond to the expected number of columns (" + processors.length + ")!" );
                     }
                 }
             }
-        } catch( FileNotFoundException ex ) {
-            Exceptions.printStackTrace( ex );
         } catch( IOException ex ) {
-            Exceptions.printStackTrace( ex );
+            LOG.error( ex.getMessage(), ex );
         } catch( SuperCsvException ex ) {
             tableData = null;
         }
