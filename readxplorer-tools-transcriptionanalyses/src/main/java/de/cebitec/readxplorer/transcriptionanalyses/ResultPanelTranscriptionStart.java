@@ -371,21 +371,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         PersistentReference ref = referenceViewer.getReference();
 
         //get the promoter region for each TSS
-        int chromLength = ref.getActiveChromosome().getLength();
+        int lastChromId = -1;
+        int chromLength = -1;
         for( TranscriptionStart tSS : tssResult.getResults() ) {
+            if( lastChromId != tSS.getChromId() ) {
+                chromLength = ref.getChromosome( tSS.getChromId() ).getLength();
+                lastChromId = tSS.getChromId();
+            }
             final String promoter;
             if( tSS.isFwdStrand() ) {
                 int promoterStart = tSS.getPos() - promoterUpstreamLength;
                 int promoterEnd = tSS.getPos() + promoterDownstreamLength;
                 promoterStart = promoterStart < 0 ? 0 : promoterStart;
                 promoterEnd = promoterEnd > chromLength ? chromLength : promoterEnd;
-                promoter = ref.getActiveChromSequence( promoterStart, promoterEnd );
+                promoter = ref.getChromSequence( tSS.getChromId(), promoterStart, promoterEnd );
             } else {
                 int promoterStart = tSS.getPos() + promoterUpstreamLength;
                 int promoterEnd = tSS.getPos() - promoterDownstreamLength;
                 promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
                 promoterEnd = promoterEnd < 0 ? 0 : promoterEnd;
-                promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( promoterEnd, promoterStart ) );
+                promoter = SequenceUtils.getReverseComplement( ref.getChromSequence( tSS.getChromId(), promoterEnd, promoterStart ) );
             }
             this.promoterRegions.add( promoter );
         }
