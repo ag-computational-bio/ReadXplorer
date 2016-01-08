@@ -30,16 +30,26 @@
             <artifactId>readxplorer-parser</artifactId>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui-visualisation</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.broadinstitute</groupId>
+            <artifactId>picard</artifactId>
+            <version>1.141</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0-rc2</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -85,16 +95,6 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-settings</artifactId>
             <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.broadinstitute</groupId>
-            <artifactId>picard</artifactId>
-            <version>1.141</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0-rc2</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
