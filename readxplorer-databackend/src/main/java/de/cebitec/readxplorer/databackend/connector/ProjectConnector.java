@@ -792,6 +792,7 @@ public final class ProjectConnector implements Observable {
                         pStmtInsertStats.executeBatch();
                     }
                 }
+                pStmtInsertStats.executeBatch();
                 con.commit();
                 LOG.info( "...done storing track statistics data for track with id " + trackID );
 
