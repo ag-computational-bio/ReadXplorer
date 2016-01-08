@@ -82,7 +82,9 @@ public class PosTablePanel extends TablePanel {
                 posColumn = 4;
                 break;
             case CORRELATION_TABLE:
-                posColumn = 2; //fallthrough
+                chromColumn = 0;
+                posColumn = 2;
+                break;
             case TSS_DETECTION: //fallthrough
             default:
                 trackColumn = 1;

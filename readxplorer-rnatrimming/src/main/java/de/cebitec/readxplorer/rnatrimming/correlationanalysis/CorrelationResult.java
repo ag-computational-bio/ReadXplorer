@@ -83,7 +83,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
         for( CorrelatedInterval correlation : this.correlationsList ) {
 
             List<Object> exportLine = new ArrayList<>( 6 );
-            exportLine.add( correlation.getChromId() );
+            exportLine.add( getChromosomeMap().get( correlation.getChromId() ) );
             exportLine.add( correlation.getDirection() );
             exportLine.add( correlation.getFrom() );
             exportLine.add( correlation.getTo() );

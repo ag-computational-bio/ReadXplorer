@@ -55,6 +55,7 @@ public class CsvTableParser implements CsvParserI {
     //different CellProcessors for different tables
     public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
     public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
+    public static final CellProcessor[] CORRELATION_TABLE_PROCESSOR = new CellProcessor[]{ null, null, new ParseInt() };
     public static final CellProcessor[] FEAT_COV_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, new ParseInt() };
     public static final CellProcessor[] OPERON_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, null, new ParseInt() };
     public static final CellProcessor[] NORM_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, null, null, null, null, new ParseInt() };
@@ -149,6 +150,8 @@ public class CsvTableParser implements CsvParserI {
                 generalProcessors = OPERON_TABLE_PROCESSOR;
             } else if( tableModel == TableType.TPM_RPKM_ANALYSIS ) {
                 generalProcessors = NORM_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.CORRELATION_TABLE ) {
+                generalProcessors = CORRELATION_TABLE_PROCESSOR;
             } else if( tableModel == TableType.TSS_DETECTION_JR ) {
                 generalProcessors = getTssCellProcessor();
             } else if( tableModel == TableType.OPERON_DETECTION_JR ) {
