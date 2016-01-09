@@ -16,7 +16,7 @@
     <name>${project.displayname} - CLI</name>
     <description>This module provides basic command line functionalities for ReadXplorer's CLI version.
 
-Please, have a look at CommandLineProcessor's JavaDoc for further information.</description>
+        Please, have a look at CommandLineProcessor's JavaDoc for further information.</description>
 
 
     <dependencies>
@@ -47,6 +47,10 @@ Please, have a look at CommandLineProcessor's JavaDoc for further information.</
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-tools-snpdetection</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-libs-jfreechart</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>

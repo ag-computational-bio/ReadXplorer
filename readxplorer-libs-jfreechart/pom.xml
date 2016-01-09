@@ -39,8 +39,10 @@
                 <configuration>
                     <publicPackages>
                         <publicPackage>org.jfree.*</publicPackage>
-                        <publicPackage>org.w3c.dom.events.*</publicPackage>
-                        <publicPackage>org.w3c.dom.css.*</publicPackage>
+                        <publicPackage>org.w3c.dom.*</publicPackage>
+                        <publicPackage>javax.xml.*</publicPackage>
+                        <publicPackage>org.xml.*</publicPackage>
+                        <publicPackage>org.apache.*</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

@@ -22,20 +22,16 @@ import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.MissingResourceException;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
+import org.jfree.graphics2d.svg.SVGGraphics2D;
+import org.jfree.graphics2d.svg.SVGUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
@@ -43,8 +39,6 @@ import org.openide.util.NbBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 
 /**
@@ -78,12 +72,8 @@ public final class ScreenshotUtils {
     public static void saveScreenshot( final Container container ) {
         try {
             if( container.isShowing() ) {
-                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-                String svgNS = "http://www.w3.org/2000/svg";
-                Document document = domImpl.createDocument( svgNS, SVG, null );
-                final SVGGraphics2D svgGenerator = new SVGGraphics2D( document );
+
                 Dimension screenSize = ScreenshotUtils.getOptimalScreenSize( container, container.getBounds().getSize() );
-                svgGenerator.setSVGCanvasSize( screenSize );
                 Dimension compDim = container.getSize();
                 if( screenSize.height < compDim.height ) {
                     screenSize.height = compDim.height;
@@ -91,14 +81,12 @@ public final class ScreenshotUtils {
                 if( screenSize.width < compDim.width ) {
                     screenSize.width = compDim.width;
                 }
-                
+                SVGGraphics2D svgGenerator = new SVGGraphics2D( screenSize.width, screenSize.height );
+
                 //create buffered image with content and paint it on the svg generator
-                BufferedImage img = new BufferedImage( (int) screenSize.getWidth(), (int) screenSize.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE );
-                Graphics g = img.getGraphics();
                 container.setBounds( new Rectangle( screenSize ) );
-                container.paintAll( g );
-                svgGenerator.drawImage( img, 0, 0, container );
-                
+                container.paintAll( svgGenerator );
+
                 ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{ SVG }, SVG ) {
 
                     private static final long serialVersionUID = 1L;
@@ -114,8 +102,8 @@ public final class ScreenshotUtils {
 
                             @Override
                             public void run() {
-                                try( Writer out = new OutputStreamWriter( new FileOutputStream( fileLocation ), "UTF-8" ); ) {
-                                    svgGenerator.stream( out, false );
+                                try {
+                                    SVGUtils.writeToSVG( new File( fileLocation ), svgGenerator.getSVGElement() );
                                 } catch( IOException ex ) {
                                     JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", ex.toString() ),
                                                                    NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
@@ -132,7 +120,6 @@ public final class ScreenshotUtils {
 
                         } );
                         exportThread.start();
-
                     }
 
 
