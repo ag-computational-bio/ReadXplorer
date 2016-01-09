@@ -467,8 +467,9 @@ public class ReferenceConnector {
                     pStmtFetch.setLong( 2, type.getType() );
                 }
                 try( ResultSet rs = pStmtFetch.executeQuery() ) {
+                    boolean hasFeature = rs.next();
                     pStmtFetch.close();
-                    if( rs.next() ) { // if at least one entry exists we can exit early.
+                    if( hasFeature ) { // if at least one entry exists we can exit early.
                         return true;
                     }
                 }
