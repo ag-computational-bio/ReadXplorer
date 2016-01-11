@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-libs-h2</artifactId>
-    <version>1.4.187</version>
+    <version>1.3.176</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Libs - H2</name>
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.187</version>
+            <version>1.3.176</version>
         </dependency>
     </dependencies>
 
