@@ -58,6 +58,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,7 +130,7 @@ import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.TSS;
 public final class CommandLineProcessor implements ArgsProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger( CommandLineProcessor.class.getName() );
-    private static final String DEFAULT_DATABASE_NAME = "readxplorer-db";
+    private static final String DEFAULT_DATABASE_NAME = "readxplorer";
     private static final String H2_FILE_SUFFIX = ".h2.db";
 
 
@@ -432,15 +435,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
                 dbFileArg = DEFAULT_DATABASE_NAME;
             }
 
-            File dbFile = new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + dbFileArg + H2_FILE_SUFFIX );
-            if( dbFile.exists() ) { // delete old copy of the specified file
-                dbFile.delete();
+            Path dbPath = Paths.get( System.getProperty( "user.dir" ), dbFileArg + H2_FILE_SUFFIX ).toAbsolutePath();
+            if( Files.exists( dbPath ) ) { // delete old copy of the specified file
+                Files.delete( dbPath );
             }
             ProjectConnector pc = ProjectConnector.getInstance();
-            pc.connect( dbFile.getCanonicalPath() );
+            pc.connect( Paths.get( System.getProperty( "user.dir" ), dbFileArg ).toAbsolutePath().toString() );
 
             printFine( ps, null );
-            printFine( ps, "connected to " + dbFile.getCanonicalPath() );
+            printFine( ps, "connected to " + dbPath.toString() );
             return pc;
 
         } catch( IOException | DatabaseException | SecurityException ex ) {
