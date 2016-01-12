@@ -48,12 +48,17 @@ import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 
 @ActionID( category = "Tools", id = "de.cebitec.readxplorer.differentialExpression.DiffExpWizardAction" )
-@ActionRegistration( displayName = "Differential Gene Expression Analysis" )
-@ActionReference( path = "Menu/Tools", position = 10 )
+@ActionRegistration( iconBase = "de/cebitec/readxplorer/transcriptionanalyses/dge.png",
+                     displayName = "Differential Gene Expression Analysis" )
+@ActionReferences( {
+    @ActionReference( path = "Menu/Tools", position = 10 ),
+    @ActionReference( path = "Toolbars/Tools", position = 100 )
+} )
 public final class DiffExpressionWizardIterator implements
         WizardDescriptor.Iterator<WizardDescriptor>, ActionListener {
 
