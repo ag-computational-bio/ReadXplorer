@@ -55,6 +55,18 @@
         <br/>
         <span style="font-size: 11pt;">Use a startup script (local)</span>
         <p style="font-size:0.9em">
+            ReadXplorer also offers you the usage of a startup script. This allows ReadXplorer to start up the R instance when needed and to shut it down after the computation is complete. An startup script could for example look like this:
         </p>
+        <br/>
+        <pre><span style="font-size: 10pt;"><code>
+            #!/bin/bash
+            R CMD Rserve --RS-port $1 --vanilla
+        </code></span></pre>
+        <br/>
+        <p style="font-size:0.9em">
+            ReadXplorer will execute the startup script each time a differential gene expression analysis is started unless there is already a running instance. In this case the already running instance will be used. On Linux hosts multiple connections to one RServe instance should cause no problems. The path to the startup script can be set in the options menu at "Tools" &rarr; "Options" &rarr; "GNU R". The specified port will be handed over to the startup script as the first argument.  
+        </p>
+        <br/>
+        <img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/GNUR_Linux_2.png"/>  
     </body>
 </html>
