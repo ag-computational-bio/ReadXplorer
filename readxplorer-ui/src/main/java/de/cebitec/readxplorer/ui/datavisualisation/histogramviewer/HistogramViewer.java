@@ -590,7 +590,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         while( widthCount < tmpWidth ) {
             num = gapManager.getNumOfGapsAt( lowerBound + i ); // get the number of gaps at current position
             widthCount++; // current position needs 1 base space in visual alignment
-            widthCount += num; // if gaps occured at current position, they need some space, too
+            widthCount += num; // if gaps occurred at current position, they need some space, too
             gapNo += num;
             if( widthCount > tmpWidth ) {
                 gapNo -= (widthCount - tmpWidth);

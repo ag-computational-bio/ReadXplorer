@@ -59,7 +59,7 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
 
 
     @Messages({"NoStringError=Given data is not a string and cannot be saved as fasta.",
-        "Error=An error occured during the file saving process.",
+        "Error=An error occurred during the file saving process.",
         "ProgressName=Storing data in file...",
         "SuccessMsg=Data successfully stored in ",
         "SuccessHeader=Success"})

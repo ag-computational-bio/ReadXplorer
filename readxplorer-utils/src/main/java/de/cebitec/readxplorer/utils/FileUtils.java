@@ -81,7 +81,7 @@ public final class FileUtils {
      * count lines in a file equivalent of wc -l in unix
      * <p>
      * @param file <p>
-     * @return number of lines or 0 if an error occured during reading
+     * @return number of lines or 0 if an error occurred during reading
      */
     public static int countLinesInFile( File file ) {
         int lines = 0;

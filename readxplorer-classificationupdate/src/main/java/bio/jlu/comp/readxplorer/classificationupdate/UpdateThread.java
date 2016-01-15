@@ -100,7 +100,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
     /**
      * If any message should be printed to the console, this method is used. If
-     * an error occured during the run of the parser, which does not interrupt
+     * an error occurred during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print

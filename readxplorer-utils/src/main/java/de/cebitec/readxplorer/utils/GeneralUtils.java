@@ -108,7 +108,7 @@ public final class GeneralUtils {
             } catch( UnsupportedFlavorException ex ) {
                 JOptionPane.showMessageDialog( parent, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             } catch( IOException ex ) {
-                JOptionPane.showMessageDialog( parent, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
+                JOptionPane.showMessageDialog( parent, "IOException occurred during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             }
         }
         return result;
