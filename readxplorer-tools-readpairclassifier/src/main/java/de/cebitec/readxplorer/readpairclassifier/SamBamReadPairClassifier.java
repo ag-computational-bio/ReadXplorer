@@ -97,7 +97,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
     private boolean deleteSortedFile;
     private ParsedClassification class1;
     private ParsedClassification class2;
-    private RefDictionary refDictionary;
 
     StatsContainer statsContainer;
     private DiscreteCountingDistribution readPairSizeDistribution;
@@ -203,6 +202,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             SAMFileHeader header = samBamReader.getFileHeader();
             SAMFileHeader.SortOrder sortOrder = samBamReader.getFileHeader().getSortOrder();
             header.setSortOrder( SAMFileHeader.SortOrder.coordinate );
+            RefDictionary refDictionary = trackJob.getSequenceDictionary();
             if( refDictionary != null && refDictionary instanceof SamSeqDictionary ) {
                 header.setSequenceDictionary( ((SamSeqDictionary) refDictionary).getSamDictionary() );
             }
@@ -744,17 +744,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
      */
     public void setStatsContainer( StatsContainer statsContainer ) {
         this.statsContainer = statsContainer;
-    }
-
-
-    /**
-     * Sets the given reference dictionary to this parser. Then this parser
-     * replaces the original mapping file dictionary by the given one.
-     * <p>
-     * @param refDictionary The reference dictionary to set
-     */
-    public void setCorrectedRefIds( RefDictionary refDictionary ) {
-        this.refDictionary = refDictionary;
     }
 
 

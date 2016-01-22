@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.ui.importer;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -36,10 +37,12 @@ import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.parser.reference.filter.FilterRuleSource;
 import de.cebitec.readxplorer.readpairclassifier.SamBamReadPairClassifier;
 import de.cebitec.readxplorer.readpairclassifier.SamBamReadPairStatsParser;
+import de.cebitec.readxplorer.ui.importer.seqidentifier.SeqIdChecker;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -61,8 +64,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * @author ddoppmeier, rhilker
  */
-public class ImportThread extends SwingWorker<Object, Object> implements
-        Observer {
+public class ImportThread extends SwingWorker<Object, Object> implements Observer {
 
     private static final Logger LOG = LoggerFactory.getLogger( ImportThread.class.getName() );
 
@@ -202,6 +204,35 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
 
     /**
+     * Checks if the reference sequence ids can be found in the mapping file of
+     * the TrackJob. Auto correction is performed and the result presented to
+     * the user. If no auto-correction is possible, both dictionaries are shown
+     * to the user and can be edited.
+     *
+     * @param trackJob The track job to check
+     */
+    private void checkRefIds( TrackJob trackJob ) throws ParsingException {
+        SeqIdChecker seqIdChecker = new SeqIdChecker();
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackJob.getRefGen().getID() );
+        try {
+            boolean seqIdsValid = seqIdChecker.checkSeqIds( trackJob.getFile(), refConnector.getRefGenome() );
+            trackJob.setSequenceDictionary( seqIdChecker.getSequenceDictionary() );
+            if( !seqIdsValid ) {
+                String guienvProp = System.getProperty( "guienv" );
+                if( guienvProp == null || guienvProp.equals( "true" ) ) {
+                    trackJob.setSequenceDictionary( seqIdChecker.triggerManualEditing() );
+                } else {
+                    String msg = "No reference sequence id from the selected reference matches any of the sequence ids in the mapping file: " + trackJob.getFile();
+                    throw new ParsingException( msg );
+                }
+            }
+        } catch( DatabaseException ex ) {
+            LOG.error( ex.getMessage(), ex );
+        }
+    }
+
+
+    /**
      * Processes track jobs (parsing and storing) of the current import.
      */
     private void processTrackJobs() {
@@ -209,7 +240,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements
             printAndLog( getBundleString( "MSG_ImportThread.import.start.track" ) + ":" );
 
             for( TrackJob trackJob : tracksJobs ) {
-                this.parseBamTrack( trackJob );
+                try {
+                    checkRefIds( trackJob );
+                    parseBamTrack( trackJob );
+                } catch( ParsingException ex ) {
+                    noErrors = false;
+                    ErrorHelper.getHandler().handle( ex, "Reference ID error" );
+                    printAndLogError( ex );
+                }
 
                 ph.progress( ++workunits );
             }
@@ -222,8 +260,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
             printAndLog( getBundleString( "MSG_ImportThread.import.start.readPairs" ) + ":" );
 
-            for( Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext(); ) {
-                ReadPairJobContainer readPairJobContainer = it.next();
+            for( ReadPairJobContainer readPairJobContainer : readPairJobs ) {
 
                 int distance = readPairJobContainer.getDistance();
                 if( distance > 0 ) {
@@ -246,6 +283,15 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                     TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
                     TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
                     try {
+                        checkRefIds( trackJob1 );
+                        checkRefIds( trackJob2 );
+                    } catch( ParsingException ex ) {
+                        ErrorHelper.getHandler().handle( ex, "Reference ID error" );
+                        printAndLogError( ex );
+                        noErrors = false;
+                        continue;
+                    }
+                    try {
                         this.setChromLengthMap( trackJob1 );
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
@@ -260,7 +306,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
                             trackJob1.getParser().removeObserver( this );
                             if( !success ) {
-                                this.noErrors = false;
+                                noErrors = false;
                                 printAndLogError( "Conversion of " + trackJob1.getName() + " failed!" );
                                 continue;
                             }
@@ -274,7 +320,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 trackJob2.getParser().removeObserver( this );
                                 File lastWorkFile2 = trackJob2.getFile();
                                 if( !success ) {
-                                    this.noErrors = false;
+                                    noErrors = false;
                                     printAndLogError( "Conversion of " + trackJob2.getName() + " failed!" );
                                     continue;
                                 }
@@ -284,7 +330,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                                 combiner.registerObserver( this );
                                 success = combiner.combineData();
                                 if( !success ) {
-                                    this.noErrors = false;
+                                    noErrors = false;
                                     printAndLogError( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
                                     continue;
                                 }
@@ -332,21 +378,21 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                         ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
 
                     } catch( OutOfMemoryError ex ) {
-                        printAndLogError( "Out of Memory error during parsing of bam track: " + ex.getMessage() );
+                        printAndLogError( "Out of memory error during parsing of bam track: " + ex.getMessage() );
                         LOG.error( ex.getMessage(), ex );
-                        this.noErrors = false;
+                        noErrors = false;
                         continue;
 
                     } catch( DatabaseException | ParsingException | IOException ex ) {
                         printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
                         LOG.error( ex.getMessage(), ex );
-                        this.noErrors = false;
+                        noErrors = false;
                         continue;
                     }
 
                 } else { //if (distance <= 0)
                     printAndLogError( getBundleString( "MSG_ImportThread.import.error" ) );
-                    this.noErrors = false;
+                    noErrors = false;
                 }
 
                 ph.progress( ++workunits );
@@ -534,6 +580,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements
     private void printAndLogError( String msg ) {
         io.getOut().println( msg );
         LOG.error( msg );
+    }
+    
+    /**
+     * Prints the given message to the io stream and the logger at error level.
+     *
+     * @param msg The message to print
+     */
+    private void printAndLogError( Exception e ) {
+        io.getOut().println( e.getMessage() );
+        LOG.error( e.getMessage(), e );
     }
 
 

@@ -126,6 +126,7 @@
                         <publicPackage>de.cebitec.readxplorer.ui.importer</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.ui.importer.actions</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.ui.importer.dataTable</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.importer.seqidentifier</publicPackage>
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>

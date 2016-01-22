@@ -31,13 +31,14 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.sequence.RefDictionary;
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -178,15 +181,15 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
     public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         //new algorithm:
-        /* 1.
-         * sort by read NAME */
-        /* 2. iterate all mappings, store record data including diffs for all
-         * with same read NAME */
-        /* 3. when read NAME finished: add mappings to bam writer with
-         * classification */
-        /* 4. CommonsMappingParser.addClassificationData(record, differences,
-         * classificationMap); */
-        /* 5. clear data structures and continue with next read NAME... */
+        // 1.
+        // sort by read NAME 
+        // 2. iterate all mappings, store record data including diffs for all
+        // with same read NAME 
+        // 3. when read NAME finished: add mappings to bam writer with
+        // classification 
+        // 4. CommonsMappingParser.addClassificationData(record, differences,
+        // classificationMap); 
+        // 5. clear data structures and continue with next read NAME... 
 
         this.refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
         Boolean success = this.preprocessData( trackJob );
@@ -205,13 +208,17 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
         int noReads = 0;
         int noSkippedReads = 0;
-        try( final SAMFileReader samReader = new SAMFileReader( fileSortedByReadName ) ) {
-            samReader.setValidationStringency( ValidationStringency.LENIENT );
-            SAMFileHeader.SortOrder sortOrder = samReader.getFileHeader().getSortOrder();
-            SAMRecordIterator samItor = samReader.iterator();
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samReader = samReaderFactory.open( fileSortedByReadName ); ) {
 
+            SAMFileHeader.SortOrder sortOrder = samReader.getFileHeader().getSortOrder();
             SAMFileHeader header = samReader.getFileHeader();
             header.setSortOrder( SAMFileHeader.SortOrder.coordinate );
+            RefDictionary refDictionary = trackJob.getSequenceDictionary();
+            if( refDictionary != null && refDictionary instanceof SamSeqDictionary ) {
+                header.setSequenceDictionary( ((SamSeqDictionary) refDictionary).getSamDictionary() );
+            }
             Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(
                     fileSortedByReadName, header, false, SamUtils.EXTENDED_STRING );
             SAMFileWriter bamWriter = writerAndFile.getFirst();
@@ -226,6 +233,8 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             ParsedClassification class2 = new ParsedClassification( sortOrder );
 
             int lineno = 0;
+            
+            SAMRecordIterator samItor = samReader.iterator();
             while( samItor.hasNext() ) {
                 try {
                     ++lineno;

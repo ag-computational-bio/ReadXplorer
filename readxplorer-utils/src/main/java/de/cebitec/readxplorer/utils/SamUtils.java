@@ -22,16 +22,11 @@ import de.cebitec.readxplorer.api.constants.Paths;
 import htsjdk.samtools.BAMIndexer;
 import htsjdk.samtools.Cigar;
 import htsjdk.samtools.CigarElement;
-import htsjdk.samtools.SAMException;
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFileWriterFactory;
-import htsjdk.samtools.SAMFormatException;
-import htsjdk.samtools.SAMRecord;
-import htsjdk.samtools.SAMRecordIterator;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
-import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +35,7 @@ import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static htsjdk.samtools.SamReaderFactory.Option.INCLUDE_SOURCE_IN_RECORDS;
 import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
@@ -92,53 +88,6 @@ public class SamUtils implements Observable {
     }
 
 
-    /**
-     * Generates a BAM index file from an input BAM file.
-     * <p>
-     * @param reader SAMFileReader for input BAM file
-     * @param output File for output index file
-     * <p>
-     * @return true, if the index creation succeeded, false otherwise
-     * <p>
-     * @author rhilker
-     */
-    public boolean createIndex( SamReader reader, File output ) {
-
-        boolean success = true;
-        BAMIndexer indexer = new BAMIndexer( output, reader.getFileHeader() );
-        int totalRecords = 0;
-
-        try( SAMRecordIterator samItor = reader.iterator(); ) {
-
-            // create and write the content
-            while( samItor.hasNext() ) {
-                try {
-                    SAMRecord record = samItor.next();
-                    if( ++totalRecords % 500000 == 0 ) {
-                        this.notifyObservers( totalRecords + " reads indexed ..." );
-                    }
-                    indexer.processAlignment( record );
-                } catch( RuntimeEOFException e ) {
-                    this.notifyObservers( e );
-                } catch( SAMFormatException e ) {
-                    if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
-                        this.notifyObservers( e.getMessage() );
-                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
-                }
-            }
-            this.notifyObservers( "All " + totalRecords + " reads indexed!" );
-        } catch( SAMException e ) {
-            this.notifyObservers( "If you tried to create an index on a sam " +
-                                  "file this is the reason for the exception. Indexes" +
-                                  "can only be created for bam files!" );
-            this.notifyObservers( e );
-            success = false;
-        }
-        indexer.finish();
-        return success;
-    }
-
-
     @Override
     public void registerObserver( Observer observer ) {
         this.observers.add( observer );
@@ -170,13 +119,11 @@ public class SamUtils implements Observable {
      */
     public static boolean createBamIndex( File bamFile, Observer observer ) {
         boolean success = false;
-        SamReaderFactory.setDefaultValidationStringency( LENIENT );
-        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        SamReaderFactory samReaderFactory = SamReaderFactory.makeDefault()
+                .enable( INCLUDE_SOURCE_IN_RECORDS )
+                .validationStringency( LENIENT );
         try( final SamReader samBamReader = samReaderFactory.open( bamFile ) ) {
-            SamUtils utils = new SamUtils();
-            utils.registerObserver( observer );
-            success = utils.createIndex( samBamReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
-            utils.removeObserver( observer );
+            BAMIndexer.createIndex( samBamReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
         } catch( IOException e ) {
             LOG.error( e.getMessage(), e );
         }
