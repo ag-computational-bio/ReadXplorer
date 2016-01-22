@@ -295,7 +295,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements
         MappingParserI newparser = (MappingParserI) this.mappingTypeCombo.getSelectedItem();
         if( getCurrentParser() != newparser ) {
             setCurrentParser( newparser );
-            multiTrackList.setModel( new DefaultListModel<String>() );
+            multiTrackList.setModel( new DefaultListModel<>() );
             mappingFiles.clear();
             mappingFileField.setText( "" );
             nameField.setText( "" );

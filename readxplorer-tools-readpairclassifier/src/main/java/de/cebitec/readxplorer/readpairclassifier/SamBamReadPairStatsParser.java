@@ -31,14 +31,16 @@ import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.util.Map;
 import org.openide.util.NbBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -89,14 +91,15 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
     @Override
     public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
 
-        try( SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() ) ) {
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( trackJob.getFile() );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
+            
             long start = System.currentTimeMillis();
             long finish;
             int lineNo = 0;
             notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
-
-            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
-            SAMRecordIterator samItor = samBamReader.iterator();
 
             while( samItor.hasNext() ) {
                 ++lineNo;
@@ -142,8 +145,6 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                 }
                 System.err.flush();
             }
-
-            samItor.close();
 
             finish = System.currentTimeMillis();
             String msg = NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Finish" );

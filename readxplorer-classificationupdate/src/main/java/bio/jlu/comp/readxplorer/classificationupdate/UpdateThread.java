@@ -43,7 +43,6 @@ import java.util.Map;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.Exceptions;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
         try {
             io.getOut().reset();
         } catch( IOException ex ) {
-            Exceptions.printStackTrace( ex );
+            LOG.error( ex.getMessage(), ex );
         }
         io.select();
 

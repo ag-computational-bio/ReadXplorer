@@ -18,14 +18,16 @@
 package de.cebitec.readxplorer.utils;
 
 
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -59,9 +61,11 @@ public class SamReadLengthEstimator implements Observable {
 
         int meanReadLength = -1;
 
-        try( SAMFileReader samBamReader = new SAMFileReader( file ) ) {
-            SAMRecordIterator samItor = samBamReader.iterator();
-            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( file );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
+            
             int count = 1;
             int readLengthSum = 0;
             while( samItor.hasNext() && count <= numMappings ) {
@@ -75,7 +79,6 @@ public class SamReadLengthEstimator implements Observable {
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
             }
-            samItor.close();
 
             meanReadLength = readLengthSum / count;
 

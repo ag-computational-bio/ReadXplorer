@@ -25,15 +25,17 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.openide.util.NbBundle;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -85,10 +87,12 @@ public class SamBamSorter implements Observable {
         String msg;
         Pair<SAMFileWriter, File> writerAndFile = null;
 
-        try( SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() ) ) {
-            SAMRecordIterator samItor = samBamReader.iterator();
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( trackJob.getFile() );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
+            
             SAMFileHeader header = samBamReader.getFileHeader();
-            samBamReader.setValidationStringency( ValidationStringency.LENIENT );
             if( header.getSortOrder() != SAMFileHeader.SortOrder.queryname ) {
                 header.setSortOrder( sortOrder );
                 writerAndFile = SamUtils.createSamBamWriter( trackJob.getFile(), header, false, sortOrderMsg );
@@ -107,7 +111,6 @@ public class SamBamSorter implements Observable {
                     }
                 }
                 this.notifyObservers( "Writing sorted bam file... " );
-                samItor.close();
                 writer.close();
 
                 trackJob.setFile( writerAndFile.getSecond() );

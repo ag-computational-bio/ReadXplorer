@@ -22,12 +22,13 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readxplorer.utils.SimpleOutput;
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFileWriterFactory;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -46,6 +47,7 @@ import org.openide.util.RequestProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 import static java.util.regex.Pattern.compile;
 
 
@@ -67,7 +69,7 @@ public class RNATrimProcessor {
     private final TrimProcessResult trimProcessResult;
 
 
-    private Map<String, Integer> computeMappingHistogram( SAMFileReader samBamReader ) {
+    private Map<String, Integer> computeMappingHistogram( SamReader samBamReader ) {
         MapCounter<String> histogram = new MapCounter<>();
         try( SAMRecordIterator samItor = samBamReader.iterator() ) {
             while( samItor.hasNext() && (!this.canceled) ) {
@@ -118,8 +120,10 @@ public class RNATrimProcessor {
         //int mapped = 0;
         this.trimProcessResult.setMappedReads( 0 );
         int currentline = 0;
-        try( SAMFileReader samBamReader = new SAMFileReader( samfile );
-             SAMRecordIterator samItor = samBamReader.iterator() ) {
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( samfile );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
 
             FileWriter fileWriter = new FileWriter( new File( fastaPath ) );
             BufferedWriter fasta = new BufferedWriter( fileWriter );
@@ -207,8 +211,10 @@ public class RNATrimProcessor {
         ph.switchToDeterminate( lines );
 
         int currentline = 0;
-        try( SAMFileReader samBamReader = new SAMFileReader( samfile );
-             SAMRecordIterator samItor = samBamReader.iterator() ) {
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( samfile );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
 
             SAMFileHeader header = samBamReader.getFileHeader();
             SAMFileWriterFactory factory = new SAMFileWriterFactory();
@@ -271,7 +277,7 @@ public class RNATrimProcessor {
 
     /**
      * If any message should be printed to the console, this method is used. If
-     * an error occured during the run of the parser, which does not interrupt
+     * an error occurred during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print

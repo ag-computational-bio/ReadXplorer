@@ -24,18 +24,23 @@ import htsjdk.samtools.Cigar;
 import htsjdk.samtools.CigarElement;
 import htsjdk.samtools.SAMException;
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFileWriterFactory;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /*
@@ -68,6 +73,8 @@ import org.openide.util.NbPreferences;
  */
 public class SamUtils implements Observable {
 
+    private static final Logger LOG = LoggerFactory.getLogger( SamUtils.class.getName() );
+
     public static final String SORT_PREFIX = "_sort";
     public static final String SORT_READSEQ_STRING = SORT_PREFIX + "_readSequence";
     public static final String SORT_READNAME_STRING = SORT_PREFIX + "_readName";
@@ -93,22 +100,20 @@ public class SamUtils implements Observable {
      * <p>
      * @return true, if the index creation succeeded, false otherwise
      * <p>
-     * @author Martha Borkan, rhilker
+     * @author rhilker
      */
-    public boolean createIndex( SAMFileReader reader, File output ) {
+    public boolean createIndex( SamReader reader, File output ) {
 
         boolean success = true;
         BAMIndexer indexer = new BAMIndexer( output, reader.getFileHeader() );
-        reader.enableFileSource( true );
         int totalRecords = 0;
 
-        try {
+        try( SAMRecordIterator samItor = reader.iterator(); ) {
+
             // create and write the content
-            SAMRecordIterator samItor = reader.iterator();
-            SAMRecord record;
             while( samItor.hasNext() ) {
                 try {
-                    record = samItor.next();
+                    SAMRecord record = samItor.next();
                     if( ++totalRecords % 500000 == 0 ) {
                         this.notifyObservers( totalRecords + " reads indexed ..." );
                     }
@@ -121,7 +126,6 @@ public class SamUtils implements Observable {
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
             }
-            samItor.close();
             this.notifyObservers( "All " + totalRecords + " reads indexed!" );
         } catch( SAMException e ) {
             this.notifyObservers( "If you tried to create an index on a sam " +
@@ -166,12 +170,15 @@ public class SamUtils implements Observable {
      */
     public static boolean createBamIndex( File bamFile, Observer observer ) {
         boolean success = false;
-        try( SAMFileReader samReader = new SAMFileReader( bamFile ) ) { //close is performed by try statement
-            samReader.setValidationStringency( ValidationStringency.LENIENT );
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( bamFile ) ) {
             SamUtils utils = new SamUtils();
             utils.registerObserver( observer );
-            success = utils.createIndex( samReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
+            success = utils.createIndex( samBamReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
             utils.removeObserver( observer );
+        } catch( IOException e ) {
+            LOG.error( e.getMessage(), e );
         }
         return success;
     }
@@ -326,12 +333,12 @@ public class SamUtils implements Observable {
      *         sortOrderToCheck
      */
     public static boolean isSortedBy( File fileToCheck, SAMFileHeader.SortOrder sortOrderToCheck ) {
-        try( SAMFileReader samReader = new SAMFileReader( fileToCheck ) ) {
-            try {
-                return samReader.getFileHeader().getSortOrder().equals( sortOrderToCheck );
-            } catch( IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
-                return false;
-            }
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( fileToCheck ) ) {
+            return samBamReader.getFileHeader().getSortOrder().equals( sortOrderToCheck );
+        } catch( IOException | IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
+            return false;
         }
     }
 

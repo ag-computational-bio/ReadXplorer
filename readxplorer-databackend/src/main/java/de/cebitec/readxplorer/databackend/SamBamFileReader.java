@@ -39,13 +39,14 @@ import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import htsjdk.samtools.SAMException;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
-import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.util.RuntimeIOException;
 import java.awt.Dialog;
 import java.io.File;
+import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +60,8 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -88,7 +91,7 @@ public class SamBamFileReader implements Observable, Observer {
     private final int trackId;
     private final PersistentReference reference;
     private final SamUtils samUtils;
-    private SAMFileReader samFileReader;
+    private SamReader samFileReader;
     private final List<Observer> observers;
 
 
@@ -118,8 +121,9 @@ public class SamBamFileReader implements Observable, Observer {
      * Initializes or re-initializes the bam file reader.
      */
     private void initializeReader() {
-        samFileReader = new SAMFileReader( dataFile );
-        samFileReader.setValidationStringency( ValidationStringency.LENIENT );
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        samFileReader = samReaderFactory.open( dataFile );
 //        header = samFileReader.getFileHeader().getTextHeader();
         checkIndex();
     }
@@ -194,7 +198,7 @@ public class SamBamFileReader implements Observable, Observer {
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                     boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                    byte classification = Byte.valueOf(record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                    byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
                     MappingClass mappingClass = MappingClass.getFeatureType( classification );
                     Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
                     int mappingQuality = record.getMappingQuality();
@@ -257,14 +261,14 @@ public class SamBamFileReader implements Observable, Observer {
      * Checks if diffs and gaps are needed and if the mapping contains some.
      * <p>
      * @param request
-     * @param type <p>
+     * @param type    <p>
      * @return true, if diffs and gaps are needed and the mapping contains some,
      *         false otherwise
      */
     private boolean hasNeededDiffs( IntervalRequest request, MappingClass type ) {
         return request.isDiffsAndGapsNeeded() &&
-                 type != MappingClass.SINGLE_PERFECT_MATCH &&
-                 type != MappingClass.PERFECT_MATCH;
+               type != MappingClass.SINGLE_PERFECT_MATCH &&
+               type != MappingClass.PERFECT_MATCH;
     }
 
 
@@ -532,12 +536,10 @@ public class SamBamFileReader implements Observable, Observer {
                         boolean isFwdStrand;
                         if( readClassParams.isStrandBothOption() ) {
                             isFwdStrand = readClassParams.isStrandBothFwdOption();
+                        } else if( readClassParams.isStrandOppositeOption() ) {
+                            isFwdStrand = record.getReadNegativeStrandFlag();
                         } else {
-                            if( readClassParams.isStrandOppositeOption() ) {
-                                isFwdStrand = record.getReadNegativeStrandFlag();
-                            } else {
-                                isFwdStrand = !record.getReadNegativeStrandFlag();
-                            }
+                            isFwdStrand = !record.getReadNegativeStrandFlag();
                         }
 
                         // add read start
@@ -834,7 +836,11 @@ public class SamBamFileReader implements Observable, Observer {
      * Closes this reader.
      */
     public void close() {
-        samFileReader.close();
+        try {
+            samFileReader.close();
+        } catch( IOException ex ) {
+            LOG.error( ex.getMessage(), ex );
+        }
     }
 
 
@@ -870,8 +876,8 @@ public class SamBamFileReader implements Observable, Observer {
      */
     private boolean isIncludedMapping( MappingClass mappingClass, Integer numMappingsForRead, int mappingQuality, ParametersReadClasses readClassParams ) {
         boolean isIncludedMapping = (readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ||
-                 !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) && numMappingsForRead != null && numMappingsForRead == 1) &&
-                 (mappingQuality == UNKNOWN_MAP_QUAL ||
+                                     !readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) && numMappingsForRead != null && numMappingsForRead == 1) &&
+                                    (mappingQuality == UNKNOWN_MAP_QUAL ||
                                      mappingQuality >= readClassParams.getMinMappingQual());
         if( isIncludedMapping ) {
             isIncludedMapping = readClassParams.isClassificationAllowed( mappingClass );

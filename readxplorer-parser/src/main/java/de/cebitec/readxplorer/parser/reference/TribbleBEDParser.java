@@ -95,7 +95,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                 while( reader.hasIndex() ) {
 
                     final BEDFeature feat = featIt.next();
-                    if( chromMap.containsKey( feat.getChr() ) ) {
+                    if( chromMap.containsKey( feat.getContig() ) ) {
 
                         final int start = feat.getStart();
                         final int stop = feat.getEnd();
@@ -113,7 +113,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                         final FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             this.notifyObservers( referenceJob.getFile().getName() +
-                                     ": Using unknown feature type for " + parsedType );
+                                                  ": Using unknown feature type for " + parsedType );
                         }
 
                         final List<ParsedFeature> subFeatures = new ArrayList<>();
@@ -130,7 +130,7 @@ public class TribbleBEDParser implements ReferenceParserI {
 //                        feat.getColor();
 
                         ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
-                        ParsedChromosome currentChrom = chromMap.get( feat.getChr() );
+                        ParsedChromosome currentChrom = chromMap.get( feat.getContig() );
                         currentChrom.addFeature( currentFeature );
 
                     }

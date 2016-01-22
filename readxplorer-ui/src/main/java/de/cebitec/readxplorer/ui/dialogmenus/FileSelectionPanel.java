@@ -177,7 +177,7 @@ public class FileSelectionPanel extends JPanel {
             this.setSize( this.getPreferredSize() );
         } else {
             fileTextField.setText( getMappingFile() != null ? getMappingFile().getAbsolutePath() : "" );
-            multiTrackList.setModel( new DefaultListModel<String>() );
+            multiTrackList.setModel( new DefaultListModel<>() );
         }
     }
 
