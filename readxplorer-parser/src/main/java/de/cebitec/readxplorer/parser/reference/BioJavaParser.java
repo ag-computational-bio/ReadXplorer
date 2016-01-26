@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.parser.reference;
 
 
-import de.cebitec.common.parser.Converter;
-import de.cebitec.common.parser.embl.parsers.EmblSequenceToFastaConverterParser;
-import de.cebitec.common.parser.genbank.parsers.GenbankSequenceToFastaConverterParser;
+import de.cebitec.common.converter.Converter;
+import de.cebitec.common.converter.embl.EmblSequenceToFastaConverter;
+import de.cebitec.common.converter.genbank.GenbankSequenceToFastaConverter;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -38,12 +38,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.biojava.bio.BioException;
@@ -77,53 +79,51 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
     private static final Logger LOG = LoggerFactory.getLogger( BioJavaParser.class.getName() );
 
 
-    /**
-     * Use this for initializing an embl parser.
-     */
-    public static final int EMBL = 1;
-    /**
-     * Use this for initializing a genbank parser.
-     */
-    public static final int GENBANK = 2;
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] FILE_EXTENSION_EMBL = new String[]{ "embl", "EMBL" };
-    private static final String[] FILE_EXTENSION_GBK = new String[]{ "gbk", "gb", "genbank", "GBK", "GB", "GENBANK" };
     // name of this parser for use in ComboBoxes
-    private static final String PARSER_NAME_EMBL = "EMBL file";
-    private static final String PARSER_NAME_GBK = "GenBank file";
-    private static final String FILE_DESCRIPTION_EMBL = "EMBL file";
-    private static final String FILE_DESCRIPTION_GBK = "GenBank file";
-    private final String[] fileExtension;
-    private final String parserName;
-    private final String fileDescription;
-    private final RichSequenceFormat seqFormat;
-    private final ArrayList<Observer> observers = new ArrayList<>();
+    private static final String[] EXTENSIONS_EMBL = new String[]{ "embl", "ebl", "EMBL", "EBL" };
+    private static final String[] EXTENSIONS_GBK = new String[]{ "gbk", "gb", "genbank", "GBK", "GB", "GENBANK" };
+    private final String[] fileExtensions = Stream.concat(
+            Arrays.stream( EXTENSIONS_EMBL ),
+            Arrays.stream( EXTENSIONS_GBK ) ).
+            toArray( String[]::new );
+    private String parserName = "EMBL/GenBank file";
+    private String fileDescription = "EMBL/GenBank file";
+    private RichSequenceFormat seqFormat;
+    private final List<Observer> observers = new ArrayList<>();
     private final ErrorLimit errorLimit;
 
 
     /**
      * A biojava parser can be initialized to parse embl or genbank files and
      * parses them into a ParsedReference object.
-     *
-     * @param type the type of the parser, either BioJavaParser.EMBL or
-     *             BioJavaParser.GENBANK
      */
-    public BioJavaParser( int type ) {
+    public BioJavaParser() {
+        this.errorLimit = new ErrorLimit( 100 );
+    }
 
-        if( type == BioJavaParser.EMBL ) {
-            this.fileExtension = FILE_EXTENSION_EMBL;
-            this.parserName = PARSER_NAME_EMBL;
-            this.fileDescription = FILE_DESCRIPTION_EMBL;
-            this.seqFormat = new EMBLFormat();
 
-        } else { //for your info: if (type == BioJavaParser.GENBANK){
-            this.fileExtension = FILE_EXTENSION_GBK;
-            this.parserName = PARSER_NAME_GBK;
-            this.fileDescription = FILE_DESCRIPTION_GBK;
-            this.seqFormat = new GenbankFormat();
+    private void determineParserType( final ReferenceJob refGenJob ) throws ParsingException {
+        if( isInGivenFormat( refGenJob, EXTENSIONS_EMBL ) ) {
+            seqFormat = new EMBLFormat();
+        } else if( isInGivenFormat( refGenJob, EXTENSIONS_GBK ) ) {
+            seqFormat = new GenbankFormat();
+        } else {
+            throw new ParsingException( "Unknown file extension used. Please provide a valid embl or genbank extension!" );
         }
 
-        this.errorLimit = new ErrorLimit( 100 );
+    }
+
+
+    private boolean isInGivenFormat( final ReferenceJob refGenJob, String[] validExtensions ) {
+        boolean isSupported = false;
+        for( String extension : validExtensions ) {
+            if( refGenJob.getFile().getName().endsWith( extension ) ) {
+                isSupported = true;
+                break;
+            }
+        }
+        return isSupported;
     }
 
 
@@ -135,6 +135,8 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
         refGenome.setFeatureFilter( filter );
         //at first store all exons in one data structure and add them to the ref genome at the end
         final Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
+
+        determineParserType( refGenJob );
 
         LOG.info( "Start reading file  \"{0}\"", refGenJob.getFile() );
         try( final BufferedReader br = new BufferedReader( new FileReader( refGenJob.getFile() ) ) ) {
@@ -154,9 +156,9 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             Path fastaPath = new File( refGenJob.getFile().getAbsolutePath() + ".fasta" ).toPath();
             Converter seqConverter;
             if( seqFormat instanceof EMBLFormat ) {
-                seqConverter = EmblSequenceToFastaConverterParser.fileConverter( refGenJob.getFile().toPath(), fastaPath );
+                seqConverter = EmblSequenceToFastaConverter.fileConverter( refGenJob.getFile().toPath(), fastaPath );
             } else {
-                seqConverter = GenbankSequenceToFastaConverterParser.fileConverter( refGenJob.getFile().toPath(), fastaPath );
+                seqConverter = GenbankSequenceToFastaConverter.fileConverter( refGenJob.getFile().toPath(), fastaPath );
             }
             seqConverter.convert();
             seqConverter.close();
@@ -227,7 +229,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             this.sendMsgIfAllowed( refGenJob.getFile().getName() +
-                                     ": Using unknown feature type for " + parsedType );
+                                                   ": Using unknown feature type for " + parsedType );
                         }
 
 
@@ -302,6 +304,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             }
 
         } catch( Exception ex ) {
+            LOG.error( ex.getMessage(), ex );
             throw new ParsingException( ex );
         }
 
@@ -397,8 +400,8 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             for( int i = lastIndex; i < features.size(); ++i ) {
                 final ParsedFeature feature = features.get( i );
                 if( feature.getStrand() == subFeature.getStrand() &&
-                         feature.getStart() <= subFeature.getStart() &&
-                         feature.getStop() >= subFeature.getStop() ) {
+                    feature.getStart() <= subFeature.getStart() &&
+                    feature.getStop() >= subFeature.getStop() ) {
 
                     feature.addSubFeature( subFeature );
                     added = true;
@@ -434,7 +437,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
     @Override
     public String[] getFileExtensions() {
-        return fileExtension;
+        return fileExtensions;
     }
 
 

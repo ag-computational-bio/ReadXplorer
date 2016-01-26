@@ -109,11 +109,10 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
         switch( fileTypeArg.toLowerCase() ) {
             case "ebl":
             case "embl":
-                return new BioJavaParser( BioJavaParser.EMBL );
             case "gb":
             case "gbk":
             case "genbank":
-                return new BioJavaParser( BioJavaParser.GENBANK );
+                return new BioJavaParser();
             case "gff3":
                 return new BioJavaGff3Parser();
             case "gff2":
