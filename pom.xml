@@ -47,6 +47,7 @@
         <module>readxplorer-tools-transcriptionanalyses</module>
         <module>readxplorer-libs-h2</module>
         <module>readxplorer-libs-jfreechart</module>
+        <module>lib.batik</module>
     </modules>
 
 
@@ -236,6 +237,11 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-libs-jfreechart</artifactId>
                 <version>1.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>bio.jlu.comp.readxplorer</groupId>
+                <artifactId>batik.nbm</artifactId>
+                <version>1.7</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

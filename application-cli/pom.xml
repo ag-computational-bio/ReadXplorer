@@ -84,6 +84,10 @@
             <artifactId>org-netbeans-core-windows</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
+        </dependency>
     </dependencies>
 
 

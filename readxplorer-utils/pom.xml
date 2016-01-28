@@ -127,6 +127,10 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
+        </dependency>
     </dependencies>
 
 
@@ -161,11 +165,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>de.cebitec.readxplorer.utils</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.errorhandling</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.filechooser</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.polytree</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.sequence</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.utils.*</publicPackage>
                         <publicPackage>de.cebitec.common.*</publicPackage>
                         <publicPackage>htsjdk.*</publicPackage>
                         <publicPackage>net.sf.picard.*</publicPackage>

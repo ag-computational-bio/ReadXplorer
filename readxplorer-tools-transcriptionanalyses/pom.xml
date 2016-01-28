@@ -54,9 +54,8 @@
             <artifactId>readxplorer-libs-jfreechart</artifactId>
         </dependency>
         <dependency>
-            <groupId>batik</groupId>
-            <artifactId>batik-swing</artifactId>
-            <version>1.6-1</version>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
         </dependency>
         <dependency>
             <groupId>net.rforge</groupId>
