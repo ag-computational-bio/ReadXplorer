@@ -101,9 +101,6 @@ public final class FixRefsVisualPanel extends JobPanel {
 
         private static final long serialVersionUID = 1L;
 
-        private int addIndex = -1; //Location where items were added
-        private int addCount = 0;  //Number of items added.
-
 
         /**
          * @param c The component (JList)
@@ -125,24 +122,12 @@ public final class FixRefsVisualPanel extends JobPanel {
                 JList<String> source = (JList) c;
                 @SuppressWarnings( "unchecked" )
                 DefaultListModel<ChangeableSeqName> model = (DefaultListModel) source.getModel();
-                //If we are moving items around in the same list, we
-                //need to adjust the indices accordingly, since those
-                //after the insertion point have moved.
-                if( addCount > 0 ) {
-                    for( int i = 0; i < indices.length; i++ ) {
-                        if( indices[i] > addIndex ) {
-                            indices[i] += addCount;
-                        }
-                    }
-                }
                 for( int i = indices.length - 1; i >= 0; i-- ) {
                     model.get( indices[i] ).setNewSeqName( null );
                 }
                 source.paintAll( source.getGraphics() );
             }
             transferable.setIndices( null );
-            addCount = 0;
-            addIndex = -1;
         }
 
 
@@ -199,7 +184,7 @@ public final class FixRefsVisualPanel extends JobPanel {
 
                     Rectangle rect = list.getCellBounds( index, index );
                     list.scrollRectToVisible( rect );
-//                list.setSelectedIndex( index );
+//                    list.setSelectedIndex( index );
                     list.requestFocusInWindow();
                     index++;
                 }
@@ -217,8 +202,8 @@ public final class FixRefsVisualPanel extends JobPanel {
 
         private static final long serialVersionUID = 1L;
 
-        private int addIndex = -1; //Location where items were added
-        private int addCount = 0;  //Number of items added.
+        private int shuffleIndex = -1; //Location where items were added
+        private int shuffleCount = 0;  //Number of items added.
 
 
         @Override
@@ -246,28 +231,48 @@ public final class FixRefsVisualPanel extends JobPanel {
 
             int index = dl.getIndex();
 
+            //this is the receiving JList
+            JList<String> list = (JList<String>) support.getComponent();
+            DefaultListModel<String> model = (DefaultListModel<String>) list.getModel();
+
             // fetch the data and bail if this fails
             List<ChangeableSeqName> mappingSeqIds;
+            List<String> refIds;
             try {
-                mappingSeqIds = (List<ChangeableSeqName>) support.getTransferable().getTransferData( LIST_FLAVOR );
-            } catch( UnsupportedFlavorException | java.io.IOException e ) {
+                List transferData = (List) support.getTransferable().getTransferData( LIST_FLAVOR );
+                if( !transferData.isEmpty() && transferData.get( 0 ) instanceof ChangeableSeqName ) {
+                    mappingSeqIds = transferData;
+
+                    for( ChangeableSeqName mappingSeqId : mappingSeqIds ) {
+                        if( mappingSeqId.hasNewName() ) {
+                            model.add( index, mappingSeqId.getNewName() );
+
+                            Rectangle rect = list.getCellBounds( index, index );
+                            list.scrollRectToVisible( rect );
+//                list.setSelectedIndex( index );
+                            list.requestFocusInWindow();
+                            ++index;
+                        }
+                    }
+                } else if( !transferData.isEmpty() && transferData.get( 0 ) instanceof String ) {
+                    refIds = transferData;
+
+                    for( String refId : refIds ) {
+                        model.add( index, refId );
+
+                        Rectangle rect = list.getCellBounds( index, index );
+                        list.scrollRectToVisible( rect );
+//                list.setSelectedIndex( index );
+                        list.requestFocusInWindow();
+                        shuffleIndex = index;
+                        ++index;
+                        ++shuffleCount;
+                    }
+                }
+            } catch( UnsupportedFlavorException | java.io.IOException ex ) {
                 return false;
             }
 
-            //this is the receiving mapping seq ids JList
-            JList<String> list = (JList<String>) support.getComponent();
-            DefaultListModel<String> model = (DefaultListModel<String>) list.getModel();
-            for( ChangeableSeqName mappingSeqId : mappingSeqIds ) {
-                if( mappingSeqId.hasNewName() ) {
-                    model.add( index, mappingSeqId.getNewName() );
-
-                    Rectangle rect = list.getCellBounds( index, index );
-                    list.scrollRectToVisible( rect );
-//                list.setSelectedIndex( index );
-                    list.requestFocusInWindow();
-                    ++index;
-                }
-            }
             list.paintAll( list.getGraphics() );
             return true;
         }
@@ -297,10 +302,10 @@ public final class FixRefsVisualPanel extends JobPanel {
                 //If we are moving items around in the same list, we
                 //need to adjust the indices accordingly, since those
                 //after the insertion point have moved.
-                if( addCount > 0 ) {
+                if( shuffleCount > 0 ) {
                     for( int i = 0; i < indices.length; i++ ) {
-                        if( indices[i] > addIndex ) {
-                            indices[i] += addCount;
+                        if( indices[i] > shuffleIndex ) {
+                            indices[i] += shuffleCount;
                         }
                     }
                 }
@@ -309,8 +314,8 @@ public final class FixRefsVisualPanel extends JobPanel {
                 }
             }
             transferable.setIndices( null );
-            addCount = 0;
-            addIndex = -1;
+            shuffleCount = 0;
+            shuffleIndex = -1;
         }
 
 
