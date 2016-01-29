@@ -19,19 +19,21 @@ package de.cebitec.readxplorer.ui.importer.seqidentifier;
 
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 
 /**
+ * Attempts to automatically correct improper reference sequence identifiers
+ * between mapping and reference files by replacing the mapping file header.
+ * Note that the reference file header cannot be modified, as this would
+ * compromise other mapping data sets.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class SeqIdAutoCorrector {
 
-    private final File mappingFile;
     private final SAMSequenceDictionary sequenceDictionary;
     private final Set<String> chromIds;
     private boolean fixed;
@@ -39,19 +41,27 @@ public class SeqIdAutoCorrector {
 
 
     /**
+     * Attempts to automatically correct improper reference sequence identifiers
+     * between mapping and reference files by replacing the mapping file header.
+     * Note that the reference file header cannot be modified, as this would
+     * compromise other mapping data sets.
      *
-     * @param mappingFile
-     * @param sequenceDictionary
-     * @param chromIds
+     * @param sequenceDictionary The mapping file sequence dictionary
+     * @param chromIds           The reference sequence identifiers
      */
-    public SeqIdAutoCorrector( File mappingFile, SAMSequenceDictionary sequenceDictionary, Set<String> chromIds ) {
-        this.mappingFile = mappingFile;
+    public SeqIdAutoCorrector( SAMSequenceDictionary sequenceDictionary, Set<String> chromIds ) {
         this.sequenceDictionary = sequenceDictionary;
         this.chromIds = chromIds;
         correctSeqIds();
     }
 
 
+    /**
+     * Attempts to automatically correct improper reference sequence identifiers
+     * between mapping and reference files by replacing the mapping file header.
+     * Note that the reference file header cannot be modified, as this would
+     * compromise other mapping data sets.
+     */
     private void correctSeqIds() {
 
         /* replace -,.,' ', by '_'; chr_x by x or x by chr_x, gbk locus found as
@@ -60,35 +70,63 @@ public class SeqIdAutoCorrector {
          */
         List<SAMSequenceRecord> newSeqRecordList = new ArrayList<>();
         missingSeqs = new ArrayList<>();
-        for( SAMSequenceRecord refRecord : sequenceDictionary.getSequences() ) {
-            String refFixed = refRecord.getSequenceName();
-            if( !chromIds.contains( refFixed ) ) {
-                refFixed = refRecord.getSequenceName()
-                        .replace( ':', '-' )
-                        .replace( '/', '-' )
-                        .replace( '\\', '-' )
-                        .replace( '*', '-' )
-                        .replace( '?', '-' )
-                        .replace( '|', '-' )
-                        .replace( '<', '-' )
-                        .replace( '>', '-' )
-                        .replace( '"', '_' );
+        if( chromIds.size() == 1 && sequenceDictionary.size() == 1 ) {
+            String chromId = chromIds.iterator().next();
+            SAMSequenceRecord mappingRef = sequenceDictionary.getSequences().get( 0 );
+            if( !chromId.equals( mappingRef.getSequenceName() ) ) {
+                SAMSequenceRecord newRecord = new SAMSequenceRecord( chromId, mappingRef.getSequenceLength() );
+                newSeqRecordList.add( newRecord );
+            } //otherwise both are already equal
+        } else {
+            for( SAMSequenceRecord refRecord : sequenceDictionary.getSequences() ) {
+                String refFixed = refRecord.getSequenceName();
+                String addToRef = "";
+                //Try replacing different characters and prefixes
+                if( !chromIds.contains( refFixed ) ) {
+                    refFixed = refRecord.getSequenceName()
+                            .replace( ':', '-' )
+                            .replace( '/', '-' )
+                            .replace( '\\', '-' )
+                            .replace( '*', '-' )
+                            .replace( '?', '-' )
+                            .replace( '|', '-' )
+                            .replace( '<', '-' )
+                            .replace( '>', '-' )
+                            .replace( '"', '_' );
 
-                if( !chromIds.contains( refFixed ) ) {
-                    refFixed = refFixed.replaceFirst( "chr\\d+", "\\d+" );
-                }
-                if( !chromIds.contains( refFixed ) ) {
-                    refFixed = refFixed.replaceFirst( "^\\d+", "chr\\d+" );
-                }
-                
-                if( chromIds.contains( refFixed ) ) {
-                    SAMSequenceRecord newRecord = new SAMSequenceRecord( refFixed, refRecord.getSequenceLength() );
-                    newSeqRecordList.add( newRecord );
+                    if( !chromIds.contains( refFixed ) ) {
+                        refFixed = refFixed.replaceFirst( "chr_?(\\d+)", "$1" );
+                    }
+                    if( !chromIds.contains( refFixed ) ) {
+                        refFixed = refFixed.replaceFirst( "chromosome_?(\\d+)", "$1" );
+                    }
+                   
+                    //Try adding chromosome prefixes
+                    if( !chromIds.contains( refFixed ) ) {
+                        addToRef = refFixed.replaceFirst( "(^\\d+)", "chr$1" );
+                    }
+                    if( !chromIds.contains( addToRef ) ) {
+                        addToRef = refFixed.replaceFirst( "(^\\d+)", "chr_$1" );
+                    }
+                    if( !chromIds.contains( addToRef ) ) {
+                        addToRef = refFixed.replaceFirst( "(^\\d+)", "chromosome$1" );
+                    }
+                    if( !chromIds.contains( addToRef ) ) {
+                        addToRef = refFixed.replaceFirst( "(^\\d+)", "chromosome_$1" );
+                    }
+                    if (chromIds.contains( addToRef)) {
+                        refFixed = addToRef;
+                    }
+
+                    if( chromIds.contains( refFixed ) ) {
+                        SAMSequenceRecord newRecord = new SAMSequenceRecord( refFixed, refRecord.getSequenceLength() );
+                        newSeqRecordList.add( newRecord );
+                    } else {
+                        missingSeqs.add( refRecord.getSequenceName() );
+                    }
                 } else {
-                    missingSeqs.add( refRecord.getSequenceName() );
+                    newSeqRecordList.add( refRecord );
                 }
-            } else {
-                newSeqRecordList.add( refRecord );
             }
         }
         if( !newSeqRecordList.isEmpty() ) {

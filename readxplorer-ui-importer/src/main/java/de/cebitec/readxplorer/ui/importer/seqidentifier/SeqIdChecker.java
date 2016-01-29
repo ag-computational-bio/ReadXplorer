@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.ui.importer.seqidentifier;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
-import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.mappings.SamSeqDictionary;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
@@ -66,7 +66,7 @@ public class SeqIdChecker {
 
     /**
      * Compares the sequence id stored in the mapping files with the sequence
-     * ids in the reference.
+     * ids in the reference and performs auto correction if possible.
      *
      * @param mappingFile mapping file to check
      * @param ref         the DB reference associated to the mapping files
@@ -87,24 +87,11 @@ public class SeqIdChecker {
 
 
     /**
-     * Compares the sequence id stored in the mapping files with the sequence
-     * ids in the reference.
+     * Compares the sequence ids from a mapping file to the given list of
+     * sequence ids and performs auto correction if possible.
      *
      * @param mappingFile mapping file to check
-     * @param refJob      a new reference to import and associated to the
-     *                    mapping files
-     */
-    public void checkSeqIds( File mappingFile, ReferenceJob refJob ) {
-        //TODO: get chrom names from file, depending on parser, or only run this method after reference imports in import thread
-    }
-
-
-    /**
-     * Compares the sequence ids from a mapping file to the given list of
-     * sequence ids.
-     *
-     * @param mappingFile
-     * @param chromIds
+     * @param chromIds    the list of chromosome identifiers from the reference
      *
      * @return <code>true</code> if at least one id was found,
      *         <code>false</code> otherwise
@@ -116,7 +103,7 @@ public class SeqIdChecker {
         sequenceDictionary = fileHeader.getSequenceDictionary();
         int noMatches = 0;
 
-        HashSet<String> chromSet = new HashSet<>( chromIds );
+        Set<String> chromSet = new HashSet<>( chromIds );
         for( SAMSequenceRecord record : sequenceDictionary.getSequences() ) {
             if( chromSet.contains( record.getSequenceName() ) ) {
                 noMatches++;
@@ -126,7 +113,7 @@ public class SeqIdChecker {
         boolean foundId;
         if( noMatches <= 0 ) {
             //1.: Try auto correction
-            SeqIdAutoCorrector idCorrector = new SeqIdAutoCorrector( mappingFile, sequenceDictionary, new HashSet<>( chromIds ) );
+            SeqIdAutoCorrector idCorrector = new SeqIdAutoCorrector( sequenceDictionary, new HashSet<>( chromIds ) );
             foundId = idCorrector.isFixed();
             missingSeqs = idCorrector.getMissingSeqs();
         } else {
