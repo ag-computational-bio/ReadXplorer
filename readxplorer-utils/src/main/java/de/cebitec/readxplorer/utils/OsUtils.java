@@ -27,6 +27,8 @@ public final class OsUtils {
 
     private static String os = null;
     private static boolean isWindows = false;
+    private static boolean isMac = false;
+    private static boolean isLinux = false;
 
 
     /**
@@ -35,7 +37,10 @@ public final class OsUtils {
     public static String getOsName() {
         if( os == null ) {
             os = System.getProperty( "os.name" );
-            isWindows = os.toLowerCase().startsWith( "windows" );
+            String osLowerCase = os.toLowerCase();
+            isWindows = osLowerCase.startsWith( "windows" );
+            isMac = osLowerCase.contains( "mac" );
+            isLinux = osLowerCase.contains( "linux" );
         }
         return os;
     }
@@ -48,6 +53,26 @@ public final class OsUtils {
     public static boolean isWindows() {
         getOsName();
         return isWindows;
+    }
+
+
+    /**
+     * @return <code>true</code> if the current system is a Mac system,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean isMac() {
+        getOsName();
+        return isMac;
+    }
+
+
+    /**
+     * @return <code>true</code> if the current system is a Linux system,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean isLinux() {
+        getOsName();
+        return isLinux;
     }
 
 

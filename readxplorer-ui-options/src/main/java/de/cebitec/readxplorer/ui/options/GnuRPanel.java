@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.Downloader;
 import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.OsUtils;
 import de.cebitec.readxplorer.utils.PasswordStore;
 import de.cebitec.readxplorer.utils.Unzip;
 import java.awt.Desktop;
@@ -35,7 +36,6 @@ import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.prefs.Preferences;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -72,7 +72,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private static final String DEFAULT_R_DOWNLOAD_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
     private static final String DEFAULT_RSERVE_HOST = "localhost";
     private static final int DEFAULT_RSERVE_PORT = 6311;
-    private static final String OS = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
     private static final String GNU_LICENSE = "             GNU GENERAL PUBLIC LICENSE\n" +
                                               "               Version 2, June 1991\n" +
                                               "\n" +
@@ -427,7 +426,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         sourceFileTextField.setText( sourceUri );
         jProgressBar1.setMaximum( 100 );
         setUpListener();
-        if( OS.contains( "windows" ) ) {
+        if( OsUtils.isWindows() ) {
             messages.setText( "'Manual Local' setup is only supported under Linux and Mac OS." );
             manualLocalButton.setEnabled( false );
             if( !versionIndicator.exists() ) {
@@ -443,7 +442,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 manualLocalButton.setEnabled( false );
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-            } else if( OS.contains( "mac" ) ) {
+            } else if( OsUtils.isMac() ) {
                 messages.setText( "Rserve is bundled with the Mac installation and hence no configuration is needed." );
                 autoButton.setEnabled( false );
                 manualLocalButton.setEnabled( false );
