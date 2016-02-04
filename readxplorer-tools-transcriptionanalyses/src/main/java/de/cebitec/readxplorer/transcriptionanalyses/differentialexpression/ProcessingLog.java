@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,15 @@ public final class ProcessingLog {
                 Object currentProperty = tmpProperties.get( key );
                 if( currentProperty instanceof Map ) {
                     Map currentPropertyMap = (Map) currentProperty;
-                    log.append( key ).append( " = " ).append( Arrays.deepToString( currentPropertyMap.values().toArray() ) ).append( System.getProperty( "line.separator" ) );
+                    log.append( key ).append( " = " ).append( Arrays.deepToString( currentPropertyMap.values().toArray() ) )
+                            .append( System.getProperty( "line.separator" ) );
+                } else if( currentProperty instanceof ParametersReadClasses) {
+                    ParametersReadClasses currentPropertyParam = (ParametersReadClasses) currentProperty;
+                    log.append( key ).append( " = " ).append( "Min Mapping Qualit:").append(currentPropertyParam.getMinMappingQual())
+                            .append( "|").append( "Strand Option:").append(currentPropertyParam.getStrandOption())
+                            .append( "|").append( "Excluded Mapping Classes:")
+                            .append( Arrays.deepToString(currentPropertyParam.getExcludedClasses().toArray()));
+
                 } else {
                     log.append( key ).append( " = " ).append( currentProperty.toString() ).append( System.getProperty( "line.separator" ) );
                 }
