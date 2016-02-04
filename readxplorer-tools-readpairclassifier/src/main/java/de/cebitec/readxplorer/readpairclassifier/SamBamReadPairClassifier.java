@@ -174,7 +174,8 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
     @Override
     @NbBundle.Messages( { "Classifier.Classification.Start=Starting read pair classification...",
                           "Classifier.Classification.Finish=Finished read pair classification. ",
-                          "# {0} - error", "Classifier.Error=An error occurred during the read pair classification: {0}" } )
+                          "# {0} - error", "Classifier.Error=An error occurred during the read pair classification: {0}",
+                          "Classifier_Info=The track import can still be completed!"} )
     public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
 
         this.refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
@@ -302,10 +303,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             String msg = Bundle.Classifier_Classification_Finish();
             notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
-            if( deleteSortedFile ) { //delete the sorted/preprocessed file
-                GeneralUtils.deleteOldWorkFile( oldWorkFile );
-            }
-
             trackJob.setFile( outputFile );
 
             statsContainer.setReadPairDistribution( readPairSizeDistribution );
@@ -315,6 +312,16 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         } catch( MissingResourceException | IOException e ) {
             notifyObservers( Bundle.Classifier_Error( e.getMessage() ) );
             LOG.info( e.getMessage() );
+        }
+
+        if( deleteSortedFile ) { //delete the sorted/preprocessed file
+            try {
+                GeneralUtils.deleteOldWorkFile( oldWorkFile );
+            } catch( IOException e ) {
+                notifyObservers( Bundle.Classifier_Error( e.getMessage() ) );
+                notifyObservers( Bundle.Classifier_Info() );
+                LOG.info( e.getMessage() );
+            }
         }
 
         return new ParsedReadPairContainer();
@@ -437,8 +444,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                                 potPairList.add( readPair );
                                             }
                                         } else //////////////// distance too small, potential pair //////////////////////////
-                                        {
-                                            if( currDist < this.minDist ) {
+                                         if( currDist < this.minDist ) {
                                                 ReadPair readPair = new ReadPair( recordA, recordB, readPairId, ReadPairType.DIST_SMALL_PAIR, currDist );
                                                 if( largestSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches() ) { //best mappings
                                                     largestSmallerDist = currDist;
@@ -450,7 +456,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
 //                                        } else {//////////////// distance too large //////////////////////////
 //                                            //currently nothing to do if dist too large
                                             }
-                                        }
                                     } else { //////////////////////////// inversion of one read ////////////////////////////////
                                         int currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
                                         ++currDist;

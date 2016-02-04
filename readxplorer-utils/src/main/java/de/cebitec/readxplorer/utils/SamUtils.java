@@ -124,6 +124,7 @@ public class SamUtils implements Observable {
                 .validationStringency( LENIENT );
         try( final SamReader samBamReader = samReaderFactory.open( bamFile ) ) {
             BAMIndexer.createIndex( samBamReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
+            success = true;
         } catch( IOException e ) {
             LOG.error( e.getMessage(), e );
         }

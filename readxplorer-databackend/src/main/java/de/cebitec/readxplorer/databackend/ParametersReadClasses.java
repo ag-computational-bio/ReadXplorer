@@ -31,8 +31,7 @@ import java.util.List;
 /**
  * Creates a parameters set which contains all parameters concerning the usage
  * of ReadXplorer's coverage classes and if only uniquely mapped reads shall be
- * used,
- * or all reads.
+ * used, or all reads.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -52,9 +51,9 @@ public class ParametersReadClasses {
      *                        parameter set is used
      * @param minMappingQual  Minimum phred scaled mapping quality.
      * @param strandOption    The strand option: Determines if mappings from the
-     *                        feature strand, from the opposite strand or combined from both strands
-     *                        are used. The values are among<br>
-     *                        {@link Strand.Feature}<br>
+     *                        feature strand, from the opposite strand or
+     *                        combined from both strands are used. The values
+     *                        are among<br> {@link Strand.Feature}<br>
      *                        {@link Strand.Opposite} and<br>
      *                        {@link Strand.Both}
      */
@@ -84,7 +83,7 @@ public class ParametersReadClasses {
      * included here.
      */
     public ParametersReadClasses() {
-        this( new ArrayList<>(), (byte)0, Strand.Feature );
+        this( new ArrayList<>(), (byte) 0, Strand.Feature );
     }
 
 
@@ -98,11 +97,9 @@ public class ParametersReadClasses {
 
     /**
      * @return The strand option: Determines if mappings from the feature
-     *         strand, from the opposite strand or combined from both strands are used.
-     *         The values are among<br>
-     *         {@link Strand.Feature}<br>
-     *         {@link Strand.Opposite} and<br>
-     *         {@link Strand.Both}
+     *         strand, from the opposite strand or combined from both strands
+     *         are used. The values are among<br> {@link Strand.Feature}<br>
+     *         {@link Strand.Opposite} and<br> {@link Strand.Both}
      */
     public Strand getStrandOption() {
         return strandOption;
@@ -132,8 +129,8 @@ public class ParametersReadClasses {
 
 
     /**
-     * Adds all parameters stored in this object to the given statistics
-     * export data.
+     * Adds all parameters stored in this object to the given statistics export
+     * data.
      * <p>
      * @param statisticsExportData The table data for an export table
      */
@@ -161,9 +158,9 @@ public class ParametersReadClasses {
         String strandOptionString = "Feature/analysis strand"; //default
         if( getStrandOption() == Strand.Opposite ) {
             strandOptionString += "Opposite Strand";
-        } else if( getStrandOption() == Strand.Both
-                   || getStrandOption() == Strand.BothForward
-                   || getStrandOption() == Strand.BothReverse ) {
+        } else if( getStrandOption() == Strand.Both ||
+                 getStrandOption() == Strand.BothForward ||
+                 getStrandOption() == Strand.BothReverse ) {
             strandOptionString += "Combine both strands";
         }
         return strandOptionString;
@@ -201,13 +198,13 @@ public class ParametersReadClasses {
      * to query if the both strands option is selected.
      * <p>
      * @return <code>true</code>, if the mappings of both strands are taken into
-     *         account = the comine both strands option is chosen. <code>false</code>,
-     *         if one of the other options is chosen.
+     *         account = the combine both strands option is chosen.
+     *         <code>false</code>, if one of the other options is chosen.
      */
     public boolean isStrandBothOption() {
-        return getStrandOption() == Strand.Both
-               || getStrandOption() == Strand.BothForward
-               || getStrandOption() == Strand.BothReverse;
+        return getStrandOption() == Strand.Both ||
+                 getStrandOption() == Strand.BothForward ||
+                 getStrandOption() == Strand.BothReverse;
     }
 
 
@@ -219,8 +216,8 @@ public class ParametersReadClasses {
      * <p>
      * @return <code>true</code>, if the mappings of both strands are taken into
      *         account and treated as originating from the forward strand.
-     *         <code>false</code>, if they shall be treated as originating from the
-     *         reverse strand OR if another strand option is chosen.
+     *         <code>false</code>, if they shall be treated as originating from
+     *         the reverse strand OR if another strand option is chosen.
      */
     public boolean isStrandBothFwdOption() {
         return getStrandOption() == Strand.BothForward;
