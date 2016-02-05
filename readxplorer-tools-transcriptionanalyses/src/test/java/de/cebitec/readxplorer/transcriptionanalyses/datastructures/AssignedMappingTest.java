@@ -118,12 +118,12 @@ public class AssignedMappingTest {
 
         // - rev strand
         // 1. Fst added mapping - does it work, is it added?
-        boolean countIt = assignedMapping2.checkAssignment( feature4.getStart(), feature4.getStop(), feature4 );
+        boolean countIt = assignedMapping2.checkAssignment( feature4.getStart(), feature4.getStop(), feature4, false );
         // 2. Second feature of same type added:
         // 1. Mapping is overlapping
-        boolean countIt2 = assignedMapping2.checkAssignment( feature5.getStart(), feature5.getStop(), feature5 );
+        boolean countIt2 = assignedMapping2.checkAssignment( feature5.getStart(), feature5.getStop(), feature5, false );
         // 2. Mapping is contained in both
-        boolean countIt3 = assignedMapping2.checkAssignment( feature6.getStart(), feature6.getStop(), feature6 );
+        boolean countIt3 = assignedMapping2.checkAssignment( feature6.getStart(), feature6.getStop(), feature6, false );
 
         assertTrue( assignedMapping2.getRevRemoveList().size() == 1 );
 

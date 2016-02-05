@@ -26,13 +26,13 @@ import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetNormalization;
 /**
  * Data storage for read count and normalized read count values (RPKM and TPM)
  * of a reference feature.
- * <br/>
- * <br/><b>RPKM = Reads per kilobase per million mapped reads -> Mortazavi et
+ * <br>
+ * <br><b>RPKM = Reads per kilobase per million mapped reads -> Mortazavi et
  * al. 2008</b>: Mapping and Quantifying mammalian transcriptomes by RNA-Seq
- * <br/>
- * <br/><b>TPM = Transcripts per million -> Li et al. 2010</b>: RNA-Seq gene
+ * <br>
+ * <br><b>TPM = Transcripts per million -> Li et al. 2010</b>: RNA-Seq gene
  * expression estimation with read mapping uncertainty
- * <br/>
+ * <br>
  *
  * @author Martin Tötsches, Rolf Hilker
  */
@@ -50,14 +50,14 @@ public class NormalizedReadCount extends TrackResultEntry {
     /**
      * Data storage for read count and normalized read count values (RPKM and
      * TPM) of a reference feature.
-     * <br/>
-     * <br/><b>RPKM = Reads per kilobase per million mapped reads -> Mortazavi
+     * <br>
+     * <br><b>RPKM = Reads per kilobase per million mapped reads -> Mortazavi
      * et al. 2008</b>: Mapping and Quantifying mammalian transcriptomes by
      * RNA-Seq
-     * <br/>
-     * <br/><b>TPM = Transcripts per million -> Li et al. 2010</b>: RNA-Seq gene
+     * <br>
+     * <br><b>TPM = Transcripts per million -> Li et al. 2010</b>: RNA-Seq gene
      * expression estimation with read mapping uncertainty
-     * <br/>
+     * <br>
      * <p>
      * @param feature   feature for which the values shall be stored
      * @param rpkm      the RPKM value for this feature
@@ -82,14 +82,14 @@ public class NormalizedReadCount extends TrackResultEntry {
     /**
      * Data storage for read count and normalized read count values (RPKM and
      * TPM) of a reference feature.
-     * <br/>
-     * <br/><b>RPKM = Reads per kilobase per million mapped reads -> Mortazavi
+     * <br>
+     * <br><b>RPKM = Reads per kilobase per million mapped reads -> Mortazavi
      * et al. 2008</b>: Mapping and Quantifying mammalian transcriptomes by
      * RNA-Seq
-     * <br/>
-     * <br/><b>TPM = Transcripts per million -> Li et al. 2010</b>: RNA-Seq gene
+     * <br>
+     * <br><b>TPM = Transcripts per million -> Li et al. 2010</b>: RNA-Seq gene
      * expression estimation with read mapping uncertainty
-     * <br/>
+     * <br>
      * <p>
      * @param feature       Feature for which the values shall be stored
      * @param rpkm          The RPKM value for this feature

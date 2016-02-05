@@ -179,7 +179,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                 int featStop = paramsNormalization.calcFeatureStopOffset( feature );
                 boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
                 boolean fstFittingMapping = true;
-                int readLengthSum = 0; //sum of all mappings of a single feature
+                int geneReadLengthSum = 0; //sum of all mappings of a single feature
                 int currentCount = 0; //count for one genomic feature
 
                 for( int j = lastMappingIdx; j < mappings.size(); ++j ) {
@@ -195,11 +195,11 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                             fstFittingMapping = false;
                         }
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
-                            boolean countIt = assignedMapping.checkAssignment( featStart, featStop, feature );
+                            boolean countIt = assignedMapping.checkAssignment( featStart, featStop, feature, isStrandBothOption );
                             if( countIt ) {
                                 assignedMapping.checkCountDecrease( featureReadCount );
                                 ++currentCount;
-                                readLengthSum += mapping.getLength();
+                                geneReadLengthSum += mapping.getLength();
                             }
                         }
 
@@ -216,7 +216,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
 
                 //store read count in feature
                 featureReadCount.get( feature.getId() ).setReadCount( featureReadCount.get( feature.getId() ).getReadCount() + currentCount );
-                featureReadCount.get( feature.getId() ).addReadLength( readLengthSum );
+                featureReadCount.get( feature.getId() ).addReadLength( geneReadLengthSum );
             }
         }
 
@@ -348,6 +348,8 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                     }
                 }
             }
+
+
         } );
     }
 

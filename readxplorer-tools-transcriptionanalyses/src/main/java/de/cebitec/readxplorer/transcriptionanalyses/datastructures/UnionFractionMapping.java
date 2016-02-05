@@ -87,15 +87,20 @@ public class UnionFractionMapping extends AssignedMapping {
      * feature(s), if the current feature is the only feature containing the
      * whole mapping (not just overlapping it).
      * <p>
-     * @param featStart The start of the feature, always smaller than featStop
-     * @param featStop  The stop of the feature, always larger than featStart
-     * @param feature   The feature to check
+     * @param featStart          The start of the feature, always smaller than
+     *                           featStop
+     * @param featStop           The stop of the feature, always larger than
+     *                           featStart
+     * @param feature            The feature to check
      * <p>
+     * @param isStrandBothOption <code>true</code> if both strands are counted
+     *                           for a feature, <code>false</code> otherwise.
+     *
      * @return <code>true</code> if the mapping should be counted for the
      *         current feature, <code>false</code> otherwise.
      */
     @Override
-    public boolean checkAssignment( int featStart, int featStop, PersistentFeature feature ) {
+    public boolean checkAssignment( int featStart, int featStop, PersistentFeature feature, boolean isStrandBothOption ) {
         boolean countIt = true;
         List<PersistentFeature> removeList = new ArrayList<>();
         if( !assignedFeatures.isEmpty() ) {
@@ -104,25 +109,53 @@ public class UnionFractionMapping extends AssignedMapping {
             //if two features of the same type start at the same position, then the fraction of the mapping is counted for both
             for( PersistentFeature assignedFeature : assignedFeatures ) {
                 if( assignedFeature.getType().equals( feature.getType() ) ) {
-                    if( feature.isFwdStrand() ) {
-                        if( getMapping().getStart() < featStart && featStart != assignedFeature.getStart() ) {
-                            countIt = false;
-                        } else {
+
+                    if( !isStrandBothOption ) {
+                        if( feature.isFwdStrand() ) {
+                            if( getMapping().getStart() < featStart && featStart != assignedFeature.getStart() ) {
+                                countIt = false;
+                            } else {
+                                addToFractionMap( feature, assignedFeature );
+                            }
+                        } else if( !feature.isFwdStrand() ) {  //since they arrive in sorted order!
+                            if( getMapping().getStop() > assignedFeature.getStop() && feature.getStop() != assignedFeature.getStop() ) {
+                                //means delete read count of other feature!
+                                removeList.add( assignedFeature );
+                                //the remove list can be retrieved via getter -> then analysis decreases rc
+                            } else {
+                                addToFractionMap( feature, assignedFeature );
+                            }
+                        }
+
+                        //combine strands option is on and features on opposite strands
+                    } else if( feature.isFwdStrand() != assignedFeature.isFwdStrand() ) {
+                        if( assignedFeatures.size() == 1 ) { //means only the two compared features are assigned until now
                             addToFractionMap( feature, assignedFeature );
                         }
-                    } else if( !feature.isFwdStrand() ) {  //since they arrive in sorted order!
-                        if( getMapping().getStop() > assignedFeature.getStop() && feature.getStop() != assignedFeature.getStop() ) {
-                            //means delete read count of other feature!
-                            removeList.add( assignedFeature );
-                            //either read count map must be known here or this has to be implemented in analysis class...
-                            //or the remove list can be retrieved via getter -> then analysis decreases rc
-                        } else {
-                            addToFractionMap( feature, assignedFeature );
-                        }
+
+                    } else //combine strands option is on and features on same strand
+                    //Not counted for current (SECOND) fwd feature when:
+                    //Mapping:  ______(-------)________
+                    //CDS1 fwd: ___[--------]_____
+                    //CDS2 fwd: _________[---------]_____
+                    //Not counted for current (FIRST) rev feature when:
+                    //Mapping:  ______(-------)________
+                    //CDS1 rev: ___[--------]_____
+                    //CDS2 rev: _________[---------]_____   
+                    if( feature.isFwdStrand() && getMapping().getStart() < featStart && featStart != assignedFeature.getStart() ) {
+                        countIt = false;
+                    } else if( !feature.isFwdStrand() && getMapping().getStop() > assignedFeature.getStop() && feature.getStop() != assignedFeature.getStop() ) {
+                        //means delete read count of other feature!
+                        removeList.add( assignedFeature );
+                        replaceInFractionMap( assignedFeature, feature );
+                        //the remove list can be retrieved via getter -> then analysis decreases rc
+                    } else {
+                        addToFractionMap( feature, assignedFeature );
                     }
                 }
             }
         }
+
         if( countIt ) {
             assignedFeatures.add( feature );
         }
@@ -137,22 +170,48 @@ public class UnionFractionMapping extends AssignedMapping {
 
 
     /**
-     * Adds both featues to the fraction map stored in this object. The map is
-     * created if it does not exist and the feature type key is created, if it
-     * does not exist yet.
+     * The map is created if it does not exist and the feature type key is
+     * created, if it does not exist yet.
+     *
+     * @param type Ensures that the feature type exists in the map
+     */
+    private void initFractionMap( FeatureType type ) {
+        if( fractionMap == null ) {
+            fractionMap = new HashMap<>();
+        }
+        if( !fractionMap.containsKey( type ) ) {
+            fractionMap.put( type, new HashSet<>() );
+        }
+    }
+
+
+    /**
+     * Adds both featues to the fraction map stored in this object. Makes sure
+     * that the fraction map is initialized with the needed feature key.
      * <p>
      * @param feature         The new feature to add to the fraction map
      * @param assignedFeature The feature from the asssignedFeatures map to add
      *                        to the fraction map
      */
     private void addToFractionMap( PersistentFeature feature, PersistentFeature assignedFeature ) {
-        if( fractionMap == null ) {
-            fractionMap = new HashMap<>();
-        }
-        if( !fractionMap.containsKey( feature.getType() ) ) {
-            fractionMap.put( feature.getType(), new HashSet<PersistentFeature>() );
-        }
+        initFractionMap( feature.getType() );
         fractionMap.get( feature.getType() ).add( assignedFeature );
+        fractionMap.get( feature.getType() ).add( feature );
+    }
+
+
+    /**
+     * Replace the already assigned feature by the new feature in the fraction
+     * map. Makes sure that the fraction map is initialized with the needed
+     * feature key.
+     *
+     * @param assignedFeature The feature from the asssignedFeatures map to add
+     *                        to the fraction map
+     * @param feature         The new feature to add to the fraction map
+     */
+    private void replaceInFractionMap( PersistentFeature assignedFeature, PersistentFeature feature ) {
+        initFractionMap( feature.getType() );
+        fractionMap.get( assignedFeature.getType() ).remove( assignedFeature ); //also delete from fraction map
         fractionMap.get( feature.getType() ).add( feature );
     }
 

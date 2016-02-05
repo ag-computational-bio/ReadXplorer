@@ -22,7 +22,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import java.util.Map;
 
 
-
 /**
  * An interface for classes assigning features to a mapping according to a
  * certain assignment model.
@@ -34,21 +33,29 @@ public interface MappingAssignment {
 
     /**
      * Computes if the feature can be assigned to the mapping or not.
-     * @param featStart The start of the feature, always smaller than featStop
-     * @param featStop The stop of the feature, always larger than featStart
-     * @param feature The feature to check
+     *
+     * @param featStart          The start of the feature, always smaller than
+     *                           featStop
+     * @param featStop           The stop of the feature, always larger than
+     *                           featStart
+     * @param feature            The feature to check
+     * @param isStrandBothOption <code>true</code> if both strands are counted
+     *                           for a feature, <code>false</code> otherwise.
+     *
      * @return <code>true</code> if the mapping should be counted for the
      *         current feature, <code>false</code> otherwise.
      */
-    boolean checkAssignment( int featStart, int featStop, PersistentFeature feature );
+    boolean checkAssignment( int featStart, int featStop, PersistentFeature feature, boolean isStrandBothOption );
 
 
     /**
      * Allows calculating fractions of the read count of the mapping for all
      * features associated to this mapping according to the implemented model.
+     *
      * @param featureReadCount The map containing the read counts for each
-     * feature (accessible via it's id)
+     *                         feature (accessible via it's id)
      */
     void fractionAssignmentCheck( Map<Integer, NormalizedReadCount> featureReadCount );
+
 
 }
