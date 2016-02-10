@@ -23,9 +23,15 @@ import java.util.List;
 import org.openide.WizardDescriptor;
 
 
+/**
+ * Wizard panel to manually fix the reference sequence ids in the mapping file
+ * dictionary.
+ *
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
 public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
 
-    public static final String PROP_FIXED_DICTIONARY = "PROP_FIXED_DICTIONARY";
+    public static final String PROP_FIXED_DICTIONARY = "PROP_FIXED_DICTIONARY_";
     private final List<String> chromNames;
 
     /**
@@ -33,6 +39,8 @@ public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
      * component from this class, just use getComponent().
      */
     private FixRefsVisualPanel component;
+    private final String fileNames;
+    private final String id;
     private final SAMSequenceDictionary sequenceDictionary;
 
 
@@ -42,11 +50,16 @@ public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
      *
      * @param chromNames         Reference chromosome names
      * @param sequenceDictionary Mapping file sequence dictionary
+     * @param fileNames          Concatenated names of the mapping files
+     *                           associated to this panel
+     * @param id                 Identifier of the mapping file, e.g. track id
      */
-    FixRefsWizardPanel( List<String> chromNames, SAMSequenceDictionary sequenceDictionary ) {
+    public FixRefsWizardPanel( List<String> chromNames, SAMSequenceDictionary sequenceDictionary, String fileNames, String id ) {
         super( "" );
         this.chromNames = chromNames;
         this.sequenceDictionary = sequenceDictionary;
+        this.fileNames = fileNames;
+        this.id = id;
     }
 
 
@@ -57,7 +70,7 @@ public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
     @Override
     public FixRefsVisualPanel getComponent() {
         if( component == null ) {
-            component = new FixRefsVisualPanel( chromNames, sequenceDictionary );
+            component = new FixRefsVisualPanel( chromNames, sequenceDictionary, fileNames );
         }
         return component;
     }
@@ -66,7 +79,7 @@ public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
-            wiz.putProperty( PROP_FIXED_DICTIONARY, this.component.getDictionary() );
+            wiz.putProperty( PROP_FIXED_DICTIONARY + id, this.component.getDictionary() );
         }
     }
 

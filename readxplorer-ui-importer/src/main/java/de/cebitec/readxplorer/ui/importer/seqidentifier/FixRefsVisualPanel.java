@@ -36,13 +36,18 @@ import javax.swing.TransferHandler;
 import static de.cebitec.readxplorer.ui.importer.seqidentifier.ChangeableSeqName.LIST_FLAVOR;
 
 
+/**
+ * Visual wizard panel to manually fix the reference sequence ids in the mapping
+ * file dictionary.
+ * 
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
 public final class FixRefsVisualPanel extends JobPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // Create a custom data format which acts as a key and give it a name
-
     private List<String> chromNames;
+    private final String fileNames;
     private SAMSequenceDictionary sequenceDictionary;
 
 
@@ -52,10 +57,13 @@ public final class FixRefsVisualPanel extends JobPanel {
      *
      * @param chromNames         Reference chromosome names
      * @param sequenceDictionary Mapping file sequence dictionary
+     * @param fileNames          Concatenated names of the mapping files associated
+     *                           to this panel
      */
-    FixRefsVisualPanel( List<String> chromNames, SAMSequenceDictionary sequenceDictionary ) {
+    public FixRefsVisualPanel( List<String> chromNames, SAMSequenceDictionary sequenceDictionary, String fileNames ) {
         this.chromNames = chromNames;
         this.sequenceDictionary = sequenceDictionary;
+        this.fileNames = fileNames;
         initComponents();
         initAdditionalComponents();
     }
@@ -65,6 +73,9 @@ public final class FixRefsVisualPanel extends JobPanel {
      * Init data structures and both JLists.
      */
     private void initAdditionalComponents() {
+        String shortFileNames = fileNames.length() > 80 ? fileNames.substring( 0, 80 ) + "..." : fileNames;
+        captionLabel.setText( "<html><b>Sequence id correction for:</b> " + shortFileNames + "</html>" );
+
         populateData();
 
         refNamesList.setTransferHandler( new RefTransferHandler() );
@@ -398,6 +409,7 @@ public final class FixRefsVisualPanel extends JobPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        captionLabel = new javax.swing.JLabel();
 
         refNamesList.setDragEnabled(true);
         refNamesList.setDropMode(javax.swing.DropMode.INSERT);
@@ -412,6 +424,8 @@ public final class FixRefsVisualPanel extends JobPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FixRefsVisualPanel.class, "FixRefsVisualPanel.jLabel2.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(FixRefsVisualPanel.class, "FixRefsVisualPanel.jLabel3.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(captionLabel, org.openide.util.NbBundle.getMessage(FixRefsVisualPanel.class, "FixRefsVisualPanel.captionLabel.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -428,24 +442,25 @@ public final class FixRefsVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addComponent(captionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(captionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane4)
-                            .addComponent(jScrollPane3)))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 176, Short.MAX_VALUE)
                         .addComponent(jLabel3)
-                        .addGap(192, 192, 192))))
+                        .addGap(192, 192, 192))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -479,6 +494,7 @@ public final class FixRefsVisualPanel extends JobPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel captionLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

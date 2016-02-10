@@ -31,6 +31,7 @@ import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamStatsParser;
+import de.cebitec.readxplorer.parser.mappings.SamSeqDictionary;
 import de.cebitec.readxplorer.parser.output.SamBamCombiner;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
@@ -38,13 +39,17 @@ import de.cebitec.readxplorer.parser.reference.filter.FilterRuleSource;
 import de.cebitec.readxplorer.readpairclassifier.SamBamReadPairClassifier;
 import de.cebitec.readxplorer.readpairclassifier.SamBamReadPairStatsParser;
 import de.cebitec.readxplorer.ui.importer.seqidentifier.SeqIdChecker;
+import de.cebitec.readxplorer.ui.importer.seqidentifier.SeqIdCorrectionContainer;
+import de.cebitec.readxplorer.ui.importer.seqidentifier.SeqIdManualCorrector;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
+import htsjdk.samtools.SAMSequenceDictionary;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -211,23 +216,93 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      *
      * @param trackJob The track job to check
      */
-    private void checkRefIds( TrackJob trackJob ) throws ParsingException {
-        SeqIdChecker seqIdChecker = new SeqIdChecker();
+    private SeqIdCorrectionContainer checkRefIds( TrackJob trackJob ) throws ParsingException {
+        SeqIdChecker seqIdChecker = new SeqIdChecker( new SeqIdCorrectionContainer( trackJob, String.valueOf( trackJob.getID() ) ) );
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackJob.getRefGen().getID() );
         try {
-            boolean seqIdsValid = seqIdChecker.checkSeqIds( trackJob.getFile(), refConnector.getRefGenome() );
-            trackJob.setSequenceDictionary( seqIdChecker.getSequenceDictionary() );
-            if( !seqIdsValid ) {
-                String guienvProp = System.getProperty( "guienv" );
-                if( guienvProp == null || guienvProp.equals( "true" ) ) {
-                    trackJob.setSequenceDictionary( seqIdChecker.triggerManualEditing() );
-                } else {
-                    String msg = "No reference sequence id from the selected reference matches any of the sequence ids in the mapping file: " + trackJob.getFile();
-                    throw new ParsingException( msg );
-                }
-            }
+            seqIdChecker.checkSeqIds( trackJob.getFile(), refConnector.getRefGenome() );
+            trackJob.setSequenceDictionary( seqIdChecker.getCorrectionDataContainer().getSequenceDictionary() );
+
         } catch( DatabaseException ex ) {
             LOG.error( ex.getMessage(), ex );
+        }
+        return seqIdChecker.getCorrectionDataContainer();
+    }
+
+
+    /**
+     * First tries to perform auto correction and then in the GUI version also
+     * manual correction. The manual correction is invoced already if one
+     * mapping file id is missing in the reference. The console version is
+     * forgiving and only aborts if none of the mapping file ids can be
+     * automatically associated to any reference sequence ids.
+     */
+    private void correctRefIds( List<SeqIdCorrectionContainer> seqIdCorrectionList ) {
+
+        //TODO: only add those which need manual correction to new list
+        String guienvProp = System.getProperty( "guienv" );
+        List<SeqIdCorrectionContainer> identicalDictionaries = new ArrayList<>();
+        for( SeqIdCorrectionContainer correctionContainer : seqIdCorrectionList ) {
+            if( !correctionContainer.isSeqIdsValid() ) {
+                if( guienvProp == null || guienvProp.equals( "true" ) ) {
+                    //We always trigger manual editing if at least one mapping file id is missing in the reference
+                    mergeIdenticalDictionaries( identicalDictionaries, correctionContainer );
+
+                } else if( correctionContainer.getFoundIds() == 0 ) {
+                    noErrors = false;
+                    ParsingException ex = new ParsingException( "No reference sequence id matches any sequence ids in the mapping file. If you don't use identical names, the import does not succeed." );
+                    ErrorHelper.getHandler().handle( ex, "Reference ID error" );
+                    printAndLogError( ex );
+                }
+            }
+        }
+
+        SeqIdManualCorrector manualCorrector = new SeqIdManualCorrector();
+        try {
+            manualCorrector.triggerManualEditing( identicalDictionaries );
+        } catch( ParsingException ex ) {
+            noErrors = false;
+            ErrorHelper.getHandler().handle( ex, "Reference ID error" );
+            printAndLogError( ex );
+        }
+    }
+
+
+    /**
+     * One container in the identicalDictionaries list represents multiple
+     * identical dictionaries.
+     *
+     * @param identicalDictionaries List of sequence id correction containers,
+     *                              where each container holds all track jobs
+     *                              with the same SAMSequenceDictionary.
+     * @param correctionContainer   A single sequence id correction container
+     *                              which shall either be merged in one of the
+     *                              dictionaries in the identicalDictionaries
+     *                              list or simply added to the list when the
+     *                              sequence dictionary differs to all other
+     *                              ones already in the list
+     */
+    private void mergeIdenticalDictionaries( List<SeqIdCorrectionContainer> identicalDictionaries, SeqIdCorrectionContainer correctionContainer ) {
+        if( identicalDictionaries.isEmpty() ) {
+            identicalDictionaries.add( correctionContainer );
+        } else {
+            //compare with containers in list
+            boolean isAdded = false;
+            for( SeqIdCorrectionContainer container : identicalDictionaries ) {
+                SAMSequenceDictionary dictionary = ((SamSeqDictionary) container.getSequenceDictionary()).getSamDictionary();
+                SAMSequenceDictionary newDictionary = ((SamSeqDictionary) correctionContainer.getSequenceDictionary()).getSamDictionary();
+                try {
+                    dictionary.assertSameDictionary( newDictionary );
+                    container.addTrackJob( correctionContainer.getTrackJob() );
+                    isAdded = true;
+                    break;
+                } catch( AssertionError e ) { //they are not equal, we need to add it to the identicalDictionaries list
+                    isAdded = false;
+                }
+            }
+            if( !isAdded ) {
+                identicalDictionaries.add( correctionContainer );
+            }
         }
     }
 
@@ -239,165 +314,195 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         if( !tracksJobs.isEmpty() ) {
             printAndLog( getBundleString( "MSG_ImportThread.import.start.track" ) + ":" );
 
+            List<SeqIdCorrectionContainer> corretionList = new ArrayList<>();
             for( TrackJob trackJob : tracksJobs ) {
                 try {
-                    checkRefIds( trackJob );
-                    parseBamTrack( trackJob );
+                    corretionList.add( checkRefIds( trackJob ) );
                 } catch( ParsingException ex ) {
                     noErrors = false;
                     ErrorHelper.getHandler().handle( ex, "Reference ID error" );
                     printAndLogError( ex );
                 }
+            }
 
+            correctRefIds( corretionList ); //After check they can be corrected
+
+            for( TrackJob trackJob : tracksJobs ) {
+                parseBamTrack( trackJob );
                 ph.progress( ++workunits );
             }
         }
     }
 
 
+    /**
+     * Processes read pair jobs (parsing and storing) of the current import.
+     */
     private void processReadPairJobs() {
         if( !readPairJobs.isEmpty() ) {
 
             printAndLog( getBundleString( "MSG_ImportThread.import.start.readPairs" ) + ":" );
 
+            List<SeqIdCorrectionContainer> correctionList = new ArrayList<>();
             for( ReadPairJobContainer readPairJobContainer : readPairJobs ) {
-
-                int distance = readPairJobContainer.getDistance();
-                if( distance > 0 ) {
-
-                    int trackId1;
-                    int trackId2 = -1;
-
-                    /*
-                     * Algorithm: start file if (PersistentTrack not yet
-                     * imported) { convert file 1 to sam/bam, if necessary if
-                     * (isTwoTracks) { convert file 2 to sam/bam, if necessary
-                     * combine them unsorted (NEW FILE) } sort by readseq (NEW
-                     * FILE) - if isTwoTracks: deleteOldFile parse mappings sort
-                     * by read name (NEW FILE) - deleteOldFile read pair
-                     * classification, extension & sorting by coordinate -
-                     * deleteOldFile } create position table (advantage: is
-                     * already sorted by coordinate & classification in file)
-                     */
-
-                    TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
-                    TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
+                if( readPairJobContainer.getDistance() > 0 ) {
                     try {
-                        checkRefIds( trackJob1 );
-                        checkRefIds( trackJob2 );
+                        correctionList.add( checkRefIds( readPairJobContainer.getTrackJob1() ) );
+                        TrackJob trackJob2 = readPairJobContainer.getTrackJob2(); //may be NULL!!!
+                        if( trackJob2 != null ) {
+                            correctionList.add( checkRefIds( trackJob2 ) );
+                        }
                     } catch( ParsingException ex ) {
                         ErrorHelper.getHandler().handle( ex, "Reference ID error" );
                         printAndLogError( ex );
                         noErrors = false;
-                        continue;
                     }
-                    try {
-                        this.setChromLengthMap( trackJob1 );
-                        File inputFile1 = trackJob1.getFile();
-                        inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                        StatsContainer statsContainer = new StatsContainer();
-                        statsContainer.prepareForTrack();
-                        statsContainer.prepareForReadPairTrack();
-
-                        if( !trackJob1.isAlreadyImported() ) {
-
-                            //executes any conversion before other calculations, if the parser supports any
-                            trackJob1.getParser().registerObserver( this );
-                            Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
-                            trackJob1.getParser().removeObserver( this );
-                            if( !success ) {
-                                noErrors = false;
-                                printAndLogError( "Conversion of " + trackJob1.getName() + " failed!" );
-                                continue;
-                            }
-                            File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
-
-                            if( trackJob2 != null ) { //only combine, if data is not already combined
-                                File inputFile2 = trackJob2.getFile();
-                                inputFile2.setReadOnly();
-                                trackJob2.getParser().registerObserver( this );
-                                success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
-                                trackJob2.getParser().removeObserver( this );
-                                File lastWorkFile2 = trackJob2.getFile();
-                                if( !success ) {
-                                    noErrors = false;
-                                    printAndLogError( "Conversion of " + trackJob2.getName() + " failed!" );
-                                    continue;
-                                }
-
-                                //combine both tracks and continue with trackJob1, they are unsorted now
-                                SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
-                                combiner.registerObserver( this );
-                                success = combiner.combineData();
-                                if( !success ) {
-                                    noErrors = false;
-                                    printAndLogError( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
-                                    continue;
-                                }
-                                GeneralUtils.deleteOldWorkFile( lastWorkFile ); //either were converted or are write protected
-                                GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
-                                lastWorkFile = trackJob1.getFile(); //the combined file
-                                inputFile2.setWritable( true );
-
-                                ph.progress( ++workunits );
-                            }
-
-                            //extension for both classification and read pair info
-                            SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier(
-                                    readPairJobContainer, chromLengthMap );
-                            samBamDirectReadPairClassifier.registerObserver( this );
-                            samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
-                            samBamDirectReadPairClassifier.classifyReadPairs();
-
-                            //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
-                            GeneralUtils.deleteOldWorkFile( lastWorkFile );
-                            ph.progress( ++workunits );
-
-                        } else { //else case with 2 already imported tracks is prohibited
-                            //we have to calculate the stats
-                            SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
-                            statsParser.setStatsContainer( statsContainer );
-                            statsParser.registerObserver( this );
-                            statsParser.classifyReadPairs();
-
-                            ph.progress( ++workunits );
-                        }
-
-                        //create general track stats
-                        SamBamStatsParser statsParser = new SamBamStatsParser();
-                        statsParser.setStatsContainer( statsContainer );
-                        statsParser.registerObserver( this );
-                        ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
-                        statsParser.removeObserver( this );
-
-                        this.storeBamTrack( track ); // store track entry in db
-                        trackId1 = trackJob1.getID();
-                        inputFile1.setWritable( true );
-
-                        //read pair ids have to be set in track entry
-                        ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
-
-                    } catch( OutOfMemoryError ex ) {
-                        printAndLogError( "Out of memory error during parsing of bam track: " + ex.getMessage() );
-                        LOG.error( ex.getMessage(), ex );
-                        noErrors = false;
-                        continue;
-
-                    } catch( DatabaseException | ParsingException | IOException ex ) {
-                        printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
-                        LOG.error( ex.getMessage(), ex );
-                        noErrors = false;
-                        continue;
-                    }
-
-                } else { //if (distance <= 0)
-                    printAndLogError( getBundleString( "MSG_ImportThread.import.error" ) );
-                    noErrors = false;
                 }
+            }
 
-                ph.progress( ++workunits );
+            correctRefIds( correctionList ); //After check they can be corrected
+
+            for( ReadPairJobContainer readPairJobContainer : readPairJobs ) {
+                parseReadPairJob( readPairJobContainer );
             }
         }
+    }
+
+
+    /**
+     * Performs the actual parsing of a read pair import.
+     *
+     * @param readPairJobContainer The container with both track jobs
+     */
+    private void parseReadPairJob( ReadPairJobContainer readPairJobContainer ) {
+
+        int distance = readPairJobContainer.getDistance();
+        if( distance > 0 ) {
+
+            int trackId1;
+            int trackId2 = -1;
+
+            /*
+             * Algorithm: start file if (PersistentTrack not yet imported) {
+             * convert file 1 to sam/bam, if necessary if (isTwoTracks) {
+             * convert file 2 to sam/bam, if necessary combine them unsorted
+             * (NEW FILE) } sort by readseq (NEW FILE) - if isTwoTracks:
+             * deleteOldFile parse mappings sort by read name (NEW FILE) -
+             * deleteOldFile read pair classification, extension & sorting by
+             * coordinate - deleteOldFile } create position table (advantage: is
+             * already sorted by coordinate & classification in file)
+             */
+
+            TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
+            TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
+            try {
+                this.setChromLengthMap( trackJob1 );
+                File inputFile1 = trackJob1.getFile();
+                inputFile1.setReadOnly(); //prevents changes or deletion of original file!
+                StatsContainer statsContainer = new StatsContainer();
+                statsContainer.prepareForTrack();
+                statsContainer.prepareForReadPairTrack();
+
+                if( !trackJob1.isAlreadyImported() ) {
+
+                    //executes any conversion before other calculations, if the parser supports any
+                    trackJob1.getParser().registerObserver( this );
+                    Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
+                    trackJob1.getParser().removeObserver( this );
+                    if( !success ) {
+                        noErrors = false;
+                        printAndLogError( "Conversion of " + trackJob1.getName() + " failed!" );
+                        workunits += trackJob2 != null ? 3 : 2;
+                        ph.progress( workunits );
+                        return;
+                    }
+                    File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
+
+                    if( trackJob2 != null ) { //only combine, if data is not already combined
+                        File inputFile2 = trackJob2.getFile();
+                        inputFile2.setReadOnly();
+                        trackJob2.getParser().registerObserver( this );
+                        success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
+                        trackJob2.getParser().removeObserver( this );
+                        File lastWorkFile2 = trackJob2.getFile();
+                        if( !success ) {
+                            noErrors = false;
+                            printAndLogError( "Conversion of " + trackJob2.getName() + " failed!" );
+                            workunits += 3;
+                            ph.progress( workunits );
+                            return;
+                        }
+
+                        //combine both tracks and continue with trackJob1, they are unsorted now
+                        SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
+                        combiner.registerObserver( this );
+                        success = combiner.combineData();
+                        ph.progress( ++workunits );
+
+                        if( !success ) {
+                            noErrors = false;
+                            printAndLogError( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
+                            return;
+                        }
+                        GeneralUtils.deleteOldWorkFile( lastWorkFile ); //either were converted or are write protected
+                        GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
+                        lastWorkFile = trackJob1.getFile(); //the combined file
+                        inputFile2.setWritable( true );
+
+                    }
+
+                    //extension for both classification and read pair info
+                    SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier(
+                            readPairJobContainer, chromLengthMap );
+                    samBamDirectReadPairClassifier.registerObserver( this );
+                    samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
+                    samBamDirectReadPairClassifier.classifyReadPairs();
+
+                    //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
+                    GeneralUtils.deleteOldWorkFile( lastWorkFile );
+                    ph.progress( ++workunits );
+
+                } else { //else case with 2 already imported tracks is prohibited
+                    //we have to calculate the stats
+                    SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
+                    statsParser.setStatsContainer( statsContainer );
+                    statsParser.registerObserver( this );
+                    statsParser.classifyReadPairs();
+
+                    ph.progress( ++workunits );
+                }
+
+                //create general track stats
+                SamBamStatsParser statsParser = new SamBamStatsParser();
+                statsParser.setStatsContainer( statsContainer );
+                statsParser.registerObserver( this );
+                ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
+                statsParser.removeObserver( this );
+
+                this.storeBamTrack( track ); // store track entry in db
+                trackId1 = trackJob1.getID();
+                inputFile1.setWritable( true );
+
+                //read pair ids have to be set in track entry
+                ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
+
+            } catch( OutOfMemoryError ex ) {
+                printAndLogError( "Out of memory error during parsing of bam track: " + ex.getMessage() );
+                LOG.error( ex.getMessage(), ex );
+                noErrors = false;
+
+            } catch( DatabaseException | ParsingException | IOException ex ) {
+                printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
+                LOG.error( ex.getMessage(), ex );
+                noErrors = false;
+            }
+
+        } else { //if (distance <= 0)
+            printAndLogError( getBundleString( "MSG_ImportThread.import.error" ) );
+            noErrors = false;
+        }
+
+        ph.progress( ++workunits );
     }
 
 
@@ -581,7 +686,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         io.getOut().println( msg );
         LOG.error( msg );
     }
-    
+
+
     /**
      * Prints the given message to the io stream and the logger at error level.
      *

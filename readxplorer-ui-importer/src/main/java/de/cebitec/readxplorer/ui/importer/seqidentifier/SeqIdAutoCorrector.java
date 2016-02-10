@@ -66,7 +66,6 @@ public class SeqIdAutoCorrector {
 
         /* replace -,.,' ', by '_'; chr_x by x or x by chr_x, gbk locus found as
          * part of fasta header = only keep locus tag in fasta,.
-         *
          */
         List<SAMSequenceRecord> newSeqRecordList = new ArrayList<>();
         missingSeqs = new ArrayList<>();
@@ -100,7 +99,7 @@ public class SeqIdAutoCorrector {
                     if( !chromIds.contains( refFixed ) ) {
                         refFixed = refFixed.replaceFirst( "chromosome_?(\\d+)", "$1" );
                     }
-                   
+
                     //Try adding chromosome prefixes
                     if( !chromIds.contains( refFixed ) ) {
                         addToRef = refFixed.replaceFirst( "(^\\d+)", "chr$1" );
@@ -114,7 +113,7 @@ public class SeqIdAutoCorrector {
                     if( !chromIds.contains( addToRef ) ) {
                         addToRef = refFixed.replaceFirst( "(^\\d+)", "chromosome_$1" );
                     }
-                    if (chromIds.contains( addToRef)) {
+                    if( chromIds.contains( addToRef ) ) {
                         refFixed = addToRef;
                     }
 
@@ -146,8 +145,9 @@ public class SeqIdAutoCorrector {
 
 
     /**
-     * @return <code>true</code> if at least one reference id from the mapping
-     *         file could be associated to a reference from the genome file.
+     * @return <code>true</code> if all reference ids from the mapping file
+     *         could be associated to a reference from the genome file,
+     *         <code>false</code> otherwise.
      */
     public boolean isFixed() {
         return fixed;
