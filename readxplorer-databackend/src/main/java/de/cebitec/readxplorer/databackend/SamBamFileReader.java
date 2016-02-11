@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.databackend;
 
 
 import de.cebitec.readxplorer.api.enums.FeatureType;
-import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.api.enums.MappingClass;
 import de.cebitec.readxplorer.api.enums.ReadPairType;
 import de.cebitec.readxplorer.api.enums.SAMRecordTag;
@@ -41,6 +40,7 @@ import de.cebitec.readxplorer.utils.SequenceUtils;
 import htsjdk.samtools.SAMException;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SAMSequenceRecord;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.util.RuntimeIOException;
@@ -168,6 +168,21 @@ public class SamBamFileReader implements Observable, Observer {
 
 
     /**
+     * Checks if the reference id exists in the mapping file header
+     *
+     * @param request The request to send to the mapping file
+     *
+     * @return <code>true</code> if the reference id exists in the mapping file
+     *         sequence dictionary, <code>false</code> otherwise
+     */
+    private boolean checkRefExists( IntervalRequest request ) {
+        String chrom = reference.getChromosome( request.getChromId() ).getName();
+        SAMSequenceRecord chromRecord = samFileReader.getFileHeader().getSequence( chrom );
+        return chromRecord != null;
+    }
+
+
+    /**
      * Retrieves the mappings from the given interval from the sam or bam file
      * set for this data reader and the reference sequence with the given name.
      * <p>
@@ -183,68 +198,70 @@ public class SamBamFileReader implements Observable, Observer {
         try {
             checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome(
-                    request.getChromId() ).getName(), request.getTotalFrom(), request.getTotalTo(), false );
-            String refSubSeq;
-            int id = 0;
+            if( checkRefExists( request ) ) {
+                SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome(
+                        request.getChromId() ).getName(), request.getTotalFrom(), request.getTotalTo(), false );
+                String refSubSeq;
+                int id = 0;
 //            int numReplicates = 1;
 
-            while( samRecordIterator.hasNext() ) {
-                SAMRecord record = samRecordIterator.next();
+                while( samRecordIterator.hasNext() ) {
+                    SAMRecord record = samRecordIterator.next();
 
-                if( !record.getReadUnmappedFlag() ) {
-                    int start = record.getAlignmentStart();
-                    int stop = record.getAlignmentEnd();
+                    if( !record.getReadUnmappedFlag() ) {
+                        int start = record.getAlignmentStart();
+                        int stop = record.getAlignmentEnd();
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
-                    boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                    byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
-                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
-                    int mappingQuality = record.getMappingQuality();
+                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                        byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                        MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                        Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
+                        int mappingQuality = record.getMappingQuality();
 
-                    //only add mappings, which are valid according to the read classification parameters
-                    if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
+                        //only add mappings, which are valid according to the read classification parameters
+                        if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        Mapping mapping = getMappingForValues( mappingClass, numMappingsForRead, id++,
-                                                               start, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
-                        mapping.setAlignmentBlocks( samUtils.getAlignmentBlocks( record.getCigar(), start ) );
-                        // We must alway check for Diffs and Gaps even if "classification != MappingClass.PERFECT_MATCH"
-                        // because there might still be a split read.
-                        if( hasNeededDiffs( request, mappingClass ) ) {
+                            Mapping mapping = getMappingForValues( mappingClass, numMappingsForRead, id++,
+                                                                   start, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
+                            mapping.setAlignmentBlocks( samUtils.getAlignmentBlocks( record.getCigar(), start ) );
+                            // We must alway check for Diffs and Gaps even if "classification != MappingClass.PERFECT_MATCH"
+                            // because there might still be a split read.
+                            if( hasNeededDiffs( request, mappingClass ) ) {
 
-                            //find check alignment via cigar string and add diffs to mapping
-                            String cigar = record.getCigarString();
-                            if( cigar.contains( "M" ) ) { //TODO check if this check is faster or the version in other methods here
-                                refSubSeq = reference.getChromSequence( request.getChromId(), start, stop );
-                            } else {
-                                refSubSeq = null;
+                                //find check alignment via cigar string and add diffs to mapping
+                                String cigar = record.getCigarString();
+                                if( cigar.contains( "M" ) ) { //TODO check if this check is faster or the version in other methods here
+                                    refSubSeq = reference.getChromSequence( request.getChromId(), start, stop );
+                                } else {
+                                    refSubSeq = null;
+                                }
+                                createDiffsAndGaps( record, refSubSeq, mapping );
                             }
-                            createDiffsAndGaps( record, refSubSeq, mapping );
-                        }
 
-                        //stuff for trimmed reads
-                        Object originalSequence = record.getAttribute( "os" );
-                        if( (originalSequence != null) && (originalSequence instanceof String) ) {
-                            String ors = (String) originalSequence;
-                            ors = ors.replace( "@", record.getReadString() );
-                            mapping.setOriginalSequence( ors );
-                        }
-                        Object trimmedFromLeft = record.getIntegerAttribute( "tl" );
-                        if( (trimmedFromLeft != null) && (trimmedFromLeft instanceof Integer) ) {
-                            mapping.setTrimmedFromLeft( (Integer) trimmedFromLeft );
-                        }
-                        Object trimmedFromRight = record.getIntegerAttribute( "tr" );
-                        if( (trimmedFromRight != null) && (trimmedFromRight instanceof Integer) ) {
-                            mapping.setTrimmedFromRight( (Integer) trimmedFromRight );
-                        }
+                            //stuff for trimmed reads
+                            Object originalSequence = record.getAttribute( "os" );
+                            if( (originalSequence != null) && (originalSequence instanceof String) ) {
+                                String ors = (String) originalSequence;
+                                ors = ors.replace( "@", record.getReadString() );
+                                mapping.setOriginalSequence( ors );
+                            }
+                            Object trimmedFromLeft = record.getIntegerAttribute( "tl" );
+                            if( (trimmedFromLeft != null) && (trimmedFromLeft instanceof Integer) ) {
+                                mapping.setTrimmedFromLeft( (Integer) trimmedFromLeft );
+                            }
+                            Object trimmedFromRight = record.getIntegerAttribute( "tr" );
+                            if( (trimmedFromRight != null) && (trimmedFromRight instanceof Integer) ) {
+                                mapping.setTrimmedFromRight( (Integer) trimmedFromRight );
+                            }
 
-                        mappings.add( mapping );
+                            mappings.add( mapping );
+                        }
                     }
-                }
 
+                }
+                samRecordIterator.close();
             }
-            samRecordIterator.close();
 
         } catch( NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e ) {
             notifyObservers( e );
@@ -291,27 +308,29 @@ public class SamBamFileReader implements Observable, Observer {
         try {
             checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            while( samRecordIterator.hasNext() ) {
-                final SAMRecord record = samRecordIterator.next();
-                if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
-                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
-                    int mappingQuality = record.getMappingQuality();
+            if( checkRefExists( request ) ) {
+                SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
+                while( samRecordIterator.hasNext() ) {
+                    final SAMRecord record = samRecordIterator.next();
+                    if( !record.getReadUnmappedFlag() ) {
+                        Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                        MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                        Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
+                        int mappingQuality = record.getMappingQuality();
 
-                    //only add mappings, which are valid according to the read classification paramters
-                    if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
+                        //only add mappings, which are valid according to the read classification paramters
+                        if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        int start = record.getAlignmentStart();
-                        int stop = record.getAlignmentEnd();
-                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                        mappings.add( new Mapping( start, stop, isFwdStrand ) );
+                            int start = record.getAlignmentStart();
+                            int stop = record.getAlignmentEnd();
+                            boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                            mappings.add( new Mapping( start, stop, isFwdStrand ) );
+                        }
                     }
                 }
-            }
-            samRecordIterator.close();
+                samRecordIterator.close();
 
+            }
         } catch( NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e ) {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
@@ -343,62 +362,64 @@ public class SamBamFileReader implements Observable, Observer {
         try {
             checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            int id = 0;
-            while( samRecordIterator.hasNext() ) {
-                final SAMRecord record = samRecordIterator.next();
+            if( checkRefExists( request ) ) {
+                SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
+                int id = 0;
+                while( samRecordIterator.hasNext() ) {
+                    final SAMRecord record = samRecordIterator.next();
 
-                if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
-                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
-                    int mappingQuality = record.getMappingQuality();
+                    if( !record.getReadUnmappedFlag() ) {
+                        Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                        MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                        Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
+                        int mappingQuality = record.getMappingQuality();
 
-                    if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
+                        if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        int startPos = record.getAlignmentStart(); //in the genome, to get the index: -1
-                        int stop = record.getAlignmentEnd();
-                        //            start = start < 0 ? 0 : start;
-                        //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
-                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                        Integer pairId = (Integer) record.getAttribute( SAMRecordTag.ReadPairId.toString() );
-                        Integer pairType = (Integer) record.getAttribute( SAMRecordTag.ReadPairType.toString() );
-                        int mateStart = record.getMateAlignmentStart();
-                        boolean bothVisible = mateStart > from && mateStart < to;
+                            int startPos = record.getAlignmentStart(); //in the genome, to get the index: -1
+                            int stop = record.getAlignmentEnd();
+                            //            start = start < 0 ? 0 : start;
+                            //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
+                            boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                            Integer pairId = (Integer) record.getAttribute( SAMRecordTag.ReadPairId.toString() );
+                            Integer pairType = (Integer) record.getAttribute( SAMRecordTag.ReadPairType.toString() );
+                            int mateStart = record.getMateAlignmentStart();
+                            boolean bothVisible = mateStart > from && mateStart < to;
 
-                        Mapping mapping = getMappingForValues( mappingClass, numMappingsForRead, id++,
-                                                               startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
-                        if( pairId != null && pairType != null ) { //since both data fields are always written together
-                            // add new readPair if not exists
-                            long readPairId = pairId;
-                            ReadPairType readPairType = ReadPairType.getReadPairType( pairType );
-                            if( !readPairs.containsKey( readPairId ) ) {
-                                ReadPairGroup newGroup = new ReadPairGroup();
-                                newGroup.setReadPairId( pairId );
-                                readPairs.put( readPairId, newGroup );
-                            } //TODO check where ids are needed
-                            Mapping mate;
-                            try {
-                                mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte( "0" ), new byte[0] );
-                            } catch( IllegalStateException e ) {
-                                mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, true, new Byte( "0" ), new byte[0] );
-                            } //TODO get mate data from querried records later
-                            readPairs.get( readPairId ).addPersistentDirectAccessMapping( mapping, mate, readPairType, bothVisible );
-                        }
+                            Mapping mapping = getMappingForValues( mappingClass, numMappingsForRead, id++,
+                                                                   startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
+                            if( pairId != null && pairType != null ) { //since both data fields are always written together
+                                // add new readPair if not exists
+                                long readPairId = pairId;
+                                ReadPairType readPairType = ReadPairType.getReadPairType( pairType );
+                                if( !readPairs.containsKey( readPairId ) ) {
+                                    ReadPairGroup newGroup = new ReadPairGroup();
+                                    newGroup.setReadPairId( pairId );
+                                    readPairs.put( readPairId, newGroup );
+                                } //TODO check where ids are needed
+                                Mapping mate;
+                                try {
+                                    mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte( "0" ), new byte[0] );
+                                } catch( IllegalStateException e ) {
+                                    mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, true, new Byte( "0" ), new byte[0] );
+                                } //TODO get mate data from querried records later
+                                readPairs.get( readPairId ).addPersistentDirectAccessMapping( mapping, mate, readPairType, bothVisible );
+                            }
 
-                        if( hasNeededDiffs( request, mappingClass ) ) {
+                            if( hasNeededDiffs( request, mappingClass ) ) {
 
-                            //check alignment via cigar string and add diffs to mapping
-                            String cigar = record.getCigarString();
-                            String refSubSeq = cigar.contains( "M" ) ? reference.getChromSequence( request.getChromId(), startPos, stop ) : null;
-                            createDiffsAndGaps( record, refSubSeq, mapping );
+                                //check alignment via cigar string and add diffs to mapping
+                                String cigar = record.getCigarString();
+                                String refSubSeq = cigar.contains( "M" ) ? reference.getChromSequence( request.getChromId(), startPos, stop ) : null;
+                                createDiffsAndGaps( record, refSubSeq, mapping );
+                            }
                         }
                     }
                 }
-            }
-            samRecordIterator.close();
-            readPairGroups = readPairs.values();
+                samRecordIterator.close();
+                readPairGroups = readPairs.values();
 
+            }
         } catch( NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e ) {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
@@ -455,34 +476,35 @@ public class SamBamFileReader implements Observable, Observer {
         CoverageAndDiffResult result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
         try {
             checkIndex();
-            SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            while( samRecordIterator.hasNext() ) {
-                SAMRecord record = samRecordIterator.next();
+            if( checkRefExists( request ) ) {
+                SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
+                while( samRecordIterator.hasNext() ) {
+                    SAMRecord record = samRecordIterator.next();
 
-                if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
-                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
-                    int mappingQuality = record.getMappingQuality();
+                    if( !record.getReadUnmappedFlag() ) {
+                        Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                        MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                        Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
+                        int mappingQuality = record.getMappingQuality();
 
-                    if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
+                        if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        boolean isFwdStrand;
-                        if( readClassParams.isStrandBothOption() ) {
-                            isFwdStrand = readClassParams.isStrandBothFwdOption();
-                        } else {
-                            isFwdStrand = !record.getReadNegativeStrandFlag();
+                            boolean isFwdStrand;
+                            if( readClassParams.isStrandBothOption() ) {
+                                isFwdStrand = readClassParams.isStrandBothFwdOption();
+                            } else {
+                                isFwdStrand = !record.getReadNegativeStrandFlag();
+                            }
+                            int startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd(); //in the genome, to get the index: -1
+
+                            increaseCoverage( mappingClass, isFwdStrand,
+                                              startPos, startPos, coverage );
                         }
-                        int startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd(); //in the genome, to get the index: -1
-
-                        increaseCoverage( mappingClass, isFwdStrand,
-                                          startPos, startPos, coverage );
                     }
                 }
+                samRecordIterator.close();
+                result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
             }
-            samRecordIterator.close();
-            result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
-
         } catch( NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e ) {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
@@ -505,7 +527,6 @@ public class SamBamFileReader implements Observable, Observer {
      */
     public CoverageAndDiffResult getCoverageAndReadStartsFromBam( IntervalRequest request ) {
 
-        IntervalRequestData trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         ParametersReadClasses readClassParams = request.getReadClassParams();
@@ -521,60 +542,62 @@ public class SamBamFileReader implements Observable, Observer {
         try {
             checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            while( samRecordIterator.hasNext() ) {
-                SAMRecord record = samRecordIterator.next();
+            if( checkRefExists( request ) ) {
+                SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
+                while( samRecordIterator.hasNext() ) {
+                    SAMRecord record = samRecordIterator.next();
 
-                if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
-                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
-                    int mappingQuality = record.getMappingQuality();
+                    if( !record.getReadUnmappedFlag() ) {
+                        Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                        MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                        Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
+                        int mappingQuality = record.getMappingQuality();
 
-                    if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
+                        if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        boolean isFwdStrand;
-                        if( readClassParams.isStrandBothOption() ) {
-                            isFwdStrand = readClassParams.isStrandBothFwdOption();
-                        } else if( readClassParams.isStrandOppositeOption() ) {
-                            isFwdStrand = record.getReadNegativeStrandFlag();
-                        } else {
+                            boolean isFwdStrand;
+                            if( readClassParams.isStrandBothOption() ) {
+                                isFwdStrand = readClassParams.isStrandBothFwdOption();
+                            } else if( readClassParams.isStrandOppositeOption() ) {
+                                isFwdStrand = record.getReadNegativeStrandFlag();
+                            } else {
+                                isFwdStrand = !record.getReadNegativeStrandFlag();
+                            }
+
+                            // add read start
+                            int startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd(); //in the genome, to get the index: -1
+                            if( readClassParams.isStrandBothOption() ) {
+                                isFwdStrand = readClassParams.isStrandBothFwdOption();
+                            } else {
+                                isFwdStrand = !record.getReadNegativeStrandFlag();
+                            }
+
+                            increaseCoverage( mappingClass, isFwdStrand, startPos, startPos, readStarts );
+
+                            //This enables us to handle split reads correctly.
+                            startPos = record.getAlignmentStart();
                             isFwdStrand = !record.getReadNegativeStrandFlag();
-                        }
+                            List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks( record.getCigar(), startPos );
+                            for( SamAlignmentBlock block : alignmentBlocks ) {
+                                increaseCoverage( mappingClass, isFwdStrand,
+                                                  block.getRefStart(), block.getRefStop(), coverage );
+                            }
 
-                        // add read start
-                        int startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd(); //in the genome, to get the index: -1
-                        if( readClassParams.isStrandBothOption() ) {
-                            isFwdStrand = readClassParams.isStrandBothFwdOption();
-                        } else {
-                            isFwdStrand = !record.getReadNegativeStrandFlag();
-                        }
-
-                        increaseCoverage( mappingClass, isFwdStrand, startPos, startPos, readStarts );
-
-                        //This enables us to handle split reads correctly.
-                        startPos = record.getAlignmentStart();
-                        isFwdStrand = !record.getReadNegativeStrandFlag();
-                        List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks( record.getCigar(), startPos );
-                        for( SamAlignmentBlock block : alignmentBlocks ) {
-                            increaseCoverage( mappingClass, isFwdStrand,
-                                              block.getRefStart(), block.getRefStop(), coverage );
-                        }
-
-                        if( hasNeededDiffs( request, mappingClass ) ) {
-                            int stop = record.getAlignmentEnd();
-                            DiffAndGapResult diffsAndGaps = createDiffsAndGaps( record,
-                                                                                reference.getChromSequence( request.getChromId(), startPos, stop ), null );
-                            diffs.addAll( diffsAndGaps.getDiffs() );
-                            gaps.addAll( diffsAndGaps.getGaps() );
+                            if( hasNeededDiffs( request, mappingClass ) ) {
+                                int stop = record.getAlignmentEnd();
+                                DiffAndGapResult diffsAndGaps = createDiffsAndGaps( record,
+                                                                                    reference.getChromSequence( request.getChromId(), startPos, stop ), null );
+                                diffs.addAll( diffsAndGaps.getDiffs() );
+                                gaps.addAll( diffsAndGaps.getGaps() );
+                            }
                         }
                     }
                 }
-            }
-            samRecordIterator.close();
-            result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
-            result.setReadStarts( readStarts );
+                samRecordIterator.close();
+                result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
+                result.setReadStarts( readStarts );
 
+            }
         } catch( NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e ) {
             notifyObservers( e );
         } catch( BufferUnderflowException e ) {
@@ -609,39 +632,41 @@ public class SamBamFileReader implements Observable, Observer {
         CoverageAndDiffResult result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
         try {
             checkIndex();
+            
+            if( checkRefExists( request ) ) {
+                SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
+                while( samRecordIterator.hasNext() ) {
+                    SAMRecord record = samRecordIterator.next();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            while( samRecordIterator.hasNext() ) {
-                SAMRecord record = samRecordIterator.next();
+                    if( !record.getReadUnmappedFlag() ) {
+                        Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
+                        MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                        Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
+                        int mappingQuality = record.getMappingQuality();
 
-                if( !record.getReadUnmappedFlag() ) {
-                    Byte classification = Byte.valueOf( record.getAttribute( SAMRecordTag.ReadClass.toString() ).toString() );
-                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
-                    Integer numMappingsForRead = (Integer) record.getAttribute( SAMRecordTag.MapCount.toString() );
-                    int mappingQuality = record.getMappingQuality();
+                        if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
+                            boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                            //This enables us to handle split reads correctly.
+                            int startPos = record.getAlignmentStart(); //in the genome, to get the index: -1
+                            List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks( record.getCigar(), startPos );
+                            for( SamAlignmentBlock block : alignmentBlocks ) {
+                                increaseCoverage( mappingClass, isFwdStrand,
+                                                  block.getRefStart(), block.getRefStop(), coverage );
+                            }
 
-                    if( isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
-                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-                        //This enables us to handle split reads correctly.
-                        int startPos = record.getAlignmentStart(); //in the genome, to get the index: -1
-                        List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks( record.getCigar(), startPos );
-                        for( SamAlignmentBlock block : alignmentBlocks ) {
-                            increaseCoverage( mappingClass, isFwdStrand,
-                                              block.getRefStart(), block.getRefStop(), coverage );
-                        }
-
-                        if( hasNeededDiffs( request, mappingClass ) ) {
-                            int stop = record.getAlignmentEnd();
-                            DiffAndGapResult diffsAndGaps = createDiffsAndGaps( record,
-                                                                                reference.getChromSequence( request.getChromId(), startPos, stop ), null );
-                            diffs.addAll( diffsAndGaps.getDiffs() );
-                            gaps.addAll( diffsAndGaps.getGaps() );
+                            if( hasNeededDiffs( request, mappingClass ) ) {
+                                int stop = record.getAlignmentEnd();
+                                DiffAndGapResult diffsAndGaps = createDiffsAndGaps( record,
+                                                                                    reference.getChromSequence( request.getChromId(), startPos, stop ), null );
+                                diffs.addAll( diffsAndGaps.getDiffs() );
+                                gaps.addAll( diffsAndGaps.getGaps() );
+                            }
                         }
                     }
                 }
+                samRecordIterator.close();
+                result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
             }
-            samRecordIterator.close();
-            result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
 
         } catch( NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e ) {
             notifyObservers( e );

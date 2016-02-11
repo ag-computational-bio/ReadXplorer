@@ -108,8 +108,8 @@ public class SeqIdAutoCorrectorTest {
         //Keeping PAO11 while ignoring the other sequences
         SeqIdAutoCorrector multiCorrector = new SeqIdAutoCorrector( multiDictionary, pao11Ids );
         assertFalse( multiCorrector.isFixed() );
-        assertTrue( multiCorrector.getMissingSeqs().size() == 3 );
-        assertTrue( multiDictionary.size() == 1 );
+        assertTrue( multiCorrector.getMissingSeqIds().size() == 3 );
+        assertTrue( multiDictionary.size() == 4 );
 
         SAMSequenceDictionary multiDictionaryWorkx = new SAMSequenceDictionary();
         multiDictionaryWorkx.addSequence( new SAMSequenceRecord( pao11, 6000000 ) );

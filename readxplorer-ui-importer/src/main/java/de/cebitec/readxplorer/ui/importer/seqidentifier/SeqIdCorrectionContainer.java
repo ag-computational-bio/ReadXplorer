@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.importer.seqidentifier;
 
 import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readxplorer.utils.sequence.RefDictionary;
+import htsjdk.samtools.SAMSequenceDictionary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,8 +37,8 @@ public class SeqIdCorrectionContainer {
     private String id;
     private final List<TrackJob> trackJobs;
     private List<String> chromNames;
-    private RefDictionary sequenceDictionary;
-    private List<String> missingSeqs;
+    private SAMSequenceDictionary sequenceDictionary;
+    private List<Integer> missingSeqIds;
     private int foundIds;
     private boolean isSeqIdsValid;
     private boolean manualFixFailed;
@@ -78,7 +78,7 @@ public class SeqIdCorrectionContainer {
     private void init() {
         chromNames = new ArrayList<>();
         sequenceDictionary = null;
-        missingSeqs = new ArrayList<>();
+        missingSeqIds = new ArrayList<>();
         foundIds = 0;
     }
 
@@ -126,20 +126,20 @@ public class SeqIdCorrectionContainer {
 
 
     /**
-     * @param missingSeqs All sequence identifiers of the mapping file missing
-     *                    in the reference file.
+     * @param missingSeqs All sequence record ids of the mapping file missing in
+     *                    the reference file.
      */
-    public void setMissingSeqs( List<String> missingSeqs ) {
-        this.missingSeqs = missingSeqs;
+    public void setMissingSeqIds( List<Integer> missingSeqs ) {
+        this.missingSeqIds = missingSeqs;
     }
 
 
     /**
-     * @return All sequence identifiers of the mapping file missing in the
+     * @return All sequence record ids of the mapping file missing in the
      *         reference file.
      */
-    public List<String> getMissingSeqs() {
-        return Collections.unmodifiableList( missingSeqs );
+    public List<Integer> getMissingSeqIds() {
+        return Collections.unmodifiableList( missingSeqIds );
     }
 
 
@@ -148,7 +148,7 @@ public class SeqIdCorrectionContainer {
      *                           corrections to incorporate in an extended
      *                           mapping file.
      */
-    public void setSequenceDictionary( RefDictionary sequenceDictionary ) {
+    public void setSequenceDictionary( SAMSequenceDictionary sequenceDictionary ) {
         this.sequenceDictionary = sequenceDictionary;
     }
 
@@ -157,7 +157,7 @@ public class SeqIdCorrectionContainer {
      * @return The sequence dictionary containing automatic corrections to
      *         incorporate in an extended mapping file.
      */
-    public RefDictionary getSequenceDictionary() {
+    public SAMSequenceDictionary getSequenceDictionary() {
         return sequenceDictionary;
     }
 

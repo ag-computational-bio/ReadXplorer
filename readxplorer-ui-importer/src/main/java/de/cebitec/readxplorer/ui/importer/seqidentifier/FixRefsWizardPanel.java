@@ -18,8 +18,6 @@
 package de.cebitec.readxplorer.ui.importer.seqidentifier;
 
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningFinishWizardPanel;
-import htsjdk.samtools.SAMSequenceDictionary;
-import java.util.List;
 import org.openide.WizardDescriptor;
 
 
@@ -32,34 +30,26 @@ import org.openide.WizardDescriptor;
 public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
 
     public static final String PROP_FIXED_DICTIONARY = "PROP_FIXED_DICTIONARY_";
-    private final List<String> chromNames;
+    public static final String PROP_FIXED = "PROP_FIXED_";
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private FixRefsVisualPanel component;
-    private final String fileNames;
-    private final String id;
-    private final SAMSequenceDictionary sequenceDictionary;
-
+    private final SeqIdCorrectionContainer seqIdData;
 
     /**
      * Wizard panel to manually fix the reference sequence ids in the mapping
      * file dictionary.
      *
-     * @param chromNames         Reference chromosome names
-     * @param sequenceDictionary Mapping file sequence dictionary
-     * @param fileNames          Concatenated names of the mapping files
-     *                           associated to this panel
-     * @param id                 Identifier of the mapping file, e.g. track id
+     * @param correctionContainer Sequence id correction container with all
+     *                            necessary data to manually fix the sequence
+     *                            ids
      */
-    public FixRefsWizardPanel( List<String> chromNames, SAMSequenceDictionary sequenceDictionary, String fileNames, String id ) {
+    public FixRefsWizardPanel( SeqIdCorrectionContainer correctionContainer ) {
         super( "" );
-        this.chromNames = chromNames;
-        this.sequenceDictionary = sequenceDictionary;
-        this.fileNames = fileNames;
-        this.id = id;
+        this.seqIdData = correctionContainer;
     }
 
 
@@ -70,7 +60,9 @@ public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
     @Override
     public FixRefsVisualPanel getComponent() {
         if( component == null ) {
-            component = new FixRefsVisualPanel( chromNames, sequenceDictionary, fileNames );
+            component = new FixRefsVisualPanel( seqIdData.getChromNames(),
+                                                seqIdData.getSequenceDictionary(),
+                                                seqIdData.getMappingFileNames() );
         }
         return component;
     }
@@ -79,7 +71,9 @@ public class FixRefsWizardPanel extends ChangeListeningFinishWizardPanel {
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( isValid() ) {
-            wiz.putProperty( PROP_FIXED_DICTIONARY + id, this.component.getDictionary() );
+            boolean isFixed = this.component.isFixed() || seqIdData.getFoundIds() > 0;
+            wiz.putProperty( PROP_FIXED_DICTIONARY + seqIdData.getId(), this.component.getDictionary() );
+            wiz.putProperty( PROP_FIXED + seqIdData.getId(), isFixed );
         }
     }
 

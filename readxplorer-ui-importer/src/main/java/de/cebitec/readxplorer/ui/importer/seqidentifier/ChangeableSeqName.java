@@ -45,8 +45,7 @@ public class ChangeableSeqName implements Transferable, Serializable {
     /**
      * Creates a sequence name that can be changed to a new name.
      *
-     * @param seqName Original name of the reference sequence
-     * @param seqLength Length of the reference sequence
+     * @param seqRecord Sequence record for which a ChangeableSeqName is needed
      */
     public ChangeableSeqName( SAMSequenceRecord seqRecord ) {
         this.seqRecord = seqRecord;

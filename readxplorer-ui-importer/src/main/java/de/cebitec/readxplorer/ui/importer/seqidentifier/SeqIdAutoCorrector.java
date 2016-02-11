@@ -37,7 +37,7 @@ public class SeqIdAutoCorrector {
     private final SAMSequenceDictionary sequenceDictionary;
     private final Set<String> chromIds;
     private boolean fixed;
-    private List<String> missingSeqs;
+    private List<Integer> missingSeqIds;
 
 
     /**
@@ -68,7 +68,7 @@ public class SeqIdAutoCorrector {
          * part of fasta header = only keep locus tag in fasta,.
          */
         List<SAMSequenceRecord> newSeqRecordList = new ArrayList<>();
-        missingSeqs = new ArrayList<>();
+        missingSeqIds = new ArrayList<>();
         if( chromIds.size() == 1 && sequenceDictionary.size() == 1 ) {
             String chromId = chromIds.iterator().next();
             SAMSequenceRecord mappingRef = sequenceDictionary.getSequences().get( 0 );
@@ -77,7 +77,8 @@ public class SeqIdAutoCorrector {
                 newSeqRecordList.add( newRecord );
             } //otherwise both are already equal
         } else {
-            for( SAMSequenceRecord refRecord : sequenceDictionary.getSequences() ) {
+            for( int i = 0; i < sequenceDictionary.size(); i++ ) {
+                SAMSequenceRecord refRecord = sequenceDictionary.getSequence( i );
                 String refFixed = refRecord.getSequenceName();
                 String addToRef = "";
                 //Try replacing different characters and prefixes
@@ -121,26 +122,25 @@ public class SeqIdAutoCorrector {
                         SAMSequenceRecord newRecord = new SAMSequenceRecord( refFixed, refRecord.getSequenceLength() );
                         newSeqRecordList.add( newRecord );
                     } else {
-                        missingSeqs.add( refRecord.getSequenceName() );
+                        newSeqRecordList.add( refRecord );
+                        missingSeqIds.add( i );
                     }
                 } else {
                     newSeqRecordList.add( refRecord );
                 }
             }
         }
-        if( !newSeqRecordList.isEmpty() ) {
-            sequenceDictionary.setSequences( newSeqRecordList );
-        }
-        fixed = missingSeqs.isEmpty();
+        sequenceDictionary.setSequences( newSeqRecordList );
+        fixed = missingSeqIds.isEmpty();
     }
 
 
     /**
-     * @return All sequence identifiers of the mapping file missing in the
+     * @return All sequence record ids of the mapping file missing in the
      *         reference file.
      */
-    public List<String> getMissingSeqs() {
-        return missingSeqs;
+    public List<Integer> getMissingSeqIds() {
+        return missingSeqIds;
     }
 
 

@@ -39,7 +39,7 @@ import static de.cebitec.readxplorer.ui.importer.seqidentifier.ChangeableSeqName
 /**
  * Visual wizard panel to manually fix the reference sequence ids in the mapping
  * file dictionary.
- * 
+ *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class FixRefsVisualPanel extends JobPanel {
@@ -49,6 +49,7 @@ public final class FixRefsVisualPanel extends JobPanel {
     private List<String> chromNames;
     private final String fileNames;
     private SAMSequenceDictionary sequenceDictionary;
+    private boolean isFixed = false;
 
 
     /**
@@ -57,8 +58,8 @@ public final class FixRefsVisualPanel extends JobPanel {
      *
      * @param chromNames         Reference chromosome names
      * @param sequenceDictionary Mapping file sequence dictionary
-     * @param fileNames          Concatenated names of the mapping files associated
-     *                           to this panel
+     * @param fileNames          Concatenated names of the mapping files
+     *                           associated to this panel
      */
     public FixRefsVisualPanel( List<String> chromNames, SAMSequenceDictionary sequenceDictionary, String fileNames ) {
         this.chromNames = chromNames;
@@ -475,7 +476,8 @@ public final class FixRefsVisualPanel extends JobPanel {
      * Loads the last selected parameters into the component.
      */
     private void loadLastParameterSelection() {
-
+        //Currently no parameters to restore
+        //TODO: option to show wizard whenever at least one mapping id is not resolvable
     }
 
 
@@ -488,8 +490,21 @@ public final class FixRefsVisualPanel extends JobPanel {
         for( int i = 0; i < mappingIdList.getSize(); i++ ) {
             ChangeableSeqName mappingId = mappingIdList.getElementAt( i );
             fixedSeqDictionary.addSequence( new SAMSequenceRecord( mappingId.getNewName(), mappingId.getSeqRecord().getSequenceLength() ) );
+            if( !isFixed ) {
+                isFixed = mappingId.hasNewName();
+            }
         }
         return fixedSeqDictionary;
+    }
+
+
+    /**
+     * @return <code>true</code> if at least one of the mapping sequence ids has
+     *         been associated to a reference sequence id, <code>false</code>
+     *         otherwise.
+     */
+    public boolean isFixed() {
+        return isFixed;
     }
 
 

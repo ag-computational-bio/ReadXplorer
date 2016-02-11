@@ -33,10 +33,17 @@ import static de.cebitec.readxplorer.ui.importer.seqidentifier.Bundle.FixRefsWiz
 
 
 /**
+ * Handle manual correction of seuqence ids to match those of the reference.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class SeqIdManualCorrector {
+
+    /**
+     * Handle manual correction of seuqence ids to match those of the reference.
+     */
+    public SeqIdManualCorrector() {
+    }
 
 
     /**
@@ -58,9 +65,7 @@ public class SeqIdManualCorrector {
 
         for( SeqIdCorrectionContainer container : identicalDictionaryContainers ) {
 
-            SAMSequenceDictionary dictionary = ((SamSeqDictionary) container.getSequenceDictionary()).getSamDictionary();
-            panels.add( new FixRefsWizardPanel( container.getChromNames(), dictionary, container.getMappingFileNames(), container.getId() ) );
-            //TODO: implement null check
+            panels.add( new FixRefsWizardPanel( container ) );
         }
 
         WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
@@ -73,23 +78,36 @@ public class SeqIdManualCorrector {
         if( !cancelled ) {
 
             for( SeqIdCorrectionContainer container : identicalDictionaryContainers ) {
-                SAMSequenceDictionary fixedDictionariy = (SAMSequenceDictionary) wiz.getProperty( FixRefsWizardPanel.PROP_FIXED_DICTIONARY + container.getId() );
-                if( fixedDictionariy != null ) {
+                SAMSequenceDictionary fixedDictionary = (SAMSequenceDictionary) wiz.getProperty( FixRefsWizardPanel.PROP_FIXED_DICTIONARY + container.getId() );
+                boolean isFixed = (boolean) wiz.getProperty( FixRefsWizardPanel.PROP_FIXED + container.getId() );
+                if( fixedDictionary != null && isFixed ) {
 
-                    SamSeqDictionary wrappedDictionary = new SamSeqDictionary( fixedDictionariy );
-                    container.setSequenceDictionary( wrappedDictionary );
+                    container.setSequenceDictionary( fixedDictionary );
                     List<TrackJob> trackJobs = container.getTrackJobs();
-                    for( TrackJob trackJob : trackJobs ) { //TODO: decide if both times newDictionary needs to be added or which is better
-                        trackJob.setSequenceDictionary( wrappedDictionary );
+                    for( TrackJob trackJob : trackJobs ) {
+                        trackJob.setSequenceDictionary( new SamSeqDictionary( fixedDictionary ) );
                     }
                     //means all tracks missing in the map do not get a new dictionary
                 } else {
-                    container.setManualFixFailed( true );
-                    //TODO: make sure this data set is not imported
+                    //make sure this data set is not imported
+                    for( TrackJob trackJob : container.getTrackJobs() ) {
+                        trackJob.setCanBeImported( false );
+                    }
                 }
             }
-        } else {
-            throw new ParsingException( "No reference sequence id matches any sequence ids in the mapping file. If you don't use identical names, the import does not succeed." );
+        } else { //make sure these data sets are not imported
+            boolean atLeastOneFailed = false;
+            for( SeqIdCorrectionContainer container : identicalDictionaryContainers ) {
+                if( container.getFoundIds() <= 0 ) { //make sure these data sets are not imported
+                    atLeastOneFailed = true;
+                    for( TrackJob trackJob : container.getTrackJobs() ) {
+                        trackJob.setCanBeImported( false );
+                    }
+                }
+            }
+            if( atLeastOneFailed ) {
+                throw new ParsingException( "No reference sequence id matches any sequence ids in the mapping file. If you don't use identical names, the import does not succeed." );
+            }
         }
     }
 

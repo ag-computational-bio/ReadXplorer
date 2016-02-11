@@ -39,6 +39,7 @@ public class TrackJob implements Job {
     private ReferenceJob refGen;
     private final boolean isAlreadyImported;
     private RefDictionary sequenceDictionary;
+    private boolean canBeImported = true;
 
 
     /**
@@ -161,6 +162,26 @@ public class TrackJob implements Job {
     @Override
     public String getName() {
         return this.getDescription();
+    }
+
+
+    /**
+     * @return <code>true</code> if the track can be imported,
+     *         <code>false</code> if something went wrong and the track cannot
+     *         be imported.
+     */
+    public boolean isCanBeImported() {
+        return canBeImported;
+    }
+
+
+    /**
+     * @param canBeImported <code>true</code> if the track can be imported,
+     *                      <code>false</code> if something went wrong and the
+     *                      track cannot be imported.
+     */
+    public void setCanBeImported( boolean canBeImported ) {
+        this.canBeImported = canBeImported;
     }
 
 

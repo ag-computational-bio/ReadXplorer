@@ -46,7 +46,6 @@ import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
-import htsjdk.samtools.SAMSequenceDictionary;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -221,7 +220,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackJob.getRefGen().getID() );
         try {
             seqIdChecker.checkSeqIds( trackJob.getFile(), refConnector.getRefGenome() );
-            trackJob.setSequenceDictionary( seqIdChecker.getCorrectionDataContainer().getSequenceDictionary() );
+            trackJob.setSequenceDictionary( new SamSeqDictionary( seqIdChecker.getCorrectionDataContainer().getSequenceDictionary() ) );
 
         } catch( DatabaseException ex ) {
             LOG.error( ex.getMessage(), ex );
@@ -239,7 +238,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      */
     private void correctRefIds( List<SeqIdCorrectionContainer> seqIdCorrectionList ) {
 
-        //TODO: only add those which need manual correction to new list
         String guienvProp = System.getProperty( "guienv" );
         List<SeqIdCorrectionContainer> identicalDictionaries = new ArrayList<>();
         for( SeqIdCorrectionContainer correctionContainer : seqIdCorrectionList ) {
@@ -289,10 +287,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             //compare with containers in list
             boolean isAdded = false;
             for( SeqIdCorrectionContainer container : identicalDictionaries ) {
-                SAMSequenceDictionary dictionary = ((SamSeqDictionary) container.getSequenceDictionary()).getSamDictionary();
-                SAMSequenceDictionary newDictionary = ((SamSeqDictionary) correctionContainer.getSequenceDictionary()).getSamDictionary();
                 try {
-                    dictionary.assertSameDictionary( newDictionary );
+                    container.getSequenceDictionary().assertSameDictionary( correctionContainer.getSequenceDictionary() );
                     container.addTrackJob( correctionContainer.getTrackJob() );
                     isAdded = true;
                     break;
@@ -328,8 +324,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             correctRefIds( corretionList ); //After check they can be corrected
 
             for( TrackJob trackJob : tracksJobs ) {
-                parseBamTrack( trackJob );
-                ph.progress( ++workunits );
+
+                if( trackJob.isCanBeImported() ) {
+                    parseBamTrack( trackJob );
+                    ph.progress( ++workunits );
+                } else {
+                    printAndLog( trackJob.getName() + " cannot be imported, because the wizard to correctly associate the sequence ids has not been finished correctly." );
+                }
             }
         }
     }
@@ -395,108 +396,113 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
             TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
             TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
-            try {
-                this.setChromLengthMap( trackJob1 );
-                File inputFile1 = trackJob1.getFile();
-                inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                StatsContainer statsContainer = new StatsContainer();
-                statsContainer.prepareForTrack();
-                statsContainer.prepareForReadPairTrack();
+            if( trackJob1.isCanBeImported() && trackJob2.isCanBeImported() ) {
+                try {
+                    this.setChromLengthMap( trackJob1 );
+                    File inputFile1 = trackJob1.getFile();
+                    inputFile1.setReadOnly(); //prevents changes or deletion of original file!
+                    StatsContainer statsContainer = new StatsContainer();
+                    statsContainer.prepareForTrack();
+                    statsContainer.prepareForReadPairTrack();
 
-                if( !trackJob1.isAlreadyImported() ) {
+                    if( !trackJob1.isAlreadyImported() ) {
 
-                    //executes any conversion before other calculations, if the parser supports any
-                    trackJob1.getParser().registerObserver( this );
-                    Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
-                    trackJob1.getParser().removeObserver( this );
-                    if( !success ) {
-                        noErrors = false;
-                        printAndLogError( "Conversion of " + trackJob1.getName() + " failed!" );
-                        workunits += trackJob2 != null ? 3 : 2;
-                        ph.progress( workunits );
-                        return;
-                    }
-                    File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
-
-                    if( trackJob2 != null ) { //only combine, if data is not already combined
-                        File inputFile2 = trackJob2.getFile();
-                        inputFile2.setReadOnly();
-                        trackJob2.getParser().registerObserver( this );
-                        success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
-                        trackJob2.getParser().removeObserver( this );
-                        File lastWorkFile2 = trackJob2.getFile();
+                        //executes any conversion before other calculations, if the parser supports any
+                        trackJob1.getParser().registerObserver( this );
+                        Boolean success = trackJob1.getParser().convert( trackJob1, chromLengthMap );
+                        trackJob1.getParser().removeObserver( this );
                         if( !success ) {
                             noErrors = false;
-                            printAndLogError( "Conversion of " + trackJob2.getName() + " failed!" );
-                            workunits += 3;
+                            printAndLogError( "Conversion of " + trackJob1.getName() + " failed!" );
+                            workunits += trackJob2 != null ? 3 : 2;
                             ph.progress( workunits );
                             return;
                         }
+                        File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
 
-                        //combine both tracks and continue with trackJob1, they are unsorted now
-                        SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
-                        combiner.registerObserver( this );
-                        success = combiner.combineData();
+                        if( trackJob2 != null ) { //only combine, if data is not already combined
+                            File inputFile2 = trackJob2.getFile();
+                            inputFile2.setReadOnly();
+                            trackJob2.getParser().registerObserver( this );
+                            success = trackJob2.getParser().convert( trackJob2, chromLengthMap );
+                            trackJob2.getParser().removeObserver( this );
+                            File lastWorkFile2 = trackJob2.getFile();
+                            if( !success ) {
+                                noErrors = false;
+                                printAndLogError( "Conversion of " + trackJob2.getName() + " failed!" );
+                                workunits += 3;
+                                ph.progress( workunits );
+                                return;
+                            }
+
+                            //combine both tracks and continue with trackJob1, they are unsorted now
+                            SamBamCombiner combiner = new SamBamCombiner( trackJob1, trackJob2, false );
+                            combiner.registerObserver( this );
+                            success = combiner.combineData();
+                            ph.progress( ++workunits );
+
+                            if( !success ) {
+                                noErrors = false;
+                                printAndLogError( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
+                                return;
+                            }
+                            GeneralUtils.deleteOldWorkFile( lastWorkFile ); //either were converted or are write protected
+                            GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
+                            lastWorkFile = trackJob1.getFile(); //the combined file
+                            inputFile2.setWritable( true );
+
+                        }
+
+                        //extension for both classification and read pair info
+                        SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier(
+                                readPairJobContainer, chromLengthMap );
+                        samBamDirectReadPairClassifier.registerObserver( this );
+                        samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
+                        samBamDirectReadPairClassifier.classifyReadPairs();
+
+                        //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
+                        GeneralUtils.deleteOldWorkFile( lastWorkFile );
                         ph.progress( ++workunits );
 
-                        if( !success ) {
-                            noErrors = false;
-                            printAndLogError( "Combination of " + trackJob1.getName() + " and " + trackJob2.getName() + " failed!" );
-                            return;
-                        }
-                        GeneralUtils.deleteOldWorkFile( lastWorkFile ); //either were converted or are write protected
-                        GeneralUtils.deleteOldWorkFile( lastWorkFile2 );
-                        lastWorkFile = trackJob1.getFile(); //the combined file
-                        inputFile2.setWritable( true );
+                    } else { //else case with 2 already imported tracks is prohibited
+                        //we have to calculate the stats
+                        SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
+                        statsParser.setStatsContainer( statsContainer );
+                        statsParser.registerObserver( this );
+                        statsParser.classifyReadPairs();
 
+                        ph.progress( ++workunits );
                     }
 
-                    //extension for both classification and read pair info
-                    SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier(
-                            readPairJobContainer, chromLengthMap );
-                    samBamDirectReadPairClassifier.registerObserver( this );
-                    samBamDirectReadPairClassifier.setStatsContainer( statsContainer );
-                    samBamDirectReadPairClassifier.classifyReadPairs();
-
-                    //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
-                    GeneralUtils.deleteOldWorkFile( lastWorkFile );
-                    ph.progress( ++workunits );
-
-                } else { //else case with 2 already imported tracks is prohibited
-                    //we have to calculate the stats
-                    SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser( readPairJobContainer, chromLengthMap, null );
+                    //create general track stats
+                    SamBamStatsParser statsParser = new SamBamStatsParser();
                     statsParser.setStatsContainer( statsContainer );
                     statsParser.registerObserver( this );
-                    statsParser.classifyReadPairs();
+                    ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
+                    statsParser.removeObserver( this );
 
-                    ph.progress( ++workunits );
+                    this.storeBamTrack( track ); // store track entry in db
+                    trackId1 = trackJob1.getID();
+                    inputFile1.setWritable( true );
+
+                    //read pair ids have to be set in track entry
+                    ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
+
+                } catch( OutOfMemoryError ex ) {
+                    printAndLogError( "Out of memory error during parsing of bam track: " + ex.getMessage() );
+                    LOG.error( ex.getMessage(), ex );
+                    noErrors = false;
+
+                } catch( DatabaseException | ParsingException | IOException ex ) {
+                    printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
+                    LOG.error( ex.getMessage(), ex );
+                    noErrors = false;
                 }
 
-                //create general track stats
-                SamBamStatsParser statsParser = new SamBamStatsParser();
-                statsParser.setStatsContainer( statsContainer );
-                statsParser.registerObserver( this );
-                ParsedTrack track = statsParser.createTrackStats( trackJob1, chromLengthMap );
-                statsParser.removeObserver( this );
-
-                this.storeBamTrack( track ); // store track entry in db
-                trackId1 = trackJob1.getID();
-                inputFile1.setWritable( true );
-
-                //read pair ids have to be set in track entry
-                ProjectConnector.getInstance().setReadPairIdsForTrackIds( trackId1, trackId2 );
-
-            } catch( OutOfMemoryError ex ) {
-                printAndLogError( "Out of memory error during parsing of bam track: " + ex.getMessage() );
-                LOG.error( ex.getMessage(), ex );
-                noErrors = false;
-
-            } catch( DatabaseException | ParsingException | IOException ex ) {
-                printAndLogError( "Error during parsing of bam track: " + ex.getMessage() );
-                LOG.error( ex.getMessage(), ex );
-                noErrors = false;
+            } else {
+                printAndLog( trackJob1.getName() + " and " + trackJob2.getName() + " cannot be imported, because the wizard to " +
+                             "correctly associate the sequence ids has not been finished correctly." );
             }
-
         } else { //if (distance <= 0)
             printAndLogError( getBundleString( "MSG_ImportThread.import.error" ) );
             noErrors = false;

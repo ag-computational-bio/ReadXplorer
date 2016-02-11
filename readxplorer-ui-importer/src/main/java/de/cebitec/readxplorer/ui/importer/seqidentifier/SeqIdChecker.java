@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.ui.importer.seqidentifier;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
-import de.cebitec.readxplorer.parser.mappings.SamSeqDictionary;
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
@@ -97,7 +96,7 @@ public class SeqIdChecker {
         SAMSequenceDictionary sequenceDictionary = fileHeader.getSequenceDictionary();
         int noMatches = 0;
         correctionDataContainer.setChromNames( chromIds );
-        correctionDataContainer.setSequenceDictionary( new SamSeqDictionary( sequenceDictionary ) );
+        correctionDataContainer.setSequenceDictionary( sequenceDictionary );
 
         Set<String> chromSet = new HashSet<>( chromIds );
         for( SAMSequenceRecord record : sequenceDictionary.getSequences() ) {
@@ -112,8 +111,8 @@ public class SeqIdChecker {
             //Try auto correction when at least one mapping file id is missing
             SeqIdAutoCorrector idCorrector = new SeqIdAutoCorrector( sequenceDictionary, chromSet );
             foundAllIds = idCorrector.isFixed();
-            foundIds = sequenceDictionary.size(); //has already been updated after auto correction
-            correctionDataContainer.setMissingSeqs( idCorrector.getMissingSeqs() );
+            foundIds = sequenceDictionary.size() - idCorrector.getMissingSeqIds().size();
+            correctionDataContainer.setMissingSeqIds( idCorrector.getMissingSeqIds() );
         }
         correctionDataContainer.setFoundIds( foundIds );
         correctionDataContainer.setIsSeqIdsValid( foundAllIds );
