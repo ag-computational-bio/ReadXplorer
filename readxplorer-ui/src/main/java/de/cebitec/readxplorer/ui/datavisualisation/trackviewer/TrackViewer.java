@@ -57,9 +57,9 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Display the coverage for a sequenced track related to a reference genome
+ * Display the coverage for a sequenced track related to a reference genome.
  * <p>
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class TrackViewer extends AbstractViewer implements ThreadListener, Observer {
 
@@ -99,7 +99,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
 
 
     /**
-     * Create a new panel to show coverage information
+     * Create a new panel to show coverage information.
      * <p>
      * @param boundsManager manager for component bounds
      * @param basePanel     The BasePanel on which the viewer is painted.
@@ -179,7 +179,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
      * <p>
      * @param pref The preference object containing the new colors
      * <p>
-     * @return
+     * @return Map of mapping classes to their colors 
      */
     protected Map<Classification, Color> createColors( Preferences pref ) {
         Map<Classification, Color> newClassToColorMap = new HashMap<>();
@@ -202,13 +202,16 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     /**
      * Updates the colors of the coverage in this viewer.
      * <p>
-     * @param classToColorMap
+     * @param classToColorMap Map of mapping classes to their colors 
      */
     protected final void setColors( Map<Classification, Color> classToColorMap ) {
         this.classToColorMap = classToColorMap;
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void paintComponent( Graphics graphics ) {
         super.paintComponent( graphics );
@@ -320,6 +323,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public synchronized void receiveData( Object coverageData ) {
         if( coverageData instanceof CoverageAndDiffResult ) {
@@ -353,6 +359,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void boundsChangedHook() {
         if( this.covManager == null || this.isNewDataRequestNeeded() ||
@@ -633,7 +642,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"left\">" + String.valueOf( scaleFacVal ) + " (" + String.valueOf( (int) value ) + ")" + "</td></tr>";
     }
 
-
+    
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void close() {
         super.close();
@@ -827,17 +839,26 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     }
 
 
+    /**
+     * Call this method to notify the viewer about a change in some colors.
+     */
     public void colorChanges() {
         this.colorChanges = true;
         this.repaint();
     }
 
 
+    /**
+     * @return The track connector
+     */
     public TrackConnector getTrackCon() {
         return this.trackCon;
     }
 
 
+    /**
+     * @return The name of this component.
+     */
     @Override
     public String toString() {
         return getName();
@@ -853,51 +874,28 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     }
 
 
+    /**
+     * @return Settings for the normalization of coverage
+     */
     public NormalizationSettings getNormalizationSettings() {
         return normSetting;
     }
 
 
+    /**
+     * @param normSetting Settings for the normalization of coverage
+     */
     public void setNormalizationSettings( NormalizationSettings normSetting ) {
         this.normSetting = normSetting;
     }
 
 
+    /**
+     * @param verticalSlider Slider for the vertical zoom of the coverage
+     */
     public void setVerticalZoomSlider( JSlider verticalSlider ) {
         this.verticalSlider = verticalSlider;
     }
-
-//    /**
-//     * In case this viewer should receive the ability to combine coverages from a
-//     * CoverageManager array, this method provides this functionality.
-//     * @param coverages the coverages of different tracks, which should be combined
-//     * @return
-//     */
-//    private CoverageManager combineCoverages(CoverageManager[] coverages) {
-//
-//        CoverageManager resultCov = new CoverageManager(coverages[0].getLeftBound(), coverages[0].getRightBound());
-//
-//        for (int i = coverages[0].getLeftBound(); i < coverages[0].getRightBound(); ++i) {
-//            for (CoverageManager cove : coverages) {
-//                resultCov.getCoverage(MappingClass.PERFECT_MATCH).setFwdCoverage(i, resultCov.getCovManager(MappingClass.PERFECT_MATCH).getFwdCov(i) + cove.getCovManager(MappingClass.PERFECT_MATCH).getFwdCov(i));
-//                resultCov.setPerfectFwdNum(i, resultCov.getPerfectFwdNum(i) + cove.getPerfectFwdNum(i));
-//                resultCov.getCoverage(MappingClass.PERFECT_MATCH).setRevCoverage(i, resultCov.getCovManager(MappingClass.PERFECT_MATCH).getRevCov(i) + cove.getCovManager(MappingClass.PERFECT_MATCH).getRevCov(i));
-//                resultCov.setPerfectRevNum(i, resultCov.getPerfectRevNum(i) + cove.getPerfectRevNum(i));
-//
-//                resultCov.getCoverage(MappingClass.BEST_MATCH).setFwdCoverage(i, resultCov.getCoverage(MappingClass.BEST_MATCH).getFwdCov(i) + cove.getCoverage(MappingClass.BEST_MATCH).getFwdCov(i));
-//                resultCov.setBestMatchFwdNum(i, resultCov.getBestMatchFwdNum(i) + cove.getBestMatchFwdNum(i));
-//                resultCov.getCoverage(MappingClass.BEST_MATCH).setRevCoverage(i, resultCov.getCoverage(MappingClass.BEST_MATCH).getRevCov(i) + cove.getCoverage(MappingClass.BEST_MATCH).getRevCov(i));
-//                resultCov.setBestMatchRevNum(i, resultCov.getBestMatchRevNum(i) + cove.getBestMatchRevNum(i));
-//
-//                resultCov.getCoverage(MappingClass.COMMON_MATCH).setFwdCoverage(i, resultCov.getCovManager(MappingClass.COMMON_MATCH).getFwdCov(i) + cove.getCovManager(MappingClass.COMMON_MATCH).getFwdCov(i));
-//                resultCov.setCommonFwdNum(i, resultCov.getCommonFwdNum(i) + cove.getCommonFwdNum(i));
-//                resultCov.getCoverage(MappingClass.COMMON_MATCH).setRevCoverage(i, resultCov.getCovManager(MappingClass.COMMON_MATCH).getRevCov(i) + cove.getCovManager(MappingClass.COMMON_MATCH).getRevCov(i));
-//                resultCov.setCommonRevNum(i, resultCov.getCommonRevNum(i) + cove.getCommonRevNum(i));
-//            }
-//        }
-//
-//        return resultCov;
-//    }
 
     /**
      * @return true, if this is a track viewer for at least two tracks.
@@ -920,6 +918,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     }
 
 
+    /**
+     * @param sameStrand <code>true</code> if the coverage shall be displayed on
+     *                   the forward strand, <code>false</code> if the default
+     *                   strand specific visualization is needed
+     */
     public void setSameStrand( boolean sameStrand ) {
         this.sameStrand = sameStrand;
         this.boundsChangedHook();
@@ -927,6 +930,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void notifySkipped() {
         //do nothing

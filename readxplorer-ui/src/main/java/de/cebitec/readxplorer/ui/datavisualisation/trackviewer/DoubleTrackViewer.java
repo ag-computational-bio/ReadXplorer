@@ -265,6 +265,8 @@ public class DoubleTrackViewer extends TrackViewer {
      * @param sb             The string builder to add to
      * @param classification The current mapping classification
      * @param coverage       The coverage value to store in the StringBuilder
+     * @param coverageNorm   Coverage normalization factor
+     * @param strandString   String representation of the DNA strand
      */
     private void addToBuilder( StringBuilder sb, Classification classification, double coverage, double coverageNorm, String strandString ) {
         String classType = classification.toString() + ' ' + strandString;

@@ -173,7 +173,7 @@ public class ReadPairPopup extends JPopupMenu {
 
         }
 
-        ArrayList<String> singleMappingList = new ArrayList<>();
+        List<String> singleMappingList = new ArrayList<>();
         for( int i = 0; i < singleMappings.size(); ++i ) {
             mapping = singleMappings.get( i );
             singleMappingList.add( this.getSingleMappingString( "SingleMapping", i + 1, mapping ) );
@@ -258,7 +258,6 @@ public class ReadPairPopup extends JPopupMenu {
      * <p>
      * @param bundleString bundle string to retrieve mapping identifier from
      *                     Bundle.properties
-     * @param type         mapping type string
      * @param mapping      pair mapping itself for start and stop positions
      * <p>
      * @return correctly formatted String.
@@ -274,7 +273,8 @@ public class ReadPairPopup extends JPopupMenu {
      * <p>
      * @param bundleString bundle string to retrieve mapping identifier from
      *                     Bundle.properties
-     * @param type         mapping type string
+     * @param count        Number assigned to this single mapping (from 1 to
+     *                     number of single mappings for the pair)
      * @param mapping      single mapping itself for start and stop positions
      * <p>
      * @return correctly formatted String.
@@ -312,7 +312,7 @@ public class ReadPairPopup extends JPopupMenu {
         private String[] content = new String[1];
 
 
-        public void setContent( ArrayList<String> content ) {
+        public void setContent( List<String> content ) {
             this.content = content.toArray( this.content );
         }
 

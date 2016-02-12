@@ -160,6 +160,10 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     }
 
 
+    /**
+     * Creates an option to display all read data on the forward strand instead
+     * of a strand specific visualization.
+     */
     private void createStrandOption() {
         JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
         final JCheckBox strandBox = LegendAndOptionsProvider.createStandardCheckBox( "All reads on fw strand" );
@@ -171,7 +175,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 JCheckBox scaleBox = (JCheckBox) e.getSource();
-                trackViewer.setSameStrand(scaleBox.isSelected() );
+                trackViewer.setSameStrand( scaleBox.isSelected() );
             }
 
 
