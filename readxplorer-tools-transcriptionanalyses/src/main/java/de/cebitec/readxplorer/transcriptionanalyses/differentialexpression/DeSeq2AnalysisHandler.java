@@ -98,8 +98,10 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
     @Override
     public void endAnalysis() throws RserveException {
-        deSeq2.shutdown();
-        deSeq2 = null;
+        if( deSeq2 != null ) {
+            deSeq2.shutdown();
+            deSeq2 = null;
+        }
     }
 
 

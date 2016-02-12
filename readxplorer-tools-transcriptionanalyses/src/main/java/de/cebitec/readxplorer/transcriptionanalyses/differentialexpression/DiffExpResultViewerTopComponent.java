@@ -391,7 +391,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                     case ERROR:
                         progressHandle.switchToDeterminate( 0 );
                         progressHandle.finish();
-                        logTopComponent = new DiffExpLogTopComponent();
+                        logTopComponent = new DiffExpLogTopComponent( analysisHandler );
                         logTopComponent.open();
                         logTopComponent.requestActive();
                         cmp.close();
