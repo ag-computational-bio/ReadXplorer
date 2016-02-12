@@ -104,7 +104,6 @@
         <dependency>
             <groupId>bio.jlu.comp.readxplorer</groupId>
             <artifactId>batik.nbm</artifactId>
-            <version>1.7</version>
         </dependency>
     </dependencies>
 
