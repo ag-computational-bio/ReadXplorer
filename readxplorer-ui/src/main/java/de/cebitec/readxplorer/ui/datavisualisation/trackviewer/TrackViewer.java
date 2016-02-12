@@ -34,6 +34,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorUtils;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -60,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * @author ddoppmeier
  */
-public class TrackViewer extends AbstractViewer implements ThreadListener {
+public class TrackViewer extends AbstractViewer implements ThreadListener, Observer {
 
     private static final Logger LOG = LoggerFactory.getLogger( TrackViewer.class.getName() );
 
@@ -111,6 +112,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                         TrackConnector trackCon, boolean combineTracks ) {
         super( boundsManager, basePanel, refGen );
 
+        refGen.registerObserver( this );
         this.covManager = new CoverageManager( 0, 0 );
         this.trackCon = trackCon;
         this.twoTracks = this.trackCon.getAssociatedTrackNames().size() > 1;
@@ -332,6 +334,21 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.covLoaded = true;
             this.repaint();
             this.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
+        }
+    }
+
+
+    /**
+     * The track viewer can listen to chromosome id changes
+     *
+     * @param args The current chromosome id after switching to a different
+     *             chromosome
+     */
+    @Override
+    public void update( Object args ) {
+        if( args instanceof Integer ) {
+            setNewDataRequestNeeded( true );
+            boundsChangedHook();
         }
     }
 
@@ -901,8 +918,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         this.automaticScaling = automaticScaling;
         this.computeAutomaticScaling();
     }
-    
-    
+
+
     public void setSameStrand( boolean sameStrand ) {
         this.sameStrand = sameStrand;
         this.boundsChangedHook();
