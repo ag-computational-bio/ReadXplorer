@@ -171,6 +171,10 @@ public class DeSeq2 {
                                              RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
-
-
+    
+    public void plotMA( File file ) throws IllegalStateException, PackageNotLoadableException,
+                                             RserveException, REngineException, REXPMismatchException, IOException {
+        gnuR.storePlot( file, "plotMA(res, main=\"\")" );
+    }
+    
 }
