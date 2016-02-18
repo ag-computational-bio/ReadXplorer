@@ -21,12 +21,19 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR;
+import java.util.prefs.Preferences;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_TOOL;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_WIZARD_NAME;
 
 
 public final class ChooseVisualPanel extends JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     private final ComboBoxModel cbm = new DefaultComboBoxModel( DeAnalysisHandler.Tool.usableTools() );
 
@@ -36,20 +43,43 @@ public final class ChooseVisualPanel extends JPanel {
      */
     public ChooseVisualPanel() {
         initComponents();
-        if(!GnuR.gnuRSetupCorrect()) {
+        loadLastParameterSelection();
+        if( !GnuR.gnuRSetupCorrect() ) {
             jriErrorText.setText( "GNU R is not installed correctly.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration." );
         }
     }
 
 
+    /**
+     * @return Selected DGE analysis tool
+     */
     public DeAnalysisHandler.Tool getSelectedTool() {
         return (Tool) cbm.getSelectedItem();
+    }
+
+
+    /**
+     * @return Selected DGE tool index
+     */
+    public int getSelectedToolIndex() {
+        return dgeToolComboBox.getSelectedIndex();
     }
 
 
     @Override
     public String getName() {
         return "Choose analysis software";
+    }
+
+
+    /**
+     * Loads the last selected parameters into the component.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        int dgeToolIndex = pref.getInt( PROP_DGE_WIZARD_NAME + PROP_DGE_TOOL, 0 );
+        dgeToolIndex = dgeToolIndex < dgeToolComboBox.getItemCount() ? dgeToolIndex : 0;
+        dgeToolComboBox.setSelectedIndex( dgeToolIndex );
     }
 
 
@@ -63,7 +93,7 @@ public final class ChooseVisualPanel extends JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jComboBox1 = new javax.swing.JComboBox(cbm);
+        dgeToolComboBox = new javax.swing.JComboBox(cbm);
         jScrollPane2 = new javax.swing.JScrollPane();
         jriErrorText = new javax.swing.JTextArea();
 
@@ -95,7 +125,7 @@ public final class ChooseVisualPanel extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dgeToolComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -107,12 +137,12 @@ public final class ChooseVisualPanel extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(dgeToolComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(154, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox dgeToolComboBox;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;

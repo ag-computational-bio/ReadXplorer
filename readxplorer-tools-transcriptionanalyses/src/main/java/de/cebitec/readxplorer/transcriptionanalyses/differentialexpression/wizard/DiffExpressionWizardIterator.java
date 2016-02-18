@@ -52,6 +52,11 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 
+/**
+ * Wizard iterator for the differential gene expression analysis.
+ * 
+ * @author Kai Stadermann
+ */
 @ActionID( category = "Tools", id = "de.cebitec.readxplorer.differentialExpression.DiffExpWizardAction" )
 @ActionRegistration( iconBase = "de/cebitec/readxplorer/transcriptionanalyses/dge.png",
                      displayName = "Differential Gene Expression Analysis" )
@@ -62,9 +67,23 @@ import org.openide.awt.ActionRegistration;
 public final class DiffExpressionWizardIterator implements
         WizardDescriptor.Iterator<WizardDescriptor>, ActionListener {
 
+    static final String PROP_DGE_WIZARD_NAME = "DifferentialGeneExpressionWizard";
+    static final String PROP_DGE_TOOL = "PROP_DGE_TOOL";
+    static final String PROP_DGE_MULTIPLE_CONDS = "moreThanTwoConditions";
+    static final String PROP_DGE_START_OFFSET = "startOffset";
+    static final String PROP_DGE_STOP_OFFSET = "stopOffset";
+    static final String PROP_DGE_SAVE_R_CMD_FILE = "saveRCmdFile";
+    static final String PROP_DGE_SAVE_R_CMD = "saveRCmd";
+    static final String PROP_DGE_SELECTED_FEAT_TYPES = "featureTypes";
+
     private final LoginCookie context;
 
 
+    /**
+     * Wizard iterator for the differential gene expression analysis.
+     *
+     * @param context Indicates if we are logged into a database
+     */
     public DiffExpressionWizardIterator( LoginCookie context ) {
         this.context = context;
     }
@@ -112,20 +131,20 @@ public final class DiffExpressionWizardIterator implements
             List<PersistentTrack> selectedTracks = (List<PersistentTrack>) wiz.getProperty( "tracks" );
             Integer genomeID = (Integer) wiz.getProperty( "genomeID" );
             int[] replicateStructure = (int[]) wiz.getProperty( "replicateStructure" );
-            File saveFile = (File) wiz.getProperty( "saveFile" );
+            File saveRCmdFile = (File) wiz.getProperty(PROP_DGE_SAVE_R_CMD_FILE );
             Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty( "design" );
-            Set<FeatureType> featureTypes = (Set<FeatureType>) wiz.getProperty( "featureType" );
-            Integer startOffset = (Integer) wiz.getProperty( "startOffset" );
-            Integer stopOffset = (Integer) wiz.getProperty( "stopOffset" );
+            Set<FeatureType> featureTypes = (Set<FeatureType>) wiz.getProperty( PROP_DGE_SELECTED_FEAT_TYPES );
+            Integer startOffset = (Integer) wiz.getProperty( PROP_DGE_START_OFFSET );
+            Integer stopOffset = (Integer) wiz.getProperty( PROP_DGE_STOP_OFFSET );
             DeAnalysisHandler handler = null;
             ProcessingLog log = new ProcessingLog();
 
             if( tool == DeAnalysisHandler.Tool.BaySeq ) {
                 handler = new BaySeqAnalysisHandler( selectedTracks, createdGroups, genomeID,
-                                                     replicateStructure, saveFile, featureTypes, startOffset,
+                                                     replicateStructure, saveRCmdFile, featureTypes, startOffset,
                                                      stopOffset, readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.DeSeq ) {
-                boolean moreThanTwoConditions = (boolean) wiz.getProperty( "moreThanTwoConditions" );
+                boolean moreThanTwoConditions = (boolean) wiz.getProperty( PROP_DGE_MULTIPLE_CONDS );
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
                 List<String> fittingGroupOne = null;
@@ -135,14 +154,14 @@ public final class DiffExpressionWizardIterator implements
                     fittingGroupTwo = (List<String>) wiz.getProperty( "fittingGroupTwo" );
                 }
                 handler = new DeSeqAnalysisHandler( selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
-                                                    fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile,
+                                                    fittingGroupTwo, genomeID, workingWithoutReplicates, saveRCmdFile,
                                                     featureTypes, startOffset, stopOffset, readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.DeSeq2 ) {
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty( "workingWithoutReplicates" );
 
                 handler = new DeSeq2AnalysisHandler( selectedTracks, design, null,
                                                      null, genomeID, workingWithoutReplicates,
-                                                     saveFile, featureTypes, startOffset, stopOffset,
+                                                     saveRCmdFile, featureTypes, startOffset, stopOffset,
                                                      readClassParams, log );
             } else if( tool == DeAnalysisHandler.Tool.ExpressTest ) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty( "groupA" );
@@ -165,11 +184,11 @@ public final class DiffExpressionWizardIterator implements
                 }
 
                 handler = new ExpressTestAnalysisHandler( selectedTracks, groupA, groupB, genomeID, workingWithoutReplicates,
-                                                          saveFile, featureTypes, startOffset, stopOffset, readClassParams,
+                                                          saveRCmdFile, featureTypes, startOffset, stopOffset, readClassParams,
                                                           normalizationFeatures, log );
 
             } else if( tool == DeAnalysisHandler.Tool.ExportCountTable ) {
-                handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset,
+                handler = new ExportOnlyAnalysisHandler( selectedTracks, genomeID, saveRCmdFile, featureTypes, startOffset, stopOffset,
                                                          readClassParams, log );
             }
 
@@ -309,7 +328,7 @@ public final class DiffExpressionWizardIterator implements
         }
         if( index == 0 ) {
             String[] contentData = null;
-            tool = (DeAnalysisHandler.Tool) wiz.getProperty( "tool" );
+            tool = (DeAnalysisHandler.Tool) wiz.getProperty( PROP_DGE_TOOL );
             if( tool == DeAnalysisHandler.Tool.DeSeq ) {
                 currentPanels = deSeqTwoCondsPanels;
                 contentData = deSeqIndex;
@@ -337,7 +356,7 @@ public final class DiffExpressionWizardIterator implements
         }
         if( (index == 1) && (tool == DeAnalysisHandler.Tool.DeSeq) ) {
             String[] contentData;
-            boolean moreThanTwoConditions = (boolean) wiz.getProperty( "moreThanTwoConditions" );
+            boolean moreThanTwoConditions = (boolean) wiz.getProperty( PROP_DGE_MULTIPLE_CONDS );
             if( moreThanTwoConditions ) {
                 currentPanels = deSeqMoreCondsPanels;
                 contentData = deSeqMoreCondsIndex;

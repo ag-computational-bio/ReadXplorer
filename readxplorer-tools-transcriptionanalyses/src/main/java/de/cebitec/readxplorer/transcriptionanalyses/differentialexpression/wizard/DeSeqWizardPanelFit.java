@@ -18,14 +18,13 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.util.Map;
-import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
 
 
-public class DeSeqWizardPanelFit implements
+public class DeSeqWizardPanelFit extends ChangeListeningWizardPanel implements
         WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
@@ -33,6 +32,11 @@ public class DeSeqWizardPanelFit implements
      * component from this class, just use getComponent().
      */
     private DeSeqVisualPanelFit component;
+
+
+    public DeSeqWizardPanelFit() {
+        super( "Please assign all conditional groups to a fitting group." );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -45,36 +49,6 @@ public class DeSeqWizardPanelFit implements
             component = new DeSeqVisualPanelFit();
         }
         return component;
-    }
-
-
-    @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
     }
 
 

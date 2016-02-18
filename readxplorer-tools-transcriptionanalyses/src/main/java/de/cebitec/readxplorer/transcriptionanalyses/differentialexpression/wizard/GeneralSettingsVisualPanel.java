@@ -53,34 +53,81 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     }
 
 
-    public void enableSaveOptions( boolean bool ) {
+    /**
+     * @param storeRCmd true if the store R command file check box should be
+     *                  selected. This only works if the box is enabled.
+     */
+    public void setStoreRCmd( boolean storeRCmd ) {
+        if( saveCheckBox.isEnabled() ) {
+            saveCheckBox.setSelected( storeRCmd );
+        }
+        saveCheckBoxActionPerformed( null );
+    }
+
+
+    public void enableSaveRCmd( boolean bool ) {
         saveCheckBox.setEnabled( bool );
     }
 
 
     public boolean verifyInput() {
-        return GeneralUtils.isValidIntegerInput( startOffset.getText() ) && GeneralUtils.isValidIntegerInput( stopOffset.getText() );
+        return GeneralUtils.isValidIntegerInput( startOffsetField.getText() ) && GeneralUtils.isValidIntegerInput( stopOffsetField.getText() );
     }
 
 
+    /**
+     * @return The field containing the configured start offset making the
+     *         feature start further upstream
+     */
     public Integer getStartOffset() {
-        return Integer.parseInt( startOffset.getText() );
+        return Integer.parseInt( startOffsetField.getText() );
     }
 
 
+    /**
+     * Sets both feature offsets.
+     *
+     * @param startOffset Start offset making the feature start further upstream
+     * @param stopOffset  Stop offset making the feature end further downstream
+     */
+    public void setFeatureOffsets( String startOffset, String stopOffset ) {
+        this.startOffsetField.setText( String.valueOf( startOffset ) );
+        this.stopOffsetField.setText( String.valueOf( stopOffset ) );
+    }
+
+
+    /**
+     * @return The field containing the configured stop offset making the
+     *         feature stop further downstream
+     */
     public Integer getStopOffset() {
-        return Integer.parseInt( stopOffset.getText() );
+        return Integer.parseInt( stopOffsetField.getText() );
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getName() {
         return "General Setup";
     }
 
 
+    /**
+     * @return The list of selected feature types.
+     */
     public List<FeatureType> getSelectedFeatureTypes() {
         return usedAnnotationsList.getSelectedValuesList();
+    }
+
+
+    /**
+     * @param selIndicesArray The array of indices which shall be selected in
+     *                        the list of feature types.
+     */
+    public void setSelectedFeatureTypes( int[] selIndicesArray ) {
+        this.usedAnnotationsList.setSelectedIndices( selIndicesArray );
     }
 
 
@@ -105,8 +152,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        startOffset = new javax.swing.JTextField();
-        stopOffset = new javax.swing.JTextField();
+        startOffsetField = new javax.swing.JTextField();
+        stopOffsetField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         fileNameField = new javax.swing.JTextField();
         saveCheckBox = new javax.swing.JCheckBox();
@@ -119,9 +166,9 @@ public final class GeneralSettingsVisualPanel extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.jLabel2.text")); // NOI18N
 
-        startOffset.setText(org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.startOffset.text")); // NOI18N
+        startOffsetField.setText(org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.startOffsetField.text")); // NOI18N
 
-        stopOffset.setText(org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.stopOffset.text")); // NOI18N
+        stopOffsetField.setText(org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.stopOffsetField.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.jLabel3.text")); // NOI18N
 
@@ -160,11 +207,11 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                         .addComponent(fileNameField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fileChooserButton))
-                    .addComponent(saveCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 490, Short.MAX_VALUE)
+                    .addComponent(saveCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(startOffsetField, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(stopOffsetField, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
@@ -185,8 +232,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(startOffsetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(stopOffsetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -234,8 +281,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBox saveCheckBox;
-    private javax.swing.JTextField startOffset;
-    private javax.swing.JTextField stopOffset;
+    private javax.swing.JTextField startOffsetField;
+    private javax.swing.JTextField stopOffsetField;
     private javax.swing.JList<FeatureType> usedAnnotationsList;
     // End of variables declaration//GEN-END:variables
 }

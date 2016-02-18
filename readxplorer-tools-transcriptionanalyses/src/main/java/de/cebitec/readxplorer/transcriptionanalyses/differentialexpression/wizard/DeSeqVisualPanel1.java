@@ -18,12 +18,19 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
+import java.util.prefs.Preferences;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_MULTIPLE_CONDS;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_WIZARD_NAME;
 
 
 public final class DeSeqVisualPanel1 extends JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     private final ButtonGroup btGroup = new ButtonGroup();
 
@@ -33,6 +40,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
      */
     public DeSeqVisualPanel1() {
         initComponents();
+        loadLastParameterSelection();
         twoConditionsRB.getModel().setActionCommand( "two" );
         moreConditionsRB.getModel().setActionCommand( "more" );
         btGroup.add( twoConditionsRB );
@@ -55,6 +63,16 @@ public final class DeSeqVisualPanel1 extends JPanel {
         ButtonModel bm = btGroup.getSelection();
         String ac = bm.getActionCommand();
         return !"two".equals( ac );
+    }
+    
+    /**
+     * Loads the last selected parameters into the component.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule( Object.class );
+        boolean dgeMultipleConds = pref.getBoolean( PROP_DGE_WIZARD_NAME + PROP_DGE_MULTIPLE_CONDS, false );
+        moreConditionsRB.setSelected( dgeMultipleConds );
+        twoConditionsRB.setSelected( !dgeMultipleConds );
     }
 
 
