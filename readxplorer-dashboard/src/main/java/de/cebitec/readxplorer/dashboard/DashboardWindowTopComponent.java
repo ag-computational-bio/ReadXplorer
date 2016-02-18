@@ -35,10 +35,13 @@ import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,7 +50,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
 import javax.swing.border.Border;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -130,7 +137,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                         try {
                             this.wait( 200 );
                         } catch( InterruptedException ex ) {
-                            Exceptions.printStackTrace( ex );
+                            LOG.warn( ex.getMessage() );
                         }
                         try {
                             //run gui updates separately in the AWT Thread
@@ -164,12 +171,12 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     public void refreshData() {
 
         if( !ProjectConnector.getInstance().isConnected() ) {
-            quickstartLabel.setVisible( true );
+            quickStartPane.setVisible( true );
             explorerSplitPane.setVisible( false );
             openButton.setVisible( false );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedOut() );
         } else {
-            quickstartLabel.setVisible( false );
+            quickStartPane.setVisible( false );
             explorerSplitPane.setVisible( true );
             openButton.setVisible( true );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedIn() );
@@ -290,7 +297,6 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        quickstartLabel = new javax.swing.JLabel();
         explorerSplitPane = new javax.swing.JSplitPane();
         explorerPanel = new javax.swing.JPanel();
         buttonPanel = new javax.swing.JPanel();
@@ -304,8 +310,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         jPanel1 = new javax.swing.JPanel();
         openDBButton = new javax.swing.JButton();
         createDBButton = new javax.swing.JButton();
-
-        org.openide.awt.Mnemonics.setLocalizedText(quickstartLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.quickstartLabel.text")); // NOI18N
+        quickStartScrollPane = new javax.swing.JScrollPane();
+        quickStartPane = new javax.swing.JEditorPane();
 
         explorerSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         explorerSplitPane.setResizeWeight(1.0);
@@ -453,6 +459,15 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        quickStartScrollPane.setBorder(null);
+
+        quickStartPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+        quickStartPane.setEditable(false);
+        quickStartPane.setBackground(new java.awt.Color(240, 240, 240));
+        quickStartPane.setBorder(null);
+        quickStartPane.setContentType("text/html"); // NOI18N
+        quickStartScrollPane.setViewportView(quickStartPane);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -462,16 +477,16 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(explorerSplitPane)
-            .addComponent(quickstartLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(quickStartScrollPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(quickstartLabel)
+                .addGap(12, 12, 12)
+                .addComponent(quickStartScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -486,11 +501,29 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                        "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
                        "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
                        "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
-                       "toolbar buttons or \"Tools\" menu)</p></html>";
-        quickstartLabel.setText( sText );
+                       "toolbar buttons or \"Tools\" menu)<br /><br /><h3>For HELP goto Help -> Help Contents or check out the " +
+                       "<a href=\"https://www.uni-giessen.de/fbz/fb08/Inst/bioinformatik/software/ReadXplorer/documentation/userManual\"> manual</a>.</h3></html></p>";
+        quickStartPane.setText( sText );
+        quickStartPane.addHyperlinkListener( new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate( HyperlinkEvent e ) {
+                if( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
+                    if( Desktop.isDesktopSupported() ) {
+                        try {
+                            Desktop.getDesktop().browse( e.getURL().toURI() );
+                        } catch( IOException | URISyntaxException ex ) {
+                            JOptionPane.showMessageDialog(quickStartPane, "The manual link caused an " +
+                                                                               ex.getClass().getCanonicalName() + "!", "URL Error", JOptionPane.ERROR_MESSAGE );
+                        }
+                    }
+                }
+            }
+
+
+        } );
 
         Border paddingBorder = BorderFactory.createEmptyBorder( 50, 100, 100, 100 );
-        quickstartLabel.setBorder( BorderFactory.createCompoundBorder( paddingBorder, paddingBorder ) );
+        quickStartPane.setBorder( BorderFactory.createCompoundBorder( paddingBorder, paddingBorder ) );
 
         //Create the outline view showing the explorer
         ov = new OutlineView(); //Set the columns of the outline view
@@ -616,7 +649,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton openButton;
     private javax.swing.JButton openDBButton;
-    private javax.swing.JLabel quickstartLabel;
+    private javax.swing.JEditorPane quickStartPane;
+    private javax.swing.JScrollPane quickStartScrollPane;
     private javax.swing.JButton selectAllButton;
     private javax.swing.JPanel selectButtonPanel;
     private javax.swing.JPanel storeButtonPanel;
