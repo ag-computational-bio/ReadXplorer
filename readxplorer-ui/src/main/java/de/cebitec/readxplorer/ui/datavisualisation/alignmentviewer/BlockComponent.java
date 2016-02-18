@@ -244,6 +244,7 @@ public class BlockComponent extends JComponent {
         StringBuilder sb = new StringBuilder( 150 );
 
         sb.append( "<html><table>" );
+        sb.append( createTableRow( "<b>Alignment info</b>", "") );
         sb.append( createTableRow( "Current position", String.valueOf( parentViewer.getCurrentMousePos() ) ) );
         sb.append( toolTipInfoPart );
 
