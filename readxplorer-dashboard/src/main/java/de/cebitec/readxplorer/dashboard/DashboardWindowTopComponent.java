@@ -172,11 +172,13 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
         if( !ProjectConnector.getInstance().isConnected() ) {
             quickStartPane.setVisible( true );
+            quickStartScrollPane.setVisible( true );
             explorerSplitPane.setVisible( false );
             openButton.setVisible( false );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedOut() );
         } else {
             quickStartPane.setVisible( false );
+            quickStartScrollPane.setVisible( false );
             explorerSplitPane.setVisible( true );
             openButton.setVisible( true );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedIn() );
@@ -483,10 +485,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(quickStartScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                .addComponent(quickStartScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
