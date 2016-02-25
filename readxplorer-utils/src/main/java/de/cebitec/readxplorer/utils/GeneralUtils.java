@@ -71,8 +71,7 @@ public final class GeneralUtils {
 
     /**
      * Calculates the percentage increase of value 1 to value 2. In case value1
-     * is 0, the percentage is set to 1.5 times the absolute difference as a
-     * weight factor.
+     * is 0, value1 is set to 1.
      * <p>
      * @param value1 smaller value
      * @param value2 larger value
@@ -81,11 +80,8 @@ public final class GeneralUtils {
      */
     public static int calculatePercentageIncrease( int value1, int value2 ) {
         int percentDiff;
-        if( value1 == 0 ) {
-            percentDiff = (int) (value2 * 1.5); //weight factor
-        } else {
-            percentDiff = (int) Math.ceil( ((double) value2 / (double) value1) * 100.0 ) - 100;
-        }
+        value1 = value1 == 0 ? 1 : value1;
+        percentDiff = (int) Math.ceil( ((double) value2 / (double) value1) * 100.0 ) - 100;
         return percentDiff;
     }
 

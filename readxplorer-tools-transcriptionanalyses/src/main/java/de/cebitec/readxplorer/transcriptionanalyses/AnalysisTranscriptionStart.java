@@ -346,16 +346,19 @@ public class AnalysisTranscriptionStart implements Observer,
      * and detecting a transcription start site, if the parameters are
      * satisfied.
      * <p>
-     * @param coverage      the CoverageManager container
-     * @param pos           the position defining the pair to analyse: pos and
-     *                      (pos + 1) on the fwd strand the TSS pos is "pos+1"
-     *                      and on the reverse strand the TSS position is "pos"
-     * @param readStartsFwd
-     * @param readStartsRev
-     * @param revCov1
-     * @param revCov2
-     * @param diffFwd
-     * @param diffRev
+     * @param pos                the position defining the pair to analyse: pos
+     *                           and (pos + 1) on the fwd strand the TSS pos is
+     *                           "pos+1" and on the reverse strand the TSS
+     *                           position is "pos"
+     * @param chromId            chromosome id
+     * @param chromLength        chromosome length
+     * @param chromFeatures      chromosome features
+     * @param readStartsFwd      readStartsFwd
+     * @param readStartsRev      readStartsRev
+     * @param increaseFwd        forward coverage increase
+     * @param increaseRev        reverse coverage increase
+     * @param percentIncreaseFwd forward coverage increase in percent
+     * @param percentIncreaseRev reverse coverage increase in percent
      */
     private void detectStart( int pos, int chromId, int chromLength, List<PersistentFeature> chromFeatures, int readStartsFwd,
                               int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev ) {
