@@ -81,7 +81,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false );
-    private boolean sameStrand = pref.getBoolean( GUI.VIEWER_SAME_STRAND, false );
+    private boolean allReadsOnFWstrand = pref.getBoolean( GUI.VIEWER_ALL_FW_STRAND, false );
+    private boolean allReadsOnRVstrand = pref.getBoolean( GUI.VIEWER_ALL_RV_STRAND, false );
     private boolean useMinimalIntervalLength = true;
 
     private JSlider verticalSlider = null;
@@ -179,7 +180,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
      * <p>
      * @param pref The preference object containing the new colors
      * <p>
-     * @return Map of mapping classes to their colors 
+     * @return Map of mapping classes to their colors
      */
     protected Map<Classification, Color> createColors( Preferences pref ) {
         Map<Classification, Color> newClassToColorMap = new HashMap<>();
@@ -202,7 +203,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     /**
      * Updates the colors of the coverage in this viewer.
      * <p>
-     * @param classToColorMap Map of mapping classes to their colors 
+     * @param classToColorMap Map of mapping classes to their colors
      */
     protected final void setColors( Map<Classification, Color> classToColorMap ) {
         this.classToColorMap = classToColorMap;
@@ -489,11 +490,17 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
     protected double getCoverageValue( boolean isFwdStrand, Classification classType, int absPos ) {
         double value;
 
-        if( sameStrand ) {
+        if( allReadsOnFWstrand ) {
             if( isFwdStrand ) {
                 value = this.calcCoverageValue( true, classType, absPos ) + this.calcCoverageValue( false, classType, absPos );
             } else {
                 return 0;
+            }
+        } else if( allReadsOnRVstrand ) {
+            if( isFwdStrand ) {
+                return 0;
+            } else {
+                value = this.calcCoverageValue( true, classType, absPos ) + this.calcCoverageValue( false, classType, absPos );
             }
         } else {
             value = this.calcCoverageValue( isFwdStrand, classType, absPos );
@@ -642,7 +649,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"left\">" + String.valueOf( scaleFacVal ) + " (" + String.valueOf( (int) value ) + ")" + "</td></tr>";
     }
 
-    
+
     /**
      * {@inheritDoc }
      */
@@ -897,6 +904,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
         this.verticalSlider = verticalSlider;
     }
 
+
     /**
      * @return true, if this is a track viewer for at least two tracks.
      */
@@ -919,12 +927,26 @@ public class TrackViewer extends AbstractViewer implements ThreadListener, Obser
 
 
     /**
-     * @param sameStrand <code>true</code> if the coverage shall be displayed on
-     *                   the forward strand, <code>false</code> if the default
-     *                   strand specific visualization is needed
+     * @param allReadsOnFWstrand <code>true</code> if the coverage shall be
+     *                              displayed on the forward strand,
+     *                              <code>false</code> if the default strand
+     *                              specific visualization is needed
      */
-    public void setSameStrand( boolean sameStrand ) {
-        this.sameStrand = sameStrand;
+    public void setAllReadsOnFWstrand( boolean allReadsOnFWstrand ) {
+        this.allReadsOnFWstrand = allReadsOnFWstrand;
+        this.boundsChangedHook();
+        this.repaint();
+    }
+
+
+    /**
+     * @param allReadsOnRVstrand <code>true</code> if the coverage shall be
+     *                              displayed on the forward strand,
+     *                              <code>false</code> if the default strand
+     *                              specific visualization is needed
+     */
+    public void setAllReadsOnRVstrand( boolean allReadsOnRVstrand ) {
+        this.allReadsOnRVstrand = allReadsOnRVstrand;
         this.boundsChangedHook();
         this.repaint();
     }

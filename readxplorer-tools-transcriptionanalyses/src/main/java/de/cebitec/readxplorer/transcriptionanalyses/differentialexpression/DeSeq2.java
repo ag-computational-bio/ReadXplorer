@@ -130,9 +130,10 @@ public class DeSeq2 {
                 path = path.replace( "\\", "\\\\" );
                 gnuR.eval( "save.image(\"" + path + "\")" );
             }
-        } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
-            //The new generated exception can than be caught an handelt by the DeAnalysisHandler
-            //If something goes wrong try to shutdown Rserve so that no instance keeps running
+        } catch( Exception e ) {
+            //We don't know what errors Gnu R might cause, so we have to catch all.
+            //The newly generated exception can than be caught and handelt by the DeAnalysisHandler
+            //If something goes wrong tries to shutdown Rserve so that no instance keeps running
             this.shutdown();
             throw new UnknownGnuRException( e );
         }
