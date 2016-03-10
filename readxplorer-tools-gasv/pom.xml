@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-tools-gasv</artifactId>
-    <version>1.0.0-FINAL</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Tools - GASV</name>
 
@@ -30,16 +30,26 @@
             <artifactId>readxplorer-parser</artifactId>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui-visualisation</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.broadinstitute</groupId>
+            <artifactId>picard</artifactId>
+            <version>1.141</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0-rc2</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -85,6 +95,15 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-settings</artifactId>
             <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
         </dependency>
     </dependencies>
 

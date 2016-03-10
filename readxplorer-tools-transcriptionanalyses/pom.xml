@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-tools-transcriptionanalyses</artifactId>
-    <version>1.2.0-FINAL</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Tools - TranscriptionAnalyses</name>
 
@@ -54,9 +54,13 @@
             <artifactId>readxplorer-libs-jfreechart</artifactId>
         </dependency>
         <dependency>
-            <groupId>batik</groupId>
-            <artifactId>batik-swing</artifactId>
-            <version>1.6-1</version>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.rforge</groupId>
+            <artifactId>Rserve</artifactId>
+            <version>0.6-8.1</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -89,26 +93,14 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.rforge</groupId>
-            <artifactId>Rserve</artifactId>
-            <version>0.6-8.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-modules</artifactId>
-            <version>RELEASE80</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE80</version>
-            <type>jar</type>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -125,6 +117,12 @@
             <artifactId>commons-math3</artifactId>
             <version>3.3</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

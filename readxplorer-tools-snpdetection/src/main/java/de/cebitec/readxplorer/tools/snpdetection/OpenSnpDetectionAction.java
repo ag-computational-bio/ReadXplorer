@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -34,6 +35,7 @@ import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -42,8 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -54,6 +54,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -76,7 +78,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
                                                      DataVisualisationI {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( OpenSnpDetectionAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( OpenSnpDetectionAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "SNP_Wizard";
 
     private final ReferenceViewer context;
@@ -187,16 +189,15 @@ public final class OpenSnpDetectionAction implements ActionListener,
                                                     readClassParams, minBaseQuality, minAverageBaseQual, minAverageMapQual );
         if( !combineTracks ) {
             for( PersistentTrack track : tracks ) {
-                TrackConnector connector;
-                try {
-                    connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                try { //every track has its own analysis handlers
+                    TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    this.createAnalysis( connector, readClassParams );
+
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                    continue;
+                } catch( DatabaseException e ) {
+                    ErrorHelper.getHandler().handle( e );
                 }
-
-                //every track has its own analysis handlers
-                this.createAnalysis( connector, readClassParams );
             }
         } else {
             try {
@@ -205,6 +206,8 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+            } catch( DatabaseException e ) {
+                ErrorHelper.getHandler().handle( e );
             }
         }
     }
@@ -276,7 +279,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
             }
 
         } catch( ClassCastException e ) {
-            LOG.log( Level.INFO, "Passed wrong data container to {0}", getClass().getName() );
+            LOG.info( "Passed wrong data container to {0}", getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
     }

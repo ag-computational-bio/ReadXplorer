@@ -160,36 +160,67 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     }
 
 
+    /**
+     * Creates an option to display all read data on the forward strand instead
+     * of a strand specific visualization.
+     */
     private void createStrandOption() {
-        JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
-        final JCheckBox strandBox = LegendAndOptionsProvider.createStandardCheckBox( "All reads on fw strand" );
-        strandBox.setSelected( pref.getBoolean( GUI.VIEWER_AUTO_SCALING, false ) );
+        JPanel strandPanel = LegendAndOptionsProvider.createStandardPanel();
+        JLabel header = LegendAndOptionsProvider.createLabel( "Display all reads on ...", Font.BOLD );
+        final JCheckBox fwStrandBox = LegendAndOptionsProvider.createStandardCheckBox( "... fw strand" );
+        final JCheckBox rvStrandBox = LegendAndOptionsProvider.createStandardCheckBox( "... rv strand" );
+        fwStrandBox.setSelected( pref.getBoolean( GUI.VIEWER_ALL_FW_STRAND, false ) );
+        rvStrandBox.setSelected( pref.getBoolean( GUI.VIEWER_ALL_RV_STRAND, false ) );
 
-        //automatic scaling enabled event
-        strandBox.addActionListener( new ActionListener() {
+        fwStrandBox.addActionListener( new ActionListener() {
 
             @Override
             public void actionPerformed( ActionEvent e ) {
-                JCheckBox scaleBox = (JCheckBox) e.getSource();
-                trackViewer.setSameStrand(scaleBox.isSelected() );
+                JCheckBox fwStrandBox = (JCheckBox) e.getSource();
+                if( fwStrandBox.isSelected() ) {
+                    rvStrandBox.setSelected( false );
+                    trackViewer.setAllReadsOnRVstrand( false );
+                }
+                trackViewer.setAllReadsOnFWstrand( fwStrandBox.isSelected() );
             }
 
 
         } );
+
+        rvStrandBox.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                JCheckBox rvStrandBox = (JCheckBox) e.getSource();
+                if( rvStrandBox.isSelected() ) {
+                    fwStrandBox.setSelected( false );
+                    trackViewer.setAllReadsOnFWstrand( false );
+                }
+                trackViewer.setAllReadsOnRVstrand( rvStrandBox.isSelected() );
+            }
+
+
+        } );
+
         //preference change listener for updating the check box
         pref.addPreferenceChangeListener( new PreferenceChangeListener() {
 
             @Override
             public void preferenceChange( PreferenceChangeEvent evt ) {
-                if( evt.getKey().equals( GUI.VIEWER_SAME_STRAND ) ) {
-                    strandBox.setSelected( pref.getBoolean( GUI.VIEWER_SAME_STRAND, false ) );
+                if( evt.getKey().equals( GUI.VIEWER_ALL_FW_STRAND ) ) {
+                    fwStrandBox.setSelected( pref.getBoolean( GUI.VIEWER_ALL_FW_STRAND, false ) );
+                }
+                if( evt.getKey().equals( GUI.VIEWER_ALL_RV_STRAND ) ) {
+                    rvStrandBox.setSelected( pref.getBoolean( GUI.VIEWER_ALL_RV_STRAND, false ) );
                 }
             }
 
 
         } );
-        generalPanel.add( strandBox, BorderLayout.WEST );
-        this.add( generalPanel );
+        strandPanel.add( header, BorderLayout.NORTH );
+        strandPanel.add( fwStrandBox, BorderLayout.WEST );
+        strandPanel.add( rvStrandBox, BorderLayout.EAST );
+        this.add( strandPanel );
     }
 
 

@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.RowSorter;
@@ -59,6 +58,8 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.AnalysisStatus.ERROR;
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.AnalysisStatus.FINISHED;
@@ -93,7 +94,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( DiffExpResultViewerTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DiffExpResultViewerTopComponent.class.getName() );
     private static final int POS_IDX = 0;
     private static final int TRACK_IDX = 2;
     private static final int CHROM_IDX = 1;
@@ -325,7 +326,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                 graphicsTopComponent.requestActive();
                 break;
             default:
-                LOG.severe( "Encountered unknown differential gene expression tool" );
+                LOG.error( "Encountered unknown differential gene expression tool" );
         }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
@@ -392,7 +393,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                     case ERROR:
                         progressHandle.switchToDeterminate( 0 );
                         progressHandle.finish();
-                        logTopComponent = new DiffExpLogTopComponent();
+                        logTopComponent = new DiffExpLogTopComponent( analysisHandler );
                         logTopComponent.open();
                         logTopComponent.requestActive();
                         cmp.close();

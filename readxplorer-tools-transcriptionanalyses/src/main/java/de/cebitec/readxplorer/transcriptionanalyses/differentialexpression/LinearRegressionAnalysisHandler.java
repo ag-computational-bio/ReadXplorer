@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -41,12 +42,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import org.apache.commons.collections4.map.MultiValueMap;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -55,7 +55,7 @@ import static java.util.logging.Level.INFO;
  */
 public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
 
-    private static final Logger LOG = Logger.getLogger( LinearRegressionAnalysisHandler.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( LinearRegressionAnalysisHandler.class.getName() );
     private final int refGenomeID;
     private final int startOffset;
     private final int stopOffset;
@@ -114,42 +114,47 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
      */
     @Override
     public void startAnalysis() {
-        allContinuousCoverageData.clear();
-        Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.",
-                 currentTimestamp );
-        referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
-        List<AnalysesHandler> allHandler = new ArrayList<>();
-        genomeAnnos.clear();
+        try {
+            allContinuousCoverageData.clear();
+            Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            LOG.info( currentTimestamp + ": Starting to collect the necessary data for the differential gene expression analysis." );
+            referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
+            List<AnalysesHandler> allHandler = new ArrayList<>();
+            genomeAnnos.clear();
 
-        for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
-            genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(),
-                                                                                    selectedFeatureTypes, chrom.getId() ) );
-        }
-
-        for( PersistentTrack currentTrack : selectedTracks ) {
-            try {
-                TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
-
-                CollectContinuousCoverageData collCovData = new CollectContinuousCoverageData(
-                        genomeAnnos, startOffset, stopOffset, readClassParams );
-                allContinuousCoverageData.put( currentTrack.getId(), collCovData.getContinuousCountData() );
-                AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this,
-                                                               "Collecting coverage data for track " + currentTrack.getDescription() + ".", readClassParams );
-                handler.setMappingsNeeded( true );
-                handler.setDesiredData( IntervalRequestData.ReducedMappings );
-                handler.registerObserver( collCovData );
-                allHandler.add( handler );
-            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
-                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                getProcessingLog().addProperty( "Unresolved track", currentTrack );
-                notifyObservers( DeAnalysisHandler.AnalysisStatus.ERROR );
-                this.interrupt();
-                return;
+            for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
+                genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(),
+                                                                                        selectedFeatureTypes, chrom.getId() ) );
             }
-        }
-        for( AnalysesHandler handler : allHandler ) {
-            handler.startAnalysis();
+
+            for( PersistentTrack currentTrack : selectedTracks ) {
+                try {
+                    TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
+
+                    CollectContinuousCoverageData collCovData = new CollectContinuousCoverageData(
+                            genomeAnnos, startOffset, stopOffset, readClassParams );
+                    allContinuousCoverageData.put( currentTrack.getId(), collCovData.getContinuousCountData() );
+                    AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this,
+                                                                   "Collecting coverage data for track " + currentTrack.getDescription() + ".", readClassParams );
+                    handler.setMappingsNeeded( true );
+                    handler.setDesiredData( IntervalRequestData.ReducedMappings );
+                    handler.registerObserver( collCovData );
+                    allHandler.add( handler );
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+                    getProcessingLog().addProperty( "Unresolved track", currentTrack );
+                    notifyObservers( DeAnalysisHandler.AnalysisStatus.ERROR );
+                    this.interrupt();
+                    return;
+                }
+            }
+            for( AnalysesHandler handler : allHandler ) {
+                handler.startAnalysis();
+            }
+        } catch( DatabaseException e ) {
+            LOG.error( e.getMessage(), e );
+            notifyObservers( AnalysisStatus.ERROR );
+            interrupt();
         }
     }
 
@@ -388,14 +393,14 @@ public class LinearRegressionAnalysisHandler extends DeAnalysisHandler {
                     tmp.add( rRepA );
                     tmp.add( rRepB );
                 }
-                
+
                 double slope = currentResult.getPearsonSlope();
-                if(slope < 1){
-                    slope *= (1/slope);
+                if( slope < 1 ) {
+                    slope *= (1 / slope);
                 }
-                
+
                 Double ranking = (Math.abs( slope ) * Math.abs( rRepA ) * Math.abs( rRepB )) / Math.abs( currentResult.getR() );
-                
+
                 if( ranking.isNaN() ) {
                     ranking = 0d;
                 }

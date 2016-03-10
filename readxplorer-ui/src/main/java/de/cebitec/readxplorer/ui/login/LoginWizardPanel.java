@@ -40,11 +40,7 @@ public class LoginWizardPanel implements
      */
     private LoginVisualPanel component;
 
-    public static final String PROP_ADAPTER = "adapter";
-    public static final String PROP_HOST = "hostname";
     public static final String PROP_DATABASE = "database";
-    public static final String PROP_USER = "user";
-    public static final String PROP_PASSWORD = "password";
 
 
     // Get the visual component for the panel. In this template, the component
@@ -96,21 +92,10 @@ public class LoginWizardPanel implements
 
     @Override
     public void storeSettings( WizardDescriptor settings ) {
+
         Map<String, String> loginData = component.getLoginData();
-
-        String adapter, hostname, database, user, password;
-
-        adapter = loginData.get( PROP_ADAPTER );
-        hostname = loginData.get( PROP_HOST );
-        database = loginData.get( PROP_DATABASE );
-        user = loginData.get( PROP_USER );
-        password = loginData.get( PROP_PASSWORD );
-
-        settings.putProperty( PROP_ADAPTER, adapter );
-        settings.putProperty( PROP_HOST, hostname );
-        settings.putProperty( PROP_DATABASE, database );
-        settings.putProperty( PROP_USER, user );
-        settings.putProperty( PROP_PASSWORD, password );
+        settings.putProperty( PROP_DATABASE, loginData.get( PROP_DATABASE ) );
+        
     }
 
 

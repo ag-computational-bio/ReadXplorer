@@ -31,13 +31,12 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,7 +47,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class JFeature extends JComponent {
 
-    private static final Logger LOG = Logger.getLogger( JFeature.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( JFeature.class.getName() );
 
     private static final long serialVersionUID = 347348234;
     public static final int NORMAL_HEIGHT = 12;
@@ -90,11 +89,17 @@ public class JFeature extends JComponent {
     }
 
 
+    /**
+     * @return The underlying persistent feature
+     */
     public PersistentFeature getPersistentFeature() {
         return feature;
     }
 
 
+    /**
+     * @return The tool tip text with detailed information for this feature
+     */
     private String createToolTipText() {
         StringBuilder sb = new StringBuilder( 100 );
         sb.append( "<html>" );
@@ -118,11 +123,22 @@ public class JFeature extends JComponent {
     }
 
 
+    /**
+     * A table row for the tool tip
+     *
+     * @param label The label to display
+     * @param value The value to display
+     *
+     * @return The string for the tool tip
+     */
     private String createTableRow( String label, String value ) {
         return "<tr><td align=\"right\"><b>" + label + ":</b></td><td align=\"left\">" + value + "</td></tr>";
     }
 
 
+    /**
+     * @param selected true if this feature is selected, false otherwise
+     */
     public void setSelected( boolean selected ) {
         if( selected ) {
             color = Colors.SELECTED_FEATURE;
@@ -133,6 +149,9 @@ public class JFeature extends JComponent {
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void paintComponent( Graphics graphics ) {
         Graphics2D g = (Graphics2D) graphics;
@@ -194,6 +213,14 @@ public class JFeature extends JComponent {
     }
 
 
+    /**
+     * Determine the label of the feature
+     *
+     * @param text The original text to display
+     * @param fm   The font metrics to use
+     *
+     * @return The reworked feature label string
+     */
     private String determineLabel( String text, FontMetrics fm ) {
         // cut down the string if it extends the width of this component
         if( fm.stringWidth( text ) > this.getWidth() - 10 ) {
@@ -269,7 +296,7 @@ public class JFeature extends JComponent {
                 c = Colors.MINUS_TEN;
                 break;
             default:
-                LOG.log( SEVERE, "Found unknown type for feature {0}", feature.getType() );
+                LOG.error( "Found unknown type for feature {0}", feature.getType() );
                 c = Colors.UNDEF_FEATURE;
         }
 
@@ -277,6 +304,11 @@ public class JFeature extends JComponent {
     }
 
 
+    /**
+     * Add all necessary listeners.
+     *
+     * @param refViewer The viewer in which the feature is displayed
+     */
     private void addListeners( final ReferenceViewer refViewer ) {
         this.addMouseListener( new MouseListener() {
 

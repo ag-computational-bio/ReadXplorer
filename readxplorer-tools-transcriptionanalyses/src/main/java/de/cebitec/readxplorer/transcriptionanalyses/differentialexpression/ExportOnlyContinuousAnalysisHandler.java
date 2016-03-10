@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -39,12 +40,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.rosuda.REngine.Rserve.RserveException;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -53,7 +53,7 @@ import static java.util.logging.Level.INFO;
  */
 public class ExportOnlyContinuousAnalysisHandler extends DeAnalysisHandler {
 
-    private static final Logger LOG = Logger.getLogger( LinearRegressionAnalysisHandler.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ExportOnlyContinuousAnalysisHandler.class.getName() );
     private ReferenceConnector referenceConnector;
     private final List<PersistentFeature> genomeAnnos;
     private List<ResultDeAnalysis> results;
@@ -74,42 +74,47 @@ public class ExportOnlyContinuousAnalysisHandler extends DeAnalysisHandler {
      */
     @Override
     public void startAnalysis() {
-        allContinuousCoverageData.clear();
-        Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.",
-                 currentTimestamp );
-        referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( super.getRefGenomeID() );
-        List<AnalysesHandler> allHandler = new ArrayList<>();
-        genomeAnnos.clear();
+        try {
+            allContinuousCoverageData.clear();
+            Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            LOG.info( currentTimestamp + ": Starting to collect the necessary data for the differential gene expression analysis." );
+            referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( super.getRefGenomeID() );
+            List<AnalysesHandler> allHandler = new ArrayList<>();
+            genomeAnnos.clear();
 
-        for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
-            genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(),
-                                                                                    super.getSelectedFeatureTypes(), chrom.getId() ) );
-        }
-
-        for( PersistentTrack currentTrack : super.getSelectedTracks() ) {
-            try {
-                TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
-
-                CollectContinuousCoverageData collCovData = new CollectContinuousCoverageData(
-                        genomeAnnos, super.getStartOffset(), super.getStopOffset(), super.getReadClassParams() );
-                allContinuousCoverageData.put( currentTrack, collCovData.getContinuousCountData() );
-                AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this,
-                                                               "Collecting coverage data for track " + currentTrack.getDescription() + ".", super.getReadClassParams() );
-                handler.setMappingsNeeded( true );
-                handler.setDesiredData( IntervalRequestData.ReducedMappings );
-                handler.registerObserver( collCovData );
-                allHandler.add( handler );
-            } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
-                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                getProcessingLog().addProperty( "Unresolved track", currentTrack );
-                notifyObservers( DeAnalysisHandler.AnalysisStatus.ERROR );
-                this.interrupt();
-                return;
+            for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
+                genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(),
+                                                                                        super.getSelectedFeatureTypes(), chrom.getId() ) );
             }
-        }
-        for( AnalysesHandler handler : allHandler ) {
-            handler.startAnalysis();
+
+            for( PersistentTrack currentTrack : super.getSelectedTracks() ) {
+                try {
+                    TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
+
+                    CollectContinuousCoverageData collCovData = new CollectContinuousCoverageData(
+                            genomeAnnos, super.getStartOffset(), super.getStopOffset(), super.getReadClassParams() );
+                    allContinuousCoverageData.put( currentTrack, collCovData.getContinuousCountData() );
+                    AnalysesHandler handler = new AnalysesHandler( tc, (DataVisualisationI) this,
+                                                                   "Collecting coverage data for track " + currentTrack.getDescription() + ".", super.getReadClassParams() );
+                    handler.setMappingsNeeded( true );
+                    handler.setDesiredData( IntervalRequestData.ReducedMappings );
+                    handler.registerObserver( collCovData );
+                    allHandler.add( handler );
+                } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+                    getProcessingLog().addProperty( "Unresolved track", currentTrack );
+                    notifyObservers( DeAnalysisHandler.AnalysisStatus.ERROR );
+                    this.interrupt();
+                    return;
+                }
+            }
+            for( AnalysesHandler handler : allHandler ) {
+                handler.startAnalysis();
+            }
+        } catch( DatabaseException e ) {
+            LOG.error( e.getMessage(), e );
+            notifyObservers( AnalysisStatus.ERROR );
+            interrupt();
         }
     }
 
@@ -125,45 +130,51 @@ public class ExportOnlyContinuousAnalysisHandler extends DeAnalysisHandler {
 
         for( int i = 0; i < genomeAnnos.size(); i++ ) {
 
-            final List<Object> tmp = new ArrayList<>();
-            PersistentFeature currentFeature = genomeAnnos.get( i );
-            /*
-             * Here the additional fields are added. If one field is added or
-             * remove the "offset" value must be changed accordingly.
-             */
-            tmp.add( referenceConnector.getChromosomeForGenome( currentFeature.getChromId() ) );
-            if( currentFeature.isFwdStrand() ) {
-                tmp.add( "fw" );
-            } else {
-                tmp.add( "rv" );
-            }
-            tmp.add( currentFeature.getStart() );
-            tmp.add( currentFeature.getStop() );
-            tmp.add( ExportOnlyAnalysisHandler.calculateFeatureTypeLength( currentFeature, FeatureType.EXON ) );
-            tmp.add( ExportOnlyAnalysisHandler.calculateFeatureTypeLength( currentFeature, FeatureType.INTRON ) );
-            tmp.add( currentFeature.getLength() );
-            tmp.add( currentFeature.getType() );
-
-            boolean allZero = true;
-            for( PersistentTrack currentTrack : super.getSelectedTracks() ) {
-                Map<PersistentFeature, int[]> allFeatures = allContinuousCoverageData.get( currentTrack );
-                int[] valuesForCurrentFeature = allFeatures.get( currentFeature );
-                sb = new StringBuilder( valuesForCurrentFeature.length * 2 );
-                for( int j = 0; j < valuesForCurrentFeature.length; j++ ) {
-                    int currentValue = valuesForCurrentFeature[j];
-                    if( currentValue > 0 ) {
-                        allZero = false;
-                    }
-                    sb.append( currentValue ).append( "," );
+            try {
+                final List<Object> tmp = new ArrayList<>();
+                PersistentFeature currentFeature = genomeAnnos.get( i );
+                /*
+                 * Here the additional fields are added. If one field is added
+                 * or remove the "offset" value must be changed accordingly.
+                 */
+                tmp.add( referenceConnector.getChromosomeForGenome( currentFeature.getChromId() ) );
+                if( currentFeature.isFwdStrand() ) {
+                    tmp.add( "fw" );
+                } else {
+                    tmp.add( "rv" );
                 }
-                sb.deleteCharAt( sb.length() - 1 );
-                tmp.add( sb.toString() );
+                tmp.add( currentFeature.getStart() );
+                tmp.add( currentFeature.getStop() );
+                tmp.add( ExportOnlyAnalysisHandler.calculateFeatureTypeLength( currentFeature, FeatureType.EXON ) );
+                tmp.add( ExportOnlyAnalysisHandler.calculateFeatureTypeLength( currentFeature, FeatureType.INTRON ) );
+                tmp.add( currentFeature.getLength() );
+                tmp.add( currentFeature.getType() );
+
+                boolean allZero = true;
+                for( PersistentTrack currentTrack : super.getSelectedTracks() ) {
+                    Map<PersistentFeature, int[]> allFeatures = allContinuousCoverageData.get( currentTrack );
+                    int[] valuesForCurrentFeature = allFeatures.get( currentFeature );
+                    sb = new StringBuilder( valuesForCurrentFeature.length * 2 );
+                    for( int j = 0; j < valuesForCurrentFeature.length; j++ ) {
+                        int currentValue = valuesForCurrentFeature[j];
+                        if( currentValue > 0 ) {
+                            allZero = false;
+                        }
+                        sb.append( currentValue ).append( "," );
+                    }
+                    sb.deleteCharAt( sb.length() - 1 );
+                    tmp.add( sb.toString() );
+                }
+                if( !allZero ) {
+                    tableContents.add( tmp );
+                    regionNamesList.add( currentFeature );
+                }
+                progressHandle.progress( i );
+            } catch( DatabaseException e ) {
+                LOG.error( e.getMessage(), e );
+                notifyObservers( AnalysisStatus.ERROR );
+                interrupt();
             }
-            if( !allZero ) {
-                tableContents.add( tmp );
-                regionNamesList.add( currentFeature );
-            }
-            progressHandle.progress( i );
         }
 
         List<Object> colNames = new ArrayList<>();

@@ -34,10 +34,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.openide.WizardDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPanel {
 
+    private static final Logger LOG = LoggerFactory.getLogger( DataAdminWizardSelectionPanel.class.getName() );
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -92,7 +95,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
 
         try {
 
-            List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+            List<PersistentReference> refs = ProjectConnector.getInstance().getReferences();
             for( PersistentReference ref : refs ) {
                 // File and parser parameter meaningless in this context
                 ReferenceJob rj = new ReferenceJob( ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );
@@ -104,8 +107,8 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
             for( PersistentTrack dbTrack : dbTracks ) {
                 // File and parser, refgenjob, runjob parameters meaningless in this context
                 TrackJob tj = new TrackJob( dbTrack.getId(), new File( dbTrack.getFilePath() ),
-                                           dbTrack.getDescription(), indexedRefs.get( dbTrack.getRefGenID() ),
-                                           null, false, dbTrack.getTimestamp() );
+                                            dbTrack.getDescription(), indexedRefs.get( dbTrack.getRefGenID() ),
+                                            null, false, dbTrack.getTimestamp() );
 
                 // register dependent tracks at genome and run
                 ReferenceJob gen = indexedRefs.get( dbTrack.getRefGenID() );
@@ -114,7 +117,8 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
             }
 
         } catch( OutOfMemoryError e ) {
-            VisualisationUtils.displayOutOfMemoryError( this.component );
+            LOG.error( e.getMessage(), e );
+            VisualisationUtils.displayOutOfMemoryError();
         }
 
         // fill result map

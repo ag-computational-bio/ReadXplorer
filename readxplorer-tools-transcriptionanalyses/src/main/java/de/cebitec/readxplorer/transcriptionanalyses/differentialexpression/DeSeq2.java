@@ -27,13 +27,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -44,7 +44,7 @@ public class DeSeq2 {
 
     private GnuR gnuR;
 
-    private static final Logger LOG = Logger.getLogger( DeSeq2.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DeSeq2.class.getName() );
 
 
     public DeSeq2( int referenceId ) {
@@ -54,9 +54,9 @@ public class DeSeq2 {
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile )
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
-        gnuR = GnuR.startRServe(analysisData.getProcessingLog());
+        gnuR = GnuR.startRServe( analysisData.getProcessingLog() );
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.info( "{0}: GNU R is processing data.", currentTimestamp );
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
@@ -130,14 +130,15 @@ public class DeSeq2 {
                 path = path.replace( "\\", "\\\\" );
                 gnuR.eval( "save.image(\"" + path + "\")" );
             }
-        } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
-            //The new generated exception can than be caught an handelt by the DeAnalysisHandler
-            //If something goes wrong try to shutdown Rserve so that no instance keeps running
+        } catch( Exception e ) {
+            //We don't know what errors Gnu R might cause, so we have to catch all.
+            //The newly generated exception can than be caught and handelt by the DeAnalysisHandler
+            //If something goes wrong tries to shutdown Rserve so that no instance keeps running
             this.shutdown();
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.info( "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 
@@ -171,6 +172,10 @@ public class DeSeq2 {
                                              RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
-
-
+    
+    public void plotMA( File file ) throws IllegalStateException, PackageNotLoadableException,
+                                             RserveException, REngineException, REXPMismatchException, IOException {
+        gnuR.storePlot( file, "plotMA(res, main=\"\")" );
+    }
+    
 }

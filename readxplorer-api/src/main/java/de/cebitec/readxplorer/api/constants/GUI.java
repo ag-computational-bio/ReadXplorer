@@ -4,7 +4,7 @@ package de.cebitec.readxplorer.api.constants;
 
 /**
  * Global GUI constants.
- *
+ * <p>
  * This class provides global GUI / visualisation constants.
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
@@ -12,7 +12,8 @@ package de.cebitec.readxplorer.api.constants;
 public final class GUI {
 
 
-    private GUI() {}
+    private GUI() {
+    }
 
 
     /**
@@ -50,10 +51,15 @@ public final class GUI {
      * Property for auto scaling of viewers.
      */
     public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
-    
-        /**
+
+    /**
      * Property for showing all reads on fw strand.
      */
-    public static final String VIEWER_SAME_STRAND = "VIEWER_SAME_STRAND";
+    public static final String VIEWER_ALL_FW_STRAND = "VIEWER_ALL_FW_STRAND";
+
+    /**
+     * Property for showing all reads on rv strand.
+     */
+    public static final String VIEWER_ALL_RV_STRAND = "VIEWER_ALL_RV_STRAND";
 
 }

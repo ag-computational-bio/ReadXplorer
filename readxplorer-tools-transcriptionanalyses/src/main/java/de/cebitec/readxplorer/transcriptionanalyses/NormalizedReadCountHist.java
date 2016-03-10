@@ -62,6 +62,7 @@ public class NormalizedReadCountHist extends JPanel implements ComponentListener
 
     /**
      * Histogram panel for displaying a histogram of TPM or RPKM values.
+     * @param normalizationResult result of TPM or RPKM values
      */
     public NormalizedReadCountHist( NormalizationAnalysisResult normalizationResult ) {
         initComponents();
@@ -363,7 +364,7 @@ public class NormalizedReadCountHist extends JPanel implements ComponentListener
             String name = decimalFormat.format( start ) + " - " + decimalFormat.format( end );
             double logValue = Math.log( intervals[i] );
             logValue = logValue == 0 ? 0.1 : logValue;
-            XYChart.Data<String, Number> entry = new XYChart.Data<String, Number>( name, logValue );
+            XYChart.Data<String, Number> entry = new XYChart.Data<>( name, logValue );
             entry.setExtraValue( intervals[i] );
             bar.getData().add( entry );
         }

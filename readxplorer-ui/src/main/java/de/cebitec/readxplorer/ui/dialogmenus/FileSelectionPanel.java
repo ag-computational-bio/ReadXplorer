@@ -69,7 +69,7 @@ public class FileSelectionPanel extends JPanel {
              * references up to 100? entries. Show button to list more/all //try
              * (SAMFileReader samReader = new SAMFileReader(trackJob.getFile()))
              * {
-             * //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+             * //samReader.setValidationStringency(ValidationStringency.LENIENT);
              * //SAMFileHeader header = samReader.getFileHeader(); //} } catch
              * (Exception e) { this.notifyObservers(e.getMessage() != null ?
              * e.getMessage() : e); Exceptions.printStackTrace(e); } */
@@ -177,7 +177,7 @@ public class FileSelectionPanel extends JPanel {
             this.setSize( this.getPreferredSize() );
         } else {
             fileTextField.setText( getMappingFile() != null ? getMappingFile().getAbsolutePath() : "" );
-            multiTrackList.setModel( new DefaultListModel<String>() );
+            multiTrackList.setModel( new DefaultListModel<>() );
         }
     }
 

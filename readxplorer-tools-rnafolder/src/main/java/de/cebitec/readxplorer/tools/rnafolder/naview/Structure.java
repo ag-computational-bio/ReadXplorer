@@ -21,9 +21,8 @@ package de.cebitec.readxplorer.tools.rnafolder.naview;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.FINE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -66,7 +65,7 @@ import static java.util.logging.Level.FINE;
  */
 public class Structure {
 
-    private static final Logger LOG = Logger.getLogger( Structure.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( Structure.class.getName() );
 
     private static final double ANUM = 9999.0;
     private static final double pi = Math.PI;
@@ -113,9 +112,7 @@ public class Structure {
         findCentralLoop();
 
         // show debug output
-        if( LOG.isLoggable( FINE ) ) {
-            dumpLoops();
-        }
+        dumpLoops();
 
         // calculate positions of bases
         traverseLoop( root, null );
@@ -235,9 +232,9 @@ public class Structure {
             end = region.end2;
         }
         if( bases[connection.start].x > ANUM - 100.0 ||
-                 bases[connection.end].x > ANUM - 100.0 ) {
-            LOG.severe( "Bad region passed to generateRegion. " +
-                     "Coordinates not defined." );
+            bases[connection.end].x > ANUM - 100.0 ) {
+            LOG.error( "Bad region passed to generateRegion. " +
+                       "Coordinates not defined." );
             return;
         }
         for( i = start + 1; i <= end; i++ ) {
@@ -266,7 +263,7 @@ public class Structure {
             r = Math.sqrt( h * h + b * b / 4.0 );
             disc = 1.0 - 0.5 / (r * r);
             if( Math.abs( disc ) > 1.0 ) {
-                LOG.severe( "Unexpected large magnitude discriminant: " + disc );
+                LOG.error( "Unexpected large magnitude discriminant: " + disc );
                 return new Point2D.Double( 0.0, 0.0 );
             }
             theta = Math.acos( disc );
@@ -279,7 +276,7 @@ public class Structure {
             }
         } while( Math.abs( e ) > 0.0001 && ++iter < maxiter );
         if( iter >= maxiter ) {
-            LOG.severe( "Iteration failed in findCenterForArc" );
+            LOG.error( "Iteration failed in findCenterForArc" );
             return new Point2D.Double( 0.0, 0.0 );
         }
         return new Point2D.Double( h, theta );
@@ -451,7 +448,7 @@ public class Structure {
         done = false;
         while( !done ) {
             if( ++count > nconn * 2 ) {
-                LOG.severe( "infinite loop detected" );
+                LOG.error( "infinite loop detected" );
                 return -1;
             }
             if( anchor != null && connections[ic] == croot ) {
@@ -511,7 +508,7 @@ public class Structure {
                 connection.angle += 2 * pi;
             }
             if( anchor != null &&
-                     anchor.region.equals( connection.region ) ) {
+                anchor.region.equals( connection.region ) ) {
                 icroot = ic;
                 croot = connection;
             }
@@ -534,8 +531,8 @@ public class Structure {
             connection = connections[icstart];
             count = 0;
 
-            LOG.fine( "Now processing Loop #" + loop.number +
-                     " (radius=" + radius + ")" );
+            LOG.trace( "Now processing Loop #" + loop.number +
+                       " (radius=" + radius + ")" );
 
             done = false;
             do {
@@ -580,7 +577,7 @@ public class Structure {
             } while( !done );
             done_all = false;
             icstart1 = icstart;
-            LOG.fine( "icstart1 = " + icstart1 );
+            LOG.trace( "icstart1 = " + icstart1 );
             while( !done_all ) {
                 count = 0;
                 done = false;
@@ -607,8 +604,8 @@ public class Structure {
                 }
                 icmiddle = getMiddleConnection( icstart, icend, anchor, croot, loop );
                 ic = icup = icdown = icmiddle;
-                LOG.fine( "icstart = " + icstart + ", icmiddle = " + icmiddle +
-                         ", icend = " + icend );
+                LOG.trace( "icstart = " + icstart + ", icmiddle = " + icmiddle +
+                           ", icend = " + icend );
                 done = false;
                 direction = 0;
                 while( !done ) {
@@ -807,7 +804,7 @@ public class Structure {
                 }
                 if( Math.abs( dan - dc ) > pi ) {
                     if( connection.extruded ) {
-                        LOG.warning( "Loop #" + loop.number + " has crossed regions" );
+                        LOG.warn( "Loop #" + loop.number + " has crossed regions" );
                     } else if( (cnext.start - connection.end) != 1 ) {
                         connection.extruded = true;
                         continue set_radius;
@@ -875,13 +872,13 @@ public class Structure {
         int i;
         Loop loop;
 
-        LOG.fine( "Root loop is: #" + root.number );
+        LOG.trace( "Root loop is: #" + root.number );
         for( i = 0; i < loops.size(); i++ ) {
             loop = loops.get( i );
-            LOG.fine( loop.toString() );
+            LOG.trace( loop.toString() );
 
             for( Connection connection : loop.connections ) {
-                LOG.fine( "  " + connection.toString() );
+                LOG.trace( "  " + connection.toString() );
             }
         }
     }
@@ -902,7 +899,7 @@ public class Structure {
                 maxconn = loop.connections.size();
                 root = loop;
             } else if( (d = loop.getDepth()) > maxdepth &&
-                     loop.connections.size() == maxconn ) {
+                       loop.connections.size() == maxconn ) {
                 maxdepth = d;
                 root = loop;
             }
@@ -937,8 +934,8 @@ public class Structure {
                         bases[region.end2].extracted = true;
                         loop = constructLoop( region.end2 < nbase ? region.end2 + 1 : 0 );
                     } else {
-                        LOG.severe( "Error in constructLoop: " +
-                                 i + " not found in region table." );
+                        LOG.error( "Error in constructLoop: " +
+                                   i + " not found in region table." );
                         return null;
                     }
 
@@ -989,7 +986,7 @@ public class Structure {
                 region.end1 = --i;
                 region.start2 = mate + 1;
 
-                LOG.fine( region.toString() );
+                LOG.trace( region.toString() );
             }
         }
     }

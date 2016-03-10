@@ -35,6 +35,7 @@ public class ParameterSetNormalization extends ParametersFeatureTypesAndReadClas
         implements ParameterSetI<ParameterSetNormalization> {
 
     private final boolean performNormalization;
+    private final boolean useEffectiveLength;
     private int minReadCount;
     private int maxReadCount;
 
@@ -49,6 +50,9 @@ public class ParameterSetNormalization extends ParametersFeatureTypesAndReadClas
      *                             in the result
      * @param maxReadCount         maximum read count of a feature to return it
      *                             in the result
+     * @param useEffectiveLength   true, if the effective feature length should
+     *                             be used, false if the total feature length
+     *                             should be used
      * @param featureStartOffset   The start offset making genomic features
      *                             start further upstream
      * @param featureStopOffset    The stop offset making genomic features end
@@ -57,15 +61,26 @@ public class ParameterSetNormalization extends ParametersFeatureTypesAndReadClas
      * @param readClassParams      The read classification parameters
      */
     public ParameterSetNormalization( boolean performNormalization, int minReadCount, int maxReadCount,
-                                                                                      int featureStartOffset,
-                                                                                      int featureStopOffset,
-                                                                                      Set<FeatureType> selFeatureTypes,
-                                                                                      ParametersReadClasses readClassParams ) {
+                                      boolean useEffectiveLength,
+                                      int featureStartOffset,
+                                      int featureStopOffset,
+                                      Set<FeatureType> selFeatureTypes,
+                                      ParametersReadClasses readClassParams ) {
 
         super( featureStartOffset, featureStopOffset, selFeatureTypes, readClassParams );
         this.performNormalization = performNormalization;
         this.minReadCount = minReadCount;
+        this.useEffectiveLength = useEffectiveLength;
         this.maxReadCount = maxReadCount;
+    }
+
+
+    /**
+     * @return true, if the effective feature length should be used, false if
+     *         the total feature length should be used
+     */
+    public boolean isUseEffectiveLength() {
+        return useEffectiveLength;
     }
 
 

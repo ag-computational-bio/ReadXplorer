@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
+import java.util.List;
 
 
 /**
@@ -68,7 +69,8 @@ public final class VcfImportVisualPanel extends JobPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox<>(ProjectConnector.getInstance().getGenomesAsArray());
+        List<PersistentReference> references = ProjectConnector.getInstance().getReferences();
+        jComboBox1 = new javax.swing.JComboBox<>( references.toArray( new PersistentReference[references.size()] ) );
         fileTextField = new javax.swing.JTextField();
         chooseButton = new javax.swing.JButton();
 

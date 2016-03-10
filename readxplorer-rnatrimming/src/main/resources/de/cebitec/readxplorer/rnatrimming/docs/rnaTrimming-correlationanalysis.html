@@ -14,35 +14,42 @@ and open the template in the editor.
         </style>
     </head>
     <body>
-        <h2>Correlation analysis</h2>
-        <p>
-            The correlation analysis allows to compare two tracks and find
-            biologically relevant positions with similar coverage curve progression.
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Correlation analysis:</strong></span></p>
+        <p style="text-align: justify;">
+            A correlation coefficient can be used to identify regions of two tracks mapped on the same reference showing very similar or completely different coverage progression. The coefficient allows to identify communalities and differences in the data sets automatically. 
         </p>
-        <h3>Available parameters</h3>
-        <p><b>Correlation method:</b> choose between PEARSON and SPEARMAN.
-            PEARSON stands for the Pearson product-moment correlation coefficient
-            and should be used if the coverage data could be linearly correlated.
-            SPEARMAN stands for the Spearman's rank correlation coefficient and can
-            be used if the data dependancy is not linear.
+        <p style="text-align: justify;">
+            The correlation of an interval c_i is defined as real number from -1 <= c_i <= 1, where a c_i > 0 indicates a positive correlation between a pairwise measurement (x_i, y_i) (two coverage values from two data sets for the same interval), whereas a c_i < 0 indicates a negative correlation. To give two examples of many possible applications: 2 RNA-seq data sets (e.g. a whole transcriptome and a 5' enriched one) can be compared to identify all TSS regions correlating in both tracks and all genomic regions with correlating expression levels can be retrieved from two whole transcriptome RNA-seq data sets. Two correlation analysis methods are implemented in ReadXplorer: 
         </p>
-        <p>
-            <b>Minimum percent of correlation:</b>
-            a correlated interval will appear in the result list only if the chosen
-            minimum correlation is reached.
+        <p style="text-align: justify;">
+            The Bravais-Pearson coefficient is defined as 
         </p>
-        <p>
-            <b>Minimum peak coverage for both tracks:</b>
-            for each correlated interval the software will determine the peak coverage
-            for both tracks under examination. The minimum of these two values
-            will be compared with the value selected in this setting. If it is less,
-            than the selected value, the interval will not appear in the result list.
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.rnatrimming/de/cebitec/readxplorer/rnatrimming/docs/bravais-pearson-coefficient.png" alt="bravais-pearson-coefficient" /></p>
+        <p style="text-align: justify;">
+            with x&#772; and y-bar representing the empirical mean. This coefficient requires normally distributed random variables with a linear relationship between each other. If these constraints are not met, the correlation can be underestimated.
         </p>
-        <p>
-            <b>Interval length:</b>
-            choose the interval length according to the used read length.
+        <p style="text-align: justify;">
+            <b>Spearman’s rank coefficient</b> is defined as
         </p>
-
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.rnatrimming/de/cebitec/readxplorer/rnatrimming/docs/spearman-coefficient.png" alt="spearman-coefficient" /></p>
+        <p style="text-align: justify;">
+            With rg(x_i) denoting the rank of x_i. and (rg)_x&#772; designating the mean of all ranks of x. Spearman’s rank correlation coefficient has the advantage that no assumptions on the underlying probability distribution have to be made and no linear relationship is required between the random variables.
+        </p>
+        <p style="text-align: justify;">
+            <span style="text-decoration: underline;">Wizard steps:</span>
+        </p>
+        <ol>
+            <li>Select exactly 2 tracks (the track combination will be ignored).</li>
+            <li>Select the correlation coefficient (PEARSON or SPEARMAN), the minimum percent of correlation to list an interval in the result, the minimum peak coverage for both tracks to consider an interval for the result (For each correlated interval the software will determine the peak coverage for both tracks. The minimum of these two values will be compared with the value selected here) and the length of the correlated intervals between both tracks (e.g. mean read length).</li>
+            <li>Select the read classification (see Read Classification) to include in the analysis.</li>
+        </ol>
+        <p style="text-align: justify;">
+            An exemplary result is shown below:
+        </p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.rnatrimming/de/cebitec/readxplorer/rnatrimming/docs/correlation-analysis.png" alt="correlation-analysis result" /></p>
+        <p style="text-align: justify;">
+            The example shows a correlation analysis result sorted by the correlation column. The selected interval shown in the corresponding track viewers has very high positive correlation between both bacterial RNA-seq data sets.
+        </p>
     </body>
 </html>
 <!--

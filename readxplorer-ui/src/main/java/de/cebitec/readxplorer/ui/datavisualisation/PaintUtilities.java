@@ -46,7 +46,7 @@ public final class PaintUtilities {
      * @param phyLeft  Left physical (pixel) of the component in the viewer
      * @param height   Height to set for the rectangle
      * <p>
-     * @return
+     * @return The rectangle defining the boundaries of a block
      */
     public static Rectangle calcBlockBoundaries( int refStart, int refStop, AbstractViewer viewer, int phyLeft, int height ) {
         int startPixel = (int) viewer.getPhysBoundariesForLogPos( refStart ).getLeftPhysBound();

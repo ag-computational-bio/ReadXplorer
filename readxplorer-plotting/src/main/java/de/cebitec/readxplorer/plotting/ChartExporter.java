@@ -22,19 +22,12 @@ import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import java.awt.Rectangle;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.jfree.chart.JFreeChart;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
+import org.jfree.graphics2d.svg.SVGGraphics2D;
+import org.jfree.graphics2d.svg.SVGUtils;
 
 
 /**
@@ -65,17 +58,12 @@ public class ChartExporter implements Runnable, Observable {
     public void run() {
         notifyObservers( ChartExportStatus.RUNNING );
         Rectangle bounds = new Rectangle( 1920, 1080 );
-        DOMImplementation dom = GenericDOMImplementation.getDOMImplementation();
-        Document document = dom.createDocument( null, "svg", null );
-        SVGGraphics2D generator = new SVGGraphics2D( document );
+        SVGGraphics2D generator = new SVGGraphics2D( bounds.width, bounds.height );
         chart.draw( generator, bounds );
-        try( OutputStream outputStream = Files.newOutputStream( file, StandardOpenOption.CREATE ) ) {
-            Writer out = new OutputStreamWriter( outputStream, "UTF-8" );
-            generator.stream( out, true );
-            outputStream.flush();
+        try {
+            SVGUtils.writeToSVG( file.toFile(), generator.getSVGElement() );
             notifyObservers( ChartExportStatus.FINISHED );
-        }
-        catch( IOException ex ) {
+        } catch( IOException ex ) {
             notifyObservers( ChartExportStatus.FAILED );
         }
     }

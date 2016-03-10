@@ -23,29 +23,27 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import jxl.write.WriteException;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Logger.getLogger;
 
 
 /**
  * General csv exporter. Since csv does not support multiple sheets, data for
- * multiple sheets is written to multiple files appended with a file number
- * and the sheet name.
+ * multiple sheets is written to multiple files appended with a file number and
+ * the sheet name.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvExporter implements TableExporterI {
 
-    private static final Logger LOG = getLogger( CsvExporter.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CsvExporter.class.getName() );
 
     private List<List<List<Object>>> exportData;
     private List<List<String>> headers;
@@ -117,7 +115,7 @@ public class CsvExporter implements TableExporterI {
     @Override
     public File writeFile( File file ) throws FileNotFoundException, IOException, OutOfMemoryError, WriteException {
 
-        LOG.log( INFO, "Starting to write csv file...{0}", file.getAbsolutePath() );
+        LOG.info( "Starting to write csv file...{0}", file.getAbsolutePath() );
 
         String[] header = new String[0];
 
@@ -138,7 +136,7 @@ public class CsvExporter implements TableExporterI {
 
         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get( 0 ), null );
 
-        LOG.log( INFO, "Finished writing csv file!" );
+        LOG.info( "Finished writing csv file!" );
 
 //        int currentPage = 0;
 //        int totalPage = 0;
@@ -175,9 +173,9 @@ public class CsvExporter implements TableExporterI {
      */
     @Override
     public boolean readyToExport() {
-        return this.exportData != null && !this.exportData.isEmpty()
-               && this.headers != null && !this.headers.isEmpty()
-               && this.sheetNames != null && !this.sheetNames.isEmpty();
+        return this.exportData != null && !this.exportData.isEmpty() &&
+                 this.headers != null && !this.headers.isEmpty() &&
+                 this.sheetNames != null && !this.sheetNames.isEmpty();
     }
 
 
@@ -189,8 +187,8 @@ public class CsvExporter implements TableExporterI {
      * @param dataSheetName The name of the data sheet, will also be added to
      *                      the file name
      * <p>
-     * @return The new file including the file number, if more than one file
-     *         are stored
+     * @return The new file including the file number, if more than one file are
+     *         stored
      */
     private File createOutputFile( File file, String dataSheetName ) {
         File newFile = file;

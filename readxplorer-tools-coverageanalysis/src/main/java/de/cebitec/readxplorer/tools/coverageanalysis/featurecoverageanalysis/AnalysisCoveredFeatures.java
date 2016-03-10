@@ -40,8 +40,7 @@ import java.util.List;
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class AnalysisCoveredFeatures implements Observer,
-                                                AnalysisI<List<CoveredFeature>> {
+public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<CoveredFeature>> {
 
     private final TrackConnector trackConnector;
     private final ParameterSetCoveredFeatures analysisParams;
@@ -57,20 +56,9 @@ public class AnalysisCoveredFeatures implements Observer,
      * Carries out the logic behind the covered features analysis. Both
      * parameters are mandatory.
      * <p>
-     * @param trackViewer        the track viewer for which the analyses should
-     *                           be carried out
-     * @param getCoveredFeatures <code>true</code> if the covered features
-     *                           should be returned, <code>false</code> if the
-     *                           uncovered features should be returned
-     * @param minCoveragePercent minimum percentage of an feature which has to
-     *                           be classified as covered, in order to detect it
-     *                           as 'present' in the analysis
-     * @param minCountedCoverage minimum coverage at a certain position to be
-     *                           taken into account for the analysis
-     * @param whateverStrand     <tt>true</tt>, if the strand does not matter
-     *                           for this analysis, false, if only mappings on
-     *                           the strand of the respective feature should be
-     *                           considered.
+     * @param trackConnector            the track connector for which the
+     *                                  analyses should be carried out
+     * @param featureCoverageParameters All parameters needed for the analysis.
      */
     public AnalysisCoveredFeatures( TrackConnector trackConnector, ParameterSetCoveredFeatures featureCoverageParameters ) {
         this.trackConnector = trackConnector;

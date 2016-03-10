@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,13 +28,11 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
 
 
-public class DeSeqWizardPanelDesign implements
+public class DeSeqWizardPanelDesign extends ChangeListeningWizardPanel implements
         WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
@@ -43,6 +42,11 @@ public class DeSeqWizardPanelDesign implements
     private DeSeqVisualPanelDesign component;
     private List<PersistentTrack> tracks = null;
     private Map<String, String[]> design;
+
+
+    public DeSeqWizardPanelDesign() {
+        super( "Error" );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -57,37 +61,7 @@ public class DeSeqWizardPanelDesign implements
         return component;
     }
 
-
-    @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
-    }
-
-
+    
     @Override
     public void readSettings( WizardDescriptor wiz ) {
         List<PersistentTrack> tmpTracks = (List<PersistentTrack>) wiz.getProperty( "tracks" );

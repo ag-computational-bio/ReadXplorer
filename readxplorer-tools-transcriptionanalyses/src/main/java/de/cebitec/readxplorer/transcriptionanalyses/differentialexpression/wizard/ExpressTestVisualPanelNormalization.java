@@ -130,7 +130,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         calculateButton = new javax.swing.JRadioButton();
         useHKGButton = new javax.swing.JRadioButton();
         searchField = new javax.swing.JTextField();
-        searchLable = new javax.swing.JLabel();
+        searchLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         featureTable = new javax.swing.JTable();
 
@@ -152,8 +152,8 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         searchField.setText(org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchField.text_1")); // NOI18N
         searchField.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(searchLable, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchLable.text_1")); // NOI18N
-        searchLable.setEnabled(false);
+        org.openide.awt.Mnemonics.setLocalizedText(searchLabel, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchLabel.text_1")); // NOI18N
+        searchLabel.setEnabled(false);
 
         jScrollPane2.setEnabled(false);
 
@@ -182,7 +182,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(searchLable)
+                            .addComponent(searchLabel)
                             .addComponent(calculateButton)
                             .addComponent(useHKGButton))
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -196,7 +196,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(useHKGButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(searchLable)
+                .addComponent(searchLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
@@ -209,14 +209,14 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         featureTable.setModel( tm );
         featureTable.setRowSorter( trs );
         searchField.setEnabled( true );
-        searchLable.setEnabled( true );
+        searchLabel.setEnabled( true );
         featureTable.setEnabled( true );
         jScrollPane2.setEnabled( true );
     }//GEN-LAST:event_useHKGButtonActionPerformed
 
     private void calculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateButtonActionPerformed
         searchField.setEnabled( false );
-        searchLable.setEnabled( false );
+        searchLabel.setEnabled( false );
         featureTable.setEnabled( false );
         jScrollPane2.setEnabled( false );
         featureTable.setModel( emptyTm );
@@ -226,7 +226,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     private javax.swing.JTable featureTable;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField searchField;
-    private javax.swing.JLabel searchLable;
+    private javax.swing.JLabel searchLabel;
     private javax.swing.JRadioButton useHKGButton;
     // End of variables declaration//GEN-END:variables
 }

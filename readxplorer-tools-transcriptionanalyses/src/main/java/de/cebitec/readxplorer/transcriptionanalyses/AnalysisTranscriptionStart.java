@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 import de.cebitec.readxplorer.api.enums.Distribution;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.api.objects.AnalysisI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
@@ -39,15 +40,14 @@ import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -73,7 +73,7 @@ import static java.util.logging.Logger.getLogger;
 public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
 
-    private static final Logger LOG = getLogger( AnalysisTranscriptionStart.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AnalysisTranscriptionStart.class.getName() );
 
     private final TrackConnector trackConnector;
     private ReferenceConnector refConnector;
@@ -212,9 +212,14 @@ public class AnalysisTranscriptionStart implements Observer,
      * distributions and corrects the results for automatic mode.
      */
     public void finish() {
-        storeDistributions();
-        if( parametersTSS.isAutoTssParamEstimation() ) {
-            correctResult();
+        try {
+            storeDistributions();
+            if( parametersTSS.isAutoTssParamEstimation() ) {
+                correctResult();
+            }
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( new DatabaseException( ex.getMessage() +
+                                                                    " TSS detection result parameters are not corrected!", ex ) );
         }
         linkTssInSameRegion();
     }
@@ -308,23 +313,21 @@ public class AnalysisTranscriptionStart implements Observer,
                 readStartsFwd = readStartArrayRev[pos];
                 readStartsRev = readStartArrayFwd[pos + 1];
             }
-        } else {
-            if( isBothFwdDirection ) { //TODO: Strand options disrupt distributions! calculate one for each strand option!
-                increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
-                increaseRev = 0;
-                percentIncFwd = GeneralUtils.calculatePercentageIncrease( fwdCov1 + revCov1, fwdCov2 + revCov2 );
-                percentIncRev = GeneralUtils.calculatePercentageIncrease( 0, 0 );
-                readStartsFwd = readStartArrayFwd[pos + 1] + readStartArrayRev[pos + 1];
-                readStartsRev = 0;
+        } else if( isBothFwdDirection ) { //TODO: Strand options disrupt distributions! calculate one for each strand option!
+            increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
+            increaseRev = 0;
+            percentIncFwd = GeneralUtils.calculatePercentageIncrease( fwdCov1 + revCov1, fwdCov2 + revCov2 );
+            percentIncRev = GeneralUtils.calculatePercentageIncrease( 0, 0 );
+            readStartsFwd = readStartArrayFwd[pos + 1] + readStartArrayRev[pos + 1];
+            readStartsRev = 0;
 
-            } else {
-                increaseFwd = 0;
-                increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
-                percentIncFwd = GeneralUtils.calculatePercentageIncrease( 0, 0 );
-                percentIncRev = GeneralUtils.calculatePercentageIncrease( revCov2 + fwdCov2, revCov1 + fwdCov1 );
-                readStartsFwd = 0;
-                readStartsRev = readStartArrayFwd[pos] + readStartArrayRev[pos];
-            }
+        } else {
+            increaseFwd = 0;
+            increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
+            percentIncFwd = GeneralUtils.calculatePercentageIncrease( 0, 0 );
+            percentIncRev = GeneralUtils.calculatePercentageIncrease( revCov2 + fwdCov2, revCov1 + fwdCov1 );
+            readStartsFwd = 0;
+            readStartsRev = readStartArrayFwd[pos] + readStartArrayRev[pos];
         }
 
         if( this.calcCoverageDistributions ) {
@@ -343,16 +346,19 @@ public class AnalysisTranscriptionStart implements Observer,
      * and detecting a transcription start site, if the parameters are
      * satisfied.
      * <p>
-     * @param coverage      the CoverageManager container
-     * @param pos           the position defining the pair to analyse: pos and
-     *                      (pos + 1) on the fwd strand the TSS pos is "pos+1"
-     *                      and on the reverse strand the TSS position is "pos"
-     * @param readStartsFwd
-     * @param readStartsRev
-     * @param revCov1
-     * @param revCov2
-     * @param diffFwd
-     * @param diffRev
+     * @param pos                the position defining the pair to analyse: pos
+     *                           and (pos + 1) on the fwd strand the TSS pos is
+     *                           "pos+1" and on the reverse strand the TSS
+     *                           position is "pos"
+     * @param chromId            chromosome id
+     * @param chromLength        chromosome length
+     * @param chromFeatures      chromosome features
+     * @param readStartsFwd      readStartsFwd
+     * @param readStartsRev      readStartsRev
+     * @param increaseFwd        forward coverage increase
+     * @param increaseRev        reverse coverage increase
+     * @param percentIncreaseFwd forward coverage increase in percent
+     * @param percentIncreaseRev reverse coverage increase in percent
      */
     private void detectStart( int pos, int chromId, int chromLength, List<PersistentFeature> chromFeatures, int readStartsFwd,
                               int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev ) {
@@ -451,7 +457,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             feature.getType() == FeatureType.CDS &&
                             upstreamAnno.getType() == FeatureType.GENE &&
                             upstreamAnno.getStop() >= feature.getStop() ) {
-//                            LOG.log( Level.INFO, null, "CDS covered by gene feature Fwd");
+//                            LOG.info( null, "CDS covered by gene feature Fwd");
                             continue;
                         }
 
@@ -475,7 +481,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             chromFeatures.get( i + 1 ).getType() == FeatureType.GENE ) {
                             detectedFeatures.setDownstreamFeature( chromFeatures.get( i + 1 ) );
                             detectedFeatures.setIsLeaderless( isLeaderless( chromFeatures.get( i + 1 ), tssPos ) );
-//                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Fwd");
+//                            LOG.info( null, "Gene covers CDS with same annotated TSS Fwd");
 
                         } else {
                             detectedFeatures.setDownstreamFeature( feature );
@@ -521,7 +527,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             start == upstreamAnno.getStop() &&
                             upstreamAnno.getType() == FeatureType.GENE ) {
                             //TODO: this does not work if features start at the same position on rev and fwd strand!
-//                            LOG.log( Level.INFO, null, "CDS covered by gene feature Rev");
+//                            LOG.info( null, "CDS covered by gene feature Rev");
                             continue; // we want to keep the gene instead the CDS feature
                         }
 
@@ -541,7 +547,7 @@ public class AnalysisTranscriptionStart implements Observer,
                             chromFeatures.get( i + 1 ).getType() == FeatureType.GENE &&
                             chromFeatures.get( i + 1 ).getStart() <= feature.getStart() ) {
                             detectedFeatures.setUpstreamFeature( chromFeatures.get( i + 1 ) );
-//                            LOG.log( Level.INFO, null, "Gene covers CDS with same annotated TSS Rev");
+//                            LOG.info( null, "Gene covers CDS with same annotated TSS Rev");
                         } else {
                             detectedFeatures.setUpstreamFeature( feature );
                         }
@@ -637,8 +643,8 @@ public class AnalysisTranscriptionStart implements Observer,
      * the threshold of more than 2 genes per 1KB genome size for the first time
      * for this track is calculated.<br>
      * In prokaryotic genomes gene density is approx 1 per 1kb and max 1,16 in
-     * Sulfolobus solfataricus according to I. B. Rogozin, et al., “Congruent
-     * evolution of different classes of non-coding DNA in prokaryotic genomes,”
+     * Sulfolobus solfataricus according to I. B. Rogozin, et al., "Congruent
+     * evolution of different classes of non-coding DNA in prokaryotic genomes",
      * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
      * <p>
      * In this case we allow for 2 genes per kb, because we use two
@@ -679,8 +685,8 @@ public class AnalysisTranscriptionStart implements Observer,
         /*
          * number of active genes in the current genome in prokaryotic genomes
          * gene density approx 1 per 1000bp, max 1,16 in Sulfolobus solfataricus
-         * according to I. B. Rogozin, et al., “Congruent evolution of different
-         * classes of non-coding DNA in prokaryotic genomes,” Nucleic Acids Res,
+         * according to I. B. Rogozin, et al., "Congruent evolution of different
+         * classes of non-coding DNA in prokaryotic genomes", Nucleic Acids Res,
          * vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
          */
         return distribution.getMinValueForIndex( selectedIndex );
@@ -714,8 +720,11 @@ public class AnalysisTranscriptionStart implements Observer,
      * If a new distribution was calculated, this method stores it in the DB and
      * corrects the result list with the new estimated parameters, if the
      * tssAutomatic was chosen.
+     *
+     * @throws DatabaseException An exception during data queries. It has
+     *                           already been logged.
      */
-    private void storeDistributions() {
+    private void storeDistributions() throws DatabaseException {
         if( this.calcCoverageDistributions && this.trackConnector.getAssociatedTrackNames().size() == 1 ) {
             ProjectConnector.getInstance().insertCountDistribution( readStartDistribution, this.trackConnector.getTrackID() );
             ProjectConnector.getInstance().insertCountDistribution( covIncPercentDistribution, this.trackConnector.getTrackID() );
@@ -734,8 +743,8 @@ public class AnalysisTranscriptionStart implements Observer,
     private void correctResult() {
 
         //estimate exact cutoff for readcount increase of 0,25%
-        LOG.log( Level.INFO, "old threshold read count: {0}", parametersTSS.getMinNoReadStarts() );
-        LOG.log( Level.INFO, "old threshold percent: {0}", parametersTSS.getMinPercentIncrease() );
+        LOG.info( "old threshold read count: {0}", parametersTSS.getMinNoReadStarts() );
+        LOG.info( "old threshold percent: {0}", parametersTSS.getMinPercentIncrease() );
         parametersTSS.setMinNoReadStarts( getNewThreshold( exactReadStartDist, 0 ) );//(int) (this.genomeSize * 0.0005));
         parametersTSS.setMinPercentIncrease( getNewThreshold( exactCovIncPercDist, 0 ) );//(int) (this.genomeSize * 0.0005));
 
@@ -833,12 +842,10 @@ public class AnalysisTranscriptionStart implements Observer,
             } else {
                 distType = Distribution.ReadStartBothRevStrand;
             }
+        } else if( isFeatureStrand ) {
+            distType = Distribution.ReadStartFeatStrand;
         } else {
-            if( isFeatureStrand ) {
-                distType = Distribution.ReadStartFeatStrand;
-            } else {
-                distType = Distribution.ReadStartOppStrand;
-            }
+            distType = Distribution.ReadStartOppStrand;
         }
         return distType;
     }
@@ -856,12 +863,10 @@ public class AnalysisTranscriptionStart implements Observer,
             } else {
                 distType = Distribution.CovIncPercentBothRevStrand;
             }
+        } else if( isFeatureStrand ) {
+            distType = Distribution.CovIncPercentFeatStrand;
         } else {
-            if( isFeatureStrand ) {
-                distType = Distribution.CovIncPercentFeatStrand;
-            } else {
-                distType = Distribution.CovIncPercentOppStrand;
-            }
+            distType = Distribution.CovIncPercentOppStrand;
         }
         return distType;
     }

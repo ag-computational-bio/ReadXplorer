@@ -23,9 +23,8 @@
             <version>1.0.15</version>
         </dependency>
         <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>1.3.04</version>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
         </dependency>
     </dependencies>
 
@@ -39,8 +38,10 @@
                 <configuration>
                     <publicPackages>
                         <publicPackage>org.jfree.*</publicPackage>
-                        <publicPackage>org.w3c.dom.events.*</publicPackage>
-                        <publicPackage>org.w3c.dom.css.*</publicPackage>
+                        <publicPackage>org.w3c.dom.*</publicPackage>
+                        <publicPackage>javax.xml.*</publicPackage>
+                        <publicPackage>org.xml.*</publicPackage>
+                        <publicPackage>org.apache.*</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

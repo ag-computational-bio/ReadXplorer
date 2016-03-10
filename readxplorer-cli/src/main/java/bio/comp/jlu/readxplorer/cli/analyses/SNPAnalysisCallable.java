@@ -20,6 +20,7 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 
 import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -31,23 +32,22 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import jxl.write.WriteException;
 import org.netbeans.api.sendopts.CommandException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.SNP;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.SEVERE;
 
 
 /**
- * Analysis Logic for CLI SNP Analysis.
- * Performs parallelised SNP analysis calculations and result output.
+ * Analysis Logic for CLI SNP Analysis. Performs parallelised SNP analysis
+ * calculations and result output.
  * <p>
- * For each imported track a single nucleotide polymorphism analysis will be performed.
- * Analysis preferences are read from set properties file or if not specified
- * from standard property file. After all calculations have been performed
- * results will be written to an output file.
+ * For each imported track a single nucleotide polymorphism analysis will be
+ * performed. Analysis preferences are read from set properties file or if not
+ * specified from standard property file. After all calculations have been
+ * performed results will be written to an output file.
  * <p>
  * After all analyses have been performed, common result files will be merged
  * into a single result file for each type of analysis.
@@ -56,7 +56,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public final class SNPAnalysisCallable extends AnalysisCallable {
 
-    private static final Logger LOG = Logger.getLogger( SNPAnalysisCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SNPAnalysisCallable.class.getName() );
 
     private final PersistentTrack persistentTrack;
     private final ParameterSetSNPs parameterSet;
@@ -65,7 +65,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
     /**
      * SNP Analysis Callable constructor.
      *
-     * @param verbosity is verbosity required?
+     * @param verbosity       is verbosity required?
      * @param persistentTrack imported track to analyse
      * @param parameterSetTSS set with snp parameters
      */
@@ -87,7 +87,7 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             File trackFile = new File( persistentTrack.getFilePath() );
             final String trackFileName = trackFile.getName();
 
-            LOG.log( FINE, "start SNP analysis for {0}...", trackFileName );
+            LOG.trace( "start SNP analysis for " + trackFileName + "..." );
             result.addOutput( "start analysis..." );
             final ProjectConnector pc = ProjectConnector.getInstance();
             final TrackConnector trackConnector = pc.getTrackConnector( persistentTrack );
@@ -95,10 +95,10 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             final ThreadingHelper threadingHelper = new ThreadingHelper(); // tricky work-around due to MVC blindness of the RX code :-)
             threadingHelper.start();
             final AnalysesHandler analysisHandler = new AnalysesHandler( trackConnector, threadingHelper, "", parameterSet.getReadClassParams() );
-                analysisHandler.registerObserver( analysisSNPs );
-                analysisHandler.setCoverageNeeded( true );
-                analysisHandler.setDiffsAndGapsNeeded( true );
-                analysisHandler.startAnalysis();
+            analysisHandler.registerObserver( analysisSNPs );
+            analysisHandler.setCoverageNeeded( true );
+            analysisHandler.setDiffsAndGapsNeeded( true );
+            analysisHandler.startAnalysis();
 
             threadingHelper.join(); // blocks until analysisHandler finishes its job
             Map<Integer, PersistentTrack> trackMap = new HashMap<>();
@@ -109,18 +109,18 @@ public final class SNPAnalysisCallable extends AnalysisCallable {
             snpDetectionResult.setParameters( parameterSet );
 
 
-            LOG.log( FINE, "store SNP results for {0}...", trackFileName );
+            LOG.trace( "store SNP results for " + trackFileName + "..." );
             result.addOutput( "store results..." );
             File resultFile = new File( "snp-" + trackFileName + '.' + AnalysisFileFilter.SUFFIX );
             writeFile( resultFile, snpDetectionResult.dataSheetNames(), snpDetectionResult.dataColumnDescriptions(), snpDetectionResult.dataToExcelExportList() );
 
             result.setResultFile( resultFile );
 
-        } catch( IOException | WriteException | InterruptedException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+        } catch( IOException | WriteException | InterruptedException | DatabaseException ex ) {
+            LOG.error( ex.getMessage(), ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ome ) {
-            LOG.log( SEVERE, ome.getMessage(), ome );
+            LOG.error( ome.getMessage(), ome );
             CommandException ce = new CommandException( 1, "ran out of memory!" );
             ce.initCause( ome );
             throw ce;

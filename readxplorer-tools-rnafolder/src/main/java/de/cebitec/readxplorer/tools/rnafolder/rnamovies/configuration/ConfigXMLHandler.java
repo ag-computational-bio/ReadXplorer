@@ -23,8 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -34,7 +34,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class ConfigXMLHandler implements ContentHandler {
 
-    private static final Logger LOG = Logger.getLogger( ConfigXMLHandler.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ConfigXMLHandler.class.getName() );
 
 
     /**
@@ -115,7 +115,7 @@ public class ConfigXMLHandler implements ContentHandler {
                 id = text == null ? -1 : Integer.parseInt( text );
                 id = id < -1 ? -1 : id;
             } catch( NumberFormatException e ) {
-                LOG.log( Level.WARNING, "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
+                LOG.warn( "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
                 id = -1;
             }
 
@@ -159,13 +159,13 @@ public class ConfigXMLHandler implements ContentHandler {
                     value = obj_;
                 }
             } catch( NoSuchMethodException e ) {
-                LOG.log( Level.WARNING, "Could not find Constructor: {0}", e.getMessage() );
+                LOG.warn( "Could not find Constructor: {0}", e.getMessage() );
             } catch( InstantiationException e ) {
-                LOG.log( Level.WARNING, "Could not instantiate: {0}", e.getMessage() );
+                LOG.warn( "Could not instantiate: {0}", e.getMessage() );
             } catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
-                LOG.warning( e.getMessage() );
+                LOG.warn( e.getMessage() );
             } catch( ClassNotFoundException e ) {
-                LOG.log( Level.WARNING, "Could not find class: {0}", e.getMessage() );
+                LOG.warn( "Could not find class: {0}", e.getMessage() );
             }
         } else if( qName.equalsIgnoreCase( "string" ) ) {
             if( mode == MODE_CONSTRUCTOR ) {
@@ -185,7 +185,7 @@ public class ConfigXMLHandler implements ContentHandler {
                     value = ival;
                 }
             } catch( NumberFormatException e ) {
-                LOG.log( Level.WARNING, "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
+                LOG.warn( "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
             }
         } else if( qName.equalsIgnoreCase( "float" ) ) {
             Float fval;
@@ -198,7 +198,7 @@ public class ConfigXMLHandler implements ContentHandler {
                     value = fval;
                 }
             } catch( NumberFormatException e ) {
-                LOG.log( Level.WARNING, "Cannot convert {0} to java.lang.Float.", e.getMessage() );
+                LOG.warn( "Cannot convert {0} to java.lang.Float.", e.getMessage() );
             }
         } else if( qName.equalsIgnoreCase( "boolean" ) ) {
             Boolean bval;

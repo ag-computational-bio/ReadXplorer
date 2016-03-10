@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -26,6 +27,7 @@ import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
 import de.cebitec.readxplorer.ui.dialogmenus.ImportTrackBasePanel;
 import de.cebitec.readxplorer.ui.importer.actions.ImportWizardAction;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.beans.PropertyChangeEvent;
@@ -33,13 +35,14 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,7 +54,7 @@ import org.openide.util.NbBundle;
 public class ImportSetupCard extends JPanel {
 
     private static final long serialVersionUID = 127732323;
-    private static final Logger LOG = Logger.getLogger( ImportSetupCard.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ImportSetupCard.class.getName() );
     private boolean canImport;
     public static final String PROP_HAS_JOBS = "hasJobs";
     public static final String PROP_JOB_SELECTED = "jobSelected";
@@ -67,7 +70,12 @@ public class ImportSetupCard extends JPanel {
         refJobView.addPropertyChangeListener( this.getJobPropListener() );
         trackJobView.addPropertyChangeListener( this.getJobPropListener() );
         readPairTrackJobsView.addPropertyChangeListener( this.getJobPropListener() );
-        trackID = ProjectConnector.getInstance().getLatestTrackId();
+        try {
+            trackID = ProjectConnector.getInstance().getLatestTrackId();
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( new DatabaseException( ex.getMessage() + "Restart software before import, " +
+                                                                    "otherwise existing tracks might be overwritten!", ex ) );
+        }
     }
 
 
@@ -345,7 +353,7 @@ public class ImportSetupCard extends JPanel {
         }
 
         readPairTrackJobsView.add( new ReadPairJobContainer( trackJob1, trackJob2,
-                                                                  readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation() ) );
+                                                             readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation() ) );
     }
 
 
