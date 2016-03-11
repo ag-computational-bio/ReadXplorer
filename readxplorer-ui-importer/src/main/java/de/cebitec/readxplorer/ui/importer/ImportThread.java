@@ -240,11 +240,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         String guienvProp = System.getProperty( "guienv" );
         List<SeqIdCorrectionContainer> identicalDictionaries = new ArrayList<>();
+        boolean manualCorrectionNeeded = false;
         for( SeqIdCorrectionContainer correctionContainer : seqIdCorrectionList ) {
             if( !correctionContainer.isSeqIdsValid() ) {
                 if( guienvProp == null || guienvProp.equals( "true" ) ) {
                     //We always trigger manual editing if at least one mapping file id is missing in the reference
                     mergeIdenticalDictionaries( identicalDictionaries, correctionContainer );
+                    manualCorrectionNeeded = true;
 
                 } else if( correctionContainer.getFoundIds() == 0 ) {
                     noErrors = false;
@@ -255,13 +257,15 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             }
         }
 
-        SeqIdManualCorrector manualCorrector = new SeqIdManualCorrector();
-        try {
-            manualCorrector.triggerManualEditing( identicalDictionaries );
-        } catch( ParsingException ex ) {
-            noErrors = false;
-            ErrorHelper.getHandler().handle( ex, "Reference ID error" );
-            printAndLogError( ex );
+        if( manualCorrectionNeeded ) {
+            SeqIdManualCorrector manualCorrector = new SeqIdManualCorrector();
+            try {
+                manualCorrector.triggerManualEditing( identicalDictionaries );
+            } catch( ParsingException ex ) {
+                noErrors = false;
+                ErrorHelper.getHandler().handle( ex, "Reference ID error" );
+                printAndLogError( ex );
+            }
         }
     }
 
