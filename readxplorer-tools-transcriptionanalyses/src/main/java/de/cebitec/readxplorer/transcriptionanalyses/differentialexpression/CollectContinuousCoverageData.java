@@ -38,9 +38,9 @@ import java.util.Map;
  * <p>
  * @author Agne Matuseviciute
  */
-public class CollectContinuousCoverageData implements Observer{
+public class CollectContinuousCoverageData implements Observer {
 
-  /**
+    /**
      * The whole set of features for the current genome.
      */
     private final List<PersistentFeature> genomeFeatures;
@@ -103,15 +103,15 @@ public class CollectContinuousCoverageData implements Observer{
                 ParametersFeatureTypes featTypeParams = new ParametersFeatureTypes( EnumSet.allOf( FeatureType.class ), startOffset, stopOffset );
                 int featStart = featTypeParams.calcFeatureStartOffset( feature );
                 int featStop = featTypeParams.calcFeatureStopOffset( feature );
-                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() :
-                    !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand()
+                                         : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                 boolean fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
-                int[] featurePositions = new int[featStop-featStart];
-                if( !continuousCountData.containsKey( feature ) ) {                                    
-                    Arrays.fill(featurePositions, 0);
-                    continuousCountData.put( feature,  featurePositions);
+                int[] featurePositions = new int[featStop - featStart];
+                if( !continuousCountData.containsKey( feature ) ) {
+                    Arrays.fill( featurePositions, 0 );
+                    continuousCountData.put( feature, featurePositions );
                 }
                 for( int j = lastMappingIdx; j < mappings.size(); j++ ) {
                     Mapping mapping = mappings.get( j );
@@ -125,15 +125,30 @@ public class CollectContinuousCoverageData implements Observer{
                         }
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
                             featurePositions = continuousCountData.get( feature );
-                            for( int i = mapping.getStart()-feature.getStart();
-                               ((i <= mapping.getStop()-feature.getStart()) && 
-                                (i < featurePositions.length)); i++ ) {
-                                if(i<0){
+                            for( int i = mapping.getStart() - feature.getStart();
+                                 ( (i <= mapping.getStop() - feature.getStart()) &&
+                                   (i < featurePositions.length) ); i++ ) {
+                                if( i < 0 ) {
                                     i = 0;
                                 }
                                 featurePositions[i]++;
                             }
-                            continuousCountData.put( feature, featurePositions );
+                            /*
+                             * If the feature is on the rv strand the entries in
+                             * the array need to be reversed in order to reflect
+                             * the oriantation of the feature correctly.
+                             */
+                            if( !feature.isFwdStrand() ) {
+                                int[] revFeaturePositions = new int[featurePositions.length];
+                                int indexFW = 0;
+                                int indexRV = revFeaturePositions.length - 1;
+                                while( indexFW < featurePositions.length ) {
+                                    revFeaturePositions[indexRV--] = featurePositions[indexFW++];
+                                }
+                                continuousCountData.put( feature, revFeaturePositions );
+                            } else {
+                                continuousCountData.put( feature, featurePositions );
+                            }
                         }
                         //still mappings left, but need next feature
                     } else if( mapping.getStart() > featStop ) {
@@ -157,5 +172,6 @@ public class CollectContinuousCoverageData implements Observer{
     public Map<PersistentFeature, int[]> getContinuousCountData() {
         return Collections.unmodifiableMap( continuousCountData );
     }
-    
+
+
 }
