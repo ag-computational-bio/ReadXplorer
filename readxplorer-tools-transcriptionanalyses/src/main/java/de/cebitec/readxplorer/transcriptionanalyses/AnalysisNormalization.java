@@ -198,7 +198,7 @@ public class AnalysisNormalization implements Observer, AnalysisI<List<Normalize
                             boolean countIt = assignedMapping.checkAssignment( featStart, featStop, feature, isStrandBothOption );
                             if( countIt ) {
                                 assignedMapping.checkCountDecrease( featureReadCount );
-                                ++currentCount;
+                                ++currentCount; //TODO: include multiple mapped read step: check included classes and add fractional count from all included mappings of a read
                                 geneReadLengthSum += mapping.getLength();
                             }
                         }

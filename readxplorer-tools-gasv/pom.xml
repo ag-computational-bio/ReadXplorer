@@ -105,6 +105,11 @@
             <groupId>bio.jlu.comp.readxplorer</groupId>
             <artifactId>batik.nbm</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-javahelp</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
     </dependencies>
 
 
