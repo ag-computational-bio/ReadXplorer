@@ -400,7 +400,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
             TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
             TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
-            if( trackJob1.isCanBeImported() && trackJob2.isCanBeImported() ) {
+            if( trackJob1.isCanBeImported() && trackJob2 == null || 
+                trackJob2 != null && trackJob2.isCanBeImported() ) {
                 try {
                     this.setChromLengthMap( trackJob1 );
                     File inputFile1 = trackJob1.getFile();
