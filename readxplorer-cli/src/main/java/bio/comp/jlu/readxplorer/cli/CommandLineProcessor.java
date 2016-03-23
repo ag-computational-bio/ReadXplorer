@@ -113,9 +113,9 @@ import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.TSS;
  * Optional:
  * <ul>
  * <li>--db {name}: name of newly created H2 database file</li>
- * <li>--props {file}: a customised property file</li>
+ * <li>--properties {file}: a customised property file</li>
  * <li>--threads {n}: enables multithreading with {n} worker threads</li>
- * <li>-p / --pairedend: files stored in -r/--reads dir are combined paired-end
+ * <li>-p / --paired-end: files stored in -r/--reads dir are combined paired-end
  * files</li>
  * <li>-v / --verbose: enables verbose output</li>
  * <li>-h / --help: prints a usage to STD out</li>
@@ -142,15 +142,15 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Mandatory options
      */
     @Arg( longName = "ref" )
-    @Description( shortDescription = "Reference genome to import." )
+    @Description( shortDescription = "Reference genome to import. Supported file formats: FASTA, GFF2/3, GenBank, EMBL" )
     public String referenceArg;
 
     @Arg( longName = "reads" )
-    @Description( shortDescription = "Directory with SAM/BAM read files to import [and analyse]." )
+    @Description( shortDescription = "Directory with SAM/BAM read files to import [and analyse]. Supported read files: single and forward / interlaced paired-end" )
     public String readsDirArg;
 
     @Arg( longName = "per" )
-    @Description( shortDescription = "Directory with SAM/BAM paired-end read files to import [and analyse]." )
+    @Description( shortDescription = "Directory with SAM/BAM reverse paired-end read files to import [and analyse]." )
     public String pairedEndReadsDirArg;
 
 
@@ -158,27 +158,27 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Optional options
      */
     @Arg( longName = "threads" )
-    @Description( shortDescription = "Specifies the number of available worker threads. Please, take care on multi user systems!" )
+    @Description( shortDescription = "Number of available worker threads. Please, take care on multi user systems!" )
     public String threadAmountArg;
 
     @Arg( longName = "db" )
-    @Description( shortDescription = "Set a database name to persistently store imported data (default: " + DEFAULT_DATABASE_NAME + "). ATTENTION! Existing databases will be deleted!" )
+    @Description( shortDescription = "Database name to persistently store imported data (default: " + DEFAULT_DATABASE_NAME + "). ATTENTION! Existing databases will be deleted!" )
     public String dbFileArg;
 
-    @Arg( longName = "props" )
-    @Description( shortDescription = "Sets the path to a custom property file." )
+    @Arg( longName = "properties" )
+    @Description( shortDescription = "Path to custom property file. Use this to set custom analyses properties." )
     public String propsFileArg;
 
-    @Arg( shortName = 'p', longName = "pairedend" )
-    @Description( shortDescription = "Set this flag if reads are paired-end reads." )
+    @Arg( shortName = 'p', longName = "paired-end" )
+    @Description( shortDescription = "Flag indicating <reads> as interlaced paired-end reads. Use this flag only if <per> is not set!" )
     public boolean pairedEndArg;
 
     @Arg( shortName = 'v', longName = "verbose" )
-    @Description( shortDescription = "Print detailed messages to the console." )
+    @Description( shortDescription = "Print detailed messages." )
     public boolean verboseArg;
 
     @Arg( shortName = 'h', longName = "help" )
-    @Description( shortDescription = "Print usage information to the console." )
+    @Description( shortDescription = "Print the readxplorer-cli usage." )
     public boolean helpArg;
 
 
