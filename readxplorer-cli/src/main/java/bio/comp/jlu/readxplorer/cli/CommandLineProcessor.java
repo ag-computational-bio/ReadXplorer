@@ -235,6 +235,16 @@ public final class CommandLineProcessor implements ArgsProcessor {
         }
 
 
+        // check option logics
+        if( pairedEndArg  &&  pairedEndReadsDirArg != null ) {
+            Exception iae = new IllegalArgumentException( "<paired-end> option is not allowed in combination with <per>!\nEither provide interlaced paired-end reads via <reads> and mark them as interlaced with <paired-end> or separate forward / reverse paired-end reads into <reads> and <per>." );
+            LOG.error( iae.getMessage(), iae );
+            CommandException ce = new CommandException( 1 );
+            ce.initCause( iae );
+            throw ce;
+        }
+
+
         // print optional arguments...
         final PrintStream ps = env.getOutputStream();
         try {
@@ -326,7 +336,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
             File referenceFile = new File( referenceArg );
             if( !referenceFile.canRead() ) {
-                throw new CommandException( 1, "Cannot access reference file (" + referenceArg + ")!" );
+                throw new CommandException( 1, "Reference file (" + referenceArg + ") is not readable!" );
             }
             printFine( ps, null );
             printFine( ps, "reference file to import: " + referenceFile.getName() );
@@ -334,7 +344,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return referenceFile;
 
         } else {
-            throw new CommandException( 1, "No reference file set!" );
+            throw new CommandException( 1, "No reference file provided!\nPlease, have a look at the usage via \"readxplorer-cli -h\"." );
         }
 
     }
@@ -363,7 +373,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
                 File readFile = readFiles[i];
                 if( !readFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access read file " + (i + 1) + '(' + readFile.getName() + ")!" );
+                    throw new CommandException( 1, "Read file " + (i + 1) + '(' + readFile.getName() + ") is not readable!" );
                 }
                 printFine( ps, "\t- " + readFile.getName() );
 
@@ -371,7 +381,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return readFiles;
 
         } else {
-            throw new CommandException( 1, "No read files set!" );
+            throw new CommandException( 1, "No read files provided!\nPlease, have a look at the usage via \"readxplorer-cli -h\"." );
         }
 
     }
@@ -411,7 +421,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
                 File pairedEndReadFile = pairedEndReadFiles[i];
                 if( !pairedEndReadFile.canRead() ) { // check file permissions
-                    throw new CommandException( 1, "Cannot access paired-end file " + (i + 1) + "(" + pairedEndReadFile.getName() + ")!" );
+                    throw new CommandException( 1, "Paired-end file " + (i + 1) + "(" + pairedEndReadFile.getName() + ") is not readable!" );
                 }
 
                 printFine( ps, "\t- " + pairedEndReadFile.getName() );
@@ -421,7 +431,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             return pairedEndReadFiles;
 
         } else {
-            throw new CommandException( 1, "No paired-end read files set!" ); // never reachable; only for the sake of readability
+            throw new CommandException( 1, "No paired-end read files provided!\nPlease, have a look at the usage via \"readxplorer-cli -h\"." ); // never reachable; only for the sake of readability
         }
 
     }
@@ -506,7 +516,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of reference file failed:" );
             printInfo( ps, "reason: " + ex.getMessage() );
-            CommandException ce = new CommandException( 1, "reference import failed!" );
+            CommandException ce = new CommandException( 1, "Import of reference failed!" );
             ce.initCause( ex );
             throw ce;
         }
@@ -570,7 +580,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of read file failed:" );
             printInfo( ps, "reason: " + ex.getMessage() );
-            CommandException ce = new CommandException( 1, "track import failed!" );
+            CommandException ce = new CommandException( 1, "Import of tracks failed!" );
             ce.initCause( ex );
             throw ce;
         }
@@ -656,7 +666,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             LOG.error( ex.getMessage(), ex );
             printInfo( ps, "import of paired-end read file failed:" );
             printInfo( ps, "reason: " + ex.getMessage() );
-            CommandException ce = new CommandException( 1, "track import failed!" );
+            CommandException ce = new CommandException( 1, "Import of track failed!" );
             ce.initCause( ex );
             throw ce;
         }
@@ -777,7 +787,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
             LOG.error( ex.getMessage(), ex );
             printInfo( ps, "analysis failed:" );
             printInfo( ps, "reason: " + ex.getMessage() );
-            CommandException ce = new CommandException( 1, "analysis failed!" );
+            CommandException ce = new CommandException( 1, "Analysis failed!" );
             ce.initCause( ex );
             throw ce;
         }
@@ -947,7 +957,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         } catch( IOException | BiffException | IndexOutOfBoundsException | WriteException ex ) {
             LOG.error( "ERROR: merge " + analysisType + " analysis files: " + ex.getMessage(), ex );
-            CommandException ce = new CommandException( 1, "merge of " + analysisType + " analysis files failed!" );
+            CommandException ce = new CommandException( 1, "Merge of " + analysisType + " analysis result files failed!" );
             ce.initCause( ex );
             throw ce;
         }
