@@ -797,7 +797,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
         if( snpAnalysis ) {
             mergeAnlaysisFiles( ps, "snp", new AnalysisFileFilter( SNP ) );
         }
-        if( snpAnalysis ) {
+        if( tssAnalysis ) {
             mergeAnlaysisFiles( ps, "tss", new AnalysisFileFilter( TSS ) );
         }
 
@@ -935,10 +935,13 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private static void mergeAnlaysisFiles( final PrintStream ps, final String analysisType, final FileFilter fileFilter ) throws CommandException {
 
         try {
+            LOG.debug( "analysesType={0}, fileFilter={1}", analysisType, fileFilter );
             File analysesFile = new File( analysisType + "-analyses.xls" );
+            LOG.debug( "analyses file: {}", analysesFile );
             WritableWorkbook wwb = Workbook.createWorkbook( analysesFile );
             int idxSheet = 0;
             for( File analysisFile : (new File( "." )).getCanonicalFile().listFiles( fileFilter ) ) {
+                LOG.debug( "\tanalysis file: {}", analysisFile );
                 Workbook wb = Workbook.getWorkbook( analysisFile );
                 String analysisName = analysisFile.getName().replace( analysisType + "-", "" ).replace( ".xls", "" );
                 if( idxSheet == 0 ) { // copy analysis statistics
