@@ -164,12 +164,25 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         WritableWorkbook workbook = Workbook.createWorkbook( file, wbSettings );
         WritableSheet sheet = null;
         int totalPage = 0;
+//        LOG.debug( "# headers={}, # data={}", headers.size(), exportData.size() );
         for( int i = 0; i < exportData.size(); i++ ) {
             String sheetName = sheetNames.get( i );
             List<List<Object>> sheetData = exportData.get( i );
             List<String> headerRow = headers.get( i );
-            boolean dataLeft = true;
+//            LOG.debug( "\tsheet name={}, # header={}, # data={}", sheetName, headerRow.size(), sheetData.size() );
             int currentPage = 0;
+            if( sheetData.isEmpty() ) { // prevent Excel export from looping infinitely
+                LOG.warn( "no data to export! Skip sheet data." );
+                sheet = workbook.createSheet( sheetName, totalPage );
+                totalPage++;
+                int col = 0;
+                for( String header : headerRow ) {
+                    addCell( sheet, TABLE_LABEL, header, col, 0 );
+                    col++;
+                }
+                continue;
+            }
+            boolean dataLeft = true;
             while( dataLeft ) { //only 65536 rows allowed per sheet in xls format
                 if( !sheetData.isEmpty() ) {
                     if( currentPage > 0 ) {
@@ -183,6 +196,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
                 if( sheet != null ) {
                     dataLeft = fillSheet( sheet, sheetData, headerRow );
                 }
+//                LOG.debug( "\t\tsheet name={}, # data={}, data-left={}", sheetName, sheetData.size(), dataLeft );
             }
         }
         workbook.write();
@@ -198,17 +212,17 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
         int col = 0;
 
         for( String header : headerRow ) {
-            addColumn( sheet, TABLE_LABEL, header, col, row );
+            addCell( sheet, TABLE_LABEL, header, col, row );
             col++;
         }
         row++;
-
+//        LOG.debug( "\t\t\t# sheet-data={}", sheetData.size() );
         for( List<Object> exportRow : sheetData ) {
             col = 0;
             for( Object entry : exportRow ) {
                 String objectType = getObjectType( entry );
                 try {
-                    addColumn( sheet, objectType, entry, col, row );
+                    addCell( sheet, objectType, entry, col, row );
                     col++;
                 } catch( RowsExceededException e ) {
                     dataLeft = true;
@@ -251,7 +265,7 @@ public abstract class AnalysisCallable implements Callable<AnalysisResult> {
     }
 
 
-    private static void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
+    private static void addCell( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
 
         if( cellvalue == null ) {
             sheet.addCell( new Label( column, row, "n/a" ) );
