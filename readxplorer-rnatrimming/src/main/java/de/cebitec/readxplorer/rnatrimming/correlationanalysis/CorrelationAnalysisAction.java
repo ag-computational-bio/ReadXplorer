@@ -28,7 +28,6 @@ import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -36,6 +35,8 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,7 +53,7 @@ import org.openide.util.NbBundle.Messages;
 @Messages( "CTL_CorrelationAnalysisAction=Correlation analysis" )
 public final class CorrelationAnalysisAction implements ActionListener {
 
-    private static final Logger LOG = Logger.getLogger( CorrelationAnalysisAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CorrelationAnalysisAction.class.getName() );
 
     public static final String PROP_SELECTED_TRACKS = "PROP_SELECTED_TRACKS";
     public static final String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";

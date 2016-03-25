@@ -31,14 +31,16 @@ import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.util.Map;
-import java.util.logging.Logger;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Level.INFO;
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -50,7 +52,7 @@ import static java.util.logging.Level.INFO;
  */
 public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
-    private static final Logger LOG = Logger.getLogger( SamBamReadPairStatsParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SamBamReadPairStatsParser.class.getName() );
 
     //TODO: identify when pair goes across end of genome but only if circular reference genome
     private final TrackJob trackJob;
@@ -89,14 +91,15 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
     @Override
     public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
 
-        try( SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() ) ) {
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( trackJob.getFile() );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
+            
             long start = System.currentTimeMillis();
             long finish;
             int lineNo = 0;
             notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Start" ) );
-
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-            SAMRecordIterator samItor = samBamReader.iterator();
 
             while( samItor.hasNext() ) {
                 ++lineNo;
@@ -143,8 +146,6 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                 System.err.flush();
             }
 
-            samItor.close();
-
             finish = System.currentTimeMillis();
             String msg = NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Finish" );
             this.notifyObservers( Benchmark.calculateDuration( start, finish, msg ) );
@@ -153,7 +154,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
         } catch( Exception e ) {
             this.notifyObservers( NbBundle.getMessage( SamBamReadPairClassifier.class, "ReadPairStatsParser.Error", e.getMessage() ) );
-            LOG.log( INFO, e.getMessage() );
+            LOG.info( e.getMessage() );
         }
 
         return new ParsedReadPairContainer();

@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.ui.dialogmenus.explorer;
 
 
+import de.cebitec.readxplorer.utils.OsUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -50,7 +51,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
     /**
      * Center the content of the cells displaying text.
      */
-    protected boolean centered = System.getProperty( "os.name" ).toLowerCase().indexOf( "windows" ) < 0;
+    protected boolean centered = !OsUtils.isWindows();
     /**
      * Highlight the non editable cells making the foreground lighter.
      */

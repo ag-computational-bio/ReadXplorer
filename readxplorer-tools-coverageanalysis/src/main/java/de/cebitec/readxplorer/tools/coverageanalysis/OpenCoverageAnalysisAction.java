@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -32,6 +33,7 @@ import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -39,7 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -50,8 +51,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -75,7 +76,7 @@ import static java.util.logging.Level.SEVERE;
 public final class OpenCoverageAnalysisAction implements ActionListener,
                                                          DataVisualisationI {
 
-    private static final Logger LOG = Logger.getLogger( OpenCoverageAnalysisAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( OpenCoverageAnalysisAction.class.getName() );
     private static final String PROP_WIZARD_NAME = "CoverageAnalysisWiz";
     private final ReferenceViewer context;
     private final PersistentReference reference;
@@ -168,25 +169,27 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
 
         parameters = new ParameterSetCoverageAnalysis( minCoverageCount, isSumCoverage, detectCoveredIntervals, readClassesParams );
 
-        TrackConnector connector;
         if( !combineTracks ) {
             for( PersistentTrack track : this.tracks ) {
                 try {
-                    connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    this.createAnalysis( connector, readClassesParams );
+
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                    continue;
+                } catch( DatabaseException e ) {
+                    ErrorHelper.getHandler().handle( e );
                 }
-
-                this.createAnalysis( connector, readClassesParams );
             }
         } else {
             try {
-                connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
+                TrackConnector connector = (new SaveFileFetcherForGUI()).getTrackConnector( tracks, combineTracks );
                 this.createAnalysis( connector, readClassesParams );
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+            } catch( DatabaseException e ) {
+                ErrorHelper.getHandler().handle( e );
             }
         }
     }
@@ -200,7 +203,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
      */
     private void createAnalysis( TrackConnector connector, ParametersReadClasses readClassesParams ) {
         AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler( this,
-                                                                              NbBundle.getMessage( OpenCoverageAnalysisAction.class, "MSG_AnalysesWorker.progress.name" ), readClassesParams );
+                                                                              NbBundle.getMessage( OpenCoverageAnalysisAction.class, "MSG_AnalysesWorker.progress.name" ),
+                                                                              readClassesParams );
 
         AnalysisCoverage analysisCoverage = new AnalysisCoverage( connector, parameters );
         covAnalysisHandler.registerObserver( analysisCoverage );
@@ -264,7 +268,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
             }
 
         } catch( ClassCastException e ) {
-            LOG.log( SEVERE, "Unknown data received in " + this.getClass().getName() );
+            LOG.error( "Unknown data received in " + this.getClass().getName() );
         }
 
     }

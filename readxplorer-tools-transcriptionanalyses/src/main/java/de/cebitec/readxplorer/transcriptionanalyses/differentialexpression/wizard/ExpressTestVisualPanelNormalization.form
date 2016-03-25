@@ -23,7 +23,7 @@
                   <Component id="jScrollPane2" alignment="1" pref="490" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="searchLable" min="-2" max="-2" attributes="0"/>
+                          <Component id="searchLabel" min="-2" max="-2" attributes="0"/>
                           <Component id="calculateButton" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="useHKGButton" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -42,7 +42,7 @@
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Component id="useHKGButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="searchLable" min="-2" max="-2" attributes="0"/>
+              <Component id="searchLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="searchField" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
@@ -82,10 +82,10 @@
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="searchLable">
+    <Component class="javax.swing.JLabel" name="searchLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="ExpressTestVisualPanelNormalization.searchLable.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="ExpressTestVisualPanelNormalization.searchLabel.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>

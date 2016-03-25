@@ -21,6 +21,7 @@ package bio.comp.jlu.readxplorer.cli.analyses;
 import bio.comp.jlu.readxplorer.cli.filefilter.AnalysisFileFilter;
 import de.cebitec.readxplorer.api.enums.IntervalRequestData;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -37,23 +38,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import jxl.write.WriteException;
 import org.netbeans.api.sendopts.CommandException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.TSS;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.SEVERE;
 
 
 /**
- * Analysis Logic for CLI TSS Analysis.
- * Performs parallelised TSS analysis calculations and result output.
+ * Analysis Logic for CLI TSS Analysis. Performs parallelised TSS analysis
+ * calculations and result output.
  * <p>
- * For each imported track a transcription start site analysis will be performed.
- * Analysis preferences are read from set properties file or if not specified
- * from standard property file. After all calculations have been performed
- * results will be written to an output file.
+ * For each imported track a transcription start site analysis will be
+ * performed. Analysis preferences are read from set properties file or if not
+ * specified from standard property file. After all calculations have been
+ * performed results will be written to an output file.
  * <p>
  * After all analyses have been performed, common result files will be merged
  * into a single result file for each type of analysis.
@@ -62,7 +62,7 @@ import static java.util.logging.Level.SEVERE;
  */
 public class TSSAnalysisCallable extends AnalysisCallable {
 
-    private static final Logger LOG = Logger.getLogger( TSSAnalysisCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TSSAnalysisCallable.class.getName() );
 
     private final PersistentTrack persistentTrack;
     private final ParameterSetTSS parameterSet;
@@ -71,7 +71,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
     /**
      * TSS Analysis Callable constructor.
      *
-     * @param verbosity is verbosity required?
+     * @param verbosity       is verbosity required?
      * @param persistentTrack imported track to analyse
      * @param parameterSetTSS set with tss parameters
      */
@@ -80,7 +80,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
         super( verbosity, TSS );
 
         this.persistentTrack = persistentTrack;
-        this.parameterSet    = parameterSetTSS;
+        this.parameterSet = parameterSetTSS;
 
     }
 
@@ -94,7 +94,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             final String trackFileName = trackFile.getName();
 
 
-            LOG.log( FINE, "start TSS analysis for {0}...", trackFileName );
+            LOG.trace( "start TSS analysis for {0}...", trackFileName );
             result.addOutput( "start analysis..." );
             final ProjectConnector pc = ProjectConnector.getInstance();
             final TrackConnector trackConnector = pc.getTrackConnector( persistentTrack );
@@ -108,10 +108,10 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             threadingHelper.start();
 
             AnalysesHandler analysisHandler = new AnalysesHandler( trackConnector, threadingHelper, "", parameterSet.getReadClassParams() );
-                analysisHandler.registerObserver( analysisTSS );
-                analysisHandler.setCoverageNeeded( true );
-                analysisHandler.setDesiredData( IntervalRequestData.ReadStarts );
-                analysisHandler.startAnalysis();
+            analysisHandler.registerObserver( analysisTSS );
+            analysisHandler.setCoverageNeeded( true );
+            analysisHandler.setDesiredData( IntervalRequestData.ReadStarts );
+            analysisHandler.startAnalysis();
 
             threadingHelper.join(); // blocks until analysisHandler finishes its job
             Map<Integer, PersistentTrack> trackMap = new HashMap<>();
@@ -120,7 +120,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             TssDetectionResult tssResult = new TssDetectionResult( analysisTSS.getResults(), parameterSet, trackMap, reference, false, 1, 0 );
 
 
-            LOG.log( FINE, "store TSS results for {0}...", trackFileName );
+            LOG.trace( "store TSS results for {0}...", trackFileName );
             result.addOutput( "store results..." );
             File resultFile = new File( "tss-" + trackFileName + '.' + AnalysisFileFilter.SUFFIX );
 
@@ -129,11 +129,11 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             writeFile( resultFile, tssResult.dataSheetNames(), tssResult.dataColumnDescriptions(), tssResult.dataToExcelExportList() );
             result.setResultFile( resultFile );
 
-        } catch( IOException | WriteException | InterruptedException ex ) {
-            LOG.log( SEVERE, ex.getMessage(), ex );
+        } catch( IOException | WriteException | InterruptedException | DatabaseException ex ) {
+            LOG.error( ex.getMessage(), ex );
             result.addOutput( "Error: " + ex.getMessage() );
         } catch( OutOfMemoryError ome ) {
-            LOG.log( SEVERE, ome.getMessage(), ome );
+            LOG.error( ome.getMessage(), ome );
             CommandException ce = new CommandException( 1, "ran out of memory!" );
             ce.initCause( ome );
             throw ce;
@@ -144,7 +144,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
     }
 
 
-    private void processResultForExport( TssDetectionResult tssResult, int refGenomeId ) {
+    private void processResultForExport( TssDetectionResult tssResult, int refGenomeId ) throws DatabaseException {
 
         //Generating promoter regions for the TSS
         List<String> promoterRegions = new ArrayList<>();

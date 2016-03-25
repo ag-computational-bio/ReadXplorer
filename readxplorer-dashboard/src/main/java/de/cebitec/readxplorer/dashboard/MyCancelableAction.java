@@ -20,16 +20,14 @@ package de.cebitec.readxplorer.dashboard;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
-
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,7 +37,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public final class MyCancelableAction implements ActionListener {
 
-    private static final Logger LOG = getLogger( MyCancelableAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MyCancelableAction.class.getName() );
 
     private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private RequestProcessor.Task theTask = null;
@@ -49,13 +47,13 @@ public final class MyCancelableAction implements ActionListener {
     public void actionPerformed( ActionEvent e ) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle( "task thats shows progress", new Cancellable() {
 
-            @Override
-            public boolean cancel() {
-                return handleCancel();
-            }
+                                                                  @Override
+                                                                  public boolean cancel() {
+                                                                      return handleCancel();
+                                                                  }
 
 
-        } );
+                                                              } );
 
         Runnable runnable = new Runnable() {
 
@@ -81,7 +79,7 @@ public final class MyCancelableAction implements ActionListener {
 
 
             private void doSomething( int i ) {
-                LOG.log( Level.INFO, "doSomething with {0}", i );
+                LOG.info( "doSomething with {0}", i );
             }
 
 

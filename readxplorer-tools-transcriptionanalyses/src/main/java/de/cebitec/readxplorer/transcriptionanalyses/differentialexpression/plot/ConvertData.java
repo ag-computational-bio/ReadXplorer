@@ -26,7 +26,8 @@ import de.cebitec.readxplorer.utils.Pair;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool.DeSeq;
@@ -39,7 +40,7 @@ import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpressio
  */
 public final class ConvertData {
 
-    private static final Logger LOG = Logger.getLogger( ConvertData.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ConvertData.class.getName() );
 
     private static final int BAY_SEQ_OFFSET = 3;
     private static final int CUT_OFF = 30;
@@ -75,7 +76,7 @@ public final class ConvertData {
                 input = createDataPairForFeature( result.getTableContents(), 0, 3, 5 );
                 break;
             default:
-                LOG.severe( "Encountered unknown DGE tool value." );
+                LOG.error( "Encountered unknown DGE tool value." );
         }
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
         for( PersistentFeature key : input.keySet() ) {
@@ -88,12 +89,10 @@ public final class ConvertData {
                 Double a;
                 if( r == 0 ) {
                     a = (Math.log( g ) / Math.log( 2 ));
+                } else if( g == 0 ) {
+                    a = (Math.log( r ) / Math.log( 2 ));
                 } else {
-                    if( g == 0 ) {
-                        a = (Math.log( r ) / Math.log( 2 ));
-                    } else {
-                        a = ((Math.log( r ) / Math.log( 2 )) + (Math.log( g ) / Math.log( 2 ))) / 2;
-                    }
+                    a = ((Math.log( r ) / Math.log( 2 )) + (Math.log( g ) / Math.log( 2 ))) / 2;
                 }
                 //Values have to be added in other order than one would think, because
                 //the A value is shown on the X-Axis and the M value on the Y-Axis. So at

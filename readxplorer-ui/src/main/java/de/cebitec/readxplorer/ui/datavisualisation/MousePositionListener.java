@@ -25,9 +25,16 @@ package de.cebitec.readxplorer.ui.datavisualisation;
  */
 public interface MousePositionListener {
 
+    /**
+     * @param logPos The current mouse position in genomic coordinates
+     */
     void setCurrentMousePosition( int logPos );
 
 
+    /**
+     * @param requested <code>true</code> if mouse over painting is requested,
+     *                  <code>false</code> otherwise.
+     */
     void setMouseOverPaintingRequested( boolean requested );
 
 

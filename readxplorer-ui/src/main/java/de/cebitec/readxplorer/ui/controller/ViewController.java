@@ -184,7 +184,8 @@ public class ViewController implements MousePositionListener {
 
         if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) && !otp.getSelectedTracks().isEmpty() ) {
             if( otp.isCombineTracks() ) {
-                basePanelFac.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
+                BasePanel multiTracksPanel = basePanelFac.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks() );
+                multiTracksPanel.addPrefListener( getPrefChangeListener( multiTracksPanel ) );
             } else {
                 this.openTracksOnCurrentGenome( otp.getSelectedTracks() );
             }
@@ -225,7 +226,7 @@ public class ViewController implements MousePositionListener {
         if( okSelected ) {
             BasePanelFactory factory = this.getBasePanelFac();
             BasePanel tracksPanel = factory.getMultipleTracksBasePanel( otp.getSelectedTracks(), currentRefGen, false );
-            tracksPanel.addPrefListener( this.getPrefChangeListener( tracksPanel ) );
+            tracksPanel.addPrefListener( getPrefChangeListener( tracksPanel ) );
         }
     }
 

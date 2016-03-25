@@ -21,6 +21,14 @@ package de.cebitec.readxplorer.rnatrimming;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readxplorer.utils.SimpleOutput;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFileWriterFactory;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,15 +36,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFileWriterFactory;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
 import org.h2.store.fs.FileUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -44,8 +44,10 @@ import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Level.SEVERE;
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 import static java.util.regex.Pattern.compile;
 
 
@@ -57,7 +59,7 @@ import static java.util.regex.Pattern.compile;
  */
 public class RNATrimProcessor {
 
-    private static final Logger LOG = Logger.getLogger( RNATrimProcessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RNATrimProcessor.class.getName() );
     private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private static final Pattern OS_PATTERN = compile( ":os:" );
 
@@ -67,22 +69,22 @@ public class RNATrimProcessor {
     private final TrimProcessResult trimProcessResult;
 
 
-    private Map<String, Integer> computeMappingHistogram( SAMFileReader samBamReader ) {
+    private Map<String, Integer> computeMappingHistogram( SamReader samBamReader ) {
         MapCounter<String> histogram = new MapCounter<>();
-        SAMRecordIterator samItor = samBamReader.iterator();
-        while( samItor.hasNext() && (!this.canceled) ) {
-            try {
-                SAMRecord record = samItor.next();
-                if( record.getReadUnmappedFlag() ) {
-                    histogram.put( record.getReadName(), 0 );
-                } else {
-                    histogram.incrementCount( record.getReadName() );
+        try( SAMRecordIterator samItor = samBamReader.iterator() ) {
+            while( samItor.hasNext() && (!this.canceled) ) {
+                try {
+                    SAMRecord record = samItor.next();
+                    if( record.getReadUnmappedFlag() ) {
+                        histogram.put( record.getReadName(), 0 );
+                    } else {
+                        histogram.incrementCount( record.getReadName() );
+                    }
+                } catch( SAMFormatException e ) {
+                    this.showMsg( "Cought SAMFormatException for a record in your SAM file: " + e.getMessage() );
                 }
-            } catch( SAMFormatException e ) {
-                this.showMsg( "Cought SAMFormatException for a record in your SAM file: " + e.getMessage() );
             }
         }
-        samItor.close();
         return histogram;
     }
 
@@ -101,13 +103,13 @@ public class RNATrimProcessor {
         ProgressHandle ph = ProgressHandleFactory.createHandle(
                 NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Start", sourcePath ),
                 new Cancellable() {
-                    @Override
-                    public boolean cancel() {
-                        return handleCancel();
-                    }
+            @Override
+            public boolean cancel() {
+                return handleCancel();
+            }
 
 
-                } );
+        } );
         ph.start();
 
         //count the number of lines in the samfile, to estimate the progress
@@ -118,8 +120,10 @@ public class RNATrimProcessor {
         //int mapped = 0;
         this.trimProcessResult.setMappedReads( 0 );
         int currentline = 0;
-        try( SAMFileReader samBamReader = new SAMFileReader( samfile ) ) {
-            SAMRecordIterator samItor = samBamReader.iterator();
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( samfile );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
 
             FileWriter fileWriter = new FileWriter( new File( fastaPath ) );
             BufferedWriter fasta = new BufferedWriter( fileWriter );
@@ -150,8 +154,8 @@ public class RNATrimProcessor {
                     if( record.getReadUnmappedFlag() ) {
                         TrimMethodResult trimResult = method.trim( record.getReadString() );
                         fasta.write( ">" + record.getReadName() + separator + trimResult.getOsField() +
-                                 separator + trimResult.getTrimmedCharsFromLeft() +
-                                 separator + trimResult.getTrimmedCharsFromRight() + "\n" );
+                                     separator + trimResult.getTrimmedCharsFromLeft() +
+                                     separator + trimResult.getTrimmedCharsFromRight() + "\n" );
                         fasta.write( trimResult.getSequence() + "\n" );
                         this.trimProcessResult.incrementTrimmedReads();
                     } else {
@@ -165,7 +169,6 @@ public class RNATrimProcessor {
             //this.trimmedReads = this.allReads-this.mappedReads;
             fasta.close();
             fileWriter.close();
-            samItor.close();
             this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Finish", samfile.getAbsolutePath() ) );
         } catch( Exception e ) {
             Exceptions.printStackTrace( e );
@@ -194,13 +197,13 @@ public class RNATrimProcessor {
         ProgressHandle ph = ProgressHandleFactory.createHandle(
                 NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ),
                 new Cancellable() {
-                    @Override
-                    public boolean cancel() {
-                        return handleCancel();
-                    }
+            @Override
+            public boolean cancel() {
+                return handleCancel();
+            }
 
 
-                } );
+        } );
         ph.start();
 
         //count the number of lines in the samfile, to estimate the progress
@@ -208,8 +211,10 @@ public class RNATrimProcessor {
         ph.switchToDeterminate( lines );
 
         int currentline = 0;
-        try( SAMFileReader samBamReader = new SAMFileReader( samfile ) ) {
-            SAMRecordIterator samItor = samBamReader.iterator();
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( samfile );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
 
             SAMFileHeader header = samBamReader.getFileHeader();
             SAMFileWriterFactory factory = new SAMFileWriterFactory();
@@ -240,8 +245,8 @@ public class RNATrimProcessor {
                             record.setAttribute( "tl", tl ); // tl = trimmed from left
                             record.setAttribute( "tr", tr ); // tr = trimmed from right
                         } catch( NumberFormatException e ) {
-                            LOG.log( SEVERE, "RNATrimProcessor: Readname parts have wrong format - integer expected, but found: {0} and {1}",
-                                             new Object[]{ parts[2], parts[3] });
+                            LOG.error( "RNATrimProcessor: Readname parts have wrong format - integer expected, but found: {0} and {1}",
+                                       new Object[]{ parts[2], parts[3] } );
                         }
 
                     }
@@ -258,7 +263,6 @@ public class RNATrimProcessor {
                 }
             }
             writer.close();
-            samItor.close();
 
             this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Finish", samfile.getAbsolutePath() ) );
         } catch( Exception e ) {
@@ -273,7 +277,7 @@ public class RNATrimProcessor {
 
     /**
      * If any message should be printed to the console, this method is used. If
-     * an error occured during the run of the parser, which does not interrupt
+     * an error occurred during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print
@@ -312,13 +316,13 @@ public class RNATrimProcessor {
 
         final ProgressHandle ph = ProgressHandleFactory.createHandle( "Trim RNA reads in file '" + sourcePath + "'", new Cancellable() {
 
-            @Override
-            public boolean cancel() {
-                return handleCancel();
-            }
+                                                                  @Override
+                                                                  public boolean cancel() {
+                                                                      return handleCancel();
+                                                                  }
 
 
-        } );
+                                                              } );
         CentralLookup.getDefault().add( this );
 
         //the trim processor will:
@@ -378,8 +382,6 @@ public class RNATrimProcessor {
                 showMsg( "trimmed mapped reads: " + trimProcessResult.getTrimmedMappedReads() );
 
             }
-
-
 
 
         };

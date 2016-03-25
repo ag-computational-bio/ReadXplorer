@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
+import java.util.List;
 
 
 /**
@@ -51,7 +52,8 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        refGenList = new javax.swing.JList<>(ProjectConnector.getInstance().getGenomesAsArray());
+        List<PersistentReference> references = ProjectConnector.getInstance().getReferences();
+        refGenList = new javax.swing.JList<>(references.toArray( new PersistentReference[ references.size() ] ) );
 
         setLayout(new java.awt.BorderLayout());
 

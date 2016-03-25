@@ -27,13 +27,12 @@ import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,7 +42,7 @@ import static java.util.logging.Level.INFO;
  */
 public final class TableUtils {
 
-    private static final Logger LOG = Logger.getLogger( TableUtils.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TableUtils.class.getName() );
 
 
     /**
@@ -76,7 +75,7 @@ public final class TableUtils {
                     wantedModelIdx = selectedModelIdx;
                 }
             } catch( ArrayIndexOutOfBoundsException e ) {
-                LOG.log( INFO, "Selected row transformation not possible due to ArrayIndexOutOfBoundsException" );
+                LOG.info( "Selected row transformation not possible due to ArrayIndexOutOfBoundsException" );
                 //do nothing, just return -1 since the transformation was not possible
             }
         }

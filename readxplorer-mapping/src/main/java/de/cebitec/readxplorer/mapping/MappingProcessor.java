@@ -22,12 +22,13 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readxplorer.utils.SimpleIO;
 import java.io.IOException;
-import java.util.logging.Logger;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -38,7 +39,7 @@ import org.openide.windows.InputOutput;
  */
 public class MappingProcessor {
 
-    private static final Logger LOG = Logger.getLogger( MappingProcessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MappingProcessor.class.getName() );
 
     private static final RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
     private RequestProcessor.Task theTask = null;
@@ -47,7 +48,7 @@ public class MappingProcessor {
 
     /**
      * If any message should be printed to the console, this method is used. If
-     * an error occured during the run of the parser, which does not interrupt
+     * an error occurred during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
      * <p>
      * @param msg the msg to print

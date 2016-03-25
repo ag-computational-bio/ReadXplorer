@@ -46,6 +46,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -68,6 +70,7 @@ public class SNPDetectionResultPanel extends ResultTablePanel {
     public static final String SNPS_DELETIONS = "Deletions";
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = LoggerFactory.getLogger( OpenSnpDetectionAction.class.getName() );
     private SnpDetectionResult completeSnpData;
     private Map<String, Integer> snpStatsMap;
     private PersistentReference reference;
@@ -316,8 +319,10 @@ public class SNPDetectionResultPanel extends ResultTablePanel {
 
             ParameterSetSNPs snpAnalysisParams = (ParameterSetSNPs) snpData.getParameters();
             for( PersistentChromosome chrom : reference.getChromosomes().values() ) {
+
                 List<PersistentFeature> featuresSorted = refGenCon.getFeaturesForRegionInclParents( 0, chrom.getLength(),
-                                                                                                    snpAnalysisParams.getSelFeatureTypes(), chrom.getId() );
+                                                                                                    snpAnalysisParams.getSelFeatureTypes(), 
+                                                                                                    chrom.getId() );
 
                 SnpTranslator snpTranslator = new SnpTranslator( featuresSorted, chrom, reference );
 

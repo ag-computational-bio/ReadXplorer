@@ -25,17 +25,21 @@ import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.NbBundle;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -100,38 +104,37 @@ public class SamBamCombiner implements CombinerI {
             String fileName = fileToExtend.getName();
             this.notifyObservers( NbBundle.getMessage( SamBamCombiner.class, "Combiner.Combine.Start", fileName + " and " + file2.getName() ) );
 
-            SAMFileReader samBamReader = new SAMFileReader( fileToExtend );
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-            SAMRecordIterator samBamItor = samBamReader.iterator();
-            SAMFileHeader header = samBamReader.getFileHeader();
-            if( sortCoordinate ) {
-                header.setSortOrder( SAMFileHeader.SortOrder.coordinate );
-            } else {
-                header.setSortOrder( SAMFileHeader.SortOrder.unsorted );
-            }
+            SamReaderFactory.setDefaultValidationStringency( LENIENT );
+            SamReaderFactory samReaderFactory = SamReaderFactory.make();
+            try( final SamReader samBamReader = samReaderFactory.open( fileToExtend );
+                 final SamReader samBamReader2 = samReaderFactory.open( file2 );
+                 SAMRecordIterator samBamItor = samBamReader.iterator();
+                 SAMRecordIterator samBamItor2 = samBamReader2.iterator(); ) {
 
-            //determine writer type (sam or bam):
-            Pair<SAMFileWriter, File> writerAndFilePair = SamUtils.createSamBamWriter(
-                    fileToExtend, header, !sortCoordinate, SamUtils.COMBINED_STRING );
+                SAMFileHeader header = samBamReader.getFileHeader();
+                if( sortCoordinate ) {
+                    header.setSortOrder( SAMFileHeader.SortOrder.coordinate );
+                } else {
+                    header.setSortOrder( SAMFileHeader.SortOrder.unsorted );
+                }
 
-            SAMFileWriter samBamFileWriter = writerAndFilePair.getFirst();
-            File outputFile = writerAndFilePair.getSecond();
-            trackJob1.setFile( outputFile );
-            trackJob2.setFile( new File( "" ) ); //clean file to make sure, it is not used anymore
+                //determine writer type (sam or bam):
+                Pair<SAMFileWriter, File> writerAndFilePair = SamUtils.createSamBamWriter(
+                        fileToExtend, header, !sortCoordinate, SamUtils.COMBINED_STRING );
 
-            this.readAndWrite( samBamItor, samBamFileWriter, true );
-            samBamItor.close();
-            samBamReader.close();
+                try( SAMFileWriter samBamFileWriter = writerAndFilePair.getFirst() ) {
+                    File outputFile = writerAndFilePair.getSecond();
+                    trackJob1.setFile( outputFile );
+                    trackJob2.setFile( new File( "" ) ); //clean file to make sure, it is not used anymore
+                    this.readAndWrite( samBamItor, samBamFileWriter, true );
+                    this.readAndWrite( samBamItor2, samBamFileWriter, false );
 
-            samBamReader = new SAMFileReader( file2 );
-            samBamItor = samBamReader.iterator();
-            this.readAndWrite( samBamItor, samBamFileWriter, false );
-            samBamItor.close();
-            samBamReader.close();
-            samBamFileWriter.close();
-
-            if( sortCoordinate ) {
-                success = SamUtils.createBamIndex( outputFile, this );
+                    if( sortCoordinate ) {
+                        success = SamUtils.createBamIndex( outputFile, this );
+                    }
+                }
+            } catch( IOException e ) {
+                throw new ParsingException( e );
             }
 
             long finish = System.currentTimeMillis();
@@ -145,7 +148,8 @@ public class SamBamCombiner implements CombinerI {
 
     /**
      * Carries out the actual I/O stuff. Also sets the proper read pair flags in
-     * the {@link SAMRecord}. Observers are noticed in case a read cannot be processed.
+     * the {@link SAMRecord}. Observers are noticed in case a read cannot be
+     * processed.
      * <p>
      * @param samBamItor       the iterator to read sam records from
      * @param samBamFileWriter the writer to write to

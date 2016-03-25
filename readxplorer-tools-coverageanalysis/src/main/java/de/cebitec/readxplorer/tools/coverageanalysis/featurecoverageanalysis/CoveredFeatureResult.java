@@ -155,6 +155,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         List<List<Object>> statisticsExportData = new ArrayList<>();
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( coveredString + " feature detection statistics for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createRxVersionRow() );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 

@@ -17,7 +17,7 @@ and open the template in the editor.
             <br />
             B) The <span style="text-decoration: underline;">minimal coverage increase in percent</span> from one position to the neighboring one (default = 50%).
             <br /><br />
-            In order to output currently unannotated transcript information along with the detected TSS, you can choose the "<span style="text-decoration: underline;">Novel transcript detection</span>". For detected TSS which do not have neighboring features on their respective strand in the given "<span style="text-decoration: underline;">Max distance of features to assign to TSS</span>" distance, it adds the information that this is a novel transcript. Further, a transcript stop is inferred by the coverage threshold "<span style="text-decoration: underline;">Min transcript extension coverage"</span>, which has to be set if the novel transcript detection checkbox is selected. Additionally, the position of the first start codon on the respective strand is calculated and the corresponding CDS up to the next in-frame stop codon is calculated and listed in the table. These entries aid distinguishing real CDS from other small RNAs. The corresponding table columns are:
+        <p style="text-align: justify;">In order to output currently unannotated transcript information along with the detected TSS, you can choose the "<span style="text-decoration: underline;">Novel transcript detection</span>". For detected TSS which do not have neighboring features on their respective strand in the given "<span style="text-decoration: underline;">Max distance of features to assign to TSS</span>" distance, it adds the information that this is a novel transcript. Further, a transcript stop is inferred by the coverage threshold "<span style="text-decoration: underline;">Min transcript extension coverage"</span>, which has to be set if the novel transcript detection checkbox is selected. Additionally, the position of the first start codon on the respective strand is calculated and the corresponding CDS up to the next in-frame stop codon is calculated and listed in the table. These entries aid distinguishing real CDS from other small RNAs. The corresponding table columns are:</p>
         <ul>
             <li>"<span style="text-decoration: underline;">Start Codon Pos</span>"</li>
             <li>"<span style="text-decoration: underline;">Leader Length</span>": Bp offset from the TSS to the start codon start position</li>
@@ -25,7 +25,7 @@ and open the template in the editor.
             <li>"<span style="text-decoration: underline;">Codon Transcript Length</span>": Bp length of the transcript deduced from the two codons</li>
         </ul>
         <br />
-        TSSs are also classified as "<span style="text-decoration: underline;">primary</span>" or "<span style="text-decoration: underline;">secondary</span>" TSS. This is achieved by flagging the most significant TSS in the chosen maximum distance to genomic features (s. above) as primary and all other valid TSS as secondary.
+        <p style="text-align: justify;">TSSs are also classified as "<span style="text-decoration: underline;">primary</span>" or "<span style="text-decoration: underline;">secondary</span>" TSS. This is achieved by flagging the most significant TSS in the chosen maximum distance to genomic features (s. above) as primary and all other valid TSS as secondary.
         <br /><br />
         Additionally, two more parameters can be set for TSS detection in low coverage regions:<br /> C) The <span style="text-decoration: underline;">Max low coverage read starts</span> (default = 20 reads) can be set
         <br />
@@ -43,5 +43,6 @@ and open the template in the editor.
     <p style="text-align: justify;">This is an exemplary result of a TSS detection. The highlighted position in the table is centered in the Reference and PersistentTrack Viewers. The secondary TSS (480994) at the start of the gene has reads (transcripts) starting at exactly that position, so it is annotated correctly and we have a leaderless transcript at the inspected position (a "Leaderless" column only appears in exported tables). But the selected primary TSS (480989) has many more reads starting there. One possibility is that an alternative transcript can be generated from this position on.
         <br />
         The statistics window displays the overall statistics of this TSS detection. TSS with a downstream feature can either have a wrong annotated CDS start, or we can observe a 5'UTR in this experiment.</p>
+    <p style="text-align: justify;">When exporting TSS tables, the upstream and downstream region of each TSS can be stored. The length of this region is configurable during export.</p>
 </body>
 </html>

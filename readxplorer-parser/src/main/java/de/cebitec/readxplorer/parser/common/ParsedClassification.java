@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.parser.common;
 
 
+import htsjdk.samtools.SAMFileHeader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.samtools.SAMFileHeader;
 
 
 /**
@@ -54,7 +54,7 @@ public class ParsedClassification {
 
     /**
      * @return The smallest number of mismatches for the associated read in the
-     * current data set.
+     *         current data set.
      */
     public int getMinMismatches() {
         return minMismatches;
@@ -67,7 +67,7 @@ public class ParsedClassification {
      * stored here.
      * <p>
      * @param mismatches The number of mismatches for the associated read at the
-     * current mapping position.
+     *                   current mapping position.
      */
     public void updateMinMismatches( int mismatches ) {
         if( mismatches < minMismatches ) {
@@ -93,8 +93,8 @@ public class ParsedClassification {
      * @param start the start of the current read
      * <p>
      * @return The start position of the next mapping or the smallest mapping
-     * position, if this is the largest mapping position in the array. If only
-     * one position is stored in the array, 0 is returned.
+     *         position, if this is the largest mapping position in the array.
+     *         If only one position is stored in the array, 0 is returned.
      */
     public int getNextMappingStart( int start ) {
         if( readStarts.size() <= 1 ) {
@@ -111,7 +111,8 @@ public class ParsedClassification {
      * @param start The start to which the next start should be returned
      * <p>
      * @return The next larger start position of the same read or the smallest
-     * mapping position, if this is the largest mapping position for the read
+     *         mapping position, if this is the largest mapping position for the
+     *         read
      */
     private int getSortedMappingStart( int start ) {
         int index = readStarts.indexOf( start ) + 1;
@@ -132,8 +133,8 @@ public class ParsedClassification {
      * @param start the start of the current read
      * <p>
      * @return The start position of the next mapping or the smallest mapping
-     * position, if this is the largest mapping position in the array. If no
-     * fitting position is found, 0 is returned.
+     *         position, if this is the largest mapping position in the array.
+     *         If no fitting position is found, 0 is returned.
      */
     private int calcNextMappingStart( int start ) {
 
@@ -158,7 +159,7 @@ public class ParsedClassification {
      * current data set.
      * <p>
      * @param mappingStart The mapping start position of this read to add to the
-     * list
+     *                     list
      */
     public void addReadStart( int mappingStart ) {
         readStarts.add( mappingStart );
@@ -175,7 +176,7 @@ public class ParsedClassification {
 
     /**
      * @return The map of a number of mismatches to their count = how often has
-     * this number of mismatches been observed in total.
+     *         this number of mismatches been observed in total.
      */
     public Map<Integer, Integer> getMismatchCountMap() {
         return Collections.unmodifiableMap( mismatchCountMap );

@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.polytree.Node;
@@ -29,10 +30,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,6 +43,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
  * @author kstaderm
  */
 public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger( ExportOnlyAnalysisHandler.class.getName() );
 
     private DeAnalysisData data;
     private List<ResultDeAnalysis> results;
@@ -73,37 +78,36 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         List<List<Object>> tableContents = new ArrayList<>();
 
         final ReferenceConnector referenceConnector = getReferenceConnector();
-        //This offset must correspond to the additional fields added by hand
-        final int offset = 8;
+        Map<Integer, PersistentChromosome> chromosomesForGenome = referenceConnector.getChromosomesForGenome();
+
         for( i = 0; i < data.getFeatures().length; i++ ) {
 
             boolean allZero = true;
-            final Object[] tmp = new Object[data.getSelectedTracks().size() + offset];
-            /*
-             * Here the additional fields are added. If one field is added or
-             * remove the "offset" value must be changed accordingly.
-             */
-            tmp[0] = referenceConnector.getChromosomeForGenome( feature[i].getChromId() );
+            final List<Object> tmp = new ArrayList<>();
+            // Here the additional fields are added. If something is added don't
+            // forget to also enter a additional colum name further down.
+            tmp.add( feature[i].getLocus() );
+            tmp.add( chromosomesForGenome.get( feature[i].getChromId() ) );
             if( feature[i].isFwdStrand() ) {
-                tmp[1] = "fw";
+                tmp.add( "fw" );
             } else {
-                tmp[1] = "rv";
+                tmp.add( "rv" );
             }
-            tmp[2] = feature[i].getStart();
-            tmp[3] = feature[i].getStop();
-            tmp[4] = calculateFeatureTypeLength( feature[i], FeatureType.EXON );
-            tmp[5] = calculateFeatureTypeLength( feature[i], FeatureType.INTRON );
-            tmp[6] = feature[i].getLength();
-            tmp[7] = feature[i].getType();
-            for( int j = offset; j < data.getSelectedTracks().size() + offset; j++ ) {
-                int value = countData[j - offset][i];
+            tmp.add( feature[i].getStart() );
+            tmp.add( feature[i].getStop() );
+            tmp.add( calculateFeatureTypeLength( feature[i], FeatureType.EXON ) );
+            tmp.add( calculateFeatureTypeLength( feature[i], FeatureType.INTRON ) );
+            tmp.add( feature[i].getLength() );
+            tmp.add( feature[i].getType() );
+            for( int j = 0; j < data.getSelectedTracks().size(); j++ ) {
+                int value = countData[j][i];
                 if( value != 0 ) {
                     allZero = false;
                 }
-                tmp[j] = value;
+                tmp.add( value );
             }
             if( !allZero ) {
-                tableContents.add( new Vector( Arrays.asList( tmp ) ) );
+                tableContents.add( tmp );
                 regionNamesList.add( feature[i] );
             }
             progressHandle.progress( i );
@@ -111,6 +115,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
         String[] trackDescriptions = data.getTrackDescriptions();
         List<Object> colNames = new ArrayList<>( trackDescriptions.length + 10 );
+        colNames.add( "Locus" );
         colNames.add( "Chromosome" );
         colNames.add( "Strand" );
         colNames.add( "Start" );

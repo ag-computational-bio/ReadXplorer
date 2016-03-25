@@ -31,22 +31,9 @@ public final class LoginProperties {
     private LoginProperties() {
     }
 
-
-    /**
-     * Database location for a mysql DB.
-     */
-    public static final String LOGIN_DATABASE_MYSQL = "login.database.mysql";
-    /**
-     * User name to use for the DB.
-     */
-    public static final String LOGIN_USER = "login.user";
-    /**
-     * Hostname to use for the DB.
-     */
-    public static final String LOGIN_HOSTNAME = "login.hostname";
     /**
      * Database location for an H2 DB.
      */
-    public static final String LOGIN_DATABASE_H2 = "login.database.h2";
+    public static final String LOGIN_DATABASE = "login.database";
 
 }

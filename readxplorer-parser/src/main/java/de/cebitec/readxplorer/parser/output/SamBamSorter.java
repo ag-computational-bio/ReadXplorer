@@ -24,15 +24,18 @@ import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SamUtils;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -61,20 +64,20 @@ public class SamBamSorter implements Observable {
      * SamFileHeader.SortOrder and sets the new sorted file as the file in the
      * trackJob.
      * <p>
-     * @param trackJob track job containing the file to sort
-     * @param sortOrder the sort order to use
+     * @param trackJob     track job containing the file to sort
+     * @param sortOrder    the sort order to use
      * @param sortOrderMsg the string representation of the sort order for
-     * status messages
+     *                     status messages
      * <p>
      * @return true, if the sorting was successful, false otherwise
      */
-    @NbBundle.Messages({
+    @NbBundle.Messages( {
         "# {0} - sort order",
         "MSG_SamBamSorter.sort.Start=Start sorting file by {0}...",
         "# {0} - sort order",
         "MSG_SamBamSorter.sort.Finish=Finished sorting file by {0}. ",
         "# {0} - track file",
-        "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported."})
+        "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported." } )
     public boolean sortSamBam( final TrackJob trackJob, final SAMFileHeader.SortOrder sortOrder, final String sortOrderMsg ) {
 
         boolean success = true;
@@ -84,10 +87,12 @@ public class SamBamSorter implements Observable {
         String msg;
         Pair<SAMFileWriter, File> writerAndFile = null;
 
-        try( SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() ) ) {
-            SAMRecordIterator samItor = samBamReader.iterator();
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( trackJob.getFile() );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
+            
             SAMFileHeader header = samBamReader.getFileHeader();
-            samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
             if( header.getSortOrder() != SAMFileHeader.SortOrder.queryname ) {
                 header.setSortOrder( sortOrder );
                 writerAndFile = SamUtils.createSamBamWriter( trackJob.getFile(), header, false, sortOrderMsg );
@@ -106,7 +111,6 @@ public class SamBamSorter implements Observable {
                     }
                 }
                 this.notifyObservers( "Writing sorted bam file... " );
-                samItor.close();
                 writer.close();
 
                 trackJob.setFile( writerAndFile.getSecond() );

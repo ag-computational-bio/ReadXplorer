@@ -499,7 +499,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             } catch( UnsupportedFlavorException ex ) {
                 JOptionPane.showMessageDialog( this, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             } catch( IOException ex ) {
-                JOptionPane.showMessageDialog( this, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
+                JOptionPane.showMessageDialog( this, "IOException occurred during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             }
         }
         return result;

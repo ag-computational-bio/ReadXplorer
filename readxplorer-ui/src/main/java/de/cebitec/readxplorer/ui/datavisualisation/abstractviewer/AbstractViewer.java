@@ -48,7 +48,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -62,8 +61,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
-
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -80,7 +79,7 @@ import static java.util.logging.Level.WARNING;
 public abstract class AbstractViewer extends JPanel implements
         LogicalBoundsListener, MousePositionListener {
 
-    private static final Logger LOG = Logger.getLogger( AbstractViewer.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractViewer.class.getName() );
 
     protected final Preferences pref = NbPreferences.forModule( Object.class );
 
@@ -226,7 +225,7 @@ public abstract class AbstractViewer extends JPanel implements
      * {@link de.cebitec.readxplorer.utils.ColorProperties#BACKGROUND_COLOR}
      */
     private void setBackgroundColor() {
-        String colorRGB = pref.get(Colors.BACKGROUND_COLOR_STRING, "" );
+        String colorRGB = pref.get( Colors.BACKGROUND_COLOR_STRING, "" );
         Color backgroundColor;
         if( !colorRGB.isEmpty() ) {
             backgroundColor = new Color( Integer.parseInt( colorRGB ) );
@@ -560,7 +559,7 @@ public abstract class AbstractViewer extends JPanel implements
     private void setPanPosition( int position ) {
         if( isPanning && canPan ) {
             int logi = transformToLogicalCoordForPannig( position );
-            //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
+            //       LoggerFactory.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
             boundsManager.navigatorBarUpdated( logi );
         }
     }
@@ -671,7 +670,7 @@ public abstract class AbstractViewer extends JPanel implements
      * @return logical position corresponding to the pixel
      */
     protected int transformToLogicalCoord( int physPos ) {
-        //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "boundsLeft "+ bounds.getLogLeft()+"right"+ bounds.getLogRight());
+        //       LoggerFactory.getLogger(this.getClass().getName()).log(Level.INFO, "boundsLeft "+ bounds.getLogLeft()+"right"+ bounds.getLogRight());
         return (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
     }
 
@@ -701,10 +700,10 @@ public abstract class AbstractViewer extends JPanel implements
             //mouse on the right side of currentLog
             if( currentLog < pos ) {
                 pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + leftbound);
-                // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "rightside plus "+pos);
+                // LoggerFactory.getLogger(this.getClass().getName()).log(Level.INFO, "rightside plus "+pos);
             } else {
                 pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + rightBound);
-                //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "leftside plus "+pos);
+                //     LoggerFactory.getLogger(this.getClass().getName()).log(Level.INFO, "leftside plus "+pos);
             }
 
         }
@@ -771,7 +770,7 @@ public abstract class AbstractViewer extends JPanel implements
                 JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
                 verticalBar.setValue( verticalBar.getMaximum() / 2 - getParent().getHeight() / 2 );
             } catch( ArrayIndexOutOfBoundsException e ) {
-                LOG.log( WARNING, "AbstractViewer: Parent height cannot be resolved." );
+                LOG.warn( "AbstractViewer: Parent height cannot be resolved." );
                 //ignore this problem, TODO: identify source of ArrayIndexOutOfBoundsException
             }
         }
@@ -885,7 +884,7 @@ public abstract class AbstractViewer extends JPanel implements
     private void paintCurrentCenterPosition( Graphics g ) {
         PhysicalBaseBounds coords = getPhysBoundariesForLogPos( getBoundsInfo().getCurrentLogPos() );
         PaintingAreaInfo info = this.getPaintingAreaInfo();
-        g.setColor(Colors.CURRENT_POSITION );
+        g.setColor( Colors.CURRENT_POSITION );
         int width = (int) (coords.getPhysWidth() >= 1 ? coords.getPhysWidth() : 1);
         g.fillRect( (int) coords.getLeftPhysBound(), info.getForwardHigh(), width, info.getCompleteHeight() );
     }
@@ -910,7 +909,7 @@ public abstract class AbstractViewer extends JPanel implements
         super.paintComponent( graphics );
 
         if( isInDrawingMode() ) {
-            graphics.setColor(Colors.MOUSEOVER );
+            graphics.setColor( Colors.MOUSEOVER );
             if( printMouseOver ) {
                 drawMouseCursor( graphics );
             }

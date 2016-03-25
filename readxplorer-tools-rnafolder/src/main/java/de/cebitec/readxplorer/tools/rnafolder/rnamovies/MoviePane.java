@@ -42,10 +42,11 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Logger;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.awt.RenderingHints.KEY_ALPHA_INTERPOLATION;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
@@ -78,7 +79,7 @@ import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 public class MoviePane extends JComponent implements Runnable, Movie,
                                                      ConfigListener {
 
-    private static final Logger LOG = Logger.getLogger( MoviePane.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MoviePane.class.getName() );
 
     private Color background = Color.WHITE;
     private Color textColor = Color.BLACK;
@@ -154,7 +155,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             f = Font.createFont( Font.TYPE1_FONT, in );
             f = f.deriveFont( Font.BOLD, 12f );
         } catch( IOException | FontFormatException e ) {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
     }
 
@@ -215,7 +216,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
 
         if( frames.size() != pairs.size() ) {
             throw new IllegalArgumentException( "Illegal argument(s) passed " +
-                     "to setMovie" );
+                                                "to setMovie" );
         }
         if( gui ) {
             stop();
@@ -285,7 +286,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                 try {
                     t.sleep( frame - tot );
                 } catch( InterruptedException e ) {
-                    LOG.severe( e.getMessage() );
+                    LOG.error( e.getMessage() );
                 }
             }
         } while( this.start_stop );
@@ -299,8 +300,8 @@ public class MoviePane extends JComponent implements Runnable, Movie,
     public synchronized void paintComponent( Graphics g ) {
 
         if( backbuffer == null ||
-                 backbuffer.getWidth( this ) != getWidth() ||
-                 backbuffer.getHeight( this ) != getHeight() ) {
+            backbuffer.getWidth( this ) != getWidth() ||
+            backbuffer.getHeight( this ) != getHeight() ) {
             backbuffer = createImage( getWidth(), getHeight() );
             drawIt();
         }
@@ -490,7 +491,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
         }
 
         /* zoomf = 0.01 * scale; */
-        /* JK : calculate zoomF */
+ /* JK : calculate zoomF */
         final double zoomf = (double) x / (double) getMaxWidth() * zoom * 0.01;
 
 
@@ -504,15 +505,13 @@ public class MoviePane extends JComponent implements Runnable, Movie,
 
         if( transparent ) {
             /* image = new BufferedImage((int)(zoomf*d.getWidth()),
-             * (int)(zoomf*d.getHeight()),
-             BufferedImage.TYPE_4BYTE_ABGR); */
+             * (int)(zoomf*d.getHeight()), BufferedImage.TYPE_4BYTE_ABGR); */
             image = new BufferedImage( x, y, BufferedImage.TYPE_4BYTE_ABGR );
             gc = (Graphics2D) image.getGraphics();
             gc.setBackground( new Color( 255, 255, 255, 255 ) );
         } else {
             /* image = new BufferedImage((int)(zoomf*d.getWidth()),
-             * (int)(zoomf*d.getHeight()),
-             BufferedImage.TYPE_3BYTE_BGR); */
+             * (int)(zoomf*d.getHeight()), BufferedImage.TYPE_3BYTE_BGR); */
             image = new BufferedImage( x, y, BufferedImage.TYPE_3BYTE_BGR );
             gc = (Graphics2D) image.getGraphics();
             gc.setBackground( background );
@@ -520,11 +519,14 @@ public class MoviePane extends JComponent implements Runnable, Movie,
 
         gc.setRenderingHints( rh );
         gc.setFont( f );
-        /* gc.clearRect(0, 0, (int)(zoomf*d.getWidth()), (int)(zoomf*d.getHeight())); */
-        /* JK : clear complete graphics context */
+        /* gc.clearRect(0, 0, (int)(zoomf*d.getWidth()),
+         * (int)(zoomf*d.getHeight())); */
+ /* JK : clear complete graphics
+         * context */
         gc.clearRect( 0, 0, x, y );
         /* gc.translate(-zoomf*origin.getX(), -zoomf*origin.getY()); */
-        /* JK : center structure */
+ /* JK :
+         * center structure */
         gc.translate( (d.getWidth() - getMaxWidth() * zoomf) / 2, (d.getHeight() - getMaxHeight() * zoomf) / 2 );
         gc.scale( zoomf, zoomf );
         if( numSteps == 0 ) {
@@ -569,7 +571,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
             t.setPriority( Thread.MAX_PRIORITY );
             t.start();
         } catch( InterruptedException e ) {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
     }
 
@@ -593,7 +595,7 @@ public class MoviePane extends JComponent implements Runnable, Movie,
                 t.join();
             }
         } catch( InterruptedException e ) {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
     }
 

@@ -18,13 +18,15 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import javax.swing.event.ChangeListener;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_MULTIPLE_CONDS;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_WIZARD_NAME;
 
 
-public class DeSeqWizardPanel1 implements
+public class DeSeqWizardPanel1 extends ChangeListeningWizardPanel implements
         WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
@@ -32,6 +34,11 @@ public class DeSeqWizardPanel1 implements
      * component from this class, just use getComponent().
      */
     private DeSeqVisualPanel1 component;
+
+
+    public DeSeqWizardPanel1() {
+        super( "Please select one of the options above." );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -48,46 +55,21 @@ public class DeSeqWizardPanel1 implements
 
 
     @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void readSettings( WizardDescriptor wiz ) {
-        // use wiz.getProperty to retrieve previous panel state
-    }
-
-
-    @Override
     public void storeSettings( WizardDescriptor wiz ) {
         if( getComponent().buttonChecked() ) {
-            wiz.putProperty( "moreThanTwoConditions", getComponent().moreThanTwoConditions() );
+            boolean moreThanTwoConditions = getComponent().moreThanTwoConditions();
+            wiz.putProperty( PROP_DGE_MULTIPLE_CONDS, moreThanTwoConditions );
+            storePrefs( moreThanTwoConditions );
         }
+    }
+
+
+    /**
+     * Stores the selected parameters for this wizard panel for later use, also
+     * after restarting the software.
+     */
+    private void storePrefs( boolean moreThanTwoConditions ) {
+        getPref().putBoolean( PROP_DGE_WIZARD_NAME + PROP_DGE_MULTIPLE_CONDS, moreThanTwoConditions );
     }
 
 

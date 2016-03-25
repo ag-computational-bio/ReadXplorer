@@ -58,6 +58,7 @@ public final class TranscriptionAnalysesWizardIterator implements
     public static final String PROP_MAX_FEATURE_DISTANCE = "maxFeatureDistance";
     public static final String PROP_MIN_NUMBER_READS = "minNumberReads";
     public static final String PROP_MAX_NUMBER_READS = "maxNumberReads";
+    public static final String PROP_USE_EFFECTIVE_LENGTH = "useEffectiveLength";
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";
     public static final String PROP_ANALYSIS_DIRECTION = "analysisDirection";
     public static final String PROP_ASSOCIATE_TSS_WINDOW = "associateTssWindow";

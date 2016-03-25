@@ -18,9 +18,11 @@
 package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.util.List;
 import org.openide.util.NbBundle;
 
@@ -91,9 +93,12 @@ public class OverviewCard extends javax.swing.JPanel {
         overviewTextArea.append( cc + "\n" );
 
         overviewTextArea.setText( "Reference:\n" );
-        overviewTextArea.append( ProjectConnector.getInstance().getRefGenomeConnector(
-                list.get( 0 ).getRefGenID() ).getRefGenome().getName() + "\n"
-        );
+        try {
+            overviewTextArea.append( ProjectConnector.getInstance().getRefGenomeConnector(
+                    list.get( 0 ).getRefGenID() ).getRefGenome().getName() + "\n" );
+        } catch( DatabaseException e ) {
+            ErrorHelper.getHandler().handle( e );
+        }
 
         overviewTextArea.append( "Selected tracks:\n" );
         for( PersistentTrack track : list ) {

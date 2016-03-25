@@ -64,7 +64,7 @@ public abstract class AssignedMapping implements MappingAssignment {
      * {@inheritDoc}
      */
     @Override
-    public abstract boolean checkAssignment( int featStart, int featStop, PersistentFeature feature );
+    public abstract boolean checkAssignment( int featStart, int featStop, PersistentFeature feature, boolean isStrandBothOption );
 
 
     /**
@@ -125,7 +125,7 @@ public abstract class AssignedMapping implements MappingAssignment {
      * Checks if the read count has to be decreased for any features. It has to
      * be decreased for all features in the reverse remove list. By default,
      * the list is null. If a feature has been removed from the association to
-     * the mapping, its read count is decrease by 1 and its read length sum is
+     * the mapping, its read count is decreased by 1 and its read length sum is
      * decreased by the length of this mapping.
      * @param featureReadCount The map containing the read counts for each
      * genomic feature id.

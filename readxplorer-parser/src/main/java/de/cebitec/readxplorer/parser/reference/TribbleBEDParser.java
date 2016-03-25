@@ -26,21 +26,20 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
+import htsjdk.tribble.AbstractFeatureReader;
+import htsjdk.tribble.TribbleException;
+import htsjdk.tribble.annotation.Strand;
+import htsjdk.tribble.bed.BEDCodec;
+import htsjdk.tribble.bed.BEDFeature;
+import htsjdk.tribble.bed.FullBEDFeature.Exon;
+import htsjdk.tribble.readers.LineIterator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-import org.broad.tribble.AbstractFeatureReader;
-import org.broad.tribble.TribbleException;
-import org.broad.tribble.annotation.Strand;
-import org.broad.tribble.bed.BEDCodec;
-import org.broad.tribble.bed.BEDFeature;
-import org.broad.tribble.bed.FullBEDFeature.Exon;
-import org.broad.tribble.readers.LineIterator;
-
-import static java.util.logging.Level.INFO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -51,10 +50,10 @@ import static java.util.logging.Level.INFO;
  */
 public class TribbleBEDParser implements ReferenceParserI {
 
-    private static final Logger LOG = Logger.getLogger( TribbleBEDParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TribbleBEDParser.class.getName() );
 
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] FILE_EXTENSION = new String[]{"bed", "BED"};
+    private static final String[] FILE_EXTENSION = new String[]{ "bed", "BED" };
     // name of this parser for use in ComboBoxes
     private static final String PARSER_NAME = "BED file";
     private static final String FILE_DESCRIPTION = "BED file";
@@ -66,7 +65,8 @@ public class TribbleBEDParser implements ReferenceParserI {
      * the BED annotations from the BED file contained in the ReferenceJob.
      * <p>
      * @param referenceJob the reference job containing the files
-     * @param filter the feature filter to use (removes undesired features)
+     * @param filter       the feature filter to use (removes undesired
+     *                     features)
      * <p>
      * @return the parsed reference object with all parsed features
      * <p>
@@ -82,7 +82,7 @@ public class TribbleBEDParser implements ReferenceParserI {
         //at first store all eonxs in one data structure and add them to the ref genome at the end
 //        Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
-        LOG.log( INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
+        LOG.info( "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
 
             final BEDCodec bedCodec = new BEDCodec( BEDCodec.StartOffset.ZERO );
@@ -95,7 +95,7 @@ public class TribbleBEDParser implements ReferenceParserI {
                 while( reader.hasIndex() ) {
 
                     final BEDFeature feat = featIt.next();
-                    if( chromMap.containsKey( feat.getChr() ) ) {
+                    if( chromMap.containsKey( feat.getContig() ) ) {
 
                         final int start = feat.getStart();
                         final int stop = feat.getEnd();
@@ -107,13 +107,13 @@ public class TribbleBEDParser implements ReferenceParserI {
                         final String parsedType = feat.getType();
 
                         /*
-                         * If the type of the feature is unknown to readxplorer (see below),
-                         * an undefined type is used.
+                         * If the type of the feature is unknown to readxplorer
+                         * (see below), an undefined type is used.
                          */
                         final FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
-                            this.notifyObservers( referenceJob.getFile().getName()
-                                    + ": Using unknown feature type for " + parsedType );
+                            this.notifyObservers( referenceJob.getFile().getName() +
+                                                  ": Using unknown feature type for " + parsedType );
                         }
 
                         final List<ParsedFeature> subFeatures = new ArrayList<>();
@@ -130,7 +130,7 @@ public class TribbleBEDParser implements ReferenceParserI {
 //                        feat.getColor();
 
                         ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
-                        ParsedChromosome currentChrom = chromMap.get( feat.getChr() );
+                        ParsedChromosome currentChrom = chromMap.get( feat.getContig() );
                         currentChrom.addFeature( currentFeature );
 
                     }

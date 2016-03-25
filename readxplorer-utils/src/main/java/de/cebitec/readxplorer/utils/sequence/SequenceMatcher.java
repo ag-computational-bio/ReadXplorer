@@ -94,7 +94,8 @@ public class SequenceMatcher {
             boolean isMaxNoResultsSet = maxNoResults > 0;
 
             Matcher m = pattern.matcher( sequence );
-            while( m.find() ) {
+            boolean found = m.find();
+            while( found ) {
                 int from = m.start();
                 int to = m.end() - 1;
 
@@ -119,6 +120,8 @@ public class SequenceMatcher {
                 if( isMaxNoResultsSet && counter >= maxNoResults ) {
                     break;
                 }
+                
+                found = m.find( from + 1 ); //needed to find overlapping matches (e.g. 2 times GTG in GTGTG)
             }
         }
 

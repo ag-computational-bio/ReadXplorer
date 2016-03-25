@@ -60,9 +60,9 @@ public class RNAFolderController implements RNAFolderI {
         Thread rnaFoldThread = new Thread( new Runnable() {
             @Override
             public void run() {
+                ProgressHandle progressHandle = ProgressHandleFactory.createHandle( NbBundle.getMessage( RNAFolderController.class, "RNA_Folder-Progress" ) );
+                progressHandle.start();
                 try { //new header because RNA movies cannot cope with spaces
-                    ProgressHandle progressHandle = ProgressHandleFactory.createHandle( NbBundle.getMessage( RNAFolderController.class, "RNA_Folder-Progress" ) );
-                    progressHandle.start();
                     String rnaMoviesHeader = header.replace( " ", "_" );
                     String foldedSequence = RNAFoldCaller.callRNAFolder( sequenceToFold, rnaMoviesHeader );
                     //for testing purposes in offline mode:
@@ -76,12 +76,12 @@ public class RNAFolderController implements RNAFolderI {
                     MoviePane rnaMovie = (MoviePane) rnaMovies.getMovie();
 
                     rnaFolderTopComp.openRNAMovie( rnaMovie, header );
-                    progressHandle.finish();
 
                 } catch( RNAFoldException ex ) {
                     NotifyDescriptor nd = new NotifyDescriptor.Message( ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE );
                     DialogDisplayer.getDefault().notify( nd );
                 }
+                progressHandle.finish();
             }
 
 

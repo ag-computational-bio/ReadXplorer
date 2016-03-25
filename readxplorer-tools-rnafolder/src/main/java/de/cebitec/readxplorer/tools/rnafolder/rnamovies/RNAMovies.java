@@ -36,11 +36,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -70,22 +70,22 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class RNAMovies extends JPanel implements ActionContainer {
 
-    private static final Logger LOG = Logger.getLogger( RNAMovies.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RNAMovies.class.getName() );
 
     public static final String TITLE = "RNAMovies";
     public static final String VERSION = "2.04";
     public static final String USAGE = TITLE + VERSION + "\n" +
-             "usage java " + TITLE + VERSION + ".jar [<arguments>] :\n\n" +
-             "ATTENTION : cmdlineoptions in early beta state!\n\n" +
-             "-nogui                         :: run RNAMovies without starting the GUI\n" +
-             "-input <String>                :: set the input filename\n" +
-             "-output <String>               :: set the output filename\n" +
-             "[-xml]                         :: determines that the input file is in RNAStructML format\n" +
-             "-[structure <int>|steps <int>] :: creates ONLY the given structure (single frame)\n" +
-             "[-size <int>]                  :: set the size of the generated frame (in pixel)\n" +
-             "[-zoom <int>]                  :: zoom factor inside" +
-             "-(gif|png|svg|jpg)             :: set the image format\n" +
-             "[-h[elp]]                      :: print out a usage message\n";
+                                       "usage java " + TITLE + VERSION + ".jar [<arguments>] :\n\n" +
+                                       "ATTENTION : cmdlineoptions in early beta state!\n\n" +
+                                       "-nogui                         :: run RNAMovies without starting the GUI\n" +
+                                       "-input <String>                :: set the input filename\n" +
+                                       "-output <String>               :: set the output filename\n" +
+                                       "[-xml]                         :: determines that the input file is in RNAStructML format\n" +
+                                       "-[structure <int>|steps <int>] :: creates ONLY the given structure (single frame)\n" +
+                                       "[-size <int>]                  :: set the size of the generated frame (in pixel)\n" +
+                                       "[-zoom <int>]                  :: zoom factor inside" +
+                                       "-(gif|png|svg|jpg)             :: set the image format\n" +
+                                       "[-h[elp]]                      :: print out a usage message\n";
 
 
     private static final int SCALE = 15;
@@ -115,10 +115,10 @@ public class RNAMovies extends JPanel implements ActionContainer {
         try {
             config = new Configuration( configStream );
         } catch( IOException e ) {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
             System.exit( 1 );
         } catch( SAXException e ) {
-            LOG.severe( "Error while parsing config: ".concat( e.getMessage() ) );
+            LOG.error( "Error while parsing config: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
@@ -130,10 +130,10 @@ public class RNAMovies extends JPanel implements ActionContainer {
                                                             new Object[]{ this } ) );
             parser.parse( new InputSource( actionStream ) );
         } catch( IOException e ) {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
             System.exit( 1 );
         } catch( SAXException e ) {
-            LOG.severe( "Error while parsing action file: ".concat( e.getMessage() ) );
+            LOG.error( "Error while parsing action file: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
@@ -319,7 +319,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
         title_end = name.indexOf( ' ' );
         mp.setMovie( frames, pairs, name.substring( 1, title_end == -1 ? name.length() : title_end ), sequence, w, h, gui );
-        LOG.log( Level.INFO, "{0} Structures loaded.", frames.size() );
+        LOG.info( "{0} Structures loaded.", frames.size() );
     }
 
 //    /**
@@ -471,16 +471,16 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //                    RNAStructML rml = new RNAStructML(dom);
 //                    parseRNAStructML(movie,rml,false,false);
 //                } catch (ParserConfigurationException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                } catch (SAXException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                } catch(IOException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                } catch (BioDOMException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                }
 //            } else {
@@ -489,7 +489,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //                    InputStream ini = new FileInputStream((String)params.get("input"));
 //                    parseScript(movie,new LineScanner(ini),false,false);
 //                } catch (FileNotFoundException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                }
 //            }
@@ -528,7 +528,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //                        Export.writeSVG(movie,out,structure-1,trans);
 //                    }
 //                }catch (IOException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                }
 //            } else {
@@ -600,7 +600,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //                        }
 //                    }
 //                } catch (IOException e){
-//                    log.severe(e.getMessage());
+//                    log.error(e.getMessage());
 //                    System.exit(1);
 //                }
 //            }
@@ -609,11 +609,11 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //            try {
 //                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 //            } catch(Exception e1) {
-//                log.severe("Could not load javax.swing.plaf.metal.MetalLookAndFeel, trying cross platform Look and Feel.");
+//                log.error("Could not load javax.swing.plaf.metal.MetalLookAndFeel, trying cross platform Look and Feel.");
 //                try {
 //                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 //                } catch(Exception e2) {
-//                    log.severe("Critical: Could not load cross platform Look and Feel.");
+//                    log.error("Critical: Could not load cross platform Look and Feel.");
 //                    System.exit(1);
 //                }
 //            }

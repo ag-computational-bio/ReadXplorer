@@ -84,12 +84,12 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
         List<ReferenceJob> refJobList = new ArrayList<>();
 
         try {
-            List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+            List<PersistentReference> refs = ProjectConnector.getInstance().getReferences();
             for( PersistentReference r : refs ) {
                 refJobList.add( new ReferenceJob( r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp() ) );
             }
         } catch( OutOfMemoryError e ) {
-            VisualisationUtils.displayOutOfMemoryError( this );
+            VisualisationUtils.displayOutOfMemoryError();
         }
         return refJobList;
     }

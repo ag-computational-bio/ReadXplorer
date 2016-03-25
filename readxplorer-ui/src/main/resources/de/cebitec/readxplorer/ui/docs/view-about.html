@@ -6,18 +6,17 @@
     </head>
     <body>
         <p style="text-align: justify;">ReadXplorer is a client software. The project data for each ReadXplorer
-            project is stored in a database (<a href="http://www.h2database.com/html/main.html">h2</a> or
-            <a href="http://www.mysql.com/">MySQL</a>, we recommend h2 here). The database (DB) contains the reference
+            project is stored in a H2 database (<a href="http://www.h2database.com/html/main.html">h2</a>. The database (DB) contains the reference
             genome and the basic track (= mapping data set) information. Therefore, the reference sequence and
             annotations are stored in the DB for the reference. For the tracks only the basic information,
             such as name and path to the corresponding <a href="http://samtools.sourceforge.net/SAM1.pdf">BAM</a> file,
             is stored in the DB.</p>
-        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/startup.jpg" /></p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/startup.png" alt="startup figure"/></p>
         <p></p>
         <p style="text-align: center;"><span style="font-size: 14pt;"><strong>ReadXplorer - Main Window:</strong></span></p>
         <p style="text-align: justify;">This is the main window of ReadXplorer with one opened reference and three
             (two of them are visible) opened track data sets. The different items are explained below.</p>
-        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/readxplorer-main-small-marked-high.jpg" alt="mainViewMarked"/>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.ui/de/cebitec/readxplorer/ui/docs/readxplorer-main-small-marked-high.png" alt="marked main view figure"/>
             <br /></p>
         <p style="text-align: justify;">a) <span style="text-decoration: underline;">Global Toolbar</span> and context
             dependent toolbar buttons. From left to right:</p>
@@ -27,6 +26,7 @@
             <li style="text-align: justify;">Open track(s) (also in Multiple Track Viewer)</li>
             <li style="text-align: justify;">Close all opened tracks for the currently selected/viewed reference</li>
             <li style="text-align: justify;">Open save screenshot wizard</li>
+            <li style="text-align: justify;">Start a differential gene expression analysis via a wizard</li>
             <li style="text-align: justify;">Start a SNP and DIP detection via a wizard</li>
             <li style="text-align: justify;">Start different transcription analyses via a wizard</li>
             <li style="text-align: justify;">Start a feature coverage analysis via a wizard</li>
@@ -147,10 +147,7 @@
                 <br data-mce-bogus="1" /></li>
         </ol>
         <p style="text-align: justify;">m) <span style="text-decoration: underline;">Track
-                Viewer Options</span>: Here, the coverage can be filtered by mapping quality (if the quality is available
-            for this data set, otherwise nothing is changed). Automatic scaling of the coverage can be enabled to adapt the coverage
-            plot to fit the viewer area. Besides that, a normalization method can be applied to the coverage of the
-            track: either by log2 or by a chosen factor x with 0 &lt; x &lt; 10.</p>
+                Viewer Options</span>: Here, the coverage can be filtered by mapping quality (if the quality is available for this data set, otherwise nothing is changed). Automatic scaling of the coverage can be enabled to adapt the coverage plot to fit the viewer area. For non-strand specific data, all reads can be displayed on the forward or on the reverse strand. Besides that, a normalization method can be applied to the coverage of the track: either by log2 or by a chosen factor x with 0 &lt; x &lt; 10.</p>
         <p style="text-align: justify;">n) <span style="text-decoration: underline;">Reference Interval Window</span>:
             It summarizes information about the currently viewed reference interval.
         <p style="text-align: justify;">o) <span style="text-decoration: underline;">Start and stop codon

@@ -23,6 +23,16 @@ package gasv.bamtogasv;
  */
 import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
 import bio.comp.jlu.readxplorer.tools.gasv.GASVUtils;
+import htsjdk.samtools.FileTruncatedException;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFormatException;
+import htsjdk.samtools.SAMReadGroupRecord;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.RuntimeEOFException;
+import htsjdk.samtools.util.RuntimeIOException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,18 +48,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.sf.picard.sam.FixMateInformation;
-import net.sf.samtools.FileTruncatedException;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileReader.ValidationStringency;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMReadGroupRecord;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.util.RuntimeEOFException;
-import net.sf.samtools.util.RuntimeIOException;
 import org.openide.windows.InputOutput;
+import picard.sam.FixMateInformation;
 
 
 /**

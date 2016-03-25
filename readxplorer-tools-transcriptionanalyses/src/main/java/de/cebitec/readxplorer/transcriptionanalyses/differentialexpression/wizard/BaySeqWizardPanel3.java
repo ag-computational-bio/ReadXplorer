@@ -19,14 +19,13 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.util.List;
-import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
 
 
-public class BaySeqWizardPanel3 implements
+public class BaySeqWizardPanel3 extends ChangeListeningWizardPanel implements
         WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
@@ -34,6 +33,11 @@ public class BaySeqWizardPanel3 implements
      * component from this class, just use getComponent().
      */
     private BaySeqVisualPanel3 component;
+
+
+    public BaySeqWizardPanel3() {
+        super( "You must create at least one group to continue." );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -46,36 +50,6 @@ public class BaySeqWizardPanel3 implements
             component = new BaySeqVisualPanel3();
         }
         return component;
-    }
-
-
-    @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
     }
 
 

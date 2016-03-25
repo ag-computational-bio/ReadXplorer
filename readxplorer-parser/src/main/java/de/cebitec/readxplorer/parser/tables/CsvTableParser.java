@@ -20,15 +20,14 @@ package de.cebitec.readxplorer.parser.tables;
 
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
-import org.openide.util.Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -36,8 +35,6 @@ import org.supercsv.exception.SuperCsvException;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
-
-import static java.util.logging.Level.INFO;
 
 
 /**
@@ -47,17 +44,21 @@ import static java.util.logging.Level.INFO;
  */
 public class CsvTableParser implements CsvParserI {
 
-    private static final Logger LOG = Logger.getLogger( CsvTableParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CsvTableParser.class.getName() );
 
     private static final String NAME = "CSV Table Parser";
-    private static final String[] FILE_EXTENSIONS = new String[]{"csv", "CSV"};
+    private static final String[] FILE_EXTENSIONS = new String[]{ "csv", "CSV" };
     private static final String FILE_DESCRIPTION = "CSV table";
 
     private boolean autoDelimiter;
     private CsvPreference csvPref;
     //different CellProcessors for different tables
     public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
-    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{new ParseInt()};
+    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
+    public static final CellProcessor[] CORRELATION_TABLE_PROCESSOR = new CellProcessor[]{ null, null, new ParseInt() };
+    public static final CellProcessor[] FEAT_COV_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, new ParseInt() };
+    public static final CellProcessor[] OPERON_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, null, new ParseInt() };
+    public static final CellProcessor[] NORM_TABLE_PROCESSOR = new CellProcessor[]{ null, null, null, null, null, null, null, null, new ParseInt() };
 
     private CellProcessor[] tableProcessor;
     private TableType tableModel;
@@ -96,7 +97,7 @@ public class CsvTableParser implements CsvParserI {
 
                 tableData = this.parseTable( fileToRead, pref );
                 if( tableData != null ) {
-                    LOG.log( INFO, "Entry delimiter used for this table is: {0}", (char) pref.getDelimiterChar() );
+                    LOG.info( "Entry delimiter used for this table is: {0}", (char) pref.getDelimiterChar() );
                     break;
                 }
             }
@@ -109,8 +110,8 @@ public class CsvTableParser implements CsvParserI {
             tableData = this.parseTable( fileToRead, csvPref );
 
             if( tableData == null ) {
-                throw new ParsingException( "Table is not in a readable format and cannot be imported.\n"
-                        + "Either choose the correct delimiter and line end characters or try autodetection of delimiter and line end character!" );
+                throw new ParsingException( "Table is not in a readable format and cannot be imported.\n" +
+                                            "Either choose the correct delimiter and line end characters or try autodetection of delimiter and line end character!" );
             }
         }
 
@@ -121,10 +122,11 @@ public class CsvTableParser implements CsvParserI {
     /**
      * Method for parsing a CSV file for a given csv preference.
      *
-     * @param fileToRead The file containing the table to read.
+     * @param fileToRead    The file containing the table to read.
      * @param csvPreference The CsvPreference to use for parsing.
      * <p>
      * @return Table in form of a list, which contains the row lists of Objects.
+     *
      * @throws de.cebitec.readxplorer.parser.common.ParsingException
      */
     public List<List<?>> parseTable( File fileToRead, CsvPreference csvPreference ) throws ParsingException {
@@ -135,12 +137,21 @@ public class CsvTableParser implements CsvParserI {
             final String[] header = listReader.getHeader( true );
             tableData.add( Arrays.asList( header ) );
 
+            //TODO: DGE table: only name of annotation given - either store pos or reassign feature to feature id, operon csv table fails
             CellProcessor[] generalProcessors;
-            if( tableModel == TableType.COVERAGE_ANALYSIS
-                    || tableModel == TableType.POS_TABLE
-                    || tableModel == TableType.SNP_DETECTION
-                    || tableModel == TableType.TSS_DETECTION ) {
+            if( tableModel == TableType.COVERAGE_ANALYSIS ||
+                tableModel == TableType.POS_TABLE ||
+                tableModel == TableType.SNP_DETECTION ||
+                tableModel == TableType.TSS_DETECTION ) {
                 generalProcessors = POS_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.FEATURE_COVERAGE_ANALYSIS ) {
+                generalProcessors = FEAT_COV_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.OPERON_DETECTION ) {
+                generalProcessors = OPERON_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.TPM_RPKM_ANALYSIS ) {
+                generalProcessors = NORM_TABLE_PROCESSOR;
+            } else if( tableModel == TableType.CORRELATION_TABLE ) {
+                generalProcessors = CORRELATION_TABLE_PROCESSOR;
             } else if( tableModel == TableType.TSS_DETECTION_JR ) {
                 generalProcessors = getTssCellProcessor();
             } else if( tableModel == TableType.OPERON_DETECTION_JR ) {
@@ -165,15 +176,13 @@ public class CsvTableParser implements CsvParserI {
                         List<Object> rowData = listReader.executeProcessors( processors );
                         tableData.add( rowData );
                     } else {
-                        throw new ParsingException( "It seems that the wrong delimiter or table format has been chosen. "
-                                + "The number of columns (" + length + ") in a row does not correspond to the expected number of columns (" + processors.length + ")!" );
+                        throw new ParsingException( "It seems that the wrong delimiter or table format has been chosen. " +
+                                                    "The number of columns (" + length + ") in a row does not correspond to the expected number of columns (" + processors.length + ")!" );
                     }
                 }
             }
-        } catch( FileNotFoundException ex ) {
-            Exceptions.printStackTrace( ex );
         } catch( IOException ex ) {
-            Exceptions.printStackTrace( ex );
+            LOG.error( ex.getMessage(), ex );
         } catch( SuperCsvException ex ) {
             tableData = null;
         }
@@ -190,8 +199,8 @@ public class CsvTableParser implements CsvParserI {
 
     /**
      * @param autoDelimiter <code>true</code>, if the delimiter shall be
-     * detected automatically, <code>false</code>, if the delimiter was selected
-     * by the user.
+     *                      detected automatically, <code>false</code>, if the
+     *                      delimiter was selected by the user.
      */
     @Override
     public void setAutoDelimiter( boolean autoDelimiter ) {
