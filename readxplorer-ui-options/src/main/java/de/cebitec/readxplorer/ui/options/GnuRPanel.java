@@ -22,6 +22,7 @@ import de.cebitec.readxplorer.api.constants.Paths;
 import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.Downloader;
 import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.OsUtils;
 import de.cebitec.readxplorer.utils.PasswordStore;
 import de.cebitec.readxplorer.utils.Unzip;
 import java.awt.Desktop;
@@ -35,8 +36,6 @@ import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -49,14 +48,13 @@ import javax.swing.SwingUtilities;
 import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
-
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 final class GnuRPanel extends OptionsPanel implements Observer {
 
-    private static final Logger LOG = Logger.getLogger( GnuRPanel.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GnuRPanel.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +72,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private static final String DEFAULT_R_DOWNLOAD_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
     private static final String DEFAULT_RSERVE_HOST = "localhost";
     private static final int DEFAULT_RSERVE_PORT = 6311;
-    private static final String OS = System.getProperty( "os.name" ).toLowerCase( Locale.ENGLISH );
     private static final String GNU_LICENSE = "             GNU GENERAL PUBLIC LICENSE\n" +
                                               "               Version 2, June 1991\n" +
                                               "\n" +
@@ -429,7 +426,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         sourceFileTextField.setText( sourceUri );
         jProgressBar1.setMaximum( 100 );
         setUpListener();
-        if( OS.contains( "windows" ) ) {
+        if( OsUtils.isWindows() ) {
             messages.setText( "'Manual Local' setup is only supported under Linux and Mac OS." );
             manualLocalButton.setEnabled( false );
             if( !versionIndicator.exists() ) {
@@ -445,17 +442,15 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 manualLocalButton.setEnabled( false );
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-            } else {
-                if( OS.contains( "mac" ) ) {
+            } else if( OsUtils.isMac() ) {
                 messages.setText( "Rserve is bundled with the Mac installation and hence no configuration is needed." );
                 autoButton.setEnabled( false );
                 manualLocalButton.setEnabled( false );
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-                } else {
-                    messages.setText( "Auto installation is only supported under Windows 7 & 8." );
-                    autoButton.setEnabled( false );
-                }
+            } else {
+                messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+                autoButton.setEnabled( false );
             }
         }
         rServePort.setInputVerifier( new PortInputVerifier() );
@@ -753,7 +748,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 th.start();
             } catch( IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( SEVERE, "{0}: Could not create temporary file.", currentTimestamp );
+                LOG.error( "{0}: Could not create temporary file.", currentTimestamp );
             }
         }
     }//GEN-LAST:event_installButtonActionPerformed
@@ -765,7 +760,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 desk.browse( new URI( cranMirror.getText() + SOURCE_URI ) );
             } catch( URISyntaxException | IOException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                LOG.log( WARNING, "{0}: Could not open URI to GNU R source file.", currentTimestamp );
+                LOG.warn( "{0}: Could not open URI to GNU R source file.", currentTimestamp );
             }
         }
     }//GEN-LAST:event_sourceFileTextFieldMouseReleased

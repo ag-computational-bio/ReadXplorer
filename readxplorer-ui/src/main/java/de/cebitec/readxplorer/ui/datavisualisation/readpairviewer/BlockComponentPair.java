@@ -182,7 +182,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         if( !parentViewer.getExcludedClassifications().contains( FeatureType.SINGLE_MAPPING ) ) {
             for( int i = 0; i < singleMappings.size(); ++i ) {
                 mapping = singleMappings.get( i );
-                this.addRectAndItsColor(Colors.BLOCK_UNPAIRED, mapping, false );
+                this.addRectAndItsColor( Colors.BLOCK_UNPAIRED, mapping, false );
             }
         }
     }
@@ -197,7 +197,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         List<Classification> excludedFeatureTypes = this.parentViewer.getExcludedClassifications();
         FeatureType typeOfPair;
         if( readPairType == ReadPairType.PERFECT_PAIR ||
-                 readPairType == ReadPairType.PERFECT_UNQ_PAIR ) {
+            readPairType == ReadPairType.PERFECT_UNQ_PAIR ) {
             typeOfPair = FeatureType.PERFECT_PAIR;
         } else if( readPairType == ReadPairType.UNPAIRED_PAIR ) {
             typeOfPair = FeatureType.SINGLE_MAPPING;
@@ -291,7 +291,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 //        graphics.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
 
         //fill pair background to indicate pair length
-        graphics2D.setColor(Colors.BLOCK_BACKGROUND );
+        graphics2D.setColor( Colors.BLOCK_BACKGROUND );
         graphics2D.fill( new Rectangle2D.Double( 0, 0, this.length, this.height ) );
 
         // paint this block's mappings
@@ -301,7 +301,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         }
 
         //paint connecting lines for pairs
-        graphics2D.setColor(Colors.CURRENT_POSITION );
+        graphics2D.setColor( Colors.CURRENT_POSITION );
         for( int i = 0; i < this.lineList.size(); ++i ) {
             graphics2D.draw( this.lineList.get( i ) );
         }
@@ -314,6 +314,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     /**
      * Determines the color and type of a block.
+     *
+     * @param readPair The read pair whose block color is needed
      * <p>
      * @return the color representing this block
      */
@@ -378,6 +380,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     /**
      * Creates the popup displaying all information regarding this read pair and
      * allowing to jump to the position of other mappings of the pair.
+     *
+     * @param e mouse event
      */
     private void createPopup( MouseEvent e ) {
         String pairType = this.determineReadPairType( this.block );

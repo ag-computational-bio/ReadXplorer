@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,7 +40,7 @@ import jxl.read.biff.BiffException;
  */
 public class ExcelToTable implements ExcelImportDataI {
 
-    private static final Logger LOG = Logger.getLogger( ExcelToTable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ExcelToTable.class.getName() );
 
     private String tableName;
     private final List<String> columnNames;
@@ -54,8 +54,7 @@ public class ExcelToTable implements ExcelImportDataI {
      * ProgressHandle.
      *
      * @param file excel file.
-     * @param handle ProgressHandle
-     * <p>
+     *
      * @throws IOException
      */
     public ExcelToTable( File file ) throws IOException {
@@ -67,7 +66,7 @@ public class ExcelToTable implements ExcelImportDataI {
     /**
      * This method extracts the data from the sheets in the given excel file.
      *
-     * @param file excel file.
+     * @param file   excel file.
      * @param handle ProgressHandle
      * <p>
      * @throws IOException
@@ -115,7 +114,7 @@ public class ExcelToTable implements ExcelImportDataI {
 
             w.close();
         } catch( BiffException e ) {
-            LOG.log( Level.WARNING, e.getMessage(), e );
+            LOG.warn( e.getMessage(), e );
         }
 
     }

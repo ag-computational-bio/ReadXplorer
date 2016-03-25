@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.dashboard;
 
 
 import de.cebitec.readxplorer.databackend.TrackStatisticsGenerator;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
@@ -31,23 +32,29 @@ import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
 import de.cebitec.readxplorer.ui.login.LoginWizardAction;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
 import javax.swing.border.Border;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -59,8 +66,8 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-
-import static java.util.logging.Level.WARNING;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -91,7 +98,7 @@ import static java.util.logging.Level.WARNING;
 public final class DashboardWindowTopComponent extends TopComponentExtended
         implements ExplorerManager.Provider {
 
-    private static final Logger LOG = Logger.getLogger( DashboardWindowTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DashboardWindowTopComponent.class.getName() );
 
 
     private static final long serialVersionUID = 1L;
@@ -116,11 +123,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         putClientProperty( TopComponent.PROP_UNDOCKING_DISABLED, Boolean.FALSE );
 
         this.refreshData();
-        ProjectConnector.getInstance().addObserver( new Observer() {
+        ProjectConnector.getInstance().registerObserver( new Observer() {
             @Override
-            public void update( Observable o, Object arg ) {
+            public void update( Object arg ) {
 
-                //dirty fix for a bug in h2 database, that is occuring, when trying
+                //dirty fix for a bug in h2 database, that is occurring, when trying
                 //to delete two or more references
                 //the code waits 200ms before updating the dashboard to ensure
                 //that the reference data has been fully deleted
@@ -130,7 +137,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                         try {
                             this.wait( 200 );
                         } catch( InterruptedException ex ) {
-                            Exceptions.printStackTrace( ex );
+                            LOG.warn( ex.getMessage() );
                         }
                         try {
                             //run gui updates separately in the AWT Thread
@@ -143,7 +150,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
                             } );
                         } catch( Exception e ) {
-                            LOG.log( WARNING, e.getMessage() );
+                            LOG.warn( e.getMessage() );
                         }
                     }
 
@@ -164,18 +171,20 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     public void refreshData() {
 
         if( !ProjectConnector.getInstance().isConnected() ) {
-            quickstartLabel.setVisible( true );
+            quickStartPane.setVisible( true );
+            quickStartScrollPane.setVisible( true );
             explorerSplitPane.setVisible( false );
             openButton.setVisible( false );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedOut() );
         } else {
-            quickstartLabel.setVisible( false );
+            quickStartPane.setVisible( false );
+            quickStartScrollPane.setVisible( false );
             explorerSplitPane.setVisible( true );
             openButton.setVisible( true );
             openDBButton.setText( Bundle.DashboardWindowTopComponent_openDBButton_loggedIn() );
             try {
                 final Map<PersistentReference, List<PersistentTrack>> genomesAndTracks
-                        = ProjectConnector.getInstance().getGenomesAndTracks();
+                        = ProjectConnector.getInstance().getReferencesAndTracks();
 
                 Node rootNode = new AbstractNode( new Children.Keys<PersistentReference>() {
                     @Override
@@ -218,7 +227,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
 
             } catch( OutOfMemoryError e ) {
-                VisualisationUtils.displayOutOfMemoryError( this );
+                LOG.error( e.getMessage(), e );
+                VisualisationUtils.displayOutOfMemoryError();
             }
         }
         this.repaint();
@@ -242,11 +252,11 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             if( item != null ) {
                 if( item.getChild() == DBItem.Child.GENOME ) {
                     if( !genomesAndTracksToOpen.containsKey( item.getID() ) ) {
-                        genomesAndTracksToOpen.put( item.getID(), new HashSet<Long>() );
+                        genomesAndTracksToOpen.put( item.getID(), new HashSet<>() );
                     }
                 } else {
                     if( !genomesAndTracksToOpen.containsKey( item.getRefID() ) ) {
-                        genomesAndTracksToOpen.put( item.getRefID(), new HashSet<Long>() );
+                        genomesAndTracksToOpen.put( item.getRefID(), new HashSet<>() );
                         DBItem parentItem = this.getItemForNode( n.getParentNode() );
                         if( parentItem != null ) {
                             parentItem.setSelected( true );
@@ -289,7 +299,6 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        quickstartLabel = new javax.swing.JLabel();
         explorerSplitPane = new javax.swing.JSplitPane();
         explorerPanel = new javax.swing.JPanel();
         buttonPanel = new javax.swing.JPanel();
@@ -303,8 +312,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         jPanel1 = new javax.swing.JPanel();
         openDBButton = new javax.swing.JButton();
         createDBButton = new javax.swing.JButton();
-
-        org.openide.awt.Mnemonics.setLocalizedText(quickstartLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.quickstartLabel.text")); // NOI18N
+        quickStartScrollPane = new javax.swing.JScrollPane();
+        quickStartPane = new javax.swing.JEditorPane();
 
         explorerSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         explorerSplitPane.setResizeWeight(1.0);
@@ -452,6 +461,15 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        quickStartScrollPane.setBorder(null);
+
+        quickStartPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+        quickStartPane.setEditable(false);
+        quickStartPane.setBackground(new java.awt.Color(240, 240, 240));
+        quickStartPane.setBorder(null);
+        quickStartPane.setContentType("text/html"); // NOI18N
+        quickStartScrollPane.setViewportView(quickStartPane);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -461,16 +479,16 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(explorerSplitPane)
-            .addComponent(quickstartLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(quickStartScrollPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(quickstartLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(quickStartScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -482,14 +500,32 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     private void initAdditionalComponents() {
 
         String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource( "splash.png" ) + "\" /><h2>ReadXplorer - " +
-                 "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
-                 "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
-                 "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
-                 "toolbar buttons or \"Tools\" menu)</p></html>";
-        quickstartLabel.setText( sText );
+                       "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> " +
+                       "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore " +
+                       "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via " +
+                       "toolbar buttons or \"Tools\" menu)<br /><br /><h3>For HELP goto Help -> Help Contents or check out the " +
+                       "<a href=\"https://www.uni-giessen.de/fbz/fb08/Inst/bioinformatik/software/ReadXplorer/documentation/userManual\"> manual</a>.</h3></html></p>";
+        quickStartPane.setText( sText );
+        quickStartPane.addHyperlinkListener( new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate( HyperlinkEvent e ) {
+                if( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
+                    if( Desktop.isDesktopSupported() ) {
+                        try {
+                            Desktop.getDesktop().browse( e.getURL().toURI() );
+                        } catch( IOException | URISyntaxException ex ) {
+                            JOptionPane.showMessageDialog(quickStartPane, "The manual link caused an " +
+                                                                               ex.getClass().getCanonicalName() + "!", "URL Error", JOptionPane.ERROR_MESSAGE );
+                        }
+                    }
+                }
+            }
+
+
+        } );
 
         Border paddingBorder = BorderFactory.createEmptyBorder( 50, 100, 100, 100 );
-        quickstartLabel.setBorder( BorderFactory.createCompoundBorder( paddingBorder, paddingBorder ) );
+        quickStartPane.setBorder( BorderFactory.createCompoundBorder( paddingBorder, paddingBorder ) );
 
         //Create the outline view showing the explorer
         ov = new OutlineView(); //Set the columns of the outline view
@@ -523,12 +559,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             if( !genomesAndTracksToOpen.containsKey( dbItem.getID() ) ) {
                                 dbItem.setSelected( true );
                             }
-                        } else {
-                            if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
-                                dbItem.setSelected( true );
-                            } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
-                                dbItem.setSelected( true );
-                            }
+                        } else if( !genomesAndTracksToOpen.containsKey( dbItem.getRefID() ) ) {
+                            dbItem.setSelected( true );
+                        } else if( !genomesAndTracksToOpen.get( dbItem.getRefID() ).contains( dbItem.getID() ) ) {
+                            dbItem.setSelected( true );
                         }
                     }
                 }
@@ -548,35 +582,39 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
         this.updateOpenList();
 
-        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
+        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getReferencesAndTracks();
 
         for( Long genomeId : genomesAndTracksToOpen.keySet() ) {
             Set<Long> trackIds = genomesAndTracksToOpen.get( genomeId );
 
             ReferenceConnector rc = ProjectConnector.getInstance().getRefGenomeConnector( genomeId.intValue() );
-            PersistentReference genome = rc.getRefGenome();
+            try {
+                PersistentReference genome = rc.getRefGenome();
 
-            //open reference genome now
-            AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
-            appPanelTopComponent.open();
-            appPanelTopComponent.getLookup().lookup( ViewController.class ).openGenome( genome );
-            appPanelTopComponent.setName( appPanelTopComponent.getLookup().lookup( ViewController.class ).getDisplayName() );
-            appPanelTopComponent.requestActive();
+                //open reference genome now
+                AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
+                appPanelTopComponent.open();
+                appPanelTopComponent.getLookup().lookup( ViewController.class ).openGenome( genome );
+                appPanelTopComponent.setName( appPanelTopComponent.getLookup().lookup( ViewController.class ).getDisplayName() );
+                appPanelTopComponent.requestActive();
 
 
-            //open tracks for this genome now
-            List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
-            List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
-            for( PersistentTrack track : allTracksForThisGenome ) {
-                if( trackIds.contains( (long) track.getId() ) ) {
-                    tracksToShow.add( track );
+                //open tracks for this genome now
+                List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
+                List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
+                for( PersistentTrack track : allTracksForThisGenome ) {
+                    if( trackIds.contains( (long) track.getId() ) ) {
+                        tracksToShow.add( track );
+                    }
                 }
+
+                appPanelTopComponent.getLookup().lookup( ViewController.class ).openTracksOnCurrentGenome( tracksToShow );
+
+                //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
+            } catch( DatabaseException ex ) {
+                ErrorHelper.getHandler().handle( ex );
             }
-
-            appPanelTopComponent.getLookup().lookup( ViewController.class ).openTracksOnCurrentGenome( tracksToShow );
-
         }
-        //ReferenceViewer referenceViewer = AppPanelTopComponent.findInstance().getReferenceViewer();
 
     }//GEN-LAST:event_openButtonActionPerformed
 
@@ -613,7 +651,8 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton openButton;
     private javax.swing.JButton openDBButton;
-    private javax.swing.JLabel quickstartLabel;
+    private javax.swing.JEditorPane quickStartPane;
+    private javax.swing.JScrollPane quickStartScrollPane;
     private javax.swing.JButton selectAllButton;
     private javax.swing.JPanel selectButtonPanel;
     private javax.swing.JPanel storeButtonPanel;

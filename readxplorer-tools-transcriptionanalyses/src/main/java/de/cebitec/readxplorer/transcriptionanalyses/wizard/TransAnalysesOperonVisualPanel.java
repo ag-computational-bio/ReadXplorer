@@ -120,6 +120,7 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
 
 
     private void initAdditionalComponents() {
+        operonDetectionAutomaticBox.setVisible( false ); //TODO: when an automatic way has been implemented, simply remove this line
         minSpanningReads = Integer.parseInt( spanningReadsField.getText() );
         spanningReadsField.getDocument().addDocumentListener( createDocumentListener() );
 

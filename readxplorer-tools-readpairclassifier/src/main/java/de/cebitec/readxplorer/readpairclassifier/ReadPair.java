@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.readpairclassifier;
 
 
 import de.cebitec.readxplorer.api.enums.ReadPairType;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecord;
 
 
 /**

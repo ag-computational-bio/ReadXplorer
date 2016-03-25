@@ -24,6 +24,7 @@ import org.openide.WizardDescriptor;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS;
+import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_USE_EFFECTIVE_LENGTH;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 
 
@@ -61,6 +62,7 @@ public class TransAnalysesNormWizardPanel extends ChangeListeningWizardPanel {
         if( isValid() ) {
             wiz.putProperty( PROP_MIN_NUMBER_READS, this.component.getMinReadCount() );
             wiz.putProperty( PROP_MAX_NUMBER_READS, this.component.getMaxReadCount() );
+            wiz.putProperty( PROP_USE_EFFECTIVE_LENGTH, this.component.isUseEffectiveLength() );
             storePrefs();
         }
     }
@@ -73,5 +75,8 @@ public class TransAnalysesNormWizardPanel extends ChangeListeningWizardPanel {
     private void storePrefs() {
         getPref().put( PROP_WIZARD_NAME + PROP_MIN_NUMBER_READS, String.valueOf( component.getMinReadCount() ) );
         getPref().put( PROP_WIZARD_NAME + PROP_MAX_NUMBER_READS, String.valueOf( component.getMaxReadCount() ) );
+        getPref().putBoolean( PROP_WIZARD_NAME + PROP_USE_EFFECTIVE_LENGTH, component.isUseEffectiveLength() );
     }
+
+
 }

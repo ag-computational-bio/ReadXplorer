@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 
@@ -261,6 +260,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public synchronized void receiveData( Object data ) {
         if( data instanceof CoverageAndDiffResult ) {
@@ -313,10 +315,13 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     }
 
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void boundsChangedHook() {
         if( this.getBoundsInfo().getLogLeft() != lowerBound || this.getBoundsInfo().getLogRight() != upperBound ||
-                 this.isNewDataRequestNeeded() ) {
+            this.isNewDataRequestNeeded() ) {
             this.lowerBound = super.getBoundsInfo().getLogLeft();
             this.upperBound = super.getBoundsInfo().getLogRight();
             this.width = upperBound - lowerBound + 1;
@@ -342,11 +347,14 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     }
 
 
+    /**
+     * @return The coverage scale line values
+     */
     private List<Integer> getCoverageScaleLineValues() {
         int minMargin = 20;
         int step;
 
-        ArrayList<Integer> test = new ArrayList<>();
+        List<Integer> test = new ArrayList<>();
         test.add( 50000 );
         test.add( 20000 );
         test.add( 10000 );
@@ -375,39 +383,21 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     }
 
 
-    private ArrayList<Integer> getValues( int stepsize ) {
-        ArrayList<Integer> list = new ArrayList<>();
+    /**
+     * @param stepSize The size of a step
+     *
+     * @return List of all steps with the given size
+     */
+    private List<Integer> getValues( int stepSize ) {
+        List<Integer> list = new ArrayList<>();
 
-        int tmp = stepsize;
+        int tmp = stepSize;
         while( tmp <= maxCoverage ) {
             list.add( tmp );
-            tmp += stepsize;
+            tmp += stepSize;
         }
 
         return list;
-    }
-
-
-    private void placeExcusePanel( JPanel p ) {
-        // has to be checked for null because, this method may be called upon
-        // initialization of this object (depending on behaviour of AbstractViewer)
-        // BEFORE the panels are initialized!
-        if( p != null ) {
-            int tmpWidth = p.getPreferredSize().width;
-            int x = this.getSize().width / 2 - tmpWidth / 2;
-            if( x < 0 ) {
-                x = 0;
-            }
-
-            int tmpHeight = p.getPreferredSize().height;
-            int y = this.getSize().height / 2 - tmpHeight / 2;
-            if( y < 0 ) {
-                y = 0;
-            }
-            p.setBounds( x, y, tmpWidth, tmpHeight );
-            this.add( p );
-            this.updateUI();
-        }
     }
 
 
@@ -435,7 +425,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
             // get physical x coordinate
             x = (int) getPhysBoundariesForLogPos( i ).getLeftPhysBound() +
-                     (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * gapManager.getNumOfGapsAt( i );
+                (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * gapManager.getNumOfGapsAt( i );
 
             this.cycleBases( i, relPos, x, pxPerCoverageUnit, true, isColored );
             this.cycleBases( i, relPos, x, pxPerCoverageUnit, false, isColored );
@@ -449,7 +439,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                     relPos += j;
 
                     x = (int) getPhysBoundariesForLogPos( i ).getLeftPhysBound() +
-                             (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * j;
+                        (int) getPhysBoundariesForLogPos( i ).getPhysWidth() * j;
 
                     this.cycleBases( i, relPos, x, pxPerCoverageUnit, true, isColored );
                     this.cycleBases( i, relPos, x, pxPerCoverageUnit, false, isColored );
@@ -462,10 +452,12 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     /**
      * Creates the colored histogram bars.
      * <p>
-     * @param absPos
-     * @param relPos
-     * @param x
-     * @param heightPerCoverageUnit
+     * @param absPos                absolute reference position
+     * @param relPos                relative reference position in currently
+     *                              visible interval coordinates
+     * @param x                     endpoint of this base in pixels
+     * @param heightPerCoverageUnit pixel height of a coverage unit (1 read
+     *                              coverage)
      * @param isForwardStrand       true, if bars for fwd strand should be
      *                              painted
      * @param isColored             true, if the histogram should be colored
@@ -514,27 +506,27 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         }
         value = logoData.getNumOfAAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_A, x, y );
+            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_A, x, y );
         }
         value = logoData.getNumOfCAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_C, x, y );
+            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_C, x, y );
         }
         value = logoData.getNumOfGAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_G, x, y );
+            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_G, x, y );
         }
         value = logoData.getNumOfTAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_T, x, y );
+            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_T, x, y );
         }
         value = logoData.getNumOfReadGapsAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_READGAP, x, y );
+            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_READGAP, x, y );
         }
         value = logoData.getNumOfNAt( relPos, isForwardStrand );
         if( value > 0 ) {
-            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_N, x, y );
+            y = this.createBlockForValue( value, isForwardStrand, heightPerCoverageUnit, bounds, Colors.LOGO_N, x, y );
         }
     }
 
@@ -590,7 +582,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         while( widthCount < tmpWidth ) {
             num = gapManager.getNumOfGapsAt( lowerBound + i ); // get the number of gaps at current position
             widthCount++; // current position needs 1 base space in visual alignment
-            widthCount += num; // if gaps occured at current position, they need some space, too
+            widthCount += num; // if gaps occurred at current position, they need some space, too
             gapNo += num;
             if( widthCount > tmpWidth ) {
                 gapNo -= (widthCount - tmpWidth);
@@ -640,8 +632,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     private void setUpLogoData() {
         logoData = new LogoDataManager( lowerBound, width +
-                                         gapManager.getNumOfGapsSmaller( upperBound ) +
-                                         gapManager.getNumOfGapsAt( upperBound ) );
+                                                    gapManager.getNumOfGapsSmaller( upperBound ) +
+                                                    gapManager.getNumOfGapsAt( upperBound ) );
 
         // store coverage information in logo data
         int relPos;
@@ -679,7 +671,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             if( !dataLoaded ) {
                 g.fillRect( 0, 0, this.getSize().width - 1, this.getSize().height - 1 );
             }
-            g.setColor(Colors.TRACKPANEL_MIDDLE_LINE );
+            g.setColor( Colors.TRACKPANEL_MIDDLE_LINE );
             drawBaseLines( g );
 
             // draw coverage values and lines for the coverage values depending

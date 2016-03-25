@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
@@ -33,6 +34,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalyses
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -41,8 +43,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
@@ -54,6 +54,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -75,7 +77,7 @@ import org.openide.windows.WindowManager;
 public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                                               DataVisualisationI {
 
-    private static final Logger LOG = Logger.getLogger( OpenTranscriptionAnalysesAction.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( OpenTranscriptionAnalysesAction.class.getName() );
 
     private final TranscriptionAnalysesTopComponent transcAnalysesTopComp;
     private final ReferenceViewer refViewer;
@@ -187,6 +189,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         int associateTssWindow = 0;
         int minNumberReads = 0;
         int maxNumberReads = 0;
+        boolean useEffectiveLength = false;
         boolean autoOperonParamEstimation = false;
         int minSpanningReads = 0;
         Set<FeatureType> selNormFeatureTypes = new HashSet<>();
@@ -227,6 +230,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         if( performNormAnalysis ) {
             minNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS );
             maxNumberReads = (int) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS );
+            useEffectiveLength = (boolean) wiz.getProperty( TranscriptionAnalysesWizardIterator.PROP_USE_EFFECTIVE_LENGTH );
             selNormFeatureTypes = (Set<FeatureType>) wiz.getProperty( selNormFeatureTypesPropString );
             normFeatureStartOffset = (int) wiz.getProperty( propStringNormFeatureStartOffset );
             normFeatureStopOffset = (int) wiz.getProperty( propStringNormFeatureStopOffset );
@@ -236,7 +240,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                              minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov,
                                              maxLeaderlessDistance, maxFeatureDistance, isAssociateTss, associateTssWindow, readClassParams );
         parametersOperonDet = new ParameterSetOperonDet( performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams );
-        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads,
+        parametersNormalization = new ParameterSetNormalization( performNormAnalysis, minNumberReads, maxNumberReads, useEffectiveLength,
                                                                  normFeatureStartOffset, normFeatureStopOffset,
                                                                  selNormFeatureTypes, readClassParams );
 
@@ -246,13 +250,14 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector( track );
+                    //every track has its own analysis handlers
+                    this.createAnalysis( connector, readClassParams );
+
                 } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                     SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                    continue;
+                } catch( DatabaseException e ) {
+                    ErrorHelper.getHandler().handle( e );
                 }
-
-                //every track has its own analysis handlers
-                this.createAnalysis( connector, readClassParams );
             }
         } else {
             try {
@@ -261,8 +266,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
             } catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+            } catch( DatabaseException e ) {
+                ErrorHelper.getHandler().handle( e );
             }
-
         }
     }
 
@@ -304,12 +310,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
             mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
         }
         if( parametersNormalization.isPerformNormAnalysis() ) {
-            analysisNormalization = new AnalysisNormalization( connector, parametersNormalization );
+                analysisNormalization = new AnalysisNormalization( connector, parametersNormalization );
 
-            mappingAnalysisHandler.registerObserver( analysisNormalization );
-            mappingAnalysisHandler.setMappingsNeeded( true );
-            mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
-        }
+                mappingAnalysisHandler.registerObserver( analysisNormalization );
+                mappingAnalysisHandler.setMappingsNeeded( true );
+                mappingAnalysisHandler.setDesiredData( IntervalRequestData.ReducedMappings );
+            }
 
         trackToAnalysisMap.put( connector.getTrackID(), new AnalysisContainer( analysisTSS, analysisOperon, analysisNormalization ) );
         covAnalysisHandler.startAnalysis();
@@ -401,7 +407,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
 
             } );
         } catch( ClassCastException e ) {
-            LOG.log( Level.INFO, "Unknown data passed to {0}", getClass().getName() );
+            LOG.info( "Unknown data passed to " + getClass().getName() );
             //do nothing, we dont handle other data in this class
         }
 

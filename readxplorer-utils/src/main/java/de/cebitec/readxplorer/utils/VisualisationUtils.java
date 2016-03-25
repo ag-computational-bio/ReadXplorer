@@ -18,13 +18,16 @@
 package de.cebitec.readxplorer.utils;
 
 
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
+
+import static de.cebitec.readxplorer.utils.Bundle.OOM_Header;
+import static de.cebitec.readxplorer.utils.Bundle.OOM_Message;
 
 
 /**
@@ -34,7 +37,7 @@ import org.openide.util.NbBundle;
  */
 public final class VisualisationUtils {
 
-    
+
     /**
      * Instantiation not allowed!
      */
@@ -95,15 +98,13 @@ public final class VisualisationUtils {
 
 
     /**
-     * Displays an out of memory error in a JOptionPane.
-     * <p>
-     * @param parentPanel The parent panel causing the error.
+     * Lets the current {@link de.cebitec.readxplorer.api.ErrorHandler} handle
+     * an out of memory error.
      */
-    public static void displayOutOfMemoryError( Component parentPanel ) {
-        String msg = NbBundle.getMessage( VisualisationUtils.class, "OOM_Message",
-                                          "An out of memory error occured during fetching the references. Please restart the software with more memory." );
-        String title = NbBundle.getMessage( VisualisationUtils.class, "OOM_Header", "Restart Software" );
-        JOptionPane.showMessageDialog( parentPanel, msg, title, JOptionPane.INFORMATION_MESSAGE );
+    @NbBundle.Messages( { "OOM_Message=An out of memory error occurred. Please restart the software with more memory.",
+                          "OOM_Header=Restart Software" } )
+    public static void displayOutOfMemoryError() {
+        ErrorHelper.getHandler().handle( new OutOfMemoryError( OOM_Message() ), OOM_Header() );
     }
 
 

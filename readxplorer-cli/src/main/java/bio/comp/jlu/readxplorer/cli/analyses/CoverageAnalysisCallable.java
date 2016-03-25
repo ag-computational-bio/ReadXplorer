@@ -18,21 +18,21 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.Coverage;
 
 
 /**
- * Analysis Callable Mockup Class.
- * This mockup class is a basic framework for future
- * coverage analysis cli implementations.
+ * Analysis Callable Mockup Class. This mockup class is a basic framework for
+ * future coverage analysis cli implementations.
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
 public class CoverageAnalysisCallable extends AnalysisCallable {
 
-    private static final Logger LOG = Logger.getLogger( CoverageAnalysisCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CoverageAnalysisCallable.class.getName() );
 
 
     public CoverageAnalysisCallable( boolean verbosity ) {
@@ -45,7 +45,7 @@ public class CoverageAnalysisCallable extends AnalysisCallable {
     @Override
     public AnalysisResult call() throws Exception {
 
-        LOG.fine( "start coverage analysis" );
+        LOG.trace( "start coverage analysis" );
         // calc coverage analyses
 
         return null;

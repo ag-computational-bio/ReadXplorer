@@ -75,6 +75,10 @@ public enum TableType {
      */
     GASV_TABLE( "GASV Result Table" ),
     /**
+     * GASV genome rearrangement detection result table.
+     */
+    CORRELATION_TABLE( "Correlation Analysis Table" ),
+    /**
      * Arbitrary table starting with a position column.
      */
     POS_TABLE( "Any table starting with position column" ),

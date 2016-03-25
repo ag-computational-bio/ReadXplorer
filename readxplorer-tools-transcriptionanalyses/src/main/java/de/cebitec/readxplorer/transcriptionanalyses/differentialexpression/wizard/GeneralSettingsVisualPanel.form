@@ -35,9 +35,9 @@
                   </Group>
                   <Component id="saveCheckBox" alignment="0" pref="490" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="startOffset" min="-2" pref="65" max="-2" attributes="0"/>
+                      <Component id="startOffsetField" min="-2" pref="65" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="stopOffset" min="-2" pref="65" max="-2" attributes="0"/>
+                      <Component id="stopOffsetField" min="-2" pref="65" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane1" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
@@ -64,8 +64,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="startOffset" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="stopOffset" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="startOffsetField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="stopOffsetField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
@@ -85,42 +85,42 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.jLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.jLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="startOffset">
+    <Component class="javax.swing.JTextField" name="startOffsetField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.startOffset.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.startOffsetField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="stopOffset">
+    <Component class="javax.swing.JTextField" name="stopOffsetField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.stopOffset.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.stopOffsetField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.jLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.jLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="fileNameField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.fileNameField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.fileNameField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -128,7 +128,7 @@
     <Component class="javax.swing.JCheckBox" name="saveCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.saveCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.saveCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -138,7 +138,7 @@
     <Component class="javax.swing.JButton" name="fileChooserButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialExpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.fileChooserButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/wizard/Bundle.properties" key="GeneralSettingsVisualPanel.fileChooserButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>

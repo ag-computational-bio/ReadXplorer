@@ -53,7 +53,8 @@ public final class SelectTrackVisualPanel extends JPanel implements
      */
     public SelectTrackVisualPanel() {
         ProjectConnector con = ProjectConnector.getInstance();
-        references = con.getGenomesAsArray();
+        List<PersistentReference> refList = ProjectConnector.getInstance().getReferences();
+        references = refList.toArray( new PersistentReference[refList.size()] );
         initComponents();
     }
 
@@ -140,9 +141,8 @@ public final class SelectTrackVisualPanel extends JPanel implements
             selectedIndex = referenceList.getSelectedIndex();
             selectedRef = references[selectedIndex];
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( selectedRef.getId() );
-            List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for( PersistentTrack persistentTrack : tracks ) {
+            for( PersistentTrack persistentTrack : refCon.getAssociatedTracks() ) {
                 trackListModel.addElement( persistentTrack );
             }
         }

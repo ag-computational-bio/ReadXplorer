@@ -22,13 +22,14 @@ import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.TabWithCloseX;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
-import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -46,7 +47,7 @@ import org.openide.windows.WindowManager;
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.rnatrimming.correlationAnalysis.TrimResultTopComponent" )
-@ActionReference( path = "Menu/Window"/* , position = 951*/ )
+@ActionReference( path = "Menu/Window"/* , position = 951 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_TrimResultAction",
          preferredID = "TrimResultTopComponent" )
@@ -57,7 +58,7 @@ import org.openide.windows.WindowManager;
 } )
 public final class TrimResultTopComponent extends TopComponentExtended {
 
-    private static final Logger LOG = Logger.getLogger( TrimResultTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrimResultTopComponent.class.getName() );
 
     private static TrimResultTopComponent instance;
     private static final String PREFERRED_ID = "TrimResultTopComponent";
@@ -117,10 +118,9 @@ public final class TrimResultTopComponent extends TopComponentExtended {
 
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files
-     * only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized
-     * instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
+     * only, i.e. deserialization routines; otherwise you could get a
+     * non-deserialized instance. To obtain the singleton instance, use
+     * {@link #findInstance}.
      */
     public static synchronized TrimResultTopComponent getDefault() {
         if( instance == null ) {
@@ -137,14 +137,14 @@ public final class TrimResultTopComponent extends TopComponentExtended {
     public static synchronized TrimResultTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warn( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof TrimResultTopComponent ) {
             return (TrimResultTopComponent) win;
         }
-        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior." );
+        LOG.warn( "There seem to be multiple components with the '" + PREFERRED_ID +
+                 "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
 
@@ -194,8 +194,8 @@ public final class TrimResultTopComponent extends TopComponentExtended {
      * @param referenceViewer the reference viewer for which the snp detection
      *                        should be carried out.
      * @param trackIds        the list of track ids (associated to the reference
-     *                        viewer) for which the snp
-     *                        detection should be carried out.
+     *                        viewer) for which the snp detection should be
+     *                        carried out.
      */
     public TrimResultPanel openResultTab( String title ) {
         TrimResultPanel resultView = new TrimResultPanel();

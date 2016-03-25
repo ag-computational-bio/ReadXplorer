@@ -30,18 +30,18 @@ import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readxplorer.utils.MessageSenderI;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.SequenceUtils;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMTag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
 
 
@@ -56,7 +56,7 @@ import static java.util.regex.Pattern.compile;
                       "Parser.checkMapping.ErrorReadEmpty=Read sequence could not be parsed in {0} line {1}.Found: {2}" } )
 public final class CommonsMappingParser {
 
-    private static final Logger LOG = Logger.getLogger( CommonsMappingParser.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommonsMappingParser.class.getName() );
 
     /*
      * The cigar values are as follows: 0 (M) = alignment match (both, match or
@@ -400,7 +400,7 @@ public final class CommonsMappingParser {
                         --numberofDeletion;
                         newreadSeq = readSeq;
                         ++readPos;
-                        //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
+                        //     LoggerFactory.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
                     }
                     break;
                 case "I":
@@ -418,7 +418,7 @@ public final class CommonsMappingParser {
                         --numberOfInsertions;
                         ++refpos;
 
-                        //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
+                        //   LoggerFactory.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                     }
                     break;
                 case "M":
@@ -441,7 +441,7 @@ public final class CommonsMappingParser {
                     }
                     break;
                 default: //shoud never happen as SAMRecord validates the cigar
-                    LOG.log( WARNING, Bundle.CommonMethod_CIGAR( op ) );
+                    LOG.warn( Bundle.CommonMethod_CIGAR( op ) );
                     break;
             }
         }
@@ -760,7 +760,7 @@ public final class CommonsMappingParser {
         if( record.getReadPairedFlag() && pairTag != ReadPairExtensions.A1.getChar() && pairTag != ReadPairExtensions.B1.getChar() &&
             pairTag != ReadPairExtensions.A2.getChar() && pairTag != ReadPairExtensions.B2.getChar() &&
             !isCasavaLarger1Dot8Format( readName ) ) {
-            readName += "/" + (record.getFirstOfPairFlag() ? ReadPairExtensions.A1 : ReadPairExtensions.A2 );
+            readName += "/" + (record.getFirstOfPairFlag() ? ReadPairExtensions.A1 : ReadPairExtensions.A2);
         }
         return readName;
     }

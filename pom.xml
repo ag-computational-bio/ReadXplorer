@@ -5,7 +5,7 @@
 
     <groupId>bio.comp.jlu.readxplorer</groupId>
     <artifactId>readxplorer</artifactId>
-    <version>2.1.0-FINAL</version>
+    <version>2.2.0-FINAL</version>
     <packaging>pom</packaging>
     <name>ReadXplorer</name>
 
@@ -16,7 +16,7 @@
         <module>branding</module>
         <module>centrallookup</module>
         <module>readxplorer-api</module>
-        <module>readxplorer-backend</module>
+        <module>readxplorer-databackend</module>
         <module>readxplorer-utils</module>
         <module>readxplorer-classificationupdate</module>
         <module>readxplorer-cli</module>
@@ -47,6 +47,7 @@
         <module>readxplorer-tools-transcriptionanalyses</module>
         <module>readxplorer-libs-h2</module>
         <module>readxplorer-libs-jfreechart</module>
+        <module>lib.batik</module>
     </modules>
 
 
@@ -65,12 +66,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-api</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.2.0-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-branding</artifactId>
-                <version>2.1.0-FINAL</version>
+                <version>2.2.0-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -80,62 +81,62 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-classificationupdate</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-cli</artifactId>
-                <version>1.0.0-FINAL</version>
+                <version>1.0.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-dashboard</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.2.0-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-databackend</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-exporter</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-mapping</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-parser</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-plotting</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-rnatrimming</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.2.0-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-thumbnail</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-coverageanalysis</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-detailedviewer</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -145,12 +146,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-gasv</artifactId>
-                <version>1.0.0-FINAL</version>
+                <version>1.0.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-readpairclassifier</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -160,67 +161,67 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-rnafolder</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-snpdetection</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-transcriptionanalyses</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.3-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-converter</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-datamanagement</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-importer</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.3.0-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-options</artifactId>
-                <version>1.2.0-FINAL</version>
+                <version>1.2.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-visualisation</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-visualisation-reference</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-visualisation-track</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-utils</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.2-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-vcfhandling</artifactId>
-                <version>1.1.0-FINAL</version>
+                <version>1.1.1-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -236,6 +237,11 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-libs-jfreechart</artifactId>
                 <version>1.0.15</version>
+            </dependency>
+            <dependency>
+                <groupId>bio.jlu.comp.readxplorer</groupId>
+                <artifactId>batik.nbm</artifactId>
+                <version>1.7</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -272,7 +278,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.2</version>
+                    <version>3.3</version>
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -283,7 +289,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>2.6</version>
                 </plugin>
 
                 <plugin>

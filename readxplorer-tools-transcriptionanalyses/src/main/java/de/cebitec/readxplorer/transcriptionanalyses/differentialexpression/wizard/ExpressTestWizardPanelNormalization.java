@@ -23,23 +23,35 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
-import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_SELECTED_FEAT_TYPES;
 
 
-public class ExpressTestWizardPanelNormalization implements
-        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+/**
+ * Express Test normalization wizard panel.
+ * 
+ * @author Kai Stadermann
+ */
+public class ExpressTestWizardPanelNormalization extends ChangeListeningWizardPanel {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private ExpressTestVisualPanelNormalization component;
+
+
+    /**
+     * Express Test normalization wizard panel.
+     */
+    public ExpressTestWizardPanelNormalization() {
+        super( "" );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -56,35 +68,10 @@ public class ExpressTestWizardPanelNormalization implements
 
 
     @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
     public void readSettings( WizardDescriptor wiz ) {
+        super.readSettings( wiz );
         int id = (int) wiz.getProperty( "genomeID" );
-        Set<FeatureType> usedFeatures = (Set<FeatureType>) wiz.getProperty( "featureType" );
+        Set<FeatureType> usedFeatures = (Set<FeatureType>) wiz.getProperty( PROP_DGE_SELECTED_FEAT_TYPES );
         ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( id );
         List<PersistentFeature> allRefFeatures = new ArrayList<>();
         for( PersistentChromosome chrom : referenceConnector.getChromosomesForGenome().values() ) {
@@ -102,11 +89,6 @@ public class ExpressTestWizardPanelNormalization implements
         if( useHouseKeepingGenesToNormalize ) {
             wiz.putProperty( "normalizationFeatures", getComponent().getSelectedFeatures() );
         }
-    }
-
-
-    @Override
-    public void validate() throws WizardValidationException {
     }
 
 

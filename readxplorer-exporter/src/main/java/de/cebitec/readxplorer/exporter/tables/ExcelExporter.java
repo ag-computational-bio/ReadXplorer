@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -41,9 +40,8 @@ import jxl.write.biff.RowsExceededException;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Logger.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -53,7 +51,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public class ExcelExporter implements TableExporterI {
 
-    private static final Logger LOG = getLogger( ExcelExporter.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ExcelExporter.class.getName() );
 
     private static final String TABLE_DOUBLE = "DOUBLE";
     private static final String TABLE_FLOAT = "FLOAT";
@@ -68,8 +66,8 @@ public class ExcelExporter implements TableExporterI {
     private List<String> sheetNames; //contains all sheet names
     private List<List<String>> headers; //contains all headers
     /**
-     * Inner list contains data of one row, middle list contains all rows,
-     * outer list is the list of sheets.
+     * Inner list contains data of one row, middle list contains all rows, outer
+     * list is the list of sheets.
      */
     private List<List<List<Object>>> exportData;
     private int rowNumberGlobal;
@@ -135,7 +133,7 @@ public class ExcelExporter implements TableExporterI {
     @Override
     public File writeFile( File file ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
-        LOG.log( INFO, "Starting to write Excel file...{0}", file.getAbsolutePath() );
+        LOG.info( "Starting to write Excel file...{0}", file.getAbsolutePath() );
 
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale( new Locale( "en", "EN" ) );
@@ -167,7 +165,7 @@ public class ExcelExporter implements TableExporterI {
 
         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get( 0 ), null );
 
-        LOG.log( INFO, "Finished writing Excel file!" );
+        LOG.info( "Finished writing Excel file!" );
 
         return file;
     }
@@ -175,16 +173,14 @@ public class ExcelExporter implements TableExporterI {
 
     /**
      * This method actually fills the given excel sheet with the data handed
-     * over to
-     * this ExcelExporter.
+     * over to this ExcelExporter.
      * <p>
      * @param sheet     the sheet to write the data to
      * @param sheetData the data to write in this sheet
      * @param headerRow the header to use for this sheet
      * <p>
      * @return dataLeft: false, if the sheet could store all data, true, if
-     *         there is too
-     *         much data for one sheet
+     *         there is too much data for one sheet
      * <p>
      * @throws OutOfMemoryError
      * @throws WriteException
@@ -196,7 +192,7 @@ public class ExcelExporter implements TableExporterI {
         int column = 0;
 
         for( String header : headerRow ) {
-            this.addColumn( sheet, TABLE_LABEL, header, column++, row );
+            ExcelExporter.addColumn( sheet, TABLE_LABEL, header, column++, row );
         }
         row++;
         this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
@@ -207,7 +203,7 @@ public class ExcelExporter implements TableExporterI {
             for( Object entry : exportRow ) {
                 String objectType = getObjectType( entry );
                 try {
-                    this.addColumn( sheet, objectType, entry, column++, row );
+                    ExcelExporter.addColumn( sheet, objectType, entry, column++, row );
                 } catch( RowsExceededException e ) {
                     dataLeft = true;
                     break;
@@ -323,9 +319,9 @@ public class ExcelExporter implements TableExporterI {
      */
     @Override
     public boolean readyToExport() {
-        return this.exportData != null && !this.exportData.isEmpty()
-               && this.headers != null && !this.headers.isEmpty()
-               && this.sheetNames != null && !this.sheetNames.isEmpty();
+        return this.exportData != null && !this.exportData.isEmpty() &&
+                 this.headers != null && !this.headers.isEmpty() &&
+                 this.sheetNames != null && !this.sheetNames.isEmpty();
     }
 
 

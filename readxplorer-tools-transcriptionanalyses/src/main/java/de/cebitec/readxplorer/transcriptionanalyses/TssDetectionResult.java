@@ -75,18 +75,24 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     private final List<String> promotorRegions;
     private final ParameterSetTSS tssParameters;
 
+    private int bpUpstream = 70;
+    private int bpDownstream = 0;
+
 
     /**
      * Container for all data belonging to a transcription start site detection
      * result.
      * <p>
      * @param results       the results of the TSS detection
+     * @param tssParams     the applied parameters
      * @param trackList     the list of tracks, for which the TSS detection was
      *                      carried out
      * @param reference     reference genome, for which this result was
      *                      generated
      * @param combineTracks <code>true</code>, if the tracks in the list are
      *                      combined, <code>false</code> otherwise
+     * @param trackColumn   track column in table
+     * @param filterColumn  filter column of table (position column)
      */
     public TssDetectionResult( List<TranscriptionStart> results, ParameterSetTSS tssParams, Map<Integer, PersistentTrack> trackList,
                                PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn ) {
@@ -97,6 +103,34 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.calcStats( results );
         promotorRegions = new ArrayList<>();
 
+    }
+
+
+    /**
+     * @param bpUpstream   the number of base pairs to export upstream of a TSS
+     * @param bpDownstream the number of base pairs to export downstream of a
+     *                     TSS
+     */
+    public void setPromoterLength( int bpUpstream, int bpDownstream ) {
+        this.bpUpstream = bpUpstream;
+        this.bpDownstream = bpDownstream;
+        
+    }
+
+
+    /**
+     * @return the number of base pairs to export upstream of a TSS
+     */
+    public int getBpUpstream() {
+        return bpUpstream;
+    }
+
+
+    /**
+     * @return the number of base pairs to export downstream of a TSS
+     */
+    public int getBpDownstream() {
+        return bpDownstream;
     }
 
 
@@ -186,7 +220,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         if( tssParameters.isAssociateTss() ) {
             dataColumnDescriptions.add( "Associated TSS" );
         }
-        dataColumnDescriptions.add( "70bp Upstream of Start" );
+        dataColumnDescriptions.add( bpUpstream + " bp Upstream of Start" );
+        dataColumnDescriptions.add( bpDownstream + " bp Downstream of Start" );
 
 
 
@@ -274,6 +309,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         statisticsExportData.add( ResultTrackAnalysis.createTableRow(
                 "Transcription start site detection statistics for tracks:",
                 GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createRxVersionRow() );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 

@@ -18,34 +18,34 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static bio.comp.jlu.readxplorer.cli.analyses.CLIAnalyses.RPKM;
 
 
 /**
- * Analysis Callable Mockup Class.
- * This mockup class is a basic framework for future
- * operon detection cli implementations.
+ * Analysis Callable Mockup Class. This mockup class is a basic framework for
+ * future operon detection cli implementations.
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
 public class RPKMAnalysisCallable extends AnalysisCallable {
 
-    private static final Logger LOG = Logger.getLogger( RPKMAnalysisCallable.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RPKMAnalysisCallable.class.getName() );
 
 
     public RPKMAnalysisCallable( boolean verbosity ) {
 
         super( verbosity, RPKM );
-        
+
     }
 
 
     @Override
     public AnalysisResult call() throws Exception {
 
-        LOG.fine( "start RPKM analysis" );
+        LOG.trace( "start RPKM analysis" );
         // calc coverage analyses
 
         return null;

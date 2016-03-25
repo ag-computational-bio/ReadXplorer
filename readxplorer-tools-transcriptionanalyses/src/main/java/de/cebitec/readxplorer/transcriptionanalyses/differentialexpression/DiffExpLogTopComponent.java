@@ -27,15 +27,14 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-
-import static java.util.logging.Level.SEVERE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -62,7 +61,7 @@ import static java.util.logging.Level.SEVERE;
 public final class DiffExpLogTopComponent extends TopComponentExtended
         implements Observer {
 
-    private static final Logger LOG = Logger.getLogger( DiffExpLogTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DiffExpLogTopComponent.class.getName() );
 
     private DeAnalysisHandler analysisHandler = null;
 
@@ -146,7 +145,7 @@ public final class DiffExpLogTopComponent extends TopComponentExtended
                     writer.close();
                 } catch( IOException ex ) {
                     Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                    LOG.log( SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                    LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                     JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                 }
             }
@@ -169,8 +168,10 @@ public final class DiffExpLogTopComponent extends TopComponentExtended
 
     @Override
     public void componentOpened() {
-        String log = analysisHandler.getProcessingLog().generateLog();
-        logTextField.setText( log );
+        if( analysisHandler != null ) {
+            String log = analysisHandler.getProcessingLog().generateLog();
+            logTextField.setText( log );
+        }
     }
 
 

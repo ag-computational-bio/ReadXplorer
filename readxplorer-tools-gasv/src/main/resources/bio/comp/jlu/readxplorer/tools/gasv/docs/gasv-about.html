@@ -1,0 +1,62 @@
+<!--
+Copyright (C) 2016 Hans
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html>
+    <head>
+        <title>Genome Rearrangement Analysis with GASV</title>
+        <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>Genome Rearrangement Analysis with GASV</h2>
+        <p style="text-align: justify;">
+            An integrated version of the command line tool 
+            <object CLASSID="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="https://code.google.com/p/gasv/">
+                <param name="text" value="<html><u>GASV 2.0</u></html>">
+                <param name="textFontSize" value="5">
+                <param name="textColor" value="blue">
+            </object>
+            enables the detection of genome rearrangements / structural variants for read pair data. All options of GASV are accessible via the analysis wizard (see 
+            <object CLASSID="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                <param name="content" value="http://gasv.googlecode.com/svn/trunk/doc/GASV_UserGuide.pdf">
+                <param name="text" value="<html><u>http://gasv.googlecode.com/svn/trunk/doc/GASV_UserGuide.pdf</u></html>">
+                <param name="textFontSize" value="5">
+                <param name="textColor" value="blue">
+            </object>
+            for available options). The analysis is configured to only use Single Perfect and Single Best Match mappings to minimize false predictions.
+        </p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="gasv.png" /></p>
+        <p style="text-align: justify;">
+            Since the tool assumes that chromosome designations are numbers and this is not the case for prokaryotes, ReadXplorer utilizes the GASV option to set a chromosome naming file to use arbitrary chromosome designations. GASV writes its results into a tab separated file in CSV format on the hard disk. The content of this file is immediately visualized in ReadXplorer after finishing an analysis. The only difference is that the left and right breakpoint borders have been split into two columns to increase readability and simplify filtering and sorting of the result table. 
+        </p>
+        <p style="text-align: justify;">
+            The figure shows an exemplary result of a GASV analysis of P. aeruginosa read pair data. The region selected in the GASV result table is automatically centered and reveals that this particular region from the reference PAO1 is deleted in the strain B420. The <i><a href="nbdocs://de.cebitec.readxplorer.tools.detailedviewer/de/cebitec/readxplorer/tools/detailedviewer/docs/detailedViewer-about.html">Read Pair Viewer</a></i> enables a detailed inspection of the region.
+        </p>
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

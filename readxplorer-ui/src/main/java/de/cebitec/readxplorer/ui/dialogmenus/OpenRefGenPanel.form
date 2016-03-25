@@ -36,7 +36,8 @@
             <Property name="selectionMode" type="int" value="0"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;(ProjectConnector.getInstance().getGenomesAsArray())"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;(references.toArray( new PersistentReference[ references.size() ] ) )"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="List&lt;PersistentReference&gt; references = ProjectConnector.getInstance().getReferences();"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataobjects.PersistentReference&gt;"/>
           </AuxValues>
         </Component>

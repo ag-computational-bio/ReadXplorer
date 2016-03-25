@@ -23,7 +23,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceView
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
@@ -32,6 +31,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,7 +42,7 @@ import org.openide.windows.WindowManager;
 public final class TrackStatisticsTopComponent extends TopComponentExtended
         implements LookupListener {
 
-    private static final Logger LOG = Logger.getLogger( TrackStatisticsTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackStatisticsTopComponent.class.getName() );
 
     private static final long serialVersionUID = 1L;
 
@@ -110,14 +111,14 @@ public final class TrackStatisticsTopComponent extends TopComponentExtended
     public static synchronized TrackStatisticsTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
         if( win == null ) {
-            LOG.warning( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
+            LOG.warn( "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
         if( win instanceof TrackStatisticsTopComponent ) {
             return (TrackStatisticsTopComponent) win;
         }
-        LOG.warning( "There seem to be multiple components with the '" + PREFERRED_ID +
-                 "' ID. That is a potential source of errors and unexpected behavior." );
+        LOG.warn( "There seem to be multiple components with the '" + PREFERRED_ID +
+                  "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
 

@@ -34,16 +34,19 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.PositionUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.util.RuntimeEOFException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+
+import static htsjdk.samtools.ValidationStringency.LENIENT;
 
 
 /**
@@ -114,11 +117,11 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             classToCoveredIntervalsMap.put( chromName, mapClassMap );
         }
 
-        try( final SAMFileReader sam = new SAMFileReader( trackJob.getFile() ) ) {
-
-            sam.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-            final SAMRecordIterator samItor = sam.iterator();
-
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( trackJob.getFile() );
+             SAMRecordIterator samItor = samBamReader.iterator(); ) {
+            
             int lineNo = 0;
             while( samItor.hasNext() ) {
                 try {
@@ -197,8 +200,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             if( errorLimit.getSkippedCount() > 0 ) {
                 this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occurred" );
             }
-            samItor.close();
-
         } catch( RuntimeEOFException e ) {
             this.notifyObservers( "Last read in file is incomplete, ignoring it!" );
         } catch( Exception e ) {

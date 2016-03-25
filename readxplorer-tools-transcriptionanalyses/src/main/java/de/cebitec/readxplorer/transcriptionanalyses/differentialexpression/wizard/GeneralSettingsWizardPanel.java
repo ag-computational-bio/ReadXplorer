@@ -22,17 +22,24 @@ import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_SAVE_R_CMD;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_SAVE_R_CMD_FILE;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_SELECTED_FEAT_TYPES;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_START_OFFSET;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_STOP_OFFSET;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_TOOL;
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_WIZARD_NAME;
 
 
-public class GeneralSettingsWizardPanel implements
+public class GeneralSettingsWizardPanel extends ChangeListeningWizardPanel implements
         WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
@@ -42,6 +49,11 @@ public class GeneralSettingsWizardPanel implements
     private GeneralSettingsVisualPanel component;
     private Integer genomeID;
     private Tool tool;
+
+
+    public GeneralSettingsWizardPanel() {
+        super( "Error" );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -58,44 +70,20 @@ public class GeneralSettingsWizardPanel implements
 
 
     @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
     public void readSettings( WizardDescriptor wiz ) {
+        super.readSettings( wiz );
         genomeID = (Integer) wiz.getProperty( "genomeID" );
-        tool = (Tool) wiz.getProperty( "tool" );
-        if( tool == Tool.ExpressTest ) {
-            getComponent().enableSaveOptions( false );
-        } else {
-            getComponent().enableSaveOptions( true );
-        }
+        tool = (Tool) wiz.getProperty( PROP_DGE_TOOL );
+        getComponent().enableSaveRCmd( tool != Tool.ExpressTest );
+
+        boolean storeRCmd = getPref().getBoolean( PROP_DGE_WIZARD_NAME + PROP_DGE_SAVE_R_CMD, false );
+        String startOffset = getPref().get( PROP_DGE_WIZARD_NAME + PROP_DGE_START_OFFSET, "0" );
+        String stopOffset = getPref().get( PROP_DGE_WIZARD_NAME + PROP_DGE_STOP_OFFSET, "0" );
+        String featuresString = getPref().get( PROP_DGE_WIZARD_NAME + PROP_DGE_SELECTED_FEAT_TYPES, "Gene,CDS" );
+        int[] selIndicesArray = FeatureType.calcSelectedIndices( featuresString );
+        getComponent().setFeatureOffsets( startOffset, stopOffset );
+        getComponent().setSelectedFeatureTypes( selIndicesArray );
+        getComponent().setStoreRCmd( storeRCmd );
     }
 
 
@@ -103,15 +91,19 @@ public class GeneralSettingsWizardPanel implements
     public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
         if( getComponent().verifyInput() ) {
-            wiz.putProperty( "startOffset", getComponent().getStartOffset() );
-            wiz.putProperty( "stopOffset", getComponent().getStopOffset() );
+            wiz.putProperty( PROP_DGE_START_OFFSET, getComponent().getStartOffset() );
+            wiz.putProperty( PROP_DGE_STOP_OFFSET, getComponent().getStopOffset() );
+            getPref().putInt( PROP_DGE_WIZARD_NAME + PROP_DGE_START_OFFSET, getComponent().getStartOffset() );
+            getPref().putInt( PROP_DGE_WIZARD_NAME + PROP_DGE_STOP_OFFSET, getComponent().getStopOffset() );
         }
         if( getComponent().isSaveBoxChecked() ) {
             //TODO: Input validation
             String path = getComponent().getSavePath();
             File file = new File( path );
-            wiz.putProperty( "saveFile", file );
+            wiz.putProperty( PROP_DGE_SAVE_R_CMD_FILE, file );
+            getPref().put( PROP_DGE_WIZARD_NAME + PROP_DGE_SAVE_R_CMD_FILE, path );
         }
+        getPref().putBoolean( PROP_DGE_WIZARD_NAME + PROP_DGE_SAVE_R_CMD, getComponent().isSaveBoxChecked() );
 
         List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         //If all possible features are selected, we use the ANY feature type
@@ -119,7 +111,10 @@ public class GeneralSettingsWizardPanel implements
             usedFeatures = new ArrayList<>();
             usedFeatures.add( FeatureType.ANY );
         }
-        wiz.putProperty( "featureType", new HashSet<>( usedFeatures ) );
+        wiz.putProperty( PROP_DGE_SELECTED_FEAT_TYPES, new HashSet<>( usedFeatures ) );
+
+        String featureTypeString = FeatureType.createFeatureTypeString( usedFeatures );
+        getPref().put( PROP_DGE_WIZARD_NAME + PROP_DGE_SELECTED_FEAT_TYPES, featureTypeString );
     }
 
 
@@ -131,12 +126,10 @@ public class GeneralSettingsWizardPanel implements
         List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         if( usedFeatures.isEmpty() ) {
             throw new WizardValidationException( null, "Please select at least one type of annotation.", null );
-        } else {
-            if( usedFeatures.size() < FeatureType.SELECTABLE_FEATURE_TYPES.length ) {
-                ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( genomeID );
-                if( !referenceConnector.hasFeatures( usedFeatures ) ) {
-                    throw new WizardValidationException( null, "The selected reference genome does not contain annotations of the selected type(s).", null );
-                }
+        } else if( usedFeatures.size() < FeatureType.SELECTABLE_FEATURE_TYPES.length ) {
+            ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( genomeID );
+            if( !referenceConnector.hasFeatures( usedFeatures ) ) {
+                throw new WizardValidationException( null, "The selected reference genome does not contain annotations of the selected type(s).", null );
             }
         }
     }

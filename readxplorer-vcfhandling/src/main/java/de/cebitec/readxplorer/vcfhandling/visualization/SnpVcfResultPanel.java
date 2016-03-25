@@ -24,11 +24,11 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
+import htsjdk.variant.variantcontext.VariantContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.table.DefaultTableModel;
-import org.broadinstitute.variant.variantcontext.VariantContext;
 
 
 /**

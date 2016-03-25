@@ -19,8 +19,6 @@ package de.cebitec.readxplorer.ui.dialogmenus;
 
 
 import de.cebitec.readxplorer.api.enums.FeatureType;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import org.openide.WizardDescriptor;
@@ -82,28 +80,12 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     public void readSettings( final WizardDescriptor wiz ) {
         super.readSettings( wiz );
 
-        String featuresString = getPref().get( analysisName + PROP_SELECTED_FEAT_TYPES, "Gene,CDS" );
-        String[] featuresArray = featuresString.split( "," );
-
-        List<FeatureType> selectedFeatTypes = new ArrayList<>();
-        for( String featureString : featuresArray ) {
-            selectedFeatTypes.add( FeatureType.getFeatureType( featureString ) );
-        }
-
-        List<FeatureType> featTypeList = Arrays.asList( FeatureType.SELECTABLE_FEATURE_TYPES );
-        List<Integer> selectedInices = new ArrayList<>();
-        for( FeatureType selFeatureType : selectedFeatTypes ) {
-            selectedInices.add( featTypeList.indexOf( selFeatureType ) );
-        }
-
-        int[] selIndicesArray = new int[selectedInices.size()];
-        for( int i = 0; i < selectedInices.size(); ++i ) {
-            selIndicesArray[i] = selectedInices.get( i );
-        }
 
         String startOffsetString = getPref().get( getPropFeatureStartOffset(), "0" );
         String stopOffsetString = getPref().get( getPropFeatureStopOffset(), "0" );
 
+        String featuresString = getPref().get( analysisName + PROP_SELECTED_FEAT_TYPES, "Gene,CDS" );
+        int[] selIndicesArray = FeatureType.calcSelectedIndices( featuresString );
         component.setSelectedFeatureTypes( selIndicesArray );
         component.setFeatureOffsets( startOffsetString, stopOffsetString );
     }
@@ -126,11 +108,8 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
      */
     private void storePrefs() {
         List<FeatureType> featureTypeList = component.getSelectedFeatureTypes();
-        StringBuilder featTypeString = new StringBuilder( 30 );
-        for( FeatureType type : featureTypeList ) {
-            featTypeString.append( type ).append( ',' );
-        }
-        getPref().put( getPropSelectedFeatTypes(), featTypeString.toString() );
+        String featureTypeString = FeatureType.createFeatureTypeString( featureTypeList );
+        getPref().put( getPropSelectedFeatTypes(), featureTypeString );
         getPref().put( getPropFeatureStartOffset(), component.getStartOffsetField().getText() );
         getPref().put( getPropFeatureStopOffset(), component.getStopOffsetField().getText() );
     }

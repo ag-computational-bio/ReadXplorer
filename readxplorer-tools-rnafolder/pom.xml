@@ -6,12 +6,12 @@
     <parent>
         <groupId>bio.comp.jlu.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
-        <version>2.1.0-FINAL</version>
+        <version>2.2.0-FINAL</version>
     </parent>
 
 
     <artifactId>readxplorer-tools-rnafolder</artifactId>
-    <version>1.1.0-FINAL</version>
+    <version>1.1.1-FINAL</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Tools - RNAFolder</name>
 
@@ -34,6 +34,36 @@
             <groupId>javax.xml.rpc</groupId>
             <artifactId>javax.xml.rpc-api</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>bio.jlu.comp.readxplorer</groupId>
+            <artifactId>batik.nbm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -65,32 +95,6 @@
             <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-            <version>1.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml</groupId>
-            <artifactId>jaxrpc-api</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
-        </dependency>
     </dependencies>
 
 
@@ -98,7 +102,7 @@
 
         <plugins>
 
-<!--            <plugin>
+            <!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <executions>

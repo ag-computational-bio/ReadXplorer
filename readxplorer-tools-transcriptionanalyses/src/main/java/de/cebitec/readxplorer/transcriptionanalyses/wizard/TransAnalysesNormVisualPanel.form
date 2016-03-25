@@ -16,16 +16,21 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="maxReadCountValueField" pref="94" max="32767" attributes="0"/>
-                  <Component id="minReadCountValueField" max="32767" attributes="0"/>
-              </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="maxRPKMValueLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="minRPKMValueLabel" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="maxReadCountValueField" pref="94" max="32767" attributes="0"/>
+                          <Component id="minReadCountValueField" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="maxRPKMValueLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="minRPKMValueLabel" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Component id="useEffectiveLengthBox" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -44,7 +49,9 @@
                   <Component id="maxReadCountValueField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="maxRPKMValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="useEffectiveLengthBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="95" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -77,6 +84,16 @@
           <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.maxRPKMValueLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="useEffectiveLengthBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesNormVisualPanel.useEffectiveLengthBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="useEffectiveLengthBoxActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

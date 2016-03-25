@@ -19,6 +19,7 @@ package de.cebitec.readxplorer.parser;
 
 
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
+import de.cebitec.readxplorer.utils.sequence.RefDictionary;
 import java.io.File;
 import java.sql.Timestamp;
 
@@ -37,22 +38,25 @@ public class TrackJob implements Job {
     private final int trackID;
     private ReferenceJob refGen;
     private final boolean isAlreadyImported;
+    private RefDictionary sequenceDictionary;
+    private boolean canBeImported = true;
 
 
     /**
      * Creates a new track job along with its data.
      * <p>
-     * @param trackID id of the track to create
-     * @param file the file to be parsed as track
-     * @param description the description of the track
-     * @param refGen the ReferenceJob with all information about the reference
-     * @param parser the parser to use for parsing
+     * @param trackID           id of the track to create
+     * @param file              the file to be parsed as track
+     * @param description       the description of the track
+     * @param refGen            the ReferenceJob with all information about the
+     *                          reference
+     * @param parser            the parser to use for parsing
      * @param isAlreadyImported true, if this track was already imported in
-     * another readxplorer db.
-     * @param timestamp the timestamp when it was created
+     *                          another readxplorer db.
+     * @param timestamp         the timestamp when it was created
      */
     public TrackJob( int trackID, File file, String description, ReferenceJob refGen,
-            MappingParserI parser, boolean isAlreadyImported, Timestamp timestamp ) {
+                     MappingParserI parser, boolean isAlreadyImported, Timestamp timestamp ) {
         this.trackID = trackID;
         this.file = file;
         this.description = description;
@@ -90,7 +94,7 @@ public class TrackJob implements Job {
 
     /**
      * @return the file, which contains the track data and which should be
-     * parsed and stored as track.
+     *         parsed and stored as track.
      */
     @Override
     public File getFile() {
@@ -100,7 +104,7 @@ public class TrackJob implements Job {
 
     /**
      * @param file the file, which contains the track data and which should be
-     * parsed and stored as track.
+     *             parsed and stored as track.
      */
     public void setFile( File file ) {
         this.file = file;
@@ -112,6 +116,25 @@ public class TrackJob implements Job {
      */
     public void setRefGen( ReferenceJob refGen ) {
         this.refGen = refGen;
+    }
+
+
+    /**
+     * @return The sequence dictionary to use for writing extended bam files.
+     *         This is null if no changes have been made to the original
+     *         dictionary.
+     */
+    public RefDictionary getSequenceDictionary() {
+        return sequenceDictionary;
+    }
+
+
+    /**
+     * @param sequenceDictionary The sequence dictionary to use for writing
+     *                           extended bam files.
+     */
+    public void setSequenceDictionary( RefDictionary sequenceDictionary ) {
+        this.sequenceDictionary = sequenceDictionary;
     }
 
 
@@ -143,6 +166,26 @@ public class TrackJob implements Job {
 
 
     /**
+     * @return <code>true</code> if the track can be imported,
+     *         <code>false</code> if something went wrong and the track cannot
+     *         be imported.
+     */
+    public boolean isCanBeImported() {
+        return canBeImported;
+    }
+
+
+    /**
+     * @param canBeImported <code>true</code> if the track can be imported,
+     *                      <code>false</code> if something went wrong and the
+     *                      track cannot be imported.
+     */
+    public void setCanBeImported( boolean canBeImported ) {
+        this.canBeImported = canBeImported;
+    }
+
+
+    /**
      * @return Modified to return the description and the timestamp.
      */
     @Override
@@ -153,7 +196,7 @@ public class TrackJob implements Job {
 
     /**
      * @return true, if this track was already imported in another readxplorer
-     * db, false otherwise.
+     *         db, false otherwise.
      */
     public boolean isAlreadyImported() {
         return this.isAlreadyImported;

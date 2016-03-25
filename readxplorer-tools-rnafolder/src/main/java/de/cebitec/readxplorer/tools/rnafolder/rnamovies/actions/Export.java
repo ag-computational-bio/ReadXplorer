@@ -27,7 +27,6 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -36,6 +35,9 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /*
  * In this version for ReadXplorer all unused code is commented out, but the
@@ -51,7 +53,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public class Export extends MovieAction {
 
-    private static final Logger LOG = Logger.getLogger( Export.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( Export.class.getName() );
 
     private File lastDir = null;
     private final String header;
@@ -149,19 +151,19 @@ public class Export extends MovieAction {
         } catch( java.io.FileNotFoundException ex ) {
             JOptionPane.showMessageDialog( movies,
                                            "Error writing file:\n" +
-                                            ex.getMessage(),
+                                           ex.getMessage(),
                                            ex.getClass().getName(),
                                            JOptionPane.ERROR_MESSAGE );
         } catch( IOException ex ) {
             JOptionPane.showMessageDialog( movies,
                                            "Error writing file:\n" +
-                                            ex.getMessage(),
+                                           ex.getMessage(),
                                            ex.getClass().getName(),
                                            JOptionPane.ERROR_MESSAGE );
         } catch( Exception ex ) {
             JOptionPane.showMessageDialog( movies,
                                            "Error writing file:\n" +
-                                            ex.getMessage(),
+                                           ex.getMessage(),
                                            ex.getClass().getName(),
                                            JOptionPane.ERROR_MESSAGE );
         }
@@ -346,12 +348,10 @@ public class Export extends MovieAction {
             } else {
                 return filename.concat( "-" + String.valueOf( number ) ).concat( extension );
             }
+        } else if( !m.find() ) {
+            return filename.concat( extension );
         } else {
-            if( !m.find() ) {
-                return filename.concat( extension );
-            } else {
-                return filename;
-            }
+            return filename;
         }
     }
 
@@ -499,8 +499,8 @@ public class Export extends MovieAction {
         @Override
         public boolean accept( File f ) {
             return f.getName().endsWith( ".jpg" ) ||
-                     f.getName().endsWith( ".jpeg" ) ||
-                     f.isDirectory();
+                   f.getName().endsWith( ".jpeg" ) ||
+                   f.isDirectory();
         }
 
 

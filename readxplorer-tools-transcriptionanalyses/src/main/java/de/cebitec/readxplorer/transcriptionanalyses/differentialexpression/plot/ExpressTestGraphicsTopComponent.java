@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import org.jfree.chart.ChartPanel;
 import org.netbeans.api.progress.ProgressHandle;
@@ -45,6 +44,8 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -74,7 +75,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
         implements Observer {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( ExpressTestGraphicsTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ExpressTestGraphicsTopComponent.class.getName() );
 
     private final DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>( PlotTypes.values() );
     private final DefaultComboBoxModel<String> cbmDataSet;
@@ -306,7 +307,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
                 plotPanel.updateUI();
                 break;
             default:
-                LOG.severe( "Encountered unknown plot type." );
+                LOG.error( "Encountered unknown plot type." );
         }
         saveButton.setEnabled( true );
         progressHandle.switchToDeterminate( 100 );

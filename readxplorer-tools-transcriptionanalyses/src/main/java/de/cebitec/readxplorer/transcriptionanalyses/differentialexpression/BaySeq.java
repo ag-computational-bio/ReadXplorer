@@ -27,13 +27,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,7 +50,7 @@ public class BaySeq {
      */
     private static final int MAX_PROCESSORS = 6;
 
-    private static final Logger LOG = Logger.getLogger( BaySeq.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( BaySeq.class.getName() );
 
 
     public BaySeq() {
@@ -82,9 +82,9 @@ public class BaySeq {
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile )
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
-        gnuR = GnuR.startRServe(bseqData.getProcessingLog());
+        gnuR = GnuR.startRServe( bseqData.getProcessingLog() );
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
+        LOG.info( "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );
         //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
         //computation will speed up a little bit but still leave you at least one core
@@ -100,7 +100,7 @@ public class BaySeq {
                 processors--;
             }
             currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
+            LOG.info( "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
             gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
         } else {
             gnuR.eval( "cl <- NULL" );
@@ -169,7 +169,7 @@ public class BaySeq {
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-        LOG.log( Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp );
+        LOG.info( "{0}: GNU R finished processing data.", currentTimestamp );
         return results;
     }
 

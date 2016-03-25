@@ -56,6 +56,14 @@
         </ul>
         <p>for all annotated features of the user-selected feature types (e.g. CDS or gene), which have a raw read count within the given range by:</p>
         <p style="text-align: justify;">1. The <span style="text-decoration: underline;">minimum number of reads</span> (default = 1 read)<br /> 2. The <span style="text-decoration: underline;">maximum number of reads</span> (default = 100000000 reads)<br /> overlapping with a feature.</p>
+        <p style="text-align: justify;">When the <b>effective length</b> option is chosen instead of the total feature length (default), the length of each genomic feature is shortened by the mean read length of reads mapping to that feature. Therefore, the effective length represents the number of bases of the feature, where reads can start. Mainly used for eukaryotes. The formula for the effective length is as defined by: <object CLASSID="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                        <param name="content" value="http://www.ncbi.nlm.nih.gov/pubmed/20436464">
+                        <param name="text" value="<html><u>Trapnell et al. 2010</u></html>">
+                        <param name="textFontSize" value="5">
+                        <param name="textColor" value="blue"></object><br />
+                        <b>L_i = sum_x (λ_F (x)) * l_i - x + 1</b>,<br />
+where x is one of the observed read length values in transcript i of length l_i, and λ_F is the fraction of reads for i with length x.
+</p>
         <p style="text-align: justify;">The implemented <b>assignment model for reads</b> to features counts a read for a genomic feature if it at least overlaps with the feature. If a read overlaps multiple features:</p>
         <ul>
             <li style="text-align: justify;">If they are sub-features of a larger feature (i.e. CDS and exons of the same gene), they are counted once per gene</li>
@@ -73,7 +81,7 @@
             <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Finish</span>" to start the <span>Read Count & Normalization (TPM & RPKM) Calculation.</span><br /></li>
         </ol>
         <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/TPM-Histogram.png" /></p>
-        <p style="text-align: justify;">The screenshot shows an Read Count & Normalization Calculation result with calculated TPM, RPKM and Read Count values in the last three columns of the table. The <b>effective length</b> (fourth last column) is the calculated length of a feature, at which reads may start. This is estimated in connection with the <b>mean read length</b> observed for the feature reads. The selected gene and its coverage is centered on the left hand side. The histogram shows the distribution of TPM values on the number of genes (log scale). The tooltip displays the actual count of features, which belong to a histogram bar. The histogram can be switched between TPM and RPKM values by the "<span style="text-decoration: underline;">Switch to ...</span>"-button at the top.</p>
+        <p style="text-align: justify;">The screenshot shows an Read Count & Normalization Calculation result with calculated TPM, RPKM and Read Count values in the last three columns of the table. If the <b>effective length</b> option is enabled, this length is shown in the fourth last column. It represents the calculated length of a feature, at which reads may start. This is estimated in connection with the mean read length observed for the feature reads (see above). When the effective length option is disabled, "-1" is printed in this column and "-" is printed in exported tables.  The selected gene and its coverage is centered on the left hand side. The histogram shows the distribution of TPM values on the number of genes (log scale). The tooltip displays the actual count of features, which belong to a histogram bar. The histogram can be switched between TPM and RPKM values by the "<span style="text-decoration: underline;">Switch to ...</span>"-button at the top.</p>
         <p style="text-align: justify;">The <b>total number of assignable mappings</b> in the analysis statistics corresponds to all mappings which could be assigned to any of the selected feature types. Thus when multiple feature types (e.g. genes and CDS) are selected in one analysis, this value can exceed the number of mappings in the data set. This is due to the fact that feature types on different hierarchy levels (like genes and CDS) are treated separately - each read mapping can be assigned to both a gene and a CDS during such an analysis.</p>
     </body>
 </html>

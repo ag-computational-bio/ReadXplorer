@@ -18,20 +18,22 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
-import javax.swing.event.ChangeListener;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 import org.openide.WizardDescriptor;
-import org.openide.WizardValidationException;
-import org.openide.util.HelpCtx;
 
 
-public class StartAnalysisWizardPanel implements
-        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class StartAnalysisWizardPanel extends ChangeListeningWizardPanel {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private StartAnalysisVisualPanel component;
+
+
+    public StartAnalysisWizardPanel() {
+        super( "" );
+    }
 
 
     // Get the visual component for the panel. In this template, the component
@@ -48,47 +50,8 @@ public class StartAnalysisWizardPanel implements
 
 
     @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return true;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-
-    @Override
-    public void addChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void removeChangeListener( ChangeListener l ) {
-    }
-
-
-    @Override
-    public void readSettings( WizardDescriptor wiz ) {
-    }
-
-
-    @Override
-    public void storeSettings( WizardDescriptor wiz ) {
-    }
-
-
-    @Override
-    public void validate() throws WizardValidationException {
+    public void storeSettings( WizardDescriptor settings ) {
+        //nothing to store
     }
 
 

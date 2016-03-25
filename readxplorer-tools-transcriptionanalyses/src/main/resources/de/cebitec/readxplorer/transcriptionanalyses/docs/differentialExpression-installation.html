@@ -6,57 +6,94 @@
     </head>
     <body>
         <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Differential Gene Expression Analysis Installation Guide</strong></span></p>
+        <br/>
+        <br/>
+        <span style="font-size: 12pt;">Since Version 2.1 the connection from ReadXplorer to GNU R is realized using RServe instead of rJava.</span><br/>
+        <br/>
+        <br/>
+        <span style="font-size: 12pt;"><strong>Windows Setup:</strong></span>
         <p style="font-size:0.9em">
-            1. Download and install GNU R for your operating system: http://cran.rstudio.com/
+            We offer a pre-build GNU R package for Windows that contains all necessary R packages.
+            <br/>
+            Within ReadXplorer go to "Tools" &rarr; "Options" &rarr; "GNU R" and select "Download and Install GNU R".
+            <br/>
+            After accepting the License the download will start automatically and a progress indicator will appear. When the installation is finished you can use the differential expression analysis located in the "Tool" menu.
             <br/>
             <br/>
-            2. Launch GNU R with administrator privileges (Windows).
-            <br/>
-            <br/>
-            3. Install rJava with the command: install.packages("rJava")
-            <br/>
-            <br/>
-            3. R.exe and jri.dll corresponding to your system architecture (x64 or i386, same as used for Java VM) must be added to your PATH variable. 
-            <br/>
-            <br/>
-            In Windows most of the times:
-            <br/>
-            C:\Program Files\R\R-2.15.3\bin\"architecture"\ and
-            <br/>
-            C:\Program Files\R\R-2.15.3\library\rJava\jri\"architecture"\
-            <br/>
-            The PATH variable can be adjusted at:
-            <br/>
-            Systemsteuerung -> System -> Erweiterte Systemeinstellungen -> Umgebungsvariablen -> Systemvariablen -> Path (in Tabelle)
-            <br/>
-            Both path can be added to the already existing paths contained in the variable. Paths are seperated by ";" like:
-            otherPath;C:\Program Files\R\R-2.15.3\bin\"Architektur"\;C:\Program Files\R\R-2.15.3\library\rJava\jri\"Architektur"\
-            <br/>
-            <br/>
-            In Linux:
-            <br/>
-            The following entries must be added to the ".profile" or ".bashrc" file:
-            <br/>
-            export LD_LIBRARY_PATH=/vol/r-2.15/lib/amd64/R/library/rJava/jri:/vol/r-2.15/bin/amd64
-            <br/>
-            export R_HOME=/vol/r-2.15/lib/amd64/R
-            <br/>
-            <br/>
-            4. All other packages needed for the analysis are automatically obtained by ftp during the first use of the differential gene expression analysis.
-            <br/>
-            The correct link is already integrated in ReadXplorer, but can be changed under Tools -> Options -> GnuR.
+            <img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/GNUR_Windows.PNG" alt="GNUR_Windows.PNG"/>          
         </p>
+        <br/>
+        <br/>
+        <span style="font-size: 12pt;"><strong>Mac OS Setup:</strong></span>
+        <p style="font-size:0.9em">
+            The Mac OS Version of ReadXplorer comes with a bundled GNU R installation. After installation you can use all the differential gene expression analysis functions directly, no further setup is needed.
+            
+        </p>
+        <br/>
+        <br/>
+        <span style="font-size: 12pt;"><strong>Linux Setup:</strong></span>
+        <p style="font-size:0.9em">
+            As there are so many different versions of Linux we do not offer an automatic installation on Linux systems. However, the GNU R configuration page located within ReadXplorer ("Tools" &rarr; "Options" &rarr; "GNU R") offers advanced setup options that allow different setup scenarios on Linux system. It is possible to run the R instance on your local machine as well as connecting to a GNU R instance running on a remote host. A few setup examples are given below.
+        </p>
+        <br/>
+        <span style="font-size: 11pt;">Installing a GNU R instance:</span>
+        <p style="font-size:0.9em">
+            For each scenario the machine that should run GNU R needs the required Software at first. Obviously, the first thing that needs to be installed is GNU R itself. The GNU R versions we use for Mac OS and Windows is 3.2.0, other 3.X versions should work as well, but we did not test them. There are GNU R packages included in most Linux distribution you can use or you can download the source-code at https://www.r-project.org/ . Which way is the best to go depends on your personal preferences and the Linux distribution you are using.
+            <br/>
+            After installing GNU R you also need to download the required, additional R packages used by ReadXplorer. For the connection between ReadXplorer and GNU R we need "RServe", which can be installed in an open R session by typing:</p><br/>
+        <pre><span style="font-size: 10pt;"><code>
+            install.packages("Rserve")
+        </code></span></pre>
+        <p style="font-size:0.9em">
+            We also need the packages for "baySeq", "DESeq" and "DESeq2". These packages are hosted on http://bioconductor.org/ . The installation is done in R by typing: </p><br/>
+            <pre><span style="font-size: 10pt;"><code>
+            ## try http:// if https:// URLs are not supported
+            source("https://bioconductor.org/biocLite.R")
+            biocLite("baySeq")
+        </code></span></pre>
+        <pre><span style="font-size: 10pt;"><code>
+            source("https://bioconductor.org/biocLite.R")
+            biocLite("DESeq")
+        </code></span></pre>
+        <pre><span style="font-size: 10pt;"><code>
+            source("https://bioconductor.org/biocLite.R")
+            biocLite("DESeq2")
+        </code></span></pre>
+        <p style="font-size:0.9em">
+            If that fails, please find further installation instructions on the http://bioconductor.org/ homepage.<br/>
+            Once everything is installed we are ready to setup the connection in one of the ways described below.
+        </p>
+        <br/>
+        <span style="font-size: 11pt;">Connect to a manually started GNU R instance (local or remote)</span>
+        <p style="font-size:0.9em">
+            Once GNU R and all the necessary packages are installed you can start the RServe instance in different ways. When within a running GNU R session type </p><br/>
+        <pre><span style="font-size: 10pt;"><code>
+            library(Rserve) 
+            Rserve()
+        </code></span></pre>    
+        <p style="font-size:0.9em">
+            to start the RServe Server instance. You can also start the RServe server directly from the commandline by executing "R CMD Rserve" provided the R is correctly included in your PATH. After executing one of these commands you will have a running RServe instance listening on its default port 6311 for connections. Please be aware that if you are on a multi user system every one with access to the machine can now connect to this RServe instance which is running with your user privileges. Because GNU R is capable of accessing the local file system this also means that this person can gain access to you files. So if you are on a multiuser system please check the RServe manual on how to setup a password protected connection. The manual also describes how to setup RServe to allow remote connections. This is especially useful if you want to provide one central R instance in your network which can than be used by different users at the same time.
+        <br/>
+            In a final step the ReadXplorer settings need to be adjusted to connect to the local (or remote) running RServe instance. Within Readxplorer go to "Tools" &rarr; "Options" &rarr; "GNU R" and select "Manual". Your must now enter the IP Address or Hostname of the machine running RServe as well as the port. If the Rserve instance requires authentication check the "Use authentication" checkbox and enter a valid "Username" and "Password" combination. ReadXplorer will store the credentials in the key storage provided by you operating system. If your RServe instance is running on your local machine (the same machine you are running ReadXplorer on) and you haven't changed the default port you can just use the default settings ("localhost" as "RServe Host" and "6311" as "RServe Port"). You should now be able to run the differential gene expression analysis located in the "Tools" menu.
+            <br/>
+            <br/>
+        <img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/GNUR_Linux.PNG" alt="GNUR_Linux.PNG"/>   
+        </p>
+        <br/>
+        <span style="font-size: 11pt;">Use a startup script (local)</span>
+        <p style="font-size:0.9em">
+            ReadXplorer also offers you the usage of a startup script. This allows ReadXplorer to start up the R instance when needed and to shut it down after the computation is complete. An startup script could for example look like this:
+        </p>
+        <br/>
+        <pre><span style="font-size: 10pt;"><code>
+            #!/bin/bash
+            R CMD Rserve --RS-port $1 --vanilla
+        </code></span></pre>
+        <br/>
+        <p style="font-size:0.9em">
+            ReadXplorer will execute the startup script each time a differential gene expression analysis is started unless there is already a running instance. In this case the already running instance will be used. On Linux hosts multiple connections to one RServe instance should cause no problems. The path to the startup script can be set in the options menu at "Tools" &rarr; "Options" &rarr; "GNU R". The specified port will be handed over to the startup script as the first argument.  
+        </p>
+        <br/>
+        <img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readxplorer.transcriptionanalyses/de/cebitec/readxplorer/transcriptionanalyses/docs/GNUR_Linux_2.png" alt="GNUR_Linux_2.png"/>  
     </body>
 </html>
-<!--
-Tip: to create a link which will open in an external web browser, try:
-<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
-    <param name="content" value="http://www.netbeans.org/">
-    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
-    <param name="textFontSize" value="medium">
-    <param name="textColor" value="blue">
-</object>
-To create a link to a help set from another module, you need to know the code name base and path, e.g.:
-<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
-(This link will behave sanely if that module is disabled or missing.)
--->

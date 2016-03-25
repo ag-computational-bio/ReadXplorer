@@ -39,8 +39,6 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -60,6 +58,8 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -87,7 +87,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger( DeSeqGraphicsTopComponent.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DeSeqGraphicsTopComponent.class.getName() );
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
@@ -291,15 +291,15 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
             plotDescriptionArea.repaint();
         } catch( IOException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
         } catch( GnuR.PackageNotLoadableException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
         } catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+            LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
         }
     }//GEN-LAST:event_plotButtonActionPerformed
@@ -326,7 +326,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
                         NotificationDisplayer.getDefault().notify( Bundle.DeSeqSuccessHeader(), new ImageIcon(), Bundle.DeSeqSuccessMsg() + outputFile.toString(), null );
                     } catch( IOException ex ) {
                         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                        LOG.log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                        LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                         JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                     } finally {
                         storeProgressHandle.switchToDeterminate( 100 );

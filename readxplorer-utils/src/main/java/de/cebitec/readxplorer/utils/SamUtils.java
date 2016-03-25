@@ -19,22 +19,25 @@ package de.cebitec.readxplorer.utils;
 
 
 import de.cebitec.readxplorer.api.constants.Paths;
+import htsjdk.samtools.BAMIndexer;
+import htsjdk.samtools.Cigar;
+import htsjdk.samtools.CigarElement;
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFileWriterFactory;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.BAMIndexer;
-import net.sf.samtools.Cigar;
-import net.sf.samtools.CigarElement;
-import net.sf.samtools.SAMException;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFileWriterFactory;
-import net.sf.samtools.SAMFormatException;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.NbPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static htsjdk.samtools.SamReaderFactory.Option.INCLUDE_SOURCE_IN_RECORDS;
+import static htsjdk.samtools.ValidationStringency.LENIENT;
+
 
 /*
  * The MIT License
@@ -59,13 +62,14 @@ import org.openide.util.NbPreferences;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 /**
  * Contains some utils for sam and bam files.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamUtils implements Observable {
+
+    private static final Logger LOG = LoggerFactory.getLogger( SamUtils.class.getName() );
 
     public static final String SORT_PREFIX = "_sort";
     public static final String SORT_READSEQ_STRING = SORT_PREFIX + "_readSequence";
@@ -81,56 +85,6 @@ public class SamUtils implements Observable {
      */
     public SamUtils() {
         this.observers = new ArrayList<>();
-    }
-
-
-    /**
-     * Generates a BAM index file from an input BAM file.
-     * <p>
-     * @param reader SAMFileReader for input BAM file
-     * @param output File for output index file
-     * <p>
-     * @return true, if the index creation succeeded, false otherwise
-     * <p>
-     * @author Martha Borkan, rhilker
-     */
-    public boolean createIndex( SAMFileReader reader, File output ) {
-
-        boolean success = true;
-        BAMIndexer indexer = new BAMIndexer( output, reader.getFileHeader() );
-        reader.enableFileSource( true );
-        int totalRecords = 0;
-
-        try {
-            // create and write the content
-            SAMRecordIterator samItor = reader.iterator();
-            SAMRecord record;
-            while( samItor.hasNext() ) {
-                try {
-                    record = samItor.next();
-                    if( ++totalRecords % 500000 == 0 ) {
-                        this.notifyObservers( totalRecords + " reads indexed ..." );
-                    }
-                    indexer.processAlignment( record );
-                } catch( RuntimeEOFException e ) {
-                    this.notifyObservers( e );
-                } catch( SAMFormatException e ) {
-                    if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
-                        this.notifyObservers( e.getMessage() );
-                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
-                }
-            }
-            samItor.close();
-            this.notifyObservers( "All " + totalRecords + " reads indexed!" );
-        } catch( SAMException e ) {
-            this.notifyObservers( "If you tried to create an index on a sam " +
-                                  "file this is the reason for the exception. Indexes" +
-                                  "can only be created for bam files!" );
-            this.notifyObservers( e );
-            success = false;
-        }
-        indexer.finish();
-        return success;
     }
 
 
@@ -165,12 +119,14 @@ public class SamUtils implements Observable {
      */
     public static boolean createBamIndex( File bamFile, Observer observer ) {
         boolean success = false;
-        try( SAMFileReader samReader = new SAMFileReader( bamFile ) ) { //close is performed by try statement
-            samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-            SamUtils utils = new SamUtils();
-            utils.registerObserver( observer );
-            success = utils.createIndex( samReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
-            utils.removeObserver( observer );
+        SamReaderFactory samReaderFactory = SamReaderFactory.makeDefault()
+                .enable( INCLUDE_SOURCE_IN_RECORDS )
+                .validationStringency( LENIENT );
+        try( final SamReader samBamReader = samReaderFactory.open( bamFile ) ) {
+            BAMIndexer.createIndex( samBamReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
+            success = true;
+        } catch( IOException e ) {
+            LOG.error( e.getMessage(), e );
         }
         return success;
     }
@@ -195,28 +151,70 @@ public class SamUtils implements Observable {
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter( File oldFile, SAMFileHeader header, boolean presorted, String newEnding ) {
 
-// commented out part: we currently don't allow to write sam files, only bam! (more efficient)
-//        String extension;
-//        try {
-//            extension = nameParts[nameParts.length - 1];
-//        } catch (ArrayIndexOutOfBoundsException e) {
-//            extension = "bam";
-//        }
-//        String newFileName = FileUtils.getFilePathWithoutExtension( oldFile );
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
-        //The default value of 500.000 is only working for short reads. When SMRT reads are importet this causes the application to
-        //run out or memory and hence the value needed to be reduced drastically.
-        factory.setMaxRecordsInRam( 10000 );
+        factory.setMaxRecordsInRam( SamUtils.determineMaxRecordsInRam( oldFile ) );
         //To improve the performance a little bit, write in parallel.
         factory.setUseAsyncIo( true );
-//        if (extension.toLowerCase().contains("sam")) {
-//            outputFile = new File(newFileName + newEnding + ".sam");
-//            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
-//        } else {
         File outputFile = SamUtils.getFileWithBamExtension( oldFile, newEnding );
         return new Pair<>( factory.makeBAMWriter( header, presorted, outputFile ), outputFile );
-//        }
+    }
+
+
+    /**
+     * Creates a bam file writer.
+     * <p>
+     * @param file      the file (if data is not stored in a file, just create a
+     *                  file with a name of your choice
+     * @param header    the header of the new file
+     * @param presorted if true, SAMRecords must be added to the SAMFileWriter
+     *                  in order that agrees with header.sortOrder.
+     * <p>
+     * @return the sam or bam file writer ready for writing
+     */
+    public static SAMFileWriter createBamWriter( File file, SAMFileHeader header, boolean presorted ) {
+
+        SAMFileWriterFactory factory = new SAMFileWriterFactory();
+        factory.setTempDirectory( new File( NbPreferences.forModule( Object.class ).get( Paths.TMP_IMPORT_DIR, System.getProperty( "java.io.tmpdir" ) ) ) );
+        factory.setMaxRecordsInRam( SamUtils.determineMaxRecordsInRam( file ) );
+        //To improve the performance a little bit, write in parallel.
+        factory.setUseAsyncIo( true );
+        return factory.makeBAMWriter( header, presorted, file );
+    }
+
+
+    /**
+     * Determines the maximum number of records allowed in the RAM by estimating
+     * it from the first 75000 mappings in the file. The default value of
+     * 500.000 is only working for short reads. When SMRT reads are importet
+     * this causes the application to run out of memory and hence the value
+     * needs to be adapted dynamically, depending on the average read length.
+     * <p>
+     * @param file SAM/BAM file for which the maximum number of records in ram
+     *             has to be estimated
+     * <p>
+     * @return The maximum number of records allowed in the RAM for the given
+     *         file.
+     */
+    private static int determineMaxRecordsInRam( File file ) {
+        int maxRecordsInRam;
+        SamReadLengthEstimator readLengthEstimator = new SamReadLengthEstimator();
+        int meanReadLength = readLengthEstimator.estimateReadLength( file, 75000 );
+        if( meanReadLength < 200 ) {
+            maxRecordsInRam = 500000;
+        } else if( meanReadLength < 400 ) {
+            maxRecordsInRam = 300000;
+        } else if( meanReadLength < 600 ) {
+            maxRecordsInRam = 200000;
+        } else if( meanReadLength < 1000 ) {
+            maxRecordsInRam = 100000;
+        } else if( meanReadLength < 5000 ) {
+            maxRecordsInRam = 50000;
+        } else {
+            maxRecordsInRam = 10000;
+        }
+
+        return maxRecordsInRam;
     }
 
 
@@ -283,12 +281,12 @@ public class SamUtils implements Observable {
      *         sortOrderToCheck
      */
     public static boolean isSortedBy( File fileToCheck, SAMFileHeader.SortOrder sortOrderToCheck ) {
-        try( SAMFileReader samReader = new SAMFileReader( fileToCheck ) ) {
-            try {
-                return samReader.getFileHeader().getSortOrder().equals( sortOrderToCheck );
-            } catch( IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
-                return false;
-            }
+        SamReaderFactory.setDefaultValidationStringency( LENIENT );
+        SamReaderFactory samReaderFactory = SamReaderFactory.make();
+        try( final SamReader samBamReader = samReaderFactory.open( fileToCheck ) ) {
+            return samBamReader.getFileHeader().getSortOrder().equals( sortOrderToCheck );
+        } catch( IOException | IllegalArgumentException e ) { //if "*" or other weird words were used as sort order we assume the file is unsorted
+            return false;
         }
     }
 

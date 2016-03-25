@@ -42,7 +42,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
      */
     public TrackStatisticsPanel() {
         initComponents();
-//        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use empty Constructor for this object! Standard constructor is only meant for GUI builder means");
+//        LoggerFactory.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use empty Constructor for this object! Standard constructor is only meant for GUI builder means");
     }
 
 

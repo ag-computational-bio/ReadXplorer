@@ -19,29 +19,26 @@ package de.cebitec.readxplorer.utils;
 
 
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.svg.BatikSvgExporter;
+import de.cebitec.readxplorer.utils.svg.JFreeSvgExporter;
+import de.cebitec.readxplorer.utils.svg.SvgExporter;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.MissingResourceException;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 
 /**
@@ -51,7 +48,7 @@ import org.w3c.dom.Document;
  */
 public final class ScreenshotUtils {
 
-    private static final Logger LOG = Logger.getLogger( ScreenshotUtils.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ScreenshotUtils.class.getName() );
 
     private static final String SVG = "svg";
 
@@ -68,19 +65,22 @@ public final class ScreenshotUtils {
      * opens a save dialog to store the svg somewhere.
      * <p>
      * @param container the <code>Container</code>, for which a screenshot shall
-     * be stored
+     *                  be stored
      */
-    @NbBundle.Messages({"ScreenshotUtils.SuccessMsg=Successfully saved the screenshot in ",
-        "ScreenshotUtils.SuccessHeader=Screenshot saved"})
+    @NbBundle.Messages( { "ScreenshotUtils.SuccessMsg=Successfully saved the screenshot in ",
+                          "ScreenshotUtils.SuccessHeader=Screenshot saved", 
+                          "# {0} - file", "ScreenshotUtils.ErrorMsg=Something went wrong during storing of the screenshot: {0}", 
+                          "ScreenshotUtils.FailHeader=Screenshot Export Error", 
+                          "ScreenshotUtils.OOMErrorHeader=Out of Memory Error", 
+                          "ScreenshotUtils.OOMErrorMsg=ReadXplorer is out of memory! Please restart the application with more RAM! (.../readxplorer/ext/readxplorer.conf)", 
+                          "ScreenshotUtils.FocusErrorHeader=Focus Problem", 
+                          "ScreenshotUtils.FocusErrorMsg=The component, of which a screenshot shall be saved, needs to be visible! Please focus the desired component!", 
+                          "ScreenshotUtils.progress.name=Exporting screenshot..." } )
     public static void saveScreenshot( final Container container ) {
         try {
             if( container.isShowing() ) {
-                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-                String svgNS = "http://www.w3.org/2000/svg";
-                Document document = domImpl.createDocument( svgNS, SVG, null );
-                final SVGGraphics2D svgGenerator = new SVGGraphics2D( document );
-                Dimension screenSize = ScreenshotUtils.getOptimalScreenSize( container, container.getBounds().getSize() );
-                svgGenerator.setSVGCanvasSize( screenSize );
+
+                final Dimension screenSize = ScreenshotUtils.getOptimalScreenSize( container, container.getBounds().getSize() );
                 Dimension compDim = container.getSize();
                 if( screenSize.height < compDim.height ) {
                     screenSize.height = compDim.height;
@@ -88,10 +88,17 @@ public final class ScreenshotUtils {
                 if( screenSize.width < compDim.width ) {
                     screenSize.width = compDim.width;
                 }
-                container.setBounds( new Rectangle( screenSize ) );
-                container.paintAll( svgGenerator );
 
-                ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{SVG}, SVG ) {
+                final SvgExporter svgExporter;
+                if( OsUtils.isWindows() ) {
+                    svgExporter = new BatikSvgExporter();
+                } else {
+                    svgExporter = new JFreeSvgExporter();
+                }
+                container.setBounds( new Rectangle( screenSize ) );
+                svgExporter.paintToExporter( container, screenSize );
+
+                ReadXplorerFileChooser screenFileChooser = new ReadXplorerFileChooser( new String[]{ SVG }, SVG ) {
 
                     private static final long serialVersionUID = 1L;
 
@@ -99,32 +106,31 @@ public final class ScreenshotUtils {
                     @Override
                     public void save( final String fileLocation ) {
 
-                        final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.progress.name" ) );
+                        final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( Bundle.ScreenshotUtils_progress_name() );
                         progressHandle.start();
 
                         Thread exportThread = new Thread( new Runnable() {
 
                             @Override
                             public void run() {
-                                try( Writer out = new OutputStreamWriter( new FileOutputStream( fileLocation ), "UTF-8" ); ) {
-                                    svgGenerator.stream( out, false );
+                                try {
+                                    svgExporter.exportSvg( fileLocation );
                                 } catch( IOException ex ) {
-                                    JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", ex.toString() ),
-                                            NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
+                                    JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.ScreenshotUtils_ErrorMsg( ex.toString() ),
+                                                                   Bundle.ScreenshotUtils_FailHeader(), JOptionPane.ERROR_MESSAGE );
                                 }
 
                                 progressHandle.finish();
 
                                 NotificationDisplayer.getDefault().notify( Bundle.ScreenshotUtils_SuccessHeader(),
-                                        new ImageIcon(), Bundle.ScreenshotUtils_SuccessMsg() + fileLocation, null );
+                                                                           new ImageIcon(), Bundle.ScreenshotUtils_SuccessMsg() + fileLocation, null );
 
-                                LOG.info( "Finished writing Excel file!" );
+                                LOG.info( "Finished writing SVG file!" );
                             }
 
 
                         } );
                         exportThread.start();
-
                     }
 
 
@@ -137,15 +143,15 @@ public final class ScreenshotUtils {
                 };
                 screenFileChooser.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
             } else {
-                JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorMsg" ),
-                        NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FocusErrorHeader" ), JOptionPane.ERROR_MESSAGE );
+                JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.ScreenshotUtils_FocusErrorMsg(),
+                                               Bundle.ScreenshotUtils_FocusErrorHeader(), JOptionPane.ERROR_MESSAGE );
             }
         } catch( OutOfMemoryError e ) {
-            JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorMsg" ),
-                    NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.OOMErrorHeader" ), JOptionPane.ERROR_MESSAGE );
+            JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.ScreenshotUtils_OOMErrorMsg(),
+                                           Bundle.ScreenshotUtils_OOMErrorHeader(), JOptionPane.ERROR_MESSAGE );
         } catch( HeadlessException | MissingResourceException | DOMException e ) {
-            JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", e.toString() ),
-                    NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.FailHeader" ), JOptionPane.ERROR_MESSAGE );
+            JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), Bundle.ScreenshotUtils_ErrorMsg( e.toString() ),
+                                           Bundle.ScreenshotUtils_FailHeader(), JOptionPane.ERROR_MESSAGE );
         }
         System.gc();
     }
@@ -156,11 +162,11 @@ public final class ScreenshotUtils {
      * means, that all subcomponents can be displayed in their full size. Starts
      * the calculation with the given <code>currentDim</code>.
      * <p>
-     * @param container the container whose optimal subcomponents size shall be
-     * calculated
+     * @param container  the container whose optimal subcomponents size shall be
+     *                   calculated
      * @param currentDim the current dimension to start with, any smaller
-     * dimension is ignored. Only if a subcomponent needs more space than given
-     * here, the dimension is adapted
+     *                   dimension is ignored. Only if a subcomponent needs more
+     *                   space than given here, the dimension is adapted
      * <p>
      * @return The optimal screen size for the given container
      */
@@ -190,7 +196,7 @@ public final class ScreenshotUtils {
                     currentDim.width = width + comp.getLocationOnScreen().x;
                 }
             } catch( IllegalStateException ise ) {
-                LOG.warning( ise.getMessage() );
+                LOG.warn( ise.getMessage() );
                 //nothing to do: ignoring non visible components of the current container
             }
         }

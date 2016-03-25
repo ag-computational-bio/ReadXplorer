@@ -49,7 +49,7 @@
     <Component class="javax.swing.JCheckBox" name="operonDetectionAutomaticBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesOperonVisualPanel.operonDetectionAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/wizard/Bundle.properties" key="TransAnalysesOperonVisualPanel.operonDetectionAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
