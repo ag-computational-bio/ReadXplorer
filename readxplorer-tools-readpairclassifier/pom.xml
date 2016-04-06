@@ -82,6 +82,13 @@
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>autoupdate</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
