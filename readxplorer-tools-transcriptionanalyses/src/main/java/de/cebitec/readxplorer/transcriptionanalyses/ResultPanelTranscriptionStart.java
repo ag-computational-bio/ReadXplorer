@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 import de.cebitec.readxplorer.api.enums.Strand;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.connector.DatabaseException;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
-import de.cebitec.readxplorer.databackend.dataobjects.PersistentReference;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TransStartUnannotated;
@@ -32,9 +32,9 @@ import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.errorhandling.ErrorHelper;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +59,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private static final long serialVersionUID = 1L;
 
     private List<String> promoterRegions;
+    private List<String> downstreamRegions;
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -191,7 +192,12 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 
-        this.processResultForExport();
+        queryPromoterSeqLength();
+        try {
+            TssUtils.processResultForExport( tssResult, referenceViewer.getReference().getId() );
+        } catch( DatabaseException ex ) {
+            ErrorHelper.getHandler().handle( ex );
+        }
 
         TableExportFileChooser fileChooser = new TableExportFileChooser( TableExportFileChooser.getTableFileExtensions(), tssResult );
     }//GEN-LAST:event_exportButtonActionPerformed
@@ -357,48 +363,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
 
     /**
-     * Prepares the result for output. Any special operations are carried out
-     * here. In this case generating the promoter region for each TSS.
-     */
-    private void processResultForExport() {
-        //Generating promoter regions for the TSS
-        queryPromoterSeqLength();
-        int promoterUpstreamLength = tssResult.getBpUpstream();
-        int promoterDownstreamLength = tssResult.getBpDownstream();
-        this.promoterRegions = new ArrayList<>();
-
-        //get reference sequence for promoter regions
-        PersistentReference ref = referenceViewer.getReference();
-
-        //get the promoter region for each TSS
-        int lastChromId = -1;
-        int chromLength = -1;
-        for( TranscriptionStart tSS : tssResult.getResults() ) {
-            if( lastChromId != tSS.getChromId() ) {
-                chromLength = ref.getChromosome( tSS.getChromId() ).getLength();
-                lastChromId = tSS.getChromId();
-            }
-            final String promoter;
-            if( tSS.isFwdStrand() ) {
-                int promoterStart = tSS.getPos() - promoterUpstreamLength;
-                int promoterEnd = tSS.getPos() + promoterDownstreamLength;
-                promoterStart = promoterStart < 0 ? 0 : promoterStart;
-                promoterEnd = promoterEnd > chromLength ? chromLength : promoterEnd;
-                promoter = ref.getChromSequence( tSS.getChromId(), promoterStart, promoterEnd );
-            } else {
-                int promoterStart = tSS.getPos() + promoterUpstreamLength;
-                int promoterEnd = tSS.getPos() - promoterDownstreamLength;
-                promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
-                promoterEnd = promoterEnd < 0 ? 0 : promoterEnd;
-                promoter = SequenceUtils.getReverseComplement( ref.getChromSequence( tSS.getChromId(), promoterEnd, promoterStart ) );
-            }
-            this.promoterRegions.add( promoter );
-        }
-        tssResult.setPromoterRegions( promoterRegions );
-    }
-
-
-    /**
      * Queries the promoter sequence length desired by the user. The selected
      * number of bases is exported upstream of each TSS.
      * <p>
@@ -408,6 +372,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private void queryPromoterSeqLength() {
         int promoterLength = 70;
         int promoterDownstreamLength = 0;
+        boolean isCircularChromosomes = true;
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         PromoterSeqLengthWizardPanel seqLengthPanel = new PromoterSeqLengthWizardPanel();
         panels.add( seqLengthPanel );
@@ -421,8 +386,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         if( !cancelled ) {
             promoterLength = (int) wiz.getProperty( PromoterSeqLengthWizardPanel.PROMOTER_LENGTH );
             promoterDownstreamLength = (int) wiz.getProperty( PromoterSeqLengthWizardPanel.PROMOTER_DOWN_LENGTH );
+            isCircularChromosomes = (boolean) wiz.getProperty( PromoterSeqLengthWizardPanel.PROMOTER_CIRCULAR_CHROMS );
         }
-        tssResult.setPromoterLength( promoterLength, promoterDownstreamLength );
+        tssResult.setPromoterLength( promoterLength, promoterDownstreamLength, isCircularChromosomes );
     }
 
 

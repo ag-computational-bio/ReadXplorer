@@ -30,13 +30,10 @@ import de.cebitec.readxplorer.transcriptionanalyses.AnalysisTranscriptionStart;
 import de.cebitec.readxplorer.transcriptionanalyses.AnalysisUnannotatedTransStart;
 import de.cebitec.readxplorer.transcriptionanalyses.ParameterSetTSS;
 import de.cebitec.readxplorer.transcriptionanalyses.TssDetectionResult;
-import de.cebitec.readxplorer.transcriptionanalyses.datastructures.TranscriptionStart;
-import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.transcriptionanalyses.TssUtils;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import jxl.write.WriteException;
 import org.netbeans.api.sendopts.CommandException;
@@ -125,7 +122,7 @@ public class TSSAnalysisCallable extends AnalysisCallable {
             File resultFile = new File( "tss-" + trackFileName + '.' + AnalysisFileFilter.SUFFIX );
 
             // prepare/write/set tssResult object
-            processResultForExport( tssResult, persistentTrack.getRefGenID() );
+            TssUtils.processResultForExport( tssResult, persistentTrack.getRefGenID() );
             writeFile( resultFile, tssResult.dataSheetNames(), tssResult.dataColumnDescriptions(), tssResult.dataToExcelExportList() );
             result.setResultFile( resultFile );
 
@@ -142,35 +139,6 @@ public class TSSAnalysisCallable extends AnalysisCallable {
         return result;
 
     }
-
-
-    private void processResultForExport( TssDetectionResult tssResult, int refGenomeId ) throws DatabaseException {
-
-        //Generating promoter regions for the TSS
-        List<String> promoterRegions = new ArrayList<>();
-
-        //get reference sequence for promoter regions
-        PersistentReference ref = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeId ).getRefGenome();
-
-        //get the promoter region for each TSS
-        int chromLength = ref.getActiveChromosome().getLength();
-        for( TranscriptionStart transStart : tssResult.getResults() ) {
-            final String promoter;
-            if( transStart.isFwdStrand() ) {
-                int promoterStart = transStart.getPos() - 70;
-                promoterStart = promoterStart < 0 ? 0 : promoterStart;
-                promoter = ref.getActiveChromSequence( promoterStart, transStart.getPos() );
-            } else {
-                int promoterStart = transStart.getPos() + 70;
-                promoterStart = promoterStart > chromLength ? chromLength : promoterStart;
-                promoter = SequenceUtils.getReverseComplement( ref.getActiveChromSequence( transStart.getPos(), promoterStart ) );
-            }
-            promoterRegions.add( promoter );
-        }
-
-        tssResult.setPromoterRegions( promoterRegions );
-
-    }
-
+    
 
 }

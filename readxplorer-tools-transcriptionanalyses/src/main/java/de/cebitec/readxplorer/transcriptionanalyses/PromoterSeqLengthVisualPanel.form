@@ -30,6 +30,7 @@
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="promoterDownLabel" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="circularChromosomesBox" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -50,7 +51,9 @@
                   <Component id="promoterDownLengthField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="promoterDownLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="circularChromosomesBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="61" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -96,6 +99,17 @@
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/Bundle.properties" key="PromoterSeqLengthVisualPanel.promoterDownLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="circularChromosomesBox">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/Bundle.properties" key="PromoterSeqLengthVisualPanel.circularChromosomesBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readxplorer/transcriptionanalyses/Bundle.properties" key="PromoterSeqLengthVisualPanel.circularChromosomesBox.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
