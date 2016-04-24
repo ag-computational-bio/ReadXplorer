@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import org.openide.modules.InstalledFileLocator;
 import org.openide.modules.Places;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
@@ -263,28 +262,28 @@ public final class GnuR extends RConnection {
             }
             instance = new GnuR( ip, 6311, false, processingLog );
             instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
-        } else if( OsUtils.isMac() ) {
-            port = 6311;
-            final Process rserveProcess;
-            host = "localhost";
-            File rserveBinary = InstalledFileLocator.getDefault().locate( "modules/R/library/Rserve/libs/Rserve", "de.cebitec.readxplorer.transcriptionanalyses", false );
-            rserveBinary.setExecutable( true );
-            File rBinary = InstalledFileLocator.getDefault().locate( "modules/R/bin/R", "de.cebitec.readxplorer.transcriptionanalyses", false );
-            rBinary.setExecutable( true );
-            File startUpScript = InstalledFileLocator.getDefault().locate( "modules/R/startup.sh", "de.cebitec.readxplorer.transcriptionanalyses", false );
-            startUpScript.setExecutable( true );
-            rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
-            connectableInstanceRunning++;
-            if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
-                instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
-                if( useAuth ) {
-                    String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
-                    String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
-                    instance.login( user, password );
-                }
-            } else {
-                throw new IOException( "Could not start Rserve instance!" );
-            }
+//        } else if( OsUtils.isMac() ) {
+//            port = 6311;
+//            final Process rserveProcess;
+//            host = "localhost";
+//            File rserveBinary = InstalledFileLocator.getDefault().locate( "modules/R/library/Rserve/libs/Rserve", "de.cebitec.readxplorer.transcriptionanalyses", false );
+//            rserveBinary.setExecutable( true );
+//            File rBinary = InstalledFileLocator.getDefault().locate( "modules/R/bin/R", "de.cebitec.readxplorer.transcriptionanalyses", false );
+//            rBinary.setExecutable( true );
+//            File startUpScript = InstalledFileLocator.getDefault().locate( "modules/R/startup.sh", "de.cebitec.readxplorer.transcriptionanalyses", false );
+//            startUpScript.setExecutable( true );
+//            rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
+//            connectableInstanceRunning++;
+//            if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
+//                instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+//                if( useAuth ) {
+//                    String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
+//                    String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
+//                    instance.login( user, password );
+//                }
+//            } else {
+//                throw new IOException( "Could not start Rserve instance!" );
+//            }
 
         } else if( manualRemoteSetup ) {
             port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
@@ -428,7 +427,8 @@ public final class GnuR extends RConnection {
 
     public static boolean gnuRSetupCorrect() {
         File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
-        if( cebitecIndicator.exists() || OsUtils.isMac() ) {
+//        if( cebitecIndicator.exists() || OsUtils.isMac() ) {
+        if( cebitecIndicator.exists()) {
             return true;
         }
         boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );

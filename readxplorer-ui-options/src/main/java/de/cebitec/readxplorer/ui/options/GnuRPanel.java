@@ -442,12 +442,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 manualLocalButton.setEnabled( false );
                 manualRemoteButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-            } else if( OsUtils.isMac() ) {
-                messages.setText( "Rserve is bundled with the Mac installation and hence no configuration is needed." );
-                autoButton.setEnabled( false );
-                manualLocalButton.setEnabled( false );
-                manualRemoteButton.setEnabled( false );
-                cranMirror.setEnabled( false );
             } else {
                 messages.setText( "Auto installation is only supported under Windows 7 & 8." );
                 autoButton.setEnabled( false );
@@ -1075,6 +1069,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             if( script.exists() && script.canExecute() ) {
                 warningMessage.setText( "" );
                 return true;
+            } else if( !manualLocalButton.isSelected() ) {
+                warningMessage.setText( "" );
+                return true;
             } else {
                 warningMessage.setText( "Please enter a valid startup script." );
                 return false;
@@ -1094,6 +1091,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             if( username.isEmpty() ) {
                 warningMessage.setText( "Username cannot be left empty." );
                 return false;
+            } else if( !manualRemoteButton.isSelected() ) {
+                warningMessage.setText( "" );
+                return true;
             } else {
                 warningMessage.setText( "" );
                 return true;
@@ -1111,6 +1111,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             JPasswordField textField = (JPasswordField) input;
             char[] password = textField.getPassword();
             if( password.length > 0 ) {
+                warningMessage.setText( "" );
+                return true;
+            } else if( !manualRemoteButton.isSelected() ) {
                 warningMessage.setText( "" );
                 return true;
             } else {
