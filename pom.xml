@@ -5,7 +5,7 @@
 
     <groupId>bio.comp.jlu.readxplorer</groupId>
     <artifactId>readxplorer</artifactId>
-    <version>2.2.0-FINAL</version>
+    <version>2.2.2-FINAL</version>
     <packaging>pom</packaging>
     <name>ReadXplorer</name>
 
@@ -71,7 +71,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-branding</artifactId>
-                <version>2.2.0-FINAL</version>
+                <version>2.2.2-FINAL</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
