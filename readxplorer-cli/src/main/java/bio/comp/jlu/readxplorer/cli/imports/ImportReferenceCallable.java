@@ -30,10 +30,14 @@ import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import de.cebitec.readxplorer.parser.reference.filter.FeatureFilter;
 import de.cebitec.readxplorer.parser.reference.filter.FilterRuleSource;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 import org.netbeans.api.sendopts.CommandException;
 import org.slf4j.Logger;
@@ -73,8 +77,16 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             result.addOutput( "create import objects..." );
 
             final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) + 1 ) );
-            final ReferenceJob referenceJob = new ReferenceJob( 0, referenceFile, refParser,
+            final ReferenceJob referenceJob;
+            if( refParser instanceof BioJavaGff3Parser  ||  refParser instanceof BioJavaGff2Parser ) {
+                Path fastaPath = Files.list( referenceFile.toPath().getParent() ).filter( p ->
+                        p.endsWith( ".fasta" ) || p.endsWith( ".fas" ) || p.endsWith( ".fna" ) || p.endsWith( ".fa" ) ).findFirst().get();
+                referenceJob = new ReferenceJob( 0, fastaPath.toFile(), referenceFile, refParser,
                                                                 "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
+            } else {
+                referenceJob = new ReferenceJob( 0, referenceFile, refParser,
+                                                                "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
+            }
             result.setReferenceJob( referenceJob );
 
             // parse reference genome
@@ -99,6 +111,11 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             CommandException ce = new CommandException( 1, "out of memory!" );
             ce.initCause( ex );
             throw ce;
+        } catch( NoSuchElementException | IOException ex ) {
+            LOG.error( null, ex );
+            CommandException ce = new CommandException( 1, "import of GFF2/3 / GTF reference failed! Please check if a corresponding fasta file is present in the reference file directory!" );
+            ce.initCause( ex );
+            throw ce;
         }
 
     }
@@ -121,6 +138,7 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             case "fasta":
             case "fna":
             case "fas":
+            case "fa":
             default:
                 return new FastaReferenceParser();
         }
