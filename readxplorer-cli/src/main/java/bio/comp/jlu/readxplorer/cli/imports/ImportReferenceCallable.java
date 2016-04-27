@@ -119,6 +119,8 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             case "gtf":
                 return new BioJavaGff2Parser();
             case "fasta":
+            case "fna":
+            case "fas":
             default:
                 return new FastaReferenceParser();
         }
