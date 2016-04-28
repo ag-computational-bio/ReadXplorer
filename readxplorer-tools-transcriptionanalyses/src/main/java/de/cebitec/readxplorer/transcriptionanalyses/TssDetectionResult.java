@@ -73,10 +73,12 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
     private final List<TranscriptionStart> results;
     private final List<String> promotorRegions;
+    private final List<String> downstreamRegions;
     private final ParameterSetTSS tssParameters;
 
     private int bpUpstream = 70;
-    private int bpDownstream = 0;
+    private int bpDownstream = 5;
+    private boolean isCircularChromosomes;
 
 
     /**
@@ -102,19 +104,23 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         this.results = new ArrayList<>( results );
         this.calcStats( results );
         promotorRegions = new ArrayList<>();
-
+        downstreamRegions = new ArrayList<>();
     }
 
 
     /**
-     * @param bpUpstream   the number of base pairs to export upstream of a TSS
-     * @param bpDownstream the number of base pairs to export downstream of a
-     *                     TSS
+     * @param bpUpstream            the number of base pairs to export upstream
+     *                              of a TSS
+     * @param bpDownstream          the number of base pairs to export
+     *                              downstream of a TSS
+     * @param isCircularChromosomes <code>true</code>, if the chromosome(s) of
+     *                              the current reference are circular,
+     *                              <code>false</code> otherwise
      */
-    public void setPromoterLength( int bpUpstream, int bpDownstream ) {
+    public void setPromoterLength( int bpUpstream, int bpDownstream, boolean isCircularChromosomes ) {
         this.bpUpstream = bpUpstream;
         this.bpDownstream = bpDownstream;
-        
+        this.isCircularChromosomes = isCircularChromosomes;
     }
 
 
@@ -131,6 +137,14 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      */
     public int getBpDownstream() {
         return bpDownstream;
+    }
+    
+    /**
+     * @return <code>true</code>, if the chromosome(s) of the current reference
+     *         are circular, <code>false</code> otherwise
+     */
+    public boolean isCircularChromosomes() {
+        return isCircularChromosomes;
     }
 
 
@@ -163,11 +177,14 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     /**
      * Sets the promotor regions of the detected TSS
      * <p>
-     * @param promotorRegions Promotor regions of the detected TSS
+     * @param promotorRegions   Promotor regions of the detected TSSs
+     * @param downstreamRegions Downstream regions of the detected TSSs
      */
-    public void setPromoterRegions( List<String> promotorRegions ) {
+    public void setPromoterRegions( List<String> promotorRegions, List<String> downstreamRegions ) {
         this.promotorRegions.clear();
+        this.downstreamRegions.clear();
         this.promotorRegions.addAll( promotorRegions );
+        this.downstreamRegions.addAll( downstreamRegions );
     }
 
 
@@ -296,6 +313,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             }
 
             tssRow.add( promotorRegions.get( i ) );
+            tssRow.add( downstreamRegions.get( i ) );
 
             tSSResults.add( tssRow );
         }

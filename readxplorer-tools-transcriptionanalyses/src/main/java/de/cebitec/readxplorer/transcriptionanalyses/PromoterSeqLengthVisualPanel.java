@@ -76,6 +76,7 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
         promoterLabel = new javax.swing.JLabel();
         promoterDownLengthField = new javax.swing.JTextField();
         promoterDownLabel = new javax.swing.JLabel();
+        circularChromosomesBox = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(promoterLengthLabel, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterLengthLabel.text")); // NOI18N
 
@@ -90,6 +91,10 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(promoterDownLabel, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterDownLabel.text")); // NOI18N
         promoterDownLabel.setToolTipText(org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.promoterDownLabel.toolTipText")); // NOI18N
+
+        circularChromosomesBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(circularChromosomesBox, org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.circularChromosomesBox.text")); // NOI18N
+        circularChromosomesBox.setToolTipText(org.openide.util.NbBundle.getMessage(PromoterSeqLengthVisualPanel.class, "PromoterSeqLengthVisualPanel.circularChromosomesBox.toolTipText")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -106,7 +111,8 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(promoterDownLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(promoterDownLabel)))
+                        .addComponent(promoterDownLabel))
+                    .addComponent(circularChromosomesBox))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -122,12 +128,15 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(promoterDownLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(promoterDownLabel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(circularChromosomesBox)
+                .addContainerGap(61, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox circularChromosomesBox;
     private javax.swing.JLabel promoterDownLabel;
     private javax.swing.JTextField promoterDownLengthField;
     private javax.swing.JLabel promoterLabel;
@@ -149,6 +158,15 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
      */
     public int getPromoterDownstreamLength() {
         return promoterDownstreamLength;
+    }
+
+
+    /**
+     * @return <code>true</code>, if the chromosome(s) of the current reference
+     *         are circular, <code>false</code> otherwise
+     */
+    public boolean isCircularChromosomes() {
+        return circularChromosomesBox.isSelected();
     }
 
 
@@ -179,6 +197,7 @@ public final class PromoterSeqLengthVisualPanel extends JobPanel {
         Preferences pref = NbPreferences.forModule( Object.class );
         promoterLength = pref.getInt( PromoterSeqLengthWizardPanel.PROMOTER_LENGTH, 70 );
         promoterDownstreamLength = pref.getInt( PromoterSeqLengthWizardPanel.PROMOTER_DOWN_LENGTH, 0 );
+        circularChromosomesBox.setSelected( pref.getBoolean( PromoterSeqLengthWizardPanel.PROMOTER_CIRCULAR_CHROMS, true ) );
     }
 
 

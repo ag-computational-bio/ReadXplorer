@@ -142,7 +142,7 @@ public final class CommandLineProcessor implements ArgsProcessor {
      * Mandatory options
      */
     @Arg( longName = "ref" )
-    @Description( shortDescription = "Reference genome to import. Supported file formats: FASTA, GFF2/3, GenBank, EMBL" )
+    @Description( shortDescription = "Reference genome to import. Supported file formats: FASTA, GFF2/3, GTF, GenBank, EMBL. In case of GFF2/3 and GTF, please provide a fasta sequence in the same directory as the reference annotation file!" )
     public String referenceArg;
 
     @Arg( longName = "reads" )

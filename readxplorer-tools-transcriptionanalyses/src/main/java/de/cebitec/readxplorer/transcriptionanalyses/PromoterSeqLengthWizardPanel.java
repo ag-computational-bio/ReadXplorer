@@ -31,6 +31,7 @@ public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
 
     public static final String PROMOTER_LENGTH = "PROMOTER_LENGTH";
     public static final String PROMOTER_DOWN_LENGTH = "PROMOTER_DOWN_LENGTH";
+    public static final String PROMOTER_CIRCULAR_CHROMS = "PROMOTER_CIRCULAR_CHROMS";
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -66,6 +67,7 @@ public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
         if( isValid() ) {
             wiz.putProperty( PROMOTER_LENGTH, this.component.getPromoterLength() );
             wiz.putProperty( PROMOTER_DOWN_LENGTH, this.component.getPromoterDownstreamLength() );
+            wiz.putProperty( PROMOTER_CIRCULAR_CHROMS, this.component.isCircularChromosomes() );
             this.storePrefs();
         }
     }
@@ -78,6 +80,7 @@ public class PromoterSeqLengthWizardPanel extends ChangeListeningWizardPanel {
     private void storePrefs() {
         getPref().putInt( PROMOTER_LENGTH, this.component.getPromoterLength() );
         getPref().putInt( PROMOTER_DOWN_LENGTH, this.component.getPromoterDownstreamLength() );
+        getPref().putBoolean( PROMOTER_CIRCULAR_CHROMS, this.component.isCircularChromosomes() );
     }
 
 
