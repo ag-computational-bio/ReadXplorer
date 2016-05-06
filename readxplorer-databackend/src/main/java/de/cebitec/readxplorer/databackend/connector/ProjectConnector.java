@@ -143,6 +143,7 @@ public final class ProjectConnector implements Observable {
         this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
 
         connectionPool = JdbcConnectionPool.create( url, "", "" );
+        connectionPool.setMaxConnections( 40 );
 
         try( Connection con = getConnection(); ) {
             con.setAutoCommit( false );

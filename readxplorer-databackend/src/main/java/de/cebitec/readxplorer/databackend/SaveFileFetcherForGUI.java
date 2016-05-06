@@ -212,7 +212,24 @@ public class SaveFileFetcherForGUI {
      */
     private PersistentTrack checkFileExists( String basePath, File oldTrackFile, PersistentTrack track ) {
         PersistentTrack newTrack = null;
-        File newTrackFile = new File( basePath + "/" + oldTrackFile.getName() );
+        String name = oldTrackFile.getName();
+
+        /* If this is true than we are working with a DB created on windows. In
+         * this case Java will return not the name of the file, but the complete
+         * windows path still containing \\ as path seperator. If this is the
+         * case we have to manually split the name to get the real filename. AND
+         * YES: two backslashed in the contains clause and four in the split
+         * method are intended and CORRECT!
+         */
+        if( name.contains( "\\" ) ) {
+            //We split at the windows path seperator
+            String[] split = name.split( "\\\\" );
+            //The last entry of the split array must be the real filename
+            name = split[split.length - 1];
+        }
+
+        File newTrackFile = new File( basePath + File.separator + name );
+        
         if( newTrackFile.exists() && newTrackFile.isFile() ) {
             newTrack = new PersistentTrack( track.getId(),
                                             newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
@@ -457,9 +474,24 @@ public class SaveFileFetcherForGUI {
      */
     private IndexedFastaSequenceFile resetRefFile( PersistentReference ref ) {
         IndexedFastaSequenceFile newFastaFile = null;
+        String name = ref.getFastaFile().getName();
+
+        /* If this is true than we are working with a DB created on windows. In
+         * this case Java will return not the name of the file, but the complete
+         * windows path still containing \\ as path seperator. If this is the
+         * case we have to manually split the name to get the real filename. AND
+         * YES: two backslashed in the contains clause and four in the split
+         * method are intended and CORRECT!
+         */
+        if( name.contains( "\\" ) ) {
+            //We split at the windows path seperator
+            String[] split = name.split( "\\\\" );
+            //The last entry of the split array must be the real filename
+            name = split[split.length - 1];
+        }
 
         File newFile = new File( CONNECTOR.getDbLocation() ).getParentFile();
-        newFile = new File( newFile.getAbsolutePath() + "/" + ref.getFastaFile().getName() );
+        newFile = new File( newFile.getAbsolutePath() + File.separator + name );
 
         if( !newFile.exists() ) {
             List<String> fileEndings = Arrays.asList( ".fasta", ".fa", ".fna", ".ffn" );
