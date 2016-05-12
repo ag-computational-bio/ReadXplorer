@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import static htsjdk.samtools.SamReaderFactory.Option.INCLUDE_SOURCE_IN_RECORDS;
 import static htsjdk.samtools.ValidationStringency.LENIENT;
+import static htsjdk.samtools.ValidationStringency.SILENT;
 
 
 /*
@@ -121,7 +122,7 @@ public class SamUtils implements Observable {
         boolean success = false;
         SamReaderFactory samReaderFactory = SamReaderFactory.makeDefault()
                 .enable( INCLUDE_SOURCE_IN_RECORDS )
-                .validationStringency( LENIENT );
+                .validationStringency( SILENT );
         try( final SamReader samBamReader = samReaderFactory.open( bamFile ) ) {
             BAMIndexer.createIndex( samBamReader, new File( bamFile + Paths.BAM_INDEX_EXT ) );
             success = true;
