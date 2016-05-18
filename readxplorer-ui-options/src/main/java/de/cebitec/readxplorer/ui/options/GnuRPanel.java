@@ -855,7 +855,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                     passwordTextField.setText( "xxxxxxxx" );
                     useAuthCheckboxSelected();
                 }
-            } else if( OsUtils.isLinux() ) {
+            } else if( OsUtils.isWindows() ) {
                 autoOrmanual.setSelected( autoButton.getModel(), true );
             } else {
                 autoOrmanual.setSelected( manualButton.getModel(), true );
