@@ -53,11 +53,11 @@ import org.slf4j.LoggerFactory;
 
 
 final class GnuRPanel extends OptionsPanel implements Observer {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger( GnuRPanel.class.getName() );
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private final GnuROptionsPanelController controller;
     private final Preferences pref;
     private Downloader downloader;
@@ -415,8 +415,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                                               "consider it more useful to permit linking proprietary applications with the\n" +
                                               "library.  If this is what you want to do, use the GNU Library General\n" +
                                               "Public License instead of this License.";
-    
-    
+
+
     GnuRPanel( GnuROptionsPanelController controller ) {
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
@@ -458,26 +458,26 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         usernameTextField.setInputVerifier( new UsernameInputVerifier() );
         passwordTextField.setInputVerifier( new PasswordInputVerifier() );
     }
-    
-    
+
+
     private void setUpListener() {
         cranMirror.addKeyListener( new KeyListener() {
             @Override
             public void keyTyped( KeyEvent e ) {
                 controller.changed();
             }
-            
-            
+
+
             @Override
             public void keyPressed( KeyEvent e ) {
             }
-            
-            
+
+
             @Override
             public void keyReleased( KeyEvent e ) {
             }
-            
-            
+
+
         } );
     }
 
@@ -730,7 +730,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void installButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installButtonActionPerformed
-        
+
         JTextArea textArea = new JTextArea( GNU_LICENSE );
         JScrollPane scrollPane = new JScrollPane( textArea );
         textArea.setLineWrap( true );
@@ -772,8 +772,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private void manualButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualButtonActionPerformed
         manualButtonSelected();
     }//GEN-LAST:event_manualButtonActionPerformed
-    
-    
+
+
     private void manualButtonSelected() {
         rServeStartupScript.setEditable( false );
         rServeHost.setEditable( true );
@@ -785,8 +785,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
         autoButtonSelected();
     }//GEN-LAST:event_autoButtonActionPerformed
-    
-    
+
+
     private void autoButtonSelected() {
         rServeStartupScript.setEditable( false );
         rServeHost.setEditable( false );
@@ -810,8 +810,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         passwordTextField.setText( "" );
         passwordChanged = true;
     }//GEN-LAST:event_passwordTextFieldFocusGained
-    
-    
+
+
     private void startupScriptButtonSelected() {
         rServeStartupScript.setEditable( true );
         rServeHost.setEditable( false );
@@ -819,23 +819,22 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         installButton.setEnabled( false );
         useAuthCheckBox.setEnabled( true );
     }
-    
-    
+
+
     private void useAuthCheckboxSelected() {
         usernameTextField.setEditable( useAuthCheckBox.isSelected() );
         passwordTextField.setEditable( useAuthCheckBox.isSelected() );
     }
-    
-    
+
+
     @Override
     void load() {
-        autoOrmanual.clearSelection();
         cranMirror.setText( pref.get( Paths.CRAN_MIRROR, DEFAULT_R_DOWNLOAD_MIRROR ) );
         rServeHost.setText( pref.get( RServe.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
         rServePort.setText( String.valueOf( pref.getInt( RServe.RSERVE_PORT, DEFAULT_RSERVE_PORT ) ) );
-        boolean manualRemoteButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
+        boolean manualButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
         boolean authSelected = pref.getBoolean( RServe.RSERVE_USE_AUTH, false );
-        if( manualRemoteButtonSelected ) {
+        if( manualButtonSelected ) {
             autoOrmanual.setSelected( manualButton.getModel(), true );
             manualButtonSelected();
             if( authSelected ) {
@@ -856,13 +855,16 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                     passwordTextField.setText( "xxxxxxxx" );
                     useAuthCheckboxSelected();
                 }
-            } else {
+            } else if( OsUtils.isLinux() ) {
                 autoOrmanual.setSelected( autoButton.getModel(), true );
+            } else {
+                autoOrmanual.setSelected( manualButton.getModel(), true );
+                manualButtonSelected();
             }
         }
     }
-    
-    
+
+
     @Override
     void store() {
         pref.put( Paths.CRAN_MIRROR, cranMirror.getText() );
@@ -939,7 +941,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JLabel warningMessage;
     // End of variables declaration//GEN-END:variables
 
-    
+
     private void unzipGNUR() {
         if( !versionIndicator.exists() && rDir.exists() ) {
             rDir.delete();
@@ -954,8 +956,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         Thread th = new Thread( unzip );
         th.start();
     }
-    
-    
+
+
     @Override
     public void update( Object args ) {
         if( args instanceof Downloader.Status ) {
@@ -969,8 +971,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 0 );
                             messages.setText( "Download failed. Please try again." );
                         }
-                        
-                        
+
+
                     } );
                     downloader.removeObserver( this );
                     break;
@@ -982,8 +984,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 100 );
                             messages.setText( "Download finished." );
                         }
-                        
-                        
+
+
                     } );
                     downloader.removeObserver( this );
                     unzipGNUR();
@@ -995,15 +997,15 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setIndeterminate( true );
                             messages.setText( "Downloading GNU R." );
                         }
-                        
-                        
+
+
                     } );
                     break;
                 default:
                     LOG.info( "Encountered unknown downloader status." );
             }
         }
-        
+
         if( args instanceof Unzip.Status ) {
             final Unzip.Status status = (Unzip.Status) args;
             SwingUtilities.invokeLater( new Runnable() {
@@ -1034,19 +1036,19 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             messages.setText( "Can not unzip R archive, please try again." );
                             jProgressBar1.setIndeterminate( false );
                             jProgressBar1.setValue( 0 );
-                        
+
                     }
                 }
-                
-                
+
+
             } );
         }
-        
+
     }
-    
-    
+
+
     class PortInputVerifier extends InputVerifier {
-        
+
         @Override
         public boolean verify( JComponent input ) {
             JTextField textField = (JTextField) input;
@@ -1060,13 +1062,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             warningMessage.setText( "" );
             return true;
         }
-        
-        
+
+
     }
-    
-    
+
+
     class ScriptInputVerifier extends InputVerifier {
-        
+
         @Override
         public boolean verify( JComponent input ) {
             JTextField textField = (JTextField) input;
@@ -1083,13 +1085,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return false;
             }
         }
-        
-        
+
+
     }
-    
-    
+
+
     class UsernameInputVerifier extends InputVerifier {
-        
+
         @Override
         public boolean verify( JComponent input ) {
             JTextField textField = (JTextField) input;
@@ -1105,13 +1107,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return true;
             }
         }
-        
-        
+
+
     }
-    
-    
+
+
     class PasswordInputVerifier extends InputVerifier {
-        
+
         @Override
         public boolean verify( JComponent input ) {
             JPasswordField textField = (JPasswordField) input;
@@ -1127,8 +1129,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return false;
             }
         }
-        
-        
+
+
     }
-    
+
 }
