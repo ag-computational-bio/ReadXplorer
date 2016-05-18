@@ -59,11 +59,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class GnuR extends RConnection {
 
-    /**
-     * The Cran Mirror used to receive additional packages.
-     */
-    private String cranMirror;
-
     final boolean runningLocal;
 
     /* Is there already a instance running that we can connect to? This is only
@@ -262,30 +257,7 @@ public final class GnuR extends RConnection {
             }
             instance = new GnuR( ip, 6311, false, processingLog );
             instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
-//        } else if( OsUtils.isMac() ) {
-//            port = 6311;
-//            final Process rserveProcess;
-//            host = "localhost";
-//            File rserveBinary = InstalledFileLocator.getDefault().locate( "modules/R/library/Rserve/libs/Rserve", "de.cebitec.readxplorer.transcriptionanalyses", false );
-//            rserveBinary.setExecutable( true );
-//            File rBinary = InstalledFileLocator.getDefault().locate( "modules/R/bin/R", "de.cebitec.readxplorer.transcriptionanalyses", false );
-//            rBinary.setExecutable( true );
-//            File startUpScript = InstalledFileLocator.getDefault().locate( "modules/R/startup.sh", "de.cebitec.readxplorer.transcriptionanalyses", false );
-//            startUpScript.setExecutable( true );
-//            rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
-//            connectableInstanceRunning++;
-//            if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
-//                instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
-//                if( useAuth ) {
-//                    String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
-//                    String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
-//                    instance.login( user, password );
-//                }
-//            } else {
-//                throw new IOException( "Could not start Rserve instance!" );
-//            }
-
-        } else if( manualRemoteSetup ) {
+        } else if( manualRemoteSetup || OsUtils.isMac()) {
             port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
             host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_HOST, "localhost" );
             instance = new GnuR( host, port, !manualRemoteSetup, processingLog );

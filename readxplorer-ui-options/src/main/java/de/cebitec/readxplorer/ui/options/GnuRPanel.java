@@ -53,11 +53,11 @@ import org.slf4j.LoggerFactory;
 
 
 final class GnuRPanel extends OptionsPanel implements Observer {
-
+    
     private static final Logger LOG = LoggerFactory.getLogger( GnuRPanel.class.getName() );
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private final GnuROptionsPanelController controller;
     private final Preferences pref;
     private Downloader downloader;
@@ -415,8 +415,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                                               "consider it more useful to permit linking proprietary applications with the\n" +
                                               "library.  If this is what you want to do, use the GNU Library General\n" +
                                               "Public License instead of this License.";
-
-
+    
+    
     GnuRPanel( GnuROptionsPanelController controller ) {
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
@@ -427,8 +427,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jProgressBar1.setMaximum( 100 );
         setUpListener();
         if( OsUtils.isWindows() ) {
-            messages.setText( "'Manual Local' setup is only supported under Linux and Mac OS." );
-            manualLocalButton.setEnabled( false );
+            messages.setText( "'Startup Script' is only supported under Linux." );
+            startupScriptButton.setEnabled( false );
             if( !versionIndicator.exists() ) {
                 installButton.setEnabled( true );
                 jProgressBar1.setEnabled( true );
@@ -439,12 +439,18 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             if( cebitecIndicator.exists() ) {
                 messages.setText( "Rserve is already configured correctly for use in CeBiTec" );
                 autoButton.setEnabled( false );
-                manualLocalButton.setEnabled( false );
-                manualRemoteButton.setEnabled( false );
+                startupScriptButton.setEnabled( false );
+                manualButton.setEnabled( false );
                 cranMirror.setEnabled( false );
-            } else {
-                messages.setText( "Auto installation is only supported under Windows 7 & 8." );
+            } else if( OsUtils.isMac() ) {
+                messages.setText( "Only change these settings if you do not want to use the bundled GNU R installation." );
                 autoButton.setEnabled( false );
+                startupScriptButton.setEnabled( false );
+                manualButtonSelected();
+            } else {
+                messages.setText( "Auto installation is only supported under Windows 7, 8 & 10." );
+                autoButton.setEnabled( false );
+                manualButtonSelected();
             }
         }
         rServePort.setInputVerifier( new PortInputVerifier() );
@@ -452,26 +458,26 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         usernameTextField.setInputVerifier( new UsernameInputVerifier() );
         passwordTextField.setInputVerifier( new PasswordInputVerifier() );
     }
-
-
+    
+    
     private void setUpListener() {
         cranMirror.addKeyListener( new KeyListener() {
             @Override
             public void keyTyped( KeyEvent e ) {
                 controller.changed();
             }
-
-
+            
+            
             @Override
             public void keyPressed( KeyEvent e ) {
             }
-
-
+            
+            
             @Override
             public void keyReleased( KeyEvent e ) {
             }
-
-
+            
+            
         } );
     }
 
@@ -495,8 +501,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jLabel3 = new javax.swing.JLabel();
         rServeHost = new javax.swing.JTextField();
         autoButton = new javax.swing.JRadioButton();
-        manualRemoteButton = new javax.swing.JRadioButton();
-        manualLocalButton = new javax.swing.JRadioButton();
+        manualButton = new javax.swing.JRadioButton();
+        startupScriptButton = new javax.swing.JRadioButton();
         jLabel4 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
@@ -557,19 +563,19 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             }
         });
 
-        autoOrmanual.add(manualRemoteButton);
-        org.openide.awt.Mnemonics.setLocalizedText(manualRemoteButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualRemoteButton.text")); // NOI18N
-        manualRemoteButton.addActionListener(new java.awt.event.ActionListener() {
+        autoOrmanual.add(manualButton);
+        org.openide.awt.Mnemonics.setLocalizedText(manualButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualButton.text")); // NOI18N
+        manualButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manualRemoteButtonActionPerformed(evt);
+                manualButtonActionPerformed(evt);
             }
         });
 
-        autoOrmanual.add(manualLocalButton);
-        org.openide.awt.Mnemonics.setLocalizedText(manualLocalButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualLocalButton.text")); // NOI18N
-        manualLocalButton.addActionListener(new java.awt.event.ActionListener() {
+        autoOrmanual.add(startupScriptButton);
+        org.openide.awt.Mnemonics.setLocalizedText(startupScriptButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.startupScriptButton.text")); // NOI18N
+        startupScriptButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manualLocalButtonActionPerformed(evt);
+                startupScriptButtonActionPerformed(evt);
             }
         });
 
@@ -630,9 +636,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(autoButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(manualLocalButton)
+                                .addComponent(startupScriptButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(manualRemoteButton))
+                                .addComponent(manualButton))
                             .addComponent(jLabel1)
                             .addComponent(installButton)
                             .addComponent(jLabel6)
@@ -675,8 +681,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(autoButton)
-                    .addComponent(manualRemoteButton)
-                    .addComponent(manualLocalButton))
+                    .addComponent(manualButton)
+                    .addComponent(startupScriptButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -724,7 +730,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void installButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installButtonActionPerformed
-
+        
         JTextArea textArea = new JTextArea( GNU_LICENSE );
         JScrollPane scrollPane = new JScrollPane( textArea );
         textArea.setLineWrap( true );
@@ -763,12 +769,12 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.sourceFileTextField.setText( cranMirror.getText() + SOURCE_URI );
     }//GEN-LAST:event_cranMirrorKeyReleased
 
-    private void manualRemoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualRemoteButtonActionPerformed
-        manualRemoteButtonSelected();
-    }//GEN-LAST:event_manualRemoteButtonActionPerformed
-
-
-    private void manualRemoteButtonSelected() {
+    private void manualButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualButtonActionPerformed
+        manualButtonSelected();
+    }//GEN-LAST:event_manualButtonActionPerformed
+    
+    
+    private void manualButtonSelected() {
         rServeStartupScript.setEditable( false );
         rServeHost.setEditable( true );
         rServePort.setEditable( true );
@@ -779,8 +785,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
         autoButtonSelected();
     }//GEN-LAST:event_autoButtonActionPerformed
-
-
+    
+    
     private void autoButtonSelected() {
         rServeStartupScript.setEditable( false );
         rServeHost.setEditable( false );
@@ -792,9 +798,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         passwordTextField.setEditable( false );
     }
 
-    private void manualLocalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualLocalButtonActionPerformed
-        manualLocalButtonSelected();
-    }//GEN-LAST:event_manualLocalButtonActionPerformed
+    private void startupScriptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startupScriptButtonActionPerformed
+        startupScriptButtonSelected();
+    }//GEN-LAST:event_startupScriptButtonActionPerformed
 
     private void useAuthCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useAuthCheckBoxActionPerformed
         useAuthCheckboxSelected();
@@ -804,23 +810,23 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         passwordTextField.setText( "" );
         passwordChanged = true;
     }//GEN-LAST:event_passwordTextFieldFocusGained
-
-
-    private void manualLocalButtonSelected() {
+    
+    
+    private void startupScriptButtonSelected() {
         rServeStartupScript.setEditable( true );
         rServeHost.setEditable( false );
         rServePort.setEditable( true );
         installButton.setEnabled( false );
         useAuthCheckBox.setEnabled( true );
     }
-
-
+    
+    
     private void useAuthCheckboxSelected() {
         usernameTextField.setEditable( useAuthCheckBox.isSelected() );
         passwordTextField.setEditable( useAuthCheckBox.isSelected() );
     }
-
-
+    
+    
     @Override
     void load() {
         autoOrmanual.clearSelection();
@@ -830,8 +836,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         boolean manualRemoteButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
         boolean authSelected = pref.getBoolean( RServe.RSERVE_USE_AUTH, false );
         if( manualRemoteButtonSelected ) {
-            autoOrmanual.setSelected( manualRemoteButton.getModel(), true );
-            manualRemoteButtonSelected();
+            autoOrmanual.setSelected( manualButton.getModel(), true );
+            manualButtonSelected();
             if( authSelected ) {
                 useAuthCheckBox.setSelected( true );
                 usernameTextField.setText( pref.get( RServe.RSERVE_USER, "" ) );
@@ -841,9 +847,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         } else {
             boolean manualLocalButtonSelected = pref.getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
             if( manualLocalButtonSelected ) {
-                autoOrmanual.setSelected( manualLocalButton.getModel(), true );
+                autoOrmanual.setSelected( startupScriptButton.getModel(), true );
                 rServeStartupScript.setText( pref.get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
-                manualLocalButtonSelected();
+                startupScriptButtonSelected();
                 if( authSelected ) {
                     useAuthCheckBox.setSelected( true );
                     usernameTextField.setText( pref.get( RServe.RSERVE_USER, "" ) );
@@ -855,16 +861,16 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             }
         }
     }
-
-
+    
+    
     @Override
     void store() {
         pref.put( Paths.CRAN_MIRROR, cranMirror.getText() );
-        boolean manualRemoteButtonSelected = manualRemoteButton.isSelected();
-        boolean manualLocalButtonSelected = manualLocalButton.isSelected();
+        boolean manualRemoteButtonSelected = manualButton.isSelected();
+        boolean manualLocalButtonSelected = startupScriptButton.isSelected();
         pref.putBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButtonSelected );
         pref.putBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButtonSelected );
-        if( manualRemoteButton.isSelected() ) {
+        if( manualButton.isSelected() ) {
             pref.put( RServe.RSERVE_HOST, rServeHost.getText() );
             pref.putInt( RServe.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
             pref.remove( RServe.RSERVE_STARTUP_SCRIPT );
@@ -879,7 +885,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 pref.remove( RServe.RSERVE_USER );
                 PasswordStore.delete( RServe.RSERVE_PASSWORD );
             }
-        } else if( manualLocalButton.isSelected() ) {
+        } else if( startupScriptButton.isSelected() ) {
             pref.put( RServe.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText() );
             pref.putInt( RServe.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
             pref.remove( RServe.RSERVE_HOST );
@@ -920,20 +926,20 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JRadioButton manualLocalButton;
-    private javax.swing.JRadioButton manualRemoteButton;
+    private javax.swing.JRadioButton manualButton;
     private javax.swing.JLabel messages;
     private javax.swing.JPasswordField passwordTextField;
     private javax.swing.JTextField rServeHost;
     private javax.swing.JTextField rServePort;
     private javax.swing.JTextField rServeStartupScript;
     private javax.swing.JTextField sourceFileTextField;
+    private javax.swing.JRadioButton startupScriptButton;
     private javax.swing.JCheckBox useAuthCheckBox;
     private javax.swing.JTextField usernameTextField;
     private javax.swing.JLabel warningMessage;
     // End of variables declaration//GEN-END:variables
 
-
+    
     private void unzipGNUR() {
         if( !versionIndicator.exists() && rDir.exists() ) {
             rDir.delete();
@@ -948,8 +954,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         Thread th = new Thread( unzip );
         th.start();
     }
-
-
+    
+    
     @Override
     public void update( Object args ) {
         if( args instanceof Downloader.Status ) {
@@ -963,8 +969,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 0 );
                             messages.setText( "Download failed. Please try again." );
                         }
-
-
+                        
+                        
                     } );
                     downloader.removeObserver( this );
                     break;
@@ -976,8 +982,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 100 );
                             messages.setText( "Download finished." );
                         }
-
-
+                        
+                        
                     } );
                     downloader.removeObserver( this );
                     unzipGNUR();
@@ -989,15 +995,15 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setIndeterminate( true );
                             messages.setText( "Downloading GNU R." );
                         }
-
-
+                        
+                        
                     } );
                     break;
                 default:
                     LOG.info( "Encountered unknown downloader status." );
             }
         }
-
+        
         if( args instanceof Unzip.Status ) {
             final Unzip.Status status = (Unzip.Status) args;
             SwingUtilities.invokeLater( new Runnable() {
@@ -1028,19 +1034,19 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             messages.setText( "Can not unzip R archive, please try again." );
                             jProgressBar1.setIndeterminate( false );
                             jProgressBar1.setValue( 0 );
-
+                        
                     }
                 }
-
-
+                
+                
             } );
         }
-
+        
     }
-
-
+    
+    
     class PortInputVerifier extends InputVerifier {
-
+        
         @Override
         public boolean verify( JComponent input ) {
             JTextField textField = (JTextField) input;
@@ -1054,13 +1060,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             warningMessage.setText( "" );
             return true;
         }
-
-
+        
+        
     }
-
-
+    
+    
     class ScriptInputVerifier extends InputVerifier {
-
+        
         @Override
         public boolean verify( JComponent input ) {
             JTextField textField = (JTextField) input;
@@ -1069,7 +1075,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             if( script.exists() && script.canExecute() ) {
                 warningMessage.setText( "" );
                 return true;
-            } else if( !manualLocalButton.isSelected() ) {
+            } else if( !startupScriptButton.isSelected() ) {
                 warningMessage.setText( "" );
                 return true;
             } else {
@@ -1077,13 +1083,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return false;
             }
         }
-
-
+        
+        
     }
-
-
+    
+    
     class UsernameInputVerifier extends InputVerifier {
-
+        
         @Override
         public boolean verify( JComponent input ) {
             JTextField textField = (JTextField) input;
@@ -1091,7 +1097,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             if( username.isEmpty() ) {
                 warningMessage.setText( "Username cannot be left empty." );
                 return false;
-            } else if( !manualRemoteButton.isSelected() ) {
+            } else if( !manualButton.isSelected() ) {
                 warningMessage.setText( "" );
                 return true;
             } else {
@@ -1099,13 +1105,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return true;
             }
         }
-
-
+        
+        
     }
-
-
+    
+    
     class PasswordInputVerifier extends InputVerifier {
-
+        
         @Override
         public boolean verify( JComponent input ) {
             JPasswordField textField = (JPasswordField) input;
@@ -1113,7 +1119,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             if( password.length > 0 ) {
                 warningMessage.setText( "" );
                 return true;
-            } else if( !manualRemoteButton.isSelected() ) {
+            } else if( !manualButton.isSelected() ) {
                 warningMessage.setText( "" );
                 return true;
             } else {
@@ -1121,8 +1127,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 return false;
             }
         }
-
-
+        
+        
     }
-
+    
 }
