@@ -34,8 +34,6 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
-import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq2AnalysisHandler.Plot.MAplot;
-
 
 /**
  *
