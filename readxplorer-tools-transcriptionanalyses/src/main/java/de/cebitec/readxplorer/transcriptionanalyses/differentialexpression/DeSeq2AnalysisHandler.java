@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.utils.OsUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -48,7 +49,7 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         DispEsts( "Per gene estimates against normalized mean expression" ),
         HIST( "Histogram of p values" ),
         MAplot( "MA Plot" );
-        String representation;
+        private final String representation;
 
 
         Plot( String representation ) {
@@ -63,7 +64,11 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
 
         public static Plot[] getValues() {
-            return new Plot[]{ DispEsts, HIST, MAplot };
+            if( OsUtils.isMac() ) {
+                return new Plot[]{ MAplot };
+            } else {
+                return Plot.values();
+            }
         }
 
 

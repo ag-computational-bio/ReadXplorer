@@ -23,6 +23,7 @@ import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.utils.OsUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -49,7 +50,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         DE( "Log2 fold change vs. base means" ),
         HIST( "Histogram of p-values" ),
         MAplot( "MA Plot" );
-        String representation;
+        private final String representation;
 
 
         Plot( String representation ) {
@@ -64,7 +65,9 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
 
         public static Plot[] getValues( boolean moreThanTwoConditions ) {
-            if( moreThanTwoConditions ) {
+            if( OsUtils.isMac() ) {
+                return new Plot[]{ MAplot };
+            } else if( moreThanTwoConditions ) {
                 return new Plot[]{ DispEsts };
             } else {
                 return new Plot[]{ DispEsts, DE, HIST, MAplot };

@@ -124,7 +124,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         List<ResultDeAnalysis> results = handler.getResults();
         this.result = results.get( results.size() - 1 );
         groups = baySeqAnalysisHandler.getGroups();
-        cbm = new DefaultComboBoxModel<>( BaySeqAnalysisHandler.Plot.values() );
+        cbm = new DefaultComboBoxModel<>( BaySeqAnalysisHandler.Plot.getValues() );
         initComponents();
         iSymbol.setVisible( false );
         iSymbol.setToolTipText( org.openide.util.NbBundle.getMessage( BaySeqGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText" ) );

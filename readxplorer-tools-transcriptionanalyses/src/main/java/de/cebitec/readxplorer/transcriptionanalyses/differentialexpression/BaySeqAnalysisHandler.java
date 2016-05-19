@@ -24,6 +24,7 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeq.SamplesNotValidException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.utils.OsUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -32,6 +33,8 @@ import java.util.Set;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
+
+import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq2AnalysisHandler.Plot.MAplot;
 
 
 /**
@@ -50,7 +53,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
         Priors( "Priors" ),
         MACD( "\"MA\"-Plot for the count data" ),
         Posteriors( "Posterior likelihoods of differential expression against log-ratio" );
-        String representation;
+        private final String representation;
 
 
         Plot( String representation ) {
@@ -61,6 +64,15 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
         @Override
         public String toString() {
             return representation;
+        }
+
+
+        public static Plot[] getValues() {
+            if( OsUtils.isMac() ) {
+                return new Plot[]{};
+            } else {
+                return Plot.values();
+            }
         }
 
 
