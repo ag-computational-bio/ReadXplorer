@@ -246,8 +246,8 @@ public final class GnuR extends RConnection {
         GnuR instance;
         String host;
         int port;
-        boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
-        boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
+        boolean useStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
+        boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
         boolean useAuth = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_AUTH, false );
         File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
         if( cebitecIndicator.exists() ) {
@@ -257,10 +257,10 @@ public final class GnuR extends RConnection {
             }
             instance = new GnuR( ip, 6311, false, processingLog );
             instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
-        } else if( manualRemoteSetup || OsUtils.isMac()) {
+        } else if( remoteSetup || OsUtils.isMac()) {
             port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
             host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_HOST, "localhost" );
-            instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+            instance = new GnuR( host, port, false, processingLog );
             if( useAuth ) {
                 String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
                 String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
@@ -271,7 +271,7 @@ public final class GnuR extends RConnection {
             final Process rserveProcess;
             host = "localhost";
 
-            if( manualLocalSetup ) {
+            if( useStartupScript ) {
                 port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
                 if( !((OsUtils.isLinux() || OsUtils.isMac()) && (connectableInstanceRunning > 0)) ) {
                     File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
@@ -281,7 +281,7 @@ public final class GnuR extends RConnection {
                     rserveProcess = null;
                 }
                 if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
-                    instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+                    instance = new GnuR( host, port, !remoteSetup, processingLog );
                     if( useAuth ) {
                         String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
                         String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
@@ -327,7 +327,7 @@ public final class GnuR extends RConnection {
                     rserveProcess = null;
                 }
                 if( rserveProcess != null && rserveProcess.isAlive() ) {
-                    instance = new GnuR( host, port, !manualRemoteSetup, processingLog );
+                    instance = new GnuR( host, port, !remoteSetup, processingLog );
                     instance.login( user, password );
 //                        instance.setDefaultCranMirror();
                 } else {
