@@ -399,7 +399,7 @@ public final class GnuR extends RConnection {
 
     public static boolean gnuRSetupCorrect() {
         File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
-        if( cebitecIndicator.exists() || OsUtils.isMac() ) {
+        if( cebitecIndicator.exists() ) {
             return true;
         }
         boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );

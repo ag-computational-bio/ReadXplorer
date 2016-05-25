@@ -443,10 +443,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 manualButton.setEnabled( false );
                 cranMirror.setEnabled( false );
             } else if( OsUtils.isMac() ) {
-                messages.setText( "Only change these settings if you do not want to use the bundled GNU R installation." );
+                messages.setText( "Startup script and auto installation are not supported under OS X." );
                 autoButton.setEnabled( false );
                 startupScriptButton.setEnabled( false );
-                manualButtonSelected();
             } else {
                 messages.setText( "Auto installation is only supported under Windows 7, 8 & 10." );
                 autoButton.setEnabled( false );
@@ -857,9 +856,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 }
             } else if( OsUtils.isWindows() ) {
                 autoOrmanual.setSelected( autoButton.getModel(), true );
-            } else {
-                autoOrmanual.setSelected( manualButton.getModel(), true );
-                manualButtonSelected();
             }
         }
     }
