@@ -175,10 +175,8 @@
                     <licenseName>GPLv3</licenseName>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
-                    <installerOsWindows>false</installerOsWindows>
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerOsLinux>false</installerOsLinux>
-                    <installerPack200Enable>false</installerPack200Enable>
                     <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
                     <installDirName>${brandingToken}</installDirName>
                     <templateFile>${basedir}/installer/template.xml</templateFile>
@@ -187,6 +185,7 @@
                         <configuration.logic.file>${basedir}/installer/ConfigurationLogic.java</configuration.logic.file>
                         <nbi.stub.buildfile>${basedir}/installer/build.xml</nbi.stub.buildfile>
                     </userSettings>
+                    <installerOsMacosx>false</installerOsMacosx>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
