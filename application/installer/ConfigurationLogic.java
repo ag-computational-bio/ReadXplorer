@@ -217,7 +217,7 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
         File binDir = new File(target, "bin");
             for (File file : binDir.listFiles()) {
             try {
-                file.setExecutable(true);
+                file.setExecutable(true, false);
             } catch (Exception ex) { 
                 throw new InstallationException("Cannot set JRE binaries executable", ex);
             }
