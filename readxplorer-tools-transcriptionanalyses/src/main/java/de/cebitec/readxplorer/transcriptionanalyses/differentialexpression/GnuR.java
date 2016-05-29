@@ -64,7 +64,9 @@ public final class GnuR extends RConnection {
     /* Is there already a instance running that we can connect to? This is only
      * interesting for manual setup on Unix hosts.
      */
-    private static int connectableInstanceRunning = 0;
+    private static boolean isConnectableInstanceRunning = false;
+    
+    private static int numberOfActiveConnections = 0; 
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -153,13 +155,14 @@ public final class GnuR extends RConnection {
 
 
     @Override
-    public void shutdown() throws RserveException {
+    public synchronized void shutdown() throws RserveException {
         //If we started the RServe instace by our self we should also terminate it.
         //If we are connected to a remote server however we should not do so.
         if( runningLocal ) {
-            super.shutdown();
-            if( connectableInstanceRunning > 0 ) {
-                connectableInstanceRunning--;
+            numberOfActiveConnections--;
+            if(numberOfActiveConnections == 0){
+                isConnectableInstanceRunning = false;
+                super.shutdown();
             }
         }
     }
@@ -257,7 +260,7 @@ public final class GnuR extends RConnection {
             }
             instance = new GnuR( ip, 6311, false, processingLog );
             instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
-        } else if( remoteSetup || OsUtils.isMac()) {
+        } else if( remoteSetup || OsUtils.isMac() ) {
             port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
             host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_HOST, "localhost" );
             instance = new GnuR( host, port, false, processingLog );
@@ -273,22 +276,26 @@ public final class GnuR extends RConnection {
 
             if( useStartupScript ) {
                 port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
-                if( !((OsUtils.isLinux() || OsUtils.isMac()) && (connectableInstanceRunning > 0)) ) {
+                if( !(OsUtils.isLinux() && isConnectableInstanceRunning ) ) {
                     File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
                     rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
-                    connectableInstanceRunning++;
-                } else {
-                    rserveProcess = null;
+                    if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
+                        isConnectableInstanceRunning = true;
+                    } else {
+                        throw new IOException( "Could not start Rserve instance!" );
+                    }
                 }
-                if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
+
+                if( isConnectableInstanceRunning ) {
                     instance = new GnuR( host, port, !remoteSetup, processingLog );
                     if( useAuth ) {
                         String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
                         String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
                         instance.login( user, password );
                     }
+                    numberOfActiveConnections++;
                 } else {
-                    throw new IOException( "Could not start Rserve instance!" );
+                    throw new IOException( "Could not log into running RServe instance!" );
                 }
             } else {
                 port = nextFreePort++;
