@@ -74,7 +74,7 @@ public class GeneralSettingsWizardPanel extends ChangeListeningWizardPanel imple
         super.readSettings( wiz );
         genomeID = (Integer) wiz.getProperty( "genomeID" );
         tool = (Tool) wiz.getProperty( PROP_DGE_TOOL );
-        getComponent().enableSaveRCmd( tool != Tool.ExpressTest );
+        getComponent().enableSaveRCmd( tool != Tool.ExpressTest && tool != Tool.ExportCountTable );
 
         boolean storeRCmd = getPref().getBoolean( PROP_DGE_WIZARD_NAME + PROP_DGE_SAVE_R_CMD, false );
         String startOffset = getPref().get( PROP_DGE_WIZARD_NAME + PROP_DGE_START_OFFSET, "0" );

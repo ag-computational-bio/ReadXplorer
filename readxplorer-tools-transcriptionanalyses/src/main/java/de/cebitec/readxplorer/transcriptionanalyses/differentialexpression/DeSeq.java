@@ -99,12 +99,6 @@ public class DeSeq {
             }
             concatenate.deleteCharAt( concatenate.length() - 1 );
 
-            if( saveFile != null ) {
-                String path = saveFile.getAbsolutePath();
-                path = path.replace( "\\", "\\\\" );
-                gnuR.eval( "save.image(\"" + path + "\")" );
-            }
-
             if( analysisData.moreThanTwoConditions() ) {
                 //The individual variables are then used to create the design element
                 gnuR.eval( "design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ')' );
@@ -231,11 +225,11 @@ public class DeSeq {
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
                                                    "Significant results sorted by the most strongly up regulated genes", analysisData ) );
             }
+            
             if( saveFile != null ) {
-                String path = saveFile.getAbsolutePath();
-                path = path.replace( "\\", "\\\\" );
-                gnuR.eval( "save.image(\"" + path + "\")" );
+                gnuR.saveDataToFile( saveFile );
             }
+            
         } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
             //The new generated exception can than be caught an handelt by the DeAnalysisHandler
             //If something goes wrong try to shutdown Rserve so that no instance keeps running
