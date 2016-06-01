@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.utils.OsUtils;
 import de.cebitec.readxplorer.utils.PasswordStore;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,6 +48,7 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RFileInputStream;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +67,8 @@ public final class GnuR extends RConnection {
      * interesting for manual setup on Unix hosts.
      */
     private static boolean isConnectableInstanceRunning = false;
-    
-    private static int numberOfActiveConnections = 0; 
+
+    private static int numberOfActiveConnections = 0;
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -100,10 +102,29 @@ public final class GnuR extends RConnection {
      * <p>
      * @param saveFile File the memory image should be saved to
      */
-    public void saveDataToFile( File saveFile ) throws RserveException {
-        String path = saveFile.getAbsolutePath();
-        path = path.replace( "\\", "/" );
-        this.eval( "save.image(\"" + path + "\")" );
+    public void saveDataToFile( File saveFile ) throws RserveException, REXPMismatchException, IOException {
+
+        if( runningLocal ) {
+            String path = saveFile.getAbsolutePath();
+            path = path.replace( "\\", "/" );
+            this.eval( "save.image(\"" + path + "\")" );
+        } else {
+            byte[] b = new byte[8192];
+            this.eval( "tmpFile <- tempfile(pattern =\"ReadXplorer_data_\", tmpdir = tempdir(), fileext =\".rdata\")" );
+            this.eval( "save.image(tmpFile)" );
+            String tmpFilePath = this.eval( "tmpFile" ).asString();
+            RFileInputStream input;
+            try (BufferedOutputStream output = new BufferedOutputStream( new FileOutputStream( saveFile ) )) {
+                input = this.openFile( tmpFilePath );
+                int c = input.read( b );
+                while( c >= 0 ) {
+                    output.write( b, 0, c );
+                    c = input.read( b );
+                }
+            }
+            input.close();
+            this.eval( "unlink(tmpFile)" );
+        }
     }
 
 
@@ -160,7 +181,7 @@ public final class GnuR extends RConnection {
         //If we are connected to a remote server however we should not do so.
         if( runningLocal ) {
             numberOfActiveConnections--;
-            if(numberOfActiveConnections == 0){
+            if( numberOfActiveConnections == 0 ) {
                 isConnectableInstanceRunning = false;
                 super.shutdown();
             }
@@ -276,7 +297,7 @@ public final class GnuR extends RConnection {
 
             if( useStartupScript ) {
                 port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
-                if( !(OsUtils.isLinux() && isConnectableInstanceRunning ) ) {
+                if( !(OsUtils.isLinux() && isConnectableInstanceRunning) ) {
                     File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
                     rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
                     if( rserveProcess != null && (rserveProcess.exitValue() == 0) ) {
