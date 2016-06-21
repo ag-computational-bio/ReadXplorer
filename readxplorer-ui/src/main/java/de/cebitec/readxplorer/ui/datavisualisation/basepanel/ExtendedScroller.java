@@ -35,16 +35,20 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
 
     private static final long serialVersionUID = 7416234;
 
+    private static final int BLOCK_INCREMENT = 1000;
+    private static final int UNIT_INCREMENT = 10;
     private int currentValue;
+    private int currentZoomValue;
     private final List<AdjustmentPanelListenerI> listeners;
 
 
     public ExtendedScroller( int min, int max, int init ) {
         super( JSlider.HORIZONTAL, init, 0, min, max );
-        this.setBlockIncrement( 1000 );
-        this.setUnitIncrement( 10 );
+        setBlockIncrement( BLOCK_INCREMENT );
+        setUnitIncrement( UNIT_INCREMENT );
 
-        this.currentValue = init;
+        currentValue = init;
+        currentZoomValue = 1;
         listeners = new ArrayList<>();
         this.addAdjustmentListener( new AdjustmentListener() {
 
@@ -100,7 +104,9 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
 
     @Override
     public void setCurrentZoomValue( int value ) {
-
+        currentZoomValue = value;
+        setBlockIncrement( BLOCK_INCREMENT * currentZoomValue / 10 );
+        setUnitIncrement( UNIT_INCREMENT * currentZoomValue / 10 );
     }
 
 

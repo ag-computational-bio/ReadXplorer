@@ -119,6 +119,7 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator {
     public void setCurrentZoomValue( int value ) {
         if( slider != null ) {
             slider.setCurrentZoomValue( value );
+            scrollbar.setCurrentZoomValue( value );
         }
     }
 
