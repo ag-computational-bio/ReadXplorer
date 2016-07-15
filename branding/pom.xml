@@ -6,12 +6,12 @@
     <parent>
         <groupId>bio.comp.jlu.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
-        <version>2.2.2-FINAL</version>
+        <version>2.2.3-FINAL</version>
     </parent>
 
 
     <artifactId>readxplorer-branding</artifactId>
-    <version>2.2.2-FINAL</version>
+    <version>2.2.3-FINAL</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Branding</name>
 

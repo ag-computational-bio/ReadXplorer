@@ -165,13 +165,13 @@
             <if property="platform" value="linux">
                 <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
                    target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-x64.${bundle.extention}">
-                    <component uid="${main.product.uid}" version="2.2.2.0.0"/>
+                    <component uid="${main.product.uid}" version="2.2.3.0.0"/>
                     <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Dropbox\jre\jre1.8.0_73-linux-x64.bin"/>
                 </create-bundle>
                 
                 <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
                    target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-i386.${bundle.extention}">
-                    <component uid="${main.product.uid}" version="2.2.2.0.0"/>
+                    <component uid="${main.product.uid}" version="2.2.3.0.0"/>
                     <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Dropbox\jre\jre1.8.0_73-linux-i386.bin"/>
                 </create-bundle>
             </if>
@@ -190,13 +190,13 @@
             <if property="platform" value="windows">
                 <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
                                target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-x64.${bundle.extention}">
-                    <component uid="${main.product.uid}" version="2.2.2.0.0"/>
+                    <component uid="${main.product.uid}" version="2.2.3.0.0"/>
                     <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Dropbox\jre\JRE_1.8.0_73_x64.exe"/>
                 </create-bundle>
                 
                 <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
                                                target="${bundles.release.dir}/${bundle.files.prefix}-${platform}-i386.${bundle.extention}">
-                    <component uid="${main.product.uid}" version="2.2.2.0.0"/>
+                    <component uid="${main.product.uid}" version="2.2.3.0.0"/>
                     <property name="nbi.bundled.jvm.file" value="C:\Users\Kai\Dropbox\jre\JRE_1.8.0_73_i386.exe"/>
                 </create-bundle>
             </if>
@@ -205,7 +205,7 @@
             <if property="platform" value="macosx">
                 <create-bundle root="${output.dir}/registry-temp" platform="${platform}"
                                target="${bundles.release.dir}/${bundle.files.prefix}-${platform}.${bundle.extention}">
-                    <component uid="${main.product.uid}" version="2.2.2.0.0"/>
+                    <component uid="${main.product.uid}" version="2.2.3.0.0"/>
                     <!--property name="nbi.bundled.jvm.file" value="/Users/kstadermann/NetBeansProjects/readxplorer/jre"/-->
                 </create-bundle>
             </if>
