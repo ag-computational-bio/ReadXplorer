@@ -46,7 +46,8 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
     public static enum Plot {
 
         DispEsts( "Per gene estimates against normalized mean expression" ),
-        HIST( "Histogram of p values" ),
+        HIST( "Histogram of p-values" ),
+        PADJ_HIST( "Histogram of adjusted p-values" ),
         MAplot( "MA Plot" );
         private final String representation;
 
@@ -115,6 +116,9 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         }
         if( plot == Plot.HIST ) {
             deSeq2.plotHist( file );
+        }
+        if( plot == Plot.PADJ_HIST ) {
+            deSeq2.plotPadjHist( file );
         }
         if( plot == Plot.MAplot ) {
             deSeq2.plotMA( file );

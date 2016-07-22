@@ -122,7 +122,7 @@ public class DeSeq2 {
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );
             }
-            
+
         } catch( Exception e ) {
             //We don't know what errors Gnu R might cause, so we have to catch all.
             //The newly generated exception can than be caught and handelt by the DeAnalysisHandler
@@ -165,10 +165,18 @@ public class DeSeq2 {
                                              RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
-    
-    public void plotMA( File file ) throws IllegalStateException, PackageNotLoadableException,
+
+
+    public void plotPadjHist( File file ) throws IllegalStateException, PackageNotLoadableException,
                                              RserveException, REngineException, REXPMismatchException, IOException {
+        gnuR.storePlot( file, "hist(res$padj, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
+    }
+
+
+    public void plotMA( File file ) throws IllegalStateException, PackageNotLoadableException,
+                                           RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "plotMA(res, main=\"\")" );
     }
-    
+
+
 }
