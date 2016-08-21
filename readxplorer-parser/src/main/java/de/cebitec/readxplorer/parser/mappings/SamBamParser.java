@@ -203,6 +203,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
         final File fileSortedByReadName = trackJob.getFile(); //sorted by read NAME bam file
         final long startTime = System.currentTimeMillis();
+        long lastTime = startTime;
         this.notifyObservers( Bundle.Parser_Parsing_Start( fileSortedByReadName.getName() ) );
 
 
@@ -282,9 +283,12 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
 
-                if( lineno % 500000 == 0 ) {
+                if( lineno % 10000 == 0 ) {
                     long finish = System.currentTimeMillis();
-                    this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
+                    if( finish - lastTime > 60000 || lineno % 500000 == 0 ) {
+                        notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
+                        lastTime = finish;
+                    }
                 }
                 System.err.flush();
             }

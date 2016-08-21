@@ -190,6 +190,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
         File oldWorkFile = trackJob.getFile();
 
         long startTime = System.currentTimeMillis();
+        long lastTime = startTime;
         long finish;
         this.notifyObservers( Bundle.Classifier_Classification_Start() );
 
@@ -273,9 +274,12 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
 
-                if( lineNo % 500000 == 0 ) {
+                if( lineNo % 10000 == 0 ) {
                     finish = System.currentTimeMillis();
-                    notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " mappings processed in " ) );
+                    if( finish - lastTime > 60000 || lineNo % 500000 == 0 ) {
+                        notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " mappings processed in " ) );
+                        lastTime = finish;
+                    }
                 }
                 System.err.flush();
             }
