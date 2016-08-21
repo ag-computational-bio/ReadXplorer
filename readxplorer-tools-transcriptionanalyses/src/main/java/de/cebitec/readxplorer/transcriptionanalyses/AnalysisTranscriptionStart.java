@@ -161,10 +161,10 @@ public class AnalysisTranscriptionStart implements Observer,
             } else {
                 calcInitialReadStartThreshold( genomeLength );
             }
+            
+            //the minimal increase is initially set to 10%, if the coverage distributions were not calculated yet
+            parametersTSS.setMinPercentIncrease( calcCoverageDistributions ? 10 : parametersTSS.getMinPercentIncrease() );
         }
-
-        //the minimal increase is initially set to 10%, if the coverage distributions were not calculated yet
-        parametersTSS.setMinPercentIncrease( calcCoverageDistributions ? 10 : parametersTSS.getMinPercentIncrease() );
     }
 
 
