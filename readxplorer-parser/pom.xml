@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-parser</artifactId>
-    <version>1.2.1-FINAL</version>
+    <version>1.2.2-FINAL</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Parser</name>
 
