@@ -64,7 +64,7 @@ public class TssAssociater implements TssLinker {
     public final void linkTss(TranscriptionStart previousTss, int prevTssIdx, TranscriptionStart tss) {
         
         while (previousTss.getPos() + parametersTSS.getAssociateTssWindow() >= tss.getPos() && prevTssIdx > 0 ) {
-            if (previousTss.isFwdStrand() == tss.isFwdStrand()) {
+            if ( previousTss.isFwdStrand() == tss.isFwdStrand() && previousTss.getChromId() == tss.getChromId() ) {
 
                 int noReadStartsLastStart = previousTss.getReadStartsAtPos();
                 int noReadStartsTSS = tss.getReadStartsAtPos();

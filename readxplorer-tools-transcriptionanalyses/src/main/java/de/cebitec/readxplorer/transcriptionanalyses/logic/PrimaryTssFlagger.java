@@ -48,7 +48,8 @@ public class PrimaryTssFlagger implements TssLinker {
      */
     @Override
     public final void linkTss(TranscriptionStart previousTss, int prevTssIdx, TranscriptionStart tss) {
-        if (previousTss.getPos() + parametersTSS.getMaxFeatureDistance() >= tss.getPos()
+        if (previousTss.getChromId() == tss.getChromId() 
+                && previousTss.getPos() + parametersTSS.getMaxFeatureDistance() >= tss.getPos()
                 && previousTss.isFwdStrand() == tss.isFwdStrand()) {
 
 //            int coverageIncreaseLast = lastDetectedStart.getPercentIncrease();

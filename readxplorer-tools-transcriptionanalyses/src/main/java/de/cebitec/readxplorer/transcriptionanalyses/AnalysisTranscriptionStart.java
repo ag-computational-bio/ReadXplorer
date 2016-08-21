@@ -626,7 +626,7 @@ public class AnalysisTranscriptionStart implements Observer,
             TranscriptionStart tss = detectedStarts.get( tssIdx );
             int prevTssIdx = tssIdx - 1;
             TranscriptionStart previousTss = this.detectedStarts.get( prevTssIdx );
-            while( previousTss.isFwdStrand() != tss.isFwdStrand() && prevTssIdx > 0 ) {
+            while( previousTss.isFwdStrand() != tss.isFwdStrand() && previousTss.getChromId() != tss.getChromId() && prevTssIdx > 0 ) {
                 previousTss = this.detectedStarts.get( --prevTssIdx );
             }
 
