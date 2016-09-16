@@ -11,7 +11,7 @@
 
 
     <artifactId>readxplorer-tools-transcriptionanalyses</artifactId>
-    <version>1.3.2-FINAL</version>
+    <version>1.3.3-FINAL</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - Tools - TranscriptionAnalyses</name>
 
