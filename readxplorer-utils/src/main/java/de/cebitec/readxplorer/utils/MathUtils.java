@@ -50,7 +50,7 @@ public final class MathUtils {
             int indexInt = (int) Math.floor( quantileIndex );
             quantileValue = 0.5 * (list.get( indexInt ) + list.get( indexInt + 1 ));
         } else {
-            quantileValue = list.get( (int) Math.ceil( quantileIndex ) );
+            quantileValue = list.get( (int) Math.floor( quantileIndex ) );
         }
         return quantileValue;
     }
