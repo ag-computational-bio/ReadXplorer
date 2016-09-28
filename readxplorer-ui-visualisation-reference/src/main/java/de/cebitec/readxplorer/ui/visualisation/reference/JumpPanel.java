@@ -385,9 +385,11 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 }//GEN-LAST:event_jumpTextfieldKeyTyped
 
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
-        if( GeneralUtils.isValidPositionInput( this.jumpTextfield.getText(), refGenome.getActiveChromLength() ) ) {
-            this.jumpPosition = Integer.parseInt( this.jumpTextfield.getText().trim() );
-            this.boundsManager.navigatorBarUpdated( this.jumpPosition );
+        String position = jumpTextfield.getText().replaceAll( "\\s", "" );
+        jumpTextfield.setText( position );
+        if( GeneralUtils.isValidPositionInput( position, refGenome.getActiveChromLength() ) ) {
+            jumpPosition = Integer.parseInt( position );
+            boundsManager.navigatorBarUpdated( jumpPosition );
         } else {
             JOptionPane.showMessageDialog( this, "Please enter a valid position! (1-" +
                                             refGenome.getActiveChromLength() +
@@ -421,7 +423,8 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
     private void searchPatternButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternButtonActionPerformed
 
-        String pattern = this.searchPatternField.getText();
+        String pattern = searchPatternField.getText().replaceAll( "\\s", "" );
+        searchPatternField.setText( pattern );
 //        if (SequenceUtils.isValidDnaString(pattern)) {
         int newPos;
 
@@ -578,23 +581,23 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
     }
 
-    /*
+    /**
      * Uses regular expression to filter all matching entries in Feature,
      * Product- or EC-Column.
      */
-
     private void updateFilter() {
         RowFilter<TableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
+            String search = filterTextfield.getText().replaceAll( "\\s", "" );
             if( radioFeatureButton.isSelected() ) {
-                rf = RowFilter.regexFilter( filterTextfield.getText(), 0 );
+                rf = RowFilter.regexFilter( search, 0 );
             } else if( radioGene.isSelected() ) {
-                rf = RowFilter.regexFilter( filterTextfield.getText(), 2 );
+                rf = RowFilter.regexFilter( search, 2 );
             } else if( radioProduct.isSelected() ) {
-                rf = RowFilter.regexFilter( filterTextfield.getText(), 3 );
+                rf = RowFilter.regexFilter( search, 3 );
             } else if( radioEC.isSelected() ) {
-                rf = RowFilter.regexFilter( filterTextfield.getText(), 4 );
+                rf = RowFilter.regexFilter( search, 4 );
             }
 
         } catch( java.util.regex.PatternSyntaxException e ) {
