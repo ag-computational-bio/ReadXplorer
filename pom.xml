@@ -48,6 +48,9 @@
         <module>readxplorer-libs-h2</module>
         <module>readxplorer-libs-jfreechart</module>
         <module>lib.batik</module>
+        <module>lib.geneticcodes</module>
+        <module>lib.parser.fasta</module>
+        <module>lib.utilities</module>
     </modules>
 
 
