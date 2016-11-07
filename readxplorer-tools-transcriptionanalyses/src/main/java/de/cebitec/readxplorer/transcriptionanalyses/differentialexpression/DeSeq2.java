@@ -175,7 +175,7 @@ public class DeSeq2 {
 
     public void plotMA( File file ) throws IllegalStateException, PackageNotLoadableException,
                                            RserveException, REngineException, REXPMismatchException, IOException {
-        gnuR.storePlot( file, "plotMA(res, main=\"\")" );
+        gnuR.storePlot( file, "plotMA(dds, alpha=0.1, main=\"\")" );
     }
 
 
