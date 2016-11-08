@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 pblumenk
+ * Copyright (C) 2016 Patrick Blumenkamp <patrick.blumenkamp at computational.bio.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPEnvironment;
 import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngine;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
@@ -41,7 +39,8 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author pblumenk
+ * @author Patrick Blumenkamp
+ * <patrick.blumenkamp at computational.bio.uni-giessen.de>
  */
 public class GnuRTest {
 
