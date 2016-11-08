@@ -196,6 +196,15 @@ public final class GnuR extends RConnection {
     }
 
 
+    /**
+     * Not usable now! RConnector.eval(REXP what, REXP where, boolean resolve) always returns REXPNull.
+     * 
+     * @param what
+     * @param where
+     * @param resolve
+     * @return
+     * @throws REngineException 
+     */
     @Override
     public REXP eval( REXP what, REXP where, boolean resolve ) throws REngineException {
 
@@ -209,12 +218,20 @@ public final class GnuR extends RConnection {
     }
 
 
+    //Always assigns ct as String!
     @Override
     public void assign( String sym, String ct ) throws RserveException {
         super.assign( sym, ct );
     }
 
 
+    /**
+     * Warning! Rserve does not support environments other than .GlobalEnv. Only valid value for env is null.
+     * @param symbol
+     * @param value
+     * @param env Must be null for not throwing an exception.
+     * @throws REngineException 
+     */
     @Override
     public void assign( String symbol, REXP value, REXP env ) throws REngineException {
         super.assign( symbol, value, env );

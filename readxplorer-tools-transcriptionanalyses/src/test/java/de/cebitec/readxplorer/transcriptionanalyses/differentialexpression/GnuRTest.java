@@ -19,8 +19,10 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -28,7 +30,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPEnvironment;
 import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngine;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 import static org.junit.Assert.*;
@@ -54,7 +59,7 @@ public class GnuRTest {
             Constructor<GnuR> constructor;
             constructor = GnuR.class.getDeclaredConstructor( String.class, int.class, boolean.class, ProcessingLog.class );
             constructor.setAccessible( true );
-            instance = constructor.newInstance( "localhost", 6311, false, new ProcessingLog() );
+            instance = constructor.newInstance( "localhost", 6311, true, new ProcessingLog() );
         } catch( SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException ex ) {
             Exceptions.printStackTrace( ex );
         }
@@ -98,7 +103,13 @@ public class GnuRTest {
 
 
     /**
-     * Test of loadPackage method, of class GnuR, with existing basic package "tool".
+     * Test of loadPackage method, of class GnuR, with existing basic package
+     * "tool".
+     *
+     * @throws
+     * de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
     public void testLoadExististingPackage() throws PackageNotLoadableException, RserveException, REXPMismatchException {
@@ -114,6 +125,9 @@ public class GnuRTest {
 
     /**
      * Test of loadPackage method, of class GnuR, with non-existing package.
+     *
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
     public void testLoadNonExististingPackage() throws RserveException, REXPMismatchException {
@@ -124,24 +138,153 @@ public class GnuRTest {
         } catch( PackageNotLoadableException ex ) {
             exceptionThrown = true;
         }
+        assertTrue( "Loading unknown package should throw a PackageNotLoadableException", exceptionThrown );
+
         REXP packagesAfter = instance.eval( "search()" );
-        assertEquals( "Package list shouldn't increase", packagesBefore.asStrings().length, packagesAfter.asStrings().length );
-        assertTrue( exceptionThrown );
+        assertEquals( "Package list should not increase", packagesBefore.asStrings().length, packagesAfter.asStrings().length );
+
     }
 
-//
-//    /**
-//     * Test of saveDataToFile method, of class GnuR.
-//     */
-//    @Test
-//    public void testSaveDataToFile() throws Exception {
-//        System.out.println( "saveDataToFile" );
-//        File saveFile = null;
-//        GnuR instance = null;
-//        instance.saveDataToFile( saveFile );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
+
+    /**
+     * Test of eval method, of class GnuR.
+     *
+     * @throws org.rosuda.REngine.REXPMismatchException
+     */
+    @Test
+    public void testEval_String() throws REXPMismatchException {
+        String cmd = "a <- 10 + 20";
+        REXP result = null;
+        try {
+            result = instance.eval( cmd );
+        } catch( RserveException ex ) {
+            fail( "Rserve could not evaluate \"" + cmd + "\"" );
+        }
+        assertEquals( "Result should be 30", 30, result.asInteger() );
+
+        cmd = "5 <|> 1";
+        boolean exceptionThrown = false;
+        try {
+            result = instance.eval( cmd );
+        } catch( RserveException ex ) {
+            exceptionThrown = true;
+        }
+        assertTrue( "eval() with unknown expression should throw an RserveException", exceptionThrown );
+    }
+
+
+    /**
+     * Test of assign method, of class GnuR.
+     *
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     * @throws org.rosuda.REngine.REXPMismatchException
+     */
+    @Test
+    public void testAssign_String_REXP() throws RserveException, REXPMismatchException {
+        instance.clearGnuR();
+        REXP list = instance.eval( "ls()" );
+        assertEquals( "R environment should be empty", 0, list.asStrings().length );
+        REXP value = instance.eval( "10" );
+        instance.assign( "a", value );
+        list = instance.eval( "ls()" );
+        assertEquals( "R environment should only contain one variable", 1, list.asStrings().length );
+        REXP valueOfA = instance.eval( "a" );
+        assertEquals( "a should contain the value 10", value.asInteger(), valueOfA.asInteger() );
+        instance.clearGnuR();
+    }
+
+
+    /**
+     * Test of assign method, of class GnuR.
+     *
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     * @throws org.rosuda.REngine.REXPMismatchException
+     */
+    @Test
+    public void testAssign_String_String() throws RserveException, REXPMismatchException {
+        instance.clearGnuR();
+        REXP list = instance.eval( "ls()" );
+        assertEquals( "R environment should be empty", 0, list.asStrings().length );
+        String value = "10";
+        instance.assign( "a", value );
+        list = instance.eval( "ls()" );
+        assertEquals( "R environment should only contain one variable", 1, list.asStrings().length );
+        REXP valueOfA = instance.eval( "a" );
+        assertEquals( "a should contain the string \"10\"", value, valueOfA.asString() );
+        assertTrue( "Value must be a string and no numerical", !valueOfA.isNumeric() && valueOfA.isString() );
+        instance.clearGnuR();
+    }
+
+
+    /**
+     * Test of assign method, of class GnuR.
+     *
+     * @throws org.rosuda.REngine.REngineException
+     * @throws org.rosuda.REngine.REXPMismatchException
+     */
+    @Test
+    public void testAssign_3args() throws REngineException, REXPMismatchException {
+        instance.clearGnuR();
+        REXP list = instance.eval( "ls()" );
+        assertEquals( "R environment should be empty", 0, list.asStrings().length );
+        REXP value = instance.eval( "10" );
+        instance.assign( "a", value, null );
+        list = instance.eval( "ls()" );
+        assertEquals( "R environment should only contain one variable", 1, list.asStrings().length );
+        REXP valueOfA = instance.eval( "a" );
+        assertEquals( "a should contain the value 10", value.asInteger(), valueOfA.asInteger() );
+        instance.clearGnuR();
+        boolean exceptionThrown = false;
+        try {
+            REXP newEnvironment = instance.newEnvironment( null, false );
+        } catch( REngineException ex ) {
+            exceptionThrown = true;
+        }
+        assertTrue( "RConnection does not support environments at the moment", exceptionThrown );
+    }
+
+
+    /**
+     * Test of storePlot method, of class GnuR.
+     *
+     * @throws java.io.IOException
+     * @throws
+     * de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException
+     * @throws org.rosuda.REngine.REngineException
+     * @throws org.rosuda.REngine.REXPMismatchException
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     */
+    @Test
+    public void testStorePlot() throws IOException, PackageNotLoadableException, IllegalStateException, REngineException, RserveException, REXPMismatchException {
+        File tmpPlot = File.createTempFile( "GnuR-Test-StorePlot", ".svg" );
+        long filesizeBefore = tmpPlot.length();
+        instance.storePlot( tmpPlot, "plot(c(1,2,3,4))" );
+        long filesizeAfter = tmpPlot.length();
+        assertTrue( "File must be larger after writing plot into it", filesizeAfter > filesizeBefore );
+        Files.delete( tmpPlot.toPath() );
+    }
+
+
+    /**
+     * Test of saveDataToFile method, of class GnuR.
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     * @throws java.io.IOException
+     * @throws org.rosuda.REngine.REXPMismatchException
+     */
+    @Test
+    public void testSaveDataToFile() throws RserveException, IOException, REXPMismatchException{
+        File tmpSave = File.createTempFile( "GnuR-Test-SaveDataToFile", ".RData" );
+        long filesizeBefore = tmpSave.length();
+        instance.assign( "a", "abc" );
+        instance.assign( "b", "def" );
+        instance.assign( "c", "ghi" );
+        instance.assign( "d", "jkl" );
+        instance.saveDataToFile( tmpSave );
+        long filesizeAfter = tmpSave.length();
+        assertTrue( "File must be larger after writing image into it", filesizeAfter > filesizeBefore );
+        Files.delete( tmpSave.toPath() );
+        instance.clearGnuR();
+    }
 //
 //
 //
@@ -159,99 +302,8 @@ public class GnuRTest {
 //    }
 //
 //
-//    /**
-//     * Test of eval method, of class GnuR.
-//     */
-//    @Test
-//    public void testEval_String() throws Exception {
-//        System.out.println( "eval" );
-//        String cmd = "";
-//        GnuR instance = null;
-//        REXP expResult = null;
-//        REXP result = instance.eval( cmd );
-//        assertEquals( expResult, result );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
 //
 //
-//    /**
-//     * Test of eval method, of class GnuR.
-//     */
-//    @Test
-//    public void testEval_3args() throws Exception {
-//        System.out.println( "eval" );
-//        REXP what = null;
-//        REXP where = null;
-//        boolean resolve = false;
-//        GnuR instance = null;
-//        REXP expResult = null;
-//        REXP result = instance.eval( what, where, resolve );
-//        assertEquals( expResult, result );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
-//
-//
-//    /**
-//     * Test of assign method, of class GnuR.
-//     */
-//    @Test
-//    public void testAssign_String_REXP() throws Exception {
-//        System.out.println( "assign" );
-//        String sym = "";
-//        REXP rexp = null;
-//        GnuR instance = null;
-//        instance.assign( sym, rexp );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
-//
-//
-//    /**
-//     * Test of assign method, of class GnuR.
-//     */
-//    @Test
-//    public void testAssign_String_String() throws Exception {
-//        System.out.println( "assign" );
-//        String sym = "";
-//        String ct = "";
-//        GnuR instance = null;
-//        instance.assign( sym, ct );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
-//
-//
-//    /**
-//     * Test of assign method, of class GnuR.
-//     */
-//    @Test
-//    public void testAssign_3args() throws Exception {
-//        System.out.println( "assign" );
-//        String symbol = "";
-//        REXP value = null;
-//        REXP env = null;
-//        GnuR instance = null;
-//        instance.assign( symbol, value, env );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
-//
-//
-//    /**
-//     * Test of storePlot method, of class GnuR.
-//     */
-//    @Test
-//    public void testStorePlot() throws Exception {
-//        System.out.println( "storePlot" );
-//        File file = null;
-//        String plotIdentifier = "";
-//        GnuR instance = null;
-//        instance.storePlot( file, plotIdentifier );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
 //
 //
 //    /**
@@ -281,5 +333,6 @@ public class GnuRTest {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail( "The test case is a prototype." );
 //    }
+
 
 }
