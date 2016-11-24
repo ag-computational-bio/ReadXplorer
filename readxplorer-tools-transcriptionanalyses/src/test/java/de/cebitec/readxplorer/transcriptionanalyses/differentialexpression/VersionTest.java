@@ -19,7 +19,11 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 
 
 /**
@@ -61,7 +65,7 @@ public class VersionTest {
         } catch( IllegalArgumentException ex ) {
             exceptionThrown = true;
         }
-        assertTrue( exceptionThrown );        
+        assertTrue( exceptionThrown );
     }
 
 
@@ -70,18 +74,21 @@ public class VersionTest {
      */
     @Test
     public void testCompareTo() {
-        Version programA = new Version( "1.0.1" );        
+        Version programA = new Version( "1.0.1" );
         Version programB = new Version( "1.0.1-alpha.1" );
         Version programC = new Version( "1.0.1+exp.sha.5114f85" );
         Version programD = new Version( "1.0.0-alpha+001-002" );
         Version programE = new Version( "1.0.0-beta+001-002" );
         Version programF = new Version( "1.0.1-rc.1" );
-        
-        assertEquals("Only differ in metadata", 0, programA.compareTo( programC));
-        assertEquals("Pre-release is older than actual release", 1, programA.compareTo( programB));
-        assertEquals("Comparison of simple version number with complex one", -1, programD.compareTo( programA ));
-        assertEquals("Compare two pre-releases", 1, programF.compareTo( programB ));
-        assertEquals("Comparison of two complex version numbers", -1, programD.compareTo( programE ));
+        Version program0 = new Version( "0" );
+        Version programMinimal = new Version("0.0.0.1");
+
+        assertEquals( "Only differ in metadata", 0, programA.compareTo( programC ) );
+        assertEquals( "Pre-release is older than actual release", 1, programA.compareTo( programB ) );
+        assertEquals( "Comparison of simple version number with complex one", -1, programD.compareTo( programA ) );
+        assertEquals( "Compare two pre-releases", 1, programF.compareTo( programB ) );
+        assertEquals( "Comparison of two complex version numbers", -1, programD.compareTo( programE ) );
+        assertEquals( "Version \"0\" should be smaller than any other version", -1, program0.compareTo( programMinimal));
     }
 
 
@@ -96,8 +103,8 @@ public class VersionTest {
         Version programD = new Version( "1.0.1-alpha.1" );
         Version programE = new Version( "1.0.1+exp.sha.5114f85" );
         Version programF = new Version( "1.0.1+exp.sha.5354354" );
-        assertEquals( programA, programA);
-        assertFalse(programA.equals( programB));
+        assertEquals( programA, programA );
+        assertFalse( programA.equals( programB ) );
         assertEquals( programE, programA );
         assertEquals( programD, programC );
         assertEquals( programE, programF );

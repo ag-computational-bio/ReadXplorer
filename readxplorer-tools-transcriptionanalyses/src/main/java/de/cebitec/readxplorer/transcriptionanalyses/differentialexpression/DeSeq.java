@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import org.openide.util.lookup.ServiceProvider;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
@@ -40,14 +41,23 @@ import org.slf4j.LoggerFactory;
  *
  * @author kstaderm
  */
-public class DeSeq {
+@ServiceProvider( service = RProcessI.class )
+public class DeSeq implements RProcessI {
 
     private GnuR gnuR;
 
     private static final Logger LOG = LoggerFactory.getLogger( DeSeq.class.getName() );
 
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq" ) };
+
 
     public DeSeq() {
+    }
+
+
+    @Override
+    public RPackageDependency[] getDependencies() {
+        return dependencies;
     }
 
 
@@ -57,11 +67,11 @@ public class DeSeq {
         gnuR = GnuR.startRServe( analysisData.getProcessingLog() );
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.info( "{0}: GNU R is processing data.", currentTimestamp );
-        gnuR.loadPackage( "DESeq" );
         final List<ResultDeAnalysis> results = new ArrayList<>();
-        //A lot of bad things can happen during the data processing by Gnu R.
-        //So we need to prepare for this.
         try {
+            gnuR.loadPackage( "DESeq" );
+            //A lot of bad things can happen during the data processing by Gnu R.
+            //So we need to prepare for this.
             //Create the plotting functions as they are not part of the DESeq package
             createPlotFunctions();
 
@@ -225,12 +235,12 @@ public class DeSeq {
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
                                                    "Significant results sorted by the most strongly up regulated genes", analysisData ) );
             }
-            
+
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );
             }
-            
-        } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
+
+        } catch( IOException | REXPMismatchException | REngineException e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
             //The new generated exception can than be caught an handelt by the DeAnalysisHandler
             //If something goes wrong try to shutdown Rserve so that no instance keeps running
             this.shutdown();

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import org.openide.util.lookup.ServiceProvider;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
@@ -40,7 +41,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author kstaderm
  */
-public class BaySeq {
+@ServiceProvider( service = RProcessI.class )
+public class BaySeq implements RProcessI {
 
     private GnuR gnuR;
     /*
@@ -52,8 +54,16 @@ public class BaySeq {
 
     private static final Logger LOG = LoggerFactory.getLogger( BaySeq.class.getName() );
 
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "baySeq" ), new RPackageDependency( "snow" ), new RPackageDependency( "parallel" ) };
+
 
     public BaySeq() {
+    }
+
+
+    @Override
+    public RPackageDependency[] getDependencies() {
+        return dependencies;
     }
 
 
@@ -85,30 +95,30 @@ public class BaySeq {
         gnuR = GnuR.startRServe( bseqData.getProcessingLog() );
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.info( "{0}: GNU R is processing data.", currentTimestamp );
-        gnuR.loadPackage( "baySeq" );
-        //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
-        //computation will speed up a little bit but still leave you at least one core
-        //for your other work.
-        if( gnuR.runningLocal ) {
-            gnuR.loadPackage( "snow" );
-            gnuR.loadPackage( "parallel" );
-            int processors = Runtime.getRuntime().availableProcessors();
-            if( processors > MAX_PROCESSORS ) {
-                processors = MAX_PROCESSORS;
-            }
-            if( processors > 1 ) {
-                processors--;
-            }
-            currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.info( "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
-            gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
-        } else {
-            gnuR.eval( "cl <- NULL" );
-        }
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
+            gnuR.loadPackage( "baySeq" );
+            //Gnu R is configured to use all your processor cores aside from one up to a maximum of six. So the
+            //computation will speed up a little bit but still leave you at least one core
+            //for your other work.
+            if( gnuR.runningLocal ) {
+                gnuR.loadPackage( "snow" );
+                gnuR.loadPackage( "parallel" );
+                int processors = Runtime.getRuntime().availableProcessors();
+                if( processors > MAX_PROCESSORS ) {
+                    processors = MAX_PROCESSORS;
+                }
+                if( processors > 1 ) {
+                    processors--;
+                }
+                currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.info( "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
+                gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
+            } else {
+                gnuR.eval( "cl <- NULL" );
+            }
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
             while( bseqData.hasCountData() ) {
@@ -162,7 +172,7 @@ public class BaySeq {
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );
             }
-        } catch( Exception e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
+        } catch( IOException | REXPMismatchException | REngineException e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
             //The new generated exception can than be caught an handelt by the DeAnalysisHandler
             //If something goes wrong try to shutdown Rserve so that no instance keeps running
             this.shutdown();
