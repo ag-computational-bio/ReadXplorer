@@ -180,6 +180,16 @@ public class Version implements Comparable<Version> {
     }
 
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + this.mainVersion.hashCode();
+        hash = 23 * hash + this.preRealease.hashCode();
+        hash = 23 * hash + this.metadata.hashCode();
+        return hash;
+    }
+
+
     public static boolean isInteger( String s, int radix ) {
         if( s.isEmpty() ) {
             return false;

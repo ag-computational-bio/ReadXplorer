@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import org.openide.util.lookup.ServiceProvider;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
@@ -40,14 +41,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author kstaderm
  */
-public class DeSeq2 {
+@ServiceProvider( service = RProcessI.class )
+public class DeSeq2 implements RProcessI {
 
     private GnuR gnuR;
 
     private static final Logger LOG = LoggerFactory.getLogger( DeSeq2.class.getName() );
 
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq2" ), new RPackageDependency( "Biobase" ) };
+
 
     public DeSeq2( int referenceId ) {
+    }
+
+
+    public DeSeq2() {
+    }
+
+
+    @Override
+    public RPackageDependency[] getDependencies() {
+        return dependencies;
     }
 
 
@@ -123,7 +137,7 @@ public class DeSeq2 {
                 gnuR.saveDataToFile( saveFile );
             }
 
-        } catch( Exception e ) {
+        } catch( IOException | REXPMismatchException | REngineException e ) {
             //We don't know what errors Gnu R might cause, so we have to catch all.
             //The newly generated exception can than be caught and handelt by the DeAnalysisHandler
             //If something goes wrong tries to shutdown Rserve so that no instance keeps running
@@ -168,7 +182,7 @@ public class DeSeq2 {
 
 
     public void plotPadjHist( File file ) throws IllegalStateException, PackageNotLoadableException,
-                                             RserveException, REngineException, REXPMismatchException, IOException {
+                                                 RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$padj, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
 

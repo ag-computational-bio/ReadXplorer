@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +32,13 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -45,13 +49,12 @@ import static org.junit.Assert.*;
 public class GnuRTest {
 
     private static GnuR instance;
-    private static ProcessingLog processingLog;
+    private static boolean rserveStarted = true;
 
 
-    public GnuRTest() {
-    }
-
-
+    /**
+     * Set up connection to Rserve.
+     */
     @BeforeClass
     public static void setUpClass() {
         try {
@@ -61,22 +64,13 @@ public class GnuRTest {
             instance = constructor.newInstance( "localhost", 6311, true, new ProcessingLog() );
         } catch( SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException ex ) {
             Exceptions.printStackTrace( ex );
+            rserveStarted = false;
         }
     }
-
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-
+    
     @Before
-    public void setUp() {
-    }
-
-
-    @After
-    public void tearDown() {
+    public void checkInstance(){
+        assumeTrue( rserveStarted );
     }
 
 
@@ -141,9 +135,33 @@ public class GnuRTest {
 
         REXP packagesAfter = instance.eval( "search()" );
         assertEquals( "Package list should not increase", packagesBefore.asStrings().length, packagesAfter.asStrings().length );
-
+    }
+    
+    /**
+     * Test of getPackageVersion method, of class GnuR.
+     *     
+     * @throws org.rosuda.REngine.REXPMismatchException
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     */
+    @Test
+    public void testGetPackageVersion() throws REXPMismatchException, RserveException {
+        Version knownPackage = instance.getPackageVersion( "base" );
+        assertNotNull("\"Base\" should be always avialable in R", knownPackage);
+        Version unknownPackage = instance.getPackageVersion( "LoadUnknownPackage" );
+        assertNull("Checking unknown package \"LoadUnknownPackage\" should return null", unknownPackage);
     }
 
+    /**
+     * Test of checkPackage method, of class GnuR.
+     *     
+     * @throws org.rosuda.REngine.REXPMismatchException
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     */
+    @Test
+    public void testCheckPackage() throws REXPMismatchException, RserveException {
+        assertTrue("\"Base\" should be always avialable in R", instance.checkPackage( "base" ));
+        assertFalse("Checking unknown package \"LoadUnknownPackage\" should return null", instance.checkPackage( "LoadUnknownPackage" ));
+    }
 
     /**
      * Test of eval method, of class GnuR.
@@ -151,7 +169,7 @@ public class GnuRTest {
      * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
-    public void testEval_String() throws REXPMismatchException {
+    public void testEvalString() throws REXPMismatchException {
         String cmd = "a <- 10 + 20";
         REXP result = null;
         try {
@@ -175,11 +193,11 @@ public class GnuRTest {
     /**
      * Test of assign method, of class GnuR.
      *
-     * @throws org.rosuda.REngine.Rserve.RserveException
-     * @throws org.rosuda.REngine.REXPMismatchException
+     * @throws org.rosuda.REngine.Rserve.RserveException 
+     * @throws org.rosuda.REngine.REXPMismatchException 
      */
     @Test
-    public void testAssign_String_REXP() throws RserveException, REXPMismatchException {
+    public void testAssignStringAndREXP() throws RserveException, REXPMismatchException {
         instance.clearGnuR();
         REXP list = instance.eval( "ls()" );
         assertEquals( "R environment should be empty", 0, list.asStrings().length );
@@ -200,7 +218,7 @@ public class GnuRTest {
      * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
-    public void testAssign_String_String() throws RserveException, REXPMismatchException {
+    public void testAssignStringAndString() throws RserveException, REXPMismatchException {
         instance.clearGnuR();
         REXP list = instance.eval( "ls()" );
         assertEquals( "R environment should be empty", 0, list.asStrings().length );
@@ -222,7 +240,7 @@ public class GnuRTest {
      * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
-    public void testAssign_3args() throws REngineException, REXPMismatchException {
+    public void testAssign3args() throws REngineException, REXPMismatchException {
         instance.clearGnuR();
         REXP list = instance.eval( "ls()" );
         assertEquals( "R environment should be empty", 0, list.asStrings().length );
@@ -248,7 +266,8 @@ public class GnuRTest {
      *
      * @throws java.io.IOException
      * @throws
-     * de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException
+     * de.cebitec.readxplorer.transcriptionanalyses.differentialexpression\
+     * .GnuR.PackageNotLoadableException
      * @throws org.rosuda.REngine.REngineException
      * @throws org.rosuda.REngine.REXPMismatchException
      * @throws org.rosuda.REngine.Rserve.RserveException
@@ -266,12 +285,13 @@ public class GnuRTest {
 
     /**
      * Test of saveDataToFile method, of class GnuR.
+     *
      * @throws org.rosuda.REngine.Rserve.RserveException
      * @throws java.io.IOException
      * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
-    public void testSaveDataToFile() throws RserveException, IOException, REXPMismatchException{
+    public void testSaveDataToFile() throws RserveException, IOException, REXPMismatchException {
         File tmpSave = File.createTempFile( "GnuR-Test-SaveDataToFile", ".RData" );
         long filesizeBefore = tmpSave.length();
         instance.assign( "a", "abc" );

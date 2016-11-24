@@ -114,7 +114,7 @@ public final class GnuR extends RConnection {
             this.eval( "save.image(tmpFile)" );
             String tmpFilePath = this.eval( "tmpFile" ).asString();
             RFileInputStream input;
-            try (BufferedOutputStream output = new BufferedOutputStream( new FileOutputStream( saveFile ) )) {
+            try( BufferedOutputStream output = new BufferedOutputStream( new FileOutputStream( saveFile ) ) ) {
                 input = this.openFile( tmpFilePath );
                 int c = input.read( b );
                 while( c >= 0 ) {
@@ -136,17 +136,86 @@ public final class GnuR extends RConnection {
      * Loads the specified Gnu R package. If not installed the method will try
      * to download and install the package.
      * <p>
+     * @throws PackageNotLoadableException Gnu R package not installed or
+     *                                     package could not be loaded.
      * @param packageName
      */
-    public void loadPackage( String packageName ) throws PackageNotLoadableException {
+    public void loadPackage( String packageName ) throws PackageNotLoadableException, RserveException, REXPMismatchException {
+        String cmd = "";
         try {
-            this.eval( "library(\"" + packageName + "\")" );
+            if( checkPackage( packageName ) ) {
+                cmd = "library(\"" + packageName + "\")";
+                this.eval( cmd );
+            } else {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.warn( "{0}: Package {1} is not installed. Please install it manually and try again.", new Object[]{ currentTimestamp, packageName } );
+                throw new PackageNotLoadableException( packageName );
+            }
         } catch( RserveException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            LOG.warn( "{0}: Package {1} is not installed. Please install it manually and try again.", new Object[]{ currentTimestamp, packageName } );
+            LOG.warn( "{0}: Evaluation of \"{1}\" failed.", new Object[]{ currentTimestamp, cmd } );
+            throw new PackageNotLoadableException( packageName );
+        } catch( REXPMismatchException ex ) {
+            Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            LOG.warn( "{0}: Internal error with REXP object in GnuR.loadPackage(\"{1}\").", new Object[]{ currentTimestamp, packageName } );
+            throw new PackageNotLoadableException( packageName );
         }
     }
 
+
+    /**
+     * Checks the version of a specified Gnu R package. If package is not
+     * installed the method returns null.
+     * <p>
+     * @throws REXPMismatchException
+     * @throws RserveException
+     * @param packageName
+     *
+     * @return Version of the installed package or null if not installed
+     */
+    public Version getPackageVersion( String packageName ) throws REXPMismatchException, RserveException {
+        REXP packageInstalled = this.eval( "\"" + packageName + "\" %in% rownames(installed.packages())" );
+        if( packageInstalled.asInteger() == 1 ) {
+            REXP versionREXP = this.eval( "as.character(packageVersion(\"" + packageName + "\"))" );
+            return new Version( versionREXP.asString() );
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
+     * Checks if the specified Gnu R package is installed. If not installed the
+     * method returns null.
+     * <p>
+     * @throws REXPMismatchException
+     * @throws RserveException
+     * @param pkg Package with or without version
+     *
+     * @return True if pkg is installed and at least the same version as the installed one, else false
+     */
+    public boolean checkPackage( RPackageDependency pkg ) throws REXPMismatchException, RserveException {
+        Version installedVersion = getPackageVersion( pkg.getName() );
+        if( installedVersion != null ) {
+            return pkg.getVersion().compareTo( installedVersion ) >= 0;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the specified Gnu R package is installed. If not installed the
+     * method returns null.
+     * <p>
+     * @throws REXPMismatchException
+     * @throws RserveException
+     * @param pkg Name of R package
+     *
+     * @return True if pkg is installed, else false
+     */
+    public boolean checkPackage( String pkg ) throws REXPMismatchException, RserveException {
+        Version installedVersion = getPackageVersion( pkg );
+        return installedVersion != null;
+    }
 
     public static class PackageNotLoadableException extends Exception {
 
@@ -197,13 +266,16 @@ public final class GnuR extends RConnection {
 
 
     /**
-     * Not usable now! RConnector.eval(REXP what, REXP where, boolean resolve) always returns REXPNull.
-     * 
+     * Not usable now! RConnector.eval(REXP what, REXP where, boolean resolve)
+     * always returns REXPNull.
+     *
      * @param what
      * @param where
      * @param resolve
+     *
      * @return
-     * @throws REngineException 
+     *
+     * @throws REngineException
      */
     @Override
     public REXP eval( REXP what, REXP where, boolean resolve ) throws REngineException {
@@ -226,11 +298,14 @@ public final class GnuR extends RConnection {
 
 
     /**
-     * Warning! Rserve does not support environments other than .GlobalEnv. Only valid value for env is null.
+     * Warning! Rserve does not support environments other than .GlobalEnv. Only
+     * valid value for env is null.
+     *
      * @param symbol
      * @param value
-     * @param env Must be null for not throwing an exception.
-     * @throws REngineException 
+     * @param env    Must be null for not throwing an exception.
+     *
+     * @throws REngineException
      */
     @Override
     public void assign( String symbol, REXP value, REXP env ) throws REngineException {
