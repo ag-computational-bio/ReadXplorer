@@ -53,6 +53,9 @@ public final class ProcessingLog {
 
 
     public synchronized void addProperty( String key, Object value ) {
+        if( this.properties == null ) {
+            this.properties = new HashMap<>();
+        }
         properties.put( key, value );
     }
 
@@ -69,12 +72,12 @@ public final class ProcessingLog {
                     Map currentPropertyMap = (Map) currentProperty;
                     log.append( key ).append( " = " ).append( Arrays.deepToString( currentPropertyMap.values().toArray() ) )
                             .append( System.getProperty( "line.separator" ) );
-                } else if( currentProperty instanceof ParametersReadClasses) {
+                } else if( currentProperty instanceof ParametersReadClasses ) {
                     ParametersReadClasses currentPropertyParam = (ParametersReadClasses) currentProperty;
-                    log.append( key ).append( " = " ).append( "Min Mapping Qualit:").append(currentPropertyParam.getMinMappingQual())
-                            .append( "|").append( "Strand Option:").append(currentPropertyParam.getStrandOption())
-                            .append( "|").append( "Excluded Mapping Classes:")
-                            .append( Arrays.deepToString(currentPropertyParam.getExcludedClasses().toArray()));
+                    log.append( key ).append( " = " ).append( "Min Mapping Qualit:" ).append( currentPropertyParam.getMinMappingQual() )
+                            .append( "|" ).append( "Strand Option:" ).append( currentPropertyParam.getStrandOption() )
+                            .append( "|" ).append( "Excluded Mapping Classes:" )
+                            .append( Arrays.deepToString( currentPropertyParam.getExcludedClasses().toArray() ) );
 
                 } else {
                     log.append( key ).append( " = " ).append( currentProperty.toString() ).append( System.getProperty( "line.separator" ) );
