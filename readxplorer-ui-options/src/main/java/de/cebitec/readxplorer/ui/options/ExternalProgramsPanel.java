@@ -25,6 +25,8 @@ import org.openide.util.NbPreferences;
 
 final class ExternalProgramsPanel extends javax.swing.JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     private final ExternalProgramsOptionsPanelController controller;
     public static final String BIOPROSPECTOR_LOCATION = "bioprospector location";
     public static final String SEQLOGO_LOCATION = "seqlogo location";

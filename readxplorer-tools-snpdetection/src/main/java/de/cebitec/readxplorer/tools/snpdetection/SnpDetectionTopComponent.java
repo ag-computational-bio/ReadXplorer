@@ -48,13 +48,10 @@ public final class SnpDetectionTopComponent extends TopComponentExtended {
     private static final long serialVersionUID = 1L;
 
 
-    @NbBundle.Messages( {
-        "CTL_SNP_DetectionTopComp=SNP Detection Window",
-        "HINT_SNP_DetectionTopComp=This is a SNP Detection window" } )
     public SnpDetectionTopComponent() {
         initComponents();
-        setName( Bundle.CTL_SNP_DetectionTopComp() );
-        setToolTipText( Bundle.HINT_SNPDetectionTopComp() );
+        setName( NbBundle.getMessage( SnpDetectionTopComponent.class, "CTL_SNP_DetectionTopComp") );
+        setToolTipText( NbBundle.getMessage( SnpDetectionTopComponent.class, "HINT_SNP_DetectionTopComp") );
         putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
         TopComponentHelper.setupContainerListener( snpTabs, preferredID() );
     }

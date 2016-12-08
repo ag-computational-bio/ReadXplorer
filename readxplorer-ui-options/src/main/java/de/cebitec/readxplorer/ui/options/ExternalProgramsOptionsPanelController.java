@@ -24,7 +24,6 @@ import javax.swing.JComponent;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle.Messages;
 
 
 @OptionsPanelController.TopLevelRegistration(
@@ -33,7 +32,6 @@ import org.openide.util.NbBundle.Messages;
     keywords = "#OptionsCategory_Keywords_ExternalPrograms",
     keywordsCategory = "ExternalPrograms"
 )
-@Messages( { "OptionsCategory_Name_ExternalPrograms=External Programs", "OptionsCategory_Keywords_ExternalPrograms=external_programs" } )
 public final class ExternalProgramsOptionsPanelController extends OptionsPanelController {
 
     private ExternalProgramsPanel panel;

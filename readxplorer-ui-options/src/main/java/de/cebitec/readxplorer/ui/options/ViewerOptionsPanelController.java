@@ -27,7 +27,6 @@ import org.netbeans.spi.options.OptionsPanelController;
          keywords = "#OptionsCategory_Keywords_Viewer",
          keywordsCategory = "Viewer"
 )
-@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_Viewer=Viewer", "OptionsCategory_Keywords_Viewer=viewer" } )
 public final class ViewerOptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private ViewerPanel panel;

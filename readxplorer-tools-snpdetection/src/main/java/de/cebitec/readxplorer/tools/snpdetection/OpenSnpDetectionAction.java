@@ -52,7 +52,6 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
-import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +72,6 @@ import org.slf4j.LoggerFactory;
     @ActionReference( path = "Menu/Tools", position = 125 ),
     @ActionReference( path = "Toolbars/Tools", position = 100 )
 } )
-@Messages( { "CTL_OpenSnpDetectionAction=OpenSnpDetectionAction", "CTL_OpenSNPDetection=SNP Detection" } )
 public final class OpenSnpDetectionAction implements ActionListener,
                                                      DataVisualisationI {
 
@@ -132,9 +130,6 @@ public final class OpenSnpDetectionAction implements ActionListener,
     /**
      * Initializes the setup wizard for the snp detection.
      */
-    @Messages( { "TTL_SNPWizardTitle=SNP Detection Parameter Wizard",
-                 "TITLE_SNPDetectionTopComp=SNP Detection Window",
-                 "HINT_SNPDetectionTopComp=This is a SNP Detection window" } )
     private void runWizardAndSnpDetection() {
 
         @SuppressWarnings( "unchecked" )
@@ -150,7 +145,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat( new MessageFormat( "{0}" ) );
-        wiz.setTitle( Bundle.TTL_SNPWizardTitle() );
+        wiz.setTitle( NbBundle.getMessage( OpenSnpDetectionAction.class, "TTL_SNPWizardTitle" ));
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
@@ -160,8 +155,8 @@ public final class OpenSnpDetectionAction implements ActionListener,
             trackMap = ProjectConnector.getTrackMap( tracks );
 
             this.snpDetectionTopComp = (SnpDetectionTopComponent) WindowManager.getDefault().findTopComponent( "SnpDetectionTopComponent" );
-            this.snpDetectionTopComp.setName( Bundle.TITLE_SNPDetectionTopComp() );
-            this.snpDetectionTopComp.setToolTipText( Bundle.HINT_SNP_DetectionTopComp() );
+            this.snpDetectionTopComp.setName( NbBundle.getMessage( OpenSnpDetectionAction.class, "TITLE_SNPDetectionTopComp" ));
+            this.snpDetectionTopComp.setToolTipText( NbBundle.getMessage( OpenSnpDetectionAction.class, "HINT_SNP_DetectionTopComp") );
             this.snpDetectionTopComp.open();
             this.startSNPDetection( wiz );
         }

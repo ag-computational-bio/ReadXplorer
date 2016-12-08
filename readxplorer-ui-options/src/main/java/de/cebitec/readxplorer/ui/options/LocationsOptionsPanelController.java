@@ -28,7 +28,6 @@ import org.netbeans.spi.options.OptionsPanelController;
          keywords = "#AdvancedOption_Keywords_Locations",
          keywordsCategory = "Advanced/Directories"
 )
-@org.openide.util.NbBundle.Messages( { "AdvancedOption_DisplayName_Locations=Locations", "AdvancedOption_Keywords_Locations=Locations" } )
 public final class LocationsOptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private LocationsPanel panel;

@@ -135,6 +135,16 @@
             <groupId>bio.jlu.comp.readxplorer</groupId>
             <artifactId>batik.nbm</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress-nb</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util-ui</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
     </dependencies>
 
 

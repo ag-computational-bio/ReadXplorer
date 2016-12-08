@@ -25,7 +25,6 @@ import org.netbeans.spi.options.OptionsPanelController;
                                               iconBase = "de/cebitec/readxplorer/ui/options/gnuR.png",
                                               keywords = "#OptionsCategory_Keywords_GnuR",
                                               keywordsCategory = "GnuR" )
-@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_GnuR=Gnu R", "OptionsCategory_Keywords_GnuR=GnuR" } )
 public final class GnuROptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private GnuRPanel panel;
