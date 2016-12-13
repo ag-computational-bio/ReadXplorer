@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
@@ -57,18 +58,24 @@ public class BaySeq implements RProcessI {
 
     private static final Logger LOG = LoggerFactory.getLogger( BaySeq.class.getName() );
 
-    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "baySeq" ), new RPackageDependency( "snow" ), new RPackageDependency( "parallel" ) };
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "baySeq" ), 
+                                                                                 new RPackageDependency( "snow" ), 
+                                                                                 new RPackageDependency( "parallel" ) };
 
 
     public BaySeq() {
     }
 
-
+    
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
     }
-
+    
+    @Override
+    public Tool getTool() {
+        return Tool.BaySeq;
+    }
 
     /**
      * Processes data from a differential expression analysis experiment using

@@ -196,7 +196,7 @@ public final class GnuR extends RConnection {
      */
     public boolean checkPackage( RPackageDependency pkg ) throws REXPMismatchException, RserveException {
         Optional<Version> installedVersion = getPackageVersion( pkg.getName() );
-        return installedVersion.filter( version -> pkg.getVersion().compareTo( version ) > 0 )
+        return installedVersion.filter( version -> pkg.getVersion().compareTo( version ) < 0 )
                 .isPresent();
     }
 

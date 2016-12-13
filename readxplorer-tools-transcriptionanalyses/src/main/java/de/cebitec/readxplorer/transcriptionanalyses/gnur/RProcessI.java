@@ -17,6 +17,9 @@
 
 package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 
+import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
+
+
 
 /**
  *
@@ -26,6 +29,9 @@ package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 public interface RProcessI {
 
     public RPackageDependency[] getDependencies();
+
+
+    public Tool getTool();
 
 
 }

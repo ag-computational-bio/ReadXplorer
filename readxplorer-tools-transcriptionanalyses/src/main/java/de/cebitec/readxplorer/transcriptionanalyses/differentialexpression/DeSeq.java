@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
@@ -61,6 +62,12 @@ public class DeSeq implements RProcessI {
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
+    }
+
+
+    @Override
+    public Tool getTool() {
+        return Tool.DeSeq;
     }
 
 

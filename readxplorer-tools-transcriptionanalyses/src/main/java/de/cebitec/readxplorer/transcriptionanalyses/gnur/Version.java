@@ -190,6 +190,12 @@ public class Version implements Comparable<Version> {
     }
 
 
+    @Override
+    public String toString() {
+        return "Version: " + getVersion();
+    }
+
+
     public static boolean isInteger( String s, int radix ) {
         if( s.isEmpty() ) {
             return false;
@@ -208,6 +214,8 @@ public class Version implements Comparable<Version> {
         }
         return true;
     }
+    
+    
 
 
 }

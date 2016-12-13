@@ -79,4 +79,12 @@ public class RPackageDependency {
     }
 
 
+    @Override
+    public String toString() {
+        return this.getName() + " - " + this.getVersion().getVersion();
+    }
+    
+    
+
+
 }

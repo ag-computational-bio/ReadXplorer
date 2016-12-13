@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
@@ -51,7 +52,7 @@ public class DeSeq2 implements RProcessI {
 
     private static final Logger LOG = LoggerFactory.getLogger( DeSeq2.class.getName() );
 
-    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq2" ), 
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq2" ),
                                                                                  new RPackageDependency( "Biobase" ) };
 
 
@@ -66,6 +67,12 @@ public class DeSeq2 implements RProcessI {
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
+    }
+
+
+    @Override
+    public Tool getTool() {
+        return Tool.DeSeq2;
     }
 
 
