@@ -26,7 +26,6 @@ import java.util.MissingResourceException;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle.Messages;
 
@@ -67,7 +66,7 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
     public void save( final String fileLocation ) {
 
         if( data instanceof String ) {
-            this.progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
+            this.progressHandle = ProgressHandle.createHandle( Bundle.ProgressName() );
             final String dataString = (String) data;
             this.progressHandle.start();
 

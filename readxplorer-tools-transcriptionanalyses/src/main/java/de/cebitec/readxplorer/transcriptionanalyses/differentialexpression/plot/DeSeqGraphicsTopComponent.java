@@ -48,7 +48,6 @@ import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.jfree.chart.ChartPanel;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -257,7 +256,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
             messages.setText( "" );
             plotButton.setEnabled( false );
             saveButton.setEnabled( false );
-            progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+            progressHandle = ProgressHandle.createHandle( "Creating plot" );
             progressHandle.start();
             progressHandle.switchToIndeterminate();
             DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
@@ -314,7 +313,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
 
             @Override
             public void save( String fileLocation ) {
-                ProgressHandle storeProgressHandle = ProgressHandleFactory.createHandle( "Save plot to svg file: " + fileLocation );
+                ProgressHandle storeProgressHandle = ProgressHandle.createHandle( "Save plot to svg file: " + fileLocation );
                 Path to = FileSystems.getDefault().getPath( fileLocation, "" );
                 DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
                 if( selectedPlot == DeSeqAnalysisHandler.Plot.MAplot ) {
@@ -434,7 +433,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended
 
 
     private void saveToSVG( String fileLocation ) {
-        svgExportProgressHandle = ProgressHandleFactory.createHandle( "Save plot to svg file: " + fileLocation );
+        svgExportProgressHandle = ProgressHandle.createHandle( "Save plot to svg file: " + fileLocation );
         Path to = FileSystems.getDefault().getPath( fileLocation, "" );
         ChartExporter exporter = new ChartExporter( to, chartPanel.getChart() );
         exporter.registerObserver( this );

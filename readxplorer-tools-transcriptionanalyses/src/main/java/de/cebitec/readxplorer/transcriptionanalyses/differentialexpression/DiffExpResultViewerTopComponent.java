@@ -52,7 +52,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -106,7 +105,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
     private TopComponent logTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
-    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Differential Gene Expression Analysis" );
+    private final ProgressHandle progressHandle = ProgressHandle.createHandle( "Differential Gene Expression Analysis" );
     private final TableRightClickFilterList<UneditableListTableModel> rktm = new TableRightClickFilterList<>( UneditableListTableModel.class, POS_IDX, TRACK_IDX );
     private ReferenceFeatureTopComp refComp;
 

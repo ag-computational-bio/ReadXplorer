@@ -38,7 +38,6 @@ import java.util.Random;
 import javax.swing.DefaultComboBoxModel;
 import org.jfree.chart.ChartPanel;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -282,7 +281,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
     }// </editor-fold>//GEN-END:initComponents
 
     private void createPlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPlotButtonActionPerformed
-        progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+        progressHandle = ProgressHandle.createHandle( "Creating plot" );
         progressHandle.start();
         progressHandle.switchToIndeterminate();
         plotPanel.removeAll();
@@ -378,7 +377,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
 
 
     private void saveToSVG( String fileLocation ) {
-        svgExportProgressHandle = ProgressHandleFactory.createHandle( "Save plot to svg file: " + fileLocation );
+        svgExportProgressHandle = ProgressHandle.createHandle( "Save plot to svg file: " + fileLocation );
         Path to = FileSystems.getDefault().getPath( fileLocation, "" );
         ChartExporter exporter = new ChartExporter( to, chartPanel.getChart() );
         exporter.registerObserver( this );

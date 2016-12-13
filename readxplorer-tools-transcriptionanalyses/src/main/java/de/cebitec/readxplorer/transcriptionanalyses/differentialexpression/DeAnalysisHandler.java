@@ -137,9 +137,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 }
                 
                 return toolList.toArray( new Tool[2] );
-//                return Tool.values();
-                //If one Tool should not be available to the user return something like :
-                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
             } else {
                 Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
                 return ret;

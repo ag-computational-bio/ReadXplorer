@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.slf4j.Logger;
@@ -139,7 +138,7 @@ public class SamBamFileReader implements Observable, Observer {
     private void checkIndex() {
         File indexFile = new File( dataFile.getAbsolutePath() + ".bai" );
         if( !samFileReader.hasIndex() && !indexFile.exists() ) { //first time after index creation the hasIndex method does not recognize the new index file
-            final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "BAM index missing, recreating it..." );
+            final ProgressHandle progressHandle = ProgressHandle.createHandle( "BAM index missing, recreating it..." );
             progressHandle.start();
 
             final IndexFileNotificationPanel indexPanel = new IndexFileNotificationPanel();

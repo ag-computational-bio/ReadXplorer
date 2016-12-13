@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
@@ -95,7 +94,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         this.tracksJobs = trackJobs;
         this.referenceJobs = refJobs;
         this.readPairJobs = readPairJobs;
-        this.ph = ProgressHandleFactory.createHandle( getBundleString( "MSG_ImportThread.progress.name" ) );
+        this.ph = ProgressHandle.createHandle( getBundleString( "MSG_ImportThread.progress.name" ) );
 
         this.workunits = refJobs.size();
         for( TrackJob trackJob : trackJobs ) {

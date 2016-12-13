@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
@@ -112,7 +111,7 @@ public final class MappingApi {
             //remember mapping params for future executions
             setLastMappingParams( mappingParameters );
 
-            ProgressHandle ph = ProgressHandleFactory.createHandle( Bundle.MSG_MappingApi_mapFastaFile_Start() );
+            ProgressHandle ph = ProgressHandle.createHandle( Bundle.MSG_MappingApi_mapFastaFile_Start() );
             ph.start();
 
             String basename = de.cebitec.readxplorer.utils.FileUtils.getFilePathWithoutExtension( fasta );

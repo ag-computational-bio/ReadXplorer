@@ -27,7 +27,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import jxl.write.WriteException;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 
 
@@ -100,7 +99,7 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
             for( List<List<Object>> dataList : tableData ) {
                 size += dataList.size();
             }
-            this.progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
+            this.progressHandle = ProgressHandle.createHandle( Bundle.ProgressName() );
             this.progressHandle.start( size + 1 );
 
             Thread exportThread = new Thread( new Runnable() {

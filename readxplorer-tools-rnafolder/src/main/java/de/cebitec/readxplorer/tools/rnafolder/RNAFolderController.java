@@ -22,7 +22,6 @@ import de.cebitec.readxplorer.tools.rnafolder.rnamovies.MoviePane;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.RNAMovies;
 import de.cebitec.readxplorer.ui.dialogmenus.RNAFolderI;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -60,7 +59,7 @@ public class RNAFolderController implements RNAFolderI {
         Thread rnaFoldThread = new Thread( new Runnable() {
             @Override
             public void run() {
-                ProgressHandle progressHandle = ProgressHandleFactory.createHandle( NbBundle.getMessage( RNAFolderController.class, "RNA_Folder-Progress" ) );
+                ProgressHandle progressHandle = ProgressHandle.createHandle( NbBundle.getMessage( RNAFolderController.class, "RNA_Folder-Progress" ) );
                 progressHandle.start();
                 try { //new header because RNA movies cannot cope with spaces
                     String rnaMoviesHeader = header.replace( " ", "_" );

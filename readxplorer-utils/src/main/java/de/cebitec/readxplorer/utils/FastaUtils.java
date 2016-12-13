@@ -36,7 +36,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.slf4j.Logger;
@@ -176,7 +175,7 @@ public final class FastaUtils implements Observable {
      */
     public void recreateMissingIndex( final File fastaFile ) {
 
-        final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Fasta index missing, recreating it..." );
+        final ProgressHandle progressHandle = ProgressHandle.createHandle( "Fasta index missing, recreating it..." );
         progressHandle.start();
 
         final IndexFileNotificationPanel indexPanel = new IndexFileNotificationPanel();

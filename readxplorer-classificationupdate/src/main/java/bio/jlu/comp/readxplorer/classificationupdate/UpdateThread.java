@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
     public UpdateThread() {
         this.io = IOProvider.getDefault().getIO( "Read Classification Update", false );
-        this.ph = ProgressHandleFactory.createHandle( "Read Classification Update" );
+        this.ph = ProgressHandle.createHandle( "Read Classification Update" );
     }
 
 
