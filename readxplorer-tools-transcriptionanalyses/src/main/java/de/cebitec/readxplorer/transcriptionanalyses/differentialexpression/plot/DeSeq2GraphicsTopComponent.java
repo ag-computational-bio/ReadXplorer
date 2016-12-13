@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot
 import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeq2AnalysisHandler;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
@@ -274,7 +274,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-        } catch( GnuR.PackageNotLoadableException ex ) {
+        } catch( PackageNotLoadableException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );

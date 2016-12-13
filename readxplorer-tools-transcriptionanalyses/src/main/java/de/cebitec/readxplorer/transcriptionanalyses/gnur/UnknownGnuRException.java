@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Patrick Blumenkamp <patrick.blumenkamp at computational.bio.uni-giessen.de>
+ * Copyright (C) 2016 Patrick Blumenkamp<patrick.blumenkamp@computational.bio.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
+package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 
 
 /**
  *
- * @author Patrick Blumenkamp
- * <patrick.blumenkamp at computational.bio.uni-giessen.de>
+ * @author Patrick
+ * Blumenkamp<patrick.blumenkamp@computational.bio.uni-giessen.de>
  */
-public interface RProcessI {
+public class UnknownGnuRException extends Exception{
 
-    public RPackageDependency[] getDependencies();
+    private static final long serialVersionUID = 1L;
+
+
+    public UnknownGnuRException( Exception e ) {
+        super( "An unknown exception occurred in GNU R while processing your data. " +
+               "This caused an " + e.getClass().getName() + " on the Java side of the programm.", e );
+    }
 
 
 }

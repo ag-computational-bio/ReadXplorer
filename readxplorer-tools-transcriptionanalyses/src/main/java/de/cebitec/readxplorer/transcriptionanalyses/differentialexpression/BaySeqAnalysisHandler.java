@@ -22,8 +22,10 @@ import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeq.SamplesNotValidException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -93,7 +95,8 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
         prepareFeatures( baySeqAnalysisData );
         prepareCountData( baySeqAnalysisData, getAllCountData() );
-        List<ResultDeAnalysis> results = baySeq.process( baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile() );
+        List<ResultDeAnalysis> results = baySeq.process( baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(),
+                                                         GnuRAccess.startRServe( baySeqAnalysisData.getProcessingLog() ) );
         return results;
     }
 

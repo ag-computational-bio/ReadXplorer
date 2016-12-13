@@ -18,8 +18,11 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RProcessI;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -62,9 +65,9 @@ public class DeSeq implements RProcessI {
 
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile )
+                                           int numberOfFeatures, int numberOfTracks, File saveFile, GnuR gnuR )
             throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
-        gnuR = GnuR.startRServe( analysisData.getProcessingLog() );
+        this.gnuR = gnuR;
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.info( "{0}: GNU R is processing data.", currentTimestamp );
         final List<ResultDeAnalysis> results = new ArrayList<>();
@@ -217,23 +220,23 @@ public class DeSeq implements RProcessI {
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
                                                    "Significant results sorted by the most significantly differentially expressed genes", analysisData ) );
 
-                //Significant results sorted by the most strongly down regulated genes
-                gnuR.eval( "res1 <- res[order(res$foldChange, -res$baseMean), ]" );
-                result = gnuR.eval( "res1" );
-                rvec = result.asList();
-                colNames = gnuR.eval( "colnames(res1)" );
-                rowNames = gnuR.eval( "rownames(res1)" );
-                results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
-                                                   "Significant results sorted by the most strongly down regulated genes", analysisData ) );
-
-                //Significant results sorted by the most strongly up regulated genes
-                gnuR.eval( "res2 <- res[order(-res$foldChange, -res$baseMean), ]" );
-                result = gnuR.eval( "res2" );
-                rvec = result.asList();
-                colNames = gnuR.eval( "colnames(res2)" );
-                rowNames = gnuR.eval( "rownames(res2)" );
-                results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
-                                                   "Significant results sorted by the most strongly up regulated genes", analysisData ) );
+//                //Significant results sorted by the most strongly down regulated genes
+//                gnuR.eval( "res1 <- res[order(res$foldChange, -res$baseMean), ]" );
+//                result = gnuR.eval( "res1" );
+//                rvec = result.asList();
+//                colNames = gnuR.eval( "colnames(res1)" );
+//                rowNames = gnuR.eval( "rownames(res1)" );
+//                results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
+//                                                   "Significant results sorted by the most strongly down regulated genes", analysisData ) );
+//
+//                //Significant results sorted by the most strongly up regulated genes
+//                gnuR.eval( "res2 <- res[order(-res$foldChange, -res$baseMean), ]" );
+//                result = gnuR.eval( "res2" );
+//                rvec = result.asList();
+//                colNames = gnuR.eval( "colnames(res2)" );
+//                rowNames = gnuR.eval( "rownames(res2)" );
+//                results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
+//                                                   "Significant results sorted by the most strongly up regulated genes", analysisData ) );
             }
 
             if( saveFile != null ) {

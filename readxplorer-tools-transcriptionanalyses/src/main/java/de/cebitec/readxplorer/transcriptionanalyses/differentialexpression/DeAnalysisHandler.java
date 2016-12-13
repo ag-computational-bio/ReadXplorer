@@ -31,8 +31,10 @@ import de.cebitec.readxplorer.databackend.dataobjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.Observable;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.Pair;
@@ -106,7 +108,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
         public static Tool[] usableTools() {
-            if( GnuR.gnuRSetupCorrect() ) {
+            if( GnuRAccess.gnuRSetupCorrect() ) {                
                 return Tool.values();
                 //If one Tool should not be available to the user return something like :
                 //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };

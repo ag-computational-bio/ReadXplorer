@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import java.util.List;
 
 

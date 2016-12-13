@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
 import java.util.prefs.Preferences;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -44,7 +44,7 @@ public final class ChooseVisualPanel extends JPanel {
     public ChooseVisualPanel() {
         initComponents();
         loadLastParameterSelection();
-        if( !GnuR.gnuRSetupCorrect() ) {
+        if( !GnuRAccess.gnuRSetupCorrect() ) {
             jriErrorText.setText( "GNU R is not installed correctly.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration." );
         }
     }

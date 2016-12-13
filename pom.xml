@@ -254,7 +254,10 @@
         <pluginManagement>
 
             <plugins>
-
+                <!-- used to check for updates, run:
+                    mvn versions:display-plugin-updates
+                    mvn versions:display-dependency-updates
+                -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>

@@ -110,8 +110,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.2.29</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress-nb</artifactId>
+            <version>RELEASE82</version>
         </dependency>
     </dependencies>
 
@@ -127,7 +138,8 @@
                     <execution>
                         <id>validate</id>
                         <configuration>
-                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
+                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>   
+                            <includeTestSourceDirectory>false</includeTestSourceDirectory>                         
                         </configuration>
                     </execution>
                 </executions>
@@ -166,7 +178,15 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
         </plugins>
 
     </build>

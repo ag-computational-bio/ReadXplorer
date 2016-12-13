@@ -30,7 +30,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffE
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExportOnlyAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExpressTestAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;

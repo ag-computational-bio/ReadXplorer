@@ -21,8 +21,10 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -91,7 +93,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );
-        results = deSeq.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile() );
+        results = deSeq.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(),
+                                 GnuRAccess.startRServe( deSeqAnalysisData.getProcessingLog() ) );
         return results;
 
     }

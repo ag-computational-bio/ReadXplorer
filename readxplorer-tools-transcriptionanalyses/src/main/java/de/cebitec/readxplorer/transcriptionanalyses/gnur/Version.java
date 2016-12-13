@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
+package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

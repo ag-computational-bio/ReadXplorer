@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
+package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import org.junit.Before;
+import java.util.Optional;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openide.util.Exceptions;
@@ -34,11 +34,8 @@ import org.rosuda.REngine.Rserve.RserveException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -49,28 +46,33 @@ import static org.junit.Assume.assumeTrue;
 public class GnuRTest {
 
     private static GnuR instance;
-    private static boolean rserveStarted = true;
 
 
     /**
      * Set up connection to Rserve.
+     *
+     * @throws org.rosuda.REngine.Rserve.RserveException
      */
     @BeforeClass
-    public static void setUpClass() {
-        try {
-            Constructor<GnuR> constructor;
-            constructor = GnuR.class.getDeclaredConstructor( String.class, int.class, boolean.class, ProcessingLog.class );
-            constructor.setAccessible( true );
-            instance = constructor.newInstance( "localhost", 6311, true, new ProcessingLog() );
-        } catch( SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException ex ) {
-            Exceptions.printStackTrace( ex );
-            rserveStarted = false;
-        }
+    public static void setUpClass() throws RserveException {
+//            ProcessBuilder pb = new ProcessBuilder( "R", "CMD", "Rserve", "--no-save", "--RS-port 6311" );
+//            Process process = pb.start();
+//            int errCode = process.waitFor();
+//            if( errCode != 0 ) {
+//                fail( "cannot create rserve session" );
+//            }
+        instance = new GnuR( "localhost", 6311, false, new ProcessingLog() );
     }
-    
-    @Before
-    public void checkInstance(){
-        assumeTrue( rserveStarted );
+
+
+    /**
+     * Shutdown connection to Rserve.
+     *
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     */
+    @AfterClass
+    public static void tearDownClass() throws RserveException {
+//        instance.shutdown();
     }
 
 
@@ -100,7 +102,7 @@ public class GnuRTest {
      * "tool".
      *
      * @throws
-     * de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException
+     * de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException
      * @throws org.rosuda.REngine.Rserve.RserveException
      * @throws org.rosuda.REngine.REXPMismatchException
      */
@@ -136,32 +138,35 @@ public class GnuRTest {
         REXP packagesAfter = instance.eval( "search()" );
         assertEquals( "Package list should not increase", packagesBefore.asStrings().length, packagesAfter.asStrings().length );
     }
-    
+
+
     /**
      * Test of getPackageVersion method, of class GnuR.
-     *     
+     *
      * @throws org.rosuda.REngine.REXPMismatchException
      * @throws org.rosuda.REngine.Rserve.RserveException
      */
     @Test
     public void testGetPackageVersion() throws REXPMismatchException, RserveException {
-        Version knownPackage = instance.getPackageVersion( "base" );
-        assertNotNull("\"Base\" should be always avialable in R", knownPackage);
-        Version unknownPackage = instance.getPackageVersion( "LoadUnknownPackage" );
-        assertNull("Checking unknown package \"LoadUnknownPackage\" should return null", unknownPackage);
+        Optional<Version> knownPackage = instance.getPackageVersion( "base" );
+        assertTrue( "\"Base\" should be always avialable in R", knownPackage.isPresent() );
+        Optional<Version> unknownPackage = instance.getPackageVersion( "LoadUnknownPackage" );
+        assertFalse( "Checking unknown package \"LoadUnknownPackage\" should return empty Optional", unknownPackage.isPresent() );
     }
+
 
     /**
      * Test of checkPackage method, of class GnuR.
-     *     
+     *
      * @throws org.rosuda.REngine.REXPMismatchException
      * @throws org.rosuda.REngine.Rserve.RserveException
      */
     @Test
     public void testCheckPackage() throws REXPMismatchException, RserveException {
-        assertTrue("\"Base\" should be always avialable in R", instance.checkPackage( "base" ));
-        assertFalse("Checking unknown package \"LoadUnknownPackage\" should return null", instance.checkPackage( "LoadUnknownPackage" ));
+        assertTrue( "\"Base\" should be always avialable in R", instance.checkPackage( "base" ) );
+        assertFalse( "Checking unknown package \"LoadUnknownPackage\" should return null", instance.checkPackage( "LoadUnknownPackage" ) );
     }
+
 
     /**
      * Test of eval method, of class GnuR.
@@ -193,8 +198,8 @@ public class GnuRTest {
     /**
      * Test of assign method, of class GnuR.
      *
-     * @throws org.rosuda.REngine.Rserve.RserveException 
-     * @throws org.rosuda.REngine.REXPMismatchException 
+     * @throws org.rosuda.REngine.Rserve.RserveException
+     * @throws org.rosuda.REngine.REXPMismatchException
      */
     @Test
     public void testAssignStringAndREXP() throws RserveException, REXPMismatchException {
@@ -266,8 +271,7 @@ public class GnuRTest {
      *
      * @throws java.io.IOException
      * @throws
-     * de.cebitec.readxplorer.transcriptionanalyses.differentialexpression\
-     * .GnuR.PackageNotLoadableException
+     * de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException
      * @throws org.rosuda.REngine.REngineException
      * @throws org.rosuda.REngine.REXPMismatchException
      * @throws org.rosuda.REngine.Rserve.RserveException
@@ -304,54 +308,6 @@ public class GnuRTest {
         Files.delete( tmpSave.toPath() );
         instance.clearGnuR();
     }
-//
-//
-//
-//
-//    /**
-//     * Test of shutdown method, of class GnuR.
-//     */
-//    @Test
-//    public void testShutdown() throws Exception {
-//        System.out.println( "shutdown" );
-//        GnuR instance = null;
-//        instance.shutdown();
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
-//
-//
-//
-//
-//
-//
-//    /**
-//     * Test of startRServe method, of class GnuR.
-//     */
-//    @Test
-//    public void testStartRServe() throws Exception {
-//        System.out.println( "startRServe" );
-//        ProcessingLog processingLog = null;
-//        GnuR expResult = null;
-//        GnuR result = GnuR.startRServe( processingLog );
-//        assertEquals( expResult, result );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
-//
-//
-//    /**
-//     * Test of gnuRSetupCorrect method, of class GnuR.
-//     */
-//    @Test
-//    public void testGnuRSetupCorrect() {
-//        System.out.println( "gnuRSetupCorrect" );
-//        boolean expResult = false;
-//        boolean result = GnuR.gnuRSetupCorrect();
-//        assertEquals( expResult, result );
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail( "The test case is a prototype." );
-//    }
 
 
 }

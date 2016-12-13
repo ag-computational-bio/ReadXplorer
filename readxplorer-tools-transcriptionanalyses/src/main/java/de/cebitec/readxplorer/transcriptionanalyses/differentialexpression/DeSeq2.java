@@ -18,8 +18,11 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RProcessI;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -48,7 +51,8 @@ public class DeSeq2 implements RProcessI {
 
     private static final Logger LOG = LoggerFactory.getLogger( DeSeq2.class.getName() );
 
-    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq2" ), new RPackageDependency( "Biobase" ) };
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq2" ), 
+                                                                                 new RPackageDependency( "Biobase" ) };
 
 
     public DeSeq2( int referenceId ) {
@@ -66,17 +70,17 @@ public class DeSeq2 implements RProcessI {
 
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile )
-            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException, IOException {
-        gnuR = GnuR.startRServe( analysisData.getProcessingLog() );
+                                           int numberOfFeatures, int numberOfTracks, File saveFile, GnuR rSession )
+            throws IllegalStateException, UnknownGnuRException, RserveException, IOException, PackageNotLoadableException {
+        gnuR = rSession;
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         LOG.info( "{0}: GNU R is processing data.", currentTimestamp );
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
-            gnuR.loadPackage( "DESeq2" );
             gnuR.loadPackage( "Biobase" );
+            gnuR.loadPackage( "DESeq2" );
             //Handing over the count data to Gnu R.
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );

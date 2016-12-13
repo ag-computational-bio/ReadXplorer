@@ -24,6 +24,9 @@ import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.polytree.Node;
 import java.io.File;
 import java.util.ArrayList;
@@ -60,7 +63,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws GnuR.PackageNotLoadableException, IllegalStateException, GnuR.UnknownGnuRException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException {
 
         prepareFeatures( data );
         prepareCountData( data, getAllCountData() );

@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

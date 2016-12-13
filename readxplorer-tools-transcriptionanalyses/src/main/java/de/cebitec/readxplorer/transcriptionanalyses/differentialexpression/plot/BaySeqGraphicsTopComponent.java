@@ -24,9 +24,9 @@ import de.cebitec.readxplorer.plotting.CreatePlots;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeq;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeqAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ResultDeAnalysis;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
@@ -452,7 +452,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             } catch( BaySeq.SamplesNotValidException ex ) {
                 messages.setText( "Samples A and B must not be the same!" );
-            } catch( GnuR.PackageNotLoadableException ex ) {
+            } catch( PackageNotLoadableException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );

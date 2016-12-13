@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.expr
 
 
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
