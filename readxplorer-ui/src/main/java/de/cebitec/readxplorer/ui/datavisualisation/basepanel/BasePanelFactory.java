@@ -592,6 +592,7 @@ public class BasePanelFactory {
         legend3.add( this.getLegendEntry( Colors.RBS, FeatureType.RBS, viewer ) );
         legend3.add( this.getLegendEntry( Colors.MINUS_THIRTYFIVE, FeatureType.MINUS_THIRTYFIVE, viewer ) );
         legend3.add( this.getLegendEntry( Colors.MINUS_TEN, FeatureType.MINUS_TEN, viewer ) );
+        legend3.add( this.getLegendEntry( Colors.TRANSCRIPT, FeatureType.TRANSCRIPT, viewer ) );
         legend3.add( this.getLegendEntry( Colors.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer ) );
 
         legend.add( legend1 );
