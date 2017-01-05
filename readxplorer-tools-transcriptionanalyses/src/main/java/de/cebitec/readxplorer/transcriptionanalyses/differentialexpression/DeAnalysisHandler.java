@@ -32,7 +32,6 @@ import de.cebitec.readxplorer.databackend.dataobjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataobjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
-import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
@@ -72,9 +71,9 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DeAnalysisHandler extends Thread implements Observable,
                                                                   DataVisualisationI {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger( DeAnalysisHandler.class.getName() );
-    
+
     private final int refGenomeID;
     private final int startOffset;
     private final int stopOffset;
@@ -84,73 +83,73 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     private final Set<FeatureType> selectedFeatureTypes;
     private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
     private final ProcessingLog processingLog;
-    
+
     private int resultsReceivedBack = 0;
     private ReferenceConnector referenceConnector;
     private File saveFile = null;
     private final List<PersistentFeature> genomeAnnos;
     private final List<ResultDeAnalysis> results;
     private final Map<Integer, CollectCoverageData> collectCoverageDataInstances;
-    
-    
+
+
     public static enum Tool {
-        
+
         ExpressTest( "Express Test" ), DeSeq( "DESeq" ), DeSeq2( "DESeq2" ), BaySeq( "baySeq" ), ExportCountTable( "Export only count table" );
-        
-        
+
+
         private Tool( String stringRep ) {
             this.stringRep = stringRep;
         }
-        
-        
+
+
         private final String stringRep;
-        
-        
+
+
         @Override
         public String toString() {
             return stringRep;
         }
-        
-        
-        public static Tool[] usableTools() {
-            if( GnuRAccess.gnuRSetupCorrect() ) {
-                ArrayList<Tool> toolList = new ArrayList<>( 5 );
-                toolList.add( ExpressTest );
-                toolList.add( ExportCountTable );
-                try {
-                    GnuR gnur = GnuRAccess.startRServe( new ProcessingLog() );
-                    for( RProcessI process : Lookup.getDefault().<RProcessI>lookupAll( RProcessI.class ) ) {
-                        boolean allDependenciesMet = true;
-                        for( RPackageDependency p : process.getDependencies() ) {
-                            if( !gnur.checkPackage( p ) ) {
-                                allDependenciesMet = false;
-                                break;
-                            }
-                        }
-                        if( allDependenciesMet ) {
-                            toolList.add( process.getTool() );
+
+
+        public static Tool[] usableTools( GnuR gnur ) {
+            ArrayList<Tool> toolList = new ArrayList<>( 5 );
+            toolList.add( ExpressTest );
+            toolList.add( ExportCountTable );
+            try {
+                for( RProcessI process : Lookup.getDefault().<RProcessI>lookupAll( RProcessI.class ) ) {
+
+                    boolean allDependenciesMet = true;
+                    for( RPackageDependency p : process.getDependencies() ) {
+                        if( !gnur.checkPackage( p ) ) {
+                            allDependenciesMet = false;
+                            break;
                         }
                     }
-                    gnur.shutdown();
-                } catch( RserveException | REXPMismatchException | IOException ex ) {
-                    return new Tool[]{ ExpressTest, ExportCountTable };
+                    if( allDependenciesMet ) {
+                        toolList.add( process.getTool() );
+                    }
                 }
-                
-                return toolList.toArray( new Tool[2] );
-            } else {
-                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
-                return ret;
+            } catch( RserveException | REXPMismatchException ex ) {
+                return usableTools();
             }
+
+            return toolList.toArray( new Tool[2] );
         }
-        
-        
+
+
+        public static Tool[] usableTools() {
+            Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
+            return ret;
+        }
+
+
     }
-    
-    
+
+
     public static enum AnalysisStatus {
-        
+
         RUNNING, FINISHED, ERROR;
-        
+
     }
 
 
@@ -185,7 +184,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         genomeAnnos = new ArrayList<>();
         results = new ArrayList<>();
         collectCoverageDataInstances = new HashMap<>();
-        
+
     }
 
 
@@ -199,16 +198,16 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos.clear();
-        
+
         try {
             for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
                 genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
             }
-            
+
             for( PersistentTrack currentTrack : selectedTracks ) {
                 try {
                     TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
-                    
+
                     CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
                     collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
                     AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track " +
@@ -239,16 +238,16 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             interrupt();
         }
     }
-    
-    
+
+
     protected void prepareFeatures( DeAnalysisData analysisData ) {
         analysisData.setFeatures( genomeAnnos );
         analysisData.setSelectedTracks( selectedTracks );
     }
-    
-    
+
+
     protected void prepareCountData( final DeAnalysisData analysisData, final Map<Integer, Map<PersistentFeature, Integer>> allCountData ) {
-        
+
         for( PersistentTrack pt : selectedTracks ) {
             Integer key = pt.getId();
             int[] data = new int[getPersAnno().size()];
@@ -260,7 +259,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             }
             analysisData.addCountDataForTrack( data );
         }
-        
+
     }
 
 
@@ -283,39 +282,39 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * the Gnu R instance at this point.
      */
     public abstract void endAnalysis() throws RserveException;
-    
-    
+
+
     public void setResults( List<ResultDeAnalysis> results ) {
         this.results.clear();
         this.results.addAll( results );
     }
-    
-    
+
+
     public Map<Integer, Map<PersistentFeature, Integer>> getAllCountData() {
         return Collections.unmodifiableMap( allCountData );
     }
-    
-    
+
+
     public File getSaveFile() {
         return saveFile;
     }
-    
-    
+
+
     public List<PersistentFeature> getPersAnno() {
         return Collections.unmodifiableList( genomeAnnos );
     }
-    
-    
+
+
     public List<PersistentTrack> getSelectedTracks() {
         return Collections.unmodifiableList( selectedTracks );
     }
-    
-    
+
+
     public List<ResultDeAnalysis> getResults() {
         return Collections.unmodifiableList( results );
     }
-    
-    
+
+
     public ProcessingLog getProcessingLog() {
         return processingLog;
     }
@@ -327,26 +326,26 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     public int getRefGenomeID() {
         return refGenomeID;
     }
-    
-    
+
+
     public Map<Integer, CollectCoverageData> getCollectCoverageDataInstances() {
         return Collections.unmodifiableMap( collectCoverageDataInstances );
     }
-    
-    
+
+
     @Override
     public void run() {
         notifyObservers( AnalysisStatus.RUNNING );
         startAnalysis();
     }
-    
-    
+
+
     @Override
     public void registerObserver( Observer observer ) {
         this.observerList.add( observer );
     }
-    
-    
+
+
     @Override
     public void removeObserver( Observer observer ) {
         this.observerList.remove( observer );
@@ -359,8 +358,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             this.interrupt();
         }
     }
-    
-    
+
+
     @Override
     public void notifyObservers( Object data ) {
         //Copy the observer list to avoid concurrent modification exception
@@ -369,13 +368,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             currentObserver.update( data );
         }
     }
-    
-    
+
+
     @Override
     public synchronized void showData( Object data ) {
         Pair<Integer, String> res = (Pair<Integer, String>) data;
         allCountData.put( res.getFirst(), getCollectCoverageDataInstances().get( res.getFirst() ).getCountData() );
-        
+
         if( ++resultsReceivedBack == getCollectCoverageDataInstances().size() ) {
             try {
                 results.clear();
@@ -405,11 +404,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             }
         }
     }
-    
-    
+
+
     protected ReferenceConnector getReferenceConnector() {
         return referenceConnector;
     }
-    
-    
+
+
 }

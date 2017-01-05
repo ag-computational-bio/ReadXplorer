@@ -20,12 +20,24 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wiza
 
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageOverview;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.RProcessI;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.Version;
+import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RserveException;
 
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_TOOL;
 import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard.DiffExpressionWizardIterator.PROP_DGE_WIZARD_NAME;
@@ -35,13 +47,21 @@ public final class ChooseVisualPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final ComboBoxModel cbm = new DefaultComboBoxModel( DeAnalysisHandler.Tool.usableTools() );
+    private final ComboBoxModel<Tool> cbm;
 
 
     /**
      * Creates new form ChooseVisualPanel
      */
     public ChooseVisualPanel() {
+        Tool[] tools;
+        try {
+            tools = Tool.usableTools( GnuRAccess.startRServe( new ProcessingLog() ) );
+        } catch( RserveException | IOException ex ) {
+            jriErrorText.setText( "RServe instance not found or couldn't be initialized.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration." );
+            tools = Tool.usableTools();
+        }
+        this.cbm = new DefaultComboBoxModel<>( tools );
         initComponents();
         loadLastParameterSelection();
         if( !GnuRAccess.gnuRSetupCorrect() ) {
@@ -96,6 +116,8 @@ public final class ChooseVisualPanel extends JPanel {
         dgeToolComboBox = new javax.swing.JComboBox(cbm);
         jScrollPane2 = new javax.swing.JScrollPane();
         jriErrorText = new javax.swing.JTextArea();
+        checkPackagesButton = new javax.swing.JButton();
+        noRserveFoundLabel = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(510, 390));
         setPreferredSize(new java.awt.Dimension(510, 390));
@@ -117,6 +139,16 @@ public final class ChooseVisualPanel extends JPanel {
         jriErrorText.setRows(5);
         jScrollPane2.setViewportView(jriErrorText);
 
+        org.openide.awt.Mnemonics.setLocalizedText(checkPackagesButton, org.openide.util.NbBundle.getMessage(ChooseVisualPanel.class, "ChooseVisualPanel.checkPackagesButton.text")); // NOI18N
+        checkPackagesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkPackagesButtonActionPerformed(evt);
+            }
+        });
+
+        noRserveFoundLabel.setForeground(new java.awt.Color(229, 2, 2));
+        org.openide.awt.Mnemonics.setLocalizedText(noRserveFoundLabel, org.openide.util.NbBundle.getMessage(ChooseVisualPanel.class, "ChooseVisualPanel.noRserveFoundLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,9 +156,13 @@ public final class ChooseVisualPanel extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
                     .addComponent(dgeToolComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(noRserveFoundLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(checkPackagesButton, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -138,14 +174,49 @@ public final class ChooseVisualPanel extends JPanel {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(dgeToolComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkPackagesButton)
+                    .addComponent(noRserveFoundLabel))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void checkPackagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkPackagesButtonActionPerformed
+        try {
+            GnuR gnur = GnuRAccess.startRServe( new ProcessingLog() );
+            StringBuilder sb = new StringBuilder( "<html><head><style>table, th, td {border: 1px solid black}</style></head><body>" );
+            for( RProcessI process : Lookup.getDefault().<RProcessI>lookupAll( RProcessI.class ) ) {
+                sb.append( "<h3>" ).append( process.getTool().toString() ).append( "</h3>" );
+                sb.append( "<table style=\"width:100%\"><tr>" );
+                sb.append( "<th>Name</th><th>Required</th><th>Installed</th></tr>" );
+                for( RPackageDependency p : process.getDependencies() ) {
+                    Version v = gnur.getPackageVersion( p.getName() ).orElse( new Version( "0" ) );
+                    String installedVersion = (v.getVersion().equals( "0" )) ? "None" : v.getVersion();
+                    String requiredVersion = (p.getVersion().getVersion().equals( "0" )) ? "Any" : p.getVersion().getVersion();
+                    if( p.getVersion().compareTo( v ) <= 0 && !installedVersion.equals( "None" ) ) {
+                        sb.append( String.format( "<tr><td>%s</td><td>%s</td><td>%s</td></tr>", p.getName(), requiredVersion, installedVersion ) );
+                    } else {
+                        sb.append( String.format( "<tr style=\"color:red;\"><td>%s</td><td>%s</td><td>%s</td></tr>", p.getName(), requiredVersion, installedVersion ) );
+                    }
+                }
+                sb.append( "</table><br>" );
+            }
+            sb.append( "</body></html>" );
+            JOptionPane.showConfirmDialog( null, new RPackageOverview( sb.toString() ), "R package dependencies", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
+            gnur.shutdown();
+        } catch( RserveException | IOException | REXPMismatchException ex ) {
+            Exceptions.printStackTrace( ex );
+        }
+    }//GEN-LAST:event_checkPackagesButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton checkPackagesButton;
     private javax.swing.JComboBox dgeToolComboBox;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jriErrorText;
+    private javax.swing.JLabel noRserveFoundLabel;
     // End of variables declaration//GEN-END:variables
 }

@@ -124,7 +124,7 @@ public class DeSeq2 implements RProcessI {
 
             if( analysisData.moreThanTwoConditions() ) {
                 LOG.info( "moreThanTwoConditions is still a TODO" );
-                //TODO
+                //TODO Analysis with more than two conditions
             } else {
                 //If this is just a two conditons experiment we only create the conds array
                 gnuR.eval( "conds <- factor(" + concatenate.toString() + ')' );

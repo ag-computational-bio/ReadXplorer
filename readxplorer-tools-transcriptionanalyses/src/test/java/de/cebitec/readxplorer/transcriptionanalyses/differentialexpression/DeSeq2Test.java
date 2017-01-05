@@ -25,8 +25,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +35,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openide.util.Exceptions;
 import org.rosuda.REngine.Rserve.RserveException;
 
 import static org.junit.Assert.assertEquals;

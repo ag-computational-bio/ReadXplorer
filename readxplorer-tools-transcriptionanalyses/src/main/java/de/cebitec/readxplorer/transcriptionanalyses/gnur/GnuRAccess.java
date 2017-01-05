@@ -24,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -58,9 +57,9 @@ public final class GnuRAccess {
      * running instances we start one port above
      */
     private static int nextFreePort = 6312;
-    
+
     private static final SecureRandom RANDOM = new SecureRandom();
-    
+
     private static final Logger LOG = LoggerFactory.getLogger( GnuRAccess.class.getName() );
 
 
@@ -75,10 +74,11 @@ public final class GnuRAccess {
         boolean useStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
         boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
         boolean useAuth = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_AUTH, false );
-        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
-        if( cebitecIndicator.exists() ) {
-            return accessCebitecRserve( cebitecIndicator, processingLog );
-        } else if( remoteSetup || OsUtils.isMac() ) {
+//        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
+//        if( cebitecIndicator.exists() ) {
+//            return accessCebitecRserve( cebitecIndicator, processingLog );
+//        } else 
+        if( remoteSetup || OsUtils.isMac() ) {
             port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
             host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_HOST, "localhost" );
             instance = accessRemoteRserve( host, port, processingLog );
@@ -89,29 +89,27 @@ public final class GnuRAccess {
             }
         } else {
             instance = accessLocalRserve( useStartupScript, processingLog );
-            if (useStartupScript && useAuth){
+            if( useStartupScript && useAuth ) {
                 String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
                 String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
                 instance.login( user, password );
             }
-                
+
         }
         return instance;
     }
 
 
-    private static GnuR accessCebitecRserve( File cebitecIndicator, ProcessingLog processingLog ) throws FileNotFoundException, IOException, RserveException {
-        String ip;
-        try( FileReader fr = new FileReader( cebitecIndicator ); BufferedReader br = new BufferedReader( fr ) ) {
-            ip = br.readLine();
-        }
-        GnuR instance = new GnuR( ip, 6311, false, processingLog );
-        instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
-        return instance;
-    }
-
-
-    private static GnuR accessRemoteRserve( String host, int port, ProcessingLog processingLog ) throws FileNotFoundException, IOException, RserveException {
+//    private static GnuR accessCebitecRserve( File cebitecIndicator, ProcessingLog processingLog ) throws FileNotFoundException, IOException, RserveException {
+//        String ip;
+//        try( FileReader fr = new FileReader( cebitecIndicator ); BufferedReader br = new BufferedReader( fr ) ) {
+//            ip = br.readLine();
+//        }
+//        GnuR instance = new GnuR( ip, 6311, false, processingLog );
+//        instance.login( "readxplorer", "DEfq984Fue3Xor81905jft249" );
+//        return instance;
+//    }
+    private static GnuR accessRemoteRserve( String host, int port, ProcessingLog processingLog ) throws FileNotFoundException, RserveException {
         return new GnuR( host, port, false, processingLog );
     }
 
@@ -204,7 +202,7 @@ public final class GnuRAccess {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.error( "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
             }
-        }).start();
+        } ).start();
         new Thread( () -> {
             try {
                 BufferedReader reader
@@ -217,7 +215,7 @@ public final class GnuRAccess {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 LOG.error( "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
             }
-        }).start();
+        } ).start();
         //Give the Process a moment to start up everything.
         try {
             rserveProcess.waitFor();
