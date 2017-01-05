@@ -58,24 +58,26 @@ public class BaySeq implements RProcessI {
 
     private static final Logger LOG = LoggerFactory.getLogger( BaySeq.class.getName() );
 
-    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "baySeq" ), 
-                                                                                 new RPackageDependency( "snow" ), 
+    private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "baySeq" ),
+                                                                                 new RPackageDependency( "snow" ),
                                                                                  new RPackageDependency( "parallel" ) };
 
 
     public BaySeq() {
     }
 
-    
+
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
     }
-    
+
+
     @Override
     public Tool getTool() {
         return Tool.BaySeq;
     }
+
 
     /**
      * Processes data from a differential expression analysis experiment using
@@ -159,6 +161,7 @@ public class BaySeq implements RProcessI {
             gnuR.eval( "groups(cD) <- list(" + concatenate.toString() + ')' );
             //parameter samplesize could be added.
             gnuR.eval( "cD <- getPriors.NB(cD, cl = cl)" );
+            //TODO: This function is deprecated; using 'getLikelihoods' instead.
             gnuR.eval( "cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)" );
             int resultIndex = 0;
             for( int j = 1; j <= numberofGroups; j++ ) {
@@ -181,6 +184,9 @@ public class BaySeq implements RProcessI {
             }
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );
+            }
+            if( gnuR.runsLocal() ) {
+                gnuR.eval( "stopCluster(cl)" );
             }
         } catch( IOException | REXPMismatchException | REngineException e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
             //The new generated exception can than be caught an handelt by the DeAnalysisHandler
