@@ -23,18 +23,13 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAna
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuRAccess;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
-import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageDependency;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.RPackageOverview;
-import de.cebitec.readxplorer.transcriptionanalyses.gnur.RProcessI;
-import de.cebitec.readxplorer.transcriptionanalyses.gnur.Version;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -54,18 +49,22 @@ public final class ChooseVisualPanel extends JPanel {
      * Creates new form ChooseVisualPanel
      */
     public ChooseVisualPanel() {
+        String errorText = null;
+        if( !GnuRAccess.gnuRSetupCorrect() ) {
+            errorText = "GNU R is not installed correctly.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration.";
+        }
         Tool[] tools;
         try {
             tools = Tool.usableTools( GnuRAccess.startRServe( new ProcessingLog() ) );
         } catch( RserveException | IOException ex ) {
-            jriErrorText.setText( "RServe instance not found or couldn't be initialized.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration." );
+            errorText = "RServe instance not found or couldn't be initialized.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration.";
             tools = Tool.usableTools();
         }
         this.cbm = new DefaultComboBoxModel<>( tools );
         initComponents();
         loadLastParameterSelection();
-        if( !GnuRAccess.gnuRSetupCorrect() ) {
-            jriErrorText.setText( "GNU R is not installed correctly.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration." );
+        if (errorText != null){
+            jriErrorText.setText( errorText );
         }
     }
 
@@ -183,30 +182,13 @@ public final class ChooseVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void checkPackagesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkPackagesButtonActionPerformed
+        //TODO: set text field immutable
         try {
             GnuR gnur = GnuRAccess.startRServe( new ProcessingLog() );
-            StringBuilder sb = new StringBuilder( "<html><head><style>table, th, td {border: 1px solid black}</style></head><body>" );
-            for( RProcessI process : Lookup.getDefault().<RProcessI>lookupAll( RProcessI.class ) ) {
-                sb.append( "<h3>" ).append( process.getTool().toString() ).append( "</h3>" );
-                sb.append( "<table style=\"width:100%\"><tr>" );
-                sb.append( "<th>Name</th><th>Required</th><th>Installed</th></tr>" );
-                for( RPackageDependency p : process.getDependencies() ) {
-                    Version v = gnur.getPackageVersion( p.getName() ).orElse( new Version( "0" ) );
-                    String installedVersion = (v.getVersion().equals( "0" )) ? "None" : v.getVersion();
-                    String requiredVersion = (p.getVersion().getVersion().equals( "0" )) ? "Any" : p.getVersion().getVersion();
-                    if( p.getVersion().compareTo( v ) <= 0 && !installedVersion.equals( "None" ) ) {
-                        sb.append( String.format( "<tr><td>%s</td><td>%s</td><td>%s</td></tr>", p.getName(), requiredVersion, installedVersion ) );
-                    } else {
-                        sb.append( String.format( "<tr style=\"color:red;\"><td>%s</td><td>%s</td><td>%s</td></tr>", p.getName(), requiredVersion, installedVersion ) );
-                    }
-                }
-                sb.append( "</table><br>" );
-            }
-            sb.append( "</body></html>" );
-            JOptionPane.showConfirmDialog( null, new RPackageOverview( sb.toString() ), "R package dependencies", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
+            JOptionPane.showMessageDialog( null, new RPackageOverview( gnur ), "R package dependencies", JOptionPane.DEFAULT_OPTION );
             gnur.shutdown();
         } catch( RserveException | IOException | REXPMismatchException ex ) {
-            Exceptions.printStackTrace( ex );
+            JOptionPane.showMessageDialog( null, "Could not connect to R server.", "R package dependencies", JOptionPane.ERROR_MESSAGE );
         }
     }//GEN-LAST:event_checkPackagesButtonActionPerformed
 
