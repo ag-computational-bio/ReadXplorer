@@ -62,6 +62,10 @@ public final class GnuR extends RConnection {
     public static boolean isLocalMachineRunning() {
         return isConnectableInstanceRunning;
     }
+    
+    public static void setLocalMachineRunning(boolean isLocalMachineRunning){
+        isConnectableInstanceRunning = isLocalMachineRunning;
+    }
 
 
     /**
@@ -219,14 +223,29 @@ public final class GnuR extends RConnection {
     @Override
     public synchronized void shutdown() throws RserveException {
         //If we started the RServe instace by our self we should also terminate it.
-        //If we are connected to a remote server however we should not do so.
+        //If we are connected to a remote server however we should not do so and 
+        //just close the connection.
         if( runningLocal ) {
             numberOfLocalActiveConnections--;
             if( numberOfLocalActiveConnections < 1 ) {
+                processingLog.logGNURoutput( "Close connection and shutdown Rserve instance." );
                 isConnectableInstanceRunning = false;
                 super.shutdown();
+                return;
             }
         }
+        processingLog.logGNURoutput( "Close connection." );
+        super.close();
+    }
+
+
+    @Override
+    public synchronized boolean close() {
+        if( runningLocal ) {
+            numberOfLocalActiveConnections--;
+        }
+        processingLog.logGNURoutput( "Close connection." );
+        return super.close();
     }
 
 
