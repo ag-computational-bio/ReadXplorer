@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,8 +63,8 @@ public final class ProcessingLog {
 
     public String generateLog() {
         StringBuilder log = new StringBuilder();
-        Set<String> keys = properties.keySet();
-        Map<String, Object> tmpProperties = new HashMap<>( properties );
+        Set<String> keys = (properties != null) ? properties.keySet() : new HashSet<>();
+        Map<String, Object> tmpProperties = (properties != null) ? new HashMap<>( properties ) : new HashMap<>();
 
         for( String key : keys ) {
             if( !key.startsWith( "WizardPanel" ) ) {
