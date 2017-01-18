@@ -54,16 +54,22 @@ public final class ChooseVisualPanel extends JPanel {
             errorText = "GNU R is not installed correctly.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration.";
         }
         Tool[] tools;
+        GnuR gnur = null;
         try {
-            tools = Tool.usableTools( GnuRAccess.startRServe( new ProcessingLog() ) );
+            gnur = GnuRAccess.startRServe( new ProcessingLog() );
+            tools = Tool.usableTools( gnur );            
         } catch( RserveException | IOException ex ) {
             errorText = "RServe instance not found or couldn't be initialized.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration.";
             tools = Tool.usableTools();
+        } finally {
+            if (gnur != null){
+                gnur.close();
+            }
         }
         this.cbm = new DefaultComboBoxModel<>( tools );
         initComponents();
         loadLastParameterSelection();
-        if (errorText != null){
+        if( errorText != null ) {
             jriErrorText.setText( errorText );
         }
     }

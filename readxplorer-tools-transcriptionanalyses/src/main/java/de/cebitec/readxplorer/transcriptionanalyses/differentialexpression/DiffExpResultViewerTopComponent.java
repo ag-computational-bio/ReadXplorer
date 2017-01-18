@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.exporter.tables.ListTableToExcel;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.AnalysisStatus;
@@ -27,8 +26,6 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.DeSeq2GraphicsTopComponent;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.DeSeqGraphicsTopComponent;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.ExpressTestGraphicsTopComponent;
-import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
-import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
@@ -58,11 +55,8 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.NbPreferences;
 import org.openide.windows.TopComponent;
-import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -363,14 +357,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
     @Override
     public void componentClosed() {
         analysisHandler.removeObserver( this );
-        if( GnuR.isLocalMachineRunning() ) {
-            int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
-            try {
-                (new GnuR( "localhost", port, true, new ProcessingLog() )).shutdown();
-            } catch( RserveException ex ) {
-                Exceptions.printStackTrace( ex );
-            }
-        }
     }
 
 

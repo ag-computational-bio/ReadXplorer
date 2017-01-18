@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -353,7 +352,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             try {
                 endAnalysis();
             } catch( RserveException ex ) {
-                Exceptions.printStackTrace( ex );
+                JOptionPane.showMessageDialog( null, "ReadXplorer could not shut down the Rserve instance. Please be aware that the Rserve server could still be running.", "Could not shut down Rserve server!", JOptionPane.WARNING_MESSAGE);
             }
             this.interrupt();
         }

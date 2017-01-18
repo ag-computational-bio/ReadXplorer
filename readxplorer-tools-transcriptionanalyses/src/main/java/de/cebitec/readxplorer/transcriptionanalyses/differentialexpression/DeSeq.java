@@ -251,7 +251,7 @@ public class DeSeq implements RProcessI {
             }
 
         } catch( IOException | REXPMismatchException | REngineException e ) { //We don't know what errors Gnu R might cause, so we have to catch all.
-            //The new generated exception can than be caught an handelt by the DeAnalysisHandler
+            //The new generated exception can than be caught an handled by the DeAnalysisHandler
             //If something goes wrong try to shutdown Rserve so that no instance keeps running
             this.shutdown();
             throw new UnknownGnuRException( e );

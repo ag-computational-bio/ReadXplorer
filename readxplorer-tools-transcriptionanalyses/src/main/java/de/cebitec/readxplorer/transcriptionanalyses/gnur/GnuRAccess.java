@@ -115,7 +115,6 @@ public final class GnuRAccess {
 
 
     private static GnuR accessLocalRserve( boolean useStartupScript, ProcessingLog processingLog ) throws FileNotFoundException, IOException, RserveException {
-        GnuR instance;
         ProcessBuilder pb;
         final Process rserveProcess;
         String host = "localhost";
@@ -127,6 +126,8 @@ public final class GnuRAccess {
                 rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
                 if( rserveProcess == null || (rserveProcess.exitValue() != 0) ) {
                     throw new IOException( "Could not start Rserve instance!" );
+                } else {
+                    GnuR.setLocalMachineRunning( true );
                 }
             }
 

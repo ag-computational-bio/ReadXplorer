@@ -18,6 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.wizard;
 
 
+import de.cebitec.readxplorer.api.constants.RServe;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.api.enums.FeatureType;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
@@ -30,6 +31,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffE
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExportOnlyAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ExpressTestAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group;
+import de.cebitec.readxplorer.transcriptionanalyses.gnur.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.gnur.ProcessingLog;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import java.awt.Component;
@@ -43,6 +45,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeListener;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -50,18 +53,21 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.NbPreferences;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
  * Wizard iterator for the differential gene expression analysis.
- * 
+ *
  * @author Kai Stadermann
  */
 @ActionID( category = "Tools", id = "de.cebitec.readxplorer.differentialExpression.DiffExpWizardAction" )
 @ActionRegistration( iconBase = "de/cebitec/readxplorer/transcriptionanalyses/dge.png",
                      displayName = "Differential Gene Expression Analysis" )
 @ActionReferences( {
-    @ActionReference( path = "Menu/Tools", position = 10 ),
+    @ActionReference( path = "Menu/Tools", position = 10 )
+    ,
     @ActionReference( path = "Toolbars/Tools", position = 100 )
 } )
 public final class DiffExpressionWizardIterator implements
@@ -131,7 +137,7 @@ public final class DiffExpressionWizardIterator implements
             List<PersistentTrack> selectedTracks = (List<PersistentTrack>) wiz.getProperty( "tracks" );
             Integer genomeID = (Integer) wiz.getProperty( "genomeID" );
             int[] replicateStructure = (int[]) wiz.getProperty( "replicateStructure" );
-            File saveRCmdFile = (File) wiz.getProperty(PROP_DGE_SAVE_R_CMD_FILE );
+            File saveRCmdFile = (File) wiz.getProperty( PROP_DGE_SAVE_R_CMD_FILE );
             Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty( "design" );
             Set<FeatureType> featureTypes = (Set<FeatureType>) wiz.getProperty( PROP_DGE_SELECTED_FEAT_TYPES );
             Integer startOffset = (Integer) wiz.getProperty( PROP_DGE_START_OFFSET );
@@ -198,6 +204,15 @@ public final class DiffExpressionWizardIterator implements
             handler.registerObserver( diffExpResultViewerTopComponent );
             log.setProperties( wiz.getProperties() );
             handler.start();
+        } else {
+            if( GnuR.isLocalMachineRunning() ) {
+                int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
+                try {
+                    (new GnuR( "localhost", port, true, new ProcessingLog() )).shutdown();
+                } catch( RserveException ex ) {
+                    JOptionPane.showMessageDialog( null, "ReadXplorer could not shut down the Rserve instance. Please be aware that the Rserve server could still be running.", "Could not shut down Rserve server!", JOptionPane.WARNING_MESSAGE );
+                }
+            }
         }
     }
 
