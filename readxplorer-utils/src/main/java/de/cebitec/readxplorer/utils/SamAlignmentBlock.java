@@ -55,6 +55,14 @@ public class SamAlignmentBlock {
     public int getRefStop() {
         return refStop;
     }
+    
+    
+    /**
+     * @return The length of the block.
+     */
+    public int getLength() {
+        return Math.abs( refStop - refStart ) + 1;
+    }
 
 
     /**

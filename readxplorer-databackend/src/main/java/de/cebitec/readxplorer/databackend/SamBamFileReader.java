@@ -388,6 +388,7 @@ public class SamBamFileReader implements Observable, Observer {
 
                             Mapping mapping = getMappingForValues( mappingClass, numMappingsForRead, id++,
                                                                    startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
+                            mapping.setAlignmentBlocks( samUtils.getAlignmentBlocks( record.getCigar(), startPos ) );
                             if( pairId != null && pairType != null ) { //since both data fields are always written together
                                 // add new readPair if not exists
                                 long readPairId = pairId;

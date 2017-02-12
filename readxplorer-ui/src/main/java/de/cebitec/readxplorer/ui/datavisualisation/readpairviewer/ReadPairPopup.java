@@ -86,7 +86,8 @@ public class ReadPairPopup extends JPopupMenu {
                           "ReadPair=Read Pair",
                           "Type=Type:",
                           "Replicates=Replicates:",
-                          "Distance=Distance:" } )
+                          "Distance=Distance:",
+                          "FragmentLength=Fragment Length:"} )
     private void initDataAndComponents() {
         ReadPairGroup readPairData = this.getReadPairInfo(); //TODO: get infos from elswhere
 
@@ -119,6 +120,7 @@ public class ReadPairPopup extends JPopupMenu {
             hex = hex.substring( 2, hex.length() );
 
             long distance = Math.abs( readPair.getStop() - readPair.getStart() );
+            int fragmentLength = readPair.getFragmentLength();
             JLabel readPairLabel = new JLabel( "<html>".concat( Bundle.ReadPair() ).
                     concat( " " ).concat( String.valueOf( i + 1 ) ).concat( "<br>" ).
                     concat( Bundle.Type() ).
@@ -127,7 +129,9 @@ public class ReadPairPopup extends JPopupMenu {
                     concat( Bundle.Replicates() ).
                     concat( " " ).concat( String.valueOf( readPair.getReadPairReplicates() ) ).concat( "<br> " ).
                     concat( Bundle.Distance() ).
-                    concat( " " ).concat( String.valueOf( distance ) ).concat( "</html>" ) );
+                    concat( " " ).concat( String.valueOf( distance ) ).concat( "<br> " ).
+                    concat( Bundle.FragmentLength() ).
+                    concat( " " ).concat( String.valueOf( fragmentLength ) ).concat( "</html>" ) );
             readPairInfoPanel.add( readPairLabel );
 
             //handle mappings of pair
@@ -237,7 +241,7 @@ public class ReadPairPopup extends JPopupMenu {
         }
         this.setSize( size );
     }
-
+    
 
     /**
      * @return all information about this components read pair from the DB to

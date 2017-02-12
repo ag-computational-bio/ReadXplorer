@@ -20,13 +20,14 @@ package de.cebitec.readxplorer.databackend.dataobjects;
 
 import de.cebitec.readxplorer.api.constants.Colors;
 import de.cebitec.readxplorer.api.enums.ReadPairType;
+import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import java.awt.Color;
 
 
 /**
- * Creates a new persistent read pair. If both mappings of the pair are
- * visible the second mapping has to be added separately.
- * TODO persistent objects vereinheitlichen, wo möglich
+ * Creates a new persistent read pair. If both mappings of the pair are visible
+ * the second mapping has to be added separately. TODO persistent objects
+ * vereinheitlichen, wo möglich
  * <p>
  * @author Rolf Hilker
  */
@@ -37,7 +38,7 @@ public class ReadPair implements ObjectWithId {
     private ReadPairType readPairType;
     private int readPairReplicates;
     private Mapping visibleMapping;
-    private Mapping visiblemapping2;
+    private Mapping visibleMapping2;
 
 
     /**
@@ -68,8 +69,7 @@ public class ReadPair implements ObjectWithId {
      * visible the second mapping has to be added separately.
      * <p>
      * @param readPairID         id of the pair, will identify all mappings
-     *                           belonging to
-     *                           this pair id
+     *                           belonging to this pair id
      * @param mapping1ID         id of mapping 1 of this pair
      * @param mapping2ID         id of mapping 2 of this pair
      * @param readPairType       type of the read pair (
@@ -87,7 +87,7 @@ public class ReadPair implements ObjectWithId {
         this.readPairType = readPairType;
         this.readPairReplicates = readPairReplicates == 0 ? 1 : readPairReplicates;
         this.visibleMapping = visibleMapping;
-        this.visiblemapping2 = mate;
+        this.visibleMapping2 = mate;
     }
 
 
@@ -144,11 +144,10 @@ public class ReadPair implements ObjectWithId {
 
     /**
      * @return If both mappings of the pair are visible, it returns the second
-     *         mapping
-     *         otherwise it returns null
+     *         mapping otherwise it returns null
      */
     public Mapping getVisibleMapping2() {
-        return visiblemapping2;
+        return visibleMapping2;
     }
 
 
@@ -159,7 +158,7 @@ public class ReadPair implements ObjectWithId {
      * @param visiblemapping2 the second mapping of the pair
      */
     public void setVisiblemapping2( Mapping visiblemapping2 ) {
-        this.visiblemapping2 = visiblemapping2;
+        this.visibleMapping2 = visiblemapping2;
     }
 
 
@@ -168,11 +167,11 @@ public class ReadPair implements ObjectWithId {
      *         pair are visible, returns the smaller start position among both
      */
     public long getStart() {
-        if( this.visiblemapping2 == null ) {
-            return this.visibleMapping.getStart();
+        if( visibleMapping2 == null ) {
+            return visibleMapping.getStart();
         } else {
-            long start1 = this.visibleMapping.getStart();
-            long start2 = this.visiblemapping2.getStart();
+            long start1 = visibleMapping.getStart();
+            long start2 = visibleMapping2.getStart();
             return start1 < start2 ? start1 : start2;
         }
     }
@@ -183,13 +182,80 @@ public class ReadPair implements ObjectWithId {
      *         pair are visible, returns the larger stop position among both
      */
     public long getStop() {
-        if( this.visiblemapping2 == null ) {
+        if( visibleMapping2 == null ) {
             return this.visibleMapping.getStop();
         } else {
-            long stop1 = this.visibleMapping.getStop();
-            long stop2 = this.visiblemapping2.getStop();
+            long stop1 = visibleMapping.getStop();
+            long stop2 = visibleMapping2.getStop();
             return stop1 > stop2 ? stop1 : stop2;
         }
+    }
+
+
+    /**
+     * Caclulate the read pair fragment length for all alignment blocks.
+     *
+     * @return The actual length of the fragment
+     */
+    public int getFragmentLength() {
+        int length;
+        if( visibleMapping2 == null || visibleMapping2.getStop() == -1 ) {
+            length = visibleMapping.getAlignmentBlockLength(); //TODO: actual length of fragment is missing read 2 here
+        } else {
+            int start = visibleMapping.getStart();
+            int start2 = visibleMapping2.getStart();
+            int stop = visibleMapping.getStop();
+            int stop2 = visibleMapping2.getStop();
+
+            boolean useFst = start < start2;
+            boolean overlapping = stop > start2 && start < start2 || stop2 > start && start2 < start;
+
+            if( !overlapping ) {
+                length = visibleMapping.getAlignmentBlockLength() + visibleMapping2.getAlignmentBlockLength();
+
+            } else if( useFst ) {
+                length = sumAlignmentBlocks( visibleMapping, visibleMapping2 );
+            } else {
+                length = sumAlignmentBlocks( visibleMapping2, visibleMapping );
+            }
+        }
+        return length;
+    }
+
+
+    /**
+     * Sum all alignment blocks to calculate the fragment length.
+     *
+     * @param mapping  First mapping with regards to reference coordinates
+     * @param mapping2 Second mapping with regards to reference coordinates
+     *
+     * @return The fragment length in bp
+     */
+    private int sumAlignmentBlocks( Mapping mapping, Mapping mapping2 ) {
+        int length = 0;
+        if( mapping.getAlignmentBlocks().isEmpty() && mapping2.getAlignmentBlocks().isEmpty() ) {
+            length = mapping2.getStart() - mapping.getStart() + mapping2.getLength();
+        
+        } else if (mapping.getAlignmentBlocks().isEmpty()) {
+            length = mapping2.getStart() - mapping.getStart() + mapping2.getAlignmentBlockLength();
+        
+        } else if (mapping2.getAlignmentBlocks().isEmpty()) {
+            length = mapping.getAlignmentBlockLength() + mapping2.getStop() - mapping.getStop();
+        
+        } else {
+            for( SamAlignmentBlock block : mapping.getAlignmentBlocks() ) {
+                if( block.getRefStop() < mapping2.getStart() ) {
+                    length += block.getLength();
+                } else {
+                    length += mapping2.getAlignmentBlocks().get( 0 ).getRefStart() - block.getRefStart();
+                    for( SamAlignmentBlock block2 : mapping2.getAlignmentBlocks() ) {
+                        length += block2.getLength();
+                    }
+                    break;
+                }
+            }
+        }
+        return length;
     }
 
 
@@ -198,7 +264,7 @@ public class ReadPair implements ObjectWithId {
      *         false otherwise
      */
     public boolean hasVisibleMapping2() {
-        return this.visiblemapping2 != null;
+        return this.visibleMapping2 != null;
     }
 
 

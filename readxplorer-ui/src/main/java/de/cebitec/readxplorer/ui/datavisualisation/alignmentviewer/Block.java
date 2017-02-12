@@ -79,9 +79,6 @@ public class Block implements BlockI, GenomicRange {
                             this.fillWithForeignGaps( gapManager.getNumOfGapsAt( i ) );
                         }
                     }
-                    if( i == 2055 ) {
-                        System.out.println();
-                    }
                     this.addDiffOrMatchBrick( mapping, i );
                 }
             }
@@ -109,9 +106,6 @@ public class Block implements BlockI, GenomicRange {
                     start = alignmentBlock.getRefStop() < absStart ? absStart : alignmentBlock.getRefStop() + 1;
                     stop = nexStart > absStop ? absStop : nexStart;
                     for( int j = start; j < stop; ++j ) {
-                        if( j == 2055 ) {
-                            System.out.println();
-                        }
                         bricks.add( Brick.SKIPPED );
                     }
                 }
