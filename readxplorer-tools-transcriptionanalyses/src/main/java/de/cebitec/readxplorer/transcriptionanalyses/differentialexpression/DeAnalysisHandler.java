@@ -352,7 +352,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             try {
                 endAnalysis();
             } catch( RserveException ex ) {
-                JOptionPane.showMessageDialog( null, "ReadXplorer could not shut down the Rserve instance. Please be aware that the Rserve server could still be running.", "Could not shut down Rserve server!", JOptionPane.WARNING_MESSAGE);
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.error( currentTimestamp + ": " + ex.getMessage() );
+                JOptionPane.showMessageDialog( null, "ReadXplorer could not shut down the Rserve instance. Please be aware that the Rserve server could still be running.", "Could not shut down Rserve server!", JOptionPane.WARNING_MESSAGE );
             }
             this.interrupt();
         }
