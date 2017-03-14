@@ -53,6 +53,27 @@ public class Group {
     }
 
 
+    public String getNormalizedStringRepresentation() {
+        if (this.integerRepresentation.length == 0){
+            return "";
+        }
+        StringBuilder sb = new StringBuilder( integerRepresentation.length );
+        char smallestGroupCharacter = 'A';
+        int smallestGroupNumber = integerRepresentation[0];
+        for( int i = 0; i < integerRepresentation.length; i++ ) {
+            if( smallestGroupNumber > integerRepresentation[i] ) {
+                smallestGroupNumber = integerRepresentation[i];
+            }
+        }
+        for( int i = 0; i < integerRepresentation.length; i++ ) {
+            sb.append( (char)(smallestGroupCharacter + integerRepresentation[i] - smallestGroupNumber) );
+            sb.append( ',' );
+        }
+        sb.deleteCharAt( sb.length()-1 );
+        return sb.toString();
+    }
+
+
     @Override
     public String toString() {
         return stringRepresentation;

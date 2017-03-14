@@ -163,6 +163,7 @@ public class BaySeq implements RProcessI {
             gnuR.eval( "cD <- getPriors.NB(cD, cl = cl)" );
             //TODO: This function is deprecated; using 'getLikelihoods' instead.
             gnuR.eval( "cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)" );
+            String[] groupStringRepresentations = bseqData.getGroupNormalizedStringRepresentations();
             int resultIndex = 0;
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ')' );
@@ -170,7 +171,8 @@ public class BaySeq implements RProcessI {
                 List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
                 REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
-                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
+                String dropdownTitle = "Result of model " + j + " (" + groupStringRepresentations[j - 1] + ")";
+                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, dropdownTitle, bseqData ) );
                 resultIndex++;
             }
             for( int j = 1; j <= numberofGroups; j++ ) {
@@ -179,7 +181,8 @@ public class BaySeq implements RProcessI {
                 List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
                 REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
-                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
+                String dropdownTitle = "Normalized result of model " + j + " (" + groupStringRepresentations[j - 1] + ")";
+                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, dropdownTitle, bseqData ) );
                 resultIndex++;
             }
             if( saveFile != null ) {

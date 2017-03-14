@@ -64,6 +64,15 @@ public class BaySeqAnalysisData extends DeAnalysisData {
     }
 
 
+    public String[] getGroupNormalizedStringRepresentations() {
+        String[] repr = new String[groups.size()];
+        for( int i = 0; i < repr.length; i++ ) {
+            repr[i] = groups.get( i ).getNormalizedStringRepresentation();
+        }
+        return repr;
+    }
+
+
     /**
      * Checks if there is still an unreturned group.
      * <p>
@@ -72,6 +81,11 @@ public class BaySeqAnalysisData extends DeAnalysisData {
      */
     public boolean hasGroups() {
         return !(nextGroup >= groups.size());
+    }
+
+
+    public void resetGroupCounter() {
+        nextGroup = 0;
     }
 
 
