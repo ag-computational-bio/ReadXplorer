@@ -68,7 +68,7 @@ public class Unzip implements Runnable, Observable {
      * Utility class for unzipping a file.
      * <p>
      * @param zip zip file
-     * @param to target file for the unzip process
+     * @param to target directory for the unzip process
      * <p>
      * @throws de.cebitec.readxplorer.utils.Unzip.NoDirectoryException
      */
