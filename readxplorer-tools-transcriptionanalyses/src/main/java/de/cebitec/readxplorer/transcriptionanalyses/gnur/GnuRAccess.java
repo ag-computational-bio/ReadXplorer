@@ -71,27 +71,28 @@ public final class GnuRAccess {
         GnuR instance;
         String host;
         int port;
-        boolean useStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
-        boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
-        boolean useAuth = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_AUTH, false );
+        boolean useStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, false );
+        boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_REMOTE_SETUP, false );
+        boolean useAuthStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_STARTUP_SCRIPT_USE_AUTH, false );
+        boolean useAuthRemote = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_REMOTE_USE_AUTH, false );
 //        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
 //        if( cebitecIndicator.exists() ) {
 //            return accessCebitecRserve( cebitecIndicator, processingLog );
 //        } else 
         if( remoteSetup || OsUtils.isMac() ) {
-            port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
-            host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_HOST, "localhost" );
+            port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_REMOTE_PORT, 6311 );
+            host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_REMOTE_HOST, "localhost" );
             instance = accessRemoteRserve( host, port, processingLog );
-            if( useAuth ) {
-                String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
-                String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
+            if( useAuthRemote ) {
+                String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_REMOTE_USER, "" );
+                String password = new String( PasswordStore.read( RServe.RSERVE_REMOTE_PASSWORD ) );
                 instance.login( user, password );
             }
         } else {
             instance = accessLocalRserve( useStartupScript, processingLog );
-            if( useStartupScript && useAuth ) {
-                String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_USER, "" );
-                String password = new String( PasswordStore.read( RServe.RSERVE_PASSWORD ) );
+            if( useStartupScript && useAuthStartupScript ) {
+                String user = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT_USER, "" );
+                String password = new String( PasswordStore.read( RServe.RSERVE_STARTUP_SCRIPT_PASSWORD ) );
                 instance.login( user, password );
             }
 
@@ -120,10 +121,14 @@ public final class GnuRAccess {
         String host = "localhost";
 
         if( useStartupScript ) {
-            int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
+            int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_STARTUP_SCRIPT_PORT, 6311 );
             if( !(OsUtils.isLinux() && GnuR.isLocalMachineRunning()) ) {
-                File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
-                rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
+                if( NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_STARTUP_SCRIPT_USE_DEFAULT_SCRIPT, false ) ) {
+                    rserveProcess = launchDefaultStartUpScript( port, processingLog );
+                } else {
+                    File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT_PATH, "" ) );
+                    rserveProcess = launchStartUpScript( startUpScript, port, processingLog );
+                }
                 if( rserveProcess == null || (rserveProcess.exitValue() != 0) ) {
                     throw new IOException( "Could not start Rserve instance!" );
                 } else {
@@ -228,15 +233,61 @@ public final class GnuRAccess {
     }
 
 
+    private static Process launchDefaultStartUpScript( int port, ProcessingLog processingLog1 ) throws IOException {
+//        ProcessBuilder pb;
+//        List<String> commands = new ArrayList<>();
+//        commands.add( "which R" );
+//        commands.add( "R CMD Rserve --RS-port " + port + " --vanilla" );
+//        commands.add( String.valueOf( port ) );
+//        commands.add( "--vanilla" );
+        ProcessBuilder pb = new ProcessBuilder( "R", "CMD", "Rserve", "--RS-port", String.valueOf(port), "--vanilla" );
+        final Process rserveProcess = pb.start();
+        new Thread( () -> {
+            try {
+                BufferedReader reader
+                        = new BufferedReader( new InputStreamReader( rserveProcess.getInputStream() ) );
+                String line;
+                while( (line = reader.readLine()) != null ) {
+                    processingLog1.logGNURoutput( line );
+                }
+            } catch( IOException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.error( "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
+            }
+        } ).start();
+        new Thread( () -> {
+            try {
+                BufferedReader reader
+                        = new BufferedReader( new InputStreamReader( rserveProcess.getErrorStream() ) );
+                String line;
+                while( (line = reader.readLine()) != null ) {
+                    processingLog1.logGNURoutput( line );
+                }
+            } catch( IOException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                LOG.error( "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
+            }
+        } ).start();
+        //Give the Process a moment to start up everything.
+        try {
+            rserveProcess.waitFor();
+            Thread.sleep( 1000 );
+        } catch( InterruptedException ex ) {
+            Exceptions.printStackTrace( ex );
+        }
+        return rserveProcess;
+    }
+
+
     public static boolean gnuRSetupCorrect() {
         File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
         if( cebitecIndicator.exists() ) {
             return true;
         }
-        boolean manualLocalSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_LOCAL_SETUP, false );
-        boolean manualRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_MANUAL_REMOTE_SETUP, false );
+        boolean startupScriptSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, false );
+        boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_REMOTE_SETUP, false );
 
-        if( !(manualLocalSetup || manualRemoteSetup) ) {
+        if( !(remoteSetup || startupScriptSetup) ) {
             File userDir = Places.getUserDirectory();
             File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
             File versionIndicator = new File( rDir.getAbsolutePath() + File.separator + "rx_minimal_version_2_1" );
