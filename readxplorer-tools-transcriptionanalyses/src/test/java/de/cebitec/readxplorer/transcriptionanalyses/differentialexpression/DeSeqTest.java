@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Patrick Blumenkamp
+ * Copyright (C) 2017 Patrick Blumenkamp<patrick.blumenkamp@computational.bio.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,9 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -43,7 +41,8 @@ import static org.junit.Assert.assertTrue;
 
 /**
  *
- * @author patrick
+ * @author Patrick
+ * Blumenkamp<patrick.blumenkamp@computational.bio.uni-giessen.de>
  */
 public class DeSeqTest {
 
@@ -64,16 +63,6 @@ public class DeSeqTest {
     @AfterClass
     public static void tearDownClass() throws RserveException, IOException {
 //        instance.shutdown();
-    }
-
-
-    @Before
-    public void setUp() {
-    }
-
-
-    @After
-    public void tearDown() {
     }
 
 
@@ -131,43 +120,5 @@ public class DeSeqTest {
         }
         assertTrue( "BaseMean should be unequal zero in every row", baseMeanNowhereZero );
     }
-
-
-//    private static volatile boolean exiting = false;
-//
-//
-//    private final static class RStreamReader implements Runnable {
-//
-//        private final InputStream err;
-//
-//
-//        RStreamReader( InputStream in ) {
-//            err = in;
-//        }
-//
-//
-//        @Override
-//        public void run() {
-//            try( BufferedReader in = new BufferedReader( new InputStreamReader( err ) ) ) {
-//                String line;
-//                while( !exiting && in.ready() && ((line = in.readLine()) != null) ) {
-//                    if( !line.trim().isEmpty() ) {
-//                        Logger.getLogger( GnuR.class.getName() ).log( Level.INFO, "R: {0}", line );
-//                    } else {
-//                        try {
-//                            Thread.sleep( 50 );
-//                        } catch( InterruptedException ex ) {
-//                        }
-//                    }
-//                }
-//            } catch( IOException ex ) {
-//                if( !exiting ) {
-//                    Logger.getLogger( GnuR.class.getName() ).log( Level.SEVERE, null, ex );
-//                }
-//            }
-//        }
-//
-//
-//    }
 
 }
