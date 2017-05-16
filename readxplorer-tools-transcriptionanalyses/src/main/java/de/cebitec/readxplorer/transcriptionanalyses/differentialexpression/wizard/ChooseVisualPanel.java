@@ -59,7 +59,7 @@ public final class ChooseVisualPanel extends JPanel {
             gnur = GnuRAccess.startRServe( new ProcessingLog() );
             tools = Tool.usableTools( gnur );            
         } catch( RserveException | IOException ex ) {
-            errorText = "RServe instance not found or couldn't be initialized.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration.";
+            errorText = "RServe instance not found or couldn't be initialized. please check if Rserve is installed.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration.";
             tools = Tool.usableTools();
         } finally {
             if (gnur != null){
