@@ -67,11 +67,9 @@ public class Mapping implements ObjectWithId, GenomicRange {
      * @param sequenceID
      * @param mappingClass       classification of this mapping
      * @param mappingQuality     phred mapping quality (if available it is > 0
-     *                           or -1
-     *                           for 255), otherwise 0
+     *                           or -1 for 255), otherwise 0
      * @param baseQualities      phred score array of base qualities, (if
-     *                           available
-     *                           it is > 0 or -1 for 255), otherwise 0
+     *                           available it is > 0 or -1 for 255), otherwise 0
      * @param numMappingsForRead number of mappings for the read of this mapping
      */
     public Mapping( int id, int start, int stop, int trackId, boolean isFwdStrand, int mismatches,
@@ -89,19 +87,25 @@ public class Mapping implements ObjectWithId, GenomicRange {
         this.mappingQuality = mappingQuality;
         this.baseQualities = baseQualities;
         this.numMappingsForRead = numMappingsForRead;
-        this.alignmentBlocks = new ArrayList<>(); //initialize as emtpy list
+        alignmentBlocks = new ArrayList<>(); //initialize as emtpy list
     }
 
-    /*
-     * A minimal version of the mapping class. It is used to collect the count
-     * data. For this only start, stop and direction are needed. Everything else
-     * isn't needed and can be left out in order to save some memory
-     */
 
+    /**
+     * A minimal version of a mapping. It is used to collect the count data.
+     * Here, only start, stop and direction are needed. Everything else can be
+     * omitted in order to save memory.
+     *
+     * @param start       Start position in reference bp of the mapping
+     * @param stop        Stop position in reference bp of the mapping
+     * @param isFwdStrand <code>true</code> if the mapping is located on the
+     *                    forward strand, <code>false</code> otherwise.
+     */
     public Mapping( int start, int stop, boolean isFwdStrand ) {
         this.start = start;
         this.stop = stop;
         this.isFwdStrand = isFwdStrand;
+        alignmentBlocks = new ArrayList<>(); //initialize as emtpy list
     }
 
 
@@ -228,7 +232,8 @@ public class Mapping implements ObjectWithId, GenomicRange {
      * @param position the position which should be checked for reference gaps
      * <p>
      * @return A TreeSet containing the reference gaps for the given position.
-     *         If no gaps are stored for the position <code>null</code> is returned
+     *         If no gaps are stored for the position <code>null</code> is
+     *         returned
      */
     public Set<ReferenceGap> getGenomeGapsAtPosition( int position ) {
         return gaps.get( position );
@@ -236,12 +241,11 @@ public class Mapping implements ObjectWithId, GenomicRange {
 
 
     /**
-     * @param position the position which should be checked for a difference
-     *                 to the reference
+     * @param position the position which should be checked for a difference to
+     *                 the reference
      * <p>
      * @return <code>true</code>, if a difference is stored for the given
-     *         position,
-     *         <code>false</code> otherwise
+     *         position, <code>false</code> otherwise
      */
     public boolean hasDiffAtPosition( int position ) {
         return diffs.containsKey( position );
@@ -253,7 +257,8 @@ public class Mapping implements ObjectWithId, GenomicRange {
      *                 returned.
      * <p>
      * @return The character deviating from the reference at the given position
-     *         Returns <code>null</code>, if no diff is stored for the given position
+     *         Returns <code>null</code>, if no diff is stored for the given
+     *         position
      */
     public Character getDiffAtPosition( int position ) {
         return diffs.get( position ).getBase();
@@ -267,7 +272,7 @@ public class Mapping implements ObjectWithId, GenomicRange {
      */
     public void addGenomeGap( ReferenceGap gap ) {
         if( !gaps.containsKey( gap.getPosition() ) ) {
-            gaps.put( gap.getPosition(), new TreeSet<ReferenceGap>() );
+            gaps.put( gap.getPosition(), new TreeSet<>() );
         }
         gaps.get( gap.getPosition() ).add( gap );
     }
@@ -312,9 +317,9 @@ public class Mapping implements ObjectWithId, GenomicRange {
 
 
     /**
-     * @return the original sequence of the read
-     *         this info is used only if the rna trim module has been used
-     *         and the corresponding custom tag is contained in the sam/bam file
+     * @return the original sequence of the read this info is used only if the
+     *         rna trim module has been used and the corresponding custom tag is
+     *         contained in the sam/bam file
      */
     public String getOriginalSequence() {
         return originalSequence;
@@ -367,8 +372,7 @@ public class Mapping implements ObjectWithId, GenomicRange {
 
     /**
      * @return The number of mappings for the read of this mapping. -1 Means
-     *         that
-     *         this information is not available.
+     *         that this information is not available.
      */
     public int getNumMappingsForRead() {
         return this.numMappingsForRead;
@@ -412,12 +416,31 @@ public class Mapping implements ObjectWithId, GenomicRange {
     /**
      * @return The alignment blocks formed by this mapping, if there are
      *         multiple alignment blocks. For mappings with a a single block
-     *         representing the whole mapping it is not stored.Several blocks exist for
-     *         split read mappings with {@link CigarOperator.N} bases. The N blocks have
-     *         to be omitted in the list. Thus, the list only represents mapped regions.
+     *         representing the whole mapping it is not stored.Several blocks
+     *         exist for split read mappings with {@link CigarOperator.N} bases.
+     *         The N blocks have to be omitted in the list. Thus, the list only
+     *         represents mapped regions.
      */
     public List<SamAlignmentBlock> getAlignmentBlocks() {
         return Collections.unmodifiableList( alignmentBlocks );
+    }
+
+
+    /**
+     * Calculate the sum of all alignment block lengths.
+     *
+     * @return The length of the actually aligned parts of the mapping
+     */
+    public int getAlignmentBlockLength() {
+        int length = 0;
+        if( alignmentBlocks.isEmpty() ) {
+            length = getLength();
+        } else {
+            for( SamAlignmentBlock alignmentBlock : alignmentBlocks ) {
+                length += Math.abs( alignmentBlock.getRefStop() - alignmentBlock.getRefStart() ) + 1;
+            }
+        }
+        return length;
     }
 
 

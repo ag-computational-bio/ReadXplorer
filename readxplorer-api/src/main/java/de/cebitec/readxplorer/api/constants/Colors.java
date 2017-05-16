@@ -144,6 +144,7 @@ public final class Colors {
     public static final Color RBS = new Color( 185, 122, 87 ); //brown
     public static final Color MINUS_THIRTYFIVE = new Color( 0, 98, 49 ); //dark green
     public static final Color MINUS_TEN = MINUS_THIRTYFIVE;
+    public static final Color TRANSCRIPT = new Color(128, 128, 64); //dirty green
     public static final Color UNDEF_FEATURE = Color.GREEN;
     // histogram viewer specific colors
     public static final Color LOGO_MATCH = Color.GREEN;

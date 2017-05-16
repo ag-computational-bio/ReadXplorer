@@ -32,3 +32,4 @@ nbactions.xml
 !/branding/src/main/nbm-branding/modules/org-netbeans-core-windows.jar/
 !/branding/src/main/nbm-branding/modules/org-netbeans-core.jar/
 /readxplorer-tools-transcriptionanalyses/nbproject/
+/readxplorer-databackend/nbproject/

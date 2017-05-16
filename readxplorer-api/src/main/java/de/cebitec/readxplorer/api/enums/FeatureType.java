@@ -121,6 +121,10 @@ public enum FeatureType implements Classification {
      */
     STOP_CODON( 36, "Stop codon" ),
     /**
+     * getType() returns '37' = To be used for transcripts.
+     */
+    TRANSCRIPT( 37, "Transcript" ),
+    /**
      * feature type for multiple mapped reads (non-unique)
      */
     MULTIPLE_MAPPED_READ( 14, "Include multiple mapped reads" ),
@@ -240,6 +244,7 @@ public enum FeatureType implements Classification {
             }
         }
 
+        //treat possible underscore cases
         if( type.equalsIgnoreCase( ORF_STRING ) ) {
             return CDS;
         } else if( type.equalsIgnoreCase( MISC_RNA_STRING_UNDERSCORE ) ) {

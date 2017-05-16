@@ -295,6 +295,9 @@ public class JFeature extends JComponent {
             case MINUS_TEN:
                 c = Colors.MINUS_TEN;
                 break;
+            case TRANSCRIPT:
+                c = Colors.TRANSCRIPT;
+                break;
             default:
                 LOG.error( "Found unknown type for feature {0}", feature.getType() );
                 c = Colors.UNDEF_FEATURE;
