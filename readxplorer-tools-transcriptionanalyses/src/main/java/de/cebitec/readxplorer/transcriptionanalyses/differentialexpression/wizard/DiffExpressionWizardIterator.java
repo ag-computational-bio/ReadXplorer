@@ -206,7 +206,7 @@ public final class DiffExpressionWizardIterator implements
             handler.start();
         } else {
             if( GnuR.isLocalMachineRunning() ) {
-                int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_PORT, 6311 );
+                int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_STARTUP_SCRIPT_PORT, 6311 );
                 try {
                     (new GnuR( "localhost", port, true, new ProcessingLog() )).shutdown();
                 } catch( RserveException ex ) {
