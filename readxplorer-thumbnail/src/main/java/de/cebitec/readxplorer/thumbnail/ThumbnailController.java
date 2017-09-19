@@ -425,7 +425,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                 for( BasePanel p : featureToTrackpanelList.get( feat ) ) {
                                     trackPanelToTrack.remove( p );
                                     //Stop CoverageThread
-                                    ((TrackViewer) p.getViewer()).getTrackCon().getCoverageThread().stop();
+                                    ((TrackViewer) p.getViewer()).getTrackCon().getCoverageThread().stopThread();
                                 }
                                 featureToTrackpanelList.remove( feat );
                                 featureToLayoutWidget.remove( feat );

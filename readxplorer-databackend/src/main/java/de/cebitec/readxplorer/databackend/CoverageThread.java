@@ -45,6 +45,7 @@ public class CoverageThread extends RequestThread {
 
     private static final Logger LOG = LoggerFactory.getLogger( CoverageThread.class.getName() );
 
+    private boolean stopThread;
     private long trackID;
     private long trackID2;
     private final List<PersistentTrack> tracks;
@@ -276,9 +277,10 @@ public class CoverageThread extends RequestThread {
 
     @Override
     public void run() {
+        stopThread = false;
 
         try {
-            while( !interrupted() ) {
+            while( !interrupted() || !stopThread ) {
                 IntervalRequest request = requestQueue.poll();
                 if( request != null ) {
 
@@ -286,10 +288,10 @@ public class CoverageThread extends RequestThread {
                     IntervalRequest nextRequest = requestQueue.peek();
                     boolean newRequestArrived = nextRequest != null && currentCov.getRequest() != null && request != nextRequest;
 
-                    if( !newRequestArrived && (!currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() )
-                                               || (!currentCov.getRequest().isDiffsAndGapsNeeded() && request.isDiffsAndGapsNeeded())
-                                               || !this.readClassParamsFulfilled( request )
-                                               || doesNotMatchLatestRequestBounds( request )) ) {
+                    if( !newRequestArrived && (!currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() ) ||
+                                               (!currentCov.getRequest().isDiffsAndGapsNeeded() && request.isDiffsAndGapsNeeded()) ||
+                                               !this.readClassParamsFulfilled( request ) ||
+                                               doesNotMatchLatestRequestBounds( request )) ) {
                         if( trackID2 != 0 ) {
                             currentCov = this.loadCoverageDouble( request );
                         } else if( this.trackID != 0 || this.canQueryCoverage() ) {
@@ -358,6 +360,11 @@ public class CoverageThread extends RequestThread {
      */
     protected boolean canQueryCoverage() {
         return this.tracks != null && !this.tracks.isEmpty();
+    }
+
+
+    public void stopThread() {
+        stopThread = true;
     }
 
 
