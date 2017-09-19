@@ -16,6 +16,7 @@
  */
 
 @HelpSetRegistration( helpSet = "mapping-hs.xml", position = 3272 )
+
 package de.cebitec.readxplorer.mapping.docs;
 
 

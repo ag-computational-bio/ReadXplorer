@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 
 
 /**
- * RegularExpressionTrimMethod trims a sequence based on the given
- * regular expression.
+ * RegularExpressionTrimMethod trims a sequence based on the given regular
+ * expression.
  * <p>
  * @author Evgeny Anisiforov
  */
@@ -90,14 +90,14 @@ public class RegularExpressionTrimMethod extends TrimMethod {
         VARIABLE_RIGHT, VARIABLE_LEFT, VARIABLE_BOTH,
         FIXED_LEFT, FIXED_RIGHT, FIXED_BOTH
 
-    };
+    }
 
     public static final int GROUPNUMBER_UNUSED = -1;
+
 
     /*
      * a list of default instances is provided here
      */
-
     public static RegularExpressionTrimMethod createNewInstance( Type t ) {
         if( t.equals( Type.VARIABLE_RIGHT ) ) {
             return new RegularExpressionTrimMethod( "^(.*?)(A{0,%X%})$", 1, GROUPNUMBER_UNUSED, 2, "trim poly-A from 3' end (right to left) by variable length", "v_r" );

@@ -168,7 +168,7 @@ public class CodonSelector extends javax.swing.JPanel {
          * <p>
          * @param familyId the id of the codon family, which should be displayed
          *                 on the titled border.
-         * @param the      list of codons, for which check boxes should be
+         * @param codons   list of codons, for which check boxes should be
          *                 created.
          */
         CodonFamilyPanel( String familyId, String[] codons ) {
@@ -181,6 +181,9 @@ public class CodonSelector extends javax.swing.JPanel {
          * Updates the components of this codon selector. When another genetic
          * code was chosen all old start codon checkboxes are removed and new
          * checkboxes are created.
+         * <p>
+         * @param codons list of codons, for which check boxes should be
+         *               updated.
          */
         private void updateComponents( String[] codons ) {
 
@@ -214,6 +217,7 @@ public class CodonSelector extends javax.swing.JPanel {
          * Adds the given array of JCheckboxes to this CodonSelectorPanel.
          * <p>
          * @param compsToAdd the array of checkboxes to add to this component
+         * @param familyId title for array of checkboxes
          */
         private void addCompsToPanel( final JComponent[] compsToAdd, String familyId ) {
 
