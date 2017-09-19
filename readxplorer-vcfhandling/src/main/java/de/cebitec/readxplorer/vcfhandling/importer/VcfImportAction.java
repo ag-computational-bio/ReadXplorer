@@ -63,7 +63,7 @@ import org.openide.windows.WindowManager;
          iconBase = "de/cebitec/readxplorer/vcfhandling/importer/import.png",
          displayName = "#CTL_VcfImportAction"
 )
-@ActionReference( path = "Menu/File", position = 1487, separatorAfter = 1493 )
+@ActionReference( path = "Menu/File", position = 1488, separatorAfter = 1494 )
 @Messages( "CTL_VcfImportAction=Import VCF file" )
 
 /**
