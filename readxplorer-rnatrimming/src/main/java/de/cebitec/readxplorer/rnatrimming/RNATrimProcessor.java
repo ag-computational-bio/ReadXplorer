@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import org.h2.store.fs.FileUtils;
 import org.netbeans.api.progress.ProgressHandle;
-import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -99,16 +98,7 @@ public class RNATrimProcessor {
         String fastaPath = de.cebitec.readxplorer.utils.FileUtils.getFilePathWithoutExtension( samfile ) + "_" + method.getShortDescription() + ".redo.fastq";
 
         //set up the progress handle to indicate progress to the user
-        ProgressHandle ph = ProgressHandle.createHandle(
-                NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Start", sourcePath ),
-                new Cancellable() {
-            @Override
-            public boolean cancel() {
-                return handleCancel();
-            }
-
-
-        } );
+        ProgressHandle ph = ProgressHandle.createHandle(NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Start", sourcePath ), () -> handleCancel());
         ph.start();
 
         //count the number of lines in the samfile, to estimate the progress
@@ -193,16 +183,7 @@ public class RNATrimProcessor {
         this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ) );
 
         //set up the progress handle to indicate progress to the user
-        ProgressHandle ph = ProgressHandle.createHandle(
-                NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ),
-                new Cancellable() {
-            @Override
-            public boolean cancel() {
-                return handleCancel();
-            }
-
-
-        } );
+        ProgressHandle ph = ProgressHandle.createHandle(NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ), () -> handleCancel());
         ph.start();
 
         //count the number of lines in the samfile, to estimate the progress
@@ -313,15 +294,7 @@ public class RNATrimProcessor {
         this.sourcePath = sourcePath;
         method.setMaximumTrimLength( maximumTrim );
 
-        final ProgressHandle ph = ProgressHandle.createHandle( "Trim RNA reads in file '" + sourcePath + "'", new Cancellable() {
-
-                                                                  @Override
-                                                                  public boolean cancel() {
-                                                                      return handleCancel();
-                                                                  }
-
-
-                                                              } );
+        final ProgressHandle ph = ProgressHandle.createHandle("Trim RNA reads in file '" + sourcePath + "'", () -> handleCancel());
         CentralLookup.getDefault().add( this );
 
         //the trim processor will:

@@ -21,7 +21,6 @@ package de.cebitec.readxplorer.ui.visualisation.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.openide.util.Cancellable;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
@@ -43,15 +42,7 @@ public final class MyCancelableAction implements ActionListener {
 
     @Override
     public void actionPerformed( ActionEvent e ) {
-        final ProgressHandle ph = ProgressHandle.createHandle( "task thats shows progress", new Cancellable() {
-
-                                                                  @Override
-                                                                  public boolean cancel() {
-                                                                      return handleCancel();
-                                                                  }
-
-
-                                                              } );
+        final ProgressHandle ph = ProgressHandle.createHandle("task thats shows progress", () -> handleCancel());
 
         Runnable runnable = new Runnable() {
 
