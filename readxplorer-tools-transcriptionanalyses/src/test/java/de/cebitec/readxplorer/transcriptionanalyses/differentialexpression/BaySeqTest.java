@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -28,6 +29,7 @@ import static org.junit.Assert.fail;
  *
  * @author patrick
  */
+@Ignore
 public class BaySeqTest {
 
     private static GnuR instance;

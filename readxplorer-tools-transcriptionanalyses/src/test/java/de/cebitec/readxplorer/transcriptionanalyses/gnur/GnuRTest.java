@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.util.Optional;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
@@ -43,6 +44,7 @@ import static org.junit.Assert.fail;
  * @author Patrick Blumenkamp
  * <patrick.blumenkamp at computational.bio.uni-giessen.de>
  */
+@Ignore
 public class GnuRTest {
 
     private static GnuR instance;

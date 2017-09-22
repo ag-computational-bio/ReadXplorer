@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -45,6 +46,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author patrick
  */
+@Ignore
 public class DeSeq2Test {
 
     private static GnuR instance;
