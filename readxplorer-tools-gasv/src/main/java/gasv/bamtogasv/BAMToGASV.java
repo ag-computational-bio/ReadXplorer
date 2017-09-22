@@ -25,11 +25,13 @@ import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
 import bio.comp.jlu.readxplorer.tools.gasv.GASVUtils;
 import htsjdk.samtools.FileTruncatedException;
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SamInputResource;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
 import htsjdk.samtools.util.RuntimeEOFException;
 import htsjdk.samtools.util.RuntimeIOException;
@@ -48,6 +50,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.openide.util.Exceptions;
 import org.openide.windows.InputOutput;
 import picard.sam.FixMateInformation;
 
@@ -117,7 +120,7 @@ public class BAMToGASV {
      * file.
      */
 
-    /* Sorters for ESPs and for Concordants */
+ /* Sorters for ESPs and for Concordants */
     public ExternalSort discordantSorter, concordantSorter;
 
     /* Static Variables */
@@ -127,6 +130,11 @@ public class BAMToGASV {
 
     /* Output BAM File Names */
     public BufferedWriter LOWQ_BAM_FILE;
+
+    private static final SamReaderFactory SAMREADERFACTORY
+            = SamReaderFactory.makeDefault()
+                    .enable( SamReaderFactory.Option.INCLUDE_SOURCE_IN_RECORDS, SamReaderFactory.Option.VALIDATE_CRC_CHECKSUMS )
+                    .validationStringency( ValidationStringency.STRICT );
 
 
     /**
@@ -155,12 +163,12 @@ public class BAMToGASV {
                 IO.getOut().println( "After Running fixMates, reading the BAM file resulted in errors.  Consult the FAQ for troubleshooting solutions." );
             }
 
-                    // MERGE CONCORDANT FILES (Anna - new June 30,2012)
+            // MERGE CONCORDANT FILES (Anna - new June 30,2012)
             // Only when GASVPRO_FLAG is set AND LIBRARY_SEPARATED is not 'all'
             if( b2g.GASVPRO_OUTPUT ) {
                 b2g.mergeConcordantFiles();
             }
-                    // (1) Get list of all concordant files.
+            // (1) Get list of all concordant files.
             // (2) Merge all concordant files using Sorter.merge() function. Write to OUTPUT_PREFIX+"_all.concordant
             // (3) Delete all other concordant files
 
@@ -190,7 +198,7 @@ public class BAMToGASV {
      */
     public BAMToGASV( String[] args ) throws IOException {
 
-		// Parse & print arguments.  If arguments didn't parse correctly,
+        // Parse & print arguments.  If arguments didn't parse correctly,
         // then print the usage and exit.
         boolean success = parseArguments( args );
         if( !success ) {
@@ -515,14 +523,15 @@ public class BAMToGASV {
         HashMap<String, String> viewedPlatforms = new HashMap<>();
 
         // open the file and read it.
-        SAMFileReader reader = null;
+        SamReader reader = null;
         if( !IS_URL ) {
-            reader = new SAMFileReader( new File( BAMFILE ) );
+            reader = SAMREADERFACTORY.open( new File( BAMFILE ) );
         } else {
             try {
-                URL url = new URL( BAMFILE );
-                reader = new SAMFileReader( url, null, false );
-            } catch( Exception e ) {
+                final SamInputResource resource
+                        = SamInputResource.of( new URL( BAMFILE ) );
+                reader = SAMREADERFACTORY.open( resource );
+            } catch( MalformedURLException e ) {
                 IO.getOut().println( "ERROR: Error reading URL " + BAMFILE + "." );
                 System.exit( -1 );
             }
@@ -577,7 +586,11 @@ public class BAMToGASV {
                 IO.getOut().println( "\t" + iter.next() );
             }
             IO.getOut().println( "Check your BAM/SAM file." );
-            reader.close();
+            try {
+                reader.close();
+            } catch( IOException ex ) {
+                IO.getOut().println( "WARNING: Cannot close SamReader." );
+            }
             System.exit( -1 );
         }
 
@@ -588,7 +601,11 @@ public class BAMToGASV {
             LIBRARY_IDS.put( "all", LIBRARY_SEPARATED );
         }
 
-        reader.close();
+        try {
+            reader.close();
+        } catch( IOException ex ) {
+            IO.getOut().println( "WARNING: Cannot close SamReader." );
+        }
 
         // Finally, make list of library information
         for( String libname : LIBRARY_IDS.values() ) {
@@ -634,7 +651,7 @@ public class BAMToGASV {
     public void fixMates() {
         IO.getOut().println( "Running Fixmate() to pair reads.  When this is done, re-run BAMToGASV.jar with the new BAM file." );
 
-		// NEWBAMFILE is the name of the file that will be fixed if the program runs
+        // NEWBAMFILE is the name of the file that will be fixed if the program runs
         // without error.
         String NEWBAMFILE = OUTPUT_PREFIX + ".fixmate.bam";
 
@@ -664,7 +681,7 @@ public class BAMToGASV {
         // Step 0: Calculate Mean and STD
         getMeanAndSTDForNovoalign( lib );
 
-		// Step 1: Determine which metric to use.
+        // Step 1: Determine which metric to use.
 
         /// EXACT CUTOFF_LMINLMAX ///
         Matcher match = exact.matcher( CUTOFF_LMINLMAX );
@@ -931,18 +948,17 @@ public class BAMToGASV {
         int recordCounter = 0; // for printing lines
         ArrayList<String> tmpFilenames = new ArrayList<>();
 
-        // set validation stringency for SAMFileReader.
-        SAMFileReader.setDefaultValidationStringency( STRINGENCY );
-
         // Open SAM file, either from the file or from the URL.
-        SAMFileReader inputSam = null;
+        SamReader inputSam = null;
         if( !IS_URL ) {
-            inputSam = new SAMFileReader( new File( BAMFILE ) );
+            inputSam = SAMREADERFACTORY.open( new File( BAMFILE ) );
         } else {
             try {
-                inputSam = new SAMFileReader( new URL( BAMFILE ), null, false );
+                final SamInputResource resource
+                        = SamInputResource.of( new URL( BAMFILE ) );
+                inputSam = SAMREADERFACTORY.open( resource );
             } catch( MalformedURLException e ) {
-                IO.getOut().println( "ERROR: URL " + BAMFILE + " is malformed." );
+                IO.getOut().println( "ERROR: Error reading URL " + BAMFILE + "." );
                 System.exit( -1 );
             }
         }
@@ -969,7 +985,7 @@ public class BAMToGASV {
             LIBRARY_INFO.put( libname, new Library( libname ) );
         }
 
-		// Iterate through each Record and store relevant information.
+        // Iterate through each Record and store relevant information.
         // Surround with try/catch to catch any IO Exception (Anna & Layla 8/21/2012)
         try {
             for( SAMRecord samRecord : inputSam ) {
@@ -1016,7 +1032,7 @@ public class BAMToGASV {
                 // get Library object.
                 Library lib = LIBRARY_INFO.get( libname );
 
-				// If we've already computed stats, just parse the record.
+                // If we've already computed stats, just parse the record.
                 // Otherwise, keep track of insert length and store in memory.
                 parseSAMRecord( samRecord, lib );
 
@@ -1032,7 +1048,7 @@ public class BAMToGASV {
                     // check variantTypes
                     checkVariantTypes( lib );
 
-					// First N reads are in memory. We must go through them and store them
+                    // First N reads are in memory. We must go through them and store them
                     // in their respective types.  Afterwards, sets pairs to null for memory
                     // efficiency.
                     for( GASVPair p : lib.firstNreads ) {
@@ -1054,8 +1070,15 @@ public class BAMToGASV {
             IO.getOut().println( "WARNING: RuntimeEOFException caught when iterating through records - closing BAM file and processing output." );
             System.err.println( "WARNING: RuntimeEOFException caught when iterating through records - closing BAM file and processing output." );
 
+        } catch( IOException ex ) {
+            IO.getOut().println( "WARNING: Cannot close SamReader." );
+            System.exit( -1 );
         }
-        inputSam.close();
+        try {
+            inputSam.close();
+        } catch( IOException ex ) {
+            IO.getOut().println( "WARNING: Cannot not close SamReader." );
+        }
         if( WRITE_LOWQ ) {
             try {
                 LOWQ_BAM_FILE.close();
@@ -1066,7 +1089,7 @@ public class BAMToGASV {
 
         IO.getOut().println( "Done reading BAM file.\n" );
 
-		// finish analysis with remaining records in libraries.
+        // finish analysis with remaining records in libraries.
         // FOR EACH LIBRARY:
         // (1) If stats haven't been computed, compute.
         //   FOR EACH VARIANT:
@@ -1076,7 +1099,7 @@ public class BAMToGASV {
             libname = LIBRARY_NAMES.get( i );
             Library lib = LIBRARY_INFO.get( libname );
 
-			// (1) If stats haven't been computed, compute.
+            // (1) If stats haven't been computed, compute.
             // After reading the entire BAM file, some libraries
             // might have fewer than USE_NUMBER_READS pairs.
             // Calculate stats now if this is the case.
@@ -1093,7 +1116,7 @@ public class BAMToGASV {
                 // check variantTypes
                 checkVariantTypes( lib );
 
-				// First N reads are in memory. We must go through them and store them
+                // First N reads are in memory. We must go through them and store them
                 // in their respective types.  Afterwards, sets pairs to null for memory
                 // efficiency.
                 for( GASVPair p : lib.firstNreads ) {
@@ -1104,7 +1127,7 @@ public class BAMToGASV {
 
             } // END haven't computed stats yet
 
-			// IF Lmin and Lmax are the initial parameters, then there are NO reads for this
+            // IF Lmin and Lmax are the initial parameters, then there are NO reads for this
             // library. We don't need to write variant files here.
             if( lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE ) {
                 continue;
@@ -1189,7 +1212,7 @@ public class BAMToGASV {
                         lib.total_C += 1;
                         if( lib.lengthHist.containsKey( insertL ) ) {
                             int tmp = lib.lengthHist.get( insertL );
-                            lib.lengthHist.put( insertL, tmp + 1);
+                            lib.lengthHist.put( insertL, tmp + 1 );
                         } else {
                             lib.lengthHist.put( insertL, 1 );
                         }
@@ -1199,7 +1222,7 @@ public class BAMToGASV {
                         lib.total_RL += s.getReadLength();
                         if( lib.lengthHist.containsKey( insertL ) ) {
                             int tmp = lib.lengthHist.get( insertL );
-                            lib.lengthHist.put( insertL, tmp + 1);
+                            lib.lengthHist.put( insertL, tmp + 1 );
                         } else {
                             lib.lengthHist.put( insertL, 1 );
                         }
@@ -1236,7 +1259,7 @@ public class BAMToGASV {
         // Add line to variant list for this library.
         lib.addLine( type, pobj.createOutput( type ) );
 
-		// Check to see if we should sort and write tmp file here.
+        // Check to see if we should sort and write tmp file here.
         // Now, sort and write ALL tmp files (all libraries, all types)
         if( lib.rowsForVariant.get( type ).size() >= NUM_LINES_FOR_EXTERNAL_SORT ) {
             for( String libname : LIBRARY_NAMES ) {
@@ -1302,7 +1325,7 @@ public class BAMToGASV {
      */
     private void parseSAMRecord( SAMRecord s, Library lib ) {
 
-                // If this record is duplicated (according to flag) OR is NOT paired, then
+        // If this record is duplicated (according to flag) OR is NOT paired, then
         // return immediately.
         // Rolf Hilker added first condition (!isForbiddenMapping(s)) to generate
         // useful results in conjunction with ReadXplorer
@@ -1312,7 +1335,7 @@ public class BAMToGASV {
 
         String readname = s.getReadName();
 
-		// If this record has high mapping quality, then store it.
+        // If this record has high mapping quality, then store it.
         // If this record has low mapping quality AND the write-lowq flag is set, store it too.
         if( s.getMappingQuality() >= MAPPING_QUALITY ) {
 
@@ -1334,7 +1357,7 @@ public class BAMToGASV {
                     return;
                 }
 
-				// If we've already computed stats, then we just need to
+                // If we've already computed stats, then we just need to
                 // parse the ESP.  If not, then keep in mem.
                 if( lib.computedStats ) {
                     // parse ESP
@@ -1353,7 +1376,7 @@ public class BAMToGASV {
                 }
 
             } else if( WRITE_LOWQ && LOWQ_INDICATOR.containsKey( readname ) ) {
-				//Current read has high quality, but the other read was: (1) already seen; (2) has low-quality.
+                //Current read has high quality, but the other read was: (1) already seen; (2) has low-quality.
                 // NOTE: if write_lowq is set, then LOWQ_ind is populated.
 
                 // remove PAIR counting of this read
@@ -1378,7 +1401,7 @@ public class BAMToGASV {
                 }
 
             } else if( WRITE_LOWQ && LOWQ_INDICATOR.containsKey( readname ) ) {
-				// NOTE: if write_lowq is set, then LOWQ_ind is populated.
+                // NOTE: if write_lowq is set, then LOWQ_ind is populated.
 
                 // remove PAIR counting of this read
                 String other = LOWQ_INDICATOR.remove( readname );
@@ -1555,7 +1578,7 @@ public class BAMToGASV {
     public void mergeConcordantFiles() {
         String concordantFile = OUTPUT_PREFIX + "_all.concordant"; // from writeGASVPROInputFile()
 
-		// MERGE CONCORDANT FILES (Anna - new June 30,2012)
+        // MERGE CONCORDANT FILES (Anna - new June 30,2012)
         // Only when GASVPRO_FLAG is set AND LIBRARY_SEPARATED is not 'all'
         // (1) Get list of all concordant files.
         ArrayList<String> concordantfiles = new ArrayList<>();

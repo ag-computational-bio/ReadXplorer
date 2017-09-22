@@ -97,7 +97,7 @@ public class GASVCaller implements Runnable {
         this.bamToGASVParams = bamToGASVParams;
         this.gasvMainParams = gasvMainParams;
         this.parent = parent;
-        this.storeChromsProgressHandle = ProgressHandleFactory.createHandle( Bundle.CallerProgressName() );
+        this.storeChromsProgressHandle = ProgressHandle.createHandle( Bundle.CallerProgressName() );
         this.analysisProgressHandle = progressHandle;
     }
 

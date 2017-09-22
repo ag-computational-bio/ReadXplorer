@@ -22,18 +22,25 @@ package gasv.utils;
  * <p>
  */
 import bio.comp.jlu.readxplorer.tools.gasv.GASVCaller;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
+import htsjdk.samtools.ValidationStringency;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import htsjdk.samtools.SAMFileReader;
-import htsjdk.samtools.SAMRecord;
 import org.openide.windows.InputOutput;
 
 
 public class SimpleSAMRecordParser {
 
     private static final InputOutput IO = GASVCaller.IO;
+
+    private static final SamReaderFactory SAMREADERFACTORY
+            = SamReaderFactory.makeDefault()
+                    .enable( SamReaderFactory.Option.INCLUDE_SOURCE_IN_RECORDS, SamReaderFactory.Option.VALIDATE_CRC_CHECKSUMS )
+                    .validationStringency( ValidationStringency.LENIENT );
 
 
     public static void main( String[] args ) throws IOException {
@@ -47,10 +54,10 @@ public class SimpleSAMRecordParser {
 
         int count = 0;
         try( BufferedWriter writer = new BufferedWriter( new FileWriter( outfile ) );
-             SAMFileReader in = new SAMFileReader( new File( bamfile ) ) ) {
+             final SamReader samReader = SAMREADERFACTORY.open( new File( bamfile ) ); ) {
 
             writer.write( "Name\tSAMFlag\tChr\tStart\tEnd\tNegativeStrand?\tQuality\tCIGAR\tNM\n" );
-            for( SAMRecord s : in ) {
+            for( SAMRecord s : samReader ) {
                 /*
                  * Iterator<SAMTagAndValue> iter = s.getAttributes().iterator();
                  * while(iter.hasNext()) { SAMTagAndValue val = iter.next();
@@ -58,9 +65,9 @@ public class SimpleSAMRecordParser {
                  */
 
                 writer.write( s.getReadName() + "\t" + s.getFlags() + "\t" + s.getReferenceName() + "\t" +
-                          s.getAlignmentStart() + "\t" + s.getAlignmentEnd() + "\t" +
-                          s.getReadNegativeStrandFlag() + "\t" + s.getMappingQuality() + "\t" +
-                          s.getCigarString() + "\t" + s.getAttribute( "NM" ) + "\n" );
+                              s.getAlignmentStart() + "\t" + s.getAlignmentEnd() + "\t" +
+                              s.getReadNegativeStrandFlag() + "\t" + s.getMappingQuality() + "\t" +
+                              s.getCigarString() + "\t" + s.getAttribute( "NM" ) + "\n" );
                 if( count % 500000 == 0 ) {
                     IO.getOut().println( "  record " + count + "..." );
                 }
@@ -68,7 +75,7 @@ public class SimpleSAMRecordParser {
             }
 
         }
-        
+
     }
 
 
