@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
                      displayName = "#CTL_OpenSNPDetection" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 125 ),
-    @ActionReference( path = "Toolbars/Tools", position = 100 )
+    @ActionReference( path = "Toolbars/Tools", position = 110 )
 } )
 public final class OpenSnpDetectionAction implements ActionListener,
                                                      DataVisualisationI {

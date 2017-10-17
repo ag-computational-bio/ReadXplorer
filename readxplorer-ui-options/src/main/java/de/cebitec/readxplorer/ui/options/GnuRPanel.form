@@ -34,7 +34,7 @@
                               <Component id="remoteButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="235" pref="303" max="32767" attributes="0"/>
+                      <EmptySpace min="235" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
@@ -68,7 +68,7 @@
                   <Component id="messages" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="gnuRSettingsPanel" pref="479" max="32767" attributes="0"/>
+              <Component id="gnuRSettingsPanel" pref="467" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
