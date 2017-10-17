@@ -91,7 +91,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-tools-gasv</artifactId>
-            <version>1.0.2-FINAL</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
