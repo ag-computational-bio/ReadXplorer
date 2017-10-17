@@ -72,14 +72,18 @@ public final class GnuRAccess {
         String host;
         int port;
         boolean useStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, false );
-        boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_REMOTE_SETUP, false );
+        boolean useRemoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_REMOTE_SETUP, false );
+        boolean useAutoSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_AUTO_SETUP, false );
         boolean useAuthStartupScript = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_STARTUP_SCRIPT_USE_AUTH, false );
         boolean useAuthRemote = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_REMOTE_USE_AUTH, false );
+        if (!(useStartupScript || useRemoteSetup || useAutoSetup)) {
+            useStartupScript = true;
+        }
 //        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
 //        if( cebitecIndicator.exists() ) {
 //            return accessCebitecRserve( cebitecIndicator, processingLog );
 //        } else 
-        if( remoteSetup || OsUtils.isMac() ) {
+        if( useRemoteSetup || OsUtils.isMac() ) {
             port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_REMOTE_PORT, 6311 );
             host = NbPreferences.forModule( Object.class ).get( RServe.RSERVE_REMOTE_HOST, "localhost" );
             instance = accessRemoteRserve( host, port, processingLog );
@@ -123,7 +127,7 @@ public final class GnuRAccess {
         if( useStartupScript ) {
             int port = NbPreferences.forModule( Object.class ).getInt( RServe.RSERVE_STARTUP_SCRIPT_PORT, 6311 );
             if( !(OsUtils.isLinux() && GnuR.isLocalMachineRunning()) ) {
-                if( NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_STARTUP_SCRIPT_USE_DEFAULT_SCRIPT, false ) ) {
+                if( NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_STARTUP_SCRIPT_USE_DEFAULT_SCRIPT, true ) ) {
                     rserveProcess = launchDefaultStartUpScript( port, processingLog );
                 } else {
                     File startUpScript = new File( NbPreferences.forModule( Object.class ).get( RServe.RSERVE_STARTUP_SCRIPT_PATH, "" ) );
@@ -240,7 +244,7 @@ public final class GnuRAccess {
 //        commands.add( "R CMD Rserve --RS-port " + port + " --vanilla" );
 //        commands.add( String.valueOf( port ) );
 //        commands.add( "--vanilla" );
-        ProcessBuilder pb = new ProcessBuilder( "R", "CMD", "Rserve", "--RS-port", String.valueOf(port), "--vanilla" );
+        ProcessBuilder pb = new ProcessBuilder( "R", "CMD", "Rserve", "--RS-port", String.valueOf( port ), "--vanilla" );
         final Process rserveProcess = pb.start();
         new Thread( () -> {
             try {
@@ -276,25 +280,6 @@ public final class GnuRAccess {
             Exceptions.printStackTrace( ex );
         }
         return rserveProcess;
-    }
-
-
-    public static boolean gnuRSetupCorrect() {
-        File cebitecIndicator = new File( "/vol/readxplorer/R/CeBiTecMode" );
-        if( cebitecIndicator.exists() ) {
-            return true;
-        }
-        boolean startupScriptSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, false );
-        boolean remoteSetup = NbPreferences.forModule( Object.class ).getBoolean( RServe.RSERVE_USE_REMOTE_SETUP, false );
-
-        if( !(remoteSetup || startupScriptSetup) ) {
-            File userDir = Places.getUserDirectory();
-            File rDir = new File( userDir.getAbsolutePath() + File.separator + "R" );
-            File versionIndicator = new File( rDir.getAbsolutePath() + File.separator + "rx_minimal_version_2_1" );
-            return versionIndicator.exists();
-        } else {
-            return true;
-        }
     }
 
 

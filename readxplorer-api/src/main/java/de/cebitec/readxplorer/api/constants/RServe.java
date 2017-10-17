@@ -24,6 +24,11 @@ public final class RServe {
      * Is Rserve manually configured to connect to a remote server.
      */
     public static final String RSERVE_USE_REMOTE_SETUP = "RSERVE_USE_REMOTE_SETUP";
+    
+    /**
+     * Is Rserve manually configured to connect to a remote server.
+     */
+    public static final String RSERVE_USE_AUTO_SETUP = "RSERVE_USE_AUTO_SETUP";
 
     /**
      * The RServe host we will connect to for GNU R computations.

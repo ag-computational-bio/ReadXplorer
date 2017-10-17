@@ -129,14 +129,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                     }
                 }
             } catch( RserveException | REXPMismatchException ex ) {
-                return usableTools();
+                return alwaysUsableTools();
             }
 
             return toolList.toArray( new Tool[2] );
         }
 
 
-        public static Tool[] usableTools() {
+        public static Tool[] alwaysUsableTools() {
             Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
             return ret;
         }

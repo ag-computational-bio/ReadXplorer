@@ -49,18 +49,15 @@ public final class ChooseVisualPanel extends JPanel {
      * Creates new form ChooseVisualPanel
      */
     public ChooseVisualPanel() {
-        String errorText = null;
-        if( !GnuRAccess.gnuRSetupCorrect() ) {
-            errorText = "GNU R is not installed correctly.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.\nPlease go to 'Options' -> 'GNU R' for configuration.";
-        }
         Tool[] tools;
         GnuR gnur = null;
+        String errorText = null;
         try {
             gnur = GnuRAccess.startRServe( new ProcessingLog() );
             tools = Tool.usableTools( gnur );            
         } catch( RserveException | IOException ex ) {
-            errorText = "RServe instance not found or couldn't be initialized. please check if Rserve is installed.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration.";
-            tools = Tool.usableTools();
+            errorText = "RServe instance not found or couldn't be initialized. Please check if Rserve is installed.\nOnly the ExpressTest and the count table export can be used.\nPlease go to 'Options' -> 'GNU R' for configuration.";
+            tools = Tool.alwaysUsableTools();
         } finally {
             if (gnur != null){
                 gnur.close();

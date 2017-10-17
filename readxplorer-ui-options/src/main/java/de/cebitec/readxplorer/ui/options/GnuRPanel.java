@@ -85,7 +85,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             remoteButton.setSelected( true );
             autoButton.setEnabled( false );
             startupScriptButton.setEnabled( false );
-            manualButtonSelected();
+            remoteButtonSelected();
         } else if( new File( "/vol/readxplorer/R/CeBiTecMode" ).exists() ) {
             messages.setText( "Rserve is already configured correctly for use in CeBiTec" );
             autoButton.setEnabled( false );
@@ -190,7 +190,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                                 .addComponent(startupScriptButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(remoteButton)))
-                        .addGap(235, 303, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(gnuRSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -215,17 +215,18 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(messages))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(gnuRSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
+                .addComponent(gnuRSettingsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 467, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void remoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_remoteButtonActionPerformed
-        manualButtonSelected();
+        remoteButtonSelected();
     }//GEN-LAST:event_remoteButtonActionPerformed
 
 
-    private void manualButtonSelected() {
+    private void remoteButtonSelected() {
+        remoteButton.setSelected( true );
         gnuRSettingsPanel.removeAll();
         gnuRSettingsPanel.add( remotePanel );
         revalidate();
@@ -238,6 +239,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
 
     private void autoButtonSelected() {
+        autoButton.setSelected( true );
         gnuRSettingsPanel.removeAll();
         gnuRSettingsPanel.add( autoPanel );
         revalidate();
@@ -250,6 +252,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
 
     private void startupScriptButtonSelected() {
+        startupScriptButton.setSelected( true );
         gnuRSettingsPanel.removeAll();
         gnuRSettingsPanel.add( scriptPanel );
         revalidate();
@@ -266,37 +269,22 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         autoPanel.load( pref, DEFAULT_R_DOWNLOAD_MIRROR );
         scriptPanel.load( pref, DEFAULT_RSERVE_PORT );
         remotePanel.load( pref, DEFAULT_RSERVE_HOST, DEFAULT_RSERVE_PORT );
-//        cranMirror.setText( pref.get( Paths.CRAN_MIRROR, DEFAULT_R_DOWNLOAD_MIRROR ) );
-//        rServeHost.setText( pref.get( RServe.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
-//        rServePort.setText( String.valueOf( pref.getInt( RServe.RSERVE_PORT, DEFAULT_RSERVE_PORT ) ) );
         boolean remoteButtonSelected = pref.getBoolean( RServe.RSERVE_USE_REMOTE_SETUP, false );
-//        boolean authSelected = pref.getBoolean( RServe.RSERVE_USE_AUTH, false );
+        boolean startupScriptButtonSelected = pref.getBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, false );
+        boolean autoButtonSelected = pref.getBoolean( RServe.RSERVE_USE_AUTO_SETUP, false );
         if( remoteButtonSelected ) {
             gnuRSettings.setSelected( remoteButton.getModel(), true );
-            manualButtonSelected();
-//            if( authSelected ) {
-//                useAuthCheckBox.setSelected( true );
-//                usernameTextField.setText( pref.get( RServe.RSERVE_USER, "" ) );
-//                passwordTextField.setText( "xxxxxxxx" );
-//                useAuthCheckboxSelected();
-//            }
+            remoteButtonSelected();
+        } else if( autoButtonSelected && OsUtils.isWindows() ) {
+            gnuRSettings.setSelected( autoButton.getModel(), true );
+            autoButtonSelected();
         } else {
-            boolean startupScriptButtonSelected = pref.getBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, false );
-            if( startupScriptButtonSelected ) {
-                gnuRSettings.setSelected( startupScriptButton.getModel(), true );
-                startupScriptButtonSelected();
-//                rServeStartupScript.setText( pref.get( RServe.RSERVE_STARTUP_SCRIPT, "" ) );
-//                if( authSelected ) {
-//                    useAuthCheckBox.setSelected( true );
-//                    usernameTextField.setText( pref.get( RServe.RSERVE_USER, "" ) );
-//                    passwordTextField.setText( "xxxxxxxx" );
-//                    useAuthCheckboxSelected();
-//                }
-            } else if( OsUtils.isWindows() ) {
-                gnuRSettings.setSelected( autoButton.getModel(), true );
-                autoButtonSelected();
-            }
+            // default is startupscript
+            gnuRSettings.setSelected( startupScriptButton.getModel(), true );
+            startupScriptButtonSelected();
         }
+
+
     }
 
 
@@ -305,49 +293,12 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         autoPanel.store( pref );
         scriptPanel.store( pref );
         remotePanel.store( pref );
-//        pref.put( Paths.CRAN_MIRROR, cranMirror.getText() );
         boolean remoteButtonSelected = remoteButton.isSelected();
         boolean startupScriptButtonSelected = startupScriptButton.isSelected();
+        boolean autoButtonSelected = autoButton.isSelected();
         pref.putBoolean( RServe.RSERVE_USE_REMOTE_SETUP, remoteButtonSelected );
         pref.putBoolean( RServe.RSERVE_USE_STARTUP_SCRIPT_SETUP, startupScriptButtonSelected );
-//        if( manualButton.isSelected() ) {
-//            pref.put( RServe.RSERVE_HOST, rServeHost.getText() );
-//            pref.putInt( RServe.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
-//            pref.remove( RServe.RSERVE_STARTUP_SCRIPT );
-//            if( useAuthCheckBox.isSelected() ) {
-//                pref.putBoolean( RServe.RSERVE_USE_AUTH, true );
-//                pref.put( RServe.RSERVE_USER, usernameTextField.getText() );
-//                if( passwordChanged ) {
-//                    PasswordStore.save( RServe.RSERVE_PASSWORD, passwordTextField.getPassword(), "" );
-//                    passwordChanged = false;
-//                }
-//            } else {
-//                pref.remove( RServe.RSERVE_USER );
-//                PasswordStore.delete( RServe.RSERVE_PASSWORD );
-//            }
-//        } else if( startupScriptButton.isSelected() ) {
-//            pref.put( RServe.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText() );
-//            pref.putInt( RServe.RSERVE_PORT, Integer.parseInt( rServePort.getText() ) );
-//            pref.remove( RServe.RSERVE_HOST );
-//            if( useAuthCheckBox.isSelected() ) {
-//                pref.putBoolean( RServe.RSERVE_USE_AUTH, true );
-//                pref.put( RServe.RSERVE_USER, usernameTextField.getText() );
-//                if( passwordChanged ) {
-//                    PasswordStore.save( RServe.RSERVE_PASSWORD, passwordTextField.getPassword(), "" );
-//                    passwordChanged = false;
-//                }
-//            } else {
-//                pref.remove( RServe.RSERVE_USER );
-//                PasswordStore.delete( RServe.RSERVE_PASSWORD );
-//            }
-//        } else {
-//            pref.remove( RServe.RSERVE_HOST );
-//            pref.remove( RServe.RSERVE_PORT );
-//            pref.remove( RServe.RSERVE_STARTUP_SCRIPT );
-//            pref.remove( RServe.RSERVE_USE_AUTH );
-//            pref.remove( RServe.RSERVE_USER );
-//            PasswordStore.delete( RServe.RSERVE_PASSWORD );
-//        }
+        pref.putBoolean( RServe.RSERVE_USE_AUTO_SETUP, autoButtonSelected );
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
