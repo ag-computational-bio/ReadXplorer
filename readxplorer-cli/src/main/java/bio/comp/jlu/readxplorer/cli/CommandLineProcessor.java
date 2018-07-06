@@ -60,7 +60,6 @@ import java.io.PrintStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -247,21 +246,18 @@ public final class CommandLineProcessor implements ArgsProcessor {
 
         // print optional arguments...
         final PrintStream ps = env.getOutputStream();
-        try {
-            String dbFilePath = (new File( System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator() + (dbFileArg != null ? dbFileArg : DEFAULT_DATABASE_NAME) + H2_FILE_SUFFIX ))
-                    .getCanonicalPath();
-            printFine( ps, "\nrun parameters: " );
-            printFine( ps, "\tverbosity: " + (verboseArg ? "on" : "off") );
-            printFine( ps, "\tpaired end: " + ((pairedEndArg || pairedEndReadsDirArg != null) ? "yes" : "no") );
-            printFine( ps, "\tthreading: " + (threadAmountArg != null ? threadAmountArg : "1") );
-            printFine( ps, "\tdb file: " + dbFilePath );
-            printFine( ps, "\tproperty file: " + (propsFileArg != null ? propsFileArg : "default") );
-        } catch( IOException ex ) {
-            LOG.error( ex.getMessage(), ex );
-            CommandException ce = new CommandException( 1 );
-            ce.initCause( ex );
-            throw ce;
+        if( dbFileArg == null ) {
+            dbFileArg = DEFAULT_DATABASE_NAME;
         }
+
+        String dbFilePath = new File( (new File(dbFileArg).isAbsolute() ? "" : (System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator())) + dbFileArg + H2_FILE_SUFFIX ).getPath();
+
+        printFine( ps, "\nrun parameters: " );
+        printFine( ps, "\tverbosity: " + (verboseArg ? "on" : "off") );
+        printFine( ps, "\tpaired end: " + ((pairedEndArg || pairedEndReadsDirArg != null) ? "yes" : "no") );
+        printFine( ps, "\tthreading: " + (threadAmountArg != null ? threadAmountArg : "1") );
+        printFine( ps, "\tdb file: " + dbFilePath );
+        printFine( ps, "\tproperty file: " + (propsFileArg != null ? propsFileArg : "default") );
 
 
         // test reference file
@@ -440,17 +436,16 @@ public final class CommandLineProcessor implements ArgsProcessor {
     private ProjectConnector setupProjectConnector( final PrintStream ps ) throws CommandException {
 
         try {
-
             if( dbFileArg == null ) {
                 dbFileArg = DEFAULT_DATABASE_NAME;
             }
-
-            Path dbPath = Paths.get( System.getProperty( "user.dir" ), dbFileArg + H2_FILE_SUFFIX ).toAbsolutePath();
+            
+            Path dbPath = new File( (new File(dbFileArg).isAbsolute() ? "" : (System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator())) + dbFileArg + H2_FILE_SUFFIX ).getAbsoluteFile().toPath();
             if( Files.exists( dbPath ) ) { // delete old copy of the specified file
                 Files.delete( dbPath );
             }
             ProjectConnector pc = ProjectConnector.getInstance();
-            pc.connect( Paths.get( System.getProperty( "user.dir" ), dbFileArg ).toAbsolutePath().toString() );
+            pc.connect( new File( (new File(dbFileArg).isAbsolute() ? "" : (System.getProperty( "user.dir" ) + FileSystems.getDefault().getSeparator())) + dbFileArg ).getAbsolutePath());
 
             printFine( ps, null );
             printFine( ps, "connected to " + dbPath.toString() );
