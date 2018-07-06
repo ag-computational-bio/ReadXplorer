@@ -79,7 +79,7 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
             final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) + 1 ) );
             final ReferenceJob referenceJob;
             if( refParser instanceof BioJavaGff3Parser  ||  refParser instanceof BioJavaGff2Parser ) {
-                Path fastaPath = Files.list( referenceFile.toPath().getParent() ).filter( (Path p) -> {
+                Path fastaPath = Files.list( referenceFile.getAbsoluteFile().toPath().getParent() ).filter( (Path p) -> {
                     String fName = p.getFileName().toString();
                     return fName.endsWith( ".fasta" ) || fName.endsWith( ".fas" ) || fName.endsWith( ".fna" ) || fName.endsWith( ".fa" ); } ).findFirst().get();
                 referenceJob = new ReferenceJob( 0, fastaPath.toFile(), referenceFile, refParser,
