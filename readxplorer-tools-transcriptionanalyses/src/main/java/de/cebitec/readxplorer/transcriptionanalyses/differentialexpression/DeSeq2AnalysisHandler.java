@@ -50,7 +50,9 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         DispEsts( "Per gene estimates against normalized mean expression" ),
         HIST( "Histogram of p-values" ),
         PADJ_HIST( "Histogram of adjusted p-values" ),
-        MAplot( "MA Plot" );
+        MAplot( "MA Plot" ),
+        VolcanoPlot( "Volcano Plot of p-values" ),
+        VolcanoPlot_Padj( "Volcano Plot of adjusted p-values" );
         private final String representation;
 
 
@@ -125,6 +127,12 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         }
         if( plot == Plot.MAplot ) {
             deSeq2.plotMA( file );
+        }
+        if( plot == Plot.VolcanoPlot ) {
+            deSeq2.plotVolcanoPlot(file, true );
+        }
+        if( plot == Plot.VolcanoPlot_Padj ) {
+            deSeq2.plotVolcanoPlotPadj(file, true );
         }
         return file;
     }

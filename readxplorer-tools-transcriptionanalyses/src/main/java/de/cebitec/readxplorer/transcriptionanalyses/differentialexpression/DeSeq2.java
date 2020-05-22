@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import org.openide.util.lookup.ServiceProvider;
 import org.rosuda.REngine.REXP;
@@ -55,6 +56,10 @@ public class DeSeq2 implements RProcessI {
     private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq2" ),
                                                                                  new RPackageDependency( "Biobase" ) };
 
+    private static RPackageDependency[] visualizationDependencies = new RPackageDependency[]{ new RPackageDependency( "ggplot2" ),
+                                                                                              new RPackageDependency( "ggrepel" ),
+                                                                                              new RPackageDependency( "svglite" ) };
+
 
     public DeSeq2( int referenceId ) {
     }
@@ -67,6 +72,11 @@ public class DeSeq2 implements RProcessI {
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
+    }
+    
+    @Override
+    public RPackageDependency[] getVisualizationDependencies() {
+        return visualizationDependencies;
     }
 
 
@@ -188,19 +198,78 @@ public class DeSeq2 implements RProcessI {
 
     public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException,
                                              RserveException, REngineException, REXPMismatchException, IOException {
-        gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
+        gnuR.storePlot( file, "hist(res$pvalue, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\", xlab = \"p-value\", ylab = \"Frequency\")" );
     }
 
 
     public void plotPadjHist( File file ) throws IllegalStateException, PackageNotLoadableException,
                                                  RserveException, REngineException, REXPMismatchException, IOException {
-        gnuR.storePlot( file, "hist(res$padj, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
+        gnuR.storePlot( file, "hist(res$padj, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\", xlab = \"adjusted p-value\", ylab = \"Frequency\")" );
     }
 
 
     public void plotMA( File file ) throws IllegalStateException, PackageNotLoadableException,
                                            RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "plotMA(dds, alpha=0.1, main=\"\")" );
+    }
+
+
+    public void plotVolcanoPlot( File file, boolean withLabel ) throws IllegalStateException, PackageNotLoadableException,
+                                                                       RserveException, REngineException, REXPMismatchException, IOException {
+
+        gnuR.loadPackage( "ggplot2" );
+        gnuR.loadPackage( "ggrepel" );
+        gnuR.loadPackage( "svglite" );
+
+        List<String> plotCode = new LinkedList<>();
+        plotCode.add( "res.vp <- as.data.frame(res)" );
+        plotCode.add( "res.vp <- res.vp[complete.cases(res.vp[, 5]), ]" );
+        plotCode.add( "res.vp$gene_name <- rownames(res.vp)" );
+        plotCode.add( "res.vp$threshold = as.factor(abs(res.vp$log2FoldChange) > 2 & res.vp$pvalue < 0.05)" );
+        plotCode.add( "g <- ggplot(data=res.vp, aes(x=log2FoldChange, y=-log10(pvalue), colour=threshold))" );
+        plotCode.add( "g <- g + geom_point(alpha=0.4, size=1.75)" );
+        plotCode.add( "g <- g + theme(legend.position = \"none\", axis.line = element_line(colour = \"black\"), " +
+                      "panel.grid.major = element_line(colour = \"light grey\", size = 0.25), " +
+                      "panel.grid.minor = element_line(colour = \"light grey\", size = 0.1), " +
+                      "panel.border = element_blank(), panel.background = element_blank(), " +
+                      "plot.margin=unit(c(40,1,10,1),\"points\"))" );
+        plotCode.add( "g <- g + xlab(\"log2 fold change\") + ylab(\"-log10 p-value\")" );
+        if( withLabel ) {
+            plotCode.add( "g <- g + geom_label_repel(data=subset(res.vp, abs(log2FoldChange) > 2 & pvalue < 0.05), " +
+                          "aes(log2FoldChange, -log10(pvalue),label=gene_name, size=0.8), colour=\"black\", force=2)" );
+        }
+
+        gnuR.storeGgplot( file, plotCode, "g" );
+    }
+
+
+    public void plotVolcanoPlotPadj( File file, boolean withLabel ) throws IllegalStateException, PackageNotLoadableException,
+                                                                           RserveException, REngineException, REXPMismatchException, IOException {
+
+        gnuR.loadPackage( "ggplot2" );
+        gnuR.loadPackage( "ggrepel" );
+        gnuR.loadPackage( "svglite" );
+
+        List<String> plotCode = new LinkedList<>();
+        plotCode.add( "res.vp <- as.data.frame(res)" );
+        plotCode.add( "res.vp <- res.vp[complete.cases(res.vp[, 5]), ]" );
+        plotCode.add( "res.vp$gene_name <- rownames(res.vp)" );
+        plotCode.add( "res.vp$threshold = as.factor(abs(res.vp$log2FoldChange) > 2 & res.vp$padj < 0.05)" );
+        plotCode.add( "g <- ggplot(data=res.vp, aes(x=log2FoldChange, y=-log10(padj), colour=threshold))" );
+        plotCode.add( "g <- g + geom_point(alpha=0.4, size=1.75)" );
+        plotCode.add( "g <- g + theme(legend.position = \"none\", axis.line = element_line(colour = \"black\"), " +
+                      "panel.grid.major = element_line(colour = \"light grey\", size = 0.25), " +
+                      "panel.grid.minor = element_line(colour = \"light grey\", size = 0.1), " +
+                      "panel.border = element_blank(), panel.background = element_blank(), " +
+                      "plot.margin=unit(c(40,1,10,1),\"points\"))" );
+        plotCode.add( "g <- g + xlab(\"log2 fold change\") + ylab(\"-log10 p-value\")" );
+        if( withLabel ) {
+            plotCode.add( "g <- g + geom_label_repel(data=subset(res.vp, abs(log2FoldChange) > 2 & padj < 0.05), " +
+                          "aes(log2FoldChange, -log10(padj),label=gene_name, size=0.8), colour=\"black\", force=2)" );
+        }
+        plotCode.add( "g" );
+
+        gnuR.storeGgplot( file, plotCode, "g" );
     }
 
 

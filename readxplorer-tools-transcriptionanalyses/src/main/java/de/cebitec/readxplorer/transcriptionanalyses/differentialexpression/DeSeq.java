@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import org.openide.util.lookup.ServiceProvider;
 import org.rosuda.REngine.REXP;
@@ -53,6 +54,7 @@ public class DeSeq implements RProcessI {
     private static final Logger LOG = LoggerFactory.getLogger( DeSeq.class.getName() );
 
     private static RPackageDependency[] dependencies = new RPackageDependency[]{ new RPackageDependency( "DESeq" ) };
+    private static RPackageDependency[] visualizationDependencies = new RPackageDependency[]{};
 
 
     public DeSeq() {
@@ -62,6 +64,12 @@ public class DeSeq implements RProcessI {
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
+    }
+
+
+    @Override
+    public RPackageDependency[] getVisualizationDependencies() {
+        return visualizationDependencies;
     }
 
 

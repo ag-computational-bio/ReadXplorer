@@ -50,7 +50,9 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         DispEsts( "Gene dispersion vs. normalized mean expression" ),
         DE( "Log2 fold change vs. base means" ),
         HIST( "Histogram of p-values" ),
-        MAplot( "MA Plot" );
+        MAplot( "MA Plot" ),
+        VolcanoPlot( "Volcano Plot of p-values" ),
+        VolcanoPlot_Padj( "Volcano Plot of adjusted p-values" );
         private final String representation;
 
 

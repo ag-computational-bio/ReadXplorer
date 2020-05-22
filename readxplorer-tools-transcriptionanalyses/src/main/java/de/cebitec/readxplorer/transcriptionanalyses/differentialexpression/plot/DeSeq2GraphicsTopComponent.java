@@ -273,14 +273,17 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            progressHandle.finish();
         } catch( PackageNotLoadableException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            progressHandle.finish();
         } catch( IllegalStateException | REXPMismatchException | REngineException ex ) {
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             LOG.error( "{0}: " + ex.getMessage(), currentTimestamp );
             JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
+            progressHandle.finish();
         }
     }//GEN-LAST:event_plotButtonActionPerformed
 

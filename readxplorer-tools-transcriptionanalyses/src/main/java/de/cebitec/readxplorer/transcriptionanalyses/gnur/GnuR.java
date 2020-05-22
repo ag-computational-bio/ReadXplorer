@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
@@ -62,8 +63,9 @@ public final class GnuR extends RConnection {
     public static boolean isLocalMachineRunning() {
         return isConnectableInstanceRunning;
     }
-    
-    public static void setLocalMachineRunning(boolean isLocalMachineRunning){
+
+
+    public static void setLocalMachineRunning( boolean isLocalMachineRunning ) {
         isConnectableInstanceRunning = isLocalMachineRunning;
     }
 
@@ -331,6 +333,86 @@ public final class GnuR extends RConnection {
             this.eval( "svg(filename=tmpFile)" );
             this.eval( plotIdentifier );
             this.eval( "dev.off()" );
+            this.eval( "r=readBin(tmpFile,\"raw\",30720*1024)" );
+            this.eval( "unlink(tmpFile)" );
+            REXP pictureData = this.parseAndEval( "r" );
+            byte[] asBytes = pictureData.asBytes();
+            try( OutputStream os = new FileOutputStream( file ) ) {
+                os.write( asBytes );
+            }
+        }
+    }
+
+
+    /**
+     * Store an SVG file of a given plot using this GnuR instance.
+     * <p>
+     * @param file           File to store the plot in
+     * @param plotIdentifier String identifying the data to plot
+     * <p>
+     * @throws
+     * de.cebitec.readxplorer.differentialExpression.gnur.PackageNotLoadableException
+     * @throws IllegalStateException
+     */
+    public void storePlot( File file, List<String> plotIdentifier ) throws PackageNotLoadableException, IllegalStateException,
+                                                                           RserveException, REngineException, REXPMismatchException,
+                                                                           FileNotFoundException, IOException {
+        this.loadPackage( "grDevices" );
+
+        if( runningLocal ) {
+            String path = file.getAbsolutePath();
+            path = path.replace( "\\", "\\\\" );
+            this.eval( "svg(filename=\"" + path + "\")" );
+            for( String line : plotIdentifier ) {
+                this.eval( line );
+            }
+            this.eval( "dev.off()" );
+        } else {
+            this.eval( "tmpFile <- tempfile(pattern =\"ReadXplorer_Plot_\", tmpdir = tempdir(), fileext =\".svg\")" );
+            this.eval( "svg(filename=tmpFile)" );
+            for( String line : plotIdentifier ) {
+                this.eval( line );
+            }
+            this.eval( "dev.off()" );
+            this.eval( "r=readBin(tmpFile,\"raw\",30720*1024)" );
+            this.eval( "unlink(tmpFile)" );
+            REXP pictureData = this.parseAndEval( "r" );
+            byte[] asBytes = pictureData.asBytes();
+            try( OutputStream os = new FileOutputStream( file ) ) {
+                os.write( asBytes );
+            }
+        }
+    }
+
+
+    /**
+     * Store an SVG file of a given plot using this GnuR instance.
+     * <p>
+     * @param file           File to store the plot in
+     * @param plotIdentifier String identifying the data to plot
+     * @param plotName       Name of the r variable with the ggplot
+     * <p>
+     * @throws
+     * de.cebitec.readxplorer.differentialExpression.gnur.PackageNotLoadableException
+     * @throws IllegalStateException
+     */
+    public void storeGgplot( File file, List<String> plotIdentifier, String plotName ) throws PackageNotLoadableException, IllegalStateException,
+                                                                                              RserveException, REngineException, REXPMismatchException,
+                                                                                              FileNotFoundException, IOException {
+        if( runningLocal ) {
+            String path = file.getAbsolutePath();
+            path = path.replace( "\\", "\\\\" );
+            for( String line : plotIdentifier ) {
+                this.eval( line );
+            }
+            this.eval( "ggsave(\"" + path + "\", " + plotName + ")" );
+        } else {
+            this.eval( "tmpFile <- tempfile(pattern =\"ReadXplorer_Plot_\", tmpdir = tempdir(), fileext =\".svg\")" );
+            this.eval( "svg(filename=tmpFile)" );
+            for( String line : plotIdentifier ) {
+                this.eval( line );
+            }
+            this.eval( "ggsave(tmpFile, " + plotName + ")" );
             this.eval( "r=readBin(tmpFile,\"raw\",30720*1024)" );
             this.eval( "unlink(tmpFile)" );
             REXP pictureData = this.parseAndEval( "r" );

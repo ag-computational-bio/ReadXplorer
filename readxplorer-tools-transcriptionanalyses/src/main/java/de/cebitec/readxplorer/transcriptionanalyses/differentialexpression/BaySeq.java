@@ -62,6 +62,8 @@ public class BaySeq implements RProcessI {
                                                                                  new RPackageDependency( "snow" ),
                                                                                  new RPackageDependency( "parallel" ) };
 
+    private static RPackageDependency[] visualizationDependencies = new RPackageDependency[]{};
+
 
     public BaySeq() {
     }
@@ -70,6 +72,12 @@ public class BaySeq implements RProcessI {
     @Override
     public RPackageDependency[] getDependencies() {
         return dependencies;
+    }
+
+
+    @Override
+    public RPackageDependency[] getVisualizationDependencies() {
+        return visualizationDependencies;
     }
 
 

@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.gnur;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAnalysisHandler.Tool;
 
 
-
 /**
  *
  * @author Patrick Blumenkamp
@@ -29,6 +28,9 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeAna
 public interface RProcessI {
 
     public RPackageDependency[] getDependencies();
+
+
+    public RPackageDependency[] getVisualizationDependencies();
 
 
     public Tool getTool();

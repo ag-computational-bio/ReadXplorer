@@ -33,7 +33,7 @@ public class RPackageOverview extends javax.swing.JPanel {
 
 
     /** Creates new form RPackageOverview */
-    public RPackageOverview( GnuR gnuR ) throws REXPMismatchException, RserveException{
+    public RPackageOverview( GnuR gnuR ) throws REXPMismatchException, RserveException {
         initComponents();
         textPane.setContentType( "text/html" );
         textPane.setText( checkDependencies( gnuR ) );
@@ -42,7 +42,7 @@ public class RPackageOverview extends javax.swing.JPanel {
 
 
     private String checkDependencies( GnuR gnur ) throws REXPMismatchException, RserveException {
-        StringBuilder sb = new StringBuilder(200);
+        StringBuilder sb = new StringBuilder( 200 );
         sb.append( "<html><head><style>table, th, td {border: 1px solid black}</style></head><body>" );
         for( RProcessI process : Lookup.getDefault().<RProcessI>lookupAll( RProcessI.class ) ) {
             sb.append( "<h3>" ).append( process.getTool().toString() ).append( "</h3>" );
@@ -59,6 +59,22 @@ public class RPackageOverview extends javax.swing.JPanel {
                 }
             }
             sb.append( "</table><br>" );
+            if( process.getVisualizationDependencies().length != 0 ) {
+                sb.append( "<h3>" ).append( process.getTool().toString() ).append( " - Visualization" ).append( "</h3>" );
+                sb.append( "<table style=\"width:100%\"><tr>" );
+                sb.append( "<th>Name</th><th>Required</th><th>Installed</th></tr>" );
+                for( RPackageDependency p : process.getVisualizationDependencies() ) {
+                    Version v = gnur.getPackageVersion( p.getName() ).orElse( new Version( "0" ) );
+                    String installedVersion = (v.getVersion().equals( "0" )) ? "None" : v.getVersion();
+                    String requiredVersion = (p.getVersion().getVersion().equals( "0" )) ? "Any" : p.getVersion().getVersion();
+                    if( p.getVersion().compareTo( v ) <= 0 && !installedVersion.equals( "None" ) ) {
+                        sb.append( String.format( "<tr><td>%s</td><td>%s</td><td>%s</td></tr>", p.getName(), requiredVersion, installedVersion ) );
+                    } else {
+                        sb.append( String.format( "<tr style=\"color:red;\"><td>%s</td><td>%s</td><td>%s</td></tr>", p.getName(), requiredVersion, installedVersion ) );
+                    }
+                }
+                sb.append( "</table><br>" );
+            }
         }
         sb.append( "</body></html>" );
         return sb.toString();
