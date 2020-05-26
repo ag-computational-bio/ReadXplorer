@@ -69,7 +69,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private final File versionIndicator = new File( rDir.getAbsolutePath() + File.separator + "rx_minimal_version_2_1" );
     private static final String SOURCE_URI = "R-3.2.0.tar";
     private static final String R_ZIP = "R-3.2.0.zip";
-    private static final String DEFAULT_R_DOWNLOAD_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
+    private static final String DEFAULT_R_DOWNLOAD_MIRROR = "https://www.computational.bio.uni-giessen.de/readxplorer/R/";
     private static final String DEFAULT_RSERVE_HOST = "localhost";
     private static final int DEFAULT_RSERVE_PORT = 6311;
     private static final String GNU_LICENSE = "             GNU GENERAL PUBLIC LICENSE\n" +
