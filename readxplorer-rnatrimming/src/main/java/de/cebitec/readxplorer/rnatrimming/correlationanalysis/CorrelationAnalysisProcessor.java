@@ -40,7 +40,6 @@ import java.util.Map;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -137,7 +136,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
 
     private void createProcessHandle( String title ) {
-        this.ph = ProgressHandleFactory.createHandle( title, new Cancellable() {
+        this.ph = ProgressHandle.createHandle( title, new Cancellable() {
 
                                                   @Override
                                                   public boolean cancel() {

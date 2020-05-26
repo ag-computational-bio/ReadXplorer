@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import javax.swing.ImageIcon;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
@@ -97,7 +96,7 @@ public class GASVCaller implements Runnable {
         this.bamToGASVParams = bamToGASVParams;
         this.gasvMainParams = gasvMainParams;
         this.parent = parent;
-        this.storeChromsProgressHandle = ProgressHandleFactory.createHandle( Bundle.CallerProgressName() );
+        this.storeChromsProgressHandle = ProgressHandle.createHandle( Bundle.CallerProgressName() );
         this.analysisProgressHandle = progressHandle;
     }
 

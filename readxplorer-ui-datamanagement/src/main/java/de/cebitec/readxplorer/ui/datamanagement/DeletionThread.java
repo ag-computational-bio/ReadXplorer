@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
@@ -67,7 +66,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         invalidGens = new HashSet<>();
 
         this.io = IOProvider.getDefault().getIO( getBundleString( "DeletionThread.ouptut.name" ), false );
-        this.ph = ProgressHandleFactory.createHandle( getBundleString( "MSG_DeletionThread.progress.name" ) );
+        this.ph = ProgressHandle.createHandle( getBundleString( "MSG_DeletionThread.progress.name" ) );
         this.workunits = this.references.size() + this.tracks.size();
     }
 

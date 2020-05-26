@@ -33,7 +33,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.slf4j.Logger;
@@ -106,7 +105,7 @@ public final class ScreenshotUtils {
                     @Override
                     public void save( final String fileLocation ) {
 
-                        final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( Bundle.ScreenshotUtils_progress_name() );
+                        final ProgressHandle progressHandle = ProgressHandle.createHandle( Bundle.ScreenshotUtils_progress_name() );
                         progressHandle.start();
 
                         Thread exportThread = new Thread( new Runnable() {

@@ -21,7 +21,6 @@ package de.cebitec.readxplorer.ui.converter;
 import de.cebitec.readxplorer.parser.output.ConverterI;
 import de.cebitec.readxplorer.utils.Observer;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
@@ -45,7 +44,7 @@ public class ConvertThread extends Thread implements Observer {
     public ConvertThread( ConverterI converter ) {
         this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( ConvertThread.class, "ConvertThread.output.name" ), false );
         this.converter = converter;
-        this.progressHandle = ProgressHandleFactory.createHandle( NbBundle.getMessage( ConvertThread.class, "ConvertThread.progress.name" ) );
+        this.progressHandle = ProgressHandle.createHandle( NbBundle.getMessage( ConvertThread.class, "ConvertThread.progress.name" ) );
         this.progressHandle.start();
 
     }

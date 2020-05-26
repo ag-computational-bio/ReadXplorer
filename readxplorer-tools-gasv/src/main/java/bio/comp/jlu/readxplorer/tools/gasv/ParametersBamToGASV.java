@@ -127,7 +127,7 @@ public class ParametersBamToGASV implements ParameterSetI<ParametersBamToGASV> {
      * Constructor for creating a default value parameter set.
      */
     public ParametersBamToGASV() {
-        this( false, false, false, false, new Byte( "20" ), 10000, FB_METHOD_PCT,
+        this( false, false, false, false, Byte.valueOf( "20" ), 10000, FB_METHOD_PCT,
               99, -1, "", "", STRINGENCY_SILENT );
     }
 

@@ -156,7 +156,7 @@ public class ExternalSort {
 
     public void split() {
         IO.getOut().println( "Reading file in chunks of " + NUM_LINES + ", sorting, and writing them to temp files." );
-        try( BufferedReader in = new BufferedReader( new FileReader( infile ) ) ) {
+        try(  BufferedReader in = new BufferedReader( new FileReader( infile ) ) ) {
             List<SortElement> rows = new ArrayList<>();
             String line = "";
             while( line != null ) {
@@ -172,11 +172,11 @@ public class ExternalSort {
                         break;
                     }
 
-					// check to see if the first line has a header.
+                    // check to see if the first line has a header.
                     // It has a header if the value is NOT parsed as a double.
                     if( firstLine ) {
                         SortElement e = new SortElement( line );
-                        if( header.isEmpty( ) ) {
+                        if( header.isEmpty() ) {
                             rows.add( e );
                         }
                         firstLine = false;
@@ -189,7 +189,7 @@ public class ExternalSort {
                 Collections.sort( rows );
 
                 // write to disk
-                try ( BufferedWriter bw = new BufferedWriter( new FileWriter( infile + "_tmp" + numFiles + ".txt" ) )) {
+                try(  BufferedWriter bw = new BufferedWriter( new FileWriter( infile + "_tmp" + numFiles + ".txt" ) ) ) {
                     for( SortElement row : rows ) {
                         bw.append( row.line + "\n" );
                     }
@@ -214,7 +214,7 @@ public class ExternalSort {
 
             // First, create SortElement from lines.get(i)
             SortElement e = new SortElement( lines.get( i ) );
-            if( !e.line.isEmpty( ) && !e.line.contains( "null" ) ) {
+            if( !e.line.isEmpty() && !e.line.contains( "null" ) ) {
                 rows.add( e );
             }
 
@@ -226,7 +226,7 @@ public class ExternalSort {
         Collections.sort( rows );
 
         // write to disk
-        try( BufferedWriter bw = new BufferedWriter( new FileWriter( outputname ) )) {
+        try(  BufferedWriter bw = new BufferedWriter( new FileWriter( outputname ) ) ) {
             for( SortElement row : rows ) {
                 bw.write( row.line + "\n" );
             }
@@ -236,11 +236,11 @@ public class ExternalSort {
 
     public void merge() {
         IO.getOut().println( "Merging files..." );
-        try( BufferedWriter out = new BufferedWriter( new FileWriter( outfile ) ) ) {
+        try(  BufferedWriter out = new BufferedWriter( new FileWriter( outfile ) ) ) {
             List<BufferedReader> mergefbr = new ArrayList<>();
             List<SortElement> filerows = new ArrayList<>();
 
-            if( !header.isEmpty( ) ) {
+            if( !header.isEmpty() ) {
                 out.write( header + "\n" );
             }
 
@@ -318,7 +318,7 @@ public class ExternalSort {
 
 
     public void merge( List<String> files, String outputfile ) {
-        try( BufferedWriter out = new BufferedWriter( new FileWriter( outputfile ) ) ) {
+        try(  BufferedWriter out = new BufferedWriter( new FileWriter( outputfile ) ) ) {
             List<BufferedReader> mergefbr = new ArrayList<>();
             List<SortElement> filerows = new ArrayList<>();
 
@@ -410,13 +410,12 @@ public class ExternalSort {
 
         // TODO: could write a getOrigLIne() function that puts the row array back together
 
-
         public SortElement( String str ) {
             line = str;
             row = str.split( "\\s+" );
 
             if( ESPfile ) {
-				// If first read is on the negative strand, flip
+                // If first read is on the negative strand, flip
                 // coordinates for sorting.
                 if( row[4].equals( "-" ) || row[4].equalsIgnoreCase( "MINUS" ) ) {
                     String tmp = row[2];
@@ -424,7 +423,7 @@ public class ExternalSort {
                     row[3] = tmp;
                 }
 
-				// If second read is on the negative strand, flip
+                // If second read is on the negative strand, flip
                 // coordinates for sorting.
                 if( row[8].equals( "-" ) || row[8].equalsIgnoreCase( "MINUS" ) ) {
                     String tmp = row[6];

@@ -6,6 +6,12 @@
     <artifactId>geneticcodes</artifactId>
     <version>1.0.1</version>
     <packaging>bundle</packaging>
+    
+    <parent>
+        <groupId>bio.comp.jlu.readxplorer</groupId>
+        <artifactId>readxplorer</artifactId>
+        <version>2.3-FINAL</version>
+    </parent>
 
     <name>Genetic codes library</name>
 
@@ -20,10 +26,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -34,11 +39,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <instructions></instructions>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -47,7 +47,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -214,7 +213,7 @@ public final class OpenGASVAction implements ActionListener, DataVisualisationI 
      */
     @NbBundle.Messages( { "ActionProgressName=Genome Rearrangements are calculated with GASV..." } )
     private void createAnalysis( TrackConnector connector, ParametersBamToGASV bamToGASVParams, ParametersGASVMain gasvMainParams ) {
-        progressHandle = ProgressHandleFactory.createHandle( Bundle.ActionProgressName() );
+        progressHandle = ProgressHandle.createHandle( Bundle.ActionProgressName() );
         progressHandle.start();
         GASVCaller gasvCaller = new GASVCaller( reference, connector, bamToGASVParams, gasvMainParams, this, progressHandle );
         Thread thread = new Thread( gasvCaller );

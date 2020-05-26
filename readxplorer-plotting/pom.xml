@@ -6,7 +6,7 @@
     <parent>
         <groupId>bio.comp.jlu.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
-        <version>2.2.3-FINAL</version>
+        <version>2.3-FINAL</version>
     </parent>
 
 
@@ -55,19 +55,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <configuration>
-                            <propertyExpansion>projectdir=${basedir}</propertyExpansion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <useDefaultManifestFile>true</useDefaultManifestFile>
@@ -75,7 +62,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>

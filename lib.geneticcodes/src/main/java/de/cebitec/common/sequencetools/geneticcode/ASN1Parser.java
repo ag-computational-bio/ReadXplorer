@@ -29,12 +29,12 @@ class ASN1Parser {
     public ParsedASN1Table parseData(InputStream inputFile) throws IOException {
 
         ParsedASN1Table parsedTable = new ParsedASN1Table();
-        List<ParsedASN1Entry> entryList = new ArrayList<ParsedASN1Entry>();
+        List<ParsedASN1Entry> entryList = new ArrayList<>();
         InputStreamReader inReader = new InputStreamReader(inputFile);
         BufferedReader in = new BufferedReader(inReader);
         String line;
         int level = 0;
-        HashMap<String, List<String>> entries = new HashMap<String, List<String>>();
+        HashMap<String, List<String>> entries = new HashMap<>();
         String key;
         String value;
         boolean closed = false;
@@ -72,7 +72,7 @@ class ASN1Parser {
                             if (entries.containsKey(key)) { //add to list
                                 entries.get(key).add(value);
                             } else { //add new entry
-                                List<String> list = new ArrayList<String>();
+                                List<String> list = new ArrayList<>();
                                 list.add(value);
                                 entries.put(key, list);
                             }

@@ -2,7 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>bio.jlu.comp.readxplorer</groupId>
+    <parent>
+        <groupId>bio.comp.jlu.readxplorer</groupId>
+        <artifactId>readxplorer</artifactId>
+        <version>2.3-FINAL</version>
+    </parent>
+
+    <groupId>bio.comp.jlu.readxplorer</groupId>
     <artifactId>batik.nbm</artifactId>
     <version>1.7</version>
     <packaging>nbm</packaging>
@@ -85,13 +91,13 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.13.2</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
                         <publicPackage>org.apache.*</publicPackage>
+                        <publicPackage>org.mozilla.javascript</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

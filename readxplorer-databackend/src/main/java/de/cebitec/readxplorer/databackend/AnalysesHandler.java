@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 
 
 /**
@@ -85,7 +84,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      */
     public AnalysesHandler( TrackConnector trackConnector, DataVisualisationI parent,
                             String handlerTitle, ParametersReadClasses readClassParams ) {
-        this.progressHandle = ProgressHandleFactory.createHandle( handlerTitle );
+        this.progressHandle = ProgressHandle.createHandle( handlerTitle );
         this.observers = new ArrayList<>();
         this.parent = parent;
         this.trackConnector = trackConnector;

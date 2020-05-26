@@ -131,7 +131,7 @@ public class ExcelExporter implements TableExporterI {
     @NbBundle.Messages( { "SuccessMsg=Excel exporter stored data successfully: ",
                           "SuccessHeader=Success" } )
     @Override
-    public File writeFile( File file ) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
+    public File writeFile( File file ) throws FileNotFoundException, IOException, WriteException {
 
         LOG.info( "Starting to write Excel file...{0}", file.getAbsolutePath() );
 
@@ -185,7 +185,7 @@ public class ExcelExporter implements TableExporterI {
      * @throws OutOfMemoryError
      * @throws WriteException
      */
-    public boolean fillSheet( WritableSheet sheet, List<List<Object>> sheetData, List<String> headerRow ) throws OutOfMemoryError, WriteException {
+    public boolean fillSheet( WritableSheet sheet, List<List<Object>> sheetData, List<String> headerRow ) throws WriteException {
 
         boolean dataLeft = false;
         int row = 0;
@@ -263,7 +263,7 @@ public class ExcelExporter implements TableExporterI {
      * @throws WriteException
      * @throws OutOfMemoryError
      */
-    public static void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
+    public static void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException {
         WritableFont arialbold = new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD );
         WritableFont arial = new WritableFont( WritableFont.ARIAL, 10 );
         if( cellvalue == null ) {

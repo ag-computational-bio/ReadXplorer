@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
         final PersistentFeature[] feature = data.getFeatures();
 
-        final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Count Data Table" );
+        final ProgressHandle progressHandle = ProgressHandle.createHandle( "Creating Count Data Table" );
         progressHandle.start( feature.length );
         final int[][] countData = new int[data.getSelectedTracks().size()][];
         final List<Object> regionNamesList = new ArrayList<>();

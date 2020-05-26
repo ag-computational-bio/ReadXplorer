@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import org.h2.store.fs.FileUtils;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -100,7 +99,7 @@ public class RNATrimProcessor {
         String fastaPath = de.cebitec.readxplorer.utils.FileUtils.getFilePathWithoutExtension( samfile ) + "_" + method.getShortDescription() + ".redo.fastq";
 
         //set up the progress handle to indicate progress to the user
-        ProgressHandle ph = ProgressHandleFactory.createHandle(
+        ProgressHandle ph = ProgressHandle.createHandle(
                 NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Start", sourcePath ),
                 new Cancellable() {
             @Override
@@ -194,7 +193,7 @@ public class RNATrimProcessor {
         this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ) );
 
         //set up the progress handle to indicate progress to the user
-        ProgressHandle ph = ProgressHandleFactory.createHandle(
+        ProgressHandle ph = ProgressHandle.createHandle(
                 NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ),
                 new Cancellable() {
             @Override
@@ -314,7 +313,7 @@ public class RNATrimProcessor {
         this.sourcePath = sourcePath;
         method.setMaximumTrimLength( maximumTrim );
 
-        final ProgressHandle ph = ProgressHandleFactory.createHandle( "Trim RNA reads in file '" + sourcePath + "'", new Cancellable() {
+        final ProgressHandle ph = ProgressHandle.createHandle( "Trim RNA reads in file '" + sourcePath + "'", new Cancellable() {
 
                                                                   @Override
                                                                   public boolean cancel() {

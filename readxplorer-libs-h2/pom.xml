@@ -6,7 +6,7 @@
     <parent>
         <groupId>bio.comp.jlu.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
-        <version>2.2.3-FINAL</version>
+        <version>2.3-FINAL</version>
     </parent>
 
 
@@ -28,7 +28,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
