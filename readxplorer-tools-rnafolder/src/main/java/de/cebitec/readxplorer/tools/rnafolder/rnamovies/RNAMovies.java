@@ -39,12 +39,13 @@ import java.util.StringTokenizer;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 //import de.unibi.techfak.bibiserv.biodom.RNAStructML;
 //import de.unibi.techfak.bibiserv.biodom.exception.BioDOMException;
@@ -117,14 +118,14 @@ public class RNAMovies extends JPanel implements ActionContainer {
         } catch( IOException e ) {
             LOG.error( e.getMessage() );
             System.exit( 1 );
-        } catch( SAXException e ) {
+        } catch( SAXException | ParserConfigurationException e ) {
             LOG.error( "Error while parsing config: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }
 
         // load actions
         try {
-            parser = XMLReaderFactory.createXMLReader();
+            parser = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
             parser.setContentHandler( new ActionXMLHandler( this,
                                                             new Class<?>[]{ this.getClass() },
                                                             new Object[]{ this } ) );
@@ -132,7 +133,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
         } catch( IOException e ) {
             LOG.error( e.getMessage() );
             System.exit( 1 );
-        } catch( SAXException e ) {
+        } catch( SAXException | ParserConfigurationException e ) {
             LOG.error( "Error while parsing action file: ".concat( e.getMessage() ) );
             System.exit( 1 );
         }

@@ -25,11 +25,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 
 public class Configuration {
@@ -37,11 +38,11 @@ public class Configuration {
     private final Map<String, Category> categories = Collections.synchronizedMap( new LinkedHashMap<String, Category>() );
 
 
-    public Configuration( InputStream in ) throws IOException, SAXException {
+    public Configuration( InputStream in ) throws IOException, SAXException, ParserConfigurationException {
         XMLReader parser;
         ContentHandler handler;
 
-        parser = XMLReaderFactory.createXMLReader();
+        parser = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
         handler = new ConfigXMLHandler( categories );
 
         parser.setContentHandler( handler );

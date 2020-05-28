@@ -177,7 +177,7 @@ public class ConfigXMLHandler implements ContentHandler {
         } else if( qName.equalsIgnoreCase( "int" ) ) {
             Integer ival;
             try {
-                ival = new Integer( text );
+                ival = Integer.valueOf(text );
                 if( mode == MODE_CONSTRUCTOR ) {
                     lastCons.peek().add( Integer.TYPE );
                     lastArgs.peek().add( ival );
@@ -190,7 +190,7 @@ public class ConfigXMLHandler implements ContentHandler {
         } else if( qName.equalsIgnoreCase( "float" ) ) {
             Float fval;
             try {
-                fval = new Float( text );
+                fval = Float.valueOf(text );
                 if( mode == MODE_CONSTRUCTOR ) {
                     lastCons.peek().add( Float.TYPE );
                     lastArgs.peek().add( fval );
