@@ -68,7 +68,7 @@ public class DBItem extends StandardItem {
         this.setTitleHidden( "Track #" + track.getId() );
         this.setDescriptionHidden( track.getDescription() );
         this.setTimestampHidden( track.getTimestamp() );
-        this.setRefID( new Long( track.getRefGenID() ) );
+        this.setRefID( Long.valueOf(track.getRefGenID() ) );
     }
 
 
@@ -157,7 +157,7 @@ public class DBItem extends StandardItem {
      * @param number The unique id of this DBItem
      */
     public void setID( Integer number ) {
-        this.id = new Long( number );
+        this.id = Long.valueOf( number );
     }
 
 
