@@ -26,8 +26,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
 import org.openide.windows.InputOutput;
 
 
@@ -46,8 +47,8 @@ public class SimpleSAMRecordParser {
         String outfile = args[1];
 
         int count = 0;
-        try( BufferedWriter writer = new BufferedWriter( new FileWriter( outfile ) );
-             SAMFileReader in = new SAMFileReader( new File( bamfile ) ) ) {
+        try(  BufferedWriter writer = new BufferedWriter( new FileWriter( outfile ) ); 
+              SamReader in = SamReaderFactory.makeDefault().open( new File( bamfile ) ) ) {
 
             writer.write( "Name\tSAMFlag\tChr\tStart\tEnd\tNegativeStrand?\tQuality\tCIGAR\tNM\n" );
             for( SAMRecord s : in ) {
@@ -58,9 +59,9 @@ public class SimpleSAMRecordParser {
                  */
 
                 writer.write( s.getReadName() + "\t" + s.getFlags() + "\t" + s.getReferenceName() + "\t" +
-                          s.getAlignmentStart() + "\t" + s.getAlignmentEnd() + "\t" +
-                          s.getReadNegativeStrandFlag() + "\t" + s.getMappingQuality() + "\t" +
-                          s.getCigarString() + "\t" + s.getAttribute( "NM" ) + "\n" );
+                              s.getAlignmentStart() + "\t" + s.getAlignmentEnd() + "\t" +
+                              s.getReadNegativeStrandFlag() + "\t" + s.getMappingQuality() + "\t" +
+                              s.getCigarString() + "\t" + s.getAttribute( "NM" ) + "\n" );
                 if( count % 500000 == 0 ) {
                     IO.getOut().println( "  record " + count + "..." );
                 }
@@ -68,7 +69,7 @@ public class SimpleSAMRecordParser {
             }
 
         }
-        
+
     }
 
 

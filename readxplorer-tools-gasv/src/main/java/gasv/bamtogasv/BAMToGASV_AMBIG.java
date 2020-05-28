@@ -38,12 +38,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMFileReader;
 import htsjdk.samtools.ValidationStringency;
 import htsjdk.samtools.SAMFormatException;
 import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMSequenceDictionary;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.SamReaderFactory;
+import org.openide.util.Exceptions;
 import picard.sam.FixMateInformation;
 
 
@@ -82,7 +84,6 @@ public class BAMToGASV_AMBIG {
     /* Additional Variables */
     // We never need pairing info now.
     public boolean someLibPassed = true; // true if at least one library is paired, false otherwise.
-    public boolean IS_URL; // true if the BAM file is a URL, false otherwise.
     public final int NUM_LINES_FOR_EXTERNAL_SORT = 500000; // number of lines for external sort.
     public int BAD_RECORD_COUNTER; // counts the # of poorly-formatted records.
     public long GL = 3000000000L; // default genome size
@@ -140,12 +141,12 @@ public class BAMToGASV_AMBIG {
             System.out.println( "After Running fixMates, reading the BAM file resulted in errors.  Consult the FAQ for troubleshooting solutions." );
         }
 
-		// MERGE CONCORDANT FILES (Anna - new June 30,2012)
+        // MERGE CONCORDANT FILES (Anna - new June 30,2012)
         // Only when GASVPRO_FLAG is set AND LIBRARY_SEPARATED is not 'all'
         if( b2g.GASVPRO_OUTPUT ) {
             b2g.mergeConcordantFiles();
         }
-		// (1) Get list of all concordant files.
+        // (1) Get list of all concordant files.
         // (2) Merge all concordant files using Sorter.merge() function. Write to OUTPUT_PREFIX+"_all.concordant
         // (3) Delete all other concordant files
 
@@ -170,7 +171,7 @@ public class BAMToGASV_AMBIG {
      */
     public BAMToGASV_AMBIG( String[] args ) throws IOException {
 
-		// Parse & print arguments.  If arguments didn't parse correctly,
+        // Parse & print arguments.  If arguments didn't parse correctly,
         // then print the usage and exit.
         boolean success = parseArguments( args );
         if( !success ) {
@@ -242,18 +243,6 @@ public class BAMToGASV_AMBIG {
 
         // default for OUTPUT_PREFIX is BAM file name.
         OUTPUT_PREFIX = BAMFILE;
-
-        // Determine whether the BAM file is a URL.
-        IS_URL = false;
-        if( !(new File( BAMFILE ).exists()) ) {
-            try {
-                URL url = new URL( BAMFILE );
-                IS_URL = true;
-            } catch( Exception e ) {
-                System.out.println( "Error! " + BAMFILE + " does not exist." );
-                return false;
-            }
-        }
 
         GASVINPUT = args[1];
 
@@ -339,11 +328,7 @@ public class BAMToGASV_AMBIG {
     public void printArguments() {
         System.out.println( "\n===================================" );
         System.out.println( "Arguments are:" );
-        if( IS_URL ) {
-            System.out.println( "  BAM File URL = " + BAMFILE );
-        } else {
-            System.out.println( "  BAM File = " + BAMFILE );
-        }
+        System.out.println( "  BAM File = " + BAMFILE );
         System.out.println( "  Output Prefix = " + OUTPUT_PREFIX );
         System.out.println( "  Minimum Mapping Quality = " + MAPPING_QUALITY );
         System.out.println( "  Lmin/Lmax Cutoff = \"" + CUTOFF_LMINLMAX + "\"" );
@@ -400,18 +385,8 @@ public class BAMToGASV_AMBIG {
         HashMap<String, String> viewedPlatforms = new HashMap<>();
 
         // open the file and read it.
-        SAMFileReader reader = null;
-        if( !IS_URL ) {
-            reader = new SAMFileReader( new File( BAMFILE ) );
-        } else {
-            try {
-                URL url = new URL( BAMFILE );
-                reader = new SAMFileReader( url, null, false );
-            } catch( Exception e ) {
-                System.out.println( "ERROR: Error reading URL " + BAMFILE + "." );
-                System.exit( -1 );
-            }
-        }
+        SamReader reader = null;
+        reader = SamReaderFactory.makeDefault().open( new File( BAMFILE ) );
 
         // get SAMFileHeader object
         SAMFileHeader header = reader.getFileHeader();
@@ -428,18 +403,18 @@ public class BAMToGASV_AMBIG {
         }
 
         // getReadGroups() returns a list of SAMReadGroupRecords.
-        for ( SAMReadGroupRecord record : header.getReadGroups() ) {
+        for( SAMReadGroupRecord record : header.getReadGroups() ) {
 
             // get platform, library ID, and library name.
             String platform = record.getPlatform();
             String id = record.getId();
             String libname = record.getLibrary();
 
-            if( platform == null || platform.isEmpty( ) ) {
+            if( platform == null || platform.isEmpty() ) {
                 System.out.println( "  WARNING: Platform not specified for library " + libname + ". Proceeding with " + PLATFORM + ". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM." );
             } else if( !platform.toLowerCase().equals( PLATFORM ) ) {
                 System.out.println( "  WARNING: Platform in library " + libname + " is " + platform + ". Proceeding with " + PLATFORM + ". You can specify the platform as Illumina, SOLiD or MatePair using -PLATFORM." );
-            } else if( !platform.isEmpty( ) ) // if platform is non an empty string, we've seen it.
+            } else if( !platform.isEmpty() ) // if platform is non an empty string, we've seen it.
             {
                 viewedPlatforms.put( platform.toLowerCase(), platform );
             }
@@ -461,7 +436,6 @@ public class BAMToGASV_AMBIG {
                 System.out.println( "\t" + iter.next() );
             }
             System.out.println( "Check your BAM/SAM file." );
-            reader.close();
             System.exit( -1 );
         }
 
@@ -472,10 +446,14 @@ public class BAMToGASV_AMBIG {
             LIBRARY_IDS.put( "all", LIBRARY_SEPARATED );
         }
 
-        reader.close();
+        try {
+            reader.close();
+        } catch( IOException ex ) {
+            Exceptions.printStackTrace( ex );
+        }
 
         // Finally, make list of library information
-        for ( String libName : LIBRARY_IDS.values() ) {
+        for( String libName : LIBRARY_IDS.values() ) {
             if( !LIBRARY_NAMES.contains( libName ) ) {
                 LIBRARY_NAMES.add( libName );
             }
@@ -518,7 +496,7 @@ public class BAMToGASV_AMBIG {
     public void fixMates() {
         System.out.println( "Running Fixmate() to pair reads.  When this is done, re-run BAMToGASV.jar with the new BAM file." );
 
-		// NEWBAMFILE is the name of the file that will be fixed if the program runs
+        // NEWBAMFILE is the name of the file that will be fixed if the program runs
         // without error.
         String NEWBAMFILE = OUTPUT_PREFIX + ".fixmate.bam";
 
@@ -551,7 +529,7 @@ public class BAMToGASV_AMBIG {
             System.exit( -1 );
         }
 
-		//File:
+        //File:
         //highQuality/VenterChr17.deletions.highQuality.esps	PR	110	289
         String espName = scan.next();
         String tmpPR = scan.next();
@@ -572,7 +550,7 @@ public class BAMToGASV_AMBIG {
     public void getLminLmax( Library lib ) {
         System.out.println( "Getting Lmin and Lmax for library \"" + lib.name + "\"..." );
 
-		// Step 1: Determine which metric to use.
+        // Step 1: Determine which metric to use.
 
         /// EXACT CUTOFF_LMINLMAX ///
         Matcher match = exact.matcher( CUTOFF_LMINLMAX );
@@ -838,11 +816,11 @@ public class BAMToGASV_AMBIG {
         List<String> tmpFilenames = new ArrayList<>();
 
         // set validation stringency for SAMFileReader.
-        SAMFileReader.setDefaultValidationStringency( STRINGENCY );
+        SamReaderFactory.setDefaultValidationStringency( STRINGENCY );
 
         // Open SAM file, either from the file or from the URL.
-        SAMFileReader inputSam = null;
-        inputSam = new SAMFileReader( new File( BAMFILE ) );
+        SamReader inputSam = null;
+        inputSam = SamReaderFactory.makeDefault().open( new File( BAMFILE ) );
 
         String libname = null;
         for( String libName : LIBRARY_NAMES ) {
@@ -918,7 +896,11 @@ public class BAMToGASV_AMBIG {
          * parseSAMRecordAmbi(samRecord1,samRecord2,lib,FRAGMENT_COUNT); }
          *
          */
-        inputSam.close();
+        try {
+            inputSam.close();
+        } catch( IOException ex ) {
+            Exceptions.printStackTrace( ex );
+        }
         System.out.println( "Done reading BAM file.\n" );
 
         for( String libName : LIBRARY_NAMES ) {
@@ -950,13 +932,13 @@ public class BAMToGASV_AMBIG {
             } // END for each variant
         } // END for each library
 
-		// finish analysis with remaining records in libraries.
+        // finish analysis with remaining records in libraries.
         // FOR EACH LIBRARY:
         // (1) If stats haven't been computed, compute.
         //   FOR EACH VARIANT:
         // (2) Write last temporary file
         // (3) merge temporary files into one sorted file.
-		/* for(int i=0;i<LIBRARY_NAMES.size();i++) { libname =
+        /* for(int i=0;i<LIBRARY_NAMES.size();i++) { libname =
          * LIBRARY_NAMES.get(i); lib = LIBRARY_INFO.get(libname);
          *
          * // (1) If stats haven't been computed, compute. // After reading the
@@ -985,8 +967,8 @@ public class BAMToGASV_AMBIG {
          * if(lib.Lmin == Integer.MIN_VALUE || lib.Lmax == Integer.MIN_VALUE)
          * continue;
          *
-         * // Go through each Variant Type. for(int j=0;j<VARIANTS.length;j++) {
-         * type = VARIANTS[j];
+         * // Go through each Variant Type. for(int j=0;j<VARIANTS.length;j++)
+         * { type = VARIANTS[j];
          *
          * // skip variant types that aren't flagged as "to-write" if(type ==
          * VariantType.CONC && !WRITE_CONCORDANT) continue; if(type ==
@@ -1054,7 +1036,7 @@ public class BAMToGASV_AMBIG {
                         lib.total_RL += s.getReadLength();
                         if( lib.lengthHist.containsKey( insertL ) ) {
                             int tmp = lib.lengthHist.get( insertL );
-                            lib.lengthHist.put(insertL, tmp + 1);
+                            lib.lengthHist.put( insertL, tmp + 1 );
                         } else {
                             lib.lengthHist.put( insertL, 1 );
                         }
@@ -1081,7 +1063,7 @@ public class BAMToGASV_AMBIG {
         // Add line to variant list for this library.
         lib.addLine( type, pobj.createOutputAmbig( type, counter ) );
 
-		// Check to see if we should sort and write tmp file here.
+        // Check to see if we should sort and write tmp file here.
         // Now, sort and write ALL tmp files (all libraries, all types)
         if( lib.rowsForVariant.get( type ).size() >= NUM_LINES_FOR_EXTERNAL_SORT ) {
             for( String libname : LIBRARY_NAMES ) {
@@ -1128,7 +1110,7 @@ public class BAMToGASV_AMBIG {
         // Add line to variant list for this library.
         lib.addLine( type, pobj.createOutput( type ) );
 
-		// Check to see if we should sort and write tmp file here.
+        // Check to see if we should sort and write tmp file here.
         // Now, sort and write ALL tmp files (all libraries, all types)
         if( lib.rowsForVariant.get( type ).size() >= NUM_LINES_FOR_EXTERNAL_SORT ) {
             for( String libname : LIBRARY_NAMES ) {
@@ -1183,7 +1165,6 @@ public class BAMToGASV_AMBIG {
      *
      * }
      */
-
     /**
      * Parse *Special Sam record
      */
@@ -1220,8 +1201,7 @@ public class BAMToGASV_AMBIG {
          * catch (IOException e) { System.out.println("ERROR WHILE WRITING
          * DISCORDANT TMP FILE " + getTmpFileName(lib.name,VAR,curnum) + ". Most
          * likely, the tmp file cannot be created - check the output directory
-         * location."); System.exit(-1); }
-				} */
+         * location."); System.exit(-1); } } */
 
     }
 
@@ -1418,7 +1398,7 @@ public class BAMToGASV_AMBIG {
     public void mergeConcordantFiles() {
         String concordantFile = OUTPUT_PREFIX + "_all.concordant"; // from writeGASVPROInputFile()
 
-		// MERGE CONCORDANT FILES (Anna - new June 30,2012)
+        // MERGE CONCORDANT FILES (Anna - new June 30,2012)
         // Only when GASVPRO_FLAG is set AND LIBRARY_SEPARATED is not 'all'
         // (1) Get list of all concordant files.
         ArrayList<String> concordantfiles = new ArrayList<>();
@@ -1457,7 +1437,7 @@ public class BAMToGASV_AMBIG {
      * library.
      */
     public void writeInfoFile() {
-        try( BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".info" ) ) ) {
+        try(  BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".info" ) ) ) {
 
             writer.write( "LibraryName\tLmin\tLmax\n" );
             for( String libname : LIBRARY_NAMES ) {
@@ -1483,7 +1463,7 @@ public class BAMToGASV_AMBIG {
      * for insertions.
      */
     public void writeGASVInputFile() {
-        try( BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasv.combined.in" ) ) ) {
+        try(  BufferedWriter writer = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasv.combined.in" ) ) ) {
             // append gasv.in to the GASVINPUT and write to .gasv.combined.in
             Scanner scan = new Scanner( new File( GASVINPUT ) );
             while( scan.hasNext() ) {
@@ -1526,7 +1506,7 @@ public class BAMToGASV_AMBIG {
             return;
         }
 
-        try( BufferedWriter writerpro = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasvpro.in" ) ) ) {
+        try(  BufferedWriter writerpro = new BufferedWriter( new FileWriter( OUTPUT_PREFIX + ".gasvpro.in" ) ) ) {
 
             int totalNC = 0;
             float totalGAvgRead = 0;

@@ -152,7 +152,7 @@ public class SnpVcfResultPanel extends ResultTablePanel {
                 int i = 0;
                 rowData = new Object[snpVcfDataSize];
                 rowData[i++] = vc.getSource();
-                rowData[i++] = vc.getChr();
+                rowData[i++] = vc.getContig();
                 rowData[i++] = vc.getStart();
                 rowData[i++] = vc.getEnd();
                 rowData[i++] = vc.getAlleles();

@@ -399,9 +399,9 @@ public class SamBamFileReader implements Observable, Observer {
                                 } //TODO check where ids are needed
                                 Mapping mate;
                                 try {
-                                    mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte( "0" ), new byte[0] );
+                                    mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), Byte.valueOf("0" ), new byte[0] );
                                 } catch( IllegalStateException e ) {
-                                    mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, true, new Byte( "0" ), new byte[0] );
+                                    mate = getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, true, Byte.valueOf("0" ), new byte[0] );
                                 } //TODO get mate data from querried records later
                                 readPairs.get( readPairId ).addPersistentDirectAccessMapping( mapping, mate, readPairType, bothVisible );
                             }

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
-import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
+import htsjdk.samtools.util.FileExtensions;
 import org.openide.modules.ModuleInstall;
 
 
@@ -30,10 +30,10 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         //add more fasta extensions to prevent errors when using such files as reference
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fas" );
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fas.gz" );
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fna" );
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fna.gz" );
+        FileExtensions.FASTA.add( ".fas" );
+        FileExtensions.FASTA.add( ".fas.gz" );
+        FileExtensions.FASTA.add( ".fna" );
+        FileExtensions.FASTA.add( ".fna.gz" );
 //        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".faa"); //amino acids not supported yet
 //        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".faa.gz");
     }
