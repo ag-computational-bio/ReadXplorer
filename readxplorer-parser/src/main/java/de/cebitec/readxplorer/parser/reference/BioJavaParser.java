@@ -81,8 +81,8 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
     // File extension used by Filechooser to choose files to be parsed by this parser
     // name of this parser for use in ComboBoxes
-    private static final String[] EXTENSIONS_EMBL = new String[]{ "embl", "ebl", "EMBL", "EBL" };
-    private static final String[] EXTENSIONS_GBK = new String[]{ "gbk", "gb", "genbank", "GBK", "GB", "GENBANK" };
+    private static final String[] EXTENSIONS_EMBL = new String[]{ "embl", "ebl" };
+    private static final String[] EXTENSIONS_GBK = new String[]{ "gbk", "gb", "genbank" };
     private final String[] fileExtensions = Stream.concat(
             Arrays.stream( EXTENSIONS_EMBL ),
             Arrays.stream( EXTENSIONS_GBK ) ).
@@ -118,7 +118,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
     private boolean isInGivenFormat( final ReferenceJob refGenJob, String[] validExtensions ) {
         boolean isSupported = false;
         for( String extension : validExtensions ) {
-            if( refGenJob.getFile().getName().endsWith( extension ) ) {
+            if( refGenJob.getFile().getName().toLowerCase().endsWith( extension ) ) {
                 isSupported = true;
                 break;
             }
