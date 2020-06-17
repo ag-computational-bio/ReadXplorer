@@ -87,7 +87,9 @@ public class FastaParser extends AbstractBufferedReaderParser<FastaEntry> {
                 sequence.append(line.trim().replaceAll("\\s", ""));
             }
         }
-        handler.handle(new FastaEntry(header.toString(), name.toString(), sequence.toString()));
+        
+        if (header.length() > 0)
+            handler.handle(new FastaEntry(header.toString(), name.toString(), sequence.toString()));
     }
 
     public Collection<String> parseIds() throws IOException {
