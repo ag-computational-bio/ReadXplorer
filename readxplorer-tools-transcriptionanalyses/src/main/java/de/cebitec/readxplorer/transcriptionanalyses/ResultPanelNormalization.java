@@ -191,7 +191,6 @@ public class ResultPanelNormalization extends ResultTablePanel {
         NormHistogramTopComponent normHistogramTopComp = (NormHistogramTopComponent) WindowManager.getDefault().findTopComponent( "NormHistogramTopComponent" );
         String panelName = "Histogram for " + GeneralUtils.generateConcatenatedString( normalizationResult.getTrackNameList(), 20 );
         NormalizedReadCountHist normalizedReadCountHist = new NormalizedReadCountHist( normalizationResult );
-        normalizedReadCountHist.showHistogram();
         normHistogramTopComp.openAnalysisTab( panelName, normalizedReadCountHist );
     }//GEN-LAST:event_histogramButtonActionPerformed
 
