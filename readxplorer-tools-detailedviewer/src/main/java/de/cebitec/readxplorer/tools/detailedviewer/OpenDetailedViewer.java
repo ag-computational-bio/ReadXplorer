@@ -24,14 +24,23 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer
 import de.cebitec.readxplorer.ui.datavisualisation.basepanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
+
+import static java.awt.Component.LEFT_ALIGNMENT;
 
 
 /**
@@ -67,7 +76,9 @@ public final class OpenDetailedViewer implements ActionListener {
 
             if( trackPanels.size() > 1 ) {
                 JList<AbstractViewer> trackList = new JList<>( openTrackViewers.toArray( new AbstractViewer[openTrackViewers.size()] ) );
-                DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation( trackList, NbBundle.getMessage( OpenDetailedViewer.class, "CTL_OpenDetailedViewer" ) );
+                trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                trackList.setBorder(BorderFactory.createTitledBorder("Select track:"));
+                DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage( OpenDetailedViewer.class, "CTL_OpenDetailedViewer" ) );
                 dd.setOptionType( DialogDescriptor.OK_CANCEL_OPTION );
                 DialogDisplayer.getDefault().notify( dd );
                 if( dd.getValue().equals( DialogDescriptor.OK_OPTION ) && !trackList.isSelectionEmpty() ) {
