@@ -57,7 +57,7 @@
 
 
     <properties>
-        <netbeans.version>RELEASE113</netbeans.version>
+        <netbeans.version>RELEASE123</netbeans.version>
         <brandingToken>readxplorer</brandingToken>
         <project.displayname>ReadXplorer</project.displayname>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -271,7 +271,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>4.2.1</version>
+                    <version>5.1.1</version>
                 </plugin>
 
                 <plugin>
