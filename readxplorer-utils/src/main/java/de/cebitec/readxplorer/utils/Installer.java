@@ -30,10 +30,10 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         //add more fasta extensions to prevent errors when using such files as reference
-//        FileExtensions.FASTA.add( ".fas" );
-//        FileExtensions.FASTA.add( ".fas.gz" );
-//        FileExtensions.FASTA.add( ".fna" );
-//        FileExtensions.FASTA.add( ".fna.gz" );
+        FileExtensions.FASTA.add( ".fas" );
+        FileExtensions.FASTA.add( ".fas.gz" );
+        FileExtensions.FASTA.add( ".fna" );
+        FileExtensions.FASTA.add( ".fna.gz" );
     }
 
 
