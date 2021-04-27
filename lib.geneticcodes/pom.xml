@@ -62,16 +62,4 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>artifactory</id>
-            <name>artifactory-releases</name>
-            <url>http://artifactory.cebitec.uni-bielefeld.de/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>artifactory</id>
-            <name>artifactory-snapshots</name>
-            <url>http://artifactory.cebitec.uni-bielefeld.de/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
