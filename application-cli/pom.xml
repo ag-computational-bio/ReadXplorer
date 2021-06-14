@@ -22,6 +22,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>platform</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-centrallookup</artifactId>
         </dependency>
