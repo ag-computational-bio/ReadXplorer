@@ -140,7 +140,7 @@ public final class ProjectConnector implements Observable {
         LOG.info( "Connecting to database" );
 
         this.dbLocation = projectLocation;
-        this.url = "jdbc:h2:" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
+        this.url = "jdbc:h2:" + projectLocation + ";MULTI_THREADED=1;CACHE_SIZE=200000";
 
         connectionPool = JdbcConnectionPool.create( url, "", "" );
         connectionPool.setMaxConnections( 40 );
