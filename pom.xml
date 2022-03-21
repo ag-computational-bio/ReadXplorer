@@ -5,7 +5,7 @@
 
     <groupId>bio.comp.jlu.readxplorer</groupId>
     <artifactId>readxplorer</artifactId>
-    <version>2.3-FINAL</version>
+    <version>2.3.0-FINAL</version>
     <packaging>pom</packaging>
     <name>ReadXplorer</name>
 
